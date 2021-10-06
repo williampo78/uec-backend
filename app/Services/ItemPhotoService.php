@@ -19,8 +19,6 @@ class ItemPhotoService
     public function insertData($data){
         $data['agent_id'] = $this->agent_id;
         $data['created_at'] = date("Y-m-d H:i:s");
-//        $data['sort'] = $photo_count;
-
         Item::insert($data);
 
         try {
