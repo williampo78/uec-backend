@@ -42,7 +42,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.php">健康力公司</a>
+                    <a class="navbar-brand" href="/backend">健康力公司</a>
                 </div>
                 <ul class="nav navbar-nav">
                     <!-- <li><a href="index.php"><i class="fa fa-home fa-fw"></i> 首頁</a></li> -->
@@ -53,7 +53,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="index.php?func=warehouse">
+                                <a href="{{route('warehouse')}}">
                                     <i class="fa fa-database fa-fw"></i>
                                     倉庫維護 </a>
                             </li>
@@ -68,7 +68,7 @@
                                     客戶資料 </a>
                             </li>
                             <li>
-                                <a href="index.php?func=supplier_type">
+                                <a href="{{route('supplier_type')}}">
                                     <i class="fa fa-cubes fa-fw"></i>
                                     供應商類別管理 </a>
                             </li>
@@ -405,7 +405,7 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        <li><a href="/admin"><i class="fa fa-home fa-fw"></i> 首頁</a></li>
+                        <li><a href="/backend"><i class="fa fa-home fa-fw"></i> 首頁</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">

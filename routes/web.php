@@ -5,6 +5,7 @@ use App\Http\Controllers\ItemControllers;
 use App\Http\Controllers\LoginAuthController;
 use App\Http\Controllers\DepartmentControllers;
 use App\Http\Controllers\SupplierTypeControllers ;
+use App\Http\Controllers\WarehouseController ;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +24,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signout');
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
-    Route::resource('/warehouse',\App\Http\Controllers\WarehouseController::class);
+    Route::resource('/warehouse',WarehouseController::class, ['names' => ['index' => 'warehouse']]);
     Route::resource('/department', DepartmentControllers::class, ['names' => ['index' => 'department']]);
     Route::resource('/supplier_type', SupplierTypeControllers::class, ['names' => ['index' => 'supplier_type']]);
 });
