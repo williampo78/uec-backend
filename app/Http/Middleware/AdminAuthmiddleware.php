@@ -19,7 +19,7 @@ class AdminAuthmiddleware
         if(Auth::check()){
             return $next($request);
         }else{
-            return Redirect('login');
+            return Redirect('/');
         }
     }
 }

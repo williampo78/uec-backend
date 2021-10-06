@@ -16,7 +16,7 @@ class LoginAuthController extends Controller
         if(!Auth::check()){
             return view('login');
         }else{
-            return Redirect('login');
+            return Redirect('backend');
         }
     }
 
@@ -36,7 +36,7 @@ class LoginAuthController extends Controller
         if ($user) {
             Auth::login($user);
 
-            return redirect()->intended('admin')
+            return redirect()->intended('backend')
                 ->withSuccess('Signed in');
         }
 
@@ -89,6 +89,8 @@ class LoginAuthController extends Controller
     public function signOut() {
         Session::flush();
         Auth::logout();
-        return Redirect('login');
+
+        dd(1);
+        return Redirect('/');
     }
 }

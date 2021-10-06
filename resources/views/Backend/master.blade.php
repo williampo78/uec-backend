@@ -415,7 +415,7 @@
                                 <li><a href="index.php?func=user"><i class="fa fa-user fa-fw"></i> 個人資料</a></li>
 
                                 <li class="divider"></li>
-                                <li><a href="index.php?func=logout"><i class="fa fa-sign-out fa-fw"></i> 登出</a></li>
+                                <li><a href="{{route('signOut')}}"><i class="fa fa-sign-out fa-fw"></i> 登出</a></li>
                             </ul>
                         </li>
                     </ul>
