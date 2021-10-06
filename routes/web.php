@@ -3,7 +3,10 @@
 use App\Http\Controllers\AdminControllers;
 use App\Http\Controllers\ItemControllers;
 use App\Http\Controllers\LoginAuthController;
+use App\Http\Controllers\DepartmentControllers;
+use App\Http\Controllers\SupplierTypeControllers ;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WarehouseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,11 +21,13 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/', [AdminControllers::class, 'index']);
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
+    Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signout');
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
-    Route::resource('/warehouse',\App\Http\Controllers\WarehouseController::class);
+    Route::resource('/warehouse',WarehouseController::class);
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
-
+    Route::resource('/department', DepartmentControllers::class, ['names' => ['index' => 'department']]);
+    Route::resource('/supplier_type', SupplierTypeControllers::class, ['names' => ['index' => 'supplier_type']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
