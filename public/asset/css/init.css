@@ -1,0 +1,88 @@
+﻿body 
+{
+	font-family: Segoe UI Light, 微軟正黑體;
+	font-weight: bold;
+	/*background-color: #eee;*/
+}
+
+/* 停用或作廢時顯示 */
+.tr-deactive
+{
+	background-color:#AAAAAA !important;
+	color:#FFFFFF !important;
+}
+
+.form-signin 
+{
+	max-width: 330px;
+	padding: 15px;
+	margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox 
+{
+	margin-bottom: 10px;
+}
+.form-signin .checkbox 
+{
+	font-weight: normal;
+}
+.form-signin .form-control 
+{
+	position: relative;
+	height: auto;
+	-webkit-box-sizing: border-box;
+		 -moz-box-sizing: border-box;
+			box-sizing: border-box;
+	padding: 10px;
+	font-size: 1.2em;
+}
+.form-signin .form-control:focus 
+{
+	z-index: 2;
+}
+table.dataTable thead .sorting 
+{
+	background:none;
+}
+table.dataTable thead .sorting_asc 
+{
+	background:none;
+}
+table.dataTable thead .sorting_desc 
+{
+	background:none;
+}
+span.select2-container 
+{
+	width: 100% !important;
+	position: relative;
+}
+.modal-dialog
+{
+	width: 90%;
+	max-width: 900px;
+	margin:0 auto;
+	margin-top:10px;
+}
+.vcenter 
+{
+	display: inline-block;
+	vertical-align: middle;
+	float: none;
+}
+span.error 
+{ 
+	color: red; 
+	display: inline-block;
+	margin-left: 10px ;
+}
+inline
+{
+	display:inline;
+}
+.add_row
+{
+	margin-top: 5px ;
+	margin-bottom: 5px ;border-left-width: 8px;
+}
