@@ -29,6 +29,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/supplier_type', SupplierTypeControllers::class, ['names' => ['index' => 'supplier_type']]);
 });
 
-Route::get('login', [LoginAuthController::class, 'index'])->name('login');
+Route::get('/', [LoginAuthController::class, 'index'])->name('login');
 Route::post('custom-login', [LoginAuthController::class, 'customLogin'])->name('login.custom');
 Route::post('custom-registration', [LoginAuthController::class, 'customRegistration'])->name('register.custom');
