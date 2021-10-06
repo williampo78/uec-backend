@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/', [AdminControllers::class, 'index']);
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
-    Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signout');
+    Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
     Route::resource('/warehouse',WarehouseController::class, ['names' => ['index' => 'warehouse']]);
