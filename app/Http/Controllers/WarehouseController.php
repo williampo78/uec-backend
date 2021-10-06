@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use App\Services\PermissionService;
 
-class AdminControllers extends Controller
+class WarehouseController extends Controller
 {
-    protected $PermissionService;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct(PermissionService $permission)
+    public function __construct()
     {
-        $this->permission = $permission;
+
+
     }
     public function index()
     {
-//        $user = Auth::user();
-        return view('Backend.example');
+        $data = Warehouse::all();
+
+        return view('Backend.warehouse.list', compact('data'));
     }
 
     /**
@@ -32,7 +32,7 @@ class AdminControllers extends Controller
      */
     public function create()
     {
-        //
+        return view('backend.warehouse.add');
     }
 
     /**
@@ -43,7 +43,14 @@ class AdminControllers extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $route_name = 'warehouse.index';
+        $act = 'add';
+        $data = $request->all();
+        $data['agent_id'] = Auth::user()->agent_id;
+        unset($data['_token']);
+        $rs = Warehouse::insert($data);
+
+        return view('backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -54,7 +61,7 @@ class AdminControllers extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
@@ -65,7 +72,9 @@ class AdminControllers extends Controller
      */
     public function edit($id)
     {
-        //
+        $data = Warehouse::find($id);
+
+        return view('backend.warehouse.upd', compact('data'));
     }
 
     /**
@@ -77,7 +86,13 @@ class AdminControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = $request->except('_token' , '_method');
+        $data['updated_by'] = Auth::user()->id;
+
+        Warehouse::where('id' ,$id)->update($data);
+        $route_name = 'warehouse.index';
+        $act = 'upd';
+        return view('backend.success', compact('route_name' , 'act'));
     }
 
     /**
@@ -89,12 +104,5 @@ class AdminControllers extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function signOut() {
-        Session::flush();
-        Auth::logout();
-
-        return Redirect('login');
     }
 }

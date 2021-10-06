@@ -15,13 +15,16 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
  */
-Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
+Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/', [AdminControllers::class, 'index']);
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signout');
+
+    Route::resource('/warehouse',\App\Http\Controllers\WarehouseController::class);
 });
+
 Route::get('login', [LoginAuthController::class, 'index'])->name('login');
 Route::post('custom-login', [LoginAuthController::class, 'customLogin'])->name('login.custom');
 Route::post('custom-registration', [LoginAuthController::class, 'customRegistration'])->name('register.custom');

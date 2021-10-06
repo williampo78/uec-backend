@@ -1,13 +1,20 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Services\CategoryService;
+use App\Services\ItemService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ItemControllers extends Controller
 {
-    public function __construct()
-    {
+    private $itemService;
+    private $categoryService;
 
+    public function __construct(ItemService $itemService, CategoryService $categoryService)
+    {
+        $this->itemService = $itemService;
+        $this->categoryService = $categoryService;
     }
     /**
      * Display a listing of the resource.
@@ -16,7 +23,13 @@ class ItemControllers extends Controller
      */
     public function index()
     {
-        return view('Backend.Item.list') ;
+        $item = $this->itemService->getItem(1);
+        $category = $this->categoryService->getCategory();
+
+        $data['item'] = $item;
+        $data['category'] = $category;
+
+        return view('Backend.Item.list' , compact('data'));
     }
 
     /**
@@ -59,7 +72,7 @@ class ItemControllers extends Controller
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**

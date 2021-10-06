@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AgentConfig;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 
 class CategoryService
@@ -15,8 +16,8 @@ class CategoryService
     public function getCategory()
     {
         $agent_id = Auth::user()->agent_id;
-        $agentConfig = AgentConfig::where('agent_id' , $agent_id)->where('key' , 'setting')->first()->toArray();
+        $category = Category::where('agent_id' , $agent_id)->get();
 
-        return $agentConfig;
+        return $category;
     }
 }

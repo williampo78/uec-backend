@@ -14,11 +14,10 @@ use Illuminate\Support\Facades\DB;
 class ItemService
 {
     private $agentConfigService;
-    private $agent_id;
+
     public function __construct(AgentConfigService $agentConfigService)
     {
         $this->agentConfigService = $agentConfigService;
-        $this->agent_id = Auth::user()->agent_id;
     }
 
     //  自動重新計算庫存數量
@@ -73,6 +72,8 @@ class ItemService
     }
 
     public function getItem($category){
+        $agent_id = Auth::user()->agent_id;
+
         if($category != "%" and $category != "" )
             $where_type = " and item.active = '".$category."'";
         else if($category == "%"){
@@ -96,12 +97,12 @@ class ItemService
                           from stock_log
                           where type = 'purchase'
                           and item_price != 0
-                          and agent_id = '".$this->agent_id."'
+                          and agent_id = '".$agent_id."'
                           group by stock_log.item_id
                         ) as table_log on table_log.max_id = stock_log.id
                         where table_log.max_id is not null
                       ) as log_table on log_table.item_id = item.id
-                      where item.agent_id = '".$this->agent_id."'
+                      where item.agent_id = '".$agent_id."'
                       and category.id like  '".$category."'
                       ".$where_type."
                       order by item.number , item.brand , item.name , item.spec
