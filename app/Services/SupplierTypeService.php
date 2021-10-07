@@ -10,8 +10,13 @@ class SupplierTypeService
     {
     }
 
-    public function Get_All()
+    public function Get_All($request)
     {
+        // dump($request->input());
+        // order_by DESC OR ASC 
+        // who order_by ? name or code ?
+        // page function 
+        // view data Number 
         return SupplierType::All()->toArray();
     }
     public function Get($SupplierType_id)
@@ -30,6 +35,5 @@ class SupplierTypeService
         $SupplierType->name = $inputData['name'];
         $SupplierType->code = $inputData['code'];
         return $SupplierType->save();
-
     }
 }
