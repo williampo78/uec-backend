@@ -35,7 +35,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_select_end_date">
                                             <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="select_end_date" id="select_end_date" value="'$select_end_date'"/>
+                                                <input type='text' class="form-control" name="select_end_date" id="select_end_date" value=""/>
                                                 <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"></span>
                           </span>
@@ -94,43 +94,46 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <?php
 
-//
-//                                if($data['status'] == "1")
-//                                    $ShowStatus = "<i class='btn btn-circle btn-success fa fa-check'></i>";
-//                                else
-//                                    $ShowStatus = "<i class='btn btn-circle btn-danger fa fa-close'></i>";
-//
-//                                $ShowActiveColor = "";
-//                                if($data['is_transfer'] == "1")
-//                                {
-//                                    $ShowActive = "<i class='btn btn-circle btn-success fa fa-check' title='已完成'> </i>";
-//                                }
-//                                elseif($data['active'] == "1")
-//                                {
-//                                    $ShowActive = "<i class='btn btn-circle btn-info fa fa-hourglass-half' title='待處理'> </i>";
-//                                }
-//                                else
-//                                {
-//                                    $ShowActiveColor = " class='tr-deactive'";
-//                                    $ShowActive = "<i class='btn btn-circle btn-danger fa fa-close' title='作廢'></i>";
-//                                }
-//
-//                                echo '<tr '.$ShowActiveColor.'>
-?>
-                            <td>
-                              <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="'.$data['id'].'" onclick="row_detail('.$data['id'].');"><i class="fa fa-search"></i></button>
-                            </td>
-                            <td>data['trade_date']</td>
-                            <td>'.$data['number'].'</td>
-                            <td>'.$data['department_name'].'</td>
-                            <td>'.$data['supplier_name'].'</td>
-                            <td>'.$data['total_price'].'</td>
-                            <td>'.$data['warehouse_name'].'</td>
-                            <td>'.$ShowActive.'</td>
-                          </tr>
+                            @foreach($data as $k => $v)
+                                <?php
 
+                                    if($v['status'] == "1")
+                                        $ShowStatus = "<i class='btn btn-circle btn-success fa fa-check'></i>";
+                                    else
+                                        $ShowStatus = "<i class='btn btn-circle btn-danger fa fa-close'></i>";
+
+                                    $ShowActiveColor = "";
+                                    if($v['is_transfer'] == "1")
+                                    {
+                                        $ShowActive = "<i class='btn btn-circle btn-success fa fa-check' title='已完成'> </i>";
+                                    }
+                                    elseif($v['active'] == "1")
+                                    {
+                                        $ShowActive = "<i class='btn btn-circle btn-info fa fa-hourglass-half' title='待處理'> </i>";
+                                    }
+                                    else
+                                    {
+                                        $ShowActiveColor = " class='tr-deactive'";
+                                        $ShowActive = "<i class='btn btn-circle btn-danger fa fa-close' title='作廢'></i>";
+                                    }
+
+                                    echo '<tr '.$ShowActiveColor.'>'
+                                ?>
+
+                                <td>
+                                  <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
+                                </td>
+                                <td>{{ $v['trade_date'] }}</td>
+                                <td>{{ $v['number'] }}</td>
+                                <td>{{ $v['department_name'] }}</td>
+                                <td>{{ $v['supplier_name'] }}</td>
+                                <td>{{ $v['total_price'] }}</td>
+                                <td>{{ $v['warehouse_name'] }}</td>
+                                <td><?php echo $ShowActive; ?></td>
+                            @endforeach
+
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -138,4 +141,5 @@
             </div>
         </div>
     </div>
+    @include('Backend.RequisitionsPurchase.detail')
 @endsection

@@ -33,6 +33,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/primary_category',PrimaryCategoryController::class, ['names' => ['index' => 'primary_category']]);
     Route::resource('/category',CategoryController::class, ['names' => ['index' => 'category']]);
     Route::resource('/requisitions_purchase',RequisitionsPurchaseController::class, ['names' => ['index' => 'requisitions_purchase']]);
+    Route::post('/requisitions_purchase/ajax',[RequisitionsPurchaseController::class,'ajax']);
+
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

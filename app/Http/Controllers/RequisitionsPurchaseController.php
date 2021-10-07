@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\PrimaryCategory;
-use App\Services\CategoryService;
+use App\Services\RequisitionsPurchaseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use phpDocumentor\Reflection\Type;
 
 class RequisitionsPurchaseController extends Controller
 {
@@ -17,15 +16,19 @@ class RequisitionsPurchaseController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function __construct()
-    {
+    private $requisitionsPurchaseService;
 
+    public function __construct(RequisitionsPurchaseService $requisitionsPurchaseService)
+    {
+        $this->requisitionsPurchaseService = $requisitionsPurchaseService;
     }
+
     public function index()
     {
-//        if($_GET['active'] != "%" and $_GET['active'] != "" )
-//            $where_type = " and requisitions_purchase.active = '".mysql_escape_string($_GET['active'])."'";
-        return view('Backend.RequisitionsPurchase.list');
+        $params['active'] = 0;
+        $data = $this->requisitionsPurchaseService->getRequisitionsPurchase($params);
+
+        return view('Backend.RequisitionsPurchase.list' , compact('data'));
     }
 
     /**
@@ -114,5 +117,17 @@ class RequisitionsPurchaseController extends Controller
     {
         //
 
+    }
+
+    public function ajax(Request $request){
+        $rs = $request->all();
+
+        if ($rs['get_type']==='requisitions_purchase'){
+            $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($rs['id']);
+            echo "OK@@".json_encode($data);
+        }elseif($rs['get_type']==='requisitions_purchase_detail'){
+            $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($rs['id']);
+            echo "OK@@".json_encode($data);
+        }
     }
 }
