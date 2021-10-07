@@ -119,7 +119,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown active">
+                        <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                                 aria-expanded="false">
                                 <i class="fa fa-truck fa-fw"></i> 進銷存 <span class="caret"></span>
@@ -136,12 +136,12 @@
                                         採購單 </a>
                                 </li>
                                 <li>
-                                    <a href="index.php?func=purchase_acceptance" class="active">
+                                    <a href="index.php?func=purchase_acceptance">
                                         <i class="fa fa-sign-in fa-fw"></i>
                                         驗收單 </a>
                                 </li>
                                 <li>
-                                    <a href="index.php?func=purchase" class="active">
+                                    <a href="index.php?func=purchase">
                                         <i class="fa fa-sign-in fa-fw"></i>
                                         進貨單 </a>
                                 </li>
