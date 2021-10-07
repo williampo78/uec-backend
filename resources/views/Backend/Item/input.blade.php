@@ -17,14 +17,14 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form role="form" id="new-form" method="post" action="" enctype="multipart/form-data">
-
+                        <form role="form" id="new-form" method="POST" action="{{ route('item') }}"
+                            enctype="multipart/form-data" novalidate="novalidate">
+                            @csrf
                             <ul class="nav nav-tabs">
                                 <li class="active"><a data-toggle="tab" href="#menu_main">基本資料</a></li>
                                 <li><a data-toggle="tab" href="#menu_photo">產品照片</a></li>
                             </ul>
                             <br>
-
                             <div class="tab-content">
                                 <div id="menu_photo" class="tab-pane fade">
                                     <div class="row">
@@ -154,6 +154,9 @@
                                                 <div class="form-group" id="div_category">
                                                     <label for="category">分類</label>
                                                     <select class="form-control js-select2" name="category" id="category">
+                                                        @foreach ($category as $val)
+                                                            <option value='{{ $val->id }}'>{{ $val->name }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>
@@ -357,10 +360,10 @@
                                 <div class="col-sm-6">
                                     <h4><i class="fa fa-th-large"></i> 商品規格</h4>
                                     <textarea class="form-control" rows="5" name="specification" placeholder="例如:
-                                    產地：台灣
-                                    適用族群：老年人、嬰幼兒、兒童、成人、通用
-                                    核准字號：衛署醫器製壹字第002376號　
-                                    "></textarea>
+                                            產地：台灣
+                                            適用族群：老年人、嬰幼兒、兒童、成人、通用
+                                            核准字號：衛署醫器製壹字第002376號　
+                                            "></textarea>
                                 </div>
                             </div>
 

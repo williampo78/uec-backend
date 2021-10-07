@@ -37,7 +37,8 @@ class ItemControllers extends Controller
      */
     public function create()
     {
-        return view('Backend.Item.input');
+        $result['category']  = $this->categoryService->getCategory();
+        return view('Backend.Item.input',$result);
     }
 
     /**
@@ -48,7 +49,7 @@ class ItemControllers extends Controller
      */
     public function store(Request $request)
     {
-        //
+        dd($request->input());
     }
 
     /**
@@ -70,6 +71,7 @@ class ItemControllers extends Controller
      */
     public function edit($id)
     {
+        
         return view('Backend.Item.input');
     }
 
