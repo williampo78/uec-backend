@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AgentConfig;
 use App\Models\Category;
+use App\Models\PrimaryCategory;
 use Illuminate\Support\Facades\Auth;
 
 class CategoryService
@@ -19,5 +20,18 @@ class CategoryService
         $category = Category::where('agent_id' , $agent_id)->get();
 
         return $category;
+    }
+
+    public function getPrimaryCategoryForList(){
+        $rs = PrimaryCategory::all();
+        $data = [];
+        foreach ($rs as $k => $v){
+            $data[$v['id']] = [
+                'name' => $v['name'] ,
+                'number' => $v['number']
+            ];
+        }
+
+        return $data;
     }
 }

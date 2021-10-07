@@ -2,27 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Warehouse;
+use App\Models\Category;
+use App\Models\PrimaryCategory;
+use App\Services\CategoryService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class WarehouseController extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct()
+
+    private $categoryService;
+
+    public function __construct(CategoryService $categoryService)
     {
-
-
+        $this->categoryService = $categoryService;
     }
     public function index()
     {
-        $data = Warehouse::all();
+        $data = Category::all();
+        $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
 
-        return view('Backend.warehouse.list', compact('data'));
+        return view('Backend.Category.list', compact('data','primary_category_list'));
     }
 
     /**
@@ -32,7 +39,9 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        return view('backend.warehouse.add');
+        $agent_id = Auth::user()->agent_id;
+        $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
+        return view('Backend.Category.add' , compact('primary_category'));
     }
 
     /**
@@ -43,12 +52,14 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'warehouse';
+        $route_name = 'category';
         $act = 'add';
-        $data = $request->all();
+        $data = $request->except('_token');
         $data['agent_id'] = Auth::user()->agent_id;
-        unset($data['_token']);
-        $rs = Warehouse::insert($data);
+        $data['created_by'] = Auth::user()->id;
+        $data['created_at'] = Carbon::now();
+
+        $rs = Category::insert($data);
 
         return view('backend.success' , compact('route_name','act'));
     }
@@ -72,9 +83,10 @@ class WarehouseController extends Controller
      */
     public function edit($id)
     {
-        $data = Warehouse::find($id);
+        $data = Category::find($id);
+        $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
 
-        return view('backend.warehouse.upd', compact('data'));
+        return view('Backend.PrimaryCategory.upd', compact('data' , 'primary_category_list'));
     }
 
     /**
@@ -88,9 +100,10 @@ class WarehouseController extends Controller
     {
         $data = $request->except('_token' , '_method');
         $data['updated_by'] = Auth::user()->id;
+        $data['updated_at'] = Carbon::now();
 
-        Warehouse::where('id' ,$id)->update($data);
-        $route_name = 'warehouse';
+        Category::where('id' ,$id)->update($data);
+        $route_name = 'category';
         $act = 'upd';
         return view('backend.success', compact('route_name' , 'act'));
     }
@@ -104,5 +117,6 @@ class WarehouseController extends Controller
     public function destroy($id)
     {
         //
+
     }
 }

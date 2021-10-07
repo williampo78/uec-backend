@@ -78,12 +78,12 @@
                                     客戶類別管理 </a>
                             </li>
                             <li>
-                                <a href="index.php?func=primary_category">
+                                <a href="{{route('primary_category')}}">
                                     <i class="fa fa-cubes fa-fw"></i>
                                     主分類管理 </a>
                             </li>
                             <li>
-                                <a href="index.php?func=category">
+                                <a href="{{route('category')}}">
                                     <i class="fa fa-cubes fa-fw"></i>
                                     子分類管理 </a>
                             </li>
