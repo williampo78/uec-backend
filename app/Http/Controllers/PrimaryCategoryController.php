@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Warehouse;
+use App\Models\PrimaryCategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class WarehouseController extends Controller
+class PrimaryCategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,9 +21,9 @@ class WarehouseController extends Controller
     }
     public function index()
     {
-        $data = Warehouse::all();
+        $data = PrimaryCategory::all();
 
-        return view('Backend.warehouse.list', compact('data'));
+        return view('Backend.PrimaryCategory.list', compact('data'));
     }
 
     /**
@@ -32,7 +33,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        return view('backend.warehouse.add');
+        return view('Backend.PrimaryCategory.add');
     }
 
     /**
@@ -43,12 +44,14 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'warehouse';
+        $route_name = 'primary_category';
         $act = 'add';
-        $data = $request->all();
+        $data = $request->except('_token');
         $data['agent_id'] = Auth::user()->agent_id;
-        unset($data['_token']);
-        $rs = Warehouse::insert($data);
+        $data['created_by'] = Auth::user()->id;
+        $data['created_at'] = Carbon::now();
+
+        $rs = PrimaryCategory::insert($data);
 
         return view('backend.success' , compact('route_name','act'));
     }
@@ -72,9 +75,9 @@ class WarehouseController extends Controller
      */
     public function edit($id)
     {
-        $data = Warehouse::find($id);
+        $data = PrimaryCategory::find($id);
 
-        return view('backend.warehouse.upd', compact('data'));
+        return view('Backend.PrimaryCategory.upd', compact('data'));
     }
 
     /**
@@ -89,8 +92,8 @@ class WarehouseController extends Controller
         $data = $request->except('_token' , '_method');
         $data['updated_by'] = Auth::user()->id;
 
-        Warehouse::where('id' ,$id)->update($data);
-        $route_name = 'warehouse';
+        PrimaryCategory::where('id' ,$id)->update($data);
+        $route_name = 'primary_category';
         $act = 'upd';
         return view('backend.success', compact('route_name' , 'act'));
     }
@@ -104,5 +107,6 @@ class WarehouseController extends Controller
     public function destroy($id)
     {
         //
+
     }
 }

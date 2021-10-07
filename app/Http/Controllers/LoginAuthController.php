@@ -87,7 +87,6 @@ class LoginAuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        dd(1);
         return Redirect('/');
     }
 }

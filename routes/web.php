@@ -6,6 +6,8 @@ use App\Http\Controllers\LoginAuthController;
 use App\Http\Controllers\DepartmentControllers;
 use App\Http\Controllers\SupplierTypeControllers ;
 use App\Http\Controllers\WarehouseController ;
+use App\Http\Controllers\PrimaryCategoryController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +29,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/warehouse',WarehouseController::class, ['names' => ['index' => 'warehouse']]);
     Route::resource('/department', DepartmentControllers::class, ['names' => ['index' => 'department']]);
     Route::resource('/supplier_type', SupplierTypeControllers::class, ['names' => ['index' => 'supplier_type']]);
+    Route::resource('/primary_category',PrimaryCategoryController::class, ['names' => ['index' => 'primary_category']]);
+    Route::resource('/category',CategoryController::class, ['names' => ['index' => 'category']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
