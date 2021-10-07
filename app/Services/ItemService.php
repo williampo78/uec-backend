@@ -83,38 +83,35 @@ class ItemService
         }
 
         $where_type = '';
-        $cmd = "select item.* ,  category.name as category_name , supplier.name as supplier_name, log_table.last_price as last_price
-                      from item
-                      left join category on item.category_id = category.id
-                      left join supplier on item.supplier_id = supplier.id
-                      left join
-                      (
-                        select item_id, item_number, item_price as last_price
-                        from stock_log
-                        left join
-                        (
-                          select max(stock_log.id) as max_id
+
+        $log_table = DB::table('stock_log')->select('item_id' , 'item_number' , DB::raw('item_price as last_price'))
+        ->leftJoin(DB::raw("(select max(stock_log.id) as max_id
                           from stock_log
                           where type = 'purchase'
                           and item_price != 0
                           and agent_id = '".$agent_id."'
                           group by stock_log.item_id
-                        ) as table_log on table_log.max_id = stock_log.id
-                        where table_log.max_id is not null
-                      ) as log_table on log_table.item_id = item.id
-                      where item.agent_id = '".$agent_id."'
-                      and category.id like  '".$category."'
-                      ".$where_type."
-                      order by item.number , item.brand , item.name , item.spec
-                      ";
+                        ) as table_log") ,
+            function($join) {
+                $join->on('table_log.max_id', '=', 'stock_log.id');
+            })
+            ->whereNotNull('table_log.max_id');
 
-        try {
-            $result = DB::select($cmd);
-        }catch (\Exception $e){
-            Log::info($e);
-        }
+        $rs = Item::select(DB::raw('item.*'))
+                    ->leftJoin('category' , 'item.category_id' , '=' , 'category.id')
+                    ->leftJoin('supplier' , 'item.supplier_id' , '=' , 'supplier.id')
+                    ->leftJoinSub($log_table , 'log_table' , function ($join){
+                        $join->on('log_table.item_id' , '=' , 'item.id');
+                    })
+                    ->where('item.agent_id' , $agent_id)
+                    ->where('category.id' , 'like' , $category.$where_type)
+                    ->orderBy('item.number')
+                    ->orderBy('item.brand')
+                    ->orderBy('item.name')
+                    ->orderBy('item.spec')
+                    ->get();
 
-        return $result;
+        return $rs;
     }
 
     public function insertData($data){
