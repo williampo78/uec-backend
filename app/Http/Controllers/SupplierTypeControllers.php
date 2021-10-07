@@ -17,10 +17,10 @@ class SupplierTypeControllers extends Controller
     {
         $this->SupplierTypeService = $SupplierTypeService;
     }
-    public function index()
+    public function index(Request $request)
     {
         $result = [];
-        $result['SupplierTypeService'] = $this->SupplierTypeService->Get_All();
+        $result['SupplierTypeService'] = $this->SupplierTypeService->Get_All($request);
         return view('Backend.SupplierType.list', $result);
     }
 
@@ -47,7 +47,6 @@ class SupplierTypeControllers extends Controller
             'code' => 'required',
             'name' => 'required',
         ]);
-
         $this->SupplierTypeService->Add($inputData);
 
         return redirect(route('supplier_type'));
