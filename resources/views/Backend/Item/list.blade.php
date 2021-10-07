@@ -48,8 +48,8 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-2">
-                                <a href="/item/create" class="btn btn-block btn-warning btn-sm" id="btn-new"><i
-                                        class="fa fa-plus"></i> 新增物品</a>
+                                <a href="{{ route('item') }}/create" class="btn btn-block btn-warning btn-sm"
+                                    id="btn-new"><i class="fa fa-plus"></i> 新增物品</a>
                             </div>
                             <div class="col-sm-10 text-right">
                             </div>
@@ -71,7 +71,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-
+                                @foreach ($item as $val)
+                                    <tr role="row">
+                                        <td>
+                                            <a href="{{ route('item') }}/{{ $val->id }}/edit"
+                                                class="btn btn-block btn-info btn-sm"><i class="fa fa-pencil"></i>
+                                                編輯</a>
+                                        </td>
+                                        <td>{{ $val->number }}</td>
+                                        <td>{{ $val->supplier_name }}</td>
+                                        <td>{{ $val->brand }}</td>
+                                        <td>{{ $val->name }}</td>
+                                        <td>{{ $val->spec }}</td>
+                                        <td>{{ $val->last_price }}</td>
+                                        <td>{{ $val->sell_price1 }}</td>
+                                        <td>{{ $val->stock_qty }}</td>
+                                        <td>{{ $val->small_unit }}</td>
+                                        <td>{{ $val->active }}</td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -81,4 +99,3 @@
         </div>
     </div>
 @endsection
-

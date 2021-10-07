@@ -21,15 +21,13 @@ class ItemControllers extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $item = $this->itemService->getItem(1);
         $category = $this->categoryService->getCategory();
-
         $data['item'] = $item;
         $data['category'] = $category;
-
-        return view('Backend.Item.list' , compact('data'));
+        return view('Backend.Item.list' , $data);
     }
 
     /**
@@ -72,7 +70,7 @@ class ItemControllers extends Controller
      */
     public function edit($id)
     {
-
+        return view('Backend.Item.input');
     }
 
     /**

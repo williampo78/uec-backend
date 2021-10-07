@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\SupplierType;
+use Illuminate\Support\Facades\Log;
 
 class SupplierTypeService
 {
@@ -13,27 +14,42 @@ class SupplierTypeService
     public function Get_All($request)
     {
         // dump($request->input());
-        // order_by DESC OR ASC 
+        // order_by DESC OR ASC
         // who order_by ? name or code ?
-        // page function 
-        // view data Number 
-        return SupplierType::All()->toArray();
+        // page function
+        // view data Number
+
+        return optional(SupplierType::All())->toArray();
     }
     public function Get($SupplierType_id)
     {
-        return SupplierType::find($SupplierType_id)->toArray();
+        try {
+            return SupplierType::find($SupplierType_id)->toArray();
+
+        } catch (\Exception $e) {
+            Log::info($e);
+        }
     }
     public function Add($inputData)
     {
-        return $user = SupplierType::create(
-            ['name' => $inputData['name'], 'code' => $inputData['code'], 'agent_id' => '1'],
-        );
+        try {
+            return $user = SupplierType::create(
+                ['name' => $inputData['name'], 'code' => $inputData['code'], 'agent_id' => '1'],
+            );
+        } catch (\Exception $e) {
+            Log::info($e);
+        }
+
     }
     public function Update($inputData, $id)
     {
         $SupplierType = SupplierType::find($id);
         $SupplierType->name = $inputData['name'];
         $SupplierType->code = $inputData['code'];
-        return $SupplierType->save();
+        try {
+            return $SupplierType->save();
+        } catch (\Exception $e) {
+            Log::info($e);
+        }
     }
 }

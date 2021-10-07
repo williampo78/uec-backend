@@ -45,6 +45,9 @@
                         <a class="navbar-brand" href="/backend">健康力公司</a>
                     </div>
                     <ul class="nav navbar-nav">
+                        <li><a href="/backend"><i class="fa fa-home fa-fw"></i> 首頁</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav">
                         <!-- <li><a href="index.php"><i class="fa fa-home fa-fw"></i> 首頁</a></li> -->
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -73,11 +76,6 @@
                                         供應商類別管理 </a>
                                 </li>
                                 <li>
-                                    <a href="index.php?func=client_type">
-                                        <i class="fa fa-cubes fa-fw"></i>
-                                        客戶類別管理 </a>
-                                </li>
-                                <li>
                                     <a href="{{ route('primary_category') }}">
                                         <i class="fa fa-cubes fa-fw"></i>
                                         主分類管理 </a>
@@ -88,38 +86,18 @@
                                         子分類管理 </a>
                                 </li>
                                 <li>
-                                    <a href="/admin/product">
+                                    <a href="{{route('item')}}">
                                         <i class="fa fa-cube fa-fw"></i>
                                         物品管理 </a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a href="index.php?func=bank">
                                         <i class="fa fa-bank fa-fw"></i>
                                         銀行管理 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=common_word">
-                                        <i class="fa fa-archive fa-fw"></i>
-                                        常用字管理 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=common_contacts">
-                                        <i class="fa fa-book fa-fw"></i>
-                                        常用通訊錄 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=exchange_rate">
-                                        <i class="fa fa-money fa-fw"></i>
-                                        匯率設定 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=pay_condition">
-                                        <i class="fa fa-cubes fa-fw"></i>
-                                        付款條件 </a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </li>
-                        <li class="dropdown active">
+                        <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                                 aria-expanded="false">
                                 <i class="fa fa-truck fa-fw"></i> 進銷存 <span class="caret"></span>
@@ -149,211 +127,6 @@
                                     <a href="index.php?func=return_purchase">
                                         <i class="fa fa-reply fa-fw"></i>
                                         進貨退出 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=order_client">
-                                        <i class="fa fa-shopping-cart fa-fw"></i>
-                                        訂購單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=shipping">
-                                        <i class="fa fa-sign-out fa-fw"></i>
-                                        出貨單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=sales">
-                                        <i class="fa fa-sign-out fa-fw"></i>
-                                        銷貨單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=return_sales">
-                                        <i class="fa fa-reply fa-fw"></i>
-                                        銷貨退回 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=adjust">
-                                        <i class="fa fa-arrows-v fa-fw"></i>
-                                        調整單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=transfer">
-                                        <i class="fa fa-retweet fa-fw"></i>
-                                        調撥單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=requisition">
-                                        <i class="fa fa-share fa-fw"></i>
-                                        雜項領用單 </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="fa fa-industry fa-fw"></i> 生產加工 <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="index.php?func=process">
-                                        <i class="fa fa-wrench fa-fw"></i>
-                                        生產加工單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=process_plan">
-                                        <i class="fa fa-hourglass-half fa-fw"></i>
-                                        生產加工計畫 </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="fa fa-building fa-fw"></i> 總務報表 <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="index.php?func=summary_salse">
-                                        <i class="fa fa-sign-out fa-fw"></i>
-                                        銷退貨彙總表 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=log_salse">
-                                        <i class="fa fa-list-alt fa-fw"></i>
-                                        銷退貨明細表 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=summary_purchase">
-                                        <i class="fa fa-sign-in fa-fw"></i>
-                                        進退貨彙總表 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=log_purchase">
-                                        <i class="fa fa-list-alt fa-fw"></i>
-                                        進退貨明細表 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=summary_stock">
-                                        <i class="fa fa-cubes fa-fw"></i>
-                                        庫存彙總表 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=log_stock">
-                                        <i class="fa fa-list-alt fa-fw"></i>
-                                        庫存異動明細 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=summary_inventory">
-                                        <i class="fa fa-cubes fa-fw"></i>
-                                        進銷存彙總表 </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="fa fa-money fa-fw"></i> 會計作業 <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="index.php?func=quotes">
-                                        <i class="fa fa-list-alt fa-fw"></i>
-                                        報價單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=discount_purchase">
-                                        <i class="fa fa-minus-square-o fa-fw"></i>
-                                        進貨折讓單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=discount_sales">
-                                        <i class="fa fa-minus-square-o fa-fw"></i>
-                                        銷貨折讓單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=accountant_category">
-                                        <i class="fa fa-cubes fa-fw"></i>
-                                        會計分類 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=accountant_list">
-                                        <i class="fa fa-list fa-fw"></i>
-                                        會計科目 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=voucher_setting">
-                                        <i class="fa fa-list fa-fw"></i>
-                                        傳票模組設定 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=cost_adjust">
-                                        <i class="fa fa-arrows-v fa-fw"></i>
-                                        差異調整單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=accounting_voucher">
-                                        <i class="fa fa-book fa-fw"></i>
-                                        日記帳 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=accounting_fees">
-                                        <i class="fa fa-dollar fa-fw"></i>
-                                        費用單 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=payable">
-                                        <i class="fa fa-usd fa-fw"></i>
-                                        應付作業 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=receivable">
-                                        <i class="fa fa-usd fa-fw"></i>
-                                        應收作業 </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="fa fa-building fa-fw"></i> 會計報表 <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="index.php?func=log_bank">
-                                        <i class="fa fa-list-alt fa-fw"></i>
-                                        銀行收支表 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=log_cash">
-                                        <i class="fa fa-list-alt fa-fw"></i>
-                                        現金收支表 </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=log_note">
-                                        <i class="fa fa-list-alt fa-fw"></i>
-                                        票據明細表 </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="fa fa-area-chart fa-fw"></i> 統計分析 <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="index.php?func=chart_item_sales">
-                                        <i class="fa fa-pie-chart fa-fw"></i>
-                                        進銷統計分析(大類) </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=chart_item_sales_small">
-                                        <i class="fa fa-pie-chart fa-fw"></i>
-                                        進銷統計分析(子類) </a>
-                                </li>
-                                <li>
-                                    <a href="index.php?func=chart_month_sales">
-                                        <i class="fa fa-line-chart fa-fw"></i>
-                                        營業統計圖表 </a>
                                 </li>
                             </ul>
                         </li>
@@ -400,9 +173,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <ul class="nav navbar-nav">
-                            <li><a href="/backend"><i class="fa fa-home fa-fw"></i> 首頁</a></li>
-                        </ul>
+                      
                         <ul class="nav navbar-nav navbar-right">
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
