@@ -30,17 +30,22 @@
                         <input class="input100" type="password" name="password" id="password" placeholder="密碼">
                         <span class="focus-input100"></span>
                     </div>
+                    <div>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li><span style="color:red;">{{ $error }}</span></li>
+                            @endforeach
+                        </ul>
+                    </div>
                     <p>&nbsp;</p>
                     <div class="container-login100-form-btn">
-                        <button type="submit" class="btn btn-lg btn-primary btn-block" id="loginBtn"><i class="fa fa-sign-in"></i> 登入</button>
+                        <button type="submit" class="btn btn-lg btn-primary btn-block" id="loginBtn"><i
+                                class="fa fa-sign-in"></i> 登入</button>
                     </div>
+
                 </form>
-            </div>
-            <div id="nouser" style="position:absolute; margin: 0 auto; z-index:9999; display:none; width:300px; margin:20px 0px;">
-                <span id="msg"></span>
             </div>
         </div>
     </div>
 
 @endsection
-
