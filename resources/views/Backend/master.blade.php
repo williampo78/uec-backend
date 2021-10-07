@@ -487,7 +487,7 @@
                             </a>
                             <ul class="dropdown-menu in">
                                 <li>
-                                    <a href="index.php?func=requisitions_purchase">
+                                    <a href="{{route('requisitions_purchase')}}">
                                         <i class="fa fa-shopping-cart fa-fw"></i>
                                         請購單 </a>
                                 </li>
@@ -785,6 +785,12 @@
             </nav>
 
         </div>
+
+    @if(session()->has('message'))
+        <div class="alert alert-success">
+            {{ session()->get('message') }}
+        </div>
+    @endif
     @endauth
     @guest
     @endguest
