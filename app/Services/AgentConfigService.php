@@ -17,7 +17,6 @@ class AgentConfigService
     {
         $agent_id = Auth::user()->agent_id;
         $agentConfig = AgentConfig::where('agent_id' , $agent_id)->where('key' , 'setting')->first()->toArray();
-
         return $agentConfig;
     }
 }

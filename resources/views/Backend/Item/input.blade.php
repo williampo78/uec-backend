@@ -156,7 +156,7 @@
                                                     <select class="form-control js-select2" name="category_id"
                                                         id="category">
                                                         @foreach ($category as $val)
-                                                            <option value='{{ $val->id }}'>{{ $val->name }}</option>
+                                                            <option value='{{ $val->id }}'  {{(old('bluesign') ?? (isset($item) ? $item->bluesign : '')) ==  $val->id  ? 'selected' : ''}}>{{ $val->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -165,9 +165,9 @@
                                                 <div class="form-group">
                                                     <label>供應商</label>
                                                     <select class="form-control js-select2-supplier" name="supplier_id"
-                                                        id="item_supplier">
+                                                        id="item_supplier" >
                                                         @foreach ($supplier as $val)
-                                                            <option value='{{ $val->id }}'>{{ $val->name }}
+                                                            <option value='{{ $val->id }}'>{{ $val->name }}  {{(old('bluesign') ?? (isset($item) ? $item->bluesign : '')) ==  $val->id  ? 'selected' : ''}}
                                                             </option>
                                                         @endforeach
                                                     </select>
@@ -182,17 +182,17 @@
                                                         <span
                                                             class="error">{{ $errors->first('number') }}</span>
                                                     </label>
-                                                    <input class="form-control" name="number" id="number">
+                                                    <input class="form-control" name="number" id="number" value="{{ old('number') ?? (isset($item) ? $item->number : '') }}">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
                                                 <div class="form-group" id="div_brand">
-                                                    <label for="brand">品牌 
+                                                    <label for="brand">品牌
                                                         <span class="error">{{ $errors->first('brand') }}
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="brand" id="brand"
-                                                        value="{{ old('brand')  ?? (isset($item) ? $item->brand : '') }}">
+                                                        value="{{ old('brand') ?? (isset($item) ? $item->brand : '') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -203,7 +203,7 @@
                                                             {{ $errors->first('name') }}
                                                         </span></label>
                                                     <input class="form-control" name="name" id="name"
-                                                    value="{{ old('name')  ?? (isset($item) ? $item->name : '') }}">
+                                                        value="{{ old('name') ?? (isset($item) ? $item->name : '') }}">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
@@ -212,7 +212,7 @@
                                                             {{ $errors->first('name_en') }}
                                                         </span></label>
                                                     <input class="form-control" name="name_en" id="name_en"
-                                                    value="{{ old('name')  ?? (isset($item) ? $item->name_en : '') }}">
+                                                        value="{{ old('name') ?? (isset($item) ? $item->name_en : '') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -224,7 +224,8 @@
                                                             {{ $errors->first('buy_price') }}
                                                         </span></label>
                                                     <input class="form-control" name="buy_price" id="buy_price"
-                                                    value="{{ old('buy_price')  ?? (isset($item) ? $item->buy_price : '') }}" type='number'>
+                                                        value="{{ old('buy_price') ?? (isset($item) ? $item->buy_price : '') }}"
+                                                        type='number'>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
@@ -235,7 +236,8 @@
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="sell_price1" id="sell_price1"
-                                                    value="{{ old('sell_price1')  ?? (isset($item) ? $item->sell_price1 : '') }}" value="{{ old('sell_price1') }}" type='number'>
+                                                        value="{{ old('sell_price1') ?? (isset($item) ? $item->sell_price1 : '') }}"
+                                                        value="{{ old('sell_price1') }}" type='number'>
                                                 </div>
                                             </div>
                                         </div>
@@ -248,7 +250,7 @@
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="large_unit" id="large_unit"
-                                                    value="{{ old('large_unit')  ?? (isset($item) ? $item->large_unit : '') }}">
+                                                        value="{{ old('large_unit') ?? (isset($item) ? $item->large_unit : '') }}">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
@@ -259,7 +261,7 @@
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="small_unit" id="small_unit"
-                                                    value="{{ old('small_unit')  ?? (isset($item) ? $item->small_unit : '') }}">
+                                                        value="{{ old('small_unit') ?? (isset($item) ? $item->small_unit : '') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -272,7 +274,9 @@
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="stock_qty" id="stock_qty"
-                                                        type='number' value="{{ old('number')  ?? (isset($item) ? $item->number : '0') }}" readonly>
+                                                        type='number'
+                                                        value="{{ old('number') ?? (isset($item) ? $item->number : '0') }}"
+                                                        readonly>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
@@ -282,7 +286,8 @@
                                                             {{ $errors->first('spec') }}
                                                         </span>
                                                     </label>
-                                                    <input class="form-control" name="spec" value="{{ old('spec')  ?? (isset($item) ? $item->spec : '') }}"
+                                                    <input class="form-control" name="spec"
+                                                        value="{{ old('spec') ?? (isset($item) ? $item->spec : '') }}"
                                                         id="spec">
                                                 </div>
                                             </div>
@@ -296,7 +301,7 @@
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="public_number" id="public_number"
-                                                    value="{{ old('public_number')  ?? (isset($item) ? $item->public_number : '') }}">
+                                                        value="{{ old('public_number') ?? (isset($item) ? $item->public_number : '') }}">
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
@@ -307,7 +312,7 @@
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="old_number" id="old_number"
-                                                    value="{{ old('old_number')  ?? (isset($item) ? $item->old_number : '') }}">
+                                                        value="{{ old('old_number') ?? (isset($item) ? $item->old_number : '') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -316,8 +321,8 @@
                                                 <div class="form-group" id="div_active">
                                                     <label for="active">狀態</label>
                                                     <select class="form-control" name="active" id="active">
-                                                        <option value="1">顯示</option>
-                                                        <option value="0">隱藏</option>
+                                                        <option value="1" {{(old('fda_class') ?? (isset($item) ? $item->fda_class : '')) == 1  ? 'selected' : ''}}>顯示</option>
+                                                        <option value="0" {{(old('fda_class') ?? (isset($item) ? $item->fda_class : '')) == 0  ? 'selected' : ''}}>隱藏</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -329,7 +334,8 @@
                                                         </span>
                                                     </label>
                                                     <input class="form-control" name="safe_stock" id="safe_stock"
-                                                    value="{{ old('safe_stock')  ?? (isset($item) ? $item->safe_stock : '') }}"type="number">
+                                                        value="{{ old('safe_stock') ?? (isset($item) ? $item->safe_stock : '') }}"
+                                                        type="number">
                                                 </div>
                                             </div>
                                         </div>
@@ -345,7 +351,7 @@
                                                         <div class="input-group col-sm-12">
                                                             <input type="number" class="form-control text-center"
                                                                 name="live_times" id="live_times"
-                                                                value="{{ old('live_times')  ?? (isset($item) ? $item->live_times : '') }}">
+                                                                value="{{ old('live_times') ?? (isset($item) ? $item->live_times : '') }}">
                                                             <div class="input-group-addon">
                                                                 <span class="input-group-text">年</span>
                                                             </div>
@@ -361,7 +367,7 @@
                                                     </label>
                                                     <input class="form-control" name="minimum_sales_qty"
                                                         id="minimum_sales_qty" type="number"
-                                                        value="{{ old('minimum_sales_qty')  ?? (isset($item) ? $item->minimum_sales_qty : '') }}">
+                                                        value="{{ old('minimum_sales_qty') ?? (isset($item) ? $item->minimum_sales_qty : '') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -370,10 +376,10 @@
                                                 <div class="form-group" id="div_fda_class">
                                                     <label for="fda_class">醫療器材分類分級(Class)</label>
                                                     <select class="form-control" name="fda_class" id="fda_class">
-                                                        <option value="0">無</option>
-                                                        <option value="1">第一級</option>
-                                                        <option value="2">第二級</option>
-                                                        <option value="3">第三級</option>
+                                                        <option value="0" {{(old('fda_class') ?? (isset($item) ? $item->fda_class : '')) == 0  ? 'selected' : ''}}>無</option>
+                                                        <option value="1" {{(old('fda_class') ?? (isset($item) ? $item->fda_class : '')) == 1  ? 'selected' : ''}}>第一級</option>
+                                                        <option value="2" {{(old('fda_class') ?? (isset($item) ? $item->fda_class : '')) == 2  ? 'selected' : ''}}>第二級</option>
+                                                        <option value="3" {{(old('fda_class') ?? (isset($item) ? $item->fda_class : '')) == 3  ? 'selected' : ''}}>第三級</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -381,8 +387,8 @@
                                                 <div class="form-group" id="div_open_sales">
                                                     <label for="open_sales">是否可以公開販售(個人)</label>
                                                     <select class="form-control" name="open_sales" id="open_sales">
-                                                        <option value="0">否</option>
-                                                        <option value="1">是</option>
+                                                        <option value="0" {{(old('open_sales') ?? (isset($item) ? $item->open_sales : '')) == 0  ? 'selected' : ''}}>否</option>
+                                                        <option value="1" {{(old('open_sales') ?? (isset($item) ? $item->open_sales : '')) == 1  ? 'selected' : ''}}>是</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -390,17 +396,17 @@
                                                 <div class="form-group" id="div_bluesign">
                                                     <label for="bluesign">是否 bluesign® 產品</label>
                                                     <select class="form-control" name="bluesign" id="bluesign">
-                                                        <option value="0">否</option>
-                                                        <option value="1">是</option>
+                                                        <option value="0" {{(old('bluesign') ?? (isset($item) ? $item->bluesign : '')) == 0  ? 'selected' : ''}}>否</option>
+                                                        <option value="1" {{(old('bluesign') ?? (isset($item) ? $item->bluesign : '')) == 1  ? 'selected' : ''}}>是</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col-sm-2">
                                                 <div class="form-group" id="div_is_fee_item">
                                                     <label for="is_fee_item">是否為費用性品項</label>
-                                                    <select class="form-control" name="is_fee_item" id="is_fee_item">
-                                                        <option value="0">否</option>
-                                                        <option value="1">是</option>
+                                                    <select class="form-control" name="is_fee_item" id="is_fee_item"  {{(old('is_fee_item') ?? (isset($item) ? $item->is_fee_item : '')) == 0  ? 'selected' : ''}}>
+                                                        <option value="0" {{(old('bluesign') ?? (isset($item) ? $item->bluesign : '')) == 0  ? 'selected' : ''}}>否</option>
+                                                        <option value="1" {{(old('bluesign') ?? (isset($item) ? $item->bluesign : '')) == 1  ? 'selected' : ''}}>是</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -413,9 +419,7 @@
                                                             {{ $errors->first('minimum_sales_qty') }}
                                                         </span>
                                                     </label>
-                                                    <textarea class="form-control" rows="3" name="remark"
-                                                        id="remark" value="{{ old('remark')  ?? (isset($item) ? $item->remark : '') }}" >
-                                                    </textarea>
+                                                    <textarea class="form-control" rows="3" name="remark" id="remark" value="{{ old('remark') ?? (isset($item) ? $item->remark : '') }}">{{ old('remark') ?? (isset($item) ? $item->remark : '') }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -429,17 +433,18 @@
                                         {{ $errors->first('description') }}
                                     </span>
                                     <textarea class="form-control" rows="5" name="description"
-                                        placeholder="請簡單描述商品介紹">{{ old('description') }}</textarea>
+                                        placeholder="請簡單描述商品介紹">{{ old('description') ?? (isset($item) ? $item->specification : '') }}</textarea>
                                 </div>
                                 <div class="col-sm-6">
                                     <h4><i class="fa fa-th-large"></i> 商品規格</h4>
                                     <span class="error">
                                         {{ $errors->first('specification') }}
                                     </span>
-                                    <textarea class="form-control" rows="5" name="specification" placeholder="例如:
-                                            產地：台灣
-                                            適用族群：老年人、嬰幼兒、兒童、成人、通用
-                                            核准字號：衛署醫器製壹字第002376號">{{ old('specification')  ?? (isset($item) ? $item->specification : '') }}</textarea>
+                                    <textarea class="form-control" rows="5" name="specification"
+                                        placeholder="例如:
+                                                產地：台灣
+                                                適用族群：老年人、嬰幼兒、兒童、成人、通用
+                                                核准字號：衛署醫器製壹字第002376號">{{ old('specification') ?? (isset($item) ? $item->specification : '') }}</textarea>
                                 </div>
                             </div>
 
@@ -447,7 +452,7 @@
                             <span class="error">
                                 {{ $errors->first('features') }}
                             </span>
-                            <textarea name="features">{{ old('features') }}</textarea>
+                            <textarea name="features">{{ old('features') ?? (isset($item) ? $item->features : '') }}</textarea>
                             <hr>
                             <div class="row">
                                 <div class="col-sm-12">
@@ -481,11 +486,9 @@
             });
         });
         //判斷fiile change 
-
         function onchangeimg(id, num) {
             var mfile = $('#' + id)[0].files[0];
             var itempic = "#itempic-" + num;
-            console.log(itempic);
             var reader = new FileReader();
             reader.onload = function() {
                 dataURL = reader.result;
