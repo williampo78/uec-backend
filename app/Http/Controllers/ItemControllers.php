@@ -100,7 +100,15 @@ class ItemControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $readyInput = $this->InputValidate($request);
+        if ($readyInput['status']) {
+            $this->itemService->update($readyInput['data'] ,$id);
+            return redirect('backend/item');
+        } else {
+            return redirect('backend/item/create')
+                ->withErrors($readyInput['data'])
+                ->withInput();
+        }
     }
 
     /**

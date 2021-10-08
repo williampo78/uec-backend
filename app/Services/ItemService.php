@@ -135,4 +135,15 @@ class ItemService
 
         return $result;
     }
+    public function update($data,$id){
+        
+        try {
+            $result = Item::where('id', $id)->update($data);
+            dd($result) ;exit ;
+        } catch (\Exception $e) {
+            Log::info($e);
+        }
+
+        return $result;
+    }
 }
