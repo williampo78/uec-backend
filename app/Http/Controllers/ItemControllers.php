@@ -3,18 +3,21 @@ namespace App\Http\Controllers;
 
 use App\Services\CategoryService;
 use App\Services\ItemService;
+use App\Services\SupplierService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ItemControllers extends Controller
 {
     private $itemService;
     private $categoryService;
 
-    public function __construct(ItemService $itemService, CategoryService $categoryService)
-    {
+    public function __construct(ItemService $itemService,
+        CategoryService $categoryService,
+        SupplierService $supplierService) {
         $this->itemService = $itemService;
         $this->categoryService = $categoryService;
+        $this->supplierService = $supplierService;
     }
     /**
      * Display a listing of the resource.
@@ -23,11 +26,9 @@ class ItemControllers extends Controller
      */
     public function index(Request $request)
     {
-        $item = $this->itemService->getItem(1);
-        $category = $this->categoryService->getCategory();
+        $item = $this->itemService->getItem()->get();
         $data['item'] = $item;
-        $data['category'] = $category;
-        return view('Backend.Item.list' , $data);
+        return view('Backend.Item.list', $data);
     }
 
     /**
@@ -37,8 +38,11 @@ class ItemControllers extends Controller
      */
     public function create()
     {
-        $result['category']  = $this->categoryService->getCategory();
-        return view('Backend.Item.input',$result);
+        $category = $this->categoryService->getCategory(); //分類
+        $supplier = $this->supplierService->getSupplier(); //供應商
+        $result['category'] = $category;
+        $result['supplier'] = $supplier;
+        return view('Backend.Item.input', $result);
     }
 
     /**
@@ -49,7 +53,17 @@ class ItemControllers extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->input());
+
+        $readyInput = $this->InputValidate($request);
+        if ($readyInput['status']) {
+            $this->itemService->insertData($readyInput['data']);
+            return redirect('backend/item');
+        } else {
+            return redirect('backend/item/create')
+                ->withErrors($readyInput['data'])
+                ->withInput();
+        }
+
     }
 
     /**
@@ -71,8 +85,10 @@ class ItemControllers extends Controller
      */
     public function edit($id)
     {
-        
-        return view('Backend.Item.input');
+        $category = $this->categoryService->getCategory(); //分類
+        $supplier = $this->supplierService->getSupplier(); //供應商
+        $item = $this->itemService->getItem(1, $id)->first(); //返回array
+        return view('Backend.Item.input', compact('item', 'category', 'supplier'));
     }
 
     /**
@@ -96,5 +112,75 @@ class ItemControllers extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function InputValidate($request)
+    {
+        $result = [];
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'required', //分類
+            'supplier_id' => 'required', //供應商a
+            'number' => 'required', //編號(主分類編號+子分類編號+品項數)
+            'brand' => 'required', //品牌
+            'name' => 'required', //名稱
+            'name_en' => 'required', //英文名稱
+            'buy_price' => 'required', //進價
+            'sell_price1' => 'required', //售價
+            'large_unit' => 'required', //進貨單位
+            'small_unit' => 'required', //出貨單位
+            'stock_qty' => '', //當前庫存(以出貨單位計算)
+            'spec' => 'required', //規格
+            'public_number' => 'required', //衛署字號
+            'old_number' => 'required', //舊系統編號
+            'active' => 'required', //狀態
+            'safe_stock' => 'required', //安全庫存量
+            'live_times' => 'required', //有效期限
+            'minimum_sales_qty' => 'required', //最低出貨量
+            'fda_class' => 'required', //醫療器材分類分級(Class)
+            'open_sales' => 'required', //是否可以公開販售(個人)
+            'is_fee_item' => 'required', //是否為費用性品項
+            'remark' => 'required', //備註
+            'description' => 'required', //商品簡介(描述)
+            'specification' => 'required', //商品規格
+            'features' => 'required', // 商品特色(圖文)
+        ]
+            , [
+                'category_id.required' => '分類不能為空', //分類
+                'supplier_id.required' => '供應商不能為空', //供應商a
+                'number.required' => '編號不能為空', //編號(主分類編號+子分類編號+品項數)
+                'brand.required' => '品牌不能為空', //品牌
+                'name.required' => '名稱不能為空', //名稱
+                'name_en.required' => '英文名稱不能為空', //英文名稱
+                'buy_price.required' => '進價不能為空', //進價
+                'sell_price1.required' => '售價不能為空', //售價
+                'large_unit.required' => '進貨單位不能為空', //進貨單位
+                'small_unit.required' => '出貨單位不能為空', //出貨單位
+                'stock_qty.required' => '當前庫存', //當前庫存(以出貨單位計算)
+                'spec.required' => '規格不能為空', //規格
+                'public_number.required' => '衛署字號不能為空', //衛署字號
+                'old_number.required' => '舊系統編號不能為空', //舊系統編號
+                'active.required' => '狀態不能為空', //狀態
+                'safe_stock.required' => '安全庫存量不能為空', //安全庫存量
+                'live_times.required' => '有效期限不能為空', //有效期限
+                'fda_class.required' => '醫療器材分類分級不能為空', //醫療器材分類分級(Class)
+                'open_sales.required' => '是否可以公開販售不能為空', //是否可以公開販售(個人)
+                'minimum_sales_qty.required' => '最地出貨量不能為空',
+                'is_fee_item.required' => '是否為費用性品項不能為空', //是否為費用性品項
+                'remark.required' => '必填', //備註
+                'description.required' => '描述必填', //商品簡介(描述)
+                'specification.required' => '商品規格必填', //商品規格
+                'features.required' => '商品特色必填', // 商品特色(圖文)
+            ]
+        );
+        if ($validator->fails() == true) { //不符合驗證
+            $result['status'] = false;
+            $result['data'] = $validator->errors();
+        } else { //符合
+            $result['status'] = true;
+            $result['data'] = $validator->validate();
+        }
+
+        return $result;
+
     }
 }

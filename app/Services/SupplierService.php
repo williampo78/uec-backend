@@ -16,6 +16,6 @@ class SupplierService
     public function getSupplier()
     {
         $agent_id = Auth::user()->agent_id;
-        return Supplier::where('agent_id' , $agent_id)->where('active',1);
+        return Supplier::where('agent_id' , $agent_id)->where('active',1)->get();
     }
 }

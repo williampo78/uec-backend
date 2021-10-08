@@ -86,3 +86,9 @@ inline
 	margin-top: 5px ;
 	margin-bottom: 5px ;border-left-width: 8px;
 }
+span .errorMsg
+{ 
+	color: red; 
+	display: inline-block;
+	margin-left: 10px ;
+}
