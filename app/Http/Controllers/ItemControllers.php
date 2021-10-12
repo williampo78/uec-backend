@@ -53,17 +53,18 @@ class ItemControllers extends Controller
      */
     public function store(Request $request)
     {
-
         $readyInput = $this->InputValidate($request);
         if ($readyInput['status']) {
-            $this->itemService->insertData($readyInput['data']);
-            return redirect('backend/item');
+            $inserStatus = $this->itemService->insertData($readyInput['data']);
+            if ($inserStatus['status']) { // 寫入DB成功
+                // $inserFile = $this->itemService->uploadImage($inserStatus['id'], $request->file(), 'create'); //圖片上傳功能
+                return redirect('backend/item');
+            }
         } else {
             return redirect('backend/item/create')
                 ->withErrors($readyInput['data'])
                 ->withInput();
         }
-
     }
 
     /**
@@ -88,7 +89,8 @@ class ItemControllers extends Controller
         $category = $this->categoryService->getCategory(); //分類
         $supplier = $this->supplierService->getSupplier(); //供應商
         $item = $this->itemService->getItem(1, $id)->first(); //返回array
-        return view('Backend.Item.input', compact('item', 'category', 'supplier'));
+        $itemPhoto = $this->itemService->Get_Item_photo($id);
+        return view('Backend.Item.input', compact('item', 'category', 'supplier','itemPhoto'));
     }
 
     /**
@@ -101,8 +103,14 @@ class ItemControllers extends Controller
     public function update(Request $request, $id)
     {
         $readyInput = $this->InputValidate($request);
+        
         if ($readyInput['status']) {
-            $this->itemService->update($readyInput['data'] ,$id);
+            $updataStatus = $this->itemService->update($readyInput['data'], $id);
+            // dd($updataStatus) ; exit ;
+            if($updataStatus){
+                $inserFile = $this->itemService->uploadImage($id, $request->file(), 'update' ,$request->input() ,); //圖片上傳功能
+                dd('TEST') ;
+            }
             return redirect('backend/item');
         } else {
             return redirect('backend/item/create')
@@ -180,6 +188,7 @@ class ItemControllers extends Controller
                 'features.required' => '商品特色必填', // 商品特色(圖文)
             ]
         );
+
         if ($validator->fails() == true) { //不符合驗證
             $result['status'] = false;
             $result['data'] = $validator->errors();
@@ -187,8 +196,10 @@ class ItemControllers extends Controller
             $result['status'] = true;
             $result['data'] = $validator->validate();
         }
-
         return $result;
-
+    }
+    public function ajax_del_Item_photo(Request $request)
+    {
+        dump($request->input());
     }
 }
