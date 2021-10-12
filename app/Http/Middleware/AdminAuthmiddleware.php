@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Middleware;
+use App\Services\RoleService;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 use Illuminate\Http\Request;
@@ -16,8 +17,16 @@ class AdminAuthmiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        $roleService = new RoleService;
+        $role_auth = $roleService->getDisplayRoles();
+
         if(Auth::check()){
-            return $next($request);
+            //DB role_permission_details 資料尚未建齊, 暫時先註解此功能
+//            if ($role_auth ==1){
+                return $next($request);
+//            }else{
+//                return redirect()->route('admin.index');
+//            }
         }else{
             return Redirect('/');
         }

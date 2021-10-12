@@ -105,6 +105,11 @@
                             </a>
                             <ul class="dropdown-menu in">
                                 <li>
+                                    <a href="{{route('quotation')}}">
+                                        <i class="fa fa-shopping-cart fa-fw"></i>
+                                        報價單 </a>
+                                </li>
+                                <li>
                                     <a href="{{route('requisitions_purchase')}}">
                                         <i class="fa fa-shopping-cart fa-fw"></i>
                                         請購單 </a>
@@ -174,7 +179,7 @@
                                 </li>
                             </ul>
                         </li>
-                      
+
                         <ul class="nav navbar-nav navbar-right">
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"

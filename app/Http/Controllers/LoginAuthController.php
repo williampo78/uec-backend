@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Hash;
+use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Session;
 
 class LoginAuthController extends Controller
 {
+    private $roleService;
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
 
     public function index()
     {
@@ -36,6 +40,8 @@ class LoginAuthController extends Controller
 
         if ($user) {
             Auth::login($user);
+            $this->roleService->putUserRolesSession();
+
             return redirect()->intended('backend')
                 ->withSuccess('Signed in');
         } else {
