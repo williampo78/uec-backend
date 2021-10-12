@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warehouse;
+use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,9 +14,11 @@ class WarehouseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct()
-    {
 
+    private $roleService;
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
 
     }
     public function index()

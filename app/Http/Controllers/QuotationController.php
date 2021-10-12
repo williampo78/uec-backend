@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\RequisitionsPurchaseService;
+use App\Models\Quotation;
+use App\Services\QuotationService;
+use App\Services\RoleService;
+use App\Services\SupplierService;
+use App\Services\UniversalService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use phpDocumentor\Reflection\Type;
 
-class RequisitionsPurchaseController extends Controller
+class QuotationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,19 +19,30 @@ class RequisitionsPurchaseController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    private $requisitionsPurchaseService;
+    private $roleService;
+    private $quotationService;
+    private $universalService;
 
-    public function __construct(RequisitionsPurchaseService $requisitionsPurchaseService)
+    public function __construct(RoleService $roleService, QuotationService $quotationService, UniversalService $universalService)
     {
-        $this->requisitionsPurchaseService = $requisitionsPurchaseService;
+        $this->roleService = $roleService;
+        $this->quotationService = $quotationService;
+        $this->universalService = $universalService;
     }
-
-    public function index()
+    public function index(Request $request)
     {
-        $params['active'] = 0;
-        $data = $this->requisitionsPurchaseService->getRequisitionsPurchase($params);
+        $getData = $request->all();
 
-        return view('Backend.RequisitionsPurchase.list' , compact('data'));
+        $role = $this->roleService->getRoles('query');
+
+        $data = [];
+        $supplier = new SupplierService();
+        $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
+        $data['quotation'] = $this->quotationService->getQuotation();
+        $data['status_code'] = $this->quotationService->getStatusCode();
+        $data['getData'] = $getData;
+
+        return view('Backend.Quotation.list', compact('data'));
     }
 
     /**
@@ -38,10 +52,10 @@ class RequisitionsPurchaseController extends Controller
      */
     public function create()
     {
-        $agent_id = Auth::user()->agent_id;
-        $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
+        $supplier = new SupplierService();
+        $data['supplier'] = $supplier->getSupplier();
 
-        return view('Backend.Category.add' , compact('primary_category'));
+        return view('backend.quotation.add', compact('data'));
     }
 
     /**
@@ -52,14 +66,18 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'category';
+        $route_name = 'quotation';
         $act = 'add';
         $data = $request->except('_token');
         $data['agent_id'] = Auth::user()->agent_id;
+        $data['doc_number'] = $this->universalService->getDocNumber();
+        $data['status_code'] = 'DRAFTED';
         $data['created_by'] = Auth::user()->id;
         $data['created_at'] = Carbon::now();
+        $data['updated_by'] = Auth::user()->id;
+        $data['updated_at'] = Carbon::now();
 
-        $rs = Category::insert($data);
+        $rs = Quotation::insert($data);
 
         return view('backend.success' , compact('route_name','act'));
     }
@@ -83,10 +101,9 @@ class RequisitionsPurchaseController extends Controller
      */
     public function edit($id)
     {
-        $data = Category::find($id);
-        $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
+        $data = Warehouse::find($id);
 
-        return view('Backend.PrimaryCategory.upd', compact('data' , 'primary_category_list'));
+        return view('backend.warehouse.upd', compact('data'));
     }
 
     /**
@@ -100,10 +117,9 @@ class RequisitionsPurchaseController extends Controller
     {
         $data = $request->except('_token' , '_method');
         $data['updated_by'] = Auth::user()->id;
-        $data['updated_at'] = Carbon::now();
 
-        Category::where('id' ,$id)->update($data);
-        $route_name = 'category';
+        Warehouse::where('id' ,$id)->update($data);
+        $route_name = 'warehouse';
         $act = 'upd';
         return view('backend.success', compact('route_name' , 'act'));
     }
@@ -117,18 +133,5 @@ class RequisitionsPurchaseController extends Controller
     public function destroy($id)
     {
         //
-
-    }
-
-    public function ajax(Request $request){
-        $rs = $request->all();
-
-        if ($rs['get_type']==='requisitions_purchase'){
-            $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($rs['id']);
-            echo "OK@@".json_encode($data);
-        }elseif($rs['get_type']==='requisitions_purchase_detail'){
-            $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($rs['id']);
-            echo "OK@@".json_encode($data);
-        }
     }
 }

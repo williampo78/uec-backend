@@ -9,6 +9,7 @@ use App\Http\Controllers\WarehouseController ;
 use App\Http\Controllers\PrimaryCategoryController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RequisitionsPurchaseController;
+use App\Http\Controllers\QuotationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,7 +35,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/category',CategoryController::class, ['names' => ['index' => 'category']]);
     Route::resource('/requisitions_purchase',RequisitionsPurchaseController::class, ['names' => ['index' => 'requisitions_purchase']]);
     Route::post('/requisitions_purchase/ajax',[RequisitionsPurchaseController::class,'ajax']);
-
+    Route::resource('/quotation',QuotationController::class, ['names' => ['index' => 'quotation']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
