@@ -26,6 +26,7 @@
     <link rel="stylesheet"
         href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
 </head>
 
 <body>
@@ -239,7 +240,6 @@
 <script src="{{ asset('asset/js/template/bower_components/morrisjs/morris.min.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"> </script>
 {{-- <script src="{{ asset('asset/css/init.css') }}"> </script> --}}
-<link src="{{ asset('asset/css/init.css') }}" rel="stylesheet">
 <script src="{{ asset('asset/js/init.js') }}"> </script>
 {{-- <script src="https://maps.googleapis.com/maps/api/js"> </script> --}}
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
