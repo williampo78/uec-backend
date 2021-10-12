@@ -36,6 +36,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/requisitions_purchase',RequisitionsPurchaseController::class, ['names' => ['index' => 'requisitions_purchase']]);
     Route::post('/requisitions_purchase/ajax',[RequisitionsPurchaseController::class,'ajax']);
     Route::resource('/quotation',QuotationController::class, ['names' => ['index' => 'quotation']]);
+    Route::post('/quotation/ajax',[QuotationController::class,'ajax']);
+
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

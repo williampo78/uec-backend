@@ -136,7 +136,7 @@ class ItemService
         return $result;
     }
     public function update($data,$id){
-        
+
         try {
             $result = Item::where('id', $id)->update($data);
             dd($result) ;exit ;
@@ -145,5 +145,15 @@ class ItemService
         }
 
         return $result;
+    }
+
+    public function getItemList(){
+        $agent_id = Auth::user()->agent_id;
+
+        return Item::where('agent_id' , $agent_id)->where('active' , 1)->orderBy('number')->get();
+    }
+
+    public function getItemInfo($id){
+        return Item::where('id' , $id)->orderBy('id' , 'ASC')->first();
     }
 }

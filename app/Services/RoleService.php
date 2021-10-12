@@ -80,12 +80,22 @@ class RoleService
         return $auth;
     }
 
+    /**
+     *  'update':操作者有「修改」權限，才開放﹝簽核﹞鈕供點擊 , 'void':作廢 , 'export':匯出檔案
+     */
     public function getOtherRoles(){
-//        case 'void':
-//            $auth = $roles[$code]['auth_void'];
-//            break;
-//        case 'export':
-//            $auth = $roles[$code]['auth_export'];
-//            break;
+        $code = explode('.' , \Request::route()->getName())[0];
+        $roles = Session::get('roles');
+        $data = [];
+
+        if(isset($roles[$code])) {
+            $data = [
+                'auth_void' => $roles[$code]['auth_void'],
+                'auth_export' => $roles[$code]['auth_export'],
+                'auth_void' => $roles[$code]['auth_update'],
+            ];
+        }
+
+        return $data;
     }
 }

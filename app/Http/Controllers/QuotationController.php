@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quotation;
+use App\Services\ItemService;
 use App\Services\QuotationService;
 use App\Services\RoleService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
+use App\Services\WarehouseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,18 +24,20 @@ class QuotationController extends Controller
     private $roleService;
     private $quotationService;
     private $universalService;
+    private $itemService;
+    private $warehouseService;
 
-    public function __construct(RoleService $roleService, QuotationService $quotationService, UniversalService $universalService)
+    public function __construct(RoleService $roleService, QuotationService $quotationService, UniversalService $universalService, ItemService $itemService, WarehouseService $warehouseService)
     {
         $this->roleService = $roleService;
         $this->quotationService = $quotationService;
         $this->universalService = $universalService;
+        $this->itemService = $itemService;
+        $this->warehouseService = $warehouseService;
     }
     public function index(Request $request)
     {
         $getData = $request->all();
-
-        $role = $this->roleService->getRoles('query');
 
         $data = [];
         $supplier = new SupplierService();
@@ -69,15 +73,7 @@ class QuotationController extends Controller
         $route_name = 'quotation';
         $act = 'add';
         $data = $request->except('_token');
-        $data['agent_id'] = Auth::user()->agent_id;
-        $data['doc_number'] = $this->universalService->getDocNumber();
-        $data['status_code'] = 'DRAFTED';
-        $data['created_by'] = Auth::user()->id;
-        $data['created_at'] = Carbon::now();
-        $data['updated_by'] = Auth::user()->id;
-        $data['updated_at'] = Carbon::now();
-
-        $rs = Quotation::insert($data);
+        $this->quotationService->addQuotation($data);
 
         return view('backend.success' , compact('route_name','act'));
     }
@@ -119,7 +115,7 @@ class QuotationController extends Controller
         $data['updated_by'] = Auth::user()->id;
 
         Warehouse::where('id' ,$id)->update($data);
-        $route_name = 'warehouse';
+        $route_name = 'quotation';
         $act = 'upd';
         return view('backend.success', compact('route_name' , 'act'));
     }
@@ -132,6 +128,23 @@ class QuotationController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $route_name = 'quotation';
+        $act = 'del';
+
+        Quotation::destroy($id);
+
+        return view('backend.success', compact('route_name' , 'act'));
+    }
+
+    public function ajax(Request $request){
+        $rs = $request->all();
+
+        if ($rs['get_type'] == 'itemlist'){
+            $data = $this->itemService->getItemList();
+        }elseif ($rs['get_type'] == 'iteminfo'){
+            $data = $this->itemService->getItemInfo($rs['item_id']);
+        }
+
+        echo "OK@@".json_encode($data);
     }
 }

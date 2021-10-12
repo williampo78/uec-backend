@@ -1,11 +1,7 @@
 <script>
     function AddItemRow(get_type, position)
     {
-        cc
         var process_plan = $("#process_plan").val();
-        var ShowWarehouseTitle = "返回倉庫";
-        if(position == "input")
-            ShowWarehouseTitle = "來源倉庫";
 
         if(process_plan == "")
         {
@@ -13,34 +9,28 @@
             return;
         }
 
-        var curRow = parseInt($('#'+position+'_row_number').val());
+        var curRow = parseInt($('#rowNo').val());
         var newRow = curRow + 1;
         if(curRow == 0)
         {
             $(" <div class='add_row'>" +
                 "<div class='row'>" +
-                "<div class='col-sm-4 text-left'>品項</div>" +
-                "<div class='col-sm-1 text-left'>庫存</div>" +
-                "<div class='col-sm-1 text-left'>數量</div>" +
-                "<div class='col-sm-2 text-left'>批號</div>" +
-                "<div class='col-sm-1 text-left'>單位</div>" +
-                "<div class='col-sm-2 text-left'>" + ShowWarehouseTitle +" </div>" +
+                "<div class='col-sm-6 text-left'>品項</div>" +
+                "<div class='col-sm-2 text-left'>單價</div>" +
+                "<div class='col-sm-3 text-left'>最小採購量</div>" +
                 "<div class='col-sm-1 text-left'>功能</div>" +
                 "</div>" +
-                " </div>").appendTo($('#'+position+'ItemDiv'));
+                " </div>").appendTo($('#ItemDiv'));
         }
 
         $(" <div class='add_row' id='div-addrow-" + position + newRow + "'>" +
             "<div class='row'>" +
-            "<input class='form-control' name='" + position + "itemid-" + newRow + "' id='" + position + "itemid-" + newRow + "' type='hidden'>" +
-            "<input class='form-control' name='" + position + "itemnumber-" + newRow + "' id='" + position + "itemnumber-" + newRow + "' type='hidden'>" +
-            "<input class='form-control' name='" + position + "itembrand-" + newRow + "' id='" + position + "itembrand-" + newRow + "' type='hidden'>" +
-            "<input class='form-control' name='" + position + "itemname-" + newRow + "' id='" + position + "itemname-" + newRow + "' type='hidden'>" +
-            "<input class='form-control' name='" + position + "itemspec-" + newRow + "' id='" + position + "itemspec-" + newRow + "' type='hidden'>" +
-            "<input class='form-control' name='" + position + "itemprice-" + newRow + "' id='" + position + "itemprice-" + newRow + "' type='hidden'>" +
-            "<div class='col-sm-4' >" +
+            "<input class='form-control' name='itemid[]' id='" + position + "itemid-" + newRow + "' type='hidden'>" +
+            "<input class='form-control' name='itemname[]' id='" + position + "itemname-" + newRow + "' type='hidden'>" +
+            "<input class='form-control' name='itemprice[]' id='" + position + "itemprice-" + newRow + "' type='hidden'>" +
+            "<div class='col-sm-6' >" +
             "<div class='input-group'>" +
-            "<select class='form-control js-select2-item' name='" + position + "item-" + newRow + "' id='" + position + "item-" + newRow + "' onchange=\"getItemInfo(" + newRow + " , '" + get_type + "', '" + position + "')\" >" +
+            "<select class='form-control js-select2-item' name='item[]' id='" + position + "item-" + newRow + "' onchange=\"getItemInfo(" + newRow + " , '" + get_type + "', '" + position + "')\" >" +
             "<option value=''></option>" +
             "</select>" +
             "<span class='input-group-btn'>"+
@@ -48,28 +38,18 @@
             "</span>" +
             "</div>" +
             "</div>" +
-            "<div class='col-sm-1' >" +
-            "<input class='form-control' name='" + position + "stockqty-" + newRow + "' id='" + position + "stockqty-" + newRow + "' readonly >" +
-            "</div>" +
-            "<div class='col-sm-1' >" +
-            "<input class='form-control qty' name='" + position + "qty-" + newRow + "' id='" + position + "qty-" + newRow + "'  type='number'>" +
-            "</div>" +
-            "<div class='col-sm-2' id='" + position + "div_lot_number_" + newRow + "'>" +
-            "<input class='form-control' name='" + position + "lotnumber-" + newRow + "' id='" + position + "lotnumber-" + newRow + "'>" +
-            "</div>" +
-            "<div class='col-sm-1' >" +
-            "<input class='form-control' name='" + position + "unit-" + newRow + "' id='" + position + "unit-" + newRow + "' readonly >" +
-            "</div>" +
             "<div class='col-sm-2' >" +
-            "<select class='form-control js-select2' name='" + position + "warehouse-" + newRow + "' id='" + position + "warehouse-" + newRow + "' >" +
-            "</select>" +
+            "<input class='form-control qty' name='price[]' id='" + position + "price-" + newRow + "'  type='number'>" +
+            "</div>" +
+            "<div class='col-sm-3' >" +
+            "<input class='form-control' name='minimum_purchase_qty[]' id='" + position + "minimum_purchase_qty-" + newRow + "' readonly >" +
             "</div>" +
             "<div class='col-sm-1'>" +
             "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow + "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
             "</div>" +
             "</div>" +
             "</div>"
-        ).appendTo($('#'+position+'ItemDiv'));
+        ).appendTo($('#ItemDiv'));
 
         $(".js-select2-item").select2(
             {
@@ -87,9 +67,9 @@
         // 即時取出物品資訊，放到 select 中
         $.ajax(
             {
-                url: "ajax/get_db_info.php",
+                url: "/backend/quotation/ajax",
                 type: "POST",
-                data: {'get_type': "itemlist"},
+                data: {'get_type': "itemlist", _token: '{{csrf_token()}}'},
                 enctype: 'multipart/form-data',
             })
             .done(function( data )
@@ -106,12 +86,30 @@
                 }
             });
 
-        // 即時取出倉庫資訊，放到 select 中
+        $('#rowNo').val(newRow);
+    }
+
+    function copy_text(row_id)
+    {
+        var name = $("#inputitemname-" + row_id).val();
+        new Clipboard('.copy_btn',
+            {
+                text: function(trigger)
+                {
+                    return name;
+                }
+            });
+    }
+
+    function getItemInfo(row_id , get_type, position)
+    {
+        var item_id = $("#"+position+"item-" + row_id).val();
+
         $.ajax(
             {
-                url: "ajax/get_db_info.php",
+                url: "/backend/quotation/ajax",
                 type: "POST",
-                data: {'get_type': "warehouselist"},
+                data: {'get_type': "iteminfo" ,'item_id': item_id ,'type': get_type, _token: '{{csrf_token()}}' },
                 enctype: 'multipart/form-data',
             })
             .done(function( data )
@@ -120,22 +118,14 @@
                 if(data_array[0] == "OK")
                 {
                     var obj = jQuery.parseJSON(data_array[1]);
-                    $.each( obj, function( key, value )
-                    {
-                        var text_value = value.name;
-                        $("#" + position + "warehouse-" + newRow).append($("<option></option>").attr("value", value.id).text(text_value));
-                    });
 
+                    $("#"+position+"itemlable-" + row_id).text("品項 = " + obj.name + " - " + obj.spec);
+                    $("#"+position+"itemname-" + row_id).val(obj.name);
+                    $("#"+position+"itemid-" + row_id).val(obj.id);
+                    // $("#"+position+"buy_price-" + row_id).val(obj.buy_price);
+                    $("#"+position+"minimum_purchase_qty-" + row_id).val(obj.minimum_sales_qty);
 
-                    $(".js-select2").select2(
-                        {
-                            allowClear: true ,
-                            theme: "bootstrap",
-                            placeholder: "請選擇"
-                        });
                 }
             });
-
-        $('#'+position+'_row_number').val(newRow);
     }
 </script>

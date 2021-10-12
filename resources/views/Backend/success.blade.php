@@ -20,6 +20,8 @@
                                         已經成功新增資料！
                                     @elseif($act==='upd')
                                         已經成功儲存修改！
+                                    @elseif($act==='del')
+                                        資料已刪除！
                                     @endif
                                 </div>
                                 <a class="btn btn-block btn-success" href="{{route($route_name)}}"><i class="fa fa-fw fa-book"></i> 返回列表</a>

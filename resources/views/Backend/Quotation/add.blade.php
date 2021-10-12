@@ -63,6 +63,20 @@
                                 </div>
 
                                 <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group" id="supplier">
+                                            <label for="supplier">稅別</label>
+                                            <select class="form-control js-select2-item" name="tax" id="tax">
+                                                <option value=1>應稅</option>
+                                                <option value=0>未稅</option>
+                                                <option value=2>內含</option>
+                                                <option value=3>零稅率</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group" id="div_remark">
                                             <label for="remark">備註</label>
@@ -74,7 +88,7 @@
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項</h4>
                                 <div id="ItemDiv">
-{{--                                    <input type="hidden" name="rowNo" id="rowNo" value="0">--}}
+                                    <input type="hidden" name="rowNo" id="rowNo" value="0">
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -113,7 +127,7 @@
 
                 $(function () {
                     $('#datetimepickera').datetimepicker({
-                        format:'YYYY-MM-DD HH:mm:ss',
+                        format:'YYYY-MM-DD',
                     });
                 });
             </script>

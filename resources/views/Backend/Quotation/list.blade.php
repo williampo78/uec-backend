@@ -34,7 +34,7 @@
                                 <div class="col-sm-3">
                                     <div class="col-sm-3"><h5>供應商統編</h5></div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="company_number" id="company_number" value="{{ isset($data['getData']['supplier'])? }}">
+                                        <input class="form-control" name="company_number" id="company_number" value="{{ $data['getData']['company_number']?? '' }}">
                                     </div>
                                 </div>
 
@@ -43,10 +43,10 @@
                                     <div class="col-sm-9">
                                         <select class="form-control js-select2-department" name="status" id="status">
                                             <option value=''></option>
-                                            <option value='drafted'>草稿</option>
-                                            <option value='reviewing'>簽核</option>
-                                            <option value='approved'>已核准</option>
-                                            <option value='rejected'>已駁回</option>
+                                            <option value='drafted' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'drafted')? 'selected':''  }}>草稿</option>
+                                            <option value='reviewing' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing')? 'selected':''  }}>簽核</option>
+                                            <option value='approved' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'approved')? 'selected':''  }}>已核准</option>
+                                            <option value='rejected' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'rejected')? 'selected':''  }}>已駁回</option>
                                         </select>
                                     </div>
                                 </div>
@@ -57,7 +57,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_select_start_date">
                                             <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="select_start_date" id="select_start_date" value=""/>
+                                                <input type='text' class="form-control" name="select_start_date" id="select_start_date" value="{{ $data['getData']['select_start_date']?? '' }}"/>
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -68,7 +68,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_select_end_date">
                                             <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="select_end_date" id="select_end_date" value=""/>
+                                                <input type='text' class="form-control" name="select_end_date" id="select_end_date" value="{{ $data['getData']['select_end_date']?? '' }}"/>
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -80,7 +80,7 @@
                                 <div class="col-sm-3">
                                     <div class="col-sm-3"><h5>報價單號</h5></div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="number" id="number">
+                                        <input class="form-control" name="doc_number" id="doc_number" value="{{ $data['getData']['doc_number']?? '' }}">
                                     </div>
                                 </div>
 
@@ -113,39 +113,55 @@
                                 <th>結案時間</th>
                             </tr>
                             </thead>
-                            <tbody>
-
                             @foreach($data['quotation'] as $k => $v)
-                                <td>
-                                    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
-                                    <button class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</button>
-                                    <button class="btn btn-info btn-sm" href="{{ route('quotation.destroy' , $v['id']) }}">刪除</button>
-                                </td>
-                                <td>{{ $v['created_at'] }}</td>
-                                <td>{{ $v['doc_number'] }}</td>
-                                <td>{{ $data['supplier'][$v['supplier_id']]['name'] }}</td>
-                                <td>{{ $data['status_code'][$v['status_code']] }}</td>
-                                <td>{{ $v['submitted_at'] }}</td>
-                                <td>{{ $v['closed_at'] }}</td>
+                                <form id="del-{{ $v['id'] }}" action="/backend/quotation/{{ $v['id'] }}" method="post">
+                                    @method('DELETE')
+                                    @csrf
+                                </form>
+                                <tbody>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
+                                        <button class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</button>
+{{--                                        <a class="btn btn-info btn-sm" onclick="del({{ $v['id'] }});">刪除</a>--}}
 
+                                        <button class="btn btn-info btn-sm" onclick="del({{ $v['id'] }});">刪除</button>
+                                    </td>
+                                    <td>{{ $v['created_at'] }}</td>
+                                    <td>{{ $v['doc_number'] }}</td>
+                                    <td>{{ $data['supplier'][$v['supplier_id']]['name'] }}</td>
+                                    <td>{{ $data['status_code'][$v['status_code']] }}</td>
+                                    <td>{{ $v['submitted_at'] }}</td>
+                                    <td>{{ $v['closed_at'] }}</td>
+                                </tbody>
                             @endforeach
-
-                                </tr>
-                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    @include('Backend.Quotation.detail')
     @section('js')
         <script>
 
             $(function () {
-                $('#datetimepicker').datetimepicker();
-                $('#datetimepicker2').datetimepicker();
+                $('#datetimepicker').datetimepicker({
+                    format:'YYYY-MM-DD',
+                });
+                $('#datetimepicker2').datetimepicker({
+                    format:'YYYY-MM-DD',
+                });
             });
+
+            function del(id)
+            {
+                if(confirm("確認要刪除此筆資料?")){
+                    document.getElementById('del-'+id).submit();
+                }
+                return false;
+            };
+
+
         </script>
     @endsection
 @endsection

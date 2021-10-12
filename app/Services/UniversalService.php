@@ -13,8 +13,8 @@ class UniversalService
 
     public function getDocNumber(){
         $dt = Carbon::now()->format('ymd');
-        $quotation = Quotation::first();
-        if (empty($serial)){
+        $quotation = Quotation::orderBy('id','DESC')->first();
+        if (empty($quotation)){
             $serial = 1;
         }else{
             $serial = $quotation->id + 1;
