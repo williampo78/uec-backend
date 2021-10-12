@@ -19,8 +19,7 @@
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
                         @if (isset($item))
-                            <form role="form" id="new-form" method="POST"
-                                action="{{ route('item.update', $item->id) }}"
+                            <form role="form" id="new-form" method="POST" action="{{ route('item.update', $item->id) }}"
                                 enctype="multipart/form-data" novalidate="novalidate">
                                 {{ method_field('PUT') }}
                                 {{ csrf_field() }}
@@ -41,110 +40,76 @@
                                         <div class="form-group">
                                             <fieldset style="width:100%; text-align:center;">
                                                 <legend><i class="fa fa-photo"></i> 主要產品照片</legend>
-                                                <div><img id="itempic-1" src="{{ asset('asset/img/default_item.png') }}"
-                                                        style="max-width:100%;"></div>
-                                                <input type="hidden" data-input="false" name="photo-1" id="photo-1"
-                                                    value="">
+                                                <div>
+                                                    @if (isset($item) && $item->photo_name !== '')
+                                                        <img id="itempic-1"
+                                                            src="{{ asset('/images/item') . $item->photo_name }}"
+                                                            style="max-width:100%;"
+                                                            data-filedata='{{ $item->id }}'
+                                                            >
+                                                    @else
+                                                        <img id="itempic-1"
+                                                            src="{{ asset('asset/img/default_item.png') }}"
+                                                            style="max-width:100%;">
+                                                    @endif
+                                                </div>
+                                                <input type="hidden" data-input="true" name="photo-1" id="photo-1" value="">
                                             </fieldset>
                                         </div>
-                                        <div class="form-group" id="divforclear-1" style="display:none;">
-                                            <input type="button" class="btn btn-warning" id="clearfile-1" value="刪除圖片">
+                                        <div class="form-group" id="divforclear-1" style="display:none">
+                                            <input type="button" class="btn btn-warning" id="clearfile-1" value="刪除圖片" 
+                                                onclick="del_img('1')">
                                         </div>
                                         <div class="form-group" id="divforfile-1">
                                             <input type="file" class="filestyle" data-input="false" name="file-1"
                                                 id="file-1" value="" onchange="onchangeimg(this.id,1)">
                                         </div>
                                     </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <fieldset style="width:100%; text-align:center;">
-                                                <legend><i class="fa fa-photo"></i> 產品照片2</legend>
-                                                <div><img id="itempic-2" src="{{ asset('asset/img/default_item.png') }}"
-                                                        style="max-width:100%;"></div>
-                                                <input type="hidden" data-input="false" name="photo-2" id="photo-2"
-                                                    value="">
-                                            </fieldset>
+                                    @for ($i = 2; $i <= 6; $i++)
+                                        <?php $photo_status = false; ?>
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <fieldset style="width:100%; text-align:center;">
+                                                    <legend>
+                                                        <i class="fa fa-photo"></i> 產品照片 {{ $i }}
+                                                    </legend>
+                                                    @if (isset($itemPhoto))
+                                                        @foreach ($itemPhoto as $photo)
+                                                            @if ($photo['sort'] == $i && $photo['photo_name'] !== '')
+                                                                <div>
+                                                                    <img data-filedata="{{$photo['id']}}" id="itempic-{{ $i }}"
+                                                                        src="{{ asset('/images/item') . $photo['photo_name'] }}"
+                                                                        style="max-width:100%;">
+                                                                </div>
+                                                                <?php $photo_status = true; ?>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                    @if (!$photo_status)
+                                                        <div>
+                                                            <img id="itempic-{{ $i }}"
+                                                                src="{{ asset('asset/img/default_item.png') }}"
+                                                                style="max-width:100%;">
+                                                        </div>
+                                                    @endif
+                                                    <input type="hidden" data-input="false"
+                                                        name="photo-{{ $i }}" id="photo-{{ $i }}"
+                                                        value="">
+                                                </fieldset>
+                                            </div>
+                                            <div class="form-group" id="divforclear-{{ $i }}"
+                                                style="display:none">
+                                                <input type="button" class="btn btn-warning" id="clearfile-{{ $i }}" value="刪除圖片" onclick="del_img({{$i}})">
+                                            </div>
+                                            <div class="form-group" id="divforfile-{{ $i }}">
+                                                <input type="file" class="filestyle" data-input="false"
+                                                    name="file-{{ $i }}" id="file-{{ $i }}"
+                                                    onchange="onchangeimg(this.id,{{ $i }})">
+                                            </div>
                                         </div>
-                                        <div class="form-group" id="divforclear-2" style="display:none;">
-                                            <input type="button" class="btn btn-warning" id="clearfile-2" value="刪除圖片">
-                                        </div>
-                                        <div class="form-group" id="divforfile-2">
-                                            <input type="file" class="filestyle" data-input="false" name="file-2"
-                                                id="file-2" onchange="onchangeimg(this.id,2)">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <fieldset style="width:100%; text-align:center;">
-                                                <legend><i class="fa fa-photo"></i> 產品照片3</legend>
-                                                <div><img id="itempic-3" src="{{ asset('asset/img/default_item.png') }}"
-                                                        style="max-width:100%;"></div>
-                                                <input type="hidden" data-input="false" name="photo-3" id="photo-3"
-                                                    value="">
-                                            </fieldset>
-                                        </div>
-                                        <div class="form-group" id="divforclear-3" style="display:none;">
-                                            <input type="button" class="btn btn-warning" id="clearfile-3" value="刪除圖片">
-                                        </div>
-                                        <div class="form-group" id="divforfile-3">
-                                            <input type="file" class="filestyle" data-input="false" name="file-3"
-                                                id="file-3" onchange="onchangeimg(this.id,3)">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <fieldset style="width:100%; text-align:center;">
-                                                <legend><i class="fa fa-photo"></i> 產品照片4</legend>
-                                                <div><img id="itempic-4" src="{{ asset('asset/img/default_item.png') }}"
-                                                        style="max-width:100%;"></div>
-                                                <input type="hidden" data-input="false" name="photo-4" id="photo-4"
-                                                    value="">
-                                            </fieldset>
-                                        </div>
-                                        <div class="form-group" id="divforclear-4" style="display:none;">
-                                            <input type="button" class="btn btn-warning" id="clearfile-4" value="刪除圖片">
-                                        </div>
-                                        <div class="form-group" id="divforfile-4">
-                                            <input type="file" class="filestyle" data-input="false" name="file-4"
-                                                id="file-4" onchange="onchangeimg(this.id,4)">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <fieldset style="width:100%; text-align:center;">
-                                                <legend><i class="fa fa-photo"></i> 產品照片5</legend>
-                                                <div><img id="itempic-5" src="{{ asset('asset/img/default_item.png') }}"
-                                                        style="max-width:100%;"></div>
-                                                <input type="hidden" data-input="false" name="photo-5" id="photo-5"
-                                                    value="">
-                                            </fieldset>
-                                        </div>
-                                        <div class="form-group" id="divforclear-5" style="display:none;">
-                                            <input type="button" class="btn btn-warning" id="clearfile-5" value="刪除圖片">
-                                        </div>
-                                        <div class="form-group" id="divforfile-5">
-                                            <input type="file" class="filestyle" data-input="false" name="file-5"
-                                                id="file-5" onchange="onchangeimg(this.id,5)">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <fieldset style="width:100%; text-align:center;">
-                                                <legend><i class="fa fa-photo"></i> 產品照片6</legend>
-                                                <div><img id="itempic-6" src="{{ asset('asset/img/default_item.png') }}"
-                                                        style="max-width:100%;"></div>
-                                                <input type="hidden" data-input="false" name="photo-6" id="photo-6"
-                                                    value="">
-                                            </fieldset>
-                                        </div>
-                                        <div class="form-group" id="divforclear-6" style="display:none;">
-                                            <input type="button" class="btn btn-warning" id="clearfile-6" value="刪除圖片">
-                                        </div>
-                                        <div class="form-group" id="divforfile-6">
-                                            <input type="file" class="filestyle" data-input="false" name="file-6"
-                                                id="file-6" onchange="onchangeimg(this.id,6)">
-                                        </div>
-                                    </div>
+                                    @endfor
+
+
                                 </div>
                             </div>
                             <div id="menu_main" class="tab-pane fade in active">
@@ -471,9 +436,9 @@
                                 </span>
                                 <textarea class="form-control" rows="5" name="specification"
                                     placeholder="例如:
-                                                    產地：台灣
-                                                    適用族群：老年人、嬰幼兒、兒童、成人、通用
-                                                    核准字號：衛署醫器製壹字第002376號">{{ old('specification') ?? (isset($item) ? $item->specification : '') }}</textarea>
+                                                                                            產地：台灣
+                                                                                            適用族群：老年人、嬰幼兒、兒童、成人、通用
+                                                                                            核准字號：衛署醫器製壹字第002376號">{{ old('specification') ?? (isset($item) ? $item->specification : '') }}</textarea>
                             </div>
                         </div>
 
@@ -514,7 +479,11 @@
                 //filebrowserUploadUrl : 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files', //可上傳一般檔案
                 filebrowserImageUploadUrl: 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images' //可上傳圖檔
             });
+
         });
+        var read_del_item = [];
+        var read_del_item_photos = [];
+
         //判斷fiile change 
         function onchangeimg(id, num) {
             var mfile = $('#' + id)[0].files[0];
@@ -525,7 +494,35 @@
                 $(itempic).attr("src", dataURL);
             };
             reader.readAsDataURL(mfile);
+            $('#divforclear-' + num).show(); //顯示刪除圖片
+        }
 
+        function checkShowImgDelBtn() {
+            for (var i = 1; i <= 6; i++) {
+                var getPhoto = "#itempic-" + i;
+                var check = $(getPhoto).prop('src');
+                var default_src = "{{ asset('asset/img/default_item.png') }}";
+                if (default_src !== check) {
+                    $('#divforclear-' + i).show();
+                }
+            }
+        }
+        checkShowImgDelBtn();
+
+        function del_img(num, id) {
+            var getPhoto = "#itempic-" + num;
+            var default_src = "{{ asset('asset/img/default_item.png') }}";
+            var check = $(getPhoto).prop('src',default_src);
+            //執行AJAX 直接刪除 
+            
+            // console.log(read_del);
+            // read_del.push(num);
+            // console.log(read_del);
+            //num等於1 id 會是針對
+            // if (id !== null) {
+            //     console.log(id) ;
+            // }
+            // console.log(num, id);
         }
     </script>
 @endsection
