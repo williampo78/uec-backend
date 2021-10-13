@@ -44,20 +44,18 @@
                                                     @if (isset($item) && $item->photo_name !== '')
                                                         <img id="itempic-1"
                                                             src="{{ asset('/images/item') . $item->photo_name }}"
-                                                            style="max-width:100%;"
-                                                            data-filedata='{{ $item->id }}'
-                                                            >
+                                                            style="max-width:100%;" data-fileid='{{ $item->id }}'>
                                                     @else
                                                         <img id="itempic-1"
                                                             src="{{ asset('asset/img/default_item.png') }}"
-                                                            style="max-width:100%;">
+                                                            style="max-width:100%;" data-fileid=''>
                                                     @endif
                                                 </div>
                                                 <input type="hidden" data-input="true" name="photo-1" id="photo-1" value="">
                                             </fieldset>
                                         </div>
                                         <div class="form-group" id="divforclear-1" style="display:none">
-                                            <input type="button" class="btn btn-warning" id="clearfile-1" value="刪除圖片" 
+                                            <input type="button" class="btn btn-warning" id="clearfile-1" value="刪除圖片"
                                                 onclick="del_img('1')">
                                         </div>
                                         <div class="form-group" id="divforfile-1">
@@ -77,7 +75,8 @@
                                                         @foreach ($itemPhoto as $photo)
                                                             @if ($photo['sort'] == $i && $photo['photo_name'] !== '')
                                                                 <div>
-                                                                    <img data-filedata="{{$photo['id']}}" id="itempic-{{ $i }}"
+                                                                    <img data-fileid="{{ $photo['id'] }}"
+                                                                        id="itempic-{{ $i }}"
                                                                         src="{{ asset('/images/item') . $photo['photo_name'] }}"
                                                                         style="max-width:100%;">
                                                                 </div>
@@ -89,7 +88,7 @@
                                                         <div>
                                                             <img id="itempic-{{ $i }}"
                                                                 src="{{ asset('asset/img/default_item.png') }}"
-                                                                style="max-width:100%;">
+                                                                style="max-width:100%;" data-fileid="">
                                                         </div>
                                                     @endif
                                                     <input type="hidden" data-input="false"
@@ -99,7 +98,9 @@
                                             </div>
                                             <div class="form-group" id="divforclear-{{ $i }}"
                                                 style="display:none">
-                                                <input type="button" class="btn btn-warning" id="clearfile-{{ $i }}" value="刪除圖片" onclick="del_img({{$i}})">
+                                                <input type="button" class="btn btn-warning"
+                                                    id="clearfile-{{ $i }}" value="刪除圖片"
+                                                    onclick="del_img({{ $i }})">
                                             </div>
                                             <div class="form-group" id="divforfile-{{ $i }}">
                                                 <input type="file" class="filestyle" data-input="false"
@@ -436,9 +437,9 @@
                                 </span>
                                 <textarea class="form-control" rows="5" name="specification"
                                     placeholder="例如:
-                                                                                            產地：台灣
-                                                                                            適用族群：老年人、嬰幼兒、兒童、成人、通用
-                                                                                            核准字號：衛署醫器製壹字第002376號">{{ old('specification') ?? (isset($item) ? $item->specification : '') }}</textarea>
+                                    產地：台灣
+                                    適用族群：老年人、嬰幼兒、兒童、成人、通用
+                                    核准字號：衛署醫器製壹字第002376號">{{ old('specification') ?? (isset($item) ? $item->specification : '') }}</textarea>
                             </div>
                         </div>
 
@@ -509,20 +510,37 @@
         }
         checkShowImgDelBtn();
 
-        function del_img(num, id) {
-            var getPhoto = "#itempic-" + num;
-            var default_src = "{{ asset('asset/img/default_item.png') }}";
-            var check = $(getPhoto).prop('src',default_src);
-            //執行AJAX 直接刪除 
-            
-            // console.log(read_del);
-            // read_del.push(num);
-            // console.log(read_del);
-            //num等於1 id 會是針對
-            // if (id !== null) {
-            //     console.log(id) ;
-            // }
-            // console.log(num, id);
+        function del_img(num) {
+            var getPhoto = "#itempic-" + num; //照片檔案
+            var default_src = "{{ asset('asset/img/default_item.png') }}"; //預設值圖片路徑
+            var id = $(getPhoto).data('fileid'); //存放id
+            if (id !== '') {
+                $.ajax({
+                    type: "POST",
+                    url: '/backend/item/ajaxphoto/del',
+                    dataType: "json",
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "num": num,
+                        "id": id,
+                    },
+                    success: function(response) {
+                        $(getPhoto).prop('src', default_src); //將圖片改回預設值
+                        $(getPhoto).data('fileid', '');
+                        $('#divforclear-' + num).hide();
+                        alert('刪除成功');
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            } else {
+                $(getPhoto).prop('src', default_src); //將圖片改回預設值
+                $(getPhoto).data('fileid', '');
+                $('#divforclear-' + num).hide();
+                $('#file-' + num).val('');
+            }
+
         }
     </script>
 @endsection

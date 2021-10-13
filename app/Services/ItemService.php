@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Item;
-use App\Models\Item_photo ;
+use App\Models\Item_photo;
 use App\Services\AgentConfigService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +16,7 @@ class ItemService
     public function __construct(AgentConfigService $agentConfigService)
     {
         $this->agentConfigService = $agentConfigService;
-        // $this->agent_id = Auth::user()->agent_id;
+        $this->destinationPath = public_path('/images/item');
     }
 
     //  自動重新計算庫存數量
@@ -150,19 +150,21 @@ class ItemService
         return $result;
     }
 
-    public function getItemList(){
+    public function getItemList()
+    {
         $agent_id = Auth::user()->agent_id;
 
-        return Item::where('agent_id' , $agent_id)->where('active' , 1)->orderBy('number')->get();
+        return Item::where('agent_id', $agent_id)->where('active', 1)->orderBy('number')->get();
     }
 
-    public function getItemInfo($id){
+    public function getItemInfo($id)
+    {
         return Item::where('id', $id)->orderBy('id', 'ASC')->first();
     }
 
-    public function Get_Item_photo($id){
+    public function getItemPhoto($id)
+    {
         try {
-
             $result = Item_photo::where('item_id', $id)->orderBy('sort', 'asc')->get()->toArray();
         } catch (\Exception $e) {
             Log::info($e);
@@ -172,40 +174,71 @@ class ItemService
     /**
      *  $itemId : 新建或刪除時 會需要使用 item 對應到  table item_photo item_id
      *  $requestFile : 從控制器請求的檔案丟到服務執行
-     *  $method  : 有創建跟修改的方式 創建則有值的話 直接寫入 如果是修改要另外判斷 $readDelId and $oldFiles
-     *  $inputData :  oldFiles  , readDelId
-     *  $inputData['oldFiles'] : 如果有新上傳的圖片要蓋掉原先的圖片
-     *  $inputData['readDelId'] : 放入要刪除的照片
+     *  $method  : 有創建跟修改的方式 創建則有值的話 直接寫入 如果是修改要另外判斷
      */
-    public function uploadImage($itemId = null, $requestFile = [], $method, $inputData)
+    public function uploadImage($itemId = null, $requestFile = [], $method)
     {
-        $destinationPath = public_path('/images/item'); //圖片
-        $destination_YM = '/'.date('Y') .'/' .date('m') ; //年月
-        $destinationPath .= $destination_YM ; // 合併
+        $destinationPath = $this->destinationPath; //圖片
+        $destination_itemId = $itemId; //年月
+        $destinationPath .= $destination_itemId; // 合併
 
         //file-1 是主要圖片
         //file-2 是以下是次要商品圖片
-        foreach($requestFile as $key => $file){
-            if($method == 'create'){
-                if($key == 'file-1'){
-                    $fileName = md5($file->getClientOriginalName() . time()) . "." . $file->getClientOriginalExtension();
-                    $file->move($destinationPath, $fileName);
-                    $item = Item::find($itemId);
-                    $item->photo_name = $destination_YM . '/' .$fileName ;
-                    $item->save();
-                }else{
-                    $replace_example = explode("-",$key);
-                    $fileName = md5($file->getClientOriginalName() . time()) . "." . $file->getClientOriginalExtension();
-                    $file->move($destinationPath, $fileName);
-                    $data['item_id'] = $itemId ;
-                    $data['agent_id'] = Auth::user()->agent_id; ;
-                    $data['photo_name'] = $destination_YM . '/' .$fileName ;
-                    $data['sort'] = $replace_example[1] ;
-                    Item_photo::create($data);
+        foreach ($requestFile as $key => $file) {
+            if ($method !== 'create') {
+                //如果是修改先檢查原先有沒有data
+                if ($key == 'file-1') {
+                    $getItem = Item::where('id', $itemId)->get()->first();
+                    if ($getItem->photo_name !== '') {
+                        $getItem->photo_name = '' ;
+                        $getItem->save() ;
+                    }
+                } else {
+                    $replace_example = explode("-", $key);
+                    $sopt =  $replace_example[1];
+                    $getPhoto = Item_photo::where('item_id',$itemId)->where('sort',$sopt)->get()->first();
+                    if($getPhoto !== null){
+                        $getPhoto->delete();
+                    }
                 }
             }
+            if ($key == 'file-1') {
+                $fileName = md5($file->getClientOriginalName() . time()) . "." . $file->getClientOriginalExtension();
+                $file->move($destinationPath, $fileName);
+                $item = Item::find($itemId);
+                $item->photo_name = $destination_itemId . '/' . $fileName;
+                $item->save();
+            } else {
+                $replace_example = explode("-", $key);
+                $fileName = md5($file->getClientOriginalName() . time()) . "." . $file->getClientOriginalExtension();
+                $file->move($destinationPath, $fileName);
+                $data['item_id'] = $itemId;
+                $data['agent_id'] = Auth::user()->agent_id;
+                $data['photo_name'] = $destination_itemId . '/' . $fileName;
+                $data['sort'] = $replace_example[1];
+                Item_photo::create($data);
+            }
         }
-        return true ;
-
+        return true;
+    }
+    public function delImage($input)
+    {
+        if ($input['type'] == 'item') {
+            try {
+                DB::table('item')
+                    ->where('id', $input['id'])
+                    ->update(array('photo_name' => ''));
+            } catch (\Exception $e) {
+                Log::info($e);
+            }
+        } else {
+            try {
+                DB::table('item_photo')->where('id', $input['id'])->delete();
+            } catch (\Exception $e) {
+                Log::info($e);
+            }
+        }
+        return true;
+        // dump($request->input()) ;
     }
 }
