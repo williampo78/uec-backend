@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\Models\Users;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -17,11 +17,10 @@ class RoleService
     {
         $user_id = Auth::user()->id;
 
-        $roles = User::select('users.user_name' , 'user_roles.role_id', 'roles.role_name', 'role_permission_details.permission_detail_id',
+        $roles = Users::select('users.user_name' , 'user_roles.role_id', 'roles.role_name', 'role_permission_details.permission_detail_id',
                                 'role_permission_details.permission_detail_id' , 'permission_detail.code' , 'permission_detail.name',
                                 'auth_query' , 'auth_create' , 'auth_update', 'auth_delete', 'auth_void', 'auth_export')
-                    ->where('user.id' , $user_id)
-                    ->leftJoin('users' , 'user.account' , '=' , 'users.user_account')
+                    ->where('users.id' , $user_id)
                     ->leftJoin('user_roles' , 'users.id' , '=' , 'user_roles.user_id')
                     ->leftJoin('roles' , 'roles.id' , '=' , 'user_roles.role_id')
                     ->leftJoin('role_permission_details' , 'role_permission_details.role_id' , '=' , 'user_roles.role_id')
@@ -90,9 +89,12 @@ class RoleService
 
         if(isset($roles[$code])) {
             $data = [
+                'auth_query' => $roles[$code]['auth_query'],
+                'auth_create' => $roles[$code]['auth_create'],
+                'auth_update' => $roles[$code]['auth_update'],
+                'auth_delete' => $roles[$code]['auth_delete'],
                 'auth_void' => $roles[$code]['auth_void'],
                 'auth_export' => $roles[$code]['auth_export'],
-                'auth_void' => $roles[$code]['auth_update'],
             ];
         }
 

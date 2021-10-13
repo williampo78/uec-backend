@@ -42,7 +42,7 @@ class QuotationController extends Controller
         $data = [];
         $supplier = new SupplierService();
         $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
-        $data['quotation'] = $this->quotationService->getQuotation();
+        $data['quotation'] = $this->quotationService->getQuotation($getData);
         $data['status_code'] = $this->quotationService->getStatusCode();
         $data['getData'] = $getData;
 
@@ -97,9 +97,12 @@ class QuotationController extends Controller
      */
     public function edit($id)
     {
-        $data = Warehouse::find($id);
+        $supplier = new SupplierService();
+        $data['supplier'] = $supplier->getSupplier();
+        $data['quotation'] = $this->quotationService->getQuotationById($id);
+        $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
 
-        return view('backend.warehouse.upd', compact('data'));
+        return view('backend.quotation.add', compact('data'));
     }
 
     /**
@@ -143,6 +146,18 @@ class QuotationController extends Controller
             $data = $this->itemService->getItemList();
         }elseif ($rs['get_type'] == 'iteminfo'){
             $data = $this->itemService->getItemInfo($rs['item_id']);
+        }elseif ($rs['get_type'] == 'quotation'){
+            $quotationStatus = $this->quotationService->getStatusCode();
+            $supplier = new SupplierService();
+            $supplierList = $this->universalService->idtokey($supplier->getSupplier());
+            $data = $this->quotationService->getQuotationById($rs['id']);
+            $data['status_code'] = $quotationStatus[$data['status_code']] ?? '';
+            $data['supplier_name'] = $supplierList[$data['supplier_id']]->name ?? '';
+
+        }elseif ($rs['get_type'] == 'quotation_detail'){
+            $data = $this->quotationService->getQuotationDetail($rs['id']);
+        }elseif ($rs['get_type'] == 'quotation_view_log'){
+            $data = [];
         }
 
         echo "OK@@".json_encode($data);

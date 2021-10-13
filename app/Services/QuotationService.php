@@ -17,10 +17,44 @@ class QuotationService
         $this->universalService = $universalService;
     }
 
-    public function getQuotation()
+    public function getQuotation($data)
     {
         $agent_id = Auth::user()->agent_id;
-        return Quotation::where('agent_id' , $agent_id)->get();
+
+        $quotation = Quotation::select('quotation.id','doc_number','supplier_id','status_code','currency_code',
+                                'exchange_rate','quotation.remark','submitted_at' , 'closed_at' , 'tax')
+                            ->where('quotation.agent_id' , $agent_id)
+                            ->leftJoin('supplier' , 'supplier.id' , '=' , 'supplier_id');
+
+        if (isset($data['status'])){
+            $quotation->where('status_code' , $data['status']);
+        }
+
+        if (isset($data['supplier'])){
+            $quotation->where('supplier_id' , $data['supplier']);
+        }
+
+        if (isset($data['doc_number'])){
+            $quotation->where('doc_number' ,'like' , '%'.$data['doc_number'].'%');
+        }
+
+        if (isset($data['select_start_date']) && isset($data['select_end_date'])){
+            $quotation->whereBetween('quotation.created_at' , [$data['select_start_date'] , $data['select_end_date']]);
+        }
+
+        if (isset($data['company_number'])){
+            $quotation->where('company_number' , $data['company_number']);
+        }
+
+        $quotation = $quotation->get();
+
+        return $quotation;
+    }
+
+    public function getQuotationById($id){
+        $agent_id = Auth::user()->agent_id;
+
+        return Quotation::select()->where('quotation.agent_id' , $agent_id)->first();
     }
 
     public function getStatusCode(){
@@ -45,6 +79,7 @@ class QuotationService
             $quotationData['supplier_id'] = $data['supplier_id'];
             $quotationData['status_code'] = 'DRAFTED';
             $quotationData['tax'] = $data['tax'];
+            $quotationData['remark'] = $data['remark'];
             $quotationData['created_by'] = Auth::user()->id;
             $quotationData['created_at'] = Carbon::now();
             $quotationData['updated_by'] = Auth::user()->id;
@@ -74,5 +109,12 @@ class QuotationService
         }
 
         return $result;
+    }
+
+    public function getQuotationDetail($quotation_id){
+        return QuotationDetails::select(DB::raw('item.name as item_name') , DB::raw('item.number as item_number') , 'original_unit_price')
+                        ->where('quotation_id' , $quotation_id)
+                        ->leftJoin('item' , 'item.id' , 'quotation_details.item_id')
+                        ->orderBy('item.id')->get();
     }
 }

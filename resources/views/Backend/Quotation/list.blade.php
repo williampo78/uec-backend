@@ -18,7 +18,6 @@
                     <div class="panel-heading">
 
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
-{{--                            @csrf--}}
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="col-sm-2"><h5>供應商</h5></div>
@@ -121,10 +120,8 @@
                                 <tbody>
                                     <td>
                                         <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
-                                        <button class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</button>
-{{--                                        <a class="btn btn-info btn-sm" onclick="del({{ $v['id'] }});">刪除</a>--}}
-
-                                        <button class="btn btn-info btn-sm" onclick="del({{ $v['id'] }});">刪除</button>
+                                        <a class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</a>
+                                        <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
                                     </td>
                                     <td>{{ $v['created_at'] }}</td>
                                     <td>{{ $v['doc_number'] }}</td>
@@ -153,9 +150,9 @@
                 });
             });
 
-            function del(id)
+            function del(id, doc_number)
             {
-                if(confirm("確認要刪除此筆資料?")){
+                if(confirm("確定要刪除報價單"+doc_number+"?")){
                     document.getElementById('del-'+id).submit();
                 }
                 return false;
