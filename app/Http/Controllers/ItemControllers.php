@@ -57,7 +57,7 @@ class ItemControllers extends Controller
         if ($readyInput['status']) {
             $inserStatus = $this->itemService->insertData($readyInput['data']);
             if ($inserStatus['status']) { // 寫入DB成功
-                // $inserFile = $this->itemService->uploadImage($inserStatus['id'], $request->file(), 'create'); //圖片上傳功能
+                $inserFile = $this->itemService->uploadImage($inserStatus['id'], $request->file(), 'create'); //圖片上傳功能
                 return redirect('backend/item');
             }
         } else {
@@ -89,7 +89,7 @@ class ItemControllers extends Controller
         $category = $this->categoryService->getCategory(); //分類
         $supplier = $this->supplierService->getSupplier(); //供應商
         $item = $this->itemService->getItem(1, $id)->first(); //返回array
-        $itemPhoto = $this->itemService->Get_Item_photo($id);
+        $itemPhoto = $this->itemService->getItemPhoto($id);
         return view('Backend.Item.input', compact('item', 'category', 'supplier','itemPhoto'));
     }
 
@@ -102,14 +102,14 @@ class ItemControllers extends Controller
      */
     public function update(Request $request, $id)
     {
+        // dd($request->file()) ;
+
         $readyInput = $this->InputValidate($request);
-        
         if ($readyInput['status']) {
             $updataStatus = $this->itemService->update($readyInput['data'], $id);
             // dd($updataStatus) ; exit ;
             if($updataStatus){
-                $inserFile = $this->itemService->uploadImage($id, $request->file(), 'update' ,$request->input() ,); //圖片上傳功能
-                dd('TEST') ;
+                $inserFile = $this->itemService->uploadImage($id, $request->file(), 'update' ); //圖片上傳功能
             }
             return redirect('backend/item');
         } else {
@@ -200,6 +200,15 @@ class ItemControllers extends Controller
     }
     public function ajax_del_Item_photo(Request $request)
     {
-        dump($request->input());
+        $input = [] ;
+        $input['type'] = $request->input('num') == 1 ? 'item' : 'item_photo' ;
+        $input['num']  = $request->input('num') ; 
+        $input['id']   = $request->input('id'); 
+        $result = $this->itemService->delImage($input);
+        if($result){
+            return response()->json(['success'=>'true']);
+        }else{
+            return response()->json(['error'=>'false']);
+        }
     }
 }
