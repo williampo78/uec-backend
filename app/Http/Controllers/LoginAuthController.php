@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Users;
 use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,13 +33,13 @@ class LoginAuthController extends Controller
             'account.required' => '使用者帳號不能為空',
             'password.required' => '密碼不能為空',
         ]);
-        $user = User::where([
-            'account' => $request->account,
-            'password' => md5($request->password),
+        $users = Users::where([
+            'user_account' => $request->account,
+            'user_password' => md5($request->password),
         ])->first();
 
-        if ($user) {
-            Auth::login($user);
+        if ($users) {
+            Auth::login($users);
             $this->roleService->putUserRolesSession();
 
             return redirect()->intended('backend')

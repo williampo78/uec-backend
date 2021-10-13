@@ -11,7 +11,7 @@ class SupplierTypeService
     {
     }
 
-    public function Get_All($request)
+    public function getSupplierType($request = null)
     {
         // dump($request->input());
         // order_by DESC OR ASC
@@ -19,7 +19,7 @@ class SupplierTypeService
         // page function
         // view data Number
 
-        return optional(SupplierType::All())->toArray();
+        return SupplierType::All();
     }
     public function Get($SupplierType_id)
     {

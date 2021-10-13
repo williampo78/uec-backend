@@ -2,26 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\SupplierService;
 use App\Services\SupplierTypeService;
 use Illuminate\Http\Request;
 
-class SupplierTypeControllers extends Controller
+class SupplierControllers extends Controller
 {
-    protected $SupplierTypeService;
+    private $supplierService;
+    private $supplierTypeService ;
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct(SupplierTypeService $SupplierTypeService)
+    public function __construct(SupplierService $supplierService,SupplierTypeService $supplierTypeService)
     {
-        $this->SupplierTypeService = $SupplierTypeService;
+        $this->supplierService = $supplierService;
+        $this->supplierTypeService = $supplierTypeService ;
     }
-    public function index(Request $request)
+    public function index()
     {
-        $result = [];
-        $result['SupplierTypeService'] = $this->SupplierTypeService->getSupplierType($request);
-        return view('Backend.SupplierType.list', $result);
+        $reslut = [] ;
+        $reslut['supplier'] = $this->supplierService->getSupplier() ;
+        return view('Backend.Supplier.list',$reslut);
     }
 
     /**
@@ -31,7 +35,8 @@ class SupplierTypeControllers extends Controller
      */
     public function create()
     {
-        return view('Backend.SupplierType.input');
+        $reslut['SupplierType'] = $this->supplierTypeService->getSupplierType();
+        return view('Backend.Supplier.input',$reslut);
     }
 
     /**
@@ -42,14 +47,11 @@ class SupplierTypeControllers extends Controller
      */
     public function store(Request $request)
     {
-        //未來要新增驗證
-        $inputData = $request->validate([
-            'code' => 'required',
-            'name' => 'required',
-        ]);
-        $this->SupplierTypeService->Add($inputData);
-
-        return redirect(route('supplier_type'));
+        $input = $request->input();
+        
+        $reslut = $this->supplierService->addSupplier($input);
+    
+        return redirect(route('supplier'));
     }
 
     /**
@@ -60,6 +62,8 @@ class SupplierTypeControllers extends Controller
      */
     public function show($id)
     {
+        // $supplier = $this->supplierService->showSupplier($id)->first();
+        // return view('Backend.Supplier.input',$supplier);
     }
 
     /**
@@ -70,9 +74,10 @@ class SupplierTypeControllers extends Controller
      */
     public function edit($id)
     {
-        $result = [];
-        $result['ShowData'] = $this->SupplierTypeService->Get($id);
-        return view('Backend.SupplierType.input', $result);
+        $reslut = [] ; 
+        $reslut['Supplier'] = $this->supplierService->showSupplier($id);
+        $reslut['SupplierType'] = $this->supplierTypeService->getSupplierType();
+        return view('Backend.Supplier.input',$reslut);
     }
 
     /**
@@ -84,14 +89,10 @@ class SupplierTypeControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        $inputData = $request->validate([
-            'code' => 'required',
-            'name' => 'required',
-        ]);
+        $input =  $request->input();
+        $result = $this->supplierService->updateSupplier($input, $id);
 
-        $result = $this->SupplierTypeService->Update($inputData, $id);
-
-        return redirect(route('supplier_type'));
+        return redirect(route('supplier'));
     }
 
     /**

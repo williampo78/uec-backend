@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\SupplierTypeService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class SupplierTypeControllers extends Controller
+
+class QuotationReviewController extends Controller
 {
-    protected $SupplierTypeService;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct(SupplierTypeService $SupplierTypeService)
+
+
+    public function __construct()
     {
-        $this->SupplierTypeService = $SupplierTypeService;
+
     }
-    public function index(Request $request)
+
+    public function index()
     {
-        $result = [];
-        $result['SupplierTypeService'] = $this->SupplierTypeService->getSupplierType($request);
-        return view('Backend.SupplierType.list', $result);
+        $data = [];
+        return view('Backend.QuotationReview.list' , compact('data'));
     }
 
     /**
@@ -31,7 +34,10 @@ class SupplierTypeControllers extends Controller
      */
     public function create()
     {
-        return view('Backend.SupplierType.input');
+        $agent_id = Auth::user()->agent_id;
+        $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
+
+        return view('Backend.Category.add' , compact('primary_category'));
     }
 
     /**
@@ -42,14 +48,16 @@ class SupplierTypeControllers extends Controller
      */
     public function store(Request $request)
     {
-        //未來要新增驗證
-        $inputData = $request->validate([
-            'code' => 'required',
-            'name' => 'required',
-        ]);
-        $this->SupplierTypeService->Add($inputData);
+        $route_name = 'category';
+        $act = 'add';
+        $data = $request->except('_token');
+        $data['agent_id'] = Auth::user()->agent_id;
+        $data['created_by'] = Auth::user()->id;
+        $data['created_at'] = Carbon::now();
 
-        return redirect(route('supplier_type'));
+        $rs = Category::insert($data);
+
+        return view('backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -60,6 +68,7 @@ class SupplierTypeControllers extends Controller
      */
     public function show($id)
     {
+
     }
 
     /**
@@ -70,9 +79,10 @@ class SupplierTypeControllers extends Controller
      */
     public function edit($id)
     {
-        $result = [];
-        $result['ShowData'] = $this->SupplierTypeService->Get($id);
-        return view('Backend.SupplierType.input', $result);
+        $data = Category::find($id);
+        $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
+
+        return view('Backend.PrimaryCategory.upd', compact('data' , 'primary_category_list'));
     }
 
     /**
@@ -84,14 +94,14 @@ class SupplierTypeControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        $inputData = $request->validate([
-            'code' => 'required',
-            'name' => 'required',
-        ]);
+        $data = $request->except('_token' , '_method');
+        $data['updated_by'] = Auth::user()->id;
+        $data['updated_at'] = Carbon::now();
 
-        $result = $this->SupplierTypeService->Update($inputData, $id);
-
-        return redirect(route('supplier_type'));
+        Category::where('id' ,$id)->update($data);
+        $route_name = 'category';
+        $act = 'upd';
+        return view('backend.success', compact('route_name' , 'act'));
     }
 
     /**
@@ -103,5 +113,7 @@ class SupplierTypeControllers extends Controller
     public function destroy($id)
     {
         //
+
     }
+
 }
