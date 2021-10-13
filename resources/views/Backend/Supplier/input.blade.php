@@ -305,11 +305,22 @@
                                         </div>
                                     </div>
                                 </div>
+                                <h4><i class="fa fa-th-large"></i> 其他聯絡人</h4>
+                                <div id="specDiv">
+                                    <input type="hidden" name="rowNo" id="rowNo" value="0">
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <a class="btn btn-warning" id="btn-addnewRow"><i class="fa fa-plus"></i>
+                                            新增聯絡人</a>
+                                    </div>
+                                </div>
+                                <hr>
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <button class="btn btn-success" id="btn-save"><i class="fa fa-save"></i>
-                                                儲存</button>
+                                            <button class="btn btn-success" id="btn-save"><i class="fa fa-check"></i>
+                                                完成</button>
                                             <a href="{{ route('supplier') }}" class="btn btn-danger" id="btn-cancel"><i
                                                     class="fa fa-ban"></i> 取消</a>
                                         </div>
