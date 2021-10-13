@@ -121,6 +121,9 @@
                 {
                     // 新增品項
                     $('#btn-addNewRow').click(function () { AddItemRow("process","input"); });
+
+                    $('#supplier_id').select2();
+                    $('#tax').select2();
                 });
 
                 $(function () {

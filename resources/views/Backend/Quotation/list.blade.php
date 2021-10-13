@@ -152,6 +152,10 @@
     @include('Backend.Quotation.detail')
     @section('js')
         <script>
+            $(document).ready(function () {
+               $('#supplier').select2();
+               $('#status').select2();
+            });
 
             $(function () {
                 $('#datetimepicker').datetimepicker({

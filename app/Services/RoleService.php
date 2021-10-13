@@ -90,10 +90,10 @@ class RoleService
         $data = [
             'auth_query' => 1,
             'auth_create' => 1,
-            'auth_update' => 0,
+            'auth_update' => 1,
             'auth_delete' => 1,
-            'auth_void' => 0,
-            'auth_export' => 0,
+            'auth_void' => 1,
+            'auth_export' => 1,
         ];
 
         if(isset($roles[$code])) {

@@ -112,6 +112,11 @@
                                         報價單 </a>
                                 </li>
                                 <li>
+                                    <a href="{{route('quotation_review')}}">
+                                        <i class="fa fa-shopping-cart fa-fw"></i>
+                                        報價單簽核 </a>
+                                </li>
+                                <li>
                                     <a href="{{route('requisitions_purchase')}}">
                                         <i class="fa fa-shopping-cart fa-fw"></i>
                                         請購單 </a>
