@@ -11,6 +11,7 @@ class ItemControllers extends Controller
 {
     private $itemService;
     private $categoryService;
+    private $supplierService ;
 
     public function __construct(ItemService $itemService,
         CategoryService $categoryService,

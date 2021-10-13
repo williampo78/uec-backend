@@ -62,7 +62,7 @@
                                         倉庫維護 </a>
                                 </li>
                                 <li>
-                                    <a href="index.php?func=supplier">
+                                    <a href="{{route('supplier')}}">
                                         <i class="fa fa-truck fa-fw"></i>
                                         供應商資料 </a>
                                 </li>
