@@ -18,7 +18,6 @@
                     <div class="panel-heading">
 
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
-{{--                            @csrf--}}
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="col-sm-2"><h5>供應商</h5></div>
@@ -86,7 +85,9 @@
 
                                 <div class="col-sm-3 text-right">
                                     <div class="col-sm-12">
-                                        <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                        @if ($share_role_auth['auth_query'])
+                                            <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -97,7 +98,9 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-2">
-                                <a class="btn btn-block btn-warning btn-sm" href="{{route('quotation.create')}}"><i class="fa fa-plus"></i> 新增</a>
+                                @if($share_role_auth['auth_create'])
+                                    <a class="btn btn-block btn-warning btn-sm" href="{{route('quotation.create')}}"><i class="fa fa-plus"></i> 新增</a>
+                                @endif
                             </div>
                         </div>
                         <hr>
@@ -120,16 +123,22 @@
                                 </form>
                                 <tbody>
                                     <td>
-                                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
-                                        <button class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</button>
-{{--                                        <a class="btn btn-info btn-sm" onclick="del({{ $v['id'] }});">刪除</a>--}}
+                                        @if($share_role_auth['auth_query'])
+                                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
+                                        @endif
 
-                                        <button class="btn btn-info btn-sm" onclick="del({{ $v['id'] }});">刪除</button>
+                                        @if($share_role_auth['auth_update'] && $v['status_code']=='DRAFTED' && $v['created_by']==$data['user_id'])
+                                            <a class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</a>
+                                        @endif
+
+                                        @if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])
+                                            <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
+                                        @endif
                                     </td>
                                     <td>{{ $v['created_at'] }}</td>
                                     <td>{{ $v['doc_number'] }}</td>
                                     <td>{{ $data['supplier'][$v['supplier_id']]['name'] }}</td>
-                                    <td>{{ $data['status_code'][$v['status_code']] }}</td>
+                                    <td>{{ $data['status_code'][$v['status_code']]?? '' }}</td>
                                     <td>{{ $v['submitted_at'] }}</td>
                                     <td>{{ $v['closed_at'] }}</td>
                                 </tbody>
@@ -143,6 +152,10 @@
     @include('Backend.Quotation.detail')
     @section('js')
         <script>
+            $(document).ready(function () {
+               $('#supplier').select2();
+               $('#status').select2();
+            });
 
             $(function () {
                 $('#datetimepicker').datetimepicker({
@@ -153,9 +166,9 @@
                 });
             });
 
-            function del(id)
+            function del(id, doc_number)
             {
-                if(confirm("確認要刪除此筆資料?")){
+                if(confirm("確定要刪除報價單"+doc_number+"?")){
                     document.getElementById('del-'+id).submit();
                 }
                 return false;

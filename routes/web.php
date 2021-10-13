@@ -11,6 +11,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers; 
+use App\Http\Controllers\QuotationReviewController;
 use App\Models\Item;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/requisitions_purchase/ajax',[RequisitionsPurchaseController::class,'ajax']);
     Route::resource('/quotation',QuotationController::class, ['names' => ['index' => 'quotation']]);
     Route::post('/quotation/ajax',[QuotationController::class,'ajax']);
+    Route::resource('/quotation_review',QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
+
 
 });
 

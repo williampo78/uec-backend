@@ -22,6 +22,10 @@
                                         已經成功儲存修改！
                                     @elseif($act==='del')
                                         資料已刪除！
+                                    @elseif($act==='DRAFTED')
+                                        儲存草稿成功！
+                                    @elseif($act==='REVIEWING')
+                                        儲存成功，報價單送審中！
                                     @endif
                                 </div>
                                 <a class="btn btn-block btn-success" href="{{route($route_name)}}"><i class="fa fa-fw fa-book"></i> 返回列表</a>

@@ -1,14 +1,6 @@
 <script>
     function AddItemRow(get_type, position)
     {
-        var process_plan = $("#process_plan").val();
-
-        if(process_plan == "")
-        {
-            alert("請先選擇計畫");
-            return;
-        }
-
         var curRow = parseInt($('#rowNo').val());
         var newRow = curRow + 1;
         if(curRow == 0)
@@ -127,5 +119,73 @@
 
                 }
             });
+    }
+
+    function ajaxGetItem(quotation_id){
+        var curRow = parseInt($('#rowNo').val());
+        var newRow = curRow + 1;
+        var position = 'input';
+        var get_type = '';
+        $.ajax({
+            url: "/backend/quotation/ajax",
+            type: "POST",
+            data: {'get_type': "quotation_detail" ,'id': quotation_id , _token: '{{csrf_token()}}' },
+            enctype: 'multipart/form-data',
+        })
+        .done(function( data ){
+
+            var data_array = data.split('@@');
+            if(data_array[0] == "OK")
+            {
+                var obj = jQuery.parseJSON(data_array[1]);
+
+                $.each( obj, function( key, value )
+                {
+                    $(" <div class='add_row' id='div-addrow-" + position + newRow + "'>" +
+                        "<div class='row'>" +
+                        "<input class='form-control' name='itemid[]' id='" + position + "itemid-" + newRow + "' type='hidden'>" +
+                        "<input class='form-control' name='itemname[]' id='" + position + "itemname-" + newRow + "' type='hidden'>" +
+                        "<input class='form-control' name='itemprice[]' id='" + position + "itemprice-" + newRow + "' type='hidden'>" +
+                        "<div class='col-sm-6' >" +
+                        "<div class='input-group'>" +
+                        "<select class='form-control js-select2-item' name='item[]' id='" + position + "item-" + newRow + "' onchange=\"getItemInfo(" + newRow + " , '" + get_type + "', '" + position + "')\" >" +
+                        "<option value=''></option>" +
+                        "</select>" +
+                        "<span class='input-group-btn'>"+
+                        "<button class='btn copy_btn' type='button' onclick=\"copy_text(" + newRow + ")\" ><i class='fa fa-copy'></i></button>" +
+                        "</span>" +
+                        "</div>" +
+                        "</div>" +
+                        "<div class='col-sm-2' >" +
+                        "<input class='form-control qty' name='price[]' id='" + position + "price-" + newRow + "'  type='number'>" +
+                        "</div>" +
+                        "<div class='col-sm-3' >" +
+                        "<input class='form-control' name='minimum_purchase_qty[]' id='" + position + "minimum_purchase_qty-" + newRow + "' readonly >" +
+                        "</div>" +
+                        "<div class='col-sm-1'>" +
+                        "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow + "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
+                        "</div>" +
+                        "</div>" +
+                        "</div>"
+                    ).appendTo($('#ItemDiv'));
+
+                    $('#rowNo').val(newRow);
+                });
+
+            }
+
+            $(".js-select2-item").select2(
+                {
+                    allowClear: true ,
+                    theme: "bootstrap",
+                    placeholder: "請選擇品項"
+                });
+
+            $('button[id^=btn-delete-]').click(function()
+            {
+                $("#div-addrow-" + position + $(this).val()).remove();
+                return false;
+            });
+        });
     }
 </script>

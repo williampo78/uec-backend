@@ -19,6 +19,9 @@ class AdminAuthmiddleware
     {
         $roleService = new RoleService;
         $role_auth = $roleService->getDisplayRoles();
+        $other_role_auth = $roleService->getOtherRoles();
+        //權限參數傳入view, 可以直接在各個view取用
+        view()->share('share_role_auth', $other_role_auth);
 
         if(Auth::check()){
             //DB role_permission_details 資料尚未建齊, 暫時先註解此功能
