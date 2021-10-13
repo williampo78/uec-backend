@@ -27,6 +27,8 @@
         href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
 </head>
 
 <body>

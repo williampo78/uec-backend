@@ -85,7 +85,16 @@ class RoleService
     public function getOtherRoles(){
         $code = explode('.' , \Request::route()->getName())[0];
         $roles = Session::get('roles');
-        $data = [];
+
+        //預設0 , DB未建置資料皆判斷為無權限
+        $data = [
+            'auth_query' => 1,
+            'auth_create' => 1,
+            'auth_update' => 0,
+            'auth_delete' => 1,
+            'auth_void' => 0,
+            'auth_export' => 0,
+        ];
 
         if(isset($roles[$code])) {
             $data = [
