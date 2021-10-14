@@ -12,6 +12,7 @@ use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\QuotationReviewController;
+use App\Http\Controllers\ContactControllers ; 
 use App\Models\Item;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
     Route::resource('/supplier', SupplierControllers::class, ['names' => ['index' => 'supplier']]);
     Route::post('/item/ajaxphoto/del',[ItemControllers::class,'ajax_del_Item_photo']); //刪除照片ajax
+    Route::post('/contact/ajax/del',[ContactControllers::class,'ajax_del_contact']); //刪除聯絡人
     Route::resource('/warehouse',WarehouseController::class, ['names' => ['index' => 'warehouse']]);
     Route::resource('/department', DepartmentControllers::class, ['names' => ['index' => 'department']]);
     Route::resource('/supplier_type', SupplierTypeControllers::class, ['names' => ['index' => 'supplier_type']]);

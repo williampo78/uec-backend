@@ -4,11 +4,11 @@
 
 @section('content')
     <div id="page-wrapper" style="min-height: 508px;">
-
+        {{-- Supplier 變數判斷現在是否是在編輯 --}}
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增資料</h1>
+                <h1 class="page-header"><i class="fa fa-plus"></i>{{ isset($Supplier) ? '編輯資料' : '新增資料' }}</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -18,13 +18,13 @@
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
                         @if (isset($Supplier))
-                            <form role="form" id="new-form" method="POST"
+                            <form role="form" id="formData" method="POST"
                                 action="{{ route('supplier.update', $Supplier->id) }}" enctype="multipart/form-data"
                                 novalidate="novalidate">
                                 {{ method_field('PUT') }}
                                 {{ csrf_field() }}
                             @else
-                                <form role="form" id="new-form" method="post" action="{{ route('supplier') }}"
+                                <form role="form" id="formData" method="post" action="{{ route('supplier') }}"
                                     enctype="multipart/form-data" novalidate="novalidate">
                         @endif
 
@@ -33,6 +33,8 @@
                             <!-- 欄位 -->
                             <div class="col-sm-12">
                                 <div class="row">
+                                    <input type="hidden" id="supplier_id"
+                                        value="{{ isset($Supplier) ? $Supplier->id : '' }}">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_supplier_type">
                                             <label for="supplier_type">供應商類別</label>
@@ -305,24 +307,64 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h4><i class="fa fa-th-large"></i> 其他聯絡人</h4>
-                                <div id="specDiv">
-                                    <input type="hidden" name="rowNo" id="rowNo" value="0">
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <a class="btn btn-warning" id="btn-addnewRow"><i class="fa fa-plus"></i>
-                                            新增聯絡人</a>
-                                    </div>
-                                </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <button class="btn btn-success" id="btn-save"><i class="fa fa-check"></i>
-                                                完成</button>
-                                            <a href="{{ route('supplier') }}" class="btn btn-danger" id="btn-cancel"><i
-                                                    class="fa fa-ban"></i> 取消</a>
+                                <div id="contact_table">
+                                    <textarea name="contact_json" style="display: none">@{{ contactData }}</textarea>
+                                    @if (isset($Supplier))
+                                        <h4><i class="fa fa-th-large"></i> 其他聯絡人 </h4>
+                                        <div id="">
+                                            <div class="well" v-for="(contact, contactkey) in contactData"
+                                                style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
+                                                <div class="row">
+                                                    <div class="col-sm-2"><label>姓名</label>
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].name">
+                                                    </div>
+                                                    <div class="col-sm-2"><label>電話</label>
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].telephone">
+                                                    </div>
+                                                    <div class="col-sm-2"><label>手機</label>
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].cell_phone">
+                                                    </div>
+                                                    <div class="col-sm-2"><label>傳真</label>
+                                                        <input class="form-control" v-model="contactData[contactkey].fax">
+                                                    </div>
+                                                    <div class="col-sm-2"><label>信箱</label>
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].email">
+                                                    </div>
+                                                    <div class="col-sm-2"><label>備註</label>
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].remark">
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <button type="button" class="btn btn-danger"
+                                                    @click="delContact(contact.id,contactkey)">
+                                                    <i class="fa fa-ban"></i>
+                                                    刪除聯絡人
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <button type="button" class="btn btn-warning" @click="addContact"><i
+                                                        class="fa fa-plus"></i>
+                                                    新增聯絡人</button>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                    @endif
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <button class="btn btn-success" type="button"><i class="fa fa-check"
+                                                        @click="submitBtn"></i> 完成</button>
+                                                <a href="{{ route('supplier') }}" class="btn btn-danger"
+                                                    id="btn-cancel"><i class="fa fa-ban"></i> 取消</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -334,4 +376,62 @@
             </div>
         </div>
     </div>
+@section('js')
+    <script>
+        var contact = Vue.extend({
+            data: function() {
+                return {
+                    contactData: @json(isset($Contact) ? $Contact : '{}'),
+                }
+            },
+            methods: {
+                addContact() {
+                    this.contactData.push({
+                        id: '',
+                        name: '',
+                        remark: '',
+                        table_id: $('#supplier_id').val(),
+                        table_name: '',
+                        telephone: '',
+                        cell_phone: '',
+                        email: '',
+                        fax: '',
+                        created_at: '',
+                        updated_at: '',
+                    });
+                },
+                delContact(id, key) {
+                    var checkDel = confirm('你確定要刪除嗎？');
+                    if (checkDel) {
+                        this.$delete(this.contactData, key)
+                        if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
+                            $.ajax({
+                                type: "POST",
+                                url: '/backend/contact/ajax/del',
+                                dataType: "json",
+                                data: {
+                                    "_token": "{{ csrf_token() }}",
+                                    "id": id,
+                                    "table_name": 'Supplier',
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            });
+                        }
+                    }
+
+                },
+                submitBtn() {
+                    $("#formData").submit();
+                },
+            }
+        })
+
+        new contact().$mount('#contact_table')
+    </script>
+@endsection
 @endsection
