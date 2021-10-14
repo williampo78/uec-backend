@@ -10,11 +10,12 @@ use App\Http\Controllers\PrimaryCategoryController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\QuotationController;
-use App\Http\Controllers\SupplierControllers; 
+use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\QuotationReviewController;
 use App\Models\Item;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\TestController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -44,7 +45,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/quotation/ajax',[QuotationController::class,'ajax']);
     Route::resource('/quotation_review',QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
 
-
+    Route::get('/test', [TestController::class, 'index'])->name('test');
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

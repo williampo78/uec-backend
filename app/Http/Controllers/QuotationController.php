@@ -49,7 +49,6 @@ class QuotationController extends Controller
             $getData['select_end_date'] = Carbon::now()->toDateString();
         }
 
-//        dd($data['quotation']);
         $data['getData'] = $getData;
         $data['user_id'] = Auth::user()->id;
 

@@ -94,6 +94,10 @@ class QuotationService
             $quotationData['updated_by'] = Auth::user()->id;
             $quotationData['updated_at'] = Carbon::now();
 
+            if($data['status_code']=='REVIEWING'){
+                $quotationData['submitted_at'] = Carbon::now();
+            }
+
             $quotation_id = Quotation::insertGetId($quotationData);
 
             $detailData = [];
@@ -128,5 +132,9 @@ class QuotationService
                         ->where('quotation_id' , $quotation_id)
                         ->leftJoin('item' , 'item.id' , 'quotation_details.item_id')
                         ->orderBy('item.id')->get();
+    }
+
+    public function getReviewService(){
+        return Quotation::where('status_code' , 'REVIEWING')->get();
     }
 }
