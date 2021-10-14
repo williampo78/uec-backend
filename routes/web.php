@@ -10,6 +10,7 @@ use App\Http\Controllers\PrimaryCategoryController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\SupplierControllers; 
 use App\Http\Controllers\QuotationReviewController;
 use App\Models\Item;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
+    Route::resource('/supplier', SupplierControllers::class, ['names' => ['index' => 'supplier']]);
     Route::post('/item/ajaxphoto/del',[ItemControllers::class,'ajax_del_Item_photo']); //刪除照片ajax
     Route::resource('/warehouse',WarehouseController::class, ['names' => ['index' => 'warehouse']]);
     Route::resource('/department', DepartmentControllers::class, ['names' => ['index' => 'department']]);
