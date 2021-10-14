@@ -4,11 +4,11 @@
 
 @section('content')
     <div id="page-wrapper" style="min-height: 508px;">
-
+        {{-- Supplier 變數判斷現在是否是在編輯 --}}
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增資料</h1>
+                <h1 class="page-header"><i class="fa fa-plus"></i>{{ isset($Supplier) ? '編輯資料' : '新增資料' }}</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -305,17 +305,37 @@
                                         </div>
                                     </div>
                                 </div>
-                                <h4><i class="fa fa-th-large"></i> 其他聯絡人</h4>
-                                <div id="specDiv">
-                                    <input type="hidden" name="rowNo" id="rowNo" value="0">
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <a class="btn btn-warning" id="btn-addnewRow"><i class="fa fa-plus"></i>
-                                            新增聯絡人</a>
+                                @if (isset($Supplier))
+                                    <h4><i class="fa fa-th-large"></i> 其他聯絡人</h4>
+                                    <div id="specDiv">
+                                        <div class="well" id="newRow1"
+                                            style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
+                                            <div class="row">
+                                                <div class="col-sm-2"><label>姓名</label><input class="form-control"
+                                                        name="name-1"></div>
+                                                <div class="col-sm-2"><label>電話</label><input class="form-control"
+                                                        name="telephone-1"></div>
+                                                <div class="col-sm-2"><label>手機</label><input class="form-control"
+                                                        name="cellphone-1"></div>
+                                                <div class="col-sm-2"><label>傳真</label><input class="form-control"
+                                                        name="fax-1"></div>
+                                                <div class="col-sm-2"><label>信箱</label><input class="form-control"
+                                                        name="email-1"></div>
+                                                <div class="col-sm-2"><label>備註</label><input class="form-control"
+                                                        name="remark-1"></div>
+                                            </div>
+                                        </div>
+                                        {{-- <input type="hidden" name="rowNo" id="rowNo" value="0"> --}}
                                     </div>
-                                </div>
-                                <hr>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <a class="btn btn-warning" id="btn-addnewRow"><i class="fa fa-plus"></i>
+                                                新增聯絡人</a>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                @endif
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -334,4 +354,11 @@
             </div>
         </div>
     </div>
+    @section('js')
+    <script>
+          var Ctor = Vue.extend(Sku);
+          new Ctor().$mount('#app');
+        console.log('TEST');
+    </script>
+    @endsection
 @endsection

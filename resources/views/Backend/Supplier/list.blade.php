@@ -178,7 +178,6 @@
                 var supplier_id = $(this).data("supplier");
                 $.each(supplier_json, function(index, val) {
                     if (supplier_id == val.id) {
-                        console.log(val) ;
                         $('#show_display_number').html(val.display_number);
                         $('#show_short_name').html(val.short_name);
                         $('#show_name').html(val.name);
@@ -193,7 +192,7 @@
                         $('#show_address4').html(val.address4);
                         $('#show_address5').html(val.address5);
                         $('#show_remark').html(val.address5);
-                        $('#hideShowMod').trigger( "click" );
+                        $('#hideShowMod').trigger("click");
                         return false;
                     }
                 });

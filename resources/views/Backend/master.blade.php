@@ -243,14 +243,12 @@
 <link src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"> </script>
-<script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/morrisjs/morris.min.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"> </script>
-{{-- <script src="{{ asset('asset/css/init.css') }}"> </script> --}}
 <script src="{{ asset('asset/js/init.js') }}"> </script>
 {{-- <script src="https://maps.googleapis.com/maps/api/js"> </script> --}}
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
-<script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 <script>
     $(document).ready(function() {
         $('#table_list').DataTable();

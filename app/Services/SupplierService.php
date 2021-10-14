@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Supplier;
+use App\Models\Contact; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -40,4 +41,15 @@ class SupplierService
 
         return Supplier::where('id', $id)->update($input);
     }
+    public function getContact(){
+        Contact::where('');
+    }
+    public function editContact(){
+
+    }
+    public function delContact(){
+        
+    }
+
+
 }
