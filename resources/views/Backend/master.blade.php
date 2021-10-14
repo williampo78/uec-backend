@@ -27,7 +27,6 @@
         href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 
 </head>
 
@@ -221,6 +220,7 @@
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}">
 </script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/collapse.js') }}"></script>
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/transition.js') }}"></script>
 <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
