@@ -27,7 +27,6 @@
         href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 
 </head>
 
@@ -251,6 +250,8 @@
 {{-- <script src="https://maps.googleapis.com/maps/api/js"> </script> --}}
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
 <script>
     $(document).ready(function() {
         $('#table_list').DataTable();
