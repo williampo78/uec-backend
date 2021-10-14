@@ -23,7 +23,8 @@ class QuotationReviewController extends Controller
 
     public function index()
     {
-        $data = [];
+        dd(Auth::user());
+        $data['user_name'] = Auth::user()->name;
         return view('Backend.QuotationReview.list' , compact('data'));
     }
 
