@@ -78,6 +78,7 @@ class SupplierControllers extends Controller
         $reslut = [] ; 
         $reslut['Supplier'] = $this->supplierService->showSupplier($id);
         $reslut['SupplierType'] = $this->supplierTypeService->getSupplierType();
+        $reslut['Contact']  = $this->supplierService->getContact($id);
         return view('Backend.Supplier.input',$reslut);
     }
 

@@ -306,26 +306,33 @@
                                     </div>
                                 </div>
                                 @if (isset($Supplier))
-                                    <h4><i class="fa fa-th-large"></i> 其他聯絡人</h4>
-                                    <div id="specDiv">
-                                        <div class="well" id="newRow1"
-                                            style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
-                                            <div class="row">
-                                                <div class="col-sm-2"><label>姓名</label><input class="form-control"
-                                                        name="name-1"></div>
-                                                <div class="col-sm-2"><label>電話</label><input class="form-control"
-                                                        name="telephone-1"></div>
-                                                <div class="col-sm-2"><label>手機</label><input class="form-control"
-                                                        name="cellphone-1"></div>
-                                                <div class="col-sm-2"><label>傳真</label><input class="form-control"
-                                                        name="fax-1"></div>
-                                                <div class="col-sm-2"><label>信箱</label><input class="form-control"
-                                                        name="email-1"></div>
-                                                <div class="col-sm-2"><label>備註</label><input class="form-control"
-                                                        name="remark-1"></div>
+                                    <h4><i class="fa fa-th-large"></i> 其他聯絡人 </h4>
+                                    <div id="contact_table">
+                                        <div class="well" v-for="(contact, contactkey) in contactData" :key="contactkey" style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
+                                            <div class="row" >
+                                                <div class="col-sm-2"><label>姓名</label>
+                                                    <input class="form-control" v-model="contact.name">
+                                                </div>
+                                                <div class="col-sm-2"><label>電話</label>
+                                                    <input class="form-control" v-model="contact.telephone">
+                                                </div>
+                                                <div class="col-sm-2"><label>手機</label>
+                                                    <input class="form-control" v-model="contact.cell_phone">
+                                                </div>
+                                                <div class="col-sm-2"><label>傳真</label>
+                                                    <input class="form-control"  v-model="contact.fax">
+                                                </div>
+                                                <div class="col-sm-2"><label>信箱</label>
+                                                    <input class="form-control"  v-model="contact.email">
+                                                </div>
+                                                <div class="col-sm-2"><label>備註</label>
+                                                    <input class="form-control"  v-model="contact.remark">
+                                                </div>
                                             </div>
+                                            <br>
+                                            <button class="btn btn-danger" id="btn-delete-1" value="2"><i class="fa fa-ban"></i> 刪除聯絡人</button>
+
                                         </div>
-                                        {{-- <input type="hidden" name="rowNo" id="rowNo" value="0"> --}}
                                     </div>
 
                                     <div class="row">
@@ -354,11 +361,18 @@
             </div>
         </div>
     </div>
-    @section('js')
+@section('js')
     <script>
-          var Ctor = Vue.extend(Sku);
-          new Ctor().$mount('#app');
-        console.log('TEST');
+        var contact = Vue.extend({
+            data: function() {
+                return {
+                    contactData: @json($Contact),
+                }
+
+            }
+        })
+
+        new contact().$mount('#contact_table')
     </script>
-    @endsection
+@endsection
 @endsection

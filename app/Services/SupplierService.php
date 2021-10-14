@@ -41,8 +41,8 @@ class SupplierService
 
         return Supplier::where('id', $id)->update($input);
     }
-    public function getContact(){
-        Contact::where('');
+    public function getContact($id){
+        return Contact::where('table_name','Supplier')->where('table_id',$id)->get();
     }
     public function editContact(){
 
