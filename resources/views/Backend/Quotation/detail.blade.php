@@ -1,6 +1,7 @@
 <!-- 報價單明細 -->
-<div class="form-group" id="row_detail" tabindex="-1">
-    <div class="">
+<div class="modal fade" id="row_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog">
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -153,12 +154,18 @@
 
                     $.each( obj, function( key, value )
                     {
+                        if (value.review_result==0){
+                            var reslut = '已駁回';
+                        }else if(value.review_result==1){
+                            var result = '已核准';
+                        }
+
                         html_value +=  "<tr>" +
-                            "<td>" + value.item_number + "</td>" +
-                            "<td>" + value.item_name + "</td>" +
-                            "<td>" + '國際條碼' + "</td>" +
-                            "<td>" + value.original_unit_price + "</td>" +
-                            "<td>" + '最小' + "</td>" +
+                            "<td>" + (key+1) + "</td>" +
+                            "<td>" + value.user_name + "</td>" +
+                            "<td>" + (value.review_at || '')+ "</td>" +
+                            "<td>" + (reslut || '') + "</td>" +
+                            "<td>" + (value.review_remark || '')+ "</td>" +
                             "</tr>";
                     });
 

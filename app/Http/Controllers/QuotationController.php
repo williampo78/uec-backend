@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quotation;
+use App\Models\Users;
 use App\Services\ItemService;
 use App\Services\QuotationService;
 use App\Services\RoleService;
@@ -169,7 +170,7 @@ class QuotationController extends Controller
         }elseif ($rs['get_type'] == 'quotation_detail'){
             $data = $this->quotationService->getQuotationDetail($rs['id']);
         }elseif ($rs['get_type'] == 'quotation_view_log'){
-            $data = [];
+            $data = $this->quotationService->getQuotationReviewLog($rs['id']);
         }
 
         echo "OK@@".json_encode($data);

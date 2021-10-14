@@ -34,7 +34,7 @@ class QuotationReviewController extends Controller
         $supplier = new SupplierService();
         $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
         $data['status_code'] = $this->quotationService->getStatusCode();
-        $data['quotation'] = $this->quotationService->getReviewService();
+        $data['quotation'] = $this->quotationService->getQuotationReview();
 
         return view('Backend.QuotationReview.list' , compact('data'));
     }
@@ -104,20 +104,10 @@ class QuotationReviewController extends Controller
     {
         $route_name = 'quotation_review';
         $act = 'review';
-        $user_id = Auth::user()->id;
-        $now = Carbon::now();
 
         $data = $request->except('_token' , '_method');
-        $data['quotation_id'] = $id;
-        $data['seq_no'] = '1';
-        $data['reviewer'] = $user_id;
-        $data['review_at'] = $now;
-        $data['created_by'] = $user_id;
-        $data['created_at'] = $now;
-        $data['updated_by'] = $user_id;
-        $data['updated_at'] = $now;
-
-        QuotationReviewLog::insert($data);
+        $data['id'] = $id;
+        $this->quotationService->updateQuotationReview($data);
 
         return view('backend.success', compact('route_name' , 'act'));
     }
