@@ -116,33 +116,35 @@
                                 <th>結案時間</th>
                             </tr>
                             </thead>
-                            @foreach($data['quotation'] as $k => $v)
-                                <form id="del-{{ $v['id'] }}" action="/backend/quotation/{{ $v['id'] }}" method="post">
-                                    @method('DELETE')
-                                    @csrf
-                                </form>
                                 <tbody>
-                                    <td>
-                                        @if($share_role_auth['auth_query'])
-                                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
-                                        @endif
+                                @foreach($data['quotation'] as $k => $v)
+                                    <form id="del-{{ $v['id'] }}" action="/backend/quotation/{{ $v['id'] }}" method="post">
+                                        @method('DELETE')
+                                        @csrf
+                                    </form>
+                                    <tr>
+                                        <td>
+                                            @if($share_role_auth['auth_query'])
+                                                <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
+                                            @endif
 
-                                        @if($share_role_auth['auth_update'] && $v['status_code']=='DRAFTED' && $v['created_by']==$data['user_id'])
-                                            <a class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</a>
-                                        @endif
+                                            @if($share_role_auth['auth_update'] && $v['status_code']=='DRAFTED' && $v['created_by']==$data['user_id'])
+                                                <a class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</a>
+                                            @endif
 
-                                        @if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])
-                                            <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
-                                        @endif
-                                    </td>
-                                    <td>{{ $v['created_at'] }}</td>
-                                    <td>{{ $v['doc_number'] }}</td>
-                                    <td>{{ $data['supplier'][$v['supplier_id']]['name'] }}</td>
-                                    <td>{{ $data['status_code'][$v['status_code']]?? '' }}</td>
-                                    <td>{{ $v['submitted_at'] }}</td>
-                                    <td>{{ $v['closed_at'] }}</td>
+                                            @if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])
+                                                <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
+                                            @endif
+                                        </td>
+                                        <td>{{ $v['created_at'] }}</td>
+                                        <td>{{ $v['doc_number'] }}</td>
+                                        <td>{{ $data['supplier'][$v['supplier_id']]['name'] }}</td>
+                                        <td>{{ $data['status_code'][$v['status_code']]?? '' }}</td>
+                                        <td>{{ $v['submitted_at'] }}</td>
+                                        <td>{{ $v['closed_at'] }}</td>
+                                    </tr>
+                                @endforeach
                                 </tbody>
-                            @endforeach
                         </table>
                     </div>
                 </div>
