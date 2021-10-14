@@ -33,6 +33,8 @@
                             <!-- 欄位 -->
                             <div class="col-sm-12">
                                 <div class="row">
+                                    <input type="hidden" id="supplier_id"
+                                        value="{{ isset($Supplier) ? $Supplier->id : '' }}">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_supplier_type">
                                             <label for="supplier_type">供應商類別</label>
@@ -307,31 +309,34 @@
                                 </div>
                                 <div id="contact_table">
                                     <textarea name="contact_json" style="display: none">@{{ contactData }}</textarea>
-
                                     @if (isset($Supplier))
                                         <h4><i class="fa fa-th-large"></i> 其他聯絡人 </h4>
                                         <div id="">
                                             <div class="well" v-for="(contact, contactkey) in contactData"
-                                                :key="contactkey"
                                                 style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
                                                 <div class="row">
                                                     <div class="col-sm-2"><label>姓名</label>
-                                                        <input class="form-control" v-model="contact.name">
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].name">
                                                     </div>
                                                     <div class="col-sm-2"><label>電話</label>
-                                                        <input class="form-control" v-model="contact.telephone">
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].telephone">
                                                     </div>
                                                     <div class="col-sm-2"><label>手機</label>
-                                                        <input class="form-control" v-model="contact.cell_phone">
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].cell_phone">
                                                     </div>
                                                     <div class="col-sm-2"><label>傳真</label>
-                                                        <input class="form-control" v-model="contact.fax">
+                                                        <input class="form-control" v-model="contactData[contactkey].fax">
                                                     </div>
                                                     <div class="col-sm-2"><label>信箱</label>
-                                                        <input class="form-control" v-model="contact.email">
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].email">
                                                     </div>
                                                     <div class="col-sm-2"><label>備註</label>
-                                                        <input class="form-control" v-model="contact.remark">
+                                                        <input class="form-control"
+                                                            v-model="contactData[contactkey].remark">
                                                     </div>
                                                 </div>
                                                 <br>
@@ -343,7 +348,6 @@
 
                                             </div>
                                         </div>
-
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <button type="button" class="btn btn-warning" @click="addContact"><i
@@ -378,11 +382,15 @@
             data: function() {
                 return {
                     contactData: @json(isset($Contact) ? $Contact : '{}'),
-                    contactDefault: {
+                }
+            },
+            methods: {
+                addContact() {
+                    this.contactData.push({
                         id: '',
                         name: '',
                         remark: '',
-                        table_id: '',
+                        table_id: $('#supplier_id').val(),
                         table_name: '',
                         telephone: '',
                         cell_phone: '',
@@ -390,13 +398,7 @@
                         fax: '',
                         created_at: '',
                         updated_at: '',
-                    }
-                }
-            },
-            methods: {
-                addContact() {
-                    let contactDefault = this.contactDefault;
-                    this.contactData.push(contactDefault);
+                    });
                 },
                 delContact(id, key) {
                     var checkDel = confirm('你確定要刪除嗎？');
