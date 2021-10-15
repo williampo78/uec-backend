@@ -12,11 +12,12 @@ use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\QuotationReviewController;
-use App\Http\Controllers\ContactControllers ; 
+use App\Http\Controllers\ContactControllers ;
 use App\Models\Item;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\UsersController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,6 +49,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/quotation_review',QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
 
     Route::get('/test', [TestController::class, 'index'])->name('test');
+    Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
