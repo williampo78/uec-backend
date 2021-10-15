@@ -1421,17 +1421,17 @@
   //   $('#rowNo').val(newRow);
   // }
 
-  function copy_text(row_id)
-  {
-    var name = $("#itemname-" + row_id).val();
-    new Clipboard('.copy_btn',
-    {
-      text: function(trigger)
-      {
-        return name;
-      }
-    });
-  }
+  // function copy_text(row_id)
+  // {
+  //   var name = $("#itemname-" + row_id).val();
+  //   new Clipboard('.copy_btn',
+  //   {
+  //     text: function(trigger)
+  //     {
+  //       return name;
+  //     }
+  //   });
+  // }
 
   // function add_item_return_event(item_qty_select)
   // {

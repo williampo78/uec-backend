@@ -12,7 +12,7 @@ use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\QuotationReviewController;
-use App\Http\Controllers\ContactControllers ; 
+use App\Http\Controllers\ContactControllers ;
 use App\Models\Item;
 use Illuminate\Support\Facades\Route;
 
@@ -48,7 +48,9 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/quotation_review',QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
     Route::post('/quotation/ajaxDelItem' , [QuotationController::class,'ajaxDelItem']);
 
-    Route::get('/test', [TestController::class, 'index'])->name('test');
+    Route::resource('/test',TestController::class, ['names' => ['index' => 'test']]);
+
+//    Route::get('/test', [TestController::class, 'index'])->name('test');
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

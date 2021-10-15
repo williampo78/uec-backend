@@ -44,7 +44,7 @@ class QuotationController extends Controller
         $data = [];
         $supplier = new SupplierService();
         $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
-        $data['quotation'] = $this->quotationService->getQuotation($getData);
+        $data['quotation'] = ($getData)? $this->quotationService->getQuotation($getData) : [];
         $data['status_code'] = $this->quotationService->getStatusCode();
         if (!isset($getData['select_start_date']) || !isset($getData['select_end_date'])){
             $getData['select_start_date'] = Carbon::now()->subMonth()->toDateString();
@@ -192,6 +192,6 @@ class QuotationController extends Controller
 
         QuotationDetails::destroy($data['id']);
 
-        echo 'ok';
+        echo json_encode(['ok']);
     }
 }

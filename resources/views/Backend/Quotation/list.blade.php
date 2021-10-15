@@ -40,7 +40,7 @@
                                 <div class="col-sm-3">
                                     <div class="col-sm-3"><h5>狀態</h5></div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2-department" name="status" id="status">
+                                        <select class="form-control js-select2" name="status" id="status">
                                             <option value=''></option>
                                             <option value='drafted' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'drafted')? 'selected':''  }}>草稿</option>
                                             <option value='reviewing' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing')? 'selected':''  }}>簽核</option>
@@ -154,9 +154,9 @@
     @include('Backend.Quotation.detail')
     @section('js')
         <script>
+            $('#supplier').select2();
+            $('#status').select2();
             $(document).ready(function () {
-               $('#supplier').select2();
-               $('#status').select2();
             });
 
             $(function () {
