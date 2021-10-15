@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Quotation;
 use App\Models\QuotationDetails;
+use App\Models\QuotationReviewLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,9 +13,11 @@ use Illuminate\Support\Facades\Log;
 class QuotationService
 {
     private $universalService;
-    public function __construct(UniversalService $universalService)
+    private $hierarchyService;
+    public function __construct(UniversalService $universalService, HierarchyService $hierarchyService)
     {
         $this->universalService = $universalService;
+        $this->hierarchyService = $hierarchyService;
     }
 
     public function getQuotation($data)
@@ -79,8 +82,16 @@ class QuotationService
 
     public function addQuotation($data){
 
-        DB::beginTransaction();
+        $user_id = Auth::user()->id;
+        $user_id = 4;
+        $now = Carbon::now();
 
+        $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION');
+        if (!$hierarchy){
+            return false;
+        }
+
+        DB::beginTransaction();
         try{
             $quotationData = [];
             $quotationData['agent_id'] = Auth::user()->agent_id;
@@ -89,10 +100,15 @@ class QuotationService
             $quotationData['status_code'] = $data['status_code'];
             $quotationData['tax'] = $data['tax'];
             $quotationData['remark'] = $data['remark'];
-            $quotationData['created_by'] = Auth::user()->id;
-            $quotationData['created_at'] = Carbon::now();
-            $quotationData['updated_by'] = Auth::user()->id;
-            $quotationData['updated_at'] = Carbon::now();
+            $quotationData['created_by'] = $user_id;
+            $quotationData['created_at'] = $now;
+            $quotationData['updated_by'] = $user_id;
+            $quotationData['updated_at'] = $now;
+            $quotationData['next_approval'] = $hierarchy[0];
+
+            if($data['status_code']=='REVIEWING'){
+                $quotationData['submitted_at'] = $now;
+            }
 
             $quotation_id = Quotation::insertGetId($quotationData);
 
@@ -103,13 +119,28 @@ class QuotationService
                     $detailData[$k]['quotation_id'] = $quotation_id;
                     $detailData[$k]['unit_price'] = $data['price'][$k] * 1; //目前匯率皆為1
                     $detailData[$k]['original_unit_price'] = $data['price'][$k];
-                    $detailData[$k]['created_by'] = Auth::user()->id;
-                    $detailData[$k]['created_at'] = Carbon::now();
-                    $detailData[$k]['updated_by'] = Auth::user()->id;
-                    $detailData[$k]['updated_at'] = Carbon::now();
+                    $detailData[$k]['created_by'] = $user_id;
+                    $detailData[$k]['created_at'] = $now;
+                    $detailData[$k]['updated_by'] = $user_id;
+                    $detailData[$k]['updated_at'] = $now;
                 }
                 QuotationDetails::insert($detailData);
             }
+
+
+            //簽核log
+            foreach ($hierarchy as $seq_no => $reviewer) {
+                $reviewLogData['quotation_id'] = $quotation_id;
+                $reviewLogData['created_by'] = $user_id;
+                $reviewLogData['created_at'] = $now;
+                $reviewLogData['updated_by'] = $user_id;
+                $reviewLogData['updated_at'] = $now;
+                $reviewLogData['seq_no'] = $seq_no + 1;
+                $reviewLogData['reviewer'] = $reviewer;
+
+                QuotationReviewLog::insert($reviewLogData);
+            }
+
 
             DB::commit();
             $result = true;
@@ -128,5 +159,47 @@ class QuotationService
                         ->where('quotation_id' , $quotation_id)
                         ->leftJoin('item' , 'item.id' , 'quotation_details.item_id')
                         ->orderBy('item.id')->get();
+    }
+
+    public function getQuotationReview(){
+        $user_id = Auth::user()->id;
+        $user_id = 3;
+
+        return Quotation::where('status_code' , 'REVIEWING')->where('next_approval' , $user_id)->get();
+    }
+
+    public function updateQuotationReview($data){
+        $reviewer = Auth::user()->id;
+        $reviewer = 3;
+        $now = Carbon::now();
+        $quotation_id = $data['id'];
+        unset($data['id']);
+        $data['review_at'] = $now;
+        $data['updated_at'] = $now;
+        QuotationReviewLog::where('quotation_id' , $quotation_id)->where('reviewer' , $reviewer)->update($data);
+
+        $next_approval = $this->hierarchyService->getNextApproval('QUOTATION');
+
+        $quotationData['updated_at'] = $now;
+        if ($data['review_result']==1) {
+            if ($next_approval) {
+                $quotationData['next_approval'] = $next_approval;
+            } else {
+                $quotationData['status_code'] = 'APPROVED';
+                $quotationData['next_approval'] = null;
+            }
+        }elseif($data['review_result']==0){
+            $quotationData['status_code'] = 'REJECTED';
+            $quotationData['next_approval'] = null;
+        }
+
+        Quotation::where('id', $quotation_id)->update($quotationData);
+
+        return true;
+    }
+
+    public function getQuotationReviewLog($quotation_id){
+        return QuotationReviewLog::where('quotation_id' , $quotation_id)
+                                ->leftJoin('users' , 'reviewer' , '=' , 'users.id')->get();
     }
 }

@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\QuotationReviewLog;
+use App\Services\QuotationService;
+use App\Services\SupplierService;
+use App\Services\UniversalService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,15 +19,23 @@ class QuotationReviewController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+    private $universalService;
+    private $quotationService;
 
-    public function __construct()
+    public function __construct(QuotationService $quotationService, UniversalService $universalService)
     {
-
+        $this->quotationService = $quotationService;
+        $this->universalService = $universalService;
     }
 
     public function index()
     {
-        $data = [];
+        $data['user_name'] = Auth::user()->user_name;
+        $supplier = new SupplierService();
+        $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
+        $data['status_code'] = $this->quotationService->getStatusCode();
+        $data['quotation'] = $this->quotationService->getQuotationReview();
+
         return view('Backend.QuotationReview.list' , compact('data'));
     }
 
@@ -35,9 +47,9 @@ class QuotationReviewController extends Controller
     public function create()
     {
         $agent_id = Auth::user()->agent_id;
-        $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
+        $data = [];
 
-        return view('Backend.Category.add' , compact('primary_category'));
+        return view('Backend.QuotationReview.review' , compact('data'));
     }
 
     /**
@@ -48,16 +60,7 @@ class QuotationReviewController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'category';
-        $act = 'add';
-        $data = $request->except('_token');
-        $data['agent_id'] = Auth::user()->agent_id;
-        $data['created_by'] = Auth::user()->id;
-        $data['created_at'] = Carbon::now();
 
-        $rs = Category::insert($data);
-
-        return view('backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -79,10 +82,15 @@ class QuotationReviewController extends Controller
      */
     public function edit($id)
     {
-        $data = Category::find($id);
-        $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
+        $data['id'] = $id;
+        $supplier = new SupplierService();
+        $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
+        $data['status_code'] = $this->quotationService->getStatusCode();
+        $data['taxList'] = $this->quotationService->getTaxList();
+        $data['quotation'] = $this->quotationService->getQuotationById($id);
+        $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
 
-        return view('Backend.PrimaryCategory.upd', compact('data' , 'primary_category_list'));
+        return view('Backend.QuotationReview.review' , compact('data'));
     }
 
     /**
@@ -94,13 +102,13 @@ class QuotationReviewController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token' , '_method');
-        $data['updated_by'] = Auth::user()->id;
-        $data['updated_at'] = Carbon::now();
+        $route_name = 'quotation_review';
+        $act = 'review';
 
-        Category::where('id' ,$id)->update($data);
-        $route_name = 'category';
-        $act = 'upd';
+        $data = $request->except('_token' , '_method');
+        $data['id'] = $id;
+        $this->quotationService->updateQuotationReview($data);
+
         return view('backend.success', compact('route_name' , 'act'));
     }
 

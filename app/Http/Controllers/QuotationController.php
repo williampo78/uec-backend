@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quotation;
+use App\Models\Users;
 use App\Services\ItemService;
 use App\Services\QuotationService;
 use App\Services\RoleService;
@@ -49,7 +50,6 @@ class QuotationController extends Controller
             $getData['select_end_date'] = Carbon::now()->toDateString();
         }
 
-//        dd($data['quotation']);
         $data['getData'] = $getData;
         $data['user_id'] = Auth::user()->id;
 
@@ -170,7 +170,7 @@ class QuotationController extends Controller
         }elseif ($rs['get_type'] == 'quotation_detail'){
             $data = $this->quotationService->getQuotationDetail($rs['id']);
         }elseif ($rs['get_type'] == 'quotation_view_log'){
-            $data = [];
+            $data = $this->quotationService->getQuotationReviewLog($rs['id']);
         }
 
         echo "OK@@".json_encode($data);
