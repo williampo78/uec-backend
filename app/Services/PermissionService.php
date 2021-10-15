@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\User_permission;
 use App\Models\Users;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class PermissionService
 {
@@ -37,10 +38,24 @@ class PermissionService
             ->orderBy('permission.id', 'asc')
             ->orderBy('permission_detail.sort', 'asc')
             ->get()->toArray();
+
         foreach ($menus as $menu) {
             $data['mainMenu'][$menu['mainID']] = $menu;
             $data['subMenu'][$menu['mainID']][$menu['subID']] = $menu;
         }
+
+        self::GetUserInfo();
         return $data;
+    }
+
+    /*
+     * 將使用者資料寫入session
+     */
+    public static function GetUserInfo()
+    {
+        $user_data = [];
+        $user_data['user_id'] = Auth::user()->id;
+        $user_data['user_name'] = Auth::user()->user_name;
+        Session::put('users' , $user_data);
     }
 }

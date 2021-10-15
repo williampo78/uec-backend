@@ -39,7 +39,7 @@ $menus = App\Services\PermissionService::GetUserMenu();
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                        aria-haspopup="true" aria-expanded="false"><i class="fa fa-bars fa-fw"></i> 設定</a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="{{route('profile')}}"><i class="fa fa-user fa-fw"></i> 個人資料</a></li>
+                        <li><a href="{{route('profile.edit' , session('users')['user_id'])}}"><i class="fa fa-user fa-fw"></i> 個人資料</a></li>
 
                         <li class="divider"></li>
                         <li><a href="{{ route('signOut') }}"><i class="fa fa-sign-out fa-fw"></i> 登出</a>

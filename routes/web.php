@@ -47,8 +47,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/quotation',QuotationController::class, ['names' => ['index' => 'quotation']]);
     Route::post('/quotation/ajax',[QuotationController::class,'ajax']);
     Route::resource('/quotation_review',QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
-
-    Route::get('/test', [TestController::class, 'index'])->name('test');
     Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
 });
 
