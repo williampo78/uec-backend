@@ -155,7 +155,7 @@ class QuotationService
     }
 
     public function getQuotationDetail($quotation_id){
-        return QuotationDetails::select(DB::raw('item.name as item_name') , DB::raw('item.number as item_number') , 'original_unit_price')
+        return QuotationDetails::select(DB::raw('quotation_details.id as quotation_details_id'),DB::raw('item.id as item_id') , DB::raw('item.name as item_name') , DB::raw('item.number as item_number') , 'original_unit_price')
                         ->where('quotation_id' , $quotation_id)
                         ->leftJoin('item' , 'item.id' , 'quotation_details.item_id')
                         ->orderBy('item.id')->get();
@@ -170,7 +170,7 @@ class QuotationService
 
     public function updateQuotationReview($data){
         $reviewer = Auth::user()->id;
-        $reviewer = 3;
+        $reviewer = 1;
         $now = Carbon::now();
         $quotation_id = $data['id'];
         unset($data['id']);
@@ -186,10 +186,12 @@ class QuotationService
                 $quotationData['next_approval'] = $next_approval;
             } else {
                 $quotationData['status_code'] = 'APPROVED';
+                $quotationData['closed_at'] = $now;
                 $quotationData['next_approval'] = null;
             }
         }elseif($data['review_result']==0){
             $quotationData['status_code'] = 'REJECTED';
+            $quotationData['closed_at'] = $now;
             $quotationData['next_approval'] = null;
         }
 
@@ -201,5 +203,46 @@ class QuotationService
     public function getQuotationReviewLog($quotation_id){
         return QuotationReviewLog::where('quotation_id' , $quotation_id)
                                 ->leftJoin('users' , 'reviewer' , '=' , 'users.id')->get();
+    }
+
+    public function updateQuotation($data){
+        $now = Carbon::now();
+        $user_id = Auth::user()->id;
+        $quotation_id = $data['id'];
+
+        $quotationData = [
+            'supplier_id' => $data['supplier_id'] ,
+            'submitted_at' => $data['submitted_at'] ,
+            'tax' => $data['tax'] ,
+            'remark' => $data['remark'] ,
+            'status_code' => $data['status_code'] ,
+            'updated_at' => $now
+        ];
+
+        Quotation::where('id' , $quotation_id)->update($quotationData);
+
+        foreach ($data['item'] as $k => $item_id){
+            $quotationDetailData = [
+                'item_id' => $item_id ,
+                'unit_price' => $data['price'][$k] ,
+                'original_unit_price' => $data['price'][$k] ,
+                'updated_at' => $now ,
+                'updated_by' => $user_id
+            ];
+
+            if(isset($data['quotation_details_id'][$k])){
+                $quotation_details_id = $data['quotation_details_id'][$k];
+                QuotationDetails::where('id' , $quotation_details_id)->update($quotationDetailData);
+            }else{
+                $quotationDetailData['quotation_id'] = $quotation_id;
+                $quotationDetailData['created_at'] = $now;
+                $quotationDetailData['created_by'] = $user_id;
+                QuotationDetails::insert($quotationDetailData);
+            }
+
+            $quotationDetailData = [];
+        }
+
+        return true;
     }
 }

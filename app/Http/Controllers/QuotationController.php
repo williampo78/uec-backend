@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quotation;
+use App\Models\QuotationDetails;
 use App\Models\Users;
 use App\Services\ItemService;
 use App\Services\QuotationService;
@@ -43,7 +44,7 @@ class QuotationController extends Controller
         $data = [];
         $supplier = new SupplierService();
         $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
-        $data['quotation'] = $this->quotationService->getQuotation($getData);
+        $data['quotation'] = ($getData)? $this->quotationService->getQuotation($getData) : [];
         $data['status_code'] = $this->quotationService->getStatusCode();
         if (!isset($getData['select_start_date']) || !isset($getData['select_end_date'])){
             $getData['select_start_date'] = Carbon::now()->subMonth()->toDateString();
@@ -65,6 +66,7 @@ class QuotationController extends Controller
     {
         $supplier = new SupplierService();
         $data['supplier'] = $supplier->getSupplier();
+        $data['act'] = 'add';
 
         return view('backend.quotation.add', compact('data'));
     }
@@ -112,6 +114,8 @@ class QuotationController extends Controller
         $data['supplier'] = $supplier->getSupplier();
         $data['quotation'] = $this->quotationService->getQuotationById($id);
         $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
+        $data['act'] = 'upd';
+        $data['id'] = $id;
 
         return view('backend.quotation.add', compact('data'));
     }
@@ -125,12 +129,13 @@ class QuotationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token' , '_method');
-        $data['updated_by'] = Auth::user()->id;
-
-        Warehouse::where('id' ,$id)->update($data);
         $route_name = 'quotation';
         $act = 'upd';
+        $data = $request->except('_token' , '_method');
+        $data['id'] = $id;
+
+        $this->quotationService->updateQuotation($data);
+
         return view('backend.success', compact('route_name' , 'act'));
     }
 
@@ -169,10 +174,24 @@ class QuotationController extends Controller
 
         }elseif ($rs['get_type'] == 'quotation_detail'){
             $data = $this->quotationService->getQuotationDetail($rs['id']);
+
+            if (isset($rs['action']) && $rs['action']=='upd'){
+                $itemList = $this->itemService->getItemList();
+                echo "OK@@".json_encode($data)."@@".json_encode($itemList);
+                return false;
+            }
         }elseif ($rs['get_type'] == 'quotation_view_log'){
             $data = $this->quotationService->getQuotationReviewLog($rs['id']);
         }
 
         echo "OK@@".json_encode($data);
+    }
+
+    public function ajaxDelItem(Request $request){
+        $data = $request->all();
+
+        QuotationDetails::destroy($data['id']);
+
+        echo json_encode(['ok']);
     }
 }

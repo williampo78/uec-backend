@@ -17,55 +17,104 @@
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
 
-                        <form role="form" id="select-form" method="post" action="" enctype="multipart/form-data">
+                        <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <div class="col-sm-2"><h5>日期：</h5></div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group" id="div_select_start_date">
-                                            <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="select_start_date" id="select_start_date" value="'$select_start_date'"/>
-                                                <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                          </span>
-                                            </div>
-                                        </div>
+                                    <div class="col-sm-2">
+                                        <h5>供應商</h5>
                                     </div>
-                                    <div class="col-sm-1"><h5>～</h5></div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group" id="div_select_end_date">
-                                            <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="select_end_date" id="select_end_date" value=""/>
-                                                <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                          </span>
-                                            </div>
+                                    <div class="col-sm-9">
+                                        <select class="form-control js-select2-department" name="supplier" id="supplier">
+                                            {{-- @foreach ($data['supplier'] as $v)
+                                                <option value='{{ $v['id'] }}' {{ (isset($data['getData']['supplier']) && $v['id']==$data['getData']['supplier'])? 'selected':'' }}>{{ $v['name'] }}</option>
+                                            @endforeach --}}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <h5>供應商統編</h5>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <input class="form-control" name="company_number" id="company_number"
+                                                value="{{ $data['getData']['company_number'] ?? '' }}">
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2"><h5>請購部門：</h5></div>
-                                    <div class="col-sm-10">
-                                        <select class="form-control js-select2-department" name="department" id="department">
-                                            <option value='1'>number-name</option>
-                                        </select>
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <h5>狀態</h5>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-department" name="status" id="status">
+                                                <option value=''>123</option>
+                                                <option value=''>123</option>
+                                                <option value=''>123</option>
+                                                <option value=''>123</option>
+                                            {{-- <option value='drafted' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'drafted')? 'selected':''  }}>草稿</option>
+                                            <option value='reviewing' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing')? 'selected':''  }}>簽核</option>
+                                            <option value='approved' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'approved')? 'selected':''  }}>已核准</option>
+                                            <option value='rejected' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'rejected')? 'selected':''  }}>已駁回</option> --}}
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <hr>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <div class="col-sm-2"><h5>類別：</h5></div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control" name="active" id="active">
-                                            <option value = "%">所有類別</option>
-                                            <option value = "1">正常</option>
-                                            <option value = "0">作廢</option>
-                                        </select>
+
+                                    <div class="col-sm-2">
+                                        <h5>日期：</h5>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group" id="div_select_start_date">
+                                            <div class='input-group date' id='datetimepicker'>
+                                                <input type='text' class="form-control" name="select_start_date"
+                                                    id="select_start_date"
+                                                    value="{{ $data['getData']['select_start_date'] ?? '' }}" />
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <h5>～</h5>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group" id="div_select_end_date">
+                                            <div class='input-group date' id='datetimepicker2'>
+                                                <input type='text' class="form-control" name="select_end_date"
+                                                    id="select_end_date"
+                                                    value="{{ $data['getData']['select_end_date'] ?? '' }}" />
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 text-right">
+
+                                <div class="col-sm-3">
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <h5>請購單號</h5>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <input class="form-control" name="doc_number" id="doc_number" value="">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-3 text-right">
                                     <div class="col-sm-12">
-                                        <button class="btn btn-warning" id="btn-select"><i class="fa fa-search  "></i> 查詢</button>
+                                        @if ($share_role_auth['auth_query'])
+                                            <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -76,64 +125,52 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-2">
-                                <button class="btn btn-block btn-warning btn-sm" id="btn-new"><i class="fa fa-plus"></i> 新增</button>
+                                @if ($share_role_auth['auth_create'])
+                                    <a class="btn btn-block btn-warning btn-sm" href="{{route('requisitions_purchase.create')}}"><i class="fa fa-plus"></i> 新增</a>
+                                @endif
                             </div>
                         </div>
                         <hr>
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
-                            <tr>
-                                <th>功能</th>
-                                <th>日期</th>
-                                <th>單號</th>
-                                <th>請購部門</th>
-                                <th>供應商</th>
-                                <th>總金額</th>
-                                <th>倉庫</th>
-                                <th>狀態</th>
-                            </tr>
+                                <tr>
+                                    <th>功能</th>
+                                    <th>請購日期</th>
+                                    <th>請購單號</th>
+                                    <th>供應商</th>
+                                    <th>狀態</th>
+                                    <th>送審時間</th>
+                                    <th>結案時間</th>
+                                </tr>
                             </thead>
                             <tbody>
+                                {{-- @foreach ($data['quotation'] as $k => $v) --}}
+                                {{-- <form id="del-{{ $v['id'] }}" action="/backend/quotation/{{ $v['id'] }}" method="post">
+                                        @method('DELETE')
+                                        @csrf
+                                    </form> --}}
+                                <tr>
+                                    <td>
+                                        {{-- @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
+                                            @endif
 
-                            @foreach($data as $k => $v)
-                                <?php
+                                            @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
+                                                <a class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</a>
+                                            @endif
 
-                                    if($v['status'] == "1")
-                                        $ShowStatus = "<i class='btn btn-circle btn-success fa fa-check'></i>";
-                                    else
-                                        $ShowStatus = "<i class='btn btn-circle btn-danger fa fa-close'></i>";
-
-                                    $ShowActiveColor = "";
-                                    if($v['is_transfer'] == "1")
-                                    {
-                                        $ShowActive = "<i class='btn btn-circle btn-success fa fa-check' title='已完成'> </i>";
-                                    }
-                                    elseif($v['active'] == "1")
-                                    {
-                                        $ShowActive = "<i class='btn btn-circle btn-info fa fa-hourglass-half' title='待處理'> </i>";
-                                    }
-                                    else
-                                    {
-                                        $ShowActiveColor = " class='tr-deactive'";
-                                        $ShowActive = "<i class='btn btn-circle btn-danger fa fa-close' title='作廢'></i>";
-                                    }
-
-                                    echo '<tr '.$ShowActiveColor.'>'
-                                ?>
-
-                                <td>
-                                  <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
-                                </td>
-                                <td>{{ $v['trade_date'] }}</td>
-                                <td>{{ $v['number'] }}</td>
-                                <td>{{ $v['department_name'] }}</td>
-                                <td>{{ $v['supplier_name'] }}</td>
-                                <td>{{ $v['total_price'] }}</td>
-                                <td>{{ $v['warehouse_name'] }}</td>
-                                <td><?php echo $ShowActive; ?></td>
-                            @endforeach
-
-                            </tr>
+                                            @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
+                                                <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
+                                            @endif --}}
+                                    </td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                </tr>
+                                {{-- @endforeach --}}
                             </tbody>
                         </table>
                     </div>
@@ -141,5 +178,29 @@
             </div>
         </div>
     </div>
-    @include('Backend.RequisitionsPurchase.detail')
+    @include('Backend.Quotation.detail')
+@section('js')
+    <script>
+        $(document).ready(function() {
+            $('#supplier').select2();
+            $('#status').select2();
+        });
+
+        $(function() {
+            $('#datetimepicker').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#datetimepicker2').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+        });
+
+        function del(id, doc_number) {
+            if (confirm("確定要刪除請購單" + doc_number + "?")) {
+                document.getElementById('del-' + id).submit();
+            }
+            return false;
+        };
+    </script>
+@endsection
 @endsection

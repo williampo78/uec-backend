@@ -7,7 +7,11 @@
             <div class="panel panel-default">
                 <div class="panel-heading">請輸入下列欄位資料</div>
                 <div class="panel-body">
-                    <form role="form" id="new-form" method="post" action="{{ route('quotation.store') }}" enctype="multipart/form-data">
+                    <form role="form" id="new-form" method="post" action="{{ $data['act']=='upd'? route('quotation.update', $data['id']):route('quotation.store') }}" enctype="multipart/form-data">
+                        @if($data['act']=='upd')
+                            @method('PUT')
+                        @endif
+
                         @csrf
                         <div class="row">
 
@@ -63,9 +67,9 @@
 
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <div class="form-group" id="supplier">
-                                            <label for="supplier">稅別</label>
-                                            <select class="form-control js-select2-item" name="tax" id="tax">
+                                        <div class="form-group" id="tax_div">
+                                            <label for="tax_div">稅別</label>
+                                            <select class="form-control js-select2-department" name="tax" id="tax">
                                                 <option value=1 {{ (isset($data['quotation']['tax']) && $data['quotation']['tax'] ==1)? 'selected' : '' }}>應稅</option>
                                                 <option value=0 {{ (isset($data['quotation']['tax']) && $data['quotation']['tax'] ==0)? 'selected' : '' }}>未稅</option>
                                                 <option value=2 {{ (isset($data['quotation']['tax']) && $data['quotation']['tax'] ==2)? 'selected' : '' }}>內含</option>

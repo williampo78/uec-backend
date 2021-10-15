@@ -25,6 +25,7 @@ class RequisitionsPurchaseController extends Controller
 
     public function index()
     {
+        $now = Carbon::now()->subDays()->toArray();
         $params['active'] = 0;
         $data = $this->requisitionsPurchaseService->getRequisitionsPurchase($params);
 
@@ -38,10 +39,11 @@ class RequisitionsPurchaseController extends Controller
      */
     public function create()
     {
-        $agent_id = Auth::user()->agent_id;
-        $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
-
-        return view('Backend.Category.add' , compact('primary_category'));
+        // dd('TEST') ; 
+        // $agent_id = Auth::user()->agent_id;
+        // $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
+        
+        return view('Backend.RequisitionsPurchase.input' );
     }
 
     /**
