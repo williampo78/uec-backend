@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
-    <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-treefy.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/sb-admin-2.css') }}" />
@@ -14,19 +13,16 @@
         href="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/timeline.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/js/template/bower_components/morrisjs/morris.css') }}" />
-    {{-- <link rel="stylesheet"
-        href="{{ asset('asset/js/template/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css') }}" /> --}}
-    {{-- <link rel="stylesheet"
-        href="{{ asset('asset/js/template/bower_components/datatables-responsive/css/dataTables.responsive.css') }}" /> --}}
     <link rel="stylesheet"
         href="{{ asset('asset/js/template/bower_components/bootstrap-datetimepicker-master/build/css/bootstrap-datetimepicker.css') }}" />
-    {{-- <link rel="stylesheet" href="{{ asset('asset/js/DataTables/datatables.min.css') }}" /> --}}
     <link rel="stylesheet"
         href="{{ asset('asset/js/template/bower_components/bootstrap-datetimepicker-master/build/css/bootstrap-datetimepicker.css') }}" />
     <link rel="stylesheet"
         href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}" />
+    <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
 
 </head>
 
@@ -229,8 +225,7 @@
 <script src="{{ asset('asset/js/template/bower_components/moment-develop/moment.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
 <script src="{{ asset('asset/js/select2.min.js') }}"></script>
-<script src="{{ asset('//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.full.js') }}"> </script>
-
+{{-- <script src="{{ asset('//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.full.js') }}"> </script> --}}
 <script src="{{ asset('asset/js/ckeditor/ckeditor.js') }}"> </script>
 <script src="{{ asset('asset/js/ckfinder/ckfinder.js') }}"> </script>
 <script src="{{ asset('asset/js/jquery.validate.js') }}"> </script>
@@ -246,7 +241,6 @@
 <script src="{{ asset('asset/js/template/bower_components/morrisjs/morris.min.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"> </script>
 <script src="{{ asset('asset/js/init.js') }}"> </script>
-{{-- <script src="https://maps.googleapis.com/maps/api/js"> </script> --}}
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
