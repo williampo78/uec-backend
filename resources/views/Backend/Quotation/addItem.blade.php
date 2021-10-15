@@ -17,9 +17,9 @@
 
         $(" <div class='add_row' id='div-addrow-" + position + newRow + "'>" +
             "<div class='row'>" +
-            "<input class='form-control' name='itemid[]' id='" + position + "itemid-" + newRow + "' type='hidden'>" +
+            // "<input class='form-control' name='itemid[]' id='" + position + "itemid-" + newRow + "' type='hidden'>" +
             "<input class='form-control' name='itemname[]' id='" + position + "itemname-" + newRow + "' type='hidden'>" +
-            "<input class='form-control' name='itemprice[]' id='" + position + "itemprice-" + newRow + "' type='hidden'>" +
+            // "<input class='form-control' name='itemprice[]' id='" + position + "itemprice-" + newRow + "' type='hidden'>" +
             "<div class='col-sm-6' >" +
             "<div class='input-group'>" +
             "<select class='form-control js-select2-item' name='item[]' id='" + position + "item-" + newRow + "' onchange=\"getItemInfo(" + newRow + " , '" + get_type + "', '" + position + "')\" >" +
@@ -84,6 +84,7 @@
     function copy_text(row_id)
     {
         var name = $("#inputitemname-" + row_id).val();
+
         new Clipboard('.copy_btn',
             {
                 text: function(trigger)
@@ -155,6 +156,7 @@
 
                     $(" <div class='add_row' id='div-addrow-" + position + newRow + "'>" +
                         "<input name='quotation_details_id[]' type='hidden' value='"+value.quotation_details_id+"'>" +
+                        "<input class='form-control' id='" + position + "itemname-" + newRow + "' type='hidden'>" +
                         "<div class='row'>" +
                         "<div class='col-sm-6' >" +
                         "<div class='input-group'>" +
@@ -173,7 +175,7 @@
                         "<input class='form-control' name='minimum_purchase_qty[]' id='" + position + "minimum_purchase_qty-" + newRow + "' readonly >" +
                         "</div>" +
                         "<div class='col-sm-1'>" +
-                        "<button type='button' data-detailsId='"+1+"' class='btn btn-danger btn_close' id='btn-delete-" + position + newRow + "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
+                        "<button type='button' data-details='"+value.quotation_details_id+"' class='btn btn-danger btn_close' id='btn-delete-" + position + newRow + "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
                         "</div>" +
                         "</div>" +
                         "</div>"
@@ -193,10 +195,8 @@
 
             $('button[id^=btn-delete-]').click(function()
             {
-                console.log($(this));
-                // var id = $(this).dataset.detailsId;
-                var id =$(this).data('detailsId');
-                console.log(id)
+                var id = this.dataset.details;
+
                 if(confirm("確定要刪除?")){
                     $.ajax({
                         url: "/backend/quotation/ajaxDelItem",
@@ -204,9 +204,8 @@
                         data: {'id': id, _token: '{{csrf_token()}}'},
                         enctype: 'multipart/form-data',
                     })
-                    .done(function() {
-                        $("#div-addrow-" + position + $(this).val()).remove();
-                    })
+
+                    $("#div-addrow-" + position + $(this).val()).remove();
                 }
                 return false;
             });

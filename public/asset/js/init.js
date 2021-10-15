@@ -1,4 +1,4 @@
-﻿$(".select2-default").select2(
+$(".select2-default").select2(
   {
     allowClear: true,
     theme: "bootstrap",
