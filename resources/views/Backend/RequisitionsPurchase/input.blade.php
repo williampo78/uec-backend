@@ -75,25 +75,25 @@
                                     <div class="col-sm-2">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label for="total_tax_price">匯率</label>
-                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value="1"
+                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value=""
                                                 readonly>
-                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="1">
+                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label for="total_tax_price">原幣稅額</label>
-                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value="1"
+                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value=""
                                                 readonly>
-                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="1">
+                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label for="total_tax_price">原幣總金額</label>
-                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value="1"
+                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value=""
                                                 readonly>
-                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="1">
+                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="">
                                         </div>
                                     </div>
                                 </div>
@@ -109,17 +109,17 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label for="total_tax_price">稅額</label>
-                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value="1"
+                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value=""
                                                 readonly>
-                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="1">
+                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label for="total_tax_price">總金額</label>
-                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value="1"
+                                            <input class="form-control" name="exchange_rate" id="exchange_rate" value=""
                                                 readonly>
-                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="1">
+                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="">
                                         </div>
                                     </div>
                                 </div>
@@ -139,31 +139,39 @@
                                     <input type="hidden" name="rowNo" id="rowNo" value="0">
                                     <div class="add_row">
                                         <div class="row">
-                                            <div class="col-sm-6 text-left">品項</div>
+                                            <div class="col-sm-3 text-left">品項</div>
+                                            <div class="col-sm-1 text-left">贈品</div>
                                             <div class="col-sm-2 text-left">單價</div>
-                                            <div class="col-sm-3 text-left">最小採購量</div>
+                                            <div class="col-sm-1 text-left">數量</div>
+                                            <div class="col-sm-1 text-left">單位</div>
+                                            <div class="col-sm-1 text-left">最小採購量</div>
+                                            <div class="col-sm-1 text-left">原幣小計<span class="redtext">*</span></div>
                                             <div class="col-sm-1 text-left">功能</div>
                                         </div>
                                     </div>
                                     <div class="add_row" id="div-addrow-input1">
                                         <div class="row">
-                                            <div class="col-sm-6">
-                                                <div class="input-group">
-                                                    
-                                                </div>
-                                            <select class="form-control select2-default">
-                                                <option value="">123</option>
-                                            </select>
-                                         
+                                            <div class="col-sm-3">
+                                                <select class="form-control select2-default">
+                                                    <option value="">123</option>
+                                                </select>
                                             </div>
-                                            <div class="col-sm-2"><input class="form-control qty" name="price[]"
-                                                    id="inputprice-1" type="number"></div>
-                                            <div class="col-sm-3"><input class="form-control"
-                                                    name="minimum_purchase_qty[]" id="inputminimum_purchase_qty-1"
-                                                    readonly=""></div>
-                                            <div class="col-sm-1"><button class="btn btn-danger btn_close"
-                                                    id="btn-delete-input1" value="1"><i class="fa fa-ban"></i>
-                                                    刪除</button></div>
+                                            <div class="col-sm-1">
+                                                <input type="checkbox" class="big-checkbox"> 
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input class="form-control qty" type="number" readonly>
+                                            </div>
+                                            <div class="col-sm-1"><input class="form-control" >
+                                            </div>
+                                            <div class="col-sm-1"><input class="form-control" readonly>
+                                            </div>
+                                            <div class="col-sm-1"><input class="form-control" readonly>
+                                            </div>
+                                            <div class="col-sm-1"><input class="form-control" readonly>
+                                            </div>
+
+                                            <div class="col-sm-1"><button class="btn btn-danger btn_close"><i class="fa fa-ban"></i>刪除</button></div>
                                         </div>
                                     </div>
                                 </div>
