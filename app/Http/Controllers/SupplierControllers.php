@@ -97,9 +97,8 @@ class SupplierControllers extends Controller
     {
         $contact_json = $request->input('contact_json') ; 
         $input = $request->input();
-        
+        unset($input['contact_json']) ;
         $this->contactService->createContact('tablename' , $contact_json) ; 
-        exit ;
         $result = $this->supplierService->updateSupplier($input, $id);
         return redirect(route('supplier'));
     }
