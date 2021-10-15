@@ -220,6 +220,7 @@
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}">
 </script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/collapse.js') }}"></script>
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/transition.js') }}"></script>
 <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
@@ -242,14 +243,12 @@
 <link src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"> </script>
-<script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/morrisjs/morris.min.js') }}"> </script>
 <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"> </script>
-{{-- <script src="{{ asset('asset/css/init.css') }}"> </script> --}}
 <script src="{{ asset('asset/js/init.js') }}"> </script>
 {{-- <script src="https://maps.googleapis.com/maps/api/js"> </script> --}}
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
-<script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 
 <script>

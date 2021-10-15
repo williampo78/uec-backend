@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ContactService;
 use App\Services\SupplierService;
 use App\Services\SupplierTypeService;
 use Illuminate\Http\Request;
@@ -9,23 +10,26 @@ use Illuminate\Http\Request;
 class SupplierControllers extends Controller
 {
     private $supplierService;
-    private $supplierTypeService ;
-
+    private $supplierTypeService;
+    private $contactService ;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct(SupplierService $supplierService,SupplierTypeService $supplierTypeService)
-    {
+    public function __construct(
+        SupplierService $supplierService,
+        SupplierTypeService $supplierTypeService,
+        ContactService $contactService) {
         $this->supplierService = $supplierService;
-        $this->supplierTypeService = $supplierTypeService ;
+        $this->supplierTypeService = $supplierTypeService;
+        $this->contactService = $contactService;
     }
     public function index()
     {
-        $reslut = [] ;
-        $reslut['supplier'] = $this->supplierService->getSupplier() ;
-        return view('Backend.Supplier.list',$reslut);
+        $reslut = [];
+        $reslut['supplier'] = $this->supplierService->getSupplier();
+        return view('Backend.Supplier.list', $reslut);
     }
 
     /**
@@ -36,7 +40,7 @@ class SupplierControllers extends Controller
     public function create()
     {
         $reslut['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        return view('Backend.Supplier.input',$reslut);
+        return view('Backend.Supplier.input', $reslut);
     }
 
     /**
@@ -48,9 +52,9 @@ class SupplierControllers extends Controller
     public function store(Request $request)
     {
         $input = $request->input();
-        
+
         $reslut = $this->supplierService->addSupplier($input);
-    
+
         return redirect(route('supplier'));
     }
 
@@ -62,6 +66,7 @@ class SupplierControllers extends Controller
      */
     public function show($id)
     {
+        // echo $id ;//
         // $supplier = $this->supplierService->showSupplier($id)->first();
         // return view('Backend.Supplier.input',$supplier);
     }
@@ -74,10 +79,11 @@ class SupplierControllers extends Controller
      */
     public function edit($id)
     {
-        $reslut = [] ; 
+        $reslut = [];
         $reslut['Supplier'] = $this->supplierService->showSupplier($id);
         $reslut['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        return view('Backend.Supplier.input',$reslut);
+        $reslut['Contact'] = $this->contactService->getContact('Supplier',$id);
+        return view('Backend.Supplier.input', $reslut);
     }
 
     /**
@@ -89,9 +95,12 @@ class SupplierControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input =  $request->input();
+        $contact_json = $request->input('contact_json') ; 
+        $input = $request->input();
+        
+        $this->contactService->createContact('tablename' , $contact_json) ; 
+        exit ;
         $result = $this->supplierService->updateSupplier($input, $id);
-
         return redirect(route('supplier'));
     }
 
