@@ -360,8 +360,7 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button class="btn btn-success" type="button"><i class="fa fa-check"
-                                                        @click="submitBtn"></i> 完成</button>
+                                                <button class="btn btn-success" type="button" @click="submitBtn"><i class="fa fa-check"></i> 完成</button>
                                                 <a href="{{ route('supplier') }}" class="btn btn-danger"
                                                     id="btn-cancel"><i class="fa fa-ban"></i> 取消</a>
                                             </div>
@@ -391,7 +390,7 @@
                         name: '',
                         remark: '',
                         table_id: $('#supplier_id').val(),
-                        table_name: '',
+                        table_name: 'Supplier',
                         telephone: '',
                         cell_phone: '',
                         email: '',
@@ -426,6 +425,7 @@
 
                 },
                 submitBtn() {
+                    console.log('TEST') ;
                     $("#formData").submit();
                 },
             }
