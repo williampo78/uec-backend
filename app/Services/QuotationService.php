@@ -83,7 +83,7 @@ class QuotationService
     public function addQuotation($data){
 
         $user_id = Auth::user()->id;
-        $user_id = 4;
+//        $user_id = 4;
         $now = Carbon::now();
 
         $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION');
@@ -104,7 +104,7 @@ class QuotationService
             $quotationData['created_at'] = $now;
             $quotationData['updated_by'] = $user_id;
             $quotationData['updated_at'] = $now;
-            $quotationData['next_approval'] = $hierarchy[0];
+            $quotationData['next_approver'] = $hierarchy[0];
 
             if($data['status_code']=='REVIEWING'){
                 $quotationData['submitted_at'] = $now;
@@ -163,14 +163,14 @@ class QuotationService
 
     public function getQuotationReview(){
         $user_id = Auth::user()->id;
-        $user_id = 3;
+//        $user_id = 3;
 
-        return Quotation::where('status_code' , 'REVIEWING')->where('next_approval' , $user_id)->get();
+        return Quotation::where('status_code' , 'REVIEWING')->where('next_approver' , $user_id)->get();
     }
 
     public function updateQuotationReview($data){
         $reviewer = Auth::user()->id;
-        $reviewer = 1;
+//        $reviewer = 3;
         $now = Carbon::now();
         $quotation_id = $data['id'];
         unset($data['id']);
@@ -178,21 +178,20 @@ class QuotationService
         $data['updated_at'] = $now;
         QuotationReviewLog::where('quotation_id' , $quotation_id)->where('reviewer' , $reviewer)->update($data);
 
-        $next_approval = $this->hierarchyService->getNextApproval('QUOTATION');
-
+        $next_approver = $this->hierarchyService->getNextApproval('QUOTATION');
         $quotationData['updated_at'] = $now;
         if ($data['review_result']==1) {
-            if ($next_approval) {
-                $quotationData['next_approval'] = $next_approval;
+            if ($next_approver) {
+                $quotationData['next_approver'] = $next_approver;
             } else {
                 $quotationData['status_code'] = 'APPROVED';
                 $quotationData['closed_at'] = $now;
-                $quotationData['next_approval'] = null;
+                $quotationData['next_approver'] = null;
             }
         }elseif($data['review_result']==0){
             $quotationData['status_code'] = 'REJECTED';
             $quotationData['closed_at'] = $now;
-            $quotationData['next_approval'] = null;
+            $quotationData['next_approver'] = null;
         }
 
         Quotation::where('id', $quotation_id)->update($quotationData);

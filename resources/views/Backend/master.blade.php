@@ -121,6 +121,11 @@
                                         請購單 </a>
                                 </li>
                                 <li>
+                                    <a href="{{route('requisitions_purchase_review')}}">
+                                        <i class="fa fa-shopping-cart fa-fw"></i>
+                                        請購單簽核 </a>
+                                </li>
+                                <li>
                                     <a href="index.php?func=order_supplier">
                                         <i class="fa fa-cart-arrow-down fa-fw"></i>
                                         採購單 </a>

@@ -89,6 +89,7 @@ class QuotationReviewController extends Controller
         $data['taxList'] = $this->quotationService->getTaxList();
         $data['quotation'] = $this->quotationService->getQuotationById($id);
         $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
+        $data['quotation_detail_log'] = $this->quotationService->getQuotationReviewLog($id);
 
         return view('Backend.QuotationReview.review' , compact('data'));
     }

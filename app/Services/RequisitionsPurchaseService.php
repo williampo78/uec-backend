@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\RequisitionsPurchase;
 use App\Models\RequisitionsPurchaseDetail;
+use App\Models\RequisitionsPurchaseReviewLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -57,5 +58,19 @@ class RequisitionsPurchaseService
                                         ->leftJoin('item' , 'requisitions_purchase_detail.item_id' , '=' , 'item.id' )
                                         ->where('requisitions_purchase_id' , $id)
                                         ->get();
+    }
+
+    public function getRequisitionPurchaseById($id){
+        return RequisitionsPurchase::where('id' , $id)->get();
+    }
+
+    public function getRequisitionPurchaseReviewLog($requisition_purchase_id){
+        return RequisitionsPurchaseReviewLog::where('requisitions_purchase_id' , $requisition_purchase_id)
+                                            ->leftJoin('users' , 'users.id' , '=' , 'reviewer')
+                                            ->get();
+    }
+
+    public function getRequisitionPurchaseDetail($requisition_purchase_id){
+
     }
 }

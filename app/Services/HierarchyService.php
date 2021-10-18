@@ -65,18 +65,18 @@ class HierarchyService
 
     public function getNextApproval($hierarchy_code){
         $reviewer = Auth::user()->id;
-        $reviewer = 1;
+//        $reviewer = 1;
         $hierarchy = $this->getHierarchyCode($hierarchy_code);
 
-        $next_approval = false;
+        $next_approver = false;
         //帶出下一個簽核者
         foreach ($hierarchy as $k => $v){
             if ($v==$reviewer && isset($hierarchy[$k+1])){
-                $next_approval= $hierarchy[$k+1];
+                $next_approver= $hierarchy[$k+1];
                 break;
             }
         }
 
-        return $next_approval;
+        return $next_approver;
     }
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\WarehouseController ;
 use App\Http\Controllers\PrimaryCategoryController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RequisitionsPurchaseController;
+use App\Http\Controllers\RequisitionsPurchaseReviewController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\QuotationReviewController;
@@ -42,6 +43,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/primary_category',PrimaryCategoryController::class, ['names' => ['index' => 'primary_category']]);
     Route::resource('/category',CategoryController::class, ['names' => ['index' => 'category']]);
     Route::resource('/requisitions_purchase',RequisitionsPurchaseController::class, ['names' => ['index' => 'requisitions_purchase']]);
+    Route::resource('/requisitions_purchase_review',RequisitionsPurchaseReviewController::class, ['names' => ['index' => 'requisitions_purchase_review']]);
     Route::post('/requisitions_purchase/ajax',[RequisitionsPurchaseController::class,'ajax']);
     Route::resource('/quotation',QuotationController::class, ['names' => ['index' => 'quotation']]);
     Route::post('/quotation/ajax',[QuotationController::class,'ajax']);
