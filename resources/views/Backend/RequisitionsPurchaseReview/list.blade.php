@@ -7,7 +7,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-sign-in"></i> 報價單簽核</h1>
+                <h1 class="page-header"><i class="fa fa-sign-in"></i> 請購單簽核</h1>
             </div>
         </div>
 
@@ -45,7 +45,7 @@
                             <thead>
                             <tr>
                                 <th>功能</th>
-                                <th>訂購日期</th>
+                                <th>請購日期</th>
                                 <th>請購單號</th>
                                 <th>供應商名稱</th>
                                 <th>狀態</th>
@@ -54,22 +54,22 @@
                             </tr>
                             </thead>
 
-{{--                            @foreach($data['requisition_purchase'] as $k => $v)--}}
+                            @foreach($data['requisition_purchase'] as $k => $v)
 
                                 <tbody>
                                 <td>
                                     @if($share_role_auth['auth_update'])
-                                        <a class="btn btn-info btn-sm" href="{{ route('requisitions_purchase_review.edit' ,1) }}">簽核</a>
+                                        <a class="btn btn-info btn-sm" href="{{ route('requisitions_purchase_review.edit' ,$v['id']) }}">簽核</a>
                                     @endif
                                 </td>
-                                <td>日期</td>
-                                <td>單號</td>
-                                <td>供應商</td>
-                                <td>狀態</td>
-                                <td>金額</td>
-                                <td>時間</td>
+                                <td>{{ $v['trade_date'] }}</td>
+                                <td>{{ $v['number'] }}</td>
+                                <td>{{ $data['supplier'][$v['supplier_id']]['name']?? '' }}</td>
+                                <td>{{ $data['status_code'][$v['status']]?? '' }}</td>
+                                <td>{{ $v['total_price'] }}</td>
+                                <td>{{ $v['created_at'] }}</td>
                                 </tbody>
-{{--                            @endforeach--}}
+                            @endforeach
                         </table>
                     </div>
                 </div>

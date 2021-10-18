@@ -34,4 +34,24 @@ class UniversalService
 
         return $rs;
     }
+
+    public function getStatusCode(){
+        $data =  [
+            'DRAFTED' => '草稿' ,
+            'REVIEWING' => '簽核中' ,
+            'APPROVED' => '已核准' ,
+            'REJECTED' => '已駁回'
+        ];
+
+        return $data;
+    }
+
+    public function getTaxList(){
+        return [
+            0 => '未稅' ,
+            1 => '應稅' ,
+            2 => '內含' ,
+            3 => '零稅率'
+        ];
+    }
 }

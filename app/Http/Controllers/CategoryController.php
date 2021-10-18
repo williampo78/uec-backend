@@ -86,7 +86,7 @@ class CategoryController extends Controller
         $data = Category::find($id);
         $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
 
-        return view('Backend.PrimaryCategory.upd', compact('data' , 'primary_category_list'));
+        return view('Backend.Category.upd', compact('data' , 'primary_category_list'));
     }
 
     /**

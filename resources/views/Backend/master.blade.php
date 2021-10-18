@@ -122,7 +122,7 @@
                                         請購單簽核 </a>
                                 </li>
                                 <li>
-                                    <a href="index.php?func=order_supplier">
+                                    <a href="{{ route('order_supplier') }}">
                                         <i class="fa fa-cart-arrow-down fa-fw"></i>
                                         採購單 </a>
                                 </li>

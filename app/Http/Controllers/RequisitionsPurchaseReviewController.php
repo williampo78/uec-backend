@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\QuotationService;
 use App\Services\RequisitionsPurchaseService;
+use App\Services\ReviewService;
+use App\Services\SupplierService;
+use App\Services\UniversalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class RequisitionsPurchaseReviewController extends Controller
 {
@@ -14,18 +19,27 @@ class RequisitionsPurchaseReviewController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    private $requisition_uprchase_service;
+    private $requisition_purchase_service;
+    private $quotation_service;
+    private $review_service;
+    private $universal_service;
 
-    public function __construct(RequisitionsPurchaseService $requisitionsPurchaseService)
+    public function __construct(RequisitionsPurchaseService $requisitionsPurchaseService, QuotationService $quotationService, ReviewService $reviewService, UniversalService $universalService)
     {
-        $this->requisition_uprchase_service = $requisitionsPurchaseService;
+        $this->requisition_purchase_service = $requisitionsPurchaseService;
+        $this->quotation_service = $quotationService;
+        $this->review_service = $reviewService;
+        $this->universal_service = $universalService;
     }
 
     public function index()
     {
         $data = [];
         $data['user_name'] = Auth::user()->user_name;
-        $data['requisition_purchase'] = [];
+        $supplier = new SupplierService();
+        $data['supplier'] = $this->universal_service->idtokey($supplier->getSupplier());
+        $data['status_code'] = $this->universal_service->getStatusCode();
+        $data['requisition_purchase'] = $this->requisition_purchase_service->getRequisitionsPurchaseReview();
 
         return view('Backend.RequisitionsPurchaseReview.list' , compact('data'));
     }
@@ -70,12 +84,14 @@ class RequisitionsPurchaseReviewController extends Controller
      */
     public function edit($id)
     {
-        //
         $data = [];
         $data['id'] = $id;
-        $data['requisitions_purchase'] = [];
-        $data['requisitions_purchase_detail'] = $this->requisition_uprchase_service->getRequisitionPurchaseDetail($id);
-        $data['requisition_purchase_review_log'] = $this->requisition_uprchase_service->getRequisitionPurchaseReviewLog($id);
+        $supplier = new SupplierService();
+        $data['supplier'] = $this->universal_service->idtokey($supplier->getSupplier());
+        $data['status_code'] = $this->quotation_service->getStatusCode();
+        $data['requisitions_purchase'] = $this->requisition_purchase_service->getRequisitionPurchaseById($id);
+        $data['requisitions_purchase_detail'] = $this->requisition_purchase_service->getRequisitionPurchaseDetail($id);
+        $data['requisition_purchase_review_log'] = $this->requisition_purchase_service->getRequisitionPurchaseReviewLog($id);
 
         return view('Backend.RequisitionsPurchaseReview.review' , compact('data'));
     }
@@ -89,7 +105,15 @@ class RequisitionsPurchaseReviewController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $route_name = 'requisitions_purchase_review';
+        $act = 'review';
+
+        $data = $request->except('_token' , '_method');
+        $data['id'] = $id;
+
+        $this->review_service->updateReview($data , 'REQUISITION_PUR');
+
+        return view('backend.success', compact('route_name' , 'act'));
     }
 
     /**

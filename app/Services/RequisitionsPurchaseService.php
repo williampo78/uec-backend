@@ -61,7 +61,9 @@ class RequisitionsPurchaseService
     }
 
     public function getRequisitionPurchaseById($id){
-        return RequisitionsPurchase::where('id' , $id)->get();
+        $agent_id = Auth::user()->agent_id;
+
+        return RequisitionsPurchase::where('agent_id' , $agent_id)->where('id' , $id)->first();
     }
 
     public function getRequisitionPurchaseReviewLog($requisition_purchase_id){
@@ -71,6 +73,12 @@ class RequisitionsPurchaseService
     }
 
     public function getRequisitionPurchaseDetail($requisition_purchase_id){
+        return RequisitionsPurchaseDetail::where('requisitions_purchase_id', $requisition_purchase_id)->get();
+    }
 
+    public function getRequisitionsPurchaseReview(){
+        $user_id = Auth::user()->id;
+
+        return RequisitionsPurchase::where('status' , 'REVIEWING')->where('next_approver' , $user_id)->get();
     }
 }

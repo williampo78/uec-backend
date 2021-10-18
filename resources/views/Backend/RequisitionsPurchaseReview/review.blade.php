@@ -4,33 +4,44 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-primary">
-                <div class="panel-heading">報價單簽核</div>
+                <div class="panel-heading">請購單簽核</div>
                 <div class="panel-body">
-                    <form role="form" id="new-form" method="post" action="{{ route('quotation_review.update' ,$data['id']) }}" enctype="multipart/form-data">
+                    <form role="form" id="new-form" method="post" action="{{ route('requisitions_purchase_review.update' ,$data['id']) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="row" style="padding: 10px;">
                             <div class="col-sm-12">
                                 <div class="row form-group">
-                                    <div class="col-sm-1"><label> 單號</label></div>
-                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-1"><label> 請購單號</label></div>
+                                    <div class="col-sm-5">{{ $data['requisitions_purchase']['number'] }}</div>
                                     <div class="col-sm-1"><label> 供應商</label></div>
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-1"><label> 狀態</label></div>
-                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-5">{{ $data['supplier'][$data['requisitions_purchase']['supplier_id']]['name']?? '' }}</div>
                                 </div>
+
                                 <div class="row form-group">
                                     <div class="col-sm-1"><label> 幣別</label></div>
-                                    <div class="col-sm-3" ></div>
-                                    <div class="col-sm-1"><label> 匯率</label></div>
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-1"><label> 稅別</label></div>
-                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-5" >{{ $data['requisitions_purchase']['currency_code'] }}</div>
+                                    <div class="col-sm-1"><label> 狀態</label></div>
+                                    <div class="col-sm-5">{{ $data['status_code'][$data['requisitions_purchase']['status']]?? '' }}</div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="col-sm-1"><label> 原幣稅額</label></div>
+                                    <div class="col-sm-5">{{ $data['requisitions_purchase']['original_total_tax_price'] }}</div>
+                                    <div class="col-sm-1"><label> 原幣金額</label></div>
+                                    <div class="col-sm-5">{{ $data['requisitions_purchase']['original_total_price'] }}</div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="col-sm-1"><label> 稅額</label></div>
+                                    <div class="col-sm-5">{{ $data['requisitions_purchase']['total_tax_price'] }}</div>
+                                    <div class="col-sm-1"><label> 總金額</label></div>
+                                    <div class="col-sm-5">{{ $data['requisitions_purchase']['total_price'] }}</div>
                                 </div>
 
                                 <div class="row form-group">
                                     <div class="col-sm-1"><label> 備註</label></div>
-                                    <div class="col-sm-10"></div>
+                                    <div class="col-sm-10">{{ $data['requisitions_purchase']['remark'] }}</div>
                                 </div>
                             </div>
 
@@ -39,18 +50,24 @@
                                 <tr>
                                     <th>商品編號</th>
                                     <th>商品名稱</th>
-                                    <th>國際條碼</th>
                                     <th>單價</th>
+                                    <th>請購量</th>
+                                    <th>單位</th>
+                                    <th>小計</th>
+                                    <th>贈品</th>
                                     <th>最小採購量</th>
                                 </tr>
                                 </thead>
-                                @foreach($data['requisitions_purchase'] as $v)
+                                @foreach($data['requisitions_purchase_detail'] as $v)
                                     <tbody>
                                     <tr>
                                         <td>{{ $v['item_number'] }}</td>
                                         <td>{{ $v['item_name'] }}</td>
-                                        <td>國際條碼</td>
-                                        <td>{{ $v['original_unit_price'] }}</td>
+                                        <td>{{ $v['item_price'] }}</td>
+                                        <td>{{ $v['item_qyt'] }}</td>
+                                        <td>{{ $v['item_unit'] }}</td>
+                                        <td>{{ $v['subtotal_price'] }}</td>
+                                        <td>{{ $v['is_gift']== 1 ? 'V':'X' }}</td>
                                         <td>最小採購量</td>
                                     </tr>
                                     </tbody>

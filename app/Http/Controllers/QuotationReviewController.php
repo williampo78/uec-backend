@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\QuotationReviewLog;
 use App\Services\QuotationService;
+use App\Services\ReviewService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
 use Carbon\Carbon;
@@ -21,11 +22,13 @@ class QuotationReviewController extends Controller
 
     private $universalService;
     private $quotationService;
+    private $reviewService;
 
-    public function __construct(QuotationService $quotationService, UniversalService $universalService)
+    public function __construct(QuotationService $quotationService, UniversalService $universalService, ReviewService $reviewService)
     {
         $this->quotationService = $quotationService;
         $this->universalService = $universalService;
+        $this->reviewService = $reviewService;
     }
 
     public function index()
@@ -46,10 +49,6 @@ class QuotationReviewController extends Controller
      */
     public function create()
     {
-        $agent_id = Auth::user()->agent_id;
-        $data = [];
-
-        return view('Backend.QuotationReview.review' , compact('data'));
     }
 
     /**
@@ -108,7 +107,7 @@ class QuotationReviewController extends Controller
 
         $data = $request->except('_token' , '_method');
         $data['id'] = $id;
-        $this->quotationService->updateQuotationReview($data);
+        $this->reviewService->updateReview($data , 'QUOTATION');
 
         return view('backend.success', compact('route_name' , 'act'));
     }

@@ -168,37 +168,6 @@ class QuotationService
         return Quotation::where('status_code' , 'REVIEWING')->where('next_approver' , $user_id)->get();
     }
 
-    public function updateQuotationReview($data){
-        $reviewer = Auth::user()->id;
-//        $reviewer = 3;
-        $now = Carbon::now();
-        $quotation_id = $data['id'];
-        unset($data['id']);
-        $data['review_at'] = $now;
-        $data['updated_at'] = $now;
-        QuotationReviewLog::where('quotation_id' , $quotation_id)->where('reviewer' , $reviewer)->update($data);
-
-        $next_approver = $this->hierarchyService->getNextApproval('QUOTATION');
-        $quotationData['updated_at'] = $now;
-        if ($data['review_result']==1) {
-            if ($next_approver) {
-                $quotationData['next_approver'] = $next_approver;
-            } else {
-                $quotationData['status_code'] = 'APPROVED';
-                $quotationData['closed_at'] = $now;
-                $quotationData['next_approver'] = null;
-            }
-        }elseif($data['review_result']==0){
-            $quotationData['status_code'] = 'REJECTED';
-            $quotationData['closed_at'] = $now;
-            $quotationData['next_approver'] = null;
-        }
-
-        Quotation::where('id', $quotation_id)->update($quotationData);
-
-        return true;
-    }
-
     public function getQuotationReviewLog($quotation_id){
         return QuotationReviewLog::where('quotation_id' , $quotation_id)
                                 ->leftJoin('users' , 'reviewer' , '=' , 'users.id')->get();

@@ -13,8 +13,8 @@ use App\Http\Controllers\RequisitionsPurchaseReviewController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\QuotationReviewController;
+use App\Http\Controllers\OrderSupplierController;
 use App\Http\Controllers\ContactControllers ;
-use App\Models\Item;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\TestController;
@@ -50,10 +50,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/quotation/ajax',[QuotationController::class,'ajax']);
     Route::resource('/quotation_review',QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
     Route::post('/quotation/ajaxDelItem' , [QuotationController::class,'ajaxDelItem']);
+    Route::resource('/order_supplier',OrderSupplierController::class, ['names' => ['index' => 'order_supplier']]);
+    Route::post('/order_supplier/ajax' , [OrderSupplierController::class, 'ajax']);
 
     Route::resource('/test',TestController::class, ['names' => ['index' => 'test']]);
-
-//    Route::get('/test', [TestController::class, 'index'])->name('test');
     Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
 });
 
