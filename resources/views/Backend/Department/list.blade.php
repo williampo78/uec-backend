@@ -22,7 +22,7 @@
                         <div class="row">
                             @if($share_role_auth['auth_create'])
                             <div class="col-sm-2">
-                                <button class="btn btn-block btn-warning btn-sm" id="btn-new" onclick="{{route('department.create')}}"><i class="fa fa-plus"></i> 新增</button>
+                                <a class="btn btn-block btn-warning btn-sm" id="btn-new" href="{{route('department.create')}}"><i class="fa fa-plus"></i> 新增</a>
                             </div>
                             @endif
                         </div>

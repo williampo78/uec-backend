@@ -455,7 +455,7 @@
                                 <div class="form-group">
                                     <button class="btn btn-success" id="btn-save"><i class="fa fa-save"></i>
                                         儲存</button>
-                                    <button class="btn btn-danger" id="btn-cancel"><i class="fa fa-ban"></i>
+                                    <button class="btn btn-danger" type="button" id="btn-cancel"><i class="fa fa-ban"></i>
                                         取消</button>
                                 </div>
                             </div>
@@ -481,11 +481,14 @@
                 filebrowserImageUploadUrl: 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images' //可上傳圖檔
             });
 
+            $("#btn-cancel").click(function () {
+                window.location.href = '{{route("item")}}';
+            });
         });
         var read_del_item = [];
         var read_del_item_photos = [];
 
-        //判斷fiile change 
+        //判斷fiile change
         function onchangeimg(id, num) {
             var mfile = $('#' + id)[0].files[0];
             var itempic = "#itempic-" + num;

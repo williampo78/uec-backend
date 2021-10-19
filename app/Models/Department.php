@@ -9,5 +9,6 @@ class Department extends Model
 {
     use HasFactory;
     protected $table = 'department';
+    protected $guarded = [];
 
 }
