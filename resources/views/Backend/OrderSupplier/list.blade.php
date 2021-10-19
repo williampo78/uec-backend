@@ -141,9 +141,9 @@
                                             <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
 {{--                                        @endif--}}
 
-                                        @if($share_role_auth['auth_update'] && $v['status_code']=='DRAFTED' && $v['created_by']==$data['user_id'])
+{{--                                        @if($share_role_auth['auth_update'] && $v['status_code']=='DRAFTED' && $v['created_by']==$data['user_id'])--}}
                                             <a class="btn btn-info btn-sm" href="{{ route('order_supplier.edit' , $v['id']) }}">修改</a>
-                                        @endif
+{{--                                        @endif--}}
 
                                         @if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])
                                             <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['number'] }}' );">刪除</button>

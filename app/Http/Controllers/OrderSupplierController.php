@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderSupplier;
 use App\Models\Quotation;
+use App\Services\ItemService;
 use App\Services\OrderSupplierService;
+use App\Services\QuotationService;
+use App\Services\RequisitionsPurchaseService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
 use Carbon\Carbon;
@@ -21,10 +25,13 @@ class OrderSupplierController extends Controller
 
     private $universalService;
     private $orderSupplierService;
-    public function __construct(UniversalService $universalService, OrderSupplierService $orderSupplierService)
+    private $requisitionsPurchaseService;
+
+    public function __construct(UniversalService $universalService, OrderSupplierService $orderSupplierService, RequisitionsPurchaseService $requisitionsPurchaseService)
     {
         $this->universalService = $universalService;
         $this->orderSupplierService = $orderSupplierService;
+        $this->requisitionsPurchaseService = $requisitionsPurchaseService;
     }
     public function index(Request $request)
     {
@@ -97,12 +104,14 @@ class OrderSupplierController extends Controller
     {
         $supplier = new SupplierService();
         $data['supplier'] = $supplier->getSupplier();
-        $data['quotation'] = $this->quotationService->getQuotationById($id);
-        $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
+        $data['requisitions_purchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchaseList();
+        $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
+        $data['tax'] = $this->universalService->getTaxList();
+
         $data['act'] = 'upd';
         $data['id'] = $id;
 
-        return view('backend.quotation.add', compact('data'));
+        return view('Backend.OrderSupplier.upd', compact('data'));
     }
 
     /**
@@ -114,12 +123,12 @@ class OrderSupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $route_name = 'quotation';
+        $route_name = 'order_supplier';
         $act = 'upd';
         $data = $request->except('_token' , '_method');
         $data['id'] = $id;
 
-        $this->quotationService->updateQuotation($data);
+        $this->orderSupplierService->updateOrderSupplier($data);
 
         return view('backend.success', compact('route_name' , 'act'));
     }
@@ -132,10 +141,10 @@ class OrderSupplierController extends Controller
      */
     public function destroy($id)
     {
-        $route_name = 'quotation';
+        $route_name = 'order_supplier';
         $act = 'del';
 
-        Quotation::destroy($id);
+        OrderSupplier::destroy($id);
 
         return view('backend.success', compact('route_name' , 'act'));
     }
@@ -148,9 +157,13 @@ class OrderSupplierController extends Controller
             $data = $this->orderSupplierService->getOrderSupplierById($rs['id']);
         }elseif ($rs['get_type'] == 'order_supplier_detail'){
             $data = $this->orderSupplierService->getOrderSupplierDetail($rs['id']);
-        }
 
-        return "OK@@".json_encode($data);
+        }
+        echo "OK@@".json_encode($data);
+    }
+
+    public function ajaxDelItem($id){
+
     }
 
 }

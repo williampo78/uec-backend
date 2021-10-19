@@ -71,6 +71,8 @@ class RoleService
                         $auth = $roles[$code]['auth_create'];
                         break;
                 }
+
+                //在admin及登出頁面必須回傳1 , 否則會一直無限導向
             }elseif($code=='admin' || $code == '' || $code =='signOut'){
                 $auth = 1;
             }

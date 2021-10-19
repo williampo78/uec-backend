@@ -18,7 +18,9 @@ class AdminAuthmiddleware
     public function handle(Request $request, Closure $next)
     {
         $roleService = new RoleService;
+        //顯示頁面權限，無權限將被導至首頁
         $role_auth = $roleService->getDisplayRoles();
+        //其他權限，顯示按鈕及能否增修刪查匯出等
         $other_role_auth = $roleService->getOtherRoles();
         //權限參數傳入view, 可以直接在各個view取用
         view()->share('share_role_auth', $other_role_auth);

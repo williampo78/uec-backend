@@ -5,8 +5,11 @@ namespace App\Services;
 
 use App\Models\OrderSupplier;
 use App\Models\OrderSupplierDetail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
+use Batch;
 
 class OrderSupplierService
 {
@@ -61,6 +64,48 @@ class OrderSupplierService
     }
 
     public function getOrderSupplierDetail($order_supplier_id){
-        return OrderSupplierDetail::where('order_supplier_id' , $order_supplier_id)->get();
+        return OrderSupplierDetail::select( DB::raw('order_supplier_detail.id as id'),DB::raw('item.name as item_name'), DB::raw('order_supplier_detail.item_unit as item_unit') , DB::raw('order_supplier_detail.item_price as item_price') ,
+                                            DB::raw('requisitions_purchase_detail.item_qty as rp_item_qty') , DB::raw('order_supplier_detail.original_subtotal_price as original_subtotal_price') , 'is_giveaway' , DB::raw('order_supplier_detail.item_qty as item_qty'))
+                                ->where('order_supplier_id' , $order_supplier_id)
+                                ->leftJoin('item' , 'item.id' , '=' , 'order_supplier_detail.item_id')
+                                ->leftJoin('requisitions_purchase_detail' , 'order_supplier_detail.requisitions_purchase_id' , '=' , 'requisitions_purchase_detail.requisitions_purchase_id')
+                                ->get();
+    }
+
+    public function updateOrderSupplier($data){
+        $now = Carbon::now();
+        $user_id = Auth::user()->id;
+
+        $orderSupplierData = [
+            'requisitions_purchase_id' => $data['requisitions_purchase_id'] ,
+            'receiver_name' => $data['receiver_name'] ,
+            'receiver_address' => $data['receiver_address'] ,
+            'invoice_company_number' => $data['invoice_company_number'] ,
+            'invoice_name' => $data['invoice_name'] ,
+            'invoice_address' => $data['invoice_address'] ,
+            'supplier_deliver_date' => $data['supplier_deliver_date'] ,
+            'expect_deliver_date' => $data['expect_deliver_date'] ,
+            'remark' => $data['remark'] ,
+            'status' => $data['status_code'] ,
+            'updated_by' => $user_id,
+            'updated_at' => $now
+        ];
+
+        OrderSupplier::where('id' , $data['id'])->update($orderSupplierData);
+
+        $orderSupplierDetailData = [];
+
+        foreach ($data['order_supplier_detail_id'] as $k => $order_supplier_detail_id){
+            $orderSupplierDetailData[$k] = [
+                'id' => $order_supplier_detail_id ,
+                'is_giveaway' =>  $data['is_giveaway'][$k] ,
+                'item_qty' => $data['item_qty'][$k]
+            ];
+        }
+
+        $orderSupplierDetailInstance = new OrderSupplierDetail();
+        Batch::update($orderSupplierDetailInstance,$orderSupplierDetailData,'id');
+
+        return true;
     }
 }

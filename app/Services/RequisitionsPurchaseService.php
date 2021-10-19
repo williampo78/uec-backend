@@ -81,4 +81,10 @@ class RequisitionsPurchaseService
 
         return RequisitionsPurchase::where('status' , 'REVIEWING')->where('next_approver' , $user_id)->get();
     }
+
+    public function getRequisitionsPurchaseList(){
+        $agent_id = Auth::user()->agent_id;
+
+        return RequisitionsPurchase::where('agent_id', $agent_id)->get();
+    }
 }
