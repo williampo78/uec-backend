@@ -251,7 +251,6 @@
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"> </script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
-
 <script>
     $(document).ready(function() {
         $('#table_list').DataTable();
