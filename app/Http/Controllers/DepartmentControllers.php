@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DepartmentControllers extends Controller
 {
@@ -13,7 +15,10 @@ class DepartmentControllers extends Controller
      */
     public function index()
     {
-        return view('Backend.Department.list');
+        $data = [];
+        $department = Department::all();
+        $data['department'] = $department;
+        return view('Backend.Department.list', compact('data'), compact('data'));
     }
 
     /**
@@ -23,7 +28,8 @@ class DepartmentControllers extends Controller
      */
     public function create()
     {
-        //
+        $agent_id = Auth::user()->agent_id;
+
     }
 
     /**
