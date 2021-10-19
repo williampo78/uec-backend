@@ -47,13 +47,14 @@
                     <!-- Table list -->
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-sm-2">
-                                <a href="{{ route('item') }}/create" class="btn btn-block btn-warning btn-sm"
-                                    id="btn-new"><i class="fa fa-plus"></i> 新增物品</a>
-                            </div>
-                            <div class="col-sm-10 text-right">
-                            </div>
+                            @if($share_role_auth['auth_create'])
+                                <div class="col-sm-2">
+                                    <a href="{{ route('item') }}/create" class="btn btn-block btn-warning btn-sm"
+                                       id="btn-new"><i class="fa fa-plus"></i> 新增物品</a>
+                                </div>
+                            @endif
                         </div>
+                        <hr>
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
                                 <tr>

@@ -16,7 +16,6 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-6">
@@ -97,11 +96,11 @@
                     <!-- Table list -->
                     <div class="panel-body">
                         <div class="row">
+                            @if($share_role_auth['auth_create'])
                             <div class="col-sm-2">
-                                @if($share_role_auth['auth_create'])
                                     <a class="btn btn-block btn-warning btn-sm" href="{{route('quotation.create')}}"><i class="fa fa-plus"></i> 新增</a>
-                                @endif
                             </div>
+                            @endif
                         </div>
                         <hr>
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">

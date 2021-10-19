@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\RequisitionsPurchaseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use phpDocumentor\Reflection\Type;
+use App\Services\WarehouseService ; 
+use App\Services\SupplierService ;  
+use App\Services\ItemService ;
 
 class RequisitionsPurchaseController extends Controller
 {
@@ -18,9 +19,16 @@ class RequisitionsPurchaseController extends Controller
 
     private $requisitionsPurchaseService;
 
-    public function __construct(RequisitionsPurchaseService $requisitionsPurchaseService)
-    {
+    public function __construct(
+    RequisitionsPurchaseService $requisitionsPurchaseService ,
+    WarehouseService $warehouseService,
+    SupplierService $supplierService ,
+    ItemService $itemService
+    ){
         $this->requisitionsPurchaseService = $requisitionsPurchaseService;
+        $this->warehouseService = $warehouseService ;  // 倉庫
+        $this->supplierService = $supplierService  ;
+        $this->itemService = $itemService ; 
     }
 
     public function index()
@@ -39,9 +47,9 @@ class RequisitionsPurchaseController extends Controller
      */
     public function create()
     {
-        // dd('TEST') ; 
-        // $agent_id = Auth::user()->agent_id;
-        // $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
+        //取得倉庫
+        //供應商
+        //品項
         
         return view('Backend.RequisitionsPurchase.input' );
     }
@@ -54,14 +62,14 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'category';
-        $act = 'add';
-        $data = $request->except('_token');
-        $data['agent_id'] = Auth::user()->agent_id;
-        $data['created_by'] = Auth::user()->id;
-        $data['created_at'] = Carbon::now();
+        // $route_name = 'category';
+        // $act = 'add';
+        // $data = $request->except('_token');
+        // $data['agent_id'] = Auth::user()->agent_id;
+        // $data['created_by'] = Auth::user()->id;
+        // $data['created_at'] = Carbon::now();
 
-        $rs = Category::insert($data);
+        // $rs = Category::insert($data);
 
         return view('backend.success' , compact('route_name','act'));
     }
@@ -85,8 +93,8 @@ class RequisitionsPurchaseController extends Controller
      */
     public function edit($id)
     {
-        $data = Category::find($id);
-        $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
+        // $data = Category::find($id);
+        // $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
 
         return view('Backend.PrimaryCategory.upd', compact('data' , 'primary_category_list'));
     }
@@ -100,13 +108,13 @@ class RequisitionsPurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token' , '_method');
-        $data['updated_by'] = Auth::user()->id;
-        $data['updated_at'] = Carbon::now();
+        // $data = $request->except('_token' , '_method');
+        // $data['updated_by'] = Auth::user()->id;
+        // $data['updated_at'] = Carbon::now();
 
-        Category::where('id' ,$id)->update($data);
-        $route_name = 'category';
-        $act = 'upd';
+        // Category::where('id' ,$id)->update($data);
+        // $route_name = 'category';
+        // $act = 'upd';
         return view('backend.success', compact('route_name' , 'act'));
     }
 

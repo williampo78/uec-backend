@@ -56,6 +56,7 @@ class PermissionService
         $user_data = [];
         $user_data['user_id'] = Auth::user()->id;
         $user_data['user_name'] = Auth::user()->user_name;
+        $user_data['agent_id'] = Auth::user()->agent_id;
         Session::put('users' , $user_data);
     }
 }

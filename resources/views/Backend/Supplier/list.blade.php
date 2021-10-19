@@ -17,11 +17,13 @@
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
                         <div class="row">
+                            @if($share_role_auth['auth_create'])
                             <div class="col-sm-2">
                                 <a href="{{ route('supplier') }}/create" class="btn btn-block btn-warning btn-sm"
                                     id="btn-new"><i class="fa fa-plus"></i>
                                     新增</a>
                             </div>
+                            @endif
                         </div>
                     </div>
 
@@ -55,10 +57,12 @@
                                                         data-target="#supplier_detail">Click me</button>
 
                                                 </button>
+                                                @if($share_role_auth['auth_update'])
                                                 <a class="btn btn-info btn-sm"
                                                     href="{{ route('supplier') }}/{{ $obj->id }}/edit" value="1">
                                                     <i class="fa fa-pencil"></i>
                                                 </a>
+                                                @endif
                                             </td>
                                             <td>{{ $obj->display_number }}</td>
                                             <td>{{ $obj->company_number }}</td>

@@ -18,9 +18,11 @@
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
                         <div class="row">
+                            @if($share_role_auth['auth_create'])
                             <div class="col-sm-2">
                                 <a class="btn btn-block btn-warning btn-sm" id="btn-new" href="{{route('primary_category.create')}}"><i class="fa fa-plus"></i> 新增</a>
                             </div>
+                            @endif
                         </div>
                     </div>
 
@@ -38,7 +40,11 @@
 
                             @foreach ($data as $k => $v)
                                 <tr>
-                                    <td><a class="btn btn-block btn-info btn-sm" href="{{route('primary_category.edit' , $v['id'])}}"><i class="fa fa-pencil"></i> 編輯</a></td>
+                                    <td>
+                                        @if($share_role_auth['auth_update'])
+                                        <a class="btn btn-block btn-info btn-sm" href="{{route('primary_category.edit' , $v['id'])}}"><i class="fa fa-pencil"></i> 編輯</a>
+                                        @endif
+                                    </td>
                                     <td>{{ $v['number'] }}</td>
                                     <td>{{ $v['name'] }}</td>
                                 </tr>
