@@ -11,6 +11,7 @@
         "laravel/framework": "^8.54",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "mavinoo/laravel-batch": "^2.2",
         "nesbot/carbon": "^2.53"
     },
     "require-dev": {

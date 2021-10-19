@@ -153,10 +153,6 @@
     @include('Backend.Quotation.detail')
     @section('js')
         <script>
-            $('#supplier').select2();
-            $('#status').select2();
-            $(document).ready(function () {
-            });
 
             $(function () {
                 $('#datetimepicker').datetimepicker({
@@ -165,6 +161,8 @@
                 $('#datetimepicker2').datetimepicker({
                     format:'YYYY-MM-DD',
                 });
+                $('#supplier').select2();
+                $('#status').select2();
             });
 
             function del(id, doc_number)
