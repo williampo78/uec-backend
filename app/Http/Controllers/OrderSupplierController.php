@@ -152,7 +152,6 @@ class OrderSupplierController extends Controller
      */
     public function destroy($id)
     {
-        dd(123);
         $route_name = 'order_supplier';
         $act = 'del';
 

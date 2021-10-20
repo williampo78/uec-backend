@@ -131,11 +131,11 @@
                             </thead>
                             <tbody>
                             @foreach($data['order_supplier'] as $k => $v)
-                                <form id="del-{{ $v['id'] }}" action="{{ route('order_supplier.destroy' , $v['id']) }}" method="post">
-                                    @method('DELETE')
-                                    @csrf
-                                </form>
                                 <tr>
+                                    <form id="del-{{$v['id']}}" action="{{ route('order_supplier.destroy' , $v['id']) }}" method="post">
+                                        @method('DELETE')
+                                        @csrf
+                                    </form>
                                     <td>
 {{--                                        @if($share_role_auth['auth_query'])--}}
                                             <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
@@ -144,6 +144,8 @@
 {{--                                        @if($share_role_auth['auth_update'] && $v['status_code']=='DRAFTED' && $v['created_by']==$data['user_id'])--}}
                                             <a class="btn btn-info btn-sm" href="{{ route('order_supplier.edit' , $v['id']) }}">修改</a>
 {{--                                        @endif--}}
+
+                                             <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#row_supplier_deliver" data-id="{{ $v['id'] }}" onclick="row_supplier_deliver({{ $v['id'] }});">預進日</button>
 
 {{--                                        @if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])--}}
                                             <button class="btn btn-danger btn-sm" type="button" onclick="del({{ $v['id'] }} , '{{ $v['number'] }}' );">刪除</button>
@@ -167,6 +169,7 @@
         </div>
     </div>
     @include('Backend.OrderSupplier.detail')
+    @include('Backend.OrderSupplier.supplier_deliver')
     @section('js')
         <script>
             $(function () {
@@ -189,7 +192,6 @@
                 }
                 return false;
             };
-
 
         </script>
     @endsection
