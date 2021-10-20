@@ -18,6 +18,9 @@ class RequisitionsPurchaseController extends Controller
      */
 
     private $requisitionsPurchaseService;
+    private $warehouseService;
+    private $supplierService;
+    private $itemService ;
 
     public function __construct(
     RequisitionsPurchaseService $requisitionsPurchaseService ,
@@ -27,8 +30,8 @@ class RequisitionsPurchaseController extends Controller
     ){
         $this->requisitionsPurchaseService = $requisitionsPurchaseService;
         $this->warehouseService = $warehouseService ;  // 倉庫
-        $this->supplierService = $supplierService  ;
-        $this->itemService = $itemService ; 
+        $this->supplierService  = $supplierService  ; //供應商
+        $this->itemService      = $itemService ;  //品項
     }
 
     public function index()
@@ -47,11 +50,14 @@ class RequisitionsPurchaseController extends Controller
      */
     public function create()
     {
-        //取得倉庫
-        //供應商
-        //品項
-        
-        return view('Backend.RequisitionsPurchase.input' );
+        $result = [] ;
+        $result['warehouse'] =  $this->warehouseService->getWarehouseList()->get() ;//取得倉庫
+        $result['supplier'] = $this->supplierService->getSupplier();//供應商
+        $result['item'] = $this->itemService->getItem()->get() ; //品項
+        foreach($result['item'] as $key => $val) {
+            $result['item'][$key]->text = $val->name ; 
+        }
+        return view('Backend.RequisitionsPurchase.input' , $result);
     }
 
     /**
