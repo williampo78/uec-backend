@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Quotation;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UniversalService
 {
@@ -11,16 +12,32 @@ class UniversalService
     {
     }
 
-    public function getDocNumber(){
+    /**
+     * 取得單號
+     * @param $type '單號類型 , quotation:報價單 , order_supplier:採購單
+     * @return string
+     */
+    public function getDocNumber($type){
         $dt = Carbon::now()->format('ymd');
-        $quotation = Quotation::orderBy('id','DESC')->first();
-        if (empty($quotation)){
+        switch ($type){
+            case 'quotation':
+                $table = 'quotation';
+                $title = 'QU';
+                break;
+            case 'order_supplier':
+                $table = 'order_supplier';
+                $title = 'PO';
+                break;
+        }
+        $rs = DB::table($table)->orderBy('id','DESC')->first();
+
+        if (empty($rs)){
             $serial = 1;
         }else{
-            $serial = $quotation->id + 1;
+            $serial = $rs->id + 1;
         }
 
-        $doc_number = 'QU' . $dt . str_pad($serial,4,"0",STR_PAD_LEFT);;
+        $doc_number = $title . $dt . str_pad($serial,4,"0",STR_PAD_LEFT);;
 
         return $doc_number;
     }

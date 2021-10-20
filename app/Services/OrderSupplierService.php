@@ -5,24 +5,28 @@ namespace App\Services;
 
 use App\Models\OrderSupplier;
 use App\Models\OrderSupplierDetail;
+use App\Models\RequisitionsPurchaseDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
 use Batch;
 
 class OrderSupplierService
 {
-    public function __construct()
+    private $universalService;
+    private $itemService;
+    public function __construct(UniversalService $universalService, ItemService $itemService)
     {
+        $this->universalService = $universalService;
+        $this->itemService = $itemService;
     }
 
     public function getOrderSupplier($data){
         $agent_id = Auth::user()->agent_id;
 
         $result = OrderSupplier::select(DB::raw('order_supplier.id as id') , DB::raw('order_supplier.supplier_id as supplier_id') , DB::raw('order_supplier.number as number'),
-                                        DB::raw('requisitions_purchase.number as requisitions_purchase_number') , DB::raw('order_supplier.trade_date as trade_date') , DB::raw('order_supplier.total_price as total_price') , DB::raw('order_supplier.status as status')
-                                        )
+                                        DB::raw('requisitions_purchase.number as requisitions_purchase_number') , DB::raw('order_supplier.trade_date as trade_date') , DB::raw('order_supplier.total_price as total_price') , DB::raw('order_supplier.status as status'),
+                                        'supplier_deliver_date' , 'expect_deliver_date')
                                 ->where('order_supplier.agent_id' , $agent_id)
                                 ->leftJoin('supplier' , 'order_supplier.supplier_id' , '=', 'supplier.id')
                                 ->leftJoin('requisitions_purchase' , 'order_supplier.requisitions_purchase_id' , '=' , 'requisitions_purchase.id');
@@ -32,7 +36,7 @@ class OrderSupplierService
         }
 
         if (isset($data['company_number'])){
-            $result->where('company_number' , $data['company_number']);
+            $result->where('company_number' , 'like' , '%' . $data['company_number'] . '%');
         }
 
         if (isset($data['status'])){
@@ -44,11 +48,11 @@ class OrderSupplierService
         }
 
         if (isset($data['order_number'])){
-            $result->where('order_supplier.number' , $data['order_number']);
+            $result->where('order_supplier.number' , 'like' , '%'. $data['order_number'] .'%');
         }
 
         if (isset($data['requisitions_purchase_number'])){
-            $result->where('requisitions_purchase.number' , $data['requisitions_purchase_number']);
+            $result->where('requisitions_purchase.number' , 'like' , '%'. $data['requisitions_purchase_number'] . '%');
         }
 
         $result = $result->get();
@@ -65,18 +69,29 @@ class OrderSupplierService
 
     public function getOrderSupplierDetail($order_supplier_id){
         return OrderSupplierDetail::select( DB::raw('order_supplier_detail.id as id'),DB::raw('item.name as item_name'), DB::raw('order_supplier_detail.item_unit as item_unit') , DB::raw('order_supplier_detail.item_price as item_price') ,
-                                            DB::raw('requisitions_purchase_detail.item_qty as rp_item_qty') , DB::raw('order_supplier_detail.original_subtotal_price as original_subtotal_price') , 'is_giveaway' , DB::raw('order_supplier_detail.item_qty as item_qty'))
+                                            DB::raw('requisitions_purchase_detail.item_qty as rp_item_qty') , DB::raw('order_supplier_detail.original_subtotal_price as original_subtotal_price') , 'is_giveaway' , DB::raw('order_supplier_detail.item_qty as item_qty'),
+                                            DB::raw('requisitions_purchase_detail.id as requisitions_purchase_detail_id') , 'purchase_qty' , 'order_supplier_detail.subtotal_price' , 'order_supplier_detail.item_number')
                                 ->where('order_supplier_id' , $order_supplier_id)
                                 ->leftJoin('item' , 'item.id' , '=' , 'order_supplier_detail.item_id')
-                                ->leftJoin('requisitions_purchase_detail' , 'order_supplier_detail.requisitions_purchase_id' , '=' , 'requisitions_purchase_detail.requisitions_purchase_id')
+                                ->leftJoin('requisitions_purchase_detail' , 'order_supplier_detail.requisitions_purchase_dtl_id' , '=' , 'requisitions_purchase_detail.requisitions_purchase_id')
                                 ->get();
     }
 
-    public function updateOrderSupplier($data){
+    public function updateOrderSupplier($data , $act){
         $now = Carbon::now();
         $user_id = Auth::user()->id;
+        $agent_id = Auth::user()->agent_id;
 
         $orderSupplierData = [
+            'trade_date' => $data['trade_date'] ,
+            'total_tax_price' => $data['total_tax_price'] ,
+            'total_price' => $data['total_price'] ,
+            'original_total_tax_price' => $data['original_total_tax_price'] ,
+            'original_total_price' => $data['original_total_price'] ,
+            'currency_id' => $data['currency_id'] ,
+            'currency_code' => $data['currency_code'] ,
+            'currency_price' => $data['currency_price'] ,
+            'tax' => $data['tax'] ,
             'requisitions_purchase_id' => $data['requisitions_purchase_id'] ,
             'receiver_name' => $data['receiver_name'] ,
             'receiver_address' => $data['receiver_address'] ,
@@ -91,20 +106,69 @@ class OrderSupplierService
             'updated_at' => $now
         ];
 
-        OrderSupplier::where('id' , $data['id'])->update($orderSupplierData);
+        if ($act == 'add'){
+            $orderSupplierData['agent_id'] = $agent_id;
+            $orderSupplierData['user_id'] = $user_id;
+            $orderSupplierData['created_at'] = $now;
+            $orderSupplierData['created_by'] = $user_id;
+            $orderSupplierData['supplier_id'] = $data['supplier_id'];
+            $orderSupplierData['number'] = $this->universalService->getDocNumber('order_supplier');
+            OrderSupplier::insert($orderSupplierData);
+        }elseif ($act == 'upd'){
+            OrderSupplier::where('id' , $data['id'])->update($orderSupplierData);
+        }
 
         $orderSupplierDetailData = [];
+        $requisitionsPurchaseDetailData = [];
+        $item = $this->universalService->idtokey($this->itemService->getItemList());
 
-        foreach ($data['order_supplier_detail_id'] as $k => $order_supplier_detail_id){
+//        dd($data);
+        foreach ($data['requisitions_purchase_detail_id'] as $k => $requisitions_purchase_detail_id){
+            $item_id = $data['item_id'][$k];
             $orderSupplierDetailData[$k] = [
-                'id' => $order_supplier_detail_id ,
+                'id' => $data['order_supplier_detail_id'][$k] ,
+                'order_supplier_id' => $data['supplier_id'] ,
                 'is_giveaway' =>  $data['is_giveaway'][$k] ,
-                'item_qty' => $data['item_qty'][$k]
+                'item_qty' => $data['order_supplier_qty'][$k] ,
+                'requisitions_purchase_dtl_id' => $requisitions_purchase_detail_id ,
+                'item_id' => $item_id ,
+                'item_number' => $item[$item_id]['number'] ,
+                'item_brand' => $item[$item_id]['brand'] ,
+                'item_name' => $item[$item_id]['name'] ,
+                'item_spec' => $item[$item_id]['spec'] ,
+                'item_lot_number' => 1 ,
+                'item_check_qty' => 1 ,
+                'item_unit' => 1 ,
+                'item_price' => 1 ,
+                'subtotal_price' => 1 ,
+                'total_price' => 1 ,
+                'original_subtotal_price' => 1  ,
+                'currency_id' => $data['currency_id'] ,
+                'currency_code' => $data['currency_code'] ,
+                'currency_price' => $data['currency_price'] ,
+                'purchase_qty' => 1
             ];
+
+            $requisitionsPurchaseDetailData[$k] = [
+               'id' => $requisitions_purchase_detail_id ,
+                'is_gift' => $data['is_giveaway'][$k]
+            ] ;
+
+            if ($act=='add'){
+                unset($orderSupplierDetailData[$k]['id']);
+            }
         }
 
         $orderSupplierDetailInstance = new OrderSupplierDetail();
-        Batch::update($orderSupplierDetailInstance,$orderSupplierDetailData,'id');
+        $requisitionsPurchaseDetailInstance = new RequisitionsPurchaseDetail();
+
+        Batch::update($requisitionsPurchaseDetailInstance, $requisitionsPurchaseDetailData , 'id');
+
+        if ($act == 'add'){
+            $orderSupplierDetailInstance->insert($orderSupplierDetailData);
+        }elseif ($act == 'upd'){
+            Batch::update($orderSupplierDetailInstance,$orderSupplierDetailData,'id');
+        }
 
         return true;
     }

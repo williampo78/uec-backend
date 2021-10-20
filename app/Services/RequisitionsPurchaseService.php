@@ -76,6 +76,14 @@ class RequisitionsPurchaseService
         return RequisitionsPurchaseDetail::where('requisitions_purchase_id', $requisition_purchase_id)->get();
     }
 
+    public function getRequisitionPurchaseDetailForOrderSupplier($requisition_purchase_id){
+        return RequisitionsPurchaseDetail::select(DB::raw('requisitions_purchase_detail.*') , DB::raw('order_supplier_detail.item_qty as order_supplier_qty'))
+                                        ->leftJoin('order_supplier_detail', 'order_supplier_detail.requisitions_purchase_dtl_id' , '=' , 'requisitions_purchase_detail.id')
+                                        ->where('requisitions_purchase_detail.requisitions_purchase_id', $requisition_purchase_id)
+                                        ->get();
+
+    }
+
     public function getRequisitionsPurchaseReview(){
         $user_id = Auth::user()->id;
 

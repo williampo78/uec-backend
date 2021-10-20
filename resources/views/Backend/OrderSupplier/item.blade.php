@@ -14,7 +14,9 @@
             });
     }
 
-    function ajaxGetItem(order_supplier_id){
+    function ajaxGetItem(requisitions_purchase_id){
+        $('#ItemDiv').html('');
+
         $(" <div class='add_row'>" +
             "<div class='row'>" +
             "<div class='col-sm-4 text-left'>品項</div>" +
@@ -34,7 +36,7 @@
         $.ajax({
             url: "/backend/order_supplier/ajax",
             type: "POST",
-            data: {'get_type': "order_supplier_detail" ,'id': order_supplier_id , _token: '{{csrf_token()}}','action':'upd' },
+            data: {'get_type': "requisitions_purchase_detail" ,'requisitions_purchase_id': requisitions_purchase_id , _token: '{{csrf_token()}}'},
             enctype: 'multipart/form-data',
         })
             .done(function( data ){
@@ -47,11 +49,12 @@
                     $.each( obj, function( key, value )
                     {
                         var giveawayChecked = '';
-                        if (value.is_giveaway==1){
+                        if (value.is_gift==1){
                             giveawayChecked = 'checked';
                         }
                         $(" <div class='add_row' id='div-addrow-" + newRow + "'>" +
                             "<input name='order_supplier_detail_id[]' type='hidden' value='"+value.id+"'>" +
+                            "<input name='requisitions_purchase_detail_id[]' type='hidden' value='"+value.id+"'>" +
                             "<div class='row'>" +
                             "<div class='col-sm-4' >" +
                             "<div class='input-group'>" +
@@ -62,19 +65,25 @@
                             "</div>" +
                             "</div>" +
                             "<div class='col-sm-1'>" +
-                            "<input class='big-checkbox' name='is_giveaway[]' type='checkbox' "+giveawayChecked+" value='"+value.is_giveaway+"'>" +
+                            "<p>" +
+                                "<input type='checkbox' class='big-checkbox' "+giveawayChecked+"/>" +
+                                // <input type="hidden" name="test_checkbox[]" value="0" />
+                                "<input type='hidden' name='is_giveaway[]' value='"+value.is_gift+"'>" +
+
+                            "</p>" +
                             "</div>" +
+                            "<input type='hidden' name='item_id[]' value='"+value.item_id+"'>" +
                             "<div class='col-sm-1'>" +
                             "<input class='form-control' id='" + "price-" + newRow + "'  type='number' value='"+value.item_price+"' readonly>" +
                             "</div>" +
                             "<div class='col-sm-1'>" +
-                            "<input class='form-control' id='" + "rp_item_qty-" + newRow + "'  type='number' value='"+value.rp_item_qty+"' readonly>" +
+                            "<input class='form-control' id='" + "item_qty-" + newRow + "'  type='number' value='"+value.item_qty+"' readonly>" +
                             "</div>" +
                             "<div class='col-sm-1'>" +
-                            "<input class='form-control' name='item_qty[]' id='" + "item_qty-" + newRow + "'  type='number' value='"+value.item_qty+"'>" +
+                            "<input class='form-control' name='order_supplier_qty[]' id='" + "order_supplier_qty-" + newRow + "'  type='number' value='"+value.order_supplier_qty+"'>" +
                             "</div>" +
                             "<div class='col-sm-1'>" +
-                            "<input class='form-control id='" + "item_unit-" + newRow + "'  type='number' value='"+value.item_unit+"' readonly>" +
+                            "<input class='form-control id='" + "item_unit-" + newRow + "' value='"+value.item_unit+"' readonly>" +
                             "</div>" +
                             "<div class='col-sm-1'>" +
                             "<input class='form-control id='" + "price-" + newRow + "' value='"+'最小採購量'+"' readonly>" +
@@ -109,6 +118,20 @@
                         $("#div-addrow-" + $(this).val()).remove();
                     }
                     return false;
+                });
+
+                $('input[type=checkbox]').on("change",function(){
+                    let is_checked = $(this).parent().find('input[type=checkbox]').is(':checked');
+                    let target = 0;
+                    if(is_checked == true)
+                    {
+                        target = 1;
+                    }
+                    else
+                    {
+                        target = 0;
+                    }
+                    $(this).parent().find('input[type=hidden]').val(target);
                 });
             });
     }
