@@ -141,8 +141,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <textarea style="" name="requisitions_purchase_detail">@{{ details }}</textarea>
-                                <textarea style=""> @{{ detailsCount }}</textarea>
+                                <textarea style="display:none" name="requisitions_purchase_detail">@{{ details }}</textarea>
+                                <textarea style="display:none"> @{{ detailsCount }}</textarea>
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項 </h4>
                                 <div id="ItemDiv">
