@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增角色</h1>
+                <h1 class="page-header"><i class="fa fa-plus"></i> 編輯角色</h1>
             </div>
         </div>
 
@@ -19,7 +19,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form id="new-form" method="post" action="{{route('roles.store')}}"
+                        <form id="new-form" method="post" action=""
                               enctype="multipart/form-data">
                             @csrf
                             <div class="row">

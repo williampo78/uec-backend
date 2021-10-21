@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}"/>
     <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
-    <link rel="stylesheet" href="{{asset('asset/css/validationEngine.jquery.css')}}">
 
 </head>
 
@@ -75,6 +74,7 @@
 <script src="{{asset('asset/js/jquery.validationEngine.js')}}"></script>
 <script src="{{asset('asset/js/jquery.validationEngine-zh_TW.js')}}"></script>
 
+<link rel="stylesheet" href="{{asset('asset/css/validationEngine.jquery.css')}}">
 <script>
     $(document).ready(function () {
         $('#table_list').DataTable();

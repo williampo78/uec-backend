@@ -51,7 +51,13 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->input();
+        unset($input['_token']);
+        $this->rolesPermission->addRole($input);
+        $act = 'add';
+        $route_name = 'roles';
+        return view('backend.success', compact('route_name', 'act'));
+
     }
 
     /**
@@ -73,7 +79,9 @@ class RolesController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data['permission'] = $this->rolesPermission->getPermission();
+        $data['permissionDetail'] = $this->rolesPermission->getPermissionDetail();
+        return view('Backend.Roles.upd', compact('data'));
     }
 
     /**

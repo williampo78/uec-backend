@@ -79,14 +79,14 @@
 
                                         @if($share_role_auth['auth_update'])
                                             <a class="btn btn-info btn-sm"
-                                               href="{{ route('department.edit' , $item->id) }}">修改</a>
+                                               href="{{ route('roles.edit' , $item->id) }}">修改</a>
                                         @endif
                                     </td>
                                     <td>{{$item->role_name}}</td>
                                     <td>{{$item->active==1?'啟用':'關閉'}}</td>
                                     <td>{{$item->is_for_supplier==1?'V':''}}</td>
                                     <td>{{$item->updated_at}}</td>
-                                    <td>{{$data['user'][$item->updated_by]['user_name']}}</td>
+                                    <td>{{($item->updated_by >0?$data['user'][$item->updated_by]['user_name']:$data['user'][$item->created_by]['user_name'])}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
