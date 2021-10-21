@@ -26,7 +26,7 @@ class RequisitionsPurchaseService
         $agent_id = Auth::user()->agent_id;
 
         $select_start_date = '2000-10-10';
-        $select_end_date = '2021-10-10';
+        $select_end_date = '2021-10-22';
         $department = 1;
         $active = 1;
 
@@ -41,9 +41,7 @@ class RequisitionsPurchaseService
             // ->where('department_id', 'like', $department)
             ->where('requisitions_purchase.active', $active)
             ->orderBy('requisitions_purchase.trade_date', 'desc')
-            ->orderBy('requisitions_purchase.created_at', 'desc')
-            ->get();
-
+            ->orderBy('requisitions_purchase.created_at', 'desc');
         return $rs;
     }
 
@@ -132,7 +130,6 @@ class RequisitionsPurchaseService
             $requisitions_purchase['use_date'] = $now; //需用日先填假值
             $requisitions_purchase['created_at'] = $now; //創建時間
             $requisitions_purchase_id = RequisitionsPurchase::insertGetId($requisitions_purchase);
-            // $requisitions_purchase_id = 4 ;
             if (isset($requisitions_purchase_detail)) {
                 foreach ($requisitions_purchase_detail as $key => $val) {
                     unset($requisitions_purchase_detail[$key]['id']);
@@ -140,7 +137,6 @@ class RequisitionsPurchaseService
                     $requisitions_purchase_detail[$key]['item_number'] = $requisitions_purchase['number'];
                     $requisitions_purchase_detail[$key]['total_price'] = $requisitions_purchase['total_price'];
                 }
-                // dd($requisitions_purchase_detail) ; exit ;
                 RequisitionsPurchaseDetail::insert($requisitions_purchase_detail);
             }
 

@@ -144,33 +144,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- @foreach ($data['quotation'] as $k => $v) --}}
-                                {{-- <form id="del-{{ $v['id'] }}" action="/backend/quotation/{{ $v['id'] }}" method="post">
-                                        @method('DELETE')
-                                        @csrf
-                                    </form> --}}
+                                @foreach ($requisitionsPurchase as $obj)
                                 <tr>
                                     <td>
-                                        {{-- @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
-                                            @endif
-
-                                            @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
-                                                <a class="btn btn-info btn-sm" href="{{ route('quotation.edit' , $v['id']) }}">修改</a>
-                                            @endif
-
-                                            @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
-                                                <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
-                                            @endif --}}
+                                        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail"><i class="fa fa-search"></i></button>
+                                        <a class="btn btn-info btn-sm" href="{{route('requisitions_purchase')}}/{{$obj->id}}/edit/">修改</a>
+                                        <button class="btn btn-danger btn-sm" onclick="del(45 , 'QU2110150045' );">刪除</button>
                                     </td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                    <td>1</td>
+                                    </td>
+                                    <td>{{$obj->trade_date}} </td>
+                                    <td>{{$obj->number}}</td>
+                                    <td>{{$obj->supplier_name}}</td>
+                                    <td>{{$obj->status}}</td>
+                                    <td>{{$obj->created_at}}</td>
+                                    <td>尚未有該欄位</td>
                                 </tr>
-                                {{-- @endforeach --}}
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

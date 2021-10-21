@@ -16,10 +16,17 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="supplier">
-                                            <label for="supplier">供應商 <span class="redtext">*</span></label>
+                                            <label for="supplier">供應商{{ $requisitionsPurchase->supplier_id }}
+                                                <span class="redtext">*</span></label>
                                             <select class="form-control select2-vue-js" name="supplier_id" id="supplier_id">
                                                 @foreach ($supplier as $obj)
-                                                    <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @if (isset($requisitionsPurchase))
+                                                        <option value="{{ $obj->id }}"
+                                                            {{ $obj->id == $requisitionsPurchase->supplier_id ? 'selected="selected"' : '' }}>
+                                                            {{ $obj->name }}</option>
+                                                    @else
+                                                        <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -29,8 +36,8 @@
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">請購日期 <span class="redtext">*</span></label>
                                             <div class='input-group date' id='datetimepickera'>
-                                                <input type='text' class="form-control" name="trade_date"
-                                                    id="trade_date" value="{{ date('Y-m-d') }}" />
+                                                <input type='text' class="form-control" name="trade_date" id="trade_date"
+                                                    value="{{ isset($requisitionsPurchase->trade_date) ? $requisitionsPurchase->trade_date : date('Y-m-d') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -52,7 +59,13 @@
                                             <label for="supplier">倉庫 <span class="redtext">*</span></label>
                                             <select class="form-control select2-vue-js" name="warehouse_id">
                                                 @foreach ($warehouse as $obj)
-                                                    <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @if (isset($requisitionsPurchase))
+                                                        <option value="{{ $obj->id }}"
+                                                            {{ $obj->id == $requisitionsPurchase->warehouse_id ? 'selected="selected"' : '' }}>
+                                                            {{ $obj->name }}</option>
+                                                    @else
+                                                        <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -121,7 +134,7 @@
                                         <div class="form-group" id="div_remark">
                                             <label for="remark">備註</label>
                                             <textarea class="form-control" rows="3" name="remark"
-                                                id="remark">{{ $data['quotation']['remark'] ?? '' }}</textarea>
+                                                id="remark">{{ $requisitionsPurchase->remark ?? '' }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -151,7 +164,9 @@
                                                     v-model="details[detailKey].item_id"> </select2>
                                             </div>
                                             <div class="col-sm-1">
-                                                <input type="checkbox" class="big-checkbox">
+
+                                                <input type="checkbox" class="big-checkbox"
+                                                    v-model="details[detailKey].is_gift" :true-value="1" :false-value="0">
                                             </div>
                                             {{-- 單價 --}}
                                             <div class="col-sm-2">
@@ -224,13 +239,13 @@
         var requisitions = Vue.extend({
             data: function() {
                 return {
-                    original_total_tax_price: 0, //原幣稅額
-                    original_total_price: 0, //原幣總金額  
-                    total_tax_price: 0, //稅額
-                    total_price: 0, //總金額
+                    original_total_tax_price: {!! isset($requisitionsPurchase->original_total_tax_price) ?? 0 !!}, //原幣稅額
+                    original_total_price: {!! isset($requisitionsPurchase->original_total_price) ?? 0 !!}, //原幣總金額  
+                    total_tax_price: {!! isset($requisitionsPurchase->total_tax_price) ?? 0 !!}, //稅額
+                    total_price: {!! isset($requisitionsPurchase->total_price) ?? 0 !!}, //總金額
                     status: '',
-                    tax: '',
-                    details: [],
+                    tax: {!! isset($requisitionsPurchase->tax) ?? 0 !!},
+                    details: @json(isset($requisitionsPurchaseDetail) ? $requisitionsPurchaseDetail : []),
                     options: @json(isset($item) ? $item : '{}')
                 }
             },
