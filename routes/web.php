@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\RolesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -52,10 +53,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/quotation/ajaxDelItem' , [QuotationController::class,'ajaxDelItem']);
     Route::resource('/order_supplier',OrderSupplierController::class, ['names' => ['index' => 'order_supplier']]);
     Route::post('/order_supplier/ajax' , [OrderSupplierController::class, 'ajax']);
-    Route::resource('/roles',RolesController::class, ['names' => ['index' => 'roles']]);
+
     Route::resource('/test',TestController::class, ['names' => ['index' => 'test']]);
     Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
-
+    Route::resource('/roles',RolesController::class, ['names' => ['index' => 'roles']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

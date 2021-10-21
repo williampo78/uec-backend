@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Quotation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Models\Users;
+use Illuminate\Support\Facades\Auth;
 
 class UniversalService
 {
@@ -75,4 +77,16 @@ class UniversalService
             3 => '零稅率'
         ];
     }
+
+    public function getUser()
+    {
+        $agent_id = Auth::user()->agent_id;
+        $users = Users::where('agent_id', $agent_id)->where('active', 1)->get();
+        $data = [];
+        foreach ($users as $k => $v) {
+            $data[$v['id']] = $v;
+        }
+        return $data;
+    }
+
 }
