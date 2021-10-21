@@ -56,9 +56,9 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2 text-right"><label> 廠商交貨日</label></div>
-                                <div class="col-sm-4" id="RPModalDate"></div>
+                                <div class="col-sm-4" id="RPModalSupplierDeliverDate"></div>
                                 <div class="col-sm-2 text-right"><label> 預計進貨日</label></div>
-                                <div class="col-sm-4" id="RPModalDate2"></div>
+                                <div class="col-sm-4" id="RPModalExpectDeliverDate"></div>
                             </div>
 
                         </div>
@@ -112,9 +112,9 @@
                     $("#RPModalInvoiceCompanyNumber").html(obj.invoice_company_number);
                     $("#RPModalReceiverAddress").html(obj.receiver_address);
                     $("#RPModalRemark").html(obj.remark);
-                    $("#RPModalWarehouse").html(obj.remark);
-                    $("#RPModalDate").html(obj.remark);
-                    $("#RPModalDate2").html(obj.remark);
+                    $("#RPModalWarehouse").html(obj.warehouse_name);
+                    $("#RPModalSupplierDeliverDate").html(obj.supplier_deliver_date);
+                    $("#RPModalExpectDeliverDate").html(obj.expect_deliver_date);
 
                 }
             });
@@ -151,16 +151,20 @@
 
                     $.each( obj, function( key, value )
                     {
+                        var is_giveaway = '否';
+                        if (value.is_giveaway == 1){
+                            is_giveaway = '是';
+                        }
                         html_value +=  "<tr>" +
                             "<td>" + value.item_number + "</td>" +
                             "<td>" + value.item_name + "</td>" +
                             "<td>" + value.item_price + "</td>" +
                             "<td>" + value.item_qty + "</td>" +
-                            "<td>" + value.unit + "</td>" +
+                            "<td>" + value.item_unit + "</td>" +
                             "<td>" + value.subtotal_price + "</td>" +
-                            "<td>" + '贈品' + "</td>" +
+                            "<td>" + is_giveaway + "</td>" +
                             "<td>" + '最小採購量' + "</td>" +
-                            "<td>" + '進貨量' + "</td>" +
+                            "<td>" + value.purchase_qty + "</td>" +
                             "</tr>";
                     });
 

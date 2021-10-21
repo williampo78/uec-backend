@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderSupplier;
 use App\Models\Quotation;
+use App\Models\Warehouse;
 use App\Services\ItemService;
 use App\Services\OrderSupplierService;
 use App\Services\QuotationService;
 use App\Services\RequisitionsPurchaseService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
+use App\Services\WarehouseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,7 +62,15 @@ class OrderSupplierController extends Controller
      */
     public function create()
     {
+        $supplier = new SupplierService();
+        $data['supplier'] = $supplier->getSupplier();
+        $data['requisitions_purchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchaseList();
+//        $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
+        $data['tax'] = $this->universalService->getTaxList();
 
+        $data['act'] = 'add';
+
+        return view('Backend.OrderSupplier.input', compact('data'));
     }
 
     /**
@@ -71,14 +81,14 @@ class OrderSupplierController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'quotation';
+        $route_name = 'order_supplier';
         $act = 'add';
         $data = $request->except('_token');
         if(isset($data['status_code'])){
             $act = $data['status_code'];
         }
 
-        $this->quotationService->addQuotation($data);
+        $this->orderSupplierService->updateOrderSupplier($data , 'add');
 
         return view('backend.success' , compact('route_name','act'));
     }
@@ -111,7 +121,8 @@ class OrderSupplierController extends Controller
         $data['act'] = 'upd';
         $data['id'] = $id;
 
-        return view('Backend.OrderSupplier.upd', compact('data'));
+//        dd($data);
+        return view('Backend.OrderSupplier.input', compact('data'));
     }
 
     /**
@@ -128,7 +139,7 @@ class OrderSupplierController extends Controller
         $data = $request->except('_token' , '_method');
         $data['id'] = $id;
 
-        $this->orderSupplierService->updateOrderSupplier($data);
+        $this->orderSupplierService->updateOrderSupplier($data, 'upd');
 
         return view('backend.success', compact('route_name' , 'act'));
     }
@@ -153,12 +164,28 @@ class OrderSupplierController extends Controller
         $rs = $request->all();
 
         $data = [];
+        $supplier = new SupplierService();
+        $supplier = $this->universalService->idtokey($supplier->getSupplier());
+        $warehouse = new WarehouseService();
+        $warehouse = $this->universalService->idtokey($warehouse->getWarehouseList());
+
         if ($rs['get_type'] == 'order_supplier'){
+            $status = $this->universalService->getStatusCode();
             $data = $this->orderSupplierService->getOrderSupplierById($rs['id']);
+            $data['warehouse_name'] = $warehouse[$data['warehouse_id']]['name'] ?? '';
+            $data['status'] = $status[$data['status']]?? '';
+        }elseif ($rs['get_type'] == 'requisitions_purchase_detail'){
+            $data = $this->requisitionsPurchaseService->getRequisitionPurchaseDetailForOrderSupplier($rs['requisitions_purchase_id']);
+        }elseif ($rs['get_type'] == 'requisitions_purchase'){
+            $tax = $this->universalService->getTaxList();
+            $data = $this->requisitionsPurchaseService->getRequisitionPurchaseById($rs['requisitions_purchase_id']);
+            $data['supplier_name'] = $supplier[$data['supplier_id']]['name'] ?? '';
+            $data['warehouse_name'] = $warehouse[$data['warehouse_id']]['name'] ?? '';
+            $data['tax_name'] = $tax[$data['tax']] ?? '';
         }elseif ($rs['get_type'] == 'order_supplier_detail'){
             $data = $this->orderSupplierService->getOrderSupplierDetail($rs['id']);
-
         }
+
         echo "OK@@".json_encode($data);
     }
 

@@ -95,7 +95,7 @@ class QuotationService
         try{
             $quotationData = [];
             $quotationData['agent_id'] = Auth::user()->agent_id;
-            $quotationData['doc_number'] = $this->universalService->getDocNumber();
+            $quotationData['doc_number'] = $this->universalService->getDocNumber('quotation');
             $quotationData['supplier_id'] = $data['supplier_id'];
             $quotationData['status_code'] = $data['status_code'];
             $quotationData['tax'] = $data['tax'];
@@ -197,7 +197,6 @@ class QuotationService
                 'updated_at' => $now ,
                 'updated_by' => $user_id
             ];
-
             if(isset($data['quotation_details_id'][$k])){
                 $quotation_details_id = $data['quotation_details_id'][$k];
                 QuotationDetails::where('id' , $quotation_details_id)->update($quotationDetailData);
@@ -207,7 +206,6 @@ class QuotationService
                 $quotationDetailData['created_by'] = $user_id;
                 QuotationDetails::insert($quotationDetailData);
             }
-
             $quotationDetailData = [];
         }
 

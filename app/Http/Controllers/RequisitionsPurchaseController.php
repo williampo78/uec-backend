@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ItemService;
 use App\Services\RequisitionsPurchaseService;
+use App\Services\SupplierService;
+use App\Services\UniversalService;
+use App\Services\WarehouseService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Services\WarehouseService ; 
-use App\Services\SupplierService ;  
-use App\Services\ItemService ;
 
 class RequisitionsPurchaseController extends Controller
 {
@@ -20,18 +21,21 @@ class RequisitionsPurchaseController extends Controller
     private $requisitionsPurchaseService;
     private $warehouseService;
     private $supplierService;
-    private $itemService ;
+    private $itemService;
+    private $universalService;
 
     public function __construct(
-    RequisitionsPurchaseService $requisitionsPurchaseService ,
-    WarehouseService $warehouseService,
-    SupplierService $supplierService ,
-    ItemService $itemService
-    ){
-        $this->requisitionsPurchaseService = $requisitionsPurchaseService;
-        $this->warehouseService = $warehouseService ;  // 倉庫
-        $this->supplierService  = $supplierService  ; //供應商
-        $this->itemService      = $itemService ;  //品項
+        RequisitionsPurchaseService $requisitionsPurchaseService,
+        WarehouseService $warehouseService,
+        SupplierService $supplierService,
+        ItemService $itemService,
+        UniversalService $universalService
+    ) {
+        $this->requisitionsPurchaseService = $requisitionsPurchaseService; //請購單
+        $this->warehouseService = $warehouseService; // 倉庫
+        $this->supplierService = $supplierService; //供應商
+        $this->itemService = $itemService; //品項
+        $this->universalService = $universalService; // 共用服務
     }
 
     public function index()
@@ -40,7 +44,7 @@ class RequisitionsPurchaseController extends Controller
         $params['active'] = 0;
         $data = $this->requisitionsPurchaseService->getRequisitionsPurchase($params);
 
-        return view('Backend.RequisitionsPurchase.list' , compact('data'));
+        return view('Backend.RequisitionsPurchase.list', compact('data'));
     }
 
     /**
@@ -50,14 +54,17 @@ class RequisitionsPurchaseController extends Controller
      */
     public function create()
     {
-        $result = [] ;
-        $result['warehouse'] =  $this->warehouseService->getWarehouseList()->get() ;//取得倉庫
-        $result['supplier'] = $this->supplierService->getSupplier();//供應商
-        $result['item'] = $this->itemService->getItem()->get() ; //品項
-        foreach($result['item'] as $key => $val) {
-            $result['item'][$key]->text = $val->name ; 
+        $result = [];
+        $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
+        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['item'] = $this->itemService->getItem()->get(); //品項
+        $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
+        //select 2 套件需要text 辨別 option name
+        foreach ($result['item'] as $key => $val) {
+            $result['item'][$key]->text = $val->name;
         }
-        return view('Backend.RequisitionsPurchase.input' , $result);
+        
+        return view('Backend.RequisitionsPurchase.input', $result);
     }
 
     /**
@@ -68,16 +75,10 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        // $route_name = 'category';
-        // $act = 'add';
-        // $data = $request->except('_token');
-        // $data['agent_id'] = Auth::user()->agent_id;
-        // $data['created_by'] = Auth::user()->id;
-        // $data['created_at'] = Carbon::now();
-
-        // $rs = Category::insert($data);
-
-        return view('backend.success' , compact('route_name','act'));
+        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input());  //創建請購單
+        $act = 'add';
+        $route_name = 'requisitions_purchase';
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -102,7 +103,7 @@ class RequisitionsPurchaseController extends Controller
         // $data = Category::find($id);
         // $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
 
-        return view('Backend.PrimaryCategory.upd', compact('data' , 'primary_category_list'));
+        return view('Backend.PrimaryCategory.upd', compact('data', 'primary_category_list'));
     }
 
     /**
@@ -121,7 +122,7 @@ class RequisitionsPurchaseController extends Controller
         // Category::where('id' ,$id)->update($data);
         // $route_name = 'category';
         // $act = 'upd';
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -136,15 +137,16 @@ class RequisitionsPurchaseController extends Controller
 
     }
 
-    public function ajax(Request $request){
+    public function ajax(Request $request)
+    {
         $rs = $request->all();
 
-        if ($rs['get_type']==='requisitions_purchase'){
+        if ($rs['get_type'] === 'requisitions_purchase') {
             $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($rs['id']);
-            echo "OK@@".json_encode($data);
-        }elseif($rs['get_type']==='requisitions_purchase_detail'){
+            echo "OK@@" . json_encode($data);
+        } elseif ($rs['get_type'] === 'requisitions_purchase_detail') {
             $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($rs['id']);
-            echo "OK@@".json_encode($data);
+            echo "OK@@" . json_encode($data);
         }
     }
 }

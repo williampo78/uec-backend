@@ -131,11 +131,11 @@
                             </thead>
                             <tbody>
                             @foreach($data['order_supplier'] as $k => $v)
-                                <form id="del-{{ $v['id'] }}" action="/backend/quotation/{{ $v['id'] }}" method="post">
-                                    @method('DELETE')
-                                    @csrf
-                                </form>
                                 <tr>
+                                    <form id="del-{{$v['id']}}" action="{{ route('order_supplier.destroy' , $v['id']) }}" method="post">
+                                        @method('DELETE')
+                                        @csrf
+                                    </form>
                                     <td>
 {{--                                        @if($share_role_auth['auth_query'])--}}
                                             <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $v['id'] }}" onclick="row_detail({{ $v['id'] }});"><i class="fa fa-search"></i></button>
@@ -145,18 +145,20 @@
                                             <a class="btn btn-info btn-sm" href="{{ route('order_supplier.edit' , $v['id']) }}">修改</a>
 {{--                                        @endif--}}
 
-                                        @if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])
-                                            <button class="btn btn-danger btn-sm" onclick="del({{ $v['id'] }} , '{{ $v['number'] }}' );">刪除</button>
-                                        @endif
+                                             <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#row_supplier_deliver" data-id="{{ $v['id'] }}" onclick="row_supplier_deliver({{ $v['id'] }});">預進日</button>
+
+{{--                                        @if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])--}}
+                                            <button class="btn btn-danger btn-sm" type="button" onclick="del({{ $v['id'] }} , '{{ $v['number'] }}' );">刪除</button>
+{{--                                        @endif--}}
                                     </td>
                                     <td>{{ $v['trade_date'] }}</td>
                                     <td>{{ $v['number'] }}</td>
                                     <td>{{ $data['supplier'][$v['supplier_id']]['name']?? '' }}</td>
                                     <td>{{ $v['total_price'] }}</td>
-                                    <td>{{ $data['status_code'][$v['status_code']]?? '' }}</td>
+                                    <td>{{ $data['status_code'][$v['status']]?? '' }}</td>
                                     <td>{{ $v['requisitions_purchase_number'] }}</td>
-                                    <td>預計進貨日</td>
-                                    <td>預進表拋出時間</td>
+                                    <td>{{ $v['expect_deliver_date'] }}</td>
+                                    <td>{{ $v['supplier_deliver_date'] }}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -167,14 +169,13 @@
         </div>
     </div>
     @include('Backend.OrderSupplier.detail')
+    @include('Backend.OrderSupplier.supplier_deliver')
     @section('js')
         <script>
-            $('#supplier').select2();
-            $('#status').select2();
-            $(document).ready(function () {
-            });
-
             $(function () {
+                $('#supplier').select2();
+                $('#status').select2();
+
                 $('#datetimepicker').datetimepicker({
                     format:'YYYY-MM-DD',
                 });
@@ -186,11 +187,11 @@
             function del(id, doc_number)
             {
                 if(confirm("確定要刪除採購單"+doc_number+"?")){
-                    document.getElementById('del-'+id).submit();
+                    console.log("del-"+id)
+                    document.getElementById("del-"+id).submit();
                 }
                 return false;
             };
-
 
         </script>
     @endsection
