@@ -122,6 +122,8 @@ class RequisitionsPurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
+        dump($request->input()) ; 
+        exit ;
         // $data = $request->except('_token' , '_method');
         // $data['updated_by'] = Auth::user()->id;
         // $data['updated_at'] = Carbon::now();
@@ -155,5 +157,14 @@ class RequisitionsPurchaseController extends Controller
             $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($rs['id']);
             echo "OK@@" . json_encode($data);
         }
+    }
+    public function ajaxDelPurchaseDetail(Request $request){
+        $data = json_encode($request->input());
+       
+        return response()->json([
+            'data' => $data
+        ]);
+        
+
     }
 }

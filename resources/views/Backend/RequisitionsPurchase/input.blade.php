@@ -141,9 +141,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <textarea style="display: none;"
-                                    name="requisitions_purchase_detail">@{{ details }}</textarea>
-                                <textarea style="display: none;"> @{{ detailsCount }}</textarea>
+                                <textarea style="" name="requisitions_purchase_detail">@{{ details }}</textarea>
+                                <textarea style=""> @{{ detailsCount }}</textarea>
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項 </h4>
                                 <div id="ItemDiv">
@@ -160,11 +159,10 @@
                                         </div>
                                     </div>
                                     <div class="add_row" v-for="(detail, detailKey) in details">
-
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <select2 :options="options" :details="details"
-                                                    v-model="details[detailKey].item_id"> </select2>
+                                                <select2 :selectkey="detailKey" :options="options" :details="details" 
+                                                    v-model="details[detailKey].item_id" > </select2>
                                             </div>
                                             <div class="col-sm-1">
 
@@ -194,8 +192,9 @@
                                             </div>
                                             {{-- 功能 --}}
                                             <div class="col-sm-1">
-                                                <button type="button" class="btn btn-danger" @click="ItemListDel(details[detailKey].id,detailKey)">
-                                                    <i class="fa fa-ban" ></i>刪除
+                                                <button type="button" class="btn btn-danger"
+                                                    @click="ItemListDel(details[detailKey].id,detailKey)">
+                                                    <i class="fa fa-ban"></i>刪除
                                                 </button>
                                             </div>
                                         </div>
@@ -215,8 +214,6 @@
                                 </div>
                                 <input type="hidden" id="status" v-model="status" name="status">
                                 <div class="row">
-                                    @{{ status }}
-
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <button class="btn btn-success" type="button" @click="submitBtn('DRAFTED')"> <i
@@ -267,9 +264,29 @@
                         is_gift: false, // 是否為贈品
                     });
                 },
-                ItemListDel(id,key) {
-                    console.log(id,key) ;
-                    console.log('del btn !') ; 
+                ItemListDel(id, key) {
+                    var checkDel = confirm('你確定要刪除嗎？');
+                    if (checkDel) {
+                        // this.$delete(this.contactData, key)
+                        if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
+                            $.ajax({
+                                type: "POST",
+                                url: '/backend/requisitions_purchase/ajaxDelPurchaseDetail',
+                                dataType: "json",
+                                data: {
+                                    "_token": "{{ csrf_token() }}",
+                                    "id": id,
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            });
+                        }
+                        this.$delete(this.details, key)
+                    }
                 },
                 submitBtn(status) {
                     this.status = status;
@@ -291,15 +308,15 @@
                 this.details.push();
             },
             computed: {
-                detailsCount() { 
+                detailsCount() {
                     var details = this.details;
                     var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
                     $.each(details, function(key, obj) {
                         //原幣小計 = 單價 * 數量 
-                        if(obj.is_gift == 1){ //如果是贈品則不計算單價
+                        if (obj.is_gift == 1) { //如果是贈品則不計算單價
                             obj.subtotal_price = 0;
-                        }else if (obj.item_qty > 0 && obj.item_qty !== '') {
+                        } else if (obj.item_qty > 0 && obj.item_qty !== '') {
                             obj.subtotal_price = obj.item_price * obj.item_qty;
                         } else {
                             obj.subtotal_price = 0;
@@ -314,7 +331,7 @@
                             break;
                         case '1':
                             // console.log('應稅');
-                            requisitions_purchase.original_total_tax_price = sum_price *0.05; //原幣稅額
+                            requisitions_purchase.original_total_tax_price = sum_price * 0.05; //原幣稅額
                             requisitions_purchase.total_tax_price = sum_price * 0.05; //稅額
                             break;
                         case '2':
@@ -340,12 +357,11 @@
 
         //Vue Js 如果要用 select2 要另外寫 
         Vue.component("select2", {
-            props: ["options", "value", "details"],
+            props: ["options", "value", "details", "selectkey"],
             template: "#select2-template",
             mounted: function() {
                 var vm = this;
-                $(this.$el)
-                    .select2({
+                $(this.$el).select2({
                         data: this.options,
                         theme: "bootstrap",
                         placeholder: "請選擇",
@@ -359,13 +375,11 @@
             },
             watch: {
                 value: function(value) {
-                    var getSelectKey = this._uid - 1; //這個u_id 當作找到選擇器的排序
+                    var getSelectKey = this.selectkey; //這個u_id 當作找到選擇器的排序
                     var details = this.details;
-                    // console.log(details) ;
                     $(this.$el)
                         .val(value)
                         .trigger("change");
-
                     $.each(this.options, function(key, obj) {
                         if (obj.id == value) {
                             details[getSelectKey].item_name = obj.name; //品項名稱
