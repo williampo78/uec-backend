@@ -193,8 +193,11 @@
                                                     v-model="details[detailKey].subtotal_price">
                                             </div>
                                             {{-- 功能 --}}
-                                            <div class="col-sm-1"><button class="btn btn-danger btn_close"><i
-                                                        class="fa fa-ban"></i>刪除</button></div>
+                                            <div class="col-sm-1">
+                                                <button type="button" class="btn btn-danger" @click="ItemListDel(details[detailKey].id,detailKey)">
+                                                    <i class="fa fa-ban" ></i>刪除
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -264,8 +267,9 @@
                         is_gift: false, // 是否為贈品
                     });
                 },
-                ItemListDel(id, key) {
-
+                ItemListDel(id,key) {
+                    console.log(id,key) ;
+                    console.log('del btn !') ; 
                 },
                 submitBtn(status) {
                     this.status = status;
@@ -293,16 +297,15 @@
                     var sum_price = 0;
                     $.each(details, function(key, obj) {
                         //原幣小計 = 單價 * 數量 
-                        if (obj.item_qty > 0 && obj.item_qty !== '') {
+                        if(obj.is_gift == 1){ //如果是贈品則不計算單價
+                            obj.subtotal_price = 0;
+                        }else if (obj.item_qty > 0 && obj.item_qty !== '') {
                             obj.subtotal_price = obj.item_price * obj.item_qty;
                         } else {
                             obj.subtotal_price = 0;
                         }
-
                         sum_price += obj.subtotal_price;
-
                     });
-                    // console.log(requisitions_purchase.tax) ; 
                     switch (requisitions_purchase.tax) {
                         case '0':
                             // console.log('未稅');
@@ -325,8 +328,6 @@
                             requisitions_purchase.total_tax_price = 0; //稅額
                             break;
                     }
-                    // this.requisitions_purchase.original_total_tax_price = 100; //原幣稅額
-                    // this.requisitions_purchase.total_tax_price = 100; //稅額
                     requisitions_purchase.original_total_price = sum_price; //原幣總金額  
                     requisitions_purchase.total_price = sum_price; //總金額
                     return details;
