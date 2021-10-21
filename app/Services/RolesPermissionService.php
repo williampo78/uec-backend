@@ -58,10 +58,11 @@ class RolesPermissionService
         return $permission_detail_array;
     }
 
-    public function addRole($inputdata)
+    public function addRole($inputdata, $act)
     {
         $user_id = Auth::user()->id;
         $now = Carbon::now();
+        $auth = ['query', 'create', 'update', 'delete', 'void', 'export'];
         DB::beginTransaction();
         try {
             $roleData = [];
@@ -71,12 +72,18 @@ class RolesPermissionService
             $roleData['is_for_supplier'] = $inputdata['is_for_supplier'];
             $roleData['created_by'] = $user_id;
             $roleData['created_at'] = $now;
-            $roleData['updated_by'] = -1;
+            $roleData['updated_by'] = $user_id;
             $roleData['updated_at'] = $now;
-            $role_id = Roles::insertGetId($roleData);
+            if ($act == 'add') {
+                $role_id = Roles::insertGetId($roleData);
+            } else if ($act =='upd') {
+                Roles::where('id' , $inputdata['id'])->update($roleData);
+                $role_id = $inputdata['id'];
+            }
 
-            $auth = ['query', 'create', 'update', 'delete', 'void', 'export'];
             $detailData = [];
+            //不管新增或編輯先把原有的權限都刪除
+            RolePermissionDetails::where('role_id', '=', $role_id)->delete();
             foreach ($inputdata['auth_index'] as $k1 => $v1) {    //有勾選才會寫入細項權限
                 $detailData['role_id'] = $role_id;
                 $detailData['permission_detail_id'] = $v1;
@@ -102,11 +109,19 @@ class RolesPermissionService
 
     public function getRolePermission($id)
     {
+        $auth = ['auth_query', 'auth_create', 'auth_update', 'auth_delete', 'auth_void', 'auth_export'];
         $permission_detail_array = [];
         $permission = RolePermissionDetails::where('role_id','=',$id)->get()->toArray();
         foreach ($permission as $data) {
-            $permission_detail_array[$data['permission_detail_id']][] = $data['id'];
+            foreach ($auth as $k=>$v){
+                $permission_detail_array[$data['permission_detail_id']][$v] = $data[$v];
+            }
         }
         return $permission_detail_array;
+    }
+
+    public function showRole($id)
+    {
+        return Roles::where('id', $id)->get()->first();
     }
 }

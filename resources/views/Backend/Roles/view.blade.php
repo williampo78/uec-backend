@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 編輯角色</h1>
+                <h1 class="page-header"><i class="fa fa-plus"></i> 檢視角色</h1>
             </div>
         </div>
 
@@ -19,10 +19,8 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form id="new-form" method="post" action="{{ route('roles.update' , $data['role']->id) }}"
+                        <form id="new-form" method="post"
                               enctype="multipart/form-data">
-                            {{ method_field('PUT') }}
-                            {{ csrf_field() }}
                             <div class="row">
 
                                 <!-- 欄位 -->
@@ -32,7 +30,7 @@
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_name">
                                                 <label for="name">名稱 <span class="text-danger">*</span></label>
-                                                <input class="form-control validate[required]" name="role_name"
+                                                <input class="form-control validate[required]" name="role_name" disabled
                                                        id="role_name" value="{{$data['role']->role_name}}">
                                             </div>
                                         </div>
@@ -42,14 +40,14 @@
                                                 <div class="row">
                                                     <div class="col-sm-2">
                                                         <input type="radio"
-                                                               name="active" id="active1"
+                                                               name="active" id="active1" disabled
                                                                {{($data['role']->active==1?'checked':'')}}
                                                                value="1">
                                                         <label for="active1">啟用</label>
                                                     </div>
                                                     <div class="col-sm-2">
                                                         <input type="radio"
-                                                               name="active" id="active0"
+                                                               name="active" id="active0" disabled
                                                                {{($data['role']->active==0?'checked':'')}}
                                                                value="0">
                                                         <label for="active0">關閉</label>
@@ -62,14 +60,14 @@
                                                 <label for="name">供應商專用 <span class="text-danger">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-2">
-                                                        <input type="radio"
+                                                        <input type="radio" disabled
                                                                name="is_for_supplier" id="is_for_supplier1"
                                                                {{($data['role']->is_for_supplier1==1?'checked':'')}}
                                                                value="1">
                                                         <label for="is_for_supplier1">是</label>
                                                     </div>
                                                     <div class="col-sm-2">
-                                                        <input type="radio"
+                                                        <input type="radio" disabled
                                                                name="is_for_supplier" id="is_for_supplier0"
                                                                {{($data['role']->is_for_supplier1==0?'checked':'')}}
                                                                value="0">
@@ -95,9 +93,10 @@
                                                     </div>
                                                     <div class="panel-body">
                                                         @foreach($data['permissionDetail'][$main['id']]['id'] as $k=>$sub)
+                                                            @if (isset($data['rolePermission'][$sub]))
                                                             <div class="row">
                                                                 <div class="col-sm-3">
-                                                                    <input type="checkbox"
+                                                                    <input type="checkbox" disabled
                                                                            id="auth_index_{{$sub}}"
                                                                            {{(isset($data['rolePermission'][$sub])?'checked':'')}}
                                                                            name="auth_index[]" value="{{$sub}}">
@@ -113,7 +112,7 @@
                                                                             <div class="col-sm-2">
 
                                                                                 <input
-                                                                                    type="checkbox"
+                                                                                    type="checkbox" disabled
                                                                                     id="auth_query_{{$sub}}" {{(isset($data['rolePermission'][$sub]['auth_query']) && $data['rolePermission'][$sub]['auth_query'] ==1?'checked':'')}}
                                                                                     name="auth_query_{{$sub}}"
                                                                                     value="1">
@@ -122,7 +121,7 @@
                                                                             </div>
                                                                             <div class="col-sm-2">
                                                                                 <input
-                                                                                    type="checkbox"
+                                                                                    type="checkbox" disabled
                                                                                     id="auth_create_{{$sub}}" {{(isset($data['rolePermission'][$sub]['auth_create']) && $data['rolePermission'][$sub]['auth_create'] ==1?'checked':'')}}
                                                                                     name="auth_create_{{$sub}}"
                                                                                     value="1">
@@ -131,7 +130,7 @@
                                                                             </div>
                                                                             <div class="col-sm-2">
                                                                                 <input
-                                                                                    type="checkbox"
+                                                                                    type="checkbox" disabled
                                                                                     id="auth_update_{{$sub}}" {{(isset($data['rolePermission'][$sub]['auth_update']) && $data['rolePermission'][$sub]['auth_update'] ==1?'checked':'')}}
                                                                                     name="auth_update_{{$sub}}"
                                                                                     value="1">
@@ -140,7 +139,7 @@
                                                                             </div>
                                                                             <div class="col-sm-2">
                                                                                 <input
-                                                                                    type="checkbox"
+                                                                                    type="checkbox" disabled
                                                                                     id="auth_delete_{{$sub}}" {{(isset($data['rolePermission'][$sub]['auth_delete']) && $data['rolePermission'][$sub]['auth_delete'] ==1?'checked':'')}}
                                                                                     name="auth_delete_{{$sub}}"
                                                                                     value="1">
@@ -149,7 +148,7 @@
                                                                             </div>
                                                                             <div class="col-sm-2">
                                                                                 <input
-                                                                                    type="checkbox"
+                                                                                    type="checkbox" disabled
                                                                                     id="auth_void_{{$sub}}" {{(isset($data['rolePermission'][$sub]['auth_void']) && $data['rolePermission'][$sub]['auth_void'] ==1?'checked':'')}}
                                                                                     name="auth_void_{{$sub}}"
                                                                                     value="1">
@@ -158,7 +157,7 @@
                                                                             </div>
                                                                             <div class="col-sm-2">
                                                                                 <input
-                                                                                    type="checkbox"
+                                                                                    type="checkbox" disabled
                                                                                     id="auth_export_{{$sub}}" {{(isset($data['rolePermission'][$sub]['auth_export']) && $data['rolePermission'][$sub]['auth_export'] ==1?'checked':'')}}
                                                                                     name="auth_export_{{$sub}}"
                                                                                     value="1">
@@ -170,6 +169,7 @@
                                                                 </div>
                                                             </div>
                                                             <hr style="margin-top:3px;"/>
+                                                            @endif
                                                         @endforeach
                                                     </div>
                                                 </div>
@@ -180,11 +180,8 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group text-center">
-                                                <button type="button" class="btn btn-success" id="btn-save"><i
-                                                        class="fa fa-save"></i> 儲存
-                                                </button>
-                                                <button type="button" class="btn btn-danger" id="btn-cancel"><i
-                                                        class="fa fa-ban"></i> 取消
+                                                <button type="button" class="btn btn-warning" id="btn-cancel"><i
+                                                        class="fa fa-reply"></i> 返回列表
                                                 </button>
                                             </div>
                                         </div>
@@ -203,10 +200,6 @@
 @section('js')
     <script>
         $(function () {
-            $("#new-form").validationEngine();
-            $("#btn-save").click(function () {
-                $("#new-form").submit();
-            });
             $("#btn-cancel").click(function () {
                 window.location.href = '{{route("roles")}}';
             });

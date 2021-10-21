@@ -53,9 +53,9 @@ class RolesController extends Controller
     {
         $input = $request->input();
         unset($input['_token']);
-        $this->rolesPermission->addRole($input);
         $act = 'add';
         $route_name = 'roles';
+        $this->rolesPermission->addRole($input, $act);
         return view('backend.success', compact('route_name', 'act'));
 
     }
@@ -68,7 +68,11 @@ class RolesController extends Controller
      */
     public function show($id)
     {
-        //
+        $data['permission'] = $this->rolesPermission->getPermission();
+        $data['permissionDetail'] = $this->rolesPermission->getPermissionDetail();
+        $data['role'] = $this->rolesPermission->showRole($id);
+        $data['rolePermission'] = $this->rolesPermission->getRolePermission($id);
+        return view('Backend.Roles.view', compact('data'));
     }
 
     /**
@@ -81,6 +85,8 @@ class RolesController extends Controller
     {
         $data['permission'] = $this->rolesPermission->getPermission();
         $data['permissionDetail'] = $this->rolesPermission->getPermissionDetail();
+        $data['role'] = $this->rolesPermission->showRole($id);
+        $data['rolePermission'] = $this->rolesPermission->getRolePermission($id);
         return view('Backend.Roles.upd', compact('data'));
     }
 
@@ -93,7 +99,13 @@ class RolesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input = $request->input();
+        unset($input['_token']);
+        $act = 'upd';
+        $route_name = 'roles';
+        $input['id'] = $id;
+        $this->rolesPermission->addRole($input, $act);
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

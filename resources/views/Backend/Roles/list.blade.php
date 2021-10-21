@@ -74,7 +74,8 @@
                                 <tr>
                                     <td>
                                         @if($share_role_auth['auth_query'])
-                                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $item['id'] }}" onclick="row_detail({{ $item['id'] }});"><i class="fa fa-search"></i></button>
+                                            <a class="btn btn-info btn-sm"
+                                               href="{{ route('roles.show' , $item->id) }}"><i class="fa fa-search"></i></a>
                                         @endif
 
                                         @if($share_role_auth['auth_update'])

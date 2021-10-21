@@ -45,7 +45,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/primary_category',PrimaryCategoryController::class, ['names' => ['index' => 'primary_category']]);
     Route::resource('/category',CategoryController::class, ['names' => ['index' => 'category']]);
     Route::resource('/requisitions_purchase',RequisitionsPurchaseController::class, ['names' => ['index' => 'requisitions_purchase']]); //請購單
-    Route::post('/requisitions_purchase/ajaxDelPurchaseDetail',[RequisitionsPurchaseController::class, 'ajaxDelPurchaseDetail']); //請購單品項 ajax del 
+    Route::post('/requisitions_purchase/ajaxDelPurchaseDetail',[RequisitionsPurchaseController::class, 'ajaxDelPurchaseDetail']); //請購單品項 ajax del
     Route::resource('/requisitions_purchase_review',RequisitionsPurchaseReviewController::class, ['names' => ['index' => 'requisitions_purchase_review']]);
     Route::post('/requisitions_purchase/ajax',[RequisitionsPurchaseController::class,'ajax']);
     Route::resource('/quotation',QuotationController::class, ['names' => ['index' => 'quotation']]);
