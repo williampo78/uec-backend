@@ -16,7 +16,7 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="supplier">
-                                            <label for="supplier">供應商{{ $requisitionsPurchase->supplier_id }}
+                                            <label for="supplier">供應商
                                                 <span class="redtext">*</span></label>
                                             <select class="form-control select2-vue-js" name="supplier_id" id="supplier_id">
                                                 @foreach ($supplier as $obj)
@@ -48,7 +48,7 @@
                                         <div class="form-group" id="div_doc_number">
                                             <label for="doc_number">報價單號 <span class="redtext">*</span></label>
                                             <input class="form-control" name="number" id="number"
-                                                value="{{ $data['number']['number'] ?? '' }}" readonly>
+                                                value="{{ $requisitionsPurchase->number ?? '' }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -92,14 +92,16 @@
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>原幣稅額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="original_total_tax_price"
-                                                id="original_total_tax_price" v-model="original_total_tax_price" readonly>
+                                                id="original_total_tax_price"
+                                                v-model="requisitions_purchase.original_total_tax_price" readonly>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>原幣總金額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="original_total_price"
-                                                id="original_total_price" v-model="original_total_price" readonly>
+                                                id="original_total_price"
+                                                v-model="requisitions_purchase.original_total_price" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -107,7 +109,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_currency_code">
                                             <label for="currency_code">稅別<span class="redtext">*</span></label>
-                                            <select class="form-control" name="tax" id="tax" v-model="tax">
+                                            <select class="form-control" name="tax" id="tax"
+                                                v-model="requisitions_purchase.tax">
                                                 @foreach ($taxList as $id => $tax)
                                                     <option value="{{ $id }}">{{ $tax }}</option>
                                                 @endforeach
@@ -118,14 +121,14 @@
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>稅額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="total_tax_price" id="total_tax_price"
-                                                v-model="total_tax_price" readonly>
+                                                v-model="requisitions_purchase.total_tax_price" readonly>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>總金額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="total_price" id="total_price"
-                                                v-model="total_price" readonly>
+                                                v-model="requisitions_purchase.total_price" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -138,9 +141,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <textarea name="requisitions_purchase_detail" id="" cols="100"
-                                    rows="10">@{{ details }}</textarea>
-                                <textarea cols="30" rows="10"> @{{ detailsCount }}</textarea>
+                                <textarea style="display: none;"
+                                    name="requisitions_purchase_detail">@{{ details }}</textarea>
+                                <textarea style="display: none;"> @{{ detailsCount }}</textarea>
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項 </h4>
                                 <div id="ItemDiv">
@@ -239,12 +242,8 @@
         var requisitions = Vue.extend({
             data: function() {
                 return {
-                    original_total_tax_price: {!! isset($requisitionsPurchase->original_total_tax_price) ?? 0 !!}, //原幣稅額
-                    original_total_price: {!! isset($requisitionsPurchase->original_total_price) ?? 0 !!}, //原幣總金額  
-                    total_tax_price: {!! isset($requisitionsPurchase->total_tax_price) ?? 0 !!}, //稅額
-                    total_price: {!! isset($requisitionsPurchase->total_price) ?? 0 !!}, //總金額
+                    requisitions_purchase: @json(isset($requisitionsPurchase) ? $requisitionsPurchase : []),
                     status: '',
-                    tax: {!! isset($requisitionsPurchase->tax) ?? 0 !!},
                     details: @json(isset($requisitionsPurchaseDetail) ? $requisitionsPurchaseDetail : []),
                     options: @json(isset($item) ? $item : '{}')
                 }
@@ -288,8 +287,9 @@
                 this.details.push();
             },
             computed: {
-                detailsCount() { //笛卡兒積演算法
+                detailsCount() { 
                     var details = this.details;
+                    var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
                     $.each(details, function(key, obj) {
                         //原幣小計 = 單價 * 數量 
@@ -298,29 +298,37 @@
                         } else {
                             obj.subtotal_price = 0;
                         }
-                        switch (this.tax) {
-                            case 0:
-                                console.log('未稅');
-                                break;
-                            case 1:
-                                console.log('應稅');
-                                break;
-                            case 2:
-                                console.log('內含');
-                                break;
-                            case 3:
-                                console.log('零稅率');
-                                break;
-                            default:
-                                break;
-                        }
+
                         sum_price += obj.subtotal_price;
 
                     });
-                    this.original_total_tax_price = 100; //原幣稅額
-                    this.total_tax_price = 100; //稅額
-                    this.original_total_price = sum_price; //原幣總金額  
-                    this.total_price = sum_price; //總金額
+                    // console.log(requisitions_purchase.tax) ; 
+                    switch (requisitions_purchase.tax) {
+                        case '0':
+                            // console.log('未稅');
+                            requisitions_purchase.original_total_tax_price = 0; //原幣稅額
+                            requisitions_purchase.total_tax_price = 0; //稅額
+                            break;
+                        case '1':
+                            // console.log('應稅');
+                            requisitions_purchase.original_total_tax_price = sum_price *0.05; //原幣稅額
+                            requisitions_purchase.total_tax_price = sum_price * 0.05; //稅額
+                            break;
+                        case '2':
+                            // console.log('內含');
+                            requisitions_purchase.original_total_tax_price = (sum_price * 0.0476).toFixed(2); //原幣稅額
+                            requisitions_purchase.total_tax_price = (sum_price * 0.0476).toFixed(2); //稅額
+                            break;
+                        case '3':
+                            // console.log('零稅率');
+                            requisitions_purchase.original_total_tax_price = 0; //原幣稅額
+                            requisitions_purchase.total_tax_price = 0; //稅額
+                            break;
+                    }
+                    // this.requisitions_purchase.original_total_tax_price = 100; //原幣稅額
+                    // this.requisitions_purchase.total_tax_price = 100; //稅額
+                    requisitions_purchase.original_total_price = sum_price; //原幣總金額  
+                    requisitions_purchase.total_price = sum_price; //總金額
                     return details;
                 },
             },
