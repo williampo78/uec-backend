@@ -16,9 +16,8 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="supplier">
-                                            {{-- 目前是以填單日 --}}
                                             <label for="supplier">供應商 <span class="redtext">*</span></label>
-                                            <select class="form-control select2-vue-js" name="trade_date" id="trade_date">
+                                            <select class="form-control select2-vue-js" name="supplier_id" id="supplier_id">
                                                 @foreach ($supplier as $obj)
                                                     <option value="{{ $obj->id }}">{{ $obj->name }}</option>
                                                 @endforeach
@@ -30,8 +29,8 @@
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">請購日期 <span class="redtext">*</span></label>
                                             <div class='input-group date' id='datetimepickera'>
-                                                <input type='text' class="form-control" name="submitted_at"
-                                                    id="submitted_at" value="{{ date('Y-m-d') }}" />
+                                                <input type='text' class="form-control" name="trade_date"
+                                                    id="trade_date" value="{{ date('Y-m-d') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -173,7 +172,7 @@
                                             </div>
                                             {{-- 原幣小計 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="details[detailKey].original_subtotal_price">
+                                                    v-model="details[detailKey].subtotal_price">
                                             </div>
                                             {{-- 功能 --}}
                                             <div class="col-sm-1"><button class="btn btn-danger btn_close"><i
@@ -193,9 +192,9 @@
                                         <hr>
                                     </div>
                                 </div>
-                                <input type="hidden" id="status_code" v-model="status_code" name="status_code">
+                                <input type="hidden" id="status" v-model="status" name="status">
                                 <div class="row">
-                                    @{{ status_code }}
+                                    @{{ status }}
 
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -229,7 +228,7 @@
                     original_total_price: 0, //原幣總金額  
                     total_tax_price: 0, //稅額
                     total_price: 0, //總金額
-                    status_code: '',
+                    status: '',
                     tax: '',
                     details: [],
                     options: @json(isset($item) ? $item : '{}')
@@ -239,7 +238,7 @@
                 ItemListAdd() {
                     this.details.push({
                         id: '',
-                        original_subtotal_price: '', // 原幣小計
+                        subtotal_price: '', // 原幣小計
                         item_id: '', // 品項ID
                         item_number: '', //品項編號
                         item_name: '', //品項名稱
@@ -254,8 +253,8 @@
                 ItemListDel(id, key) {
 
                 },
-                submitBtn(status_code) {
-                    this.status_code = status_code;
+                submitBtn(status) {
+                    this.status = status;
                     this.$nextTick(() => {
                         $('#new-form').submit();
                     });
@@ -280,9 +279,9 @@
                     $.each(details, function(key, obj) {
                         //原幣小計 = 單價 * 數量 
                         if (obj.item_qty > 0 && obj.item_qty !== '') {
-                            obj.original_subtotal_price = obj.item_price * obj.item_qty;
+                            obj.subtotal_price = obj.item_price * obj.item_qty;
                         } else {
-                            obj.original_subtotal_price = 0;
+                            obj.subtotal_price = 0;
                         }
                         switch (this.tax) {
                             case 0:
@@ -300,7 +299,7 @@
                             default:
                                 break;
                         }
-                        sum_price += obj.original_subtotal_price;
+                        sum_price += obj.subtotal_price;
 
                     });
                     this.original_total_tax_price = 100; //原幣稅額

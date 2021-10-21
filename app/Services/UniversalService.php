@@ -28,6 +28,10 @@ class UniversalService
                 $table = 'order_supplier';
                 $title = 'PO';
                 break;
+            case 'requisitions_purchase':
+                $table = 'requisitions_purchase' ;
+                $title = 'PR' ;
+                break;
         }
         $rs = DB::table($table)->orderBy('id','DESC')->first();
 

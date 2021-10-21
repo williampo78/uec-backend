@@ -55,7 +55,7 @@ class RequisitionsPurchaseController extends Controller
     public function create()
     {
         $result = [];
-        $result['warehouse'] = $this->warehouseService->getWarehouseList()->get(); //取得倉庫
+        $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
         $result['supplier'] = $this->supplierService->getSupplier(); //供應商
         $result['item'] = $this->itemService->getItem()->get(); //品項
         $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
@@ -75,9 +75,9 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input());  //創建請購單
-        
-        exit ;
+        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input());  //創建請購單
+        $act = 'add';
+        $route_name = 'requisitions_purchase';
         return view('backend.success', compact('route_name', 'act'));
     }
 
