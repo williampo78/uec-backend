@@ -16,10 +16,17 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="supplier">
-                                            <label for="supplier">供應商 <span class="redtext">*</span></label>
+                                            <label for="supplier">供應商
+                                                <span class="redtext">*</span></label>
                                             <select class="form-control select2-vue-js" name="supplier_id" id="supplier_id">
                                                 @foreach ($supplier as $obj)
-                                                    <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @if (isset($requisitionsPurchase))
+                                                        <option value="{{ $obj->id }}"
+                                                            {{ $obj->id == $requisitionsPurchase->supplier_id ? 'selected="selected"' : '' }}>
+                                                            {{ $obj->name }}</option>
+                                                    @else
+                                                        <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -29,8 +36,8 @@
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">請購日期 <span class="redtext">*</span></label>
                                             <div class='input-group date' id='datetimepickera'>
-                                                <input type='text' class="form-control" name="trade_date"
-                                                    id="trade_date" value="{{ date('Y-m-d') }}" />
+                                                <input type='text' class="form-control" name="trade_date" id="trade_date"
+                                                    value="{{ isset($requisitionsPurchase->trade_date) ? $requisitionsPurchase->trade_date : date('Y-m-d') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -41,7 +48,7 @@
                                         <div class="form-group" id="div_doc_number">
                                             <label for="doc_number">報價單號 <span class="redtext">*</span></label>
                                             <input class="form-control" name="number" id="number"
-                                                value="{{ $data['number']['number'] ?? '' }}" readonly>
+                                                value="{{ $requisitionsPurchase->number ?? '' }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -52,7 +59,13 @@
                                             <label for="supplier">倉庫 <span class="redtext">*</span></label>
                                             <select class="form-control select2-vue-js" name="warehouse_id">
                                                 @foreach ($warehouse as $obj)
-                                                    <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @if (isset($requisitionsPurchase))
+                                                        <option value="{{ $obj->id }}"
+                                                            {{ $obj->id == $requisitionsPurchase->warehouse_id ? 'selected="selected"' : '' }}>
+                                                            {{ $obj->name }}</option>
+                                                    @else
+                                                        <option value="{{ $obj->id }}">{{ $obj->name }}</option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -79,14 +92,16 @@
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>原幣稅額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="original_total_tax_price"
-                                                id="original_total_tax_price" v-model="original_total_tax_price" readonly>
+                                                id="original_total_tax_price"
+                                                v-model="requisitions_purchase.original_total_tax_price" readonly>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>原幣總金額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="original_total_price"
-                                                id="original_total_price" v-model="original_total_price" readonly>
+                                                id="original_total_price"
+                                                v-model="requisitions_purchase.original_total_price" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -94,7 +109,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_currency_code">
                                             <label for="currency_code">稅別<span class="redtext">*</span></label>
-                                            <select class="form-control" name="tax" id="tax" v-model="tax">
+                                            <select class="form-control" name="tax" id="tax"
+                                                v-model="requisitions_purchase.tax">
                                                 @foreach ($taxList as $id => $tax)
                                                     <option value="{{ $id }}">{{ $tax }}</option>
                                                 @endforeach
@@ -105,14 +121,14 @@
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>稅額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="total_tax_price" id="total_tax_price"
-                                                v-model="total_tax_price" readonly>
+                                                v-model="requisitions_purchase.total_tax_price" readonly>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_exchange_rate">
                                             <label>總金額 <span class="redtext">*</span></label>
                                             <input class="form-control" name="total_price" id="total_price"
-                                                v-model="total_price" readonly>
+                                                v-model="requisitions_purchase.total_price" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -121,13 +137,12 @@
                                         <div class="form-group" id="div_remark">
                                             <label for="remark">備註</label>
                                             <textarea class="form-control" rows="3" name="remark"
-                                                id="remark">{{ $data['quotation']['remark'] ?? '' }}</textarea>
+                                                id="remark">{{ $requisitionsPurchase->remark ?? '' }}</textarea>
                                         </div>
                                     </div>
                                 </div>
-                                <textarea name="requisitions_purchase_detail" id="" cols="100"
-                                    rows="10">@{{ details }}</textarea>
-                                <textarea cols="30" rows="10"> @{{ detailsCount }}</textarea>
+                                <textarea style="display:none" name="requisitions_purchase_detail">@{{ details }}</textarea>
+                                <textarea style="display:none"> @{{ detailsCount }}</textarea>
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項 </h4>
                                 <div id="ItemDiv">
@@ -144,14 +159,15 @@
                                         </div>
                                     </div>
                                     <div class="add_row" v-for="(detail, detailKey) in details">
-
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <select2 :options="options" :details="details"
-                                                    v-model="details[detailKey].item_id"> </select2>
+                                                <select2 :selectkey="detailKey" :options="options" :details="details" 
+                                                    v-model="details[detailKey].item_id" > </select2>
                                             </div>
                                             <div class="col-sm-1">
-                                                <input type="checkbox" class="big-checkbox">
+
+                                                <input type="checkbox" class="big-checkbox"
+                                                    v-model="details[detailKey].is_gift" :true-value="1" :false-value="0">
                                             </div>
                                             {{-- 單價 --}}
                                             <div class="col-sm-2">
@@ -175,8 +191,12 @@
                                                     v-model="details[detailKey].subtotal_price">
                                             </div>
                                             {{-- 功能 --}}
-                                            <div class="col-sm-1"><button class="btn btn-danger btn_close"><i
-                                                        class="fa fa-ban"></i>刪除</button></div>
+                                            <div class="col-sm-1">
+                                                <button type="button" class="btn btn-danger"
+                                                    @click="ItemListDel(details[detailKey].id,detailKey)">
+                                                    <i class="fa fa-ban"></i>刪除
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -194,8 +214,6 @@
                                 </div>
                                 <input type="hidden" id="status" v-model="status" name="status">
                                 <div class="row">
-                                    @{{ status }}
-
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <button class="btn btn-success" type="button" @click="submitBtn('DRAFTED')"> <i
@@ -224,13 +242,9 @@
         var requisitions = Vue.extend({
             data: function() {
                 return {
-                    original_total_tax_price: 0, //原幣稅額
-                    original_total_price: 0, //原幣總金額  
-                    total_tax_price: 0, //稅額
-                    total_price: 0, //總金額
+                    requisitions_purchase: @json(isset($requisitionsPurchase) ? $requisitionsPurchase : []),
                     status: '',
-                    tax: '',
-                    details: [],
+                    details: @json(isset($requisitionsPurchaseDetail) ? $requisitionsPurchaseDetail : []),
                     options: @json(isset($item) ? $item : '{}')
                 }
             },
@@ -251,7 +265,28 @@
                     });
                 },
                 ItemListDel(id, key) {
-
+                    var checkDel = confirm('你確定要刪除嗎？');
+                    if (checkDel) {
+                        // this.$delete(this.contactData, key)
+                        if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
+                            $.ajax({
+                                type: "POST",
+                                url: '/backend/requisitions_purchase/ajaxDelPurchaseDetail',
+                                dataType: "json",
+                                data: {
+                                    "_token": "{{ csrf_token() }}",
+                                    "id": id,
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            });
+                        }
+                        this.$delete(this.details, key)
+                    }
                 },
                 submitBtn(status) {
                     this.status = status;
@@ -273,39 +308,45 @@
                 this.details.push();
             },
             computed: {
-                detailsCount() { //笛卡兒積演算法
+                detailsCount() {
                     var details = this.details;
+                    var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
                     $.each(details, function(key, obj) {
                         //原幣小計 = 單價 * 數量 
-                        if (obj.item_qty > 0 && obj.item_qty !== '') {
+                        if (obj.is_gift == 1) { //如果是贈品則不計算單價
+                            obj.subtotal_price = 0;
+                        } else if (obj.item_qty > 0 && obj.item_qty !== '') {
                             obj.subtotal_price = obj.item_price * obj.item_qty;
                         } else {
                             obj.subtotal_price = 0;
                         }
-                        switch (this.tax) {
-                            case 0:
-                                console.log('未稅');
-                                break;
-                            case 1:
-                                console.log('應稅');
-                                break;
-                            case 2:
-                                console.log('內含');
-                                break;
-                            case 3:
-                                console.log('零稅率');
-                                break;
-                            default:
-                                break;
-                        }
                         sum_price += obj.subtotal_price;
-
                     });
-                    this.original_total_tax_price = 100; //原幣稅額
-                    this.total_tax_price = 100; //稅額
-                    this.original_total_price = sum_price; //原幣總金額  
-                    this.total_price = sum_price; //總金額
+                    switch (requisitions_purchase.tax) {
+                        case '0':
+                            // console.log('未稅');
+                            requisitions_purchase.original_total_tax_price = 0; //原幣稅額
+                            requisitions_purchase.total_tax_price = 0; //稅額
+                            break;
+                        case '1':
+                            // console.log('應稅');
+                            requisitions_purchase.original_total_tax_price = sum_price * 0.05; //原幣稅額
+                            requisitions_purchase.total_tax_price = sum_price * 0.05; //稅額
+                            break;
+                        case '2':
+                            // console.log('內含');
+                            requisitions_purchase.original_total_tax_price = (sum_price * 0.0476).toFixed(2); //原幣稅額
+                            requisitions_purchase.total_tax_price = (sum_price * 0.0476).toFixed(2); //稅額
+                            break;
+                        case '3':
+                            // console.log('零稅率');
+                            requisitions_purchase.original_total_tax_price = 0; //原幣稅額
+                            requisitions_purchase.total_tax_price = 0; //稅額
+                            break;
+                    }
+                    requisitions_purchase.original_total_price = sum_price; //原幣總金額  
+                    requisitions_purchase.total_price = sum_price; //總金額
                     return details;
                 },
             },
@@ -316,12 +357,11 @@
 
         //Vue Js 如果要用 select2 要另外寫 
         Vue.component("select2", {
-            props: ["options", "value", "details"],
+            props: ["options", "value", "details", "selectkey"],
             template: "#select2-template",
             mounted: function() {
                 var vm = this;
-                $(this.$el)
-                    .select2({
+                $(this.$el).select2({
                         data: this.options,
                         theme: "bootstrap",
                         placeholder: "請選擇",
@@ -335,13 +375,11 @@
             },
             watch: {
                 value: function(value) {
-                    var getSelectKey = this._uid - 1; //這個u_id 當作找到選擇器的排序
+                    var getSelectKey = this.selectkey; //這個u_id 當作找到選擇器的排序
                     var details = this.details;
-                    // console.log(details) ;
                     $(this.$el)
                         .val(value)
                         .trigger("change");
-
                     $.each(this.options, function(key, obj) {
                         if (obj.id == value) {
                             details[getSelectKey].item_name = obj.name; //品項名稱

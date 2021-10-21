@@ -40,11 +40,10 @@ class RequisitionsPurchaseController extends Controller
 
     public function index()
     {
-        $now = Carbon::now()->subDays()->toArray();
         $params['active'] = 0;
-        $data = $this->requisitionsPurchaseService->getRequisitionsPurchase($params);
-
-        return view('Backend.RequisitionsPurchase.list', compact('data'));
+        $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($params)->get(); ;
+        // dd($data);
+        return view('Backend.RequisitionsPurchase.list', $result);
     }
 
     /**
@@ -100,10 +99,18 @@ class RequisitionsPurchaseController extends Controller
      */
     public function edit($id)
     {
-        // $data = Category::find($id);
-        // $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
+        $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id);
+        $result['requisitionsPurchaseDetail'] = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id) ;
+        $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
+        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['item'] = $this->itemService->getItem()->get(); //品項
+        foreach ($result['item'] as $key => $val) {
+            $result['item'][$key]->text = $val->name ;
+        }
+        $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
 
-        return view('Backend.PrimaryCategory.upd', compact('data', 'primary_category_list'));
+        // dd($result) ; 
+        return view('Backend.RequisitionsPurchase.input', $result);
     }
 
     /**
@@ -115,6 +122,8 @@ class RequisitionsPurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
+        dump($request->input()) ; 
+        exit ;
         // $data = $request->except('_token' , '_method');
         // $data['updated_by'] = Auth::user()->id;
         // $data['updated_at'] = Carbon::now();
@@ -148,5 +157,14 @@ class RequisitionsPurchaseController extends Controller
             $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($rs['id']);
             echo "OK@@" . json_encode($data);
         }
+    }
+    public function ajaxDelPurchaseDetail(Request $request){
+        $data = json_encode($request->input());
+       
+        return response()->json([
+            'data' => $data
+        ]);
+        
+
     }
 }
