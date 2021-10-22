@@ -21,28 +21,39 @@ class RequisitionsPurchaseService
         $this->universalService = $universalService;
     }
 
-    public function getRequisitionsPurchase($params)
+    public function getRequisitionsPurchase($requset)
     {
         $agent_id = Auth::user()->agent_id;
-
-        $select_start_date = '2000-10-10';
-        $select_end_date = '2021-10-22';
-        $department = 1;
+        
+        $select_start_date = !isset($requset['select_start_date']) ? date('Y-m-d') : $requset['select_start_date']; //開始時間
+        $select_end_date   = !isset($requset['select_end_date']) ? date('Y-m-d')   : $requset['select_end_date'] ; //結束時間
         $active = 1;
-
         $rs = RequisitionsPurchase::select('requisitions_purchase.*', DB::RAW('user.name as user_name'), DB::RAW('supplier.name as supplier_name'),  DB::RAW('warehouse.name as warehouse_name'))
             ->leftJoin('user', 'requisitions_purchase.user_id', '=', 'user.id')
             ->leftJoin('supplier', 'requisitions_purchase.supplier_id', '=', 'supplier.id')
-            // ->leftJoin('department', 'requisitions_purchase.department_id', '=', 'department.id')
             ->leftJoin('warehouse', 'requisitions_purchase.warehouse_id', '=', 'warehouse.id')
             ->where('requisitions_purchase.agent_id', $agent_id)
             ->where('trade_date', '>=', $select_start_date)
             ->where('trade_date', '<=', $select_end_date)
-            // ->where('department_id', 'like', $department)
             ->where('requisitions_purchase.active', $active)
-            ->orderBy('requisitions_purchase.trade_date', 'desc')
+            ->orderBy('requisitions_purchase.trade_date', 'desc') 
             ->orderBy('requisitions_purchase.created_at', 'desc');
-        return $rs;
+         
+        if(isset($requset['doc_number']) && $requset['doc_number'] !== ''){ //請購單編號requisitions_purchase.number
+            $rs->where('requisitions_purchase.number' ,  $requset['doc_number']) ;
+        }
+        if(isset($requset['supplier_id']) && $requset['supplier_id'] !== ''){//請購單編號  requisitions_purchase.number
+            $rs->where('requisitions_purchase.supplier_id', $requset['supplier_id']);
+        }
+        if(isset($requset['company_number']) && $requset['company_number'] !== ''){
+            $rs->where('supplier.company_number', $requset['company_number']);
+        }
+        if(isset($requset['status']) && $requset['status'] !== ''){
+            $rs->where('requisitions_purchase.status', $requset['status']);
+        }
+
+
+        return $rs->get();
     }
 
     public function getAjaxRequisitionsPurchase($id)

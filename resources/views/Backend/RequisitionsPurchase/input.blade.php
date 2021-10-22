@@ -222,8 +222,8 @@
                                             <button class="btn btn-success" type="button"
                                                 @click="submitBtn('REVIEWING')"><i class="fa fa-save"></i>
                                                 儲存並送審</button>
-                                            <button class="btn btn-danger" type="button"><i class="fa fa-ban"></i>
-                                                取消</button>
+                                            <a href="{{route('requisitions_purchase')}}" class="btn btn-danger" type="button"><i class="fa fa-ban"></i>
+                                                取消</a>
                                         </div>
                                     </div>
                                 </div>

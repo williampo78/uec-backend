@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}"/>
     <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
-
 </head>
 
 <body>

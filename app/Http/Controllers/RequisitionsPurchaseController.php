@@ -37,11 +37,12 @@ class RequisitionsPurchaseController extends Controller
         $this->universalService = $universalService; // 共用服務
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $params['active'] = 0;
-        $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($params)->get();
-        // dd($data);
+        $input = $request->input() ;  
+        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($input);
         return view('Backend.RequisitionsPurchase.list', $result);
     }
 
@@ -133,7 +134,6 @@ class RequisitionsPurchaseController extends Controller
         // $data = $request->except('_token' , '_method');
         // $data['updated_by'] = Auth::user()->id;
         // $data['updated_at'] = Carbon::now();
-
         // Category::where('id' ,$id)->update($data);
         // $route_name = 'category';
         // $act = 'upd';
