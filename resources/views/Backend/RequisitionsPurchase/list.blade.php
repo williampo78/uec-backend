@@ -17,7 +17,7 @@
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
 
-                        <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
+                        <form role="form" id="select-form" method="GET" action="{{route('requisitions_purchase')}}" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="col-sm-2">

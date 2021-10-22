@@ -7,7 +7,6 @@ use App\Services\RequisitionsPurchaseService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
 use App\Services\WarehouseService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class RequisitionsPurchaseController extends Controller
@@ -41,7 +40,7 @@ class RequisitionsPurchaseController extends Controller
     public function index()
     {
         $params['active'] = 0;
-        $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($params)->get(); ;
+        $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($params)->get();
         // dd($data);
         return view('Backend.RequisitionsPurchase.list', $result);
     }
@@ -54,6 +53,13 @@ class RequisitionsPurchaseController extends Controller
     public function create()
     {
         $result = [];
+        $result['requisitionsPurchaseDefault'] = [
+            'total_tax_price' => 0,
+            'total_price' => 0,
+            'original_total_tax_price' => 0,
+            'original_total_price' => 0,
+            'tax' => 0,
+        ];
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
         $result['supplier'] = $this->supplierService->getSupplier(); //供應商
         $result['item'] = $this->itemService->getItem()->get(); //品項
@@ -62,7 +68,7 @@ class RequisitionsPurchaseController extends Controller
         foreach ($result['item'] as $key => $val) {
             $result['item'][$key]->text = $val->name;
         }
-        
+
         return view('Backend.RequisitionsPurchase.input', $result);
     }
 
@@ -74,7 +80,7 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input());  //創建請購單
+        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input()); //創建請購單
         $act = 'add';
         $route_name = 'requisitions_purchase';
         return view('backend.success', compact('route_name', 'act'));
@@ -100,16 +106,16 @@ class RequisitionsPurchaseController extends Controller
     public function edit($id)
     {
         $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id);
-        $result['requisitionsPurchaseDetail'] = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id) ;
+        $result['requisitionsPurchaseDetail'] = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id);
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
         $result['supplier'] = $this->supplierService->getSupplier(); //供應商
         $result['item'] = $this->itemService->getItem()->get(); //品項
         foreach ($result['item'] as $key => $val) {
-            $result['item'][$key]->text = $val->name ;
+            $result['item'][$key]->text = $val->name;
         }
         $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
 
-        // dd($result) ; 
+        // dd($result) ;
         return view('Backend.RequisitionsPurchase.input', $result);
     }
 
@@ -122,8 +128,8 @@ class RequisitionsPurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dump($request->input()) ; 
-        exit ;
+        dump($request->input());
+        exit;
         // $data = $request->except('_token' , '_method');
         // $data['updated_by'] = Auth::user()->id;
         // $data['updated_at'] = Carbon::now();
@@ -158,13 +164,13 @@ class RequisitionsPurchaseController extends Controller
             echo "OK@@" . json_encode($data);
         }
     }
-    public function ajaxDelPurchaseDetail(Request $request){
+    public function ajaxDelPurchaseDetail(Request $request)
+    {
         $data = json_encode($request->input());
-       
+
         return response()->json([
-            'data' => $data
+            'data' => $data,
         ]);
-        
 
     }
 }
