@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '角色管理')
+@section('title', '使用者管理')
 
 @section('content')
     <!--列表-->
@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-book"></i> 角色管理</h1>
+                <h1 class="page-header"><i class="fa fa-users"></i> 使用者管理</h1>
             </div>
         </div>
 
@@ -21,9 +21,12 @@
                     <div class="panel-heading">
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
                             <div class="row">
-                                <div class="col-sm-2 text-right"><h5>角色</h5></div>
-                                <div class="col-sm-3"><input class="form-control" name="role_name" id="role_name" placeholder="模糊查詢"
-                                                             value="{{ $data['getData']['role_name']?? '' }}"></div>
+                                <div class="col-sm-1 text-right"><h5>帳號</h5></div>
+                                <div class="col-sm-3"><input class="form-control" name="user_account" id="user_account" placeholder="模糊查詢"
+                                                             value="{{ $data['getData']['user_account']?? '' }}"></div>
+                                <div class="col-sm-1 text-right"><h5>名稱</h5></div>
+                                <div class="col-sm-3"><input class="form-control" name="user_name" id="user_name" placeholder="模糊查詢"
+                                                             value="{{ $data['getData']['user_name']?? '' }}"></div>
                                 <div class="col-sm-1 text-right"><h5>狀態</h5></div>
                                 <div class="col-sm-2">
                                     <select class="form-control js-select2" name="active" id="active">
@@ -38,7 +41,7 @@
                                     </select>
                                 </div>
                                 @if ($share_role_auth['auth_query'])
-                                    <div class="col-sm-4 text-right">
+                                    <div class="col-sm-1 text-right">
                                         <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
                                     </div>
                                 @endif
@@ -52,7 +55,7 @@
                             @if($share_role_auth['auth_create'])
                                 <div class="col-sm-2">
                                     <a class="btn btn-block btn-warning btn-sm" id="btn-new"
-                                       href="{{route('roles.create')}}"><i class="fa fa-plus"></i> 新增</a>
+                                       href="{{route('users.create')}}"><i class="fa fa-plus"></i> 新增</a>
                                 </div>
                             @endif
                         </div>
@@ -62,9 +65,10 @@
                             <thead>
                             <tr>
                                 <th class="col-sm-1">功能</th>
-                                <th class="col-sm-3">角色</th>
-                                <th class="col-sm-2">狀態</th>
-                                <th class="col-sm-2">供應商專用</th>
+                                <th class="col-sm-2">帳號</th>
+                                <th class="col-sm-2">名稱</th>
+                                <th class="col-sm-1">狀態</th>
+                                <th class="col-sm-3">e-Mail</th>
                                 <th class="col-sm-2">最後異動時間</th>
                                 <th class="col-sm-2">最後異動者</th>
                             </tr>
@@ -83,9 +87,10 @@
                                                href="{{ route('roles.edit' , $item->id) }}">修改</a>
                                         @endif
                                     </td>
-                                    <td>{{$item->role_name}}</td>
+                                    <td>{{$item->user_account}}</td>
+                                    <td>{{$item->user_name}}</td>
                                     <td>{{$item->active==1?'啟用':'關閉'}}</td>
-                                    <td>{{$item->is_for_supplier==1?'V':''}}</td>
+                                    <td>{{$item->user_email}}</td>
                                     <td>{{$item->updated_at}}</td>
                                     <td>{{($item->updated_by >0?$data['user'][$item->updated_by]['user_name']:$data['user'][$item->created_by]['user_name'])}}</td>
                                 </tr>
