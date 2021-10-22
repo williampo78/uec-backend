@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}"/>
     <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
-
 </head>
 
 <body>
@@ -73,6 +72,7 @@
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="{{asset('asset/js/jquery.validationEngine.js')}}"></script>
 <script src="{{asset('asset/js/jquery.validationEngine-zh_TW.js')}}"></script>
+<script src="{{asset('https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js')}}"></script>
 
 <link rel="stylesheet" href="{{asset('asset/css/validationEngine.jquery.css')}}">
 <script>

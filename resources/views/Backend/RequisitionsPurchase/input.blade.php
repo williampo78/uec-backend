@@ -141,7 +141,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <textarea style="display:none" name="requisitions_purchase_detail">@{{ details }}</textarea>
+                                <textarea style="display:none"
+                                    name="requisitions_purchase_detail">@{{ details }}</textarea>
                                 <textarea style="display:none"> @{{ detailsCount }}</textarea>
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項 </h4>
@@ -161,8 +162,8 @@
                                     <div class="add_row" v-for="(detail, detailKey) in details">
                                         <div class="row">
                                             <div class="col-sm-3">
-                                                <select2 :selectkey="detailKey" :options="options" :details="details" 
-                                                    v-model="details[detailKey].item_id" > </select2>
+                                                <select2 :selectkey="detailKey" :options="options" :details="details"
+                                                    v-model="details[detailKey].item_id"> </select2>
                                             </div>
                                             <div class="col-sm-1">
 
@@ -221,8 +222,8 @@
                                             <button class="btn btn-success" type="button"
                                                 @click="submitBtn('REVIEWING')"><i class="fa fa-save"></i>
                                                 儲存並送審</button>
-                                            <button class="btn btn-danger" type="button"><i class="fa fa-ban"></i>
-                                                取消</button>
+                                            <a href="{{route('requisitions_purchase')}}" class="btn btn-danger" type="button"><i class="fa fa-ban"></i>
+                                                取消</a>
                                         </div>
                                     </div>
                                 </div>
@@ -233,7 +234,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 
 @section('js')
@@ -242,7 +242,7 @@
         var requisitions = Vue.extend({
             data: function() {
                 return {
-                    requisitions_purchase: @json(isset($requisitionsPurchase) ? $requisitionsPurchase : []),
+                    requisitions_purchase: @json(isset($requisitionsPurchase) ? $requisitionsPurchase : $requisitionsPurchaseDefault),
                     status: '',
                     details: @json(isset($requisitionsPurchaseDetail) ? $requisitionsPurchaseDetail : []),
                     options: @json(isset($item) ? $item : '{}')
@@ -316,7 +316,7 @@
                         //原幣小計 = 單價 * 數量 
                         if (obj.is_gift == 1) { //如果是贈品則不計算單價
                             obj.subtotal_price = 0;
-                        } else if (obj.item_qty > 0 && obj.item_qty !== '') {
+                        } else if (obj.item_qty > 0) {
                             obj.subtotal_price = obj.item_price * obj.item_qty;
                         } else {
                             obj.subtotal_price = 0;

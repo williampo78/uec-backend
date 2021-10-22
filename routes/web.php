@@ -56,6 +56,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/order_supplier/ajax' , [OrderSupplierController::class, 'ajax']);
 
     Route::resource('/test',TestController::class, ['names' => ['index' => 'test']]);
+    Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
     Route::resource('/roles',RolesController::class, ['names' => ['index' => 'roles']]);
     Route::resource('/users',UsersController::class, ['names' => ['index' => 'users']]);
     Route::get('/usersAjax', [UsersController::class, 'ajax']);     //驗證使用者帳號
