@@ -305,6 +305,7 @@
                 $('#datetimepickera').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
+                this.details.push();
             },
             computed: {
                 detailsCount() {

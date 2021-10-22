@@ -10,8 +10,7 @@
                 <h1 class="page-header"><i class="fa fa-sign-in"></i> 請購單</h1>
             </div>
         </div>
-
-        <div class="row">
+        <div class="row" id="requisitions_vue_app">
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
@@ -22,7 +21,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="col-sm-2">
-                                        <h5>供應商</h5>
+                                        <h5>供應商 </h5>
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control select2-default" name="supplier_id" id="supplier_id">
@@ -153,15 +152,18 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <button style="display:none" class="btn btn-info btn-sm toggle-show-model"
+                                    data-toggle="modal" data-target="#row_detail">SHOW
+                                </button>
                                 @foreach ($requisitionsPurchase as $obj)
                                     <tr>
                                         <td>
-                                            <button class="btn btn-info btn-sm" data-toggle="modal"
-                                                data-target="#row_detail"><i class="fa fa-search"></i></button>
+                                            <button class="btn btn-info btn-sm" @click="showBtn({{ $obj->id }})"><i
+                                                    class="fa fa-search"></i></button>
+
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('requisitions_purchase') }}/{{ $obj->id }}/edit/">修改</a>
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="del(45 , 'QU2110150045' );">刪除</button>
+                                            <button class="btn btn-danger btn-sm" onclick="">刪除</button>
                                         </td>
                                         </td>
                                         <td>{{ $obj->trade_date }} </td>
@@ -172,7 +174,6 @@
                                                 @case('DRAFTED')
                                                     草稿
                                                 @break
-
                                                 @case('REVIEWING')
                                                     簽核中
                                                 @break
@@ -194,15 +195,43 @@
                     </div>
                 </div>
             </div>
+            <textarea name="" id="" cols="30" rows="10">@{{ requisitionsPurchase . number }}</textarea>
+            @include('Backend.RequisitionsPurchase.detail')
         </div>
     </div>
-    @include('Backend.RequisitionsPurchase.detail')
     @section('js')
         <script>
-            $(document).ready(function() {
-                // $('#supplier').select2();
-                // $('#status').select2();
-            });
+            var showRequisitions = Vue.extend({
+                data: function() {
+                    return {
+                        requisitionsPurchase: {},
+                        requisitionsPurchaseDetail: {},
+                        getRequisitionPurchaseReviewLog: {},
+                    }
+                },
+                methods: {
+                    showBtn(id) {
+                        let req = this;
+                        axios.get('/backend/requisitions_purchase/' + id)
+                            .then(function(response) {
+                                console.log(response.data.requisitionsPurchase) ;
+                                req.requisitionsPurchase = response.data.requisitionsPurchase;
+                                req.requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
+                                req.getRequisitionPurchaseReviewLog = response.data.getRequisitionPurchaseReviewLog;
+                            })
+                            .catch(function(error) {
+                                console.log('ERROR');
+                            })
+                        $('.toggle-show-model').click();
+                    },
+
+
+                },
+
+
+            })
+
+            new showRequisitions().$mount('#requisitions_vue_app');
 
             $(function() {
                 $('#datetimepicker').datetimepicker({

@@ -95,7 +95,16 @@ class RequisitionsPurchaseController extends Controller
      */
     public function show($id)
     {
-
+        $requisitionsPurchase = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id); //請購單
+        $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id); //請購單內的品項
+        $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id) ;  //簽核紀錄
+        // dump($requisitionsPurchase , $requisitionsPurchaseDetail ,$getRequisitionPurchaseReviewLog) ;
+        
+        return response()->json([
+            'requisitionsPurchase' => json_encode($requisitionsPurchase),
+            'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail) ,
+            'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
+        ]);
     }
 
     /**
@@ -115,7 +124,6 @@ class RequisitionsPurchaseController extends Controller
             $result['item'][$key]->text = $val->name;
         }
         $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
-
         // dd($result) ;
         return view('Backend.RequisitionsPurchase.input', $result);
     }
@@ -173,4 +181,8 @@ class RequisitionsPurchaseController extends Controller
         ]);
 
     }
+    //用請購單ID 帶出 請購單內的品項以及 簽核紀錄
+    public function ajaxShowData(Request $request){
+       
+    }   
 }
