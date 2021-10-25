@@ -232,4 +232,9 @@ class RequisitionsPurchaseService
         RequisitionsPurchaseReviewLog::where('requisitions_purchase_id', $id)->delete();
         return true ;
     }
+    public function delRequisitionsPurchaseDetail($id){
+        RequisitionsPurchaseDetail::where('id', $id)->delete();
+        return true ;
+    }
+    
 }

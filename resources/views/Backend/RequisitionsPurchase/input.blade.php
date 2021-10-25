@@ -8,7 +8,8 @@
                 <div class="panel-heading">請輸入下列欄位資料</div>
                 <div class="panel-body" id="requisitions_vue_app">
                     @if (isset($requisitionsPurchase))
-                        <form role="form" id="new-form" method="POST" action="{{ route('requisitions_purchase.update', $requisitionsPurchase->id) }}"
+                        <form role="form" id="new-form" method="POST"
+                            action="{{ route('requisitions_purchase.update', $requisitionsPurchase->id) }}"
                             enctype="multipart/form-data" novalidate="novalidate">
                             {{ method_field('PUT') }}
                             {{ csrf_field() }}
@@ -278,25 +279,23 @@
                 ItemListDel(id, key) {
                     var checkDel = confirm('你確定要刪除嗎？');
                     if (checkDel) {
-                        // this.$delete(this.contactData, key)
+                        console.log(id);
                         if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
-                            $.ajax({
-                                type: "POST",
-                                url: '/backend/requisitions_purchase/ajaxDelPurchaseDetail',
-                                dataType: "json",
-                                data: {
-                                    "_token": "{{ csrf_token() }}",
-                                    "id": id,
-                                },
-                                success: function(response) {
-                                    console.log(response);
-                                },
-                                error: function(error) {
+                            axios({
+                                    method: 'delete',
+                                    url: '/backend/requisitions_purchase/' + id + '?&type=Detail'
+                                }).then(function(response) {
+                                    if (response.data.status) {
+                                        alert('刪除成功');
+                                    }
+                                })
+                                .catch(function(error) {
                                     console.log(error);
-                                }
-                            });
+                                    console.log('ERROR');
+                                })
                         }
                         this.$delete(this.details, key)
+
                     }
                 },
                 submitBtn(status) {

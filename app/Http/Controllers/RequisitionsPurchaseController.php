@@ -128,7 +128,6 @@ class RequisitionsPurchaseController extends Controller
             $result['item'][$key]->text = $val->name;
         }
         $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
-        // dd($result) ;
         return view('Backend.RequisitionsPurchase.input', $result);
     }
 
@@ -154,12 +153,20 @@ class RequisitionsPurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
-        $this->requisitionsPurchaseService->delrequisitionsPurchase($id);
+        $type = $request->input('type') ; 
+        if($type == 'Detail'){
+            $this->requisitionsPurchaseService->delRequisitionsPurchaseDetail($id) ;
+        }else{
+            $this->requisitionsPurchaseService->delrequisitionsPurchase($id);
+        }
+
+    
         return response()->json([
             'status' => true,
-            'find'=> $id 
+            'find'=> $id,
+            'type' => $type
         ]);
     }
 
