@@ -93,7 +93,7 @@
                                             <div class="row">
                                                 <div class="col-sm-10">
                                                     <input type="checkbox" name="role[]" value="{{$item['id']}}" id="role_{{$item['id']}}" data-id="{{$item['is_for_supplier']}}">
-                                                    <label for="role_id{{$item['id']}}"> {{$item['role_name']}}</label>
+                                                    <label for="role_{{$item['id']}}"> {{$item['role_name']}}</label>
                                                 </div>
                                                 <div class="col-sm-2">
                                                     @if ($item['is_for_supplier'] == 1)
@@ -151,6 +151,7 @@
                     $("#supplier_id").addClass('validate[required]');
                 } else {
                     $("#supplier_id").removeClass('validate[required]');
+                    $("#supplier_id").val('').trigger('change');
                 }
             });
         })

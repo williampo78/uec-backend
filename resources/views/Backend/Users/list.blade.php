@@ -78,13 +78,12 @@
                                 <tr>
                                     <td>
                                         @if($share_role_auth['auth_query'])
-                                            <a class="btn btn-info btn-sm"
-                                               href="{{ route('roles.show' , $item->id) }}"><i class="fa fa-search"></i></a>
+                                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $item['id'] }}" onclick="row_detail({{ $item['id'] }});"><i class="fa fa-search"></i></button>
                                         @endif
 
                                         @if($share_role_auth['auth_update'])
                                             <a class="btn btn-info btn-sm"
-                                               href="{{ route('roles.edit' , $item->id) }}">修改</a>
+                                               href="{{ route('users.edit' , $item->id) }}">修改</a>
                                         @endif
                                     </td>
                                     <td>{{$item->user_account}}</td>
@@ -103,6 +102,7 @@
             </div>
         </div>
     </div>
+    @include('Backend.Users.detail')
 @endsection
 
 @section('js')

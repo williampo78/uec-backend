@@ -43,23 +43,25 @@ class UsersService
         try {
             $userData = [];
             $userData['agent_id'] = Auth::user()->agent_id;
-            $userData['user_account'] = $inputdata['user_account'];
-            $userData['user_password'] = md5($inputdata['user_password']);
             $userData['user_name'] = $inputdata['user_name'];
             $userData['user_email'] = $inputdata['user_email'];
             $userData['active'] = $inputdata['active'];
-            $userData['supplier_id'] = isset($inputdata['supplier_id'])?$inputdata['supplier_id']:'';
+            $userData['supplier_id'] = isset($inputdata['supplier_id'])?$inputdata['supplier_id']:null;
             $userData['created_by'] = $user_id;
             $userData['created_at'] = $now;
             $userData['updated_by'] = $user_id;
             $userData['updated_at'] = $now;
             if ($act == 'add') {
+                $userData['user_account'] = $inputdata['user_account'];
+                $userData['user_password'] = md5($inputdata['user_password']);
                 $new_id = Users::insertGetId($userData);
             } else if ($act =='upd') {
+                if ($inputdata['user_password'] != '') {
+                    $userData['user_password'] = md5($inputdata['user_password']);
+                }
                 Users::where('id' , $inputdata['id'])->update($userData);
                 $new_id = $inputdata['id'];
             }
-
             $detailData = [];
             //不管新增或編輯先把原有的角色都刪除
             UserRoles::where('user_id', '=', $new_id)->delete();
@@ -81,5 +83,16 @@ class UsersService
             $result = false;
         }
         return $result;
+    }
+
+    public function getUserRoles($id)
+    {
+        $role_detail_array = [];
+        $roles = UserRoles::where('user_id','=',$id)->get()->toArray();
+        foreach ($roles as $data) {
+            $role_detail_array[$data['role_id']] = 1;
+        }
+        return $role_detail_array;
+
     }
 }

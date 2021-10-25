@@ -62,6 +62,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/usersAjax', [UsersController::class, 'ajax']);     //驗證使用者帳號
     Route::get('/user_profile', [UsersController::class, 'profile']);
     Route::post('/user_profile', [UsersController::class, 'updateProfile']);
+    Route::post('/users/ajax',[UsersController::class,'ajaxDetail']);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
