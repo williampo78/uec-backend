@@ -226,4 +226,10 @@ class RequisitionsPurchaseService
         }
         return true ; 
     }
+    public function delrequisitionsPurchase($id){
+        RequisitionsPurchase::where('id', $id)->delete();
+        RequisitionsPurchaseDetail::where('requisitions_purchase_id', $id)->delete();
+        RequisitionsPurchaseReviewLog::where('requisitions_purchase_id', $id)->delete();
+        return true ;
+    }
 }

@@ -163,7 +163,8 @@
 
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('requisitions_purchase') }}/{{ $obj->id }}/edit/">修改</a>
-                                            <button class="btn btn-danger btn-sm" onclick="">刪除</button>
+                                            <button class="btn btn-danger btn-sm"
+                                                @click="delBtn({{ $obj->id }})">刪除</button>
                                         </td>
                                         </td>
                                         <td>{{ $obj->trade_date }} </td>
@@ -217,15 +218,39 @@
                         axios.get('/backend/requisitions_purchase/' + id)
                             .then(function(response) {
                                 req.requisitionsPurchase = JSON.parse(response.data.requisitionsPurchase);
-                                req.requisitionsPurchaseDetail = JSON.parse(response.data.requisitionsPurchaseDetail);
-                                req.getRequisitionPurchaseReviewLog = JSON.parse(response.data.getRequisitionPurchaseReviewLog);
+                                req.requisitionsPurchaseDetail = JSON.parse(response.data
+                                    .requisitionsPurchaseDetail);
+                                req.getRequisitionPurchaseReviewLog = JSON.parse(response.data
+                                    .getRequisitionPurchaseReviewLog);
                                 $('.toggle-show-model').click();
-                                return req ;
+                                return req;
                             })
                             .catch(function(error) {
                                 console.log('ERROR');
                             })
                     },
+                    delBtn(id) {
+                        var checkDel = confirm('你確定要刪除嗎？');
+                        if (checkDel) {
+                            axios({
+                                    method: 'delete',
+                                    url: '/backend/requisitions_purchase/' + id
+                                }).then(function(response) {
+                                    if(response.data.status){
+                                        alert('刪除成功');
+                                        history.go(0);
+                                    }
+                                })
+                                .catch(function(error) {
+                                    console.log('ERROR');
+                                })
+                            console.log('刪除');
+                        } else {
+                            console.log('不刪除');
+                        }
+
+                        console.log(id);
+                    }
 
                 },
 

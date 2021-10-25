@@ -156,8 +156,11 @@ class RequisitionsPurchaseController extends Controller
      */
     public function destroy($id)
     {
-        //
-
+        $this->requisitionsPurchaseService->delrequisitionsPurchase($id);
+        return response()->json([
+            'status' => true,
+            'find'=> $id 
+        ]);
     }
 
     public function ajax(Request $request)
