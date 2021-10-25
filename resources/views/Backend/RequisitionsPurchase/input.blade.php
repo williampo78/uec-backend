@@ -7,10 +7,20 @@
             <div class="panel panel-default">
                 <div class="panel-heading">請輸入下列欄位資料</div>
                 <div class="panel-body" id="requisitions_vue_app">
+                    @if (isset($requisitionsPurchase))
+                        <form role="form" id="new-form" method="POST" action="{{ route('requisitions_purchase.update', $requisitionsPurchase->id) }}"
+                            enctype="multipart/form-data" novalidate="novalidate">
+                            {{ method_field('PUT') }}
+                            {{ csrf_field() }}
+                        @else
+                            <form role="form" id="new-form" method="post"
+                                action="{{ route('requisitions_purchase.store') }}" enctype="multipart/form-data">
+                    @endif
                     <form role="form" id="new-form" method="post" action="{{ route('requisitions_purchase.store') }}"
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
+                            <input style="display:none;" name="id" value="{{ $requisitionsPurchase->id ?? '' }}">
                             <!-- 欄位 -->
                             <div class="col-sm-12">
                                 <div class="row">
@@ -222,7 +232,8 @@
                                             <button class="btn btn-success" type="button"
                                                 @click="submitBtn('REVIEWING')"><i class="fa fa-save"></i>
                                                 儲存並送審</button>
-                                            <a href="{{route('requisitions_purchase')}}" class="btn btn-danger" type="button"><i class="fa fa-ban"></i>
+                                            <a href="{{ route('requisitions_purchase') }}" class="btn btn-danger"
+                                                type="button"><i class="fa fa-ban"></i>
                                                 取消</a>
                                         </div>
                                     </div>

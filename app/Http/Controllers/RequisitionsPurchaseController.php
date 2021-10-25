@@ -141,14 +141,10 @@ class RequisitionsPurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dump($request->input());
-        exit;
-        // $data = $request->except('_token' , '_method');
-        // $data['updated_by'] = Auth::user()->id;
-        // $data['updated_at'] = Carbon::now();
-        // Category::where('id' ,$id)->update($data);
-        // $route_name = 'category';
-        // $act = 'upd';
+        // dump($request->input());
+        $result = $this->requisitionsPurchaseService->updateRequisitionsPurchase($request->input()); //創建請購單
+        $act = 'upd';
+        $route_name = 'requisitions_purchase';
         return view('backend.success', compact('route_name', 'act'));
     }
 
