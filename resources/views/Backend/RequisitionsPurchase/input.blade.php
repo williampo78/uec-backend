@@ -121,7 +121,7 @@
                                         <div class="form-group" id="div_currency_code">
                                             <label for="currency_code">稅別<span class="redtext">*</span></label>
                                             <select class="form-control" name="tax" id="tax"
-                                                v-model="requisitions_purchase.tax">
+                                                v-model="requisitions_purchase.tax" @change="getItemLastPrice">
                                                 @foreach ($taxList as $id => $tax)
                                                     <option value="{{ $id }}">{{ $tax }}</option>
                                                 @endforeach
@@ -174,6 +174,7 @@
                                         <div class="row">
                                             <div class="col-sm-3">
                                                 <select2 :selectkey="detailKey" :options="options" :details="details"
+                                                    :requisitions_purchase="requisitions_purchase"
                                                     v-model="details[detailKey].item_id"> </select2>
                                             </div>
                                             <div class="col-sm-1">
@@ -304,6 +305,9 @@
                         $('#new-form').submit();
                     });
                 },
+                getItemLastPrice() {
+                    console.log('觸發');
+                }
             },
             mounted: function() {
                 $(".select2-vue-js").select2({
@@ -323,6 +327,7 @@
                     var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
                     $.each(details, function(key, obj) {
+                        // details[key].item_price = 0  ;
                         //原幣小計 = 單價 * 數量 
                         if (obj.is_gift == 1) { //如果是贈品則不計算單價
                             obj.subtotal_price = 0;
@@ -359,6 +364,7 @@
                     requisitions_purchase.total_price = sum_price; //總金額
                     return details;
                 },
+
             },
 
         })
@@ -367,7 +373,7 @@
 
         //Vue Js 如果要用 select2 要另外寫 
         Vue.component("select2", {
-            props: ["options", "value", "details", "selectkey"],
+            props: ["options", "value", "details", "selectkey", "requisitions_purchase"],
             template: "#select2-template",
             mounted: function() {
                 var vm = this;
@@ -387,6 +393,7 @@
                 value: function(value) {
                     var getSelectKey = this.selectkey; //這個u_id 當作找到選擇器的排序
                     var details = this.details;
+                    var requisitions_purchase = this.requisitions_purchase;
                     $(this.$el)
                         .val(value)
                         .trigger("change");
@@ -397,7 +404,64 @@
                             details[getSelectKey].item_brand = obj.brand; //品牌
                             details[getSelectKey].item_spec = obj.spec; //規格
                             details[getSelectKey].item_unit = obj.small_unit; // 單位
-                            details[getSelectKey].item_price = obj.sell_price1; //目前先以販售價格**要用審核過後的價格帶出
+                            // details[getSelectKey].item_price = obj.sell_price1; //目前先以販售價格**要用審核過後的價格帶出
+                            var find_this_item_id = obj.id;
+
+                            //帶出價格
+                            var whereGet = '?supplier_id=' + $('#supplier_id').val() +
+                                '&currency_code=' + $('#currency_code').val() +
+                                '&tax=' + requisitions_purchase.tax +
+                                '&item_id=' + find_this_item_id;
+                            let async_callback = async function() {
+                                console.log('START CALL BACK FUNCTION');
+                                let find_api = await axios({
+                                        method: 'get',
+                                        url: '/backend/getItemLastPrice/' + whereGet,
+                                        data: {
+                                            "supplier_id": requisitions_purchase
+                                                .supplier_id,
+                                            "currency_code": requisitions_purchase
+                                                .currency_code,
+                                            "tax": requisitions_purchase.tax,
+                                            "item_id": find_this_item_id
+                                        }
+                                    }).then(function(response) {
+                                        console.log(response.data);
+                                        if (response.data.data !== null) {
+                                            console.log(response.data.original_unit_price);
+                                            details[getSelectKey].item_price = response.data
+                                                .data.original_unit_price;
+                                        } else {
+                                            details[getSelectKey].original_unit_price =
+                                            null;
+                                        }
+
+                                    })
+                                    .catch(function(error) {
+                                        // console.log(error);
+                                    })
+                                return find_api;
+                            }
+
+                            const myfunction = async function(x, y) {
+                                
+                                return [
+                                    x,
+                                    y,
+                                ];
+                            }
+
+                            // Start function
+                            const start = async function(a, b) {
+                                const result = await myfunction('test', 'test');
+
+                                console.log(result);
+                            }
+                            async_callback();
+                            console.log('END CALL BACK');
+
+
+                            // console.log('END');
                         }
                     });
                 },
