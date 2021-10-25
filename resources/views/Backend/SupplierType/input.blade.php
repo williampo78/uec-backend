@@ -38,14 +38,14 @@
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_supplier_type_code">
                                             <label for="supplier_type_code">編號</label>
-                                            <input class="form-control" name="code"
+                                            <input class="form-control validate[required]" name="code"
                                                 value="{{ isset($ShowData['code']) ? $ShowData['code'] : '' }}">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_supplier_type_name">
                                             <label for="supplier_type_name">供應商類別名稱</label>
-                                            <input class="form-control" name="name"
+                                            <input class="form-control validate[required]" name="name"
                                                 value="{{ isset($ShowData['name']) ? $ShowData['name'] : '' }}">
                                         </div>
                                     </div>
@@ -68,4 +68,11 @@
             </div>
         </div>
     </div>
+@endsection
+@section('js')
+    <script>
+        $(function () {
+            $("#new-form").validationEngine();
+        })
+    </script>
 @endsection

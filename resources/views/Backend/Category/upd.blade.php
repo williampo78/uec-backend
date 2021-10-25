@@ -9,7 +9,7 @@
             <!-- /.col-sm-12 -->
         </div>
         <!-- /.row -->
-        <form method="POST" action="{{ route('category.update' , $data['id']) }}">
+        <form method="POST" id="edit-form" action="{{ route('category.update' , $data['id']) }}">
             {{ method_field('PUT') }}
             {{ csrf_field() }}
             <div class="row">
@@ -22,7 +22,8 @@
                                 <div class="col-sm-12">
                                     <div class="form-group" id="div_category">
                                         <label for="category">主分類</label>
-                                        <select class="form-control js-select2" name="primary_category_id" id="category">
+                                        <select class="form-control js-select2 validate[required]" name="primary_category_id" id="category">
+                                            <option value="">請選擇</option>
                                             @foreach($primary_category_list as $id => $v)
                                                 <option value='{{ $id }}' {{$data['primary_category_id']==$id? 'selected' : ''}}>{{ $v['name'] }}</option>
                                             @endforeach
@@ -37,13 +38,13 @@
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_number">
                                                 <label for="number">編號</label>
-                                                <input class="form-control" name="number" id="number" value="{{$data['number']}}">
+                                                <input class="form-control validate[required]" name="number" id="number" value="{{$data['number']}}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_name">
                                                 <label for="name">名稱</label>
-                                                <input class="form-control" name="name" id="name" value="{{$data['name']}}">
+                                                <input class="form-control validate[required]" name="name" id="name" value="{{$data['name']}}">
                                             </div>
                                         </div>
                                     </div>
@@ -58,11 +59,6 @@
                                         <a class="btn btn-danger" href="{{route('category')}}"><i class="fa fa-ban"></i> 取消</a>
                                     </div>
                                 </div>
-                                <div class="col-sm-6 text-right">
-                                    <div class="form-group">
-                                        {{--                                        <a class="btn btn-danger" s"><i class="fa fa-trash"></i> 刪除</a>--}}
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -70,4 +66,11 @@
             </div>
         </form>
     </div>
+@endsection
+@section('js')
+    <script>
+        $(function () {
+            $("#edit-form").validationEngine();
+        })
+    </script>
 @endsection

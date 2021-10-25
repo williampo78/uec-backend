@@ -26,13 +26,13 @@
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_number">
                                             <label for="number">編號</label>
-                                            <input class="form-control" name="number" id="number">
+                                            <input class="form-control validate[required]" name="number" id="number">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_name">
                                             <label for="name">倉庫名稱</label>
-                                            <input class="form-control" name="name" id="name">
+                                            <input class="form-control validate[required]" name="name" id="name">
                                         </div>
                                     </div>
                                 </div>
@@ -54,4 +54,11 @@
     </div>
 </div>
 
+@endsection
+@section('js')
+    <script>
+        $(function () {
+            $("#new-form").validationEngine();
+        })
+    </script>
 @endsection

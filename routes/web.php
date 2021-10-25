@@ -54,10 +54,15 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/quotation/ajaxDelItem' , [QuotationController::class,'ajaxDelItem']);
     Route::resource('/order_supplier',OrderSupplierController::class, ['names' => ['index' => 'order_supplier']]);
     Route::post('/order_supplier/ajax' , [OrderSupplierController::class, 'ajax']);
+
     Route::resource('/test',TestController::class, ['names' => ['index' => 'test']]);
     Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
     Route::resource('/roles',RolesController::class, ['names' => ['index' => 'roles']]);
-    Route::resource('/users',RolesController::class, ['names' => ['index' => 'users']]);
+    Route::resource('/users',UsersController::class, ['names' => ['index' => 'users']]);
+    Route::get('/usersAjax', [UsersController::class, 'ajax']);     //驗證使用者帳號
+    Route::get('/user_profile', [UsersController::class, 'profile']);
+    Route::post('/user_profile', [UsersController::class, 'updateProfile']);
+    Route::post('/users/ajax',[UsersController::class,'ajaxDetail']);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
