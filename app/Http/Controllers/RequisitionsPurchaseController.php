@@ -93,18 +93,22 @@ class RequisitionsPurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id,Request $request)
     {
-        $requisitionsPurchase = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id); //請購單
+        $responseType =  $request->input('responseType') ;
+
+        $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($id); //請購單
         $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id); //請購單內的品項
         $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id) ;  //簽核紀錄
-        // dump($requisitionsPurchase , $requisitionsPurchaseDetail ,$getRequisitionPurchaseReviewLog) ;
+
+        if($responseType = 'json'){
+            return response()->json([
+                'requisitionsPurchase' => json_encode($requisitionsPurchase),
+                'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail) ,
+                'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
+            ]);
+        }
         
-        return response()->json([
-            'requisitionsPurchase' => json_encode($requisitionsPurchase),
-            'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail) ,
-            'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
-        ]);
     }
 
     /**
@@ -124,7 +128,6 @@ class RequisitionsPurchaseController extends Controller
             $result['item'][$key]->text = $val->name;
         }
         $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
-        // dd($result) ;
         return view('Backend.RequisitionsPurchase.input', $result);
     }
 
@@ -137,14 +140,10 @@ class RequisitionsPurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dump($request->input());
-        exit;
-        // $data = $request->except('_token' , '_method');
-        // $data['updated_by'] = Auth::user()->id;
-        // $data['updated_at'] = Carbon::now();
-        // Category::where('id' ,$id)->update($data);
-        // $route_name = 'category';
-        // $act = 'upd';
+        // dump($request->input());
+        $result = $this->requisitionsPurchaseService->updateRequisitionsPurchase($request->input()); //創建請購單
+        $act = 'upd';
+        $route_name = 'requisitions_purchase';
         return view('backend.success', compact('route_name', 'act'));
     }
 
@@ -154,10 +153,21 @@ class RequisitionsPurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id,Request $request)
     {
-        //
+        $type = $request->input('type') ; 
+        if($type == 'Detail'){
+            $this->requisitionsPurchaseService->delRequisitionsPurchaseDetail($id) ;
+        }else{
+            $this->requisitionsPurchaseService->delrequisitionsPurchase($id);
+        }
 
+    
+        return response()->json([
+            'status' => true,
+            'find'=> $id,
+            'type' => $type
+        ]);
     }
 
     public function ajax(Request $request)

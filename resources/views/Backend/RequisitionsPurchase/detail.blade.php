@@ -1,6 +1,6 @@
-
 <!-- 請購單明細 -->
-<div class="modal fade" id="row_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="row_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
@@ -13,31 +13,38 @@
                         <div class="col-sm-12">
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 請購單號</label></div>
-                                <div class="col-sm-4">@{{requisitionsPurchase.number}}</div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase . number }}</div>
                                 <div class="col-sm-2"><label> 供應商</label></div>
-                                <div class="col-sm-4" id=""></div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase . supplier_name }}</div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 幣別</label></div>
-                                <div class="col-sm-4" id=""></div>
+                                <div class="col-sm-4">台幣</div>
                                 <div class="col-sm-2"><label> 狀態</label></div>
-                                <div class="col-sm-4" id=""></div>
+                                <div class="col-sm-4">
+                                    <div v-if="requisitionsPurchase.status == 'DRAFTED'">草稿</div>
+                                    <div v-else-if="requisitionsPurchase.status == 'REVIEWING'">簽核中</div>
+                                    <div v-else-if="requisitionsPurchase.status == 'APPROVED'">已核准</div>
+                                    <div v-else-if="requisitionsPurchase.status == 'REJECTED'">已駁回</div>
+                                    <div v-else>狀態異常</div>
+                                </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 原幣稅額</label></div>
-                                <div class="col-sm-4" id=""></div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase . original_total_tax_price }}
+                                </div>
                                 <div class="col-sm-2"><label> 原幣總金額</label></div>
-                                <div class="col-sm-4" id=""></div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase . original_total_price }}</div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 稅額</label></div>
-                                <div class="col-sm-4" id=""></div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase . total_tax_price }}</div>
                                 <div class="col-sm-2"><label> 總金額</label></div>
-                                <div class="col-sm-4" id=""></div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase . total_price }}</div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 備註</label></div>
-                                <div class="col-sm-10" id=""></div>
+                                <div class="col-sm-10">@{{ requisitionsPurchase . remark }}</div>
                             </div>
                         </div>
                     </div>
@@ -47,24 +54,29 @@
                         <div class="col-sm-12">
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
-                                <tr>
-                                    <th>商品編號</th>
-                                    <th>商品名稱</th>
-                                    <th>單價</th>
-                                    <th>請購量</th>
-                                    <th>單位</th>
-                                    <th>小計</th>
-                                    <th>贈品</th>
-                                    <th>最小採購量</th>
-                                </tr>
+                                    <tr>
+                                        <th>商品編號</th>
+                                        <th>商品名稱</th>
+                                        <th>單價</th>
+                                        <th>請購量</th>
+                                        <th>單位</th>
+                                        <th>小計</th>
+                                        <th>贈品</th>
+                                        <th>最小採購量</th>
+                                    </tr>
                                 </thead>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                <tbody v-for="(item, itemKey) in requisitionsPurchaseDetail">
+                                    <tr>
+                                        <td>@{{item.item_number}}</td>
+                                        <td>@{{item.item_name}}</td>
+                                        <td>@{{item.item_price}}</td>
+                                        <td>@{{item.item_qty}}</td>
+                                        <td>@{{item.item_unit}}</td>
+                                        <td>@{{item.subtotal_price}}</td>
+                                        <td>@{{item.is_gift}}</td>
+                                        {{-- 最小出貨量 --}}
+                                        <td>@{{item.item_minimum_sales_qty}}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -75,26 +87,32 @@
                         <div class="col-sm-12">
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
-                                <tr>
-                                    <th>次序</th>
-                                    <th>簽核人員</th>
-                                    <th>簽核時間</th>
-                                    <th>簽核結果</th>
-                                    <th>簽核備註</th>
-                                </tr>
+                                    <tr>
+                                        <th>次序 </th>
+                                        <th>簽核人員 </th>
+                                        <th>簽核時間 </th>
+                                        <th>簽核結果 </th>
+                                        <th>簽核備註 </th>
+                                    </tr>
                                 </thead>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                <tbody v-for="(PurchaseReview, PurchaseReviewKey) in getRequisitionPurchaseReviewLog">
+                                    <td>@{{PurchaseReview.seq_no}}</td>
+                                    <td>@{{PurchaseReview.user_name}}</td>
+                                    <td>@{{PurchaseReview.review_at}}</td>
+                                    <td>
+                                        <div v-if="PurchaseReview.review_result == 1">核准</div>
+                                        <div v-else-if="PurchaseReview.review_result == 0">駁回</div>
+                                        <div v-else>簽核中</div>
+                                    </td>
+                                    <td>@{{PurchaseReview.review_remark}}</td>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i> 關閉視窗</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
+                        關閉視窗</button>
                 </div>
             </form>
         </div>
