@@ -70,7 +70,7 @@ class RequisitionsPurchaseService
 
     public function getAjaxRequisitionsPurchaseDetail($id)
     {
-        return RequisitionsPurchaseDetail::select(DB::RAW('requisitions_purchase_detail.*'), DB::RAW('item.stock_qty as item_stock_qty'))
+        return RequisitionsPurchaseDetail::select(DB::RAW('requisitions_purchase_detail.*'), DB::RAW('item.stock_qty as item_stock_qty'),DB::RAW('item.minimum_sales_qty as item_minimum_sales_qty'))
             ->leftJoin('item', 'requisitions_purchase_detail.item_id', '=', 'item.id')
             ->where('requisitions_purchase_id', $id)
             ->get();

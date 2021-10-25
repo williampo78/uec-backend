@@ -93,18 +93,22 @@ class RequisitionsPurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id,Request $request)
     {
-        $requisitionsPurchase = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id); //請購單
+        $responseType =  $request->input('responseType') ;
+
+        $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($id); //請購單
         $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id); //請購單內的品項
         $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id) ;  //簽核紀錄
-        // dump($requisitionsPurchase , $requisitionsPurchaseDetail ,$getRequisitionPurchaseReviewLog) ;
+
+        if($responseType = 'json'){
+            return response()->json([
+                'requisitionsPurchase' => json_encode($requisitionsPurchase),
+                'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail) ,
+                'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
+            ]);
+        }
         
-        return response()->json([
-            'requisitionsPurchase' => json_encode($requisitionsPurchase),
-            'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail) ,
-            'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
-        ]);
     }
 
     /**

@@ -195,7 +195,9 @@
                     </div>
                 </div>
             </div>
-            <textarea name="" id="" cols="30" rows="10">@{{ requisitionsPurchase . number }}</textarea>
+            {{-- <textarea name="" id="" cols="30" rows="10">@{{ requisitionsPurchase }}</textarea> --}}
+            {{-- <textarea name="" id="" cols="30" rows="10">@{{ requisitionsPurchaseDetail }}</textarea> --}}
+            {{-- <textarea name="" id="" cols="30" rows="10">@{{ getRequisitionPurchaseReviewLog }}</textarea> --}}
             @include('Backend.RequisitionsPurchase.detail')
         </div>
     </div>
@@ -211,20 +213,19 @@
                 },
                 methods: {
                     showBtn(id) {
-                        let req = this;
+                        var req = this;
                         axios.get('/backend/requisitions_purchase/' + id)
                             .then(function(response) {
-                                console.log(response.data.requisitionsPurchase) ;
-                                req.requisitionsPurchase = response.data.requisitionsPurchase;
-                                req.requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
-                                req.getRequisitionPurchaseReviewLog = response.data.getRequisitionPurchaseReviewLog;
+                                req.requisitionsPurchase = JSON.parse(response.data.requisitionsPurchase);
+                                req.requisitionsPurchaseDetail = JSON.parse(response.data.requisitionsPurchaseDetail);
+                                req.getRequisitionPurchaseReviewLog = JSON.parse(response.data.getRequisitionPurchaseReviewLog);
+                                $('.toggle-show-model').click();
+                                return req ;
                             })
                             .catch(function(error) {
                                 console.log('ERROR');
                             })
-                        $('.toggle-show-model').click();
                     },
-
 
                 },
 
