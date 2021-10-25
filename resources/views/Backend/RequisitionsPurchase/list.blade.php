@@ -24,9 +24,11 @@
                                         <h5>供應商 </h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control select2-default" name="supplier_id" id="supplier_id">
+                                        <select class="form-control" name="supplier_id" id="supplier_id">
                                             @foreach ($supplier as $obj)
-                                                <option value='{{ $obj->id }}'>{{ $obj->name }}</option>
+                                                <option value='{{ $obj->id }}'
+                                                    {{ request()->input('supplier_id') == $obj->id ? 'selected="selected"' : '' }}>
+                                                    {{ $obj->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -49,7 +51,7 @@
                                             <h5>狀態</h5>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control select2-default" name="status" id="status">
+                                            <select class="form-control" name="status" id="status">
                                                 <option value="">無</option>
                                                 <option value='drafted'
                                                     {{ request()->input('status') == 'drafted' ? 'selected="selected"' : '' }}>
@@ -236,7 +238,7 @@
                                     method: 'delete',
                                     url: '/backend/requisitions_purchase/' + id
                                 }).then(function(response) {
-                                    if(response.data.status){
+                                    if (response.data.status) {
                                         alert('刪除成功');
                                         history.go(0);
                                     }
@@ -266,6 +268,17 @@
                 $('#datetimepicker2').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
+                $("#supplier_id").select2({
+                    allowClear: true,
+                    theme: "bootstrap",
+                    placeholder: "請選擇"
+                });
+                $("#status").select2({
+                    allowClear: true,
+                    theme: "bootstrap",
+                    placeholder: "請選擇"
+                });
+
             });
 
             function del(id, doc_number) {
