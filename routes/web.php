@@ -16,6 +16,7 @@ use App\Http\Controllers\QuotationReviewController;
 use App\Http\Controllers\OrderSupplierController;
 use App\Http\Controllers\ContactControllers;
 use Illuminate\Support\Facades\Route;
+use CKSource\CKFinderBridge\Controller\CKFinderController;
 
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UsersController;
@@ -32,6 +33,8 @@ use App\Http\Controllers\QAController;
 | contains the "web" middleware group. Now create something great!
 |
  */
+Route::any('/ckfinder/connector', [CKFinderController::class, 'requestAction'])->name('ckfinder_connector');
+
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/', [AdminControllers::class, 'index']);
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');

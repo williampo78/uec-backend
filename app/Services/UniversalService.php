@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Lookup_values_v;
 use App\Models\Quotation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -85,6 +86,16 @@ class UniversalService
         $data = [];
         foreach ($users as $k => $v) {
             $data[$v['id']] = $v;
+        }
+        return $data;
+    }
+
+    public function getQACategory()
+    {
+        $lookup = Lookup_values_v::where('type_code', '=', 'QA_CATEGORY')->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
+        $data = [];
+        foreach ($lookup as $k => $v) {
+            $data[$v['code']] = $v['description'];
         }
         return $data;
     }

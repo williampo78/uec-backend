@@ -71,12 +71,12 @@
                             <thead>
                             <tr>
                                 <th class="col-sm-1">功能</th>
-                                <th class="col-sm-2">類別</th>
+                                <th class="col-sm-1">類別</th>
                                 <th class="col-sm-1">排序</th>
-                                <th class="col-sm-3">問題描述</th>
+                                <th class="col-sm-5">問題描述</th>
                                 <th class="col-sm-1">狀態</th>
                                 <th class="col-sm-2">最後異動時間</th>
-                                <th class="col-sm-2">最後異動者</th>
+                                <th class="col-sm-1">最後異動者</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -89,10 +89,10 @@
 
                                         @if($share_role_auth['auth_update'])
                                             <a class="btn btn-info btn-sm"
-                                               href="{{ route('users.edit' , $item->id) }}">修改</a>
+                                               href="{{ route('qa.edit' , $item->id) }}">修改</a>
                                         @endif
                                     </td>
-                                    <td>{{$item->parent_code}}</td>
+                                    <td>{{$data['code'][$item->parent_code]}}</td>
                                     <td>{{$item->sort}}</td>
                                     <td>{{$item->content_name}}</td>
                                     <td>{{$item->active==1?'啟用':'關閉'}}</td>
@@ -108,7 +108,6 @@
             </div>
         </div>
     </div>
-    @include('Backend.Users.detail')
 @endsection
 
 @section('js')

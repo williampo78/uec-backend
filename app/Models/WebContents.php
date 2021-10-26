@@ -9,4 +9,5 @@ class WebContents extends Model
 {
     use HasFactory;
     protected $table = 'web_contents';
+    protected $guarded = [];
 }

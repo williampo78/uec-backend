@@ -6,12 +6,14 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-pencil"></i> 新增資料</h1>
+                <h1 class="page-header"><i class="fa fa-pencil"></i> 編輯資料</h1>
             </div>
         </div>
         <!-- /.row -->
-        <form role="form" id="new-form" method="post" action="{{route('qa.store')}}" enctype="multipart/form-data">
-            @csrf
+        <form role="form" id="new-form" method="post" action="{{ route('qa.update' , $data['webcontent']->id) }}"
+              enctype="multipart/form-data">
+            {{ method_field('PUT') }}
+            {{ csrf_field() }}
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-primary">
@@ -26,7 +28,8 @@
                                                 <select name="parent_code" id="parent_code" class="validate[required]">
                                                     <option value="">請選擇</option>
                                                     @foreach($data['category'] as $cate)
-                                                        <option value="{{$cate['code']}}">{{$cate['description']}}</option>
+                                                        <option
+                                                            value="{{$cate['code']}}" {{$data['webcontent']['parent_code'] == $cate['code'] ? 'selected':''}}>{{$cate['description']}}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -34,8 +37,9 @@
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_sort">
                                                 <label for="password">排序 <span class="text-danger">*</span></label>
-                                                <input class="form-control validate[required,custom[integer]]" type="number" name="sort"
-                                                       id="sort">
+                                                <input class="form-control validate[required,custom[integer]]"
+                                                       type="number" name="sort"
+                                                       id="sort" value="{{$data['webcontent']['sort']}}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -44,13 +48,15 @@
                                                 <div class="row">
                                                     <div class="col-sm-2">
                                                         <input type="radio"
-                                                               name="active" id="active1" checked
+                                                               name="active" id="active1"
+                                                               {{$data['webcontent']['active']==1?'checked':''}}
                                                                value="1">
                                                         <label for="active1">啟用</label>
                                                     </div>
                                                     <div class="col-sm-2">
                                                         <input type="radio"
                                                                name="active" id="active0"
+                                                               {{$data['webcontent']['active']==0?'checked':''}}
                                                                value="0">
                                                         <label for="active0">關閉</label>
                                                     </div>
@@ -61,17 +67,21 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group" id="div_email">
-                                                <label for="content_name">問題描述 <span class="text-danger">*</span></label>
+                                                <label for="content_name">問題描述 <span
+                                                        class="text-danger">*</span></label>
                                                 <input class="form-control validate[required]" name="content_name"
-                                                       id="content_name">
+                                                       id="content_name"
+                                                       value="{{$data['webcontent']['content_name']}}">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group" id="div_email">
-                                                <label for="content_name">問題解答 <span class="text-danger">*</span></label>
-                                                <textarea class="form-control validate[required]" rows="5" name="content_text"></textarea>
+                                                <label for="content_name">問題解答 <span
+                                                        class="text-danger">*</span></label>
+                                                <textarea class="form-control validate[required]" rows="5"
+                                                          name="content_text">{{$data['webcontent']['content_text']}}</textarea>
                                             </div>
                                         </div>
                                     </div>

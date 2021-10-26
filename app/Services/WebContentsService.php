@@ -42,4 +42,45 @@ class WebContentsService
         $webcontents = $webcontents->orderBy('parent_code', 'asc')->orderBy('sort', 'asc')->get();
         return $webcontents;
     }
+
+    public function addWebContent($inputdata, $act)
+    {
+        $user_id = Auth::user()->id;
+        $now = Carbon::now();
+        DB::beginTransaction();
+        try {
+            $webData = [];
+            $webData['agent_id'] = Auth::user()->agent_id;
+            $webData['apply_to'] = $inputdata['apply_to'];
+            $webData['parent_code'] = $inputdata['parent_code'];
+            $webData['active'] = $inputdata['active'];
+            $webData['content_name'] = $inputdata['content_name'];
+            $webData['sort'] = $inputdata['sort'];
+            $webData['content_target'] = isset($inputdata['content_target'])?$inputdata['content_target']:null;
+            $webData['content_url'] = isset($inputdata['content_url'])?$inputdata['content_url']:null;
+            $webData['content_text'] = $inputdata['content_text'];
+            $webData['created_by'] = $user_id;
+            $webData['created_at'] = $now;
+            $webData['updated_by'] = $user_id;
+            $webData['updated_at'] = $now;
+            if ($act == 'add') {
+                $new_id = WebContents::insertGetId($webData);
+            } else if ($act =='upd') {
+                WebContents::where('id' , $inputdata['id'])->update($webData);
+                $new_id = $inputdata['id'];
+            }
+            DB::commit();
+            if ($new_id > 0) {
+                $result = true;
+            } else {
+                $result = false;
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = false;
+        }
+
+        return $result;
+    }
 }
