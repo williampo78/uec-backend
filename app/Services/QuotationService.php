@@ -211,11 +211,7 @@ class QuotationService
         return true;
     }
     public function getItemLastPrice($in){ //取得報價核准的最後一個金額
-        $in['supplier_id'] =  '1' ;
-        $in['currency_code'] =  'TWD' ;
-        $in['tax'] =  '2' ;
-        $in['item_id'] =  '3' ;
-        $get =  Quotation::select(DB::raw('quotation_details.unit_price'),DB::raw('quotation_details.original_unit_price'))
+        $get =  Quotation::select(DB::raw('quotation_details.original_unit_price'))
         ->join('quotation_details' , 'quotation.id' , 'quotation_details.quotation_id')
         ->where('quotation.supplier_id',$in['supplier_id'])
         ->where('quotation.currency_code',$in['currency_code'])
@@ -224,7 +220,7 @@ class QuotationService
         ->where('quotation_details.item_id',$in['item_id']) 
         ->orderBy('quotation.closed_at')
         ->limit(1)
-        ->get()->toArray();
+        ->get();
         return $get ;
     }
 }

@@ -306,7 +306,22 @@
                     });
                 },
                 getItemLastPrice() {
-                    console.log('觸發');
+                    var details = this.details ; 
+                    var requisitions_purchase = this.requisitions_purchase ;
+                
+                    $.each(details, function(key, obj) {
+                        var whereGet = '?supplier_id=' + $('#supplier_id').val() +
+                                '&currency_code=' + $('#currency_code').val() +
+                                '&tax=' + requisitions_purchase.tax +
+                                '&item_id=' + details.item_id;
+
+                        var req = async () => {
+                                const response = await axios.get('/backend/getItemLastPrice/' + whereGet);
+                                details[key].item_price = response.data.original_unit_price;
+                                console.log(response.data.original_unit_price) ;
+                            }
+                        req();
+                    });
                 }
             },
             mounted: function() {
@@ -406,60 +421,18 @@
                             details[getSelectKey].item_unit = obj.small_unit; // 單位
                             // details[getSelectKey].item_price = obj.sell_price1; //目前先以販售價格**要用審核過後的價格帶出
                             var find_this_item_id = obj.id;
-
                             //帶出價格
                             var whereGet = '?supplier_id=' + $('#supplier_id').val() +
                                 '&currency_code=' + $('#currency_code').val() +
                                 '&tax=' + requisitions_purchase.tax +
                                 '&item_id=' + find_this_item_id;
-                            let async_callback = async function() {
-                                console.log('START CALL BACK FUNCTION');
-                                let find_api = await axios({
-                                        method: 'get',
-                                        url: '/backend/getItemLastPrice/' + whereGet,
-                                        data: {
-                                            "supplier_id": requisitions_purchase
-                                                .supplier_id,
-                                            "currency_code": requisitions_purchase
-                                                .currency_code,
-                                            "tax": requisitions_purchase.tax,
-                                            "item_id": find_this_item_id
-                                        }
-                                    }).then(function(response) {
-                                        console.log(response.data);
-                                        if (response.data.data !== null) {
-                                            console.log(response.data.original_unit_price);
-                                            details[getSelectKey].item_price = response.data
-                                                .data.original_unit_price;
-                                        } else {
-                                            details[getSelectKey].original_unit_price =
-                                            null;
-                                        }
-
-                                    })
-                                    .catch(function(error) {
-                                        // console.log(error);
-                                    })
-                                return find_api;
+                            const req = async () => {
+                                const response = await axios.get('/backend/getItemLastPrice/' +
+                                    whereGet);
+                                details[getSelectKey].item_price = response.data
+                                    .original_unit_price;
                             }
-
-                            const myfunction = async function(x, y) {
-
-                                return [
-                                    x,
-                                    y,
-                                ];
-                            }
-                            // Start function
-                            const start = async function(a, b) {
-                                const result = await myfunction('test', 'test');
-                                console.log(result);
-                            }
-                            async_callback();
-                            console.log('END CALL BACK');
-
-
-                            // console.log('END');
+                            req();
                         }
                     });
                 },

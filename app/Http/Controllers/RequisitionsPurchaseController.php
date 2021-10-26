@@ -197,11 +197,11 @@ class RequisitionsPurchaseController extends Controller
     //用請購單ID 帶出 請購單內的品項以及 簽核紀錄
     public function getItemLastPrice(Request $request)
     {
-        $request->input();
-        $in = [];
+        $in = $request->input();
         $getItemLastPrice = $this->quotationService->getItemLastPrice($in);
+        $original_unit_price = isset($getItemLastPrice->original_unit_price) ? $getItemLastPrice->original_unit_price : null  ;
         return response()->json([
-            'data' => json_encode($getItemLastPrice,true),
+            'original_unit_price' => $original_unit_price,
         ]);
     }
 
