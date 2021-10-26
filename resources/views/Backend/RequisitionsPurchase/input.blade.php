@@ -280,7 +280,6 @@
                 ItemListDel(id, key) {
                     var checkDel = confirm('你確定要刪除嗎？');
                     if (checkDel) {
-                        console.log(id);
                         if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
                             axios({
                                     method: 'delete',
@@ -300,26 +299,56 @@
                     }
                 },
                 submitBtn(status) {
-                    this.status = status;
-                    this.$nextTick(() => {
-                        $('#new-form').submit();
+                    var details = this.details;
+                    this.status = status; //訂單狀態
+                    var check_item_status = true; //檢查表單內容 給予狀態
+
+                    console.log(details);
+                    $.each(details, function(key, obj) {
+                        if (obj.item_price == null) {
+                            check_item_status = false;
+                        }
+                        if (obj.item_id == "") {
+                            check_item_status = false;
+                        }
                     });
+                    if (details.length == 0) {
+                        check_item_status = false;
+                    }
+                    this.$nextTick(() => {
+                        if (details.length == 0 && this.status !== 'DRAFTED') {
+                            alert('請填入品項')
+                            return false;
+                        }
+                        if (check_item_status == false && this.status == 'REVIEWING') {
+                            alert('品項點選未帶入單價 表示該品項上未通過任何報價審核喔!')
+                            return false;
+
+                        }
+                        if (check_item_status == false && this.status == 'DRAFTED') {
+                            $('#new-form').submit();
+                        } else if (check_item_status == true) {
+                            $('#new-form').submit();
+                        }
+                    });
+
                 },
                 getItemLastPrice() {
-                    var details = this.details ; 
-                    var requisitions_purchase = this.requisitions_purchase ;
-                
+                    var details = this.details;
+                    var requisitions_purchase = this.requisitions_purchase;
+
                     $.each(details, function(key, obj) {
                         var whereGet = '?supplier_id=' + $('#supplier_id').val() +
-                                '&currency_code=' + $('#currency_code').val() +
-                                '&tax=' + requisitions_purchase.tax +
-                                '&item_id=' + details.item_id;
+                            '&currency_code=' + $('#currency_code').val() +
+                            '&tax=' + requisitions_purchase.tax +
+                            '&item_id=' + details.item_id;
 
                         var req = async () => {
-                                const response = await axios.get('/backend/getItemLastPrice/' + whereGet);
-                                details[key].item_price = response.data.original_unit_price;
-                                console.log(response.data.original_unit_price) ;
-                            }
+                            const response = await axios.get('/backend/getItemLastPrice/' +
+                                whereGet);
+                            details[key].item_price = response.data.original_unit_price;
+                            console.log(response.data.original_unit_price);
+                        }
                         req();
                     });
                 }
