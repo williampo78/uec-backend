@@ -79,6 +79,11 @@ class UniversalService
         ];
     }
 
+    /*
+     * 取得使用者資料
+     * Sample:
+     * Author: Rowena
+     */
     public function getUser()
     {
         $agent_id = Auth::user()->agent_id;
@@ -90,9 +95,14 @@ class UniversalService
         return $data;
     }
 
-    public function getQACategory()
+    /*
+     * 傳入分類代碼 顯示類別名稱
+     * Sample: QA_CATEGORY or FOOTER_CATEGORY
+     * Author: Rowena
+     */
+    public function getFooterCategory($category)
     {
-        $lookup = Lookup_values_v::where('type_code', '=', 'QA_CATEGORY')->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
+        $lookup = Lookup_values_v::where('type_code', '=', $category)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
         $data = [];
         foreach ($lookup as $k => $v) {
             $data[$v['code']] = $v['description'];

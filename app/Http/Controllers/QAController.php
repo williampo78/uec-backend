@@ -27,7 +27,7 @@ class QAController extends Controller
         $data['category'] = $this->webContentsService->getCategory('QA_CATEGORY');
         $data['footer'] = ($getData ? $this->webContentsService->getFooter($getData, 'QA') : []);
         $data['user'] = $this->universalService->getUser();
-        $data['code'] = $this->universalService->getQACategory();
+        $data['code'] = $this->universalService->getFooterCategory('QA_CATEGORY');
         $data['getData'] = $getData;
         return view('Backend.QA.list', compact('data'));
     }

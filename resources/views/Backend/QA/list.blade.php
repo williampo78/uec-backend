@@ -83,10 +83,6 @@
                             @foreach($data['footer'] as $item)
                                 <tr>
                                     <td>
-                                        @if($share_role_auth['auth_query'])
-                                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#row_detail" data-id="{{ $item['id'] }}" onclick="row_detail({{ $item['id'] }});"><i class="fa fa-search"></i></button>
-                                        @endif
-
                                         @if($share_role_auth['auth_update'])
                                             <a class="btn btn-info btn-sm"
                                                href="{{ route('qa.edit' , $item->id) }}">修改</a>
