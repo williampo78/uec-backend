@@ -127,7 +127,6 @@ class RequisitionsPurchaseService
         $now = Carbon::now();
 
         $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION');
-
         if (!$hierarchy) {
             return false;
         }
@@ -139,6 +138,7 @@ class RequisitionsPurchaseService
             $requisitions_purchase['user_id'] = $user_id;
             $requisitions_purchase['use_date'] = $now; //需用日先填假值
             $requisitions_purchase['created_at'] = $now; //創建時間
+            $requisitions_purchase['next_approver'] = $hierarchy[0] ;
             $requisitions_purchase_id = RequisitionsPurchase::insertGetId($requisitions_purchase);
             if (isset($requisitions_purchase_detail)) {
                 foreach ($requisitions_purchase_detail as $key => $val) {
