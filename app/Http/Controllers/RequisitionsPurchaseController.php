@@ -198,8 +198,8 @@ class RequisitionsPurchaseController extends Controller
     public function getItemLastPrice(Request $request)
     {
         $in = $request->input();
-        $getItemLastPrice = $this->quotationService->getItemLastPrice($in);
-        $original_unit_price = isset($getItemLastPrice->original_unit_price) ? $getItemLastPrice->original_unit_price : null  ;
+        $getItemLastPrice = $this->quotationService->getItemLastPrice($in)->toArray();
+        $original_unit_price = isset($getItemLastPrice[0]['original_unit_price']) ? $getItemLastPrice[0]['original_unit_price'] : null  ;
         return response()->json([
             'original_unit_price' => $original_unit_price,
         ]);

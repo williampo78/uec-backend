@@ -21,6 +21,7 @@ class SupplierService
     public function addSupplier($inputdata)
     {
         $inputdata['agent_id'] = Auth::user()->agent_id;
+
         try {
             return Supplier::create($inputdata);
         } catch (\Exception $e) {

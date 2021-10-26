@@ -341,13 +341,12 @@
                         var whereGet = '?supplier_id=' + $('#supplier_id').val() +
                             '&currency_code=' + $('#currency_code').val() +
                             '&tax=' + requisitions_purchase.tax +
-                            '&item_id=' + details.item_id;
-
+                            '&item_id=' + obj.item_id;
                         var req = async () => {
                             const response = await axios.get('/backend/getItemLastPrice/' +
                                 whereGet);
                             details[key].item_price = response.data.original_unit_price;
-                            console.log(response.data.original_unit_price);
+                            console.log(response.data);
                         }
                         req();
                     });
