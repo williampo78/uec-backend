@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}"/>
     <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
+    <link rel="stylesheet" href="{{asset('asset/js/DataTables/datatables.min.css')}}">
 </head>
 
 <body>
