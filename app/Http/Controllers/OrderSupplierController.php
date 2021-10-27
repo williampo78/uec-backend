@@ -121,7 +121,6 @@ class OrderSupplierController extends Controller
         $data['act'] = 'upd';
         $data['id'] = $id;
 
-//        dd($data);
         return view('Backend.OrderSupplier.input', compact('data'));
     }
 
