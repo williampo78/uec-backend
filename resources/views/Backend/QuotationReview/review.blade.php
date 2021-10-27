@@ -1,5 +1,5 @@
 @extends('Backend.master')
-
+@section('title', '報價單簽核')
 @section('content')
     <div class="row">
         <div class="col-sm-12">

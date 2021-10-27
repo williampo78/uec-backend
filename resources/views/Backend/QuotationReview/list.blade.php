@@ -1,4 +1,5 @@
 @extends('Backend.master')
+@section('title', '報價單簽核')
 
 @section('content')
     <!--列表-->

@@ -1,7 +1,6 @@
 @extends('Backend.master')
-
+@section('title', $data['act'] == 'upd' ? '編輯採購單': '新建採購單')
 @section('content')
-
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-default">

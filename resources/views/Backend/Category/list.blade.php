@@ -1,5 +1,5 @@
 @extends('Backend.master')
-
+@section('title', '子分類管理')
 @section('content')
     <!--列表-->
     <div id="page-wrapper">

@@ -1,5 +1,5 @@
 @extends('Backend.master')
-
+@section('title', isset($requisitionsPurchase) ? '新建請購單' : '編輯請購單' )
 @section('content')
 
     <div class="row">

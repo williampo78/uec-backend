@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '功能名稱')
+@section('title', '供應商資料')
 
 @section('content')
     <!--新增-->
