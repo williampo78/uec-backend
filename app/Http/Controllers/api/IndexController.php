@@ -32,9 +32,9 @@ class IndexController extends Controller
             }
 
             $data[] = array(
-                "fieldId" => $code, //ABOUT_US
-                "fieldValue" => $name, //關於我們
-                "fieldItems" => $items[$v['parent_code']]
+                "field_id" => $code, //ABOUT_US
+                "field_value" => $name, //關於我們
+                "field_items" => $items[$v['parent_code']]
             );
         }
         return response()->json(['status' => true, 'reuslt' => $data]);
