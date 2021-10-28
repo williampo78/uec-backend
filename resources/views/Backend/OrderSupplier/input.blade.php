@@ -234,50 +234,58 @@
                                 <div id="ItemDiv">
                                     <div class="add_row">
                                         <div class="row">
-                                            <div class="col-sm-3 text-left">品項<span class="redtext">*</span></div>
-                                            <div class="col-sm-1 text-left">贈品</div>
+                                            <div class="col-sm-2 text-left">商品編號<span class="redtext">*</span></div>
+                                            <div class="col-sm-2 text-left">商品名稱</div>
                                             <div class="col-sm-2 text-left">單價<span class="redtext">*</span></div>
-                                            <div class="col-sm-1 text-left">數量<span class="redtext">*</span></div>
+                                            <div class="col-sm-1 text-left">採購量<span class="redtext">*</span></div>
                                             <div class="col-sm-1 text-left">單位</div>
+                                            <div class="col-sm-1 text-left">小計</div>
+                                            <div class="col-sm-1 text-left">贈品</div>
                                             <div class="col-sm-1 text-left">最小採購量</div>
-                                            <div class="col-sm-2 text-left">原幣小計<span class="redtext">*</span></div>
+                                            <div class="col-sm-1 text-left">進貨量</div>
+                                            {{-- <div class="col-sm-2 text-left">原幣小計<span class="redtext">*</span></div> --}}
                                             {{-- <div class="col-sm-1 text-left">功能</div> --}}
                                         </div>
                                     </div>
                                     <div class="add_row" v-for="(detail, detailKey) in order_supplier_detail">
                                         <div class="row">
-                                            {{-- 品項名稱 --}}
-                                            <div class="col-sm-3">
-                                                <input class="form-control"  v-model="detail.item_name" readonly>
+                                            {{-- 商品編號 --}}
+                                            <div class="col-sm-2">
+                                                <input class="form-control" v-model="detail.item_number" readonly>
                                             </div>
-                                            {{-- 是否是贈品 --}}
-                                            <div class="col-sm-1">
-                                                <input class="form-control"  v-model="detail.is_giveaway" readonly>
+                                            {{-- 商品名稱 --}}
+                                            <div class="col-sm-2">
+                                                <input class="form-control" v-model="detail.item_name" readonly>
                                             </div>
                                             {{-- 單價 --}}
                                             <div class="col-sm-2">
                                                 <input class="form-control qty" type="number" readonly
                                                     v-model="detail.item_price">
                                             </div>
-                                            {{-- 數量 --}}
+                                            {{-- 採購量 --}}
                                             <div class="col-sm-1"><input class="form-control"
                                                     v-model="detail.item_qty" type="number" min="0">
                                             </div>
-                                            {{-- 採購量 --}}
-                                            <div class="col-sm-1">
-                                                <input type="" min="" max="" v-model="item_unit">
-                                            </div>
                                             {{-- 單位 --}}
+                                            <div class="col-sm-1">
+                                                <input class="form-control"
+                                                    v-model="detail.item_unit" readonly>
+                                            </div>
+                                            {{-- 小計 --}}
+                                            <div class="col-sm-1"><input class="form-control"
+                                                    v-model="detail.subtotal_price" readonly>
+                                            </div>
+                                            {{-- 贈品 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="">
+                                                    v-model="detail.is_giveaway">
                                             </div>
                                             {{-- 最小採購量 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="">
+                                                    value="最小採購量">
                                             </div>
-                                            {{-- 原幣小計 --}}
-                                            <div class="col-sm-2"><input class="form-control" readonly
-                                                    v-model="">
+                                            {{-- 進貨量 --}}
+                                            <div class="col-sm-1"><input class="form-control" readonly
+                                                    v-model="detail.purchase_qty">
                                             </div>
                                         </div>
                                     </div>
@@ -327,7 +335,7 @@
             warehouse_id: '',
             warehouse_name: '',
         };
-        var order_supplier_detail = {};
+        var order_supplier_detail = [];
 
         var requisitions = Vue.extend({
             data: function() {
@@ -349,9 +357,17 @@
                     theme: "bootstrap",
                     placeholder: "請選擇"
                 });
-                this.order_supplier_detail.push({
-                    
-                })
+                $('#datetimepicker').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
+                $('#datetimepicker2').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
+                $('#datetimepicker3').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
+                console.log(this.order_supplier_detail);
+
             },
             computed: {
                 changeRequisitionsPurchase() {
@@ -421,6 +437,24 @@
                         order_supplier.tex = requisitionsPurchase.tax;
                         order_supplier.warehouse_name = requisitionsPurchase.warehouse_name;
                         order_supplier.warehouse_id = requisitionsPurchase.warehouse_id;
+                        //子表
+                        requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail
+                        console.log(requisitionsPurchaseDetail) ; 
+                        $.each(requisitionsPurchaseDetail, function(key, obj) {
+                            order_supplier_detail.push({
+                            id: '',
+                            item_number: obj.item_number, 
+                            item_name: obj.item_name, 
+                            item_price: obj.item_price, 
+                            item_qty: '', 
+                            item_unit: '', 
+                            subtotal_price: '', 
+                            is_giveaway: '', 
+                            purchase_qty: '', 
+
+                        });
+                        });
+                        
                     }
                     req();
                 }
