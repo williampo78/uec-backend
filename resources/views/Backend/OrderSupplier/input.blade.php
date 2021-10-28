@@ -21,16 +21,11 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="supplier">請購單</label>
-                                            <select @change="changeRequisitionsPurchase" class="form-control js-select2-department"  name="requisitions_purchase_id"
-                                                id="requisitions_purchase_id">
-                                                <option value="">請選擇</option>
-                                                @foreach ($data['requisitions_purchase'] as $v)
-                                                    <option value='{{ $v['id'] }}'
-                                                        {{ isset($data['order_supplier']['requisitions_purchase_id']) && $v['id'] == $data['order_supplier']['requisitions_purchase_id'] ? 'selected' : '' }}>
-                                                        {{ $v['number'] }}</option>
-                                                @endforeach
-                                            </select>
+                                            <label for="supplier">請購單 @{{ order_supplier }}</label>
+                                            <select2 :options="requisitions_purchase_options"
+                                                :order_supplier_detail="order_supplier_detail"
+                                                :order_supplier="order_supplier" v-model="requisitions_purchase_id">
+                                            </select2>
                                         </div>
                                     </div>
 
@@ -39,7 +34,8 @@
                                             <label for="trade_date">採購日期</label>
                                             <div class='input-group date' id='datetimepicker'>
                                                 <input type='text' class="form-control" name="trade_date" id="trade_date"
-                                                    value="{{ $data['order_supplier']['trade_date'] ?? '' }}" />
+                                                    value="{{ $data['order_supplier']['trade_date'] ?? '' }}"
+                                                    v-model="order_supplier.order_supplier" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -50,7 +46,8 @@
                                         <div class="form-group">
                                             <label for="number">採購單號</label>
                                             <input class="form-control" id="number"
-                                                value="{{ $data['order_supplier']['number'] ?? '' }}" readonly>
+                                                value="{{ $data['order_supplier']['number'] ?? '' }}"
+                                                v-model="order_supplier.number" readonly>
                                         </div>
                                     </div>
 
@@ -58,9 +55,11 @@
                                         <div class="form-group">
                                             <label for="supplier">供應商</label>
                                             <input class="form-control" id="supplier"
+                                                v-model="order_supplier.supplier_name"
                                                 value="{{ isset($data['order_supplier']) && $data['supplier'][$data['order_supplier']['supplier_id']]['name'] ?? '' }}"
                                                 readonly>
-                                            <input type="hidden" id="supplier_id" name="supplier_id">
+                                            <input type="hidden" id="supplier_id" name="supplier_id"
+                                                v-model="order_supplier.supplier_id">
                                         </div>
                                     </div>
 
@@ -68,6 +67,7 @@
                                         <div class="form-group">
                                             <label for="receiver_name">收件人名稱</label>
                                             <input class="form-control" name="receiver_name" id="receiver_name"
+                                                v-model="order_supplier.receiver_name"
                                                 value="{{ $data['order_supplier']['receiver_name'] ?? '' }}">
                                         </div>
                                     </div>
@@ -76,6 +76,7 @@
                                         <div class="form-group">
                                             <label for="receiver_address">收件人地址</label>
                                             <input class="form-control" name="receiver_address" id="receiver_address"
+                                                v-model="order_supplier.receiver_address"
                                                 value="{{ $data['order_supplier']['receiver_address'] ?? '' }}">
                                         </div>
                                     </div>
@@ -97,7 +98,8 @@
                                             <label for="currency_price">匯率</label>
                                             <input class="form-control" id="currency_price" name="currency_price"
                                                 value="1" readonly>
-                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="1">
+                                            <input type="hidden" name="exchange_rate" id="exchange_rate" value="1"
+                                                v-model="order_supplier.exchange_rate">
                                         </div>
                                     </div>
 
@@ -107,7 +109,7 @@
                                             <input class="form-control" id="original_total_tax_price"
                                                 name="original_total_tax_price"
                                                 value="{{ $data['order_supplier']['original_total_tax_price'] ?? '' }}"
-                                                readonly>
+                                                v-model="order_supplier.original_total_tax_price" readonly>
                                         </div>
                                     </div>
 
@@ -117,7 +119,7 @@
                                             <input class="form-control" id="original_total_price"
                                                 name="original_total_price"
                                                 value="{{ $data['order_supplier']['original_total_price'] ?? '' }}"
-                                                readonly>
+                                                v-model="order_supplier.original_total_price" readonly>
                                         </div>
                                     </div>
 
@@ -126,8 +128,8 @@
                                             <label for="tax">稅別</label>
                                             <input class="form-control" id="tax"
                                                 value="{{ isset($data['order_supplier']) && $data['tax'][$data['order_supplier']['tax']] ?? '' }}"
-                                                readonly>
-                                            <input type="hidden" name="tax" id="tax_code">
+                                                v-model="order_supplier.tax_name" readonly>
+                                            <input type="hidden" name="tax" id="tax_code" v-model="order_supplier.tax">
                                         </div>
                                     </div>
 
@@ -135,6 +137,7 @@
                                         <div class="form-group">
                                             <label for="total_tax_price">稅額</label>
                                             <input class="form-control" id="total_tax_price" name="total_tax_price"
+                                                v-model="order_supplier.total_tax_price"
                                                 value="{{ $data['order_supplier']['total_tax_price'] ?? '' }}" readonly>
                                         </div>
                                     </div>
@@ -143,6 +146,7 @@
                                         <div class="form-group">
                                             <label for="total_price">總金額</label>
                                             <input class="form-control" id="total_price" name="total_price"
+                                                v-model="order_supplier.total_price"
                                                 value="{{ $data['order_supplier']['total_price'] ?? '' }}" readonly>
                                         </div>
                                     </div>
@@ -151,7 +155,7 @@
                                         <div class="form-group">
                                             <label for="invoice_company_number">發票統編</label>
                                             <input class="form-control" name="invoice_company_number"
-                                                id="invoice_company_number"
+                                                v-model="order_supplier.invoice_company_number" id="invoice_company_number"
                                                 value="{{ $data['order_supplier']['invoice_company_number'] ?? '' }}">
                                         </div>
                                     </div>
@@ -160,6 +164,7 @@
                                         <div class="form-group">
                                             <label for="invoice_name">發票抬頭</label>
                                             <input class="form-control" name="invoice_name" id="invoice_name"
+                                                v-model="order_supplier.invoice_name"
                                                 value="{{ $data['order_supplier']['invoice_name'] ?? '' }}">
                                         </div>
                                     </div>
@@ -168,6 +173,7 @@
                                         <div class="form-group">
                                             <label for="invoice_address">發票地址</label>
                                             <input class="form-control" name="invoice_address" id="invoice_address"
+                                                v-model="order_supplier.invoice_address"
                                                 value="{{ $data['order_supplier']['invoice_address'] ?? '' }}">
                                         </div>
                                     </div>
@@ -175,7 +181,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="doc_number">庫別</label>
-                                            <input class="form-control" id="warehouse" value="庫別" readonly>
+                                            <input class="form-control" id="warehouse" value="庫別"
+                                                v-model="order_supplier.warehouse" readonly>
                                         </div>
                                     </div>
 
@@ -185,6 +192,7 @@
                                             <div class='input-group date' id='datetimepicker2'>
                                                 <input type='text' class="form-control" name="supplier_deliver_date"
                                                     id="supplier_deliver_date"
+                                                    v-model="order_supplier.supplier_deliver_date"
                                                     value="{{ $data['order_supplier']['supplier_deliver_date'] ?? '' }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -242,6 +250,7 @@
                                                     class="fa fa-save"></i> 儲存並轉單</button>
                                             <button class="btn btn-danger" type="button" onclick="cancel()"><i
                                                     class="fa fa-ban"></i> 取消</button>
+                                            <button type="button" @click="test">測試</button>
                                         </div>
                                     </div>
                                 </div>
@@ -254,32 +263,94 @@
     </div>
 
 @section('js')
+    <script type="text/x-template" id="select2-template"><select><slot></slot></select></script>
+
     <script>
         var requisitions = Vue.extend({
             data: function() {
                 return {
-                    order_supplier : {} , //由請購單帶入
-                    order_supplier_detail:{},
+                    order_supplier: {
+                        supplier_name: '',
+                    }, //由請購單帶入
+                    order_supplier_detail: {},
+                    requisitions_purchase_options: @json(isset($data['requisitions_purchase']) ? $data['requisitions_purchase'] : '{}'),
+                    requisitions_purchase_id: '',
                 }
             },
             methods: {
-                changeRequisitionsPurchase() {
-                    console.log('執行ajax請購單')  ;
-                },
-                
+                test() {
+                    console.log(this.order_supplier.supplier_name);
+                }
             },
             mounted: function() {
-                
+                $(".js-select2-requisitions_purchase_id").select2({
+                    allowClear: false,
+                    theme: "bootstrap",
+                    placeholder: "請選擇"
+                });
             },
             computed: {
-                
+                changeRequisitionsPurchase() {
+                    console.log('抓到囉' + changeRequisitionsPurchase.inputVal);
+                }
             },
 
         })
+        Vue.component("select2", {
+            props: ["options", "value", "order_supplier", "order_supplier_detail"],
+            template: "#select2-template",
+            mounted: function() {
+                var vm = this;
+                $(this.$el).select2({
+                        data: this.options,
+                        theme: "bootstrap",
+                        placeholder: "請選擇",
+                        allowClear: false,
+                    })
+                    .val(this.value)
+                    .trigger("change")
+                    .on("change", function() {
+                        vm.$emit("input", this.value);
+                    });
+            },
+            watch: {
+                value: function(value) {
+                    $(this.$el).val(value).trigger("change");
+                    this.changeRequisitionsPurchase(value);
+                },
+                options: function(options) {
+                    $(this.$el).empty().select2({
+                        data: options
+                    });
+                }
+            },
+            methods: {
+                changeRequisitionsPurchase(requisitions_purchase_id) {
+                    
+                    var order_supplier = this.order_supplier;
+                    var order_supplier_detail = this.order_supplier_detail;
+
+                    var req = async () => {
+                        const response = await axios.post('/backend/order_supplier/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'getRequisitionsPurchase',
+                            id: requisitions_purchase_id,
+                        });
+                        requisitionsPurchase = response.data.requisitionsPurchase;
+                        this.order_supplier.supplier_name = requisitionsPurchase.supplier_name;
+                    }
+                    req();
+                }
+            },
+            destroyed: function() {
+                $(this.$el).off().select2("destroy");
+            }
+        });
+
         new requisitions().$mount('#requisitions_vue_app');
     </script>
 
 @endsection
 
-@include('Backend.OrderSupplier.item')
+{{-- @include('Backend.OrderSupplier.item') --}}
 @endsection
