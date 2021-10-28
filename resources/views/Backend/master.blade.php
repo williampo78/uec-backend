@@ -55,8 +55,13 @@
 <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
 <script src="{{ asset('asset/js/select2.min.js') }}"></script>
 {{-- <script src="{{ asset('//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.full.js') }}"> </script> --}}
-<script src="{{ asset('asset/js/ckeditor/ckeditor.js') }}"></script>
-<script src="{{ asset('asset/js/ckfinder/ckfinder.js') }}"></script>
+{{--<script src="{{ asset('asset/js/ckeditor/ckeditor.js') }}"></script>--}}
+{{--<script src="{{ asset('asset/js/ckfinder/ckfinder.js') }}"></script>--}}
+
+<script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script>
+{{--<script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>--}}
+
+
 <script src="{{ asset('asset/js/jquery.validate.js') }}"></script>
 <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
 <script src="{{ asset('asset/js/clipboard.min.js') }}"></script>
@@ -78,6 +83,7 @@
 <script src="{{asset('https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js')}}"></script>
 
 <link rel="stylesheet" href="{{asset('asset/css/validationEngine.jquery.css')}}">
+<link href="{{asset('asset/css/editor.css')}}" rel="stylesheet">
 <script>
     $(document).ready(function () {
         $('#table_list').DataTable();

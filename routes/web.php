@@ -16,10 +16,13 @@ use App\Http\Controllers\QuotationReviewController;
 use App\Http\Controllers\OrderSupplierController;
 use App\Http\Controllers\ContactControllers ;
 use Illuminate\Support\Facades\Route;
+//use CKSource\CKFinderBridge\Controller\CKFinderController;
 
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\QAController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,6 +33,8 @@ use App\Http\Controllers\RolesController;
 | contains the "web" middleware group. Now create something great!
 |
  */
+
+//Route::any('/ckfinder/connector', [CKFinderController::class, 'requestAction'])->name('ckfinder_connector');
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/', [AdminControllers::class, 'index'])->name('backend-home');
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
@@ -65,7 +70,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/user_profile', [UsersController::class, 'profile']);
     Route::post('/user_profile', [UsersController::class, 'updateProfile']);
     Route::post('/users/ajax',[UsersController::class,'ajaxDetail']);
-    Route::resource('/qa',AdminControllers::class, ['names' => ['index' => 'qa']]);
+    Route::resource('/qa',QAController::class, ['names' => ['index' => 'qa']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
