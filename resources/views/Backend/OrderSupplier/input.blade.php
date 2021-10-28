@@ -21,7 +21,7 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="supplier">請購單 @{{ order_supplier }}</label>
+                                            <label for="supplier">請購單</label>
                                             <select2 :options="requisitions_purchase_options"
                                                 :order_supplier_detail="order_supplier_detail"
                                                 :order_supplier="order_supplier" v-model="requisitions_purchase_id">
@@ -126,13 +126,10 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="tax">稅別</label>
-                                            <input class="form-control" id="tax"
-                                                value="{{ isset($data['order_supplier']) && $data['tax'][$data['order_supplier']['tax']] ?? '' }}"
-                                                v-model="order_supplier.tax_name" readonly>
-                                            <input type="hidden" name="tax" id="tax_code" v-model="order_supplier.tax">
+                                            <input class="form-control" id="tax_name" v-model="order_supplier.tax_name" readonly>
+                                            <input type="hidden" name="tax" id="tax" v-model="order_supplier.tax" >
                                         </div>
                                     </div>
-
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="total_tax_price">稅額</label>
@@ -181,8 +178,9 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="doc_number">庫別</label>
-                                            <input class="form-control" id="warehouse" value="庫別"
-                                                v-model="order_supplier.warehouse" readonly>
+                                            <input class="form-control" id="warehouse_name" value="庫別"
+                                                v-model="order_supplier.warehouse_name" readonly>
+                                            <input type="text" name="order_supplier.warehouse_id" v-model="order_supplier.warehouse_id">
                                         </div>
                                     </div>
 
@@ -264,14 +262,23 @@
 
 @section('js')
     <script type="text/x-template" id="select2-template"><select><slot></slot></select></script>
-
     <script>
+        var order_supplier = {
+            supplier_name : '',
+            original_total_tax_price : '',
+            original_total_price : '',
+            total_tax_price : '',
+            total_price : '',
+            tax_name:'',
+            tax:'' ,
+            warehouse_id : '' ,
+            warehouse_name : '',
+        };
+
         var requisitions = Vue.extend({
             data: function() {
                 return {
-                    order_supplier: {
-                        supplier_name: '',
-                    }, //由請購單帶入
+                    order_supplier: order_supplier,
                     order_supplier_detail: {},
                     requisitions_purchase_options: @json(isset($data['requisitions_purchase']) ? $data['requisitions_purchase'] : '{}'),
                     requisitions_purchase_id: '',
@@ -326,18 +333,37 @@
             },
             methods: {
                 changeRequisitionsPurchase(requisitions_purchase_id) {
-                    
-                    var order_supplier = this.order_supplier;
-                    var order_supplier_detail = this.order_supplier_detail;
-
+                    // console.log(requisitions_purchase_id) ;
                     var req = async () => {
                         const response = await axios.post('/backend/order_supplier/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'getRequisitionsPurchase',
                             id: requisitions_purchase_id,
                         });
+                        console.log(order_supplier) ; 
                         requisitionsPurchase = response.data.requisitionsPurchase;
-                        this.order_supplier.supplier_name = requisitionsPurchase.supplier_name;
+                        order_supplier.supplier_name = requisitionsPurchase.supplier_name;
+                        order_supplier.original_total_tax_price = requisitionsPurchase.original_total_tax_price;
+                        order_supplier.original_total_price = requisitionsPurchase.original_total_price;
+                        order_supplier.total_tax_price = requisitionsPurchase.total_tax_price;
+                        order_supplier.total_price = requisitionsPurchase.total_price;
+                        switch (requisitionsPurchase.tax) {
+                            case 0:
+                                order_supplier.tax_name = '未稅';
+                                break;
+                            case 1:
+                                order_supplier.tax_name = '應稅';
+                                break;
+                            case 2:
+                                order_supplier.tax_name = '內含';
+                                break;
+                            case 3:
+                                order_supplier.tax_name = '零稅率';
+                                break;
+                        }
+                        order_supplier.tex = requisitionsPurchase.tax ; 
+                        order_supplier.warehouse_name = requisitionsPurchase.warehouse_name; 
+                        order_supplier.warehouse_id = requisitionsPurchase.warehouse_id ; 
                     }
                     req();
                 }
