@@ -35,7 +35,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row" id="DivAddRow">
+                    <div id="DivAddRow">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -94,7 +94,7 @@
                 var data_array = data.split('@@');
                 if(data_array[0] == "OK")
                 {
-                    var html_value = "<table class='table table-striped table-bordered table-hover' style='width:100%' id='table_list2'>" +
+                    var html_value = "<div class='col-ms-12'><table class='table table-striped table-bordered table-hover' style='width:100%' id='table_list2'>" +
                         "<thead>" +
                         "<tr>" +
                         "<th>商品編號</th>" +
@@ -104,7 +104,7 @@
                         "<th>最小採購量</th>" +
                         "</tr>" +
                         "</thead>" +
-                        "<tbody>";
+                        "<tbody></div>";
 
                     var obj = jQuery.parseJSON(data_array[1]);
 
@@ -138,7 +138,7 @@
                 {
                     var html_value =
                         "<label>簽核紀錄</label>" +
-                        "<table class='table table-striped table-bordered table-hover' style='width:100%' id='table_list2'>" +
+                        "<div class='col-ms-12'><table class='table table-striped table-bordered table-hover' style='width:100%' id='table_list2'>" +
                         "<thead>" +
                         "<tr>" +
                         "<th>次序</th>" +
@@ -148,7 +148,7 @@
                         "<th>簽核備註</th>" +
                         "</tr>" +
                         "</thead>" +
-                        "<tbody>";
+                        "<tbody></div>";
 
                     var obj = jQuery.parseJSON(data_array[1]);
 

@@ -54,7 +54,6 @@ class SupplierControllers extends Controller
         $input = $request->input();
 
         $reslut = $this->supplierService->addSupplier($input);
-
         return redirect(route('supplier'));
     }
 

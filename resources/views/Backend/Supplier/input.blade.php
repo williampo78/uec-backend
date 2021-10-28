@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '功能名稱')
+@section('title', isset($Supplier) ? '編輯供應商資料' :'新建供應商資料')
 
 @section('content')
     <div id="page-wrapper" style="min-height: 508px;">

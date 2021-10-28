@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '新增物品')
+@section('title', isset($item) ? '編輯物品':'新增物品')
 
 @section('content')
     <!--新增-->
@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增物品</h1>
+                <h1 class="page-header"><i class="fa fa-plus"></i> {{isset($item) ? '編輯物品':'新增物品'}}</h1>
             </div>
         </div>
         <!-- /.row -->

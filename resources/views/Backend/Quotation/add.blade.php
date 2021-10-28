@@ -1,5 +1,5 @@
 @extends('Backend.master')
-
+@section('title', $data['act']=='upd' ? '編輯報價單' : '新增報價單')
 @section('content')
 
     <div class="row">

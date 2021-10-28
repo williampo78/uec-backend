@@ -20,7 +20,7 @@ class LoginAuthController extends Controller
         if (!Auth::check()) {
             return view('login');
         } else {
-            return Redirect('backend');
+            return redirect()->route('backend-home');
         }
     }
 
@@ -42,8 +42,7 @@ class LoginAuthController extends Controller
             Auth::login($users);
             $this->roleService->putUserRolesSession();
 
-            return redirect()->intended('backend')
-                ->withSuccess('Signed in');
+            return redirect()->route('backend-home')->withSuccess('Signed in');
         } else {
             return redirect('/')
                 ->withErrors('帳號或密碼錯誤')

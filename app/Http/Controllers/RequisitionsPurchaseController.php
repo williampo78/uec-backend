@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ItemService;
+use App\Services\QuotationService;
 use App\Services\RequisitionsPurchaseService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
@@ -22,25 +23,28 @@ class RequisitionsPurchaseController extends Controller
     private $supplierService;
     private $itemService;
     private $universalService;
+    private $quotationService;
 
     public function __construct(
         RequisitionsPurchaseService $requisitionsPurchaseService,
         WarehouseService $warehouseService,
         SupplierService $supplierService,
         ItemService $itemService,
-        UniversalService $universalService
+        UniversalService $universalService,
+        QuotationService $quotationService
     ) {
         $this->requisitionsPurchaseService = $requisitionsPurchaseService; //請購單
         $this->warehouseService = $warehouseService; // 倉庫
         $this->supplierService = $supplierService; //供應商
         $this->itemService = $itemService; //品項
         $this->universalService = $universalService; // 共用服務
+        $this->quotationService = $quotationService; //報價單服務
     }
 
     public function index(Request $request)
     {
         $params['active'] = 0;
-        $input = $request->input() ;  
+        $input = $request->input();
         $result['supplier'] = $this->supplierService->getSupplier(); //供應商
         $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($input);
         return view('Backend.RequisitionsPurchase.list', $result);
@@ -93,22 +97,22 @@ class RequisitionsPurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id,Request $request)
+    public function show($id, Request $request)
     {
-        $responseType =  $request->input('responseType') ;
+        $responseType = $request->input('responseType');
 
         $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($id); //請購單
         $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id); //請購單內的品項
-        $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id) ;  //簽核紀錄
+        $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id); //簽核紀錄
 
-        if($responseType = 'json'){
+        if ($responseType = 'json') {
             return response()->json([
                 'requisitionsPurchase' => json_encode($requisitionsPurchase),
-                'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail) ,
+                'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail),
                 'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
             ]);
         }
-        
+
     }
 
     /**
@@ -153,20 +157,19 @@ class RequisitionsPurchaseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id,Request $request)
+    public function destroy($id, Request $request)
     {
-        $type = $request->input('type') ; 
-        if($type == 'Detail'){
-            $this->requisitionsPurchaseService->delRequisitionsPurchaseDetail($id) ;
-        }else{
+        $type = $request->input('type');
+        if ($type == 'Detail') {
+            $this->requisitionsPurchaseService->delRequisitionsPurchaseDetail($id);
+        } else {
             $this->requisitionsPurchaseService->delrequisitionsPurchase($id);
         }
 
-    
         return response()->json([
             'status' => true,
-            'find'=> $id,
-            'type' => $type
+            'find' => $id,
+            'type' => $type,
         ]);
     }
 
@@ -192,7 +195,14 @@ class RequisitionsPurchaseController extends Controller
 
     }
     //用請購單ID 帶出 請購單內的品項以及 簽核紀錄
-    public function ajaxShowData(Request $request){
-       
-    }   
+    public function getItemLastPrice(Request $request)
+    {
+        $in = $request->input();
+        $getItemLastPrice = $this->quotationService->getItemLastPrice($in)->toArray();
+        $original_unit_price = isset($getItemLastPrice[0]['original_unit_price']) ? $getItemLastPrice[0]['original_unit_price'] : null  ;
+        return response()->json([
+            'original_unit_price' => $original_unit_price,
+        ]);
+    }
+
 }

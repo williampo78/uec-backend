@@ -1,4 +1,4 @@
-<script>
+{{-- <script>
 
     function copy_text(row_id)
     {
@@ -135,4 +135,4 @@
                 });
             });
     }
-</script>
+</script> --}}

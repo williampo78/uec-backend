@@ -1,4 +1,5 @@
 @extends('Backend.master')
+@section('title', '報價單')
 
 @section('content')
     <!--列表-->
@@ -18,10 +19,10 @@
                     <div class="panel-heading">
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
                             <div class="row">
-                                <div class="col-sm-6">
+                                <div class="col-sm-5">
                                     <div class="col-sm-2"><h5>供應商</h5></div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2-department" name="supplier" id="supplier">
+                                        <select class="form-control select2-default" name="supplier" id="supplier">
                                             @foreach($data['supplier'] as $v)
                                                 <option value='{{ $v['id'] }}' {{ (isset($data['getData']['supplier']) && $v['id']==$data['getData']['supplier'])? 'selected':'' }}>{{ $v['name'] }}</option>
                                             @endforeach
@@ -29,7 +30,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <div class="col-sm-3"><h5>供應商統編</h5></div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="company_number" id="company_number" value="{{ $data['getData']['company_number']?? '' }}">
@@ -39,7 +40,7 @@
                                 <div class="col-sm-3">
                                     <div class="col-sm-3"><h5>狀態</h5></div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="status" id="status">
+                                        <select class="form-control select2-default" name="status" id="status">
                                             <option value=''></option>
                                             <option value='drafted' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'drafted')? 'selected':''  }}>草稿</option>
                                             <option value='reviewing' {{ (isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing')? 'selected':''  }}>簽核</option>
@@ -49,8 +50,9 @@
                                     </div>
                                 </div>
                             </div>
+                            <hr>
                             <div class="row">
-                                <div class="col-sm-6">
+                                <div class="col-sm-5">
                                     <div class="col-sm-2"><h5>日期：</h5></div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_select_start_date">
@@ -75,7 +77,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <div class="col-sm-3"><h5>報價單號</h5></div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="doc_number" id="doc_number" value="{{ $data['getData']['doc_number']?? '' }}">
@@ -161,8 +163,6 @@
                 $('#datetimepicker2').datetimepicker({
                     format:'YYYY-MM-DD',
                 });
-                $('#supplier').select2();
-                $('#status').select2();
             });
 
             function del(id, doc_number)

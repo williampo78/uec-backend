@@ -1,5 +1,5 @@
 @extends('Backend.master')
-
+@section('title', isset($requisitionsPurchase) ? '新建請購單' : '編輯請購單' )
 @section('content')
 
     <div class="row">
@@ -121,7 +121,7 @@
                                         <div class="form-group" id="div_currency_code">
                                             <label for="currency_code">稅別<span class="redtext">*</span></label>
                                             <select class="form-control" name="tax" id="tax"
-                                                v-model="requisitions_purchase.tax">
+                                                v-model="requisitions_purchase.tax" @change="getItemLastPrice">
                                                 @foreach ($taxList as $id => $tax)
                                                     <option value="{{ $id }}">{{ $tax }}</option>
                                                 @endforeach
@@ -174,6 +174,7 @@
                                         <div class="row">
                                             <div class="col-sm-3">
                                                 <select2 :selectkey="detailKey" :options="options" :details="details"
+                                                    :requisitions_purchase="requisitions_purchase"
                                                     v-model="details[detailKey].item_id"> </select2>
                                             </div>
                                             <div class="col-sm-1">
@@ -279,7 +280,6 @@
                 ItemListDel(id, key) {
                     var checkDel = confirm('你確定要刪除嗎？');
                     if (checkDel) {
-                        console.log(id);
                         if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
                             axios({
                                     method: 'delete',
@@ -299,11 +299,58 @@
                     }
                 },
                 submitBtn(status) {
-                    this.status = status;
-                    this.$nextTick(() => {
-                        $('#new-form').submit();
+                    var details = this.details;
+                    this.status = status; //訂單狀態
+                    var check_item_status = true; //檢查表單內容 給予狀態
+
+                    console.log(details);
+                    $.each(details, function(key, obj) {
+                        if (obj.item_price == null) {
+                            check_item_status = false;
+                        }
+                        if (obj.item_id == "") {
+                            check_item_status = false;
+                        }
                     });
+                    if (details.length == 0) {
+                        check_item_status = false;
+                    }
+                    this.$nextTick(() => {
+                        if (details.length == 0 && this.status !== 'DRAFTED') {
+                            alert('請填入品項')
+                            return false;
+                        }
+                        if (check_item_status == false && this.status == 'REVIEWING') {
+                            alert('品項點選未帶入單價 表示該品項上未通過任何報價審核喔!')
+                            return false;
+
+                        }
+                        if (check_item_status == false && this.status == 'DRAFTED') {
+                            $('#new-form').submit();
+                        } else if (check_item_status == true) {
+                            $('#new-form').submit();
+                        }
+                    });
+
                 },
+                getItemLastPrice() {
+                    var details = this.details;
+                    var requisitions_purchase = this.requisitions_purchase;
+
+                    $.each(details, function(key, obj) {
+                        var whereGet = '?supplier_id=' + $('#supplier_id').val() +
+                            '&currency_code=' + $('#currency_code').val() +
+                            '&tax=' + requisitions_purchase.tax +
+                            '&item_id=' + obj.item_id;
+                        var req = async () => {
+                            const response = await axios.get('/backend/getItemLastPrice/' +
+                                whereGet);
+                            details[key].item_price = response.data.original_unit_price;
+                            console.log(response.data);
+                        }
+                        req();
+                    });
+                }
             },
             mounted: function() {
                 $(".select2-vue-js").select2({
@@ -323,6 +370,7 @@
                     var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
                     $.each(details, function(key, obj) {
+                        // details[key].item_price = 0  ;
                         //原幣小計 = 單價 * 數量 
                         if (obj.is_gift == 1) { //如果是贈品則不計算單價
                             obj.subtotal_price = 0;
@@ -359,6 +407,7 @@
                     requisitions_purchase.total_price = sum_price; //總金額
                     return details;
                 },
+
             },
 
         })
@@ -367,7 +416,7 @@
 
         //Vue Js 如果要用 select2 要另外寫 
         Vue.component("select2", {
-            props: ["options", "value", "details", "selectkey"],
+            props: ["options", "value", "details", "selectkey", "requisitions_purchase"],
             template: "#select2-template",
             mounted: function() {
                 var vm = this;
@@ -387,6 +436,7 @@
                 value: function(value) {
                     var getSelectKey = this.selectkey; //這個u_id 當作找到選擇器的排序
                     var details = this.details;
+                    var requisitions_purchase = this.requisitions_purchase;
                     $(this.$el)
                         .val(value)
                         .trigger("change");
@@ -397,7 +447,20 @@
                             details[getSelectKey].item_brand = obj.brand; //品牌
                             details[getSelectKey].item_spec = obj.spec; //規格
                             details[getSelectKey].item_unit = obj.small_unit; // 單位
-                            details[getSelectKey].item_price = obj.sell_price1; //目前先以販售價格**要用審核過後的價格帶出
+                            // details[getSelectKey].item_price = obj.sell_price1; //目前先以販售價格**要用審核過後的價格帶出
+                            var find_this_item_id = obj.id;
+                            //帶出價格
+                            var whereGet = '?supplier_id=' + $('#supplier_id').val() +
+                                '&currency_code=' + $('#currency_code').val() +
+                                '&tax=' + requisitions_purchase.tax +
+                                '&item_id=' + find_this_item_id;
+                            const req = async () => {
+                                const response = await axios.get('/backend/getItemLastPrice/' +
+                                    whereGet);
+                                details[getSelectKey].item_price = response.data
+                                    .original_unit_price;
+                            }
+                            req();
                         }
                     });
                 },

@@ -63,7 +63,7 @@
 
                         </div>
                     </div>
-                    <div class="row" id="DivAddRow">
+                    <div id="DivAddRow">
                     </div>
                 </div>
                 <div class="modal-footer">

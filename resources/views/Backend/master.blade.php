@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('asset/img/uarklogo.ico') }}"/>
     <title>@yield('title')</title>
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}"/>
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-treefy.css') }}"/>
@@ -21,6 +22,8 @@
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}"/>
     <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
+    <link rel="stylesheet" href="{{asset('asset/js/DataTables/datatables.min.css')}}">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 </head>
 
 <body>
