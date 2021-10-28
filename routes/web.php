@@ -31,7 +31,7 @@ use App\Http\Controllers\RolesController;
 |
  */
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
-    Route::get('/', [AdminControllers::class, 'index']);
+    Route::get('/', [AdminControllers::class, 'index'])->name('backend-home');
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
     Route::resource('/admin', AdminControllers::class);

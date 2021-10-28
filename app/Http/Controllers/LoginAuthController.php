@@ -42,7 +42,7 @@ class LoginAuthController extends Controller
             Auth::login($users);
             $this->roleService->putUserRolesSession();
 
-            return redirect()->intended('backend')
+            return redirect()->route('backend-home')
                 ->withSuccess('Signed in');
         } else {
             return redirect('/')

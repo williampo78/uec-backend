@@ -84,10 +84,13 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <label for="currency_code">幣別</label>
-                                            <select class="form-control js-select2-default" id="currency_code"
-                                                name="currency_code">
+                                            <input class="form-control" type="text" value="新台幣" readonly>
+                                            <input class="form-control" type="hidden" name="currency_code" value='TWD'>
+
+                                            {{-- <select class="form-control js-select2-default" id="currency_code" 
+                                                name="currency_code" readonly>
                                                 <option value='TWD'>新台幣</option>
-                                            </select>
+                                            </select> --}}
                                         </div>
 
                                         <input type="hidden" name="currency_id" value="1">
@@ -126,8 +129,9 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="tax">稅別</label>
-                                            <input class="form-control" id="tax_name" v-model="order_supplier.tax_name" readonly>
-                                            <input type="hidden" name="tax" id="tax" v-model="order_supplier.tax" >
+                                            <input class="form-control" id="tax_name" v-model="order_supplier.tax_name"
+                                                readonly>
+                                            <input type="hidden" name="tax" id="tax" v-model="order_supplier.tax">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
@@ -180,7 +184,8 @@
                                             <label for="doc_number">庫別</label>
                                             <input class="form-control" id="warehouse_name" value="庫別"
                                                 v-model="order_supplier.warehouse_name" readonly>
-                                            <input type="text" name="order_supplier.warehouse_id" v-model="order_supplier.warehouse_id">
+                                            <input type="hidden" name="order_supplier.warehouse_id"
+                                                v-model="order_supplier.warehouse_id">
                                         </div>
                                     </div>
 
@@ -227,7 +232,55 @@
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項</h4>
                                 <div id="ItemDiv">
-                                    <input type="hidden" name="rowNo" id="rowNo" value="0">
+                                    <div class="add_row">
+                                        <div class="row">
+                                            <div class="col-sm-3 text-left">品項<span class="redtext">*</span></div>
+                                            <div class="col-sm-1 text-left">贈品</div>
+                                            <div class="col-sm-2 text-left">單價<span class="redtext">*</span></div>
+                                            <div class="col-sm-1 text-left">數量<span class="redtext">*</span></div>
+                                            <div class="col-sm-1 text-left">單位</div>
+                                            <div class="col-sm-1 text-left">最小採購量</div>
+                                            <div class="col-sm-2 text-left">原幣小計<span class="redtext">*</span></div>
+                                            {{-- <div class="col-sm-1 text-left">功能</div> --}}
+                                        </div>
+                                    </div>
+                                    <div class="add_row" v-for="(detail, detailKey) in order_supplier_detail">
+                                        <div class="row">
+                                            {{-- 品項名稱 --}}
+                                            <div class="col-sm-3">
+                                                <input class="form-control"  v-model="detail.item_name" readonly>
+                                            </div>
+                                            {{-- 是否是贈品 --}}
+                                            <div class="col-sm-1">
+                                                <input class="form-control"  v-model="detail.is_giveaway" readonly>
+                                            </div>
+                                            {{-- 單價 --}}
+                                            <div class="col-sm-2">
+                                                <input class="form-control qty" type="number" readonly
+                                                    v-model="detail.item_price">
+                                            </div>
+                                            {{-- 數量 --}}
+                                            <div class="col-sm-1"><input class="form-control"
+                                                    v-model="detail.item_qty" type="number" min="0">
+                                            </div>
+                                            {{-- 採購量 --}}
+                                            <div class="col-sm-1">
+                                                <input type="" min="" max="" v-model="item_unit">
+                                            </div>
+                                            {{-- 單位 --}}
+                                            <div class="col-sm-1"><input class="form-control" readonly
+                                                    v-model="">
+                                            </div>
+                                            {{-- 最小採購量 --}}
+                                            <div class="col-sm-1"><input class="form-control" readonly
+                                                    v-model="">
+                                            </div>
+                                            {{-- 原幣小計 --}}
+                                            <div class="col-sm-2"><input class="form-control" readonly
+                                                    v-model="">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -264,22 +317,23 @@
     <script type="text/x-template" id="select2-template"><select><slot></slot></select></script>
     <script>
         var order_supplier = {
-            supplier_name : '',
-            original_total_tax_price : '',
-            original_total_price : '',
-            total_tax_price : '',
-            total_price : '',
-            tax_name:'',
-            tax:'' ,
-            warehouse_id : '' ,
-            warehouse_name : '',
+            supplier_name: '',
+            original_total_tax_price: '',
+            original_total_price: '',
+            total_tax_price: '',
+            total_price: '',
+            tax_name: '',
+            tax: '',
+            warehouse_id: '',
+            warehouse_name: '',
         };
+        var order_supplier_detail = {};
 
         var requisitions = Vue.extend({
             data: function() {
                 return {
                     order_supplier: order_supplier,
-                    order_supplier_detail: {},
+                    order_supplier_detail: order_supplier_detail,
                     requisitions_purchase_options: @json(isset($data['requisitions_purchase']) ? $data['requisitions_purchase'] : '{}'),
                     requisitions_purchase_id: '',
                 }
@@ -295,6 +349,9 @@
                     theme: "bootstrap",
                     placeholder: "請選擇"
                 });
+                this.order_supplier_detail.push({
+                    
+                })
             },
             computed: {
                 changeRequisitionsPurchase() {
@@ -340,10 +397,10 @@
                             type: 'getRequisitionsPurchase',
                             id: requisitions_purchase_id,
                         });
-                        console.log(order_supplier) ; 
                         requisitionsPurchase = response.data.requisitionsPurchase;
                         order_supplier.supplier_name = requisitionsPurchase.supplier_name;
-                        order_supplier.original_total_tax_price = requisitionsPurchase.original_total_tax_price;
+                        order_supplier.original_total_tax_price = requisitionsPurchase
+                            .original_total_tax_price;
                         order_supplier.original_total_price = requisitionsPurchase.original_total_price;
                         order_supplier.total_tax_price = requisitionsPurchase.total_tax_price;
                         order_supplier.total_price = requisitionsPurchase.total_price;
@@ -361,9 +418,9 @@
                                 order_supplier.tax_name = '零稅率';
                                 break;
                         }
-                        order_supplier.tex = requisitionsPurchase.tax ; 
-                        order_supplier.warehouse_name = requisitionsPurchase.warehouse_name; 
-                        order_supplier.warehouse_id = requisitionsPurchase.warehouse_id ; 
+                        order_supplier.tex = requisitionsPurchase.tax;
+                        order_supplier.warehouse_name = requisitionsPurchase.warehouse_name;
+                        order_supplier.warehouse_id = requisitionsPurchase.warehouse_id;
                     }
                     req();
                 }
