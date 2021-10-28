@@ -156,15 +156,15 @@
                             is_giveaway = '是';
                         }
                         html_value +=  "<tr>" +
-                            "<td>" + value.item_number + "</td>" +
-                            "<td>" + value.item_name + "</td>" +
-                            "<td>" + value.item_price + "</td>" +
-                            "<td>" + value.item_qty + "</td>" +
-                            "<td>" + value.item_unit + "</td>" +
-                            "<td>" + value.subtotal_price + "</td>" +
-                            "<td>" + is_giveaway + "</td>" +
-                            "<td>" + '最小採購量' + "</td>" +
-                            "<td>" + value.purchase_qty + "</td>" +
+                            "<td>" + value.item_number + "商品編號</td>" +
+                            "<td>" + value.item_name + "商品名稱</td>" +
+                            "<td>" + value.item_price + "單價</td>" +
+                            "<td>" + value.item_qty + "採購量</td>" +
+                            "<td>" + value.item_unit + "單位</td>" +
+                            "<td>" + value.subtotal_price + "小計</td>" +
+                            "<td>" + is_giveaway + "贈品</td>" +
+                            "<td>" + '最小採購量' + "最小採購量</td>" +
+                            "<td>" + value.purchase_qty + "進貨量</td>" +
                             "</tr>";
                     });
 
