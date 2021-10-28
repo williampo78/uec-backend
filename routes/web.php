@@ -70,7 +70,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/user_profile', [UsersController::class, 'profile']);
     Route::post('/user_profile', [UsersController::class, 'updateProfile']);
     Route::post('/users/ajax',[UsersController::class,'ajaxDetail']);
-    Route::resource('/qa',AdminControllers::class, ['names' => ['index' => 'qa']]);
+    Route::resource('/qa',QAController::class, ['names' => ['index' => 'qa']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

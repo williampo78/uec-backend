@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        //
+        // CKFinder 的相關路由不使用 Laravel 自帶的 CSRF 的保護
+        //'ckfinder/*',
     ];
 }

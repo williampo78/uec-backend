@@ -89,10 +89,20 @@ $config['backends']['default'] = array(
     'filesystemEncoding' => 'UTF-8'
 );
 
+$config['backends']['awss3'] = array(
+    'name' => 'awss3',
+    'adapter' => 's3',
+    'bucket' => env('AWS_BUCKET'),
+    'region' => env('AWS_DEFAULT_REGION'),
+    'key' => env('AWS_ACCESS_KEY_ID'),
+    'secret' => env('AWS_SECRET_ACCESS_KEY'),
+    'visibility' => 'public',
+);
+
 /*================================ Resource Types =====================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_resourceTypes
 
-$config['defaultResourceTypes'] = '';
+$config['defaultResourceTypes'] = 'Images';
 
 $config['resourceTypes'][] = array(
     'name'              => 'Files', // Single quotes not allowed.
@@ -105,12 +115,13 @@ $config['resourceTypes'][] = array(
 
 $config['resourceTypes'][] = array(
     'name'              => 'Images',
-    'directory'         => 'images',
-    'maxSize'           => 0,
+    'directory'         => 'webcontents/post',
+    'maxSize'           => '1M',
     'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',
     'deniedExtensions'  => '',
     'backend'           => 'default'
 );
+
 
 /*================================ Access Control =====================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_roleSessionVar

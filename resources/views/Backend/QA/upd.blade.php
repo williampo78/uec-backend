@@ -80,8 +80,8 @@
                                             <div class="form-group" id="div_email">
                                                 <label for="content_name">問題解答 <span
                                                         class="text-danger">*</span></label>
-                                                <textarea class="form-control validate[required]" rows="5"
-                                                          name="content_text">{{$data['webcontent']['content_text']}}</textarea>
+                                                <textarea id="editor" name="content_text" placeholder="請在這裡填寫內容">{{$data['webcontent']['content_text']}}</textarea>
+
                                             </div>
                                         </div>
                                     </div>
@@ -111,6 +111,25 @@
 
 @section('js')
     <script>
+        ClassicEditor.create( document.querySelector( '#editor' ), {
+
+            ckfinder: {
+                // Upload the images to the server using the CKFinder QuickUpload command.
+                uploadUrl: "https://uec.backend.localhost/ckfinder/connector?command=QuickUpload&type=Images&responseType=json"
+                /*
+                headers: {
+                    'X-CSRF-TOKEN': '{{--csrf_token()--}}',
+                    Authorization: 'Bearer <JSON Web Token>'
+                }
+                */
+            },
+        })
+            .then( editor => {
+                console.log( 'Editor was initialized', editor );
+            })
+            .catch( err => {
+                console.error( err.stack );
+            });
         $(function () {
             $("#new-form").validationEngine();
             $("select").select2();
@@ -122,12 +141,20 @@
             });
 
             //文字編輯器
+            /*
             var editor = CKEDITOR.replace('content_text', {
                 filebrowserBrowseUrl: 'ckfinder/ckfinder.html',
                 filebrowserImageBrowseUrl: 'ckfinder/ckfinder.html?Type=Images',
                 //filebrowserUploadUrl : 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files', //可上傳一般檔案
-                filebrowserImageUploadUrl: 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images' //可上傳圖檔
+                //filebrowserImageUploadUrl: 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images' //可上傳圖檔
+                filebrowserImageUploadUrl:'http://uec.backend.localhost/ckfinder/connector'
             });
+
+
+            CKEDITOR.replace( 'content_text', {
+                filebrowserUploadUrl: "{{--route('ckfinder_browser', ['_token' => csrf_token() ])--}}",
+                filebrowserUploadMethod: 'form'
+            }); */
         })
     </script>
 @endsection
