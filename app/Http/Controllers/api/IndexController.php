@@ -37,6 +37,6 @@ class IndexController extends Controller
                 "field_items" => $items[$v['parent_code']]
             );
         }
-        return response()->json(['status' => true, 'reuslt' => $data]);
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'reuslt' => $data]);
     }
 }
