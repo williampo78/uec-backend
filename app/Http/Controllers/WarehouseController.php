@@ -34,7 +34,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        return view('Backend.Warehouse.add', compact('data'));
+        return view('Backend.Warehouse.add');
     }
 
     /**
