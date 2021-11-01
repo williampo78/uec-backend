@@ -34,7 +34,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        return view('Backend.Warehouse.add');
+        return view('backend.warehouse.add');
     }
 
     /**
@@ -76,7 +76,7 @@ class WarehouseController extends Controller
     {
         $data = Warehouse::find($id);
 
-        return view('Backend.Warehouse.upd', compact('data'));
+        return view('backend.warehouse.upd', compact('data'));
     }
 
     /**
