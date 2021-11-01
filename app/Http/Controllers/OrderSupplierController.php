@@ -63,11 +63,9 @@ class OrderSupplierController extends Controller
         foreach ($data['requisitions_purchase'] as $key => $val) {
             $data['requisitions_purchase'][$key]->text = $val->number;
         }
-//        $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
+//      $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
         $data['tax'] = $this->universalService->getTaxList();
-
         $data['act'] = 'add';
-
         return view('Backend.OrderSupplier.input', compact('data'));
     }
 
@@ -85,7 +83,7 @@ class OrderSupplierController extends Controller
         if (isset($data['status_code'])) {
             $act = $data['status_code'];
         }
-
+        // dd($data) ;
         $this->orderSupplierService->updateOrderSupplier($data, 'add');
 
         return view('backend.success', compact('route_name', 'act'));

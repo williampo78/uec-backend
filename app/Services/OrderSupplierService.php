@@ -81,7 +81,6 @@ class OrderSupplierService
         $now = Carbon::now();
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
-
         $orderSupplierData = [
             'trade_date' => $data['trade_date'] ,
             'total_tax_price' => $data['total_tax_price'] ,
@@ -101,7 +100,7 @@ class OrderSupplierService
             'supplier_deliver_date' => $data['supplier_deliver_date'] ,
             'expect_deliver_date' => $data['expect_deliver_date'] ,
             'remark' => $data['remark'] ,
-            'status' => $data['status_code'] ,
+            'status' => 'APPROVED' ,
             'updated_by' => $user_id,
             'updated_at' => $now
         ];
@@ -122,20 +121,19 @@ class OrderSupplierService
         $requisitionsPurchaseDetailData = [];
         $item = $this->universalService->idtokey($this->itemService->getItemList());
 
-//        dd($data);
-        foreach ($data['requisitions_purchase_detail_id'] as $k => $requisitions_purchase_detail_id){
-            $item_id = $data['item_id'][$k];
-            $orderSupplierDetailData[$k] = [
-                'id' => $data['order_supplier_detail_id'][$k] ,
+        $order_supplier_detail = json_decode($data['order_supplier_detail_json'],true) ; 
+        foreach ($order_supplier_detail as $key => $val){
+            $orderSupplierDetailData[$key] = [
+                'id' => $val['id'] ,
                 'order_supplier_id' => $data['supplier_id'] ,
-                'is_giveaway' =>  $data['is_giveaway'][$k] ,
-                'item_qty' => $data['order_supplier_qty'][$k] ,
-                'requisitions_purchase_dtl_id' => $requisitions_purchase_detail_id ,
-                'item_id' => $item_id ,
-                'item_number' => $item[$item_id]['number'] ,
-                'item_brand' => $item[$item_id]['brand'] ,
-                'item_name' => $item[$item_id]['name'] ,
-                'item_spec' => $item[$item_id]['spec'] ,
+                'is_giveaway' =>  $val['is_giveaway'] ,
+                'item_qty' => $val['item_qty'] ,
+                'requisitions_purchase_dtl_id' => $val['requisitions_purchase_dtl_id'] ,
+                'item_id' => $val['item_id'] ,
+                'item_number' => $val['item_number'] ,
+                'item_brand' => $val['item_brand'] ,
+                'item_name' => $val['item_name'] ,
+                'item_spec' => $val['item_spec'] ,
                 'item_lot_number' => 1 ,
                 'item_check_qty' => 1 ,
                 'item_unit' => 1 ,
@@ -149,20 +147,19 @@ class OrderSupplierService
                 'purchase_qty' => 1
             ];
 
-            $requisitionsPurchaseDetailData[$k] = [
-               'id' => $requisitions_purchase_detail_id ,
-                'is_gift' => $data['is_giveaway'][$k]
-            ] ;
+            // $requisitionsPurchaseDetailData[$key] = [
+            //    'id' => $requisitions_purchase_detail_id ,
+            //     'is_gift' => $data['is_giveaway'][$k]
+            // ] ;
 
             if ($act=='add'){
-                unset($orderSupplierDetailData[$k]['id']);
+                unset($orderSupplierDetailData[$key]['id']);
             }
         }
 
         $orderSupplierDetailInstance = new OrderSupplierDetail();
-        $requisitionsPurchaseDetailInstance = new RequisitionsPurchaseDetail();
-
-        Batch::update($requisitionsPurchaseDetailInstance, $requisitionsPurchaseDetailData , 'id');
+        // $requisitionsPurchaseDetailInstance = new RequisitionsPurchaseDetail();
+        // Batch::update($requisitionsPurchaseDetailInstance, $requisitionsPurchaseDetailData , 'id');
 
         if ($act == 'add'){
             $orderSupplierDetailInstance->insert($orderSupplierDetailData);

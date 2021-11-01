@@ -28,14 +28,13 @@
                                             </select2>
                                         </div>
                                     </div>
-
+                                    <input type="hidden" name="requisitions_purchase_id" v-model="requisitions_purchase_id">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">採購日期</label>
                                             <div class='input-group date' id='datetimepicker'>
                                                 <input type='text' class="form-control" name="trade_date" id="trade_date"
-                                                    value="{{ $data['order_supplier']['trade_date'] ?? '' }}"
-                                                    v-model="order_supplier.order_supplier" />
+                                                    value="{{ $data['order_supplier']['trade_date'] ?? '' }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -131,7 +130,7 @@
                                             <label for="tax">稅別</label>
                                             <input class="form-control" id="tax_name" v-model="order_supplier.tax_name"
                                                 readonly>
-                                            <input type="hidden" name="tax" id="tax" v-model="order_supplier.tax">
+                                            <input type="hidden" name="tax" id="tax" v-model="order_supplier.tex">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
@@ -191,7 +190,7 @@
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="trade_date">廠商交貨日</label>
+                                            <label for="supplier_deliver_date">廠商交貨日</label>
                                             <div class='input-group date' id='datetimepicker2'>
                                                 <input type='text' class="form-control" name="supplier_deliver_date"
                                                     id="supplier_deliver_date"
@@ -206,7 +205,7 @@
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="trade_date">預計進貨日</label>
+                                            <label for="expect_deliver_date">預計進貨日</label>
                                             <div class='input-group date' id='datetimepicker3'>
                                                 <input type='text' class="form-control" name="expect_deliver_date"
                                                     id="expect_deliver_date"
@@ -228,7 +227,8 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                <textarea type="hidden"
+                                    name="order_supplier_detail_json">@{{ order_supplier_detail }}</textarea>
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項</h4>
                                 <div id="ItemDiv">
@@ -275,8 +275,9 @@
                                                     v-model="detail.subtotal_price" readonly>
                                             </div>
                                             {{-- 贈品 --}}
-                                            <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="detail.is_giveaway">
+                                            <div class="col-sm-1">
+                                                <input type="checkbox" class="big-checkbox" v-model="detail.is_giveaway"
+                                                    :true-value="1" :false-value="0" readonl="readonly">
                                             </div>
                                             {{-- 最小採購量 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
@@ -302,11 +303,11 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <button class="btn btn-success" type="button" onclick="saveDraft()"><i
+                                            <button class="btn btn-success" type="button" @click="saveDraft()"><i
                                                     class="fa fa-save"></i> 儲存草稿</button>
-                                            <button class="btn btn-success" type="button" onclick="saveReview()"><i
+                                            <button class="btn btn-success" type="button" @click="saveReview()"><i
                                                     class="fa fa-save"></i> 儲存並轉單</button>
-                                            <button class="btn btn-danger" type="button" onclick="cancel()"><i
+                                            <button class="btn btn-danger" type="button" @click="cancel()"><i
                                                     class="fa fa-ban"></i> 取消</button>
                                             <button type="button" @click="test">測試</button>
                                         </div>
@@ -346,6 +347,15 @@
                 }
             },
             methods: {
+                saveDraft() {
+                    $('#new-form').submit();
+                },
+                saveReview() {
+                    $('#new-form').submit();
+                },
+                cancel() {
+                    console.log('取消');
+                },
                 test() {
                     console.log(this.order_supplier.supplier_name);
                 }
@@ -403,7 +413,6 @@
             },
             methods: {
                 changeRequisitionsPurchase(requisitions_purchase_id) {
-                    // order_supplier_detail = [] ; 
                     var req = async () => {
                         const response = await axios.post('/backend/order_supplier/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
@@ -412,6 +421,7 @@
                         });
                         requisitionsPurchase = response.data.requisitionsPurchase;
                         order_supplier.supplier_name = requisitionsPurchase.supplier_name;
+                        order_supplier.supplier_id = requisitionsPurchase.supplier_id;
                         order_supplier.original_total_tax_price = requisitionsPurchase
                             .original_total_tax_price;
                         order_supplier.original_total_price = requisitionsPurchase.original_total_price;
@@ -434,25 +444,28 @@
                         order_supplier.tex = requisitionsPurchase.tax;
                         order_supplier.warehouse_name = requisitionsPurchase.warehouse_name;
                         order_supplier.warehouse_id = requisitionsPurchase.warehouse_id;
-                        if(order_supplier_detail.length !== 0) {
-                            order_supplier_detail = [] ; 
+                        if (order_supplier_detail.length !== 0) {
+                            order_supplier_detail.splice(0);
                         }
-                        requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail ; 
+                        requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
+                        console.log(response.data.requisitionsPurchaseDetail) ; 
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
                                 id: '',
+                                item_id:obj.item_id ,
+                                requisitions_purchase_dtl_id: obj.id,
                                 item_number: obj.item_number,
                                 item_name: obj.item_name,
                                 item_price: obj.item_price,
-                                item_qty: '',
-                                item_unit: '',
+                                item_qty: obj.item_qty,
+                                item_unit: obj.item_unit,
                                 subtotal_price: '',
-                                is_giveaway: '',
+                                is_giveaway: obj.is_gift,
+                                item_brand:obj.item_brand ,
+                                item_spec:obj.item_spec ,
                                 purchase_qty: '',
-
                             });
                         });
-                        // console.log('push之後:' + order_supplier_detail)  ; 
                     }
                     req();
                 }
