@@ -115,7 +115,7 @@
 
             ckfinder: {
                 // Upload the images to the server using the CKFinder QuickUpload command.
-                uploadUrl: "http://uec.backend.localhost/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token={{csrf_token()}}"
+                uploadUrl: "https://uecbackend.u-ark.com/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token={{csrf_token()}}"
                 //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
 /*
                 headers: {
