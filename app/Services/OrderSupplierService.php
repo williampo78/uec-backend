@@ -6,6 +6,7 @@ namespace App\Services;
 use App\Models\OrderSupplier;
 use App\Models\OrderSupplierDetail;
 use App\Models\RequisitionsPurchaseDetail;
+use App\Models\RequisitionsPurchase ; 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -100,7 +101,7 @@ class OrderSupplierService
             'supplier_deliver_date' => $data['supplier_deliver_date'] ,
             'expect_deliver_date' => $data['expect_deliver_date'] ,
             'remark' => $data['remark'] ,
-            'status' => 'APPROVED' ,
+            'status' => $data['status_code'] ,
             'updated_by' => $user_id,
             'updated_at' => $now
         ];
@@ -112,11 +113,12 @@ class OrderSupplierService
             $orderSupplierData['created_by'] = $user_id;
             $orderSupplierData['supplier_id'] = $data['supplier_id'];
             $orderSupplierData['number'] = $this->universalService->getDocNumber('order_supplier');
-            OrderSupplier::insert($orderSupplierData);
+            RequisitionsPurchase::where('id' ,  $data['requisitions_purchase_id'])->update(['is_transfer' => 1 ]);
+           $order_supplier_id =  $order_supplier_detail = OrderSupplier::insertGetId($orderSupplierData);
         }elseif ($act == 'upd'){
             OrderSupplier::where('id' , $data['id'])->update($orderSupplierData);
+            $order_supplier_id  = $data['id'] ;
         }
-
         $orderSupplierDetailData = [];
         $requisitionsPurchaseDetailData = [];
         $item = $this->universalService->idtokey($this->itemService->getItemList());
@@ -125,7 +127,7 @@ class OrderSupplierService
         foreach ($order_supplier_detail as $key => $val){
             $orderSupplierDetailData[$key] = [
                 'id' => $val['id'] ,
-                'order_supplier_id' => $data['supplier_id'] ,
+                'order_supplier_id' => $order_supplier_id ,
                 'is_giveaway' =>  $val['is_giveaway'] ,
                 'item_qty' => $val['item_qty'] ,
                 'requisitions_purchase_dtl_id' => $val['requisitions_purchase_dtl_id'] ,
@@ -147,10 +149,6 @@ class OrderSupplierService
                 'purchase_qty' => 1
             ];
 
-            // $requisitionsPurchaseDetailData[$key] = [
-            //    'id' => $requisitions_purchase_detail_id ,
-            //     'is_gift' => $data['is_giveaway'][$k]
-            // ] ;
 
             if ($act=='add'){
                 unset($orderSupplierDetailData[$key]['id']);
@@ -158,9 +156,6 @@ class OrderSupplierService
         }
 
         $orderSupplierDetailInstance = new OrderSupplierDetail();
-        // $requisitionsPurchaseDetailInstance = new RequisitionsPurchaseDetail();
-        // Batch::update($requisitionsPurchaseDetailInstance, $requisitionsPurchaseDetailData , 'id');
-
         if ($act == 'add'){
             $orderSupplierDetailInstance->insert($orderSupplierDetailData);
         }elseif ($act == 'upd'){

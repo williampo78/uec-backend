@@ -194,7 +194,6 @@
                                             <div class='input-group date' id='datetimepicker2'>
                                                 <input type='text' class="form-control" name="supplier_deliver_date"
                                                     id="supplier_deliver_date"
-                                                    v-model="order_supplier.supplier_deliver_date"
                                                     value="{{ $data['order_supplier']['supplier_deliver_date'] ?? '' }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -297,15 +296,15 @@
                                     </div>
                                 </div>
 
-                                <input type="hidden" name="status_code" id="status_code" value="">
+                                <input type="hidden" name="status_code" id="status_code" v-model="status_code">
                                 <input type="hidden" name="order_supplier_id" id="order_supplier_id" value="">
 
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <button class="btn btn-success" type="button" @click="saveDraft()"><i
+                                            <button class="btn btn-success" type="button" @click="submitBtn('DRAFTED')"><i
                                                     class="fa fa-save"></i> 儲存草稿</button>
-                                            <button class="btn btn-success" type="button" @click="saveReview()"><i
+                                            <button class="btn btn-success" type="button" @click="submitBtn('APPROVED')"><i
                                                     class="fa fa-save"></i> 儲存並轉單</button>
                                             <button class="btn btn-danger" type="button" @click="cancel()"><i
                                                     class="fa fa-ban"></i> 取消</button>
@@ -344,14 +343,15 @@
                     order_supplier_detail: order_supplier_detail,
                     requisitions_purchase_options: @json(isset($data['requisitions_purchase']) ? $data['requisitions_purchase'] : '{}'),
                     requisitions_purchase_id: '',
+                    status_code: '' , 
                 }
             },
             methods: {
-                saveDraft() {
-                    $('#new-form').submit();
-                },
-                saveReview() {
-                    $('#new-form').submit();
+                submitBtn(status) {
+                    this.status_code = status ; 
+                    this.$nextTick(() => {
+                        $('#new-form').submit();
+                    });
                 },
                 cancel() {
                     console.log('取消');
@@ -448,7 +448,6 @@
                             order_supplier_detail.splice(0);
                         }
                         requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
-                        console.log(response.data.requisitionsPurchaseDetail) ; 
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
                                 id: '',
