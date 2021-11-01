@@ -24,8 +24,7 @@ class WarehouseController extends Controller
     public function index()
     {
         $data = Warehouse::all();
-
-        return view('backend.warehouse.list', compact('data'));
+        return view('Backend.Warehouse.list', compact('data'));
     }
 
     /**
@@ -35,7 +34,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        return view('backend.warehouse.add');
+        return view('Backend.Warehouse.add');
     }
 
     /**
@@ -77,7 +76,7 @@ class WarehouseController extends Controller
     {
         $data = Warehouse::find($id);
 
-        return view('backend.warehouse.upd', compact('data'));
+        return view('Backend.Warehouse.upd', compact('data'));
     }
 
     /**
