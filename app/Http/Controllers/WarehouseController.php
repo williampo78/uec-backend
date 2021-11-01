@@ -25,7 +25,7 @@ class WarehouseController extends Controller
     {
         $data = Warehouse::all();
 
-        return view('Backend.warehouse.list', compact('data'));
+        return view('backend.warehouse.list', compact('data'));
     }
 
     /**
