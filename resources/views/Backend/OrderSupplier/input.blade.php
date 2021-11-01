@@ -268,8 +268,7 @@
                                             </div>
                                             {{-- 單位 --}}
                                             <div class="col-sm-1">
-                                                <input class="form-control"
-                                                    v-model="detail.item_unit" readonly>
+                                                <input class="form-control" v-model="detail.item_unit" readonly>
                                             </div>
                                             {{-- 小計 --}}
                                             <div class="col-sm-1"><input class="form-control"
@@ -366,8 +365,6 @@
                 $('#datetimepicker3').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-                console.log(this.order_supplier_detail);
-
             },
             computed: {
                 changeRequisitionsPurchase() {
@@ -406,7 +403,7 @@
             },
             methods: {
                 changeRequisitionsPurchase(requisitions_purchase_id) {
-                    // console.log(requisitions_purchase_id) ;
+                    // order_supplier_detail = [] ; 
                     var req = async () => {
                         const response = await axios.post('/backend/order_supplier/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
@@ -437,24 +434,25 @@
                         order_supplier.tex = requisitionsPurchase.tax;
                         order_supplier.warehouse_name = requisitionsPurchase.warehouse_name;
                         order_supplier.warehouse_id = requisitionsPurchase.warehouse_id;
-                        //子表
-                        requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail
-                        console.log(requisitionsPurchaseDetail) ; 
+                        if(order_supplier_detail.length !== 0) {
+                            order_supplier_detail = [] ; 
+                        }
+                        requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail ; 
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
-                            id: '',
-                            item_number: obj.item_number, 
-                            item_name: obj.item_name, 
-                            item_price: obj.item_price, 
-                            item_qty: '', 
-                            item_unit: '', 
-                            subtotal_price: '', 
-                            is_giveaway: '', 
-                            purchase_qty: '', 
+                                id: '',
+                                item_number: obj.item_number,
+                                item_name: obj.item_name,
+                                item_price: obj.item_price,
+                                item_qty: '',
+                                item_unit: '',
+                                subtotal_price: '',
+                                is_giveaway: '',
+                                purchase_qty: '',
 
+                            });
                         });
-                        });
-                        
+                        // console.log('push之後:' + order_supplier_detail)  ; 
                     }
                     req();
                 }
