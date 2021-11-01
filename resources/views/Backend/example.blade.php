@@ -14,7 +14,5 @@
         </div>
       </div>
       <script>
-        $('#btn-cancel').click(function () { window.location.href='index.php?func=warehouse'; return false; });
-        $('#btn-save').click(function () { $('#new-form').submit(); });
       </script>
 @endsection

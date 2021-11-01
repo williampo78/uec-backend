@@ -58,8 +58,8 @@
 {{--<script src="{{ asset('asset/js/ckeditor/ckeditor.js') }}"></script>--}}
 {{--<script src="{{ asset('asset/js/ckfinder/ckfinder.js') }}"></script>--}}
 
-<script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script>
-{{--<script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>--}}
+{{--<script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script>--}}
+<script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>
 
 
 <script src="{{ asset('asset/js/jquery.validate.js') }}"></script>

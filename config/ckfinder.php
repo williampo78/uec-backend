@@ -21,7 +21,6 @@
 // http://docs.cksource.com/ckfinder3-php/configuration.html
 
 $config = array();
-
 $config['loadRoutes'] = true;
 
 $config['authentication'] = '\CKSource\CKFinderBridge\CKFinderMiddleware';
