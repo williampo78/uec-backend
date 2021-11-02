@@ -13,9 +13,9 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="col-sm-2 text-right"><label> 採購單號</label></div>
-                            <div class="col-sm-4" id="OPModalNumber2"></div>
+                            <div class="col-sm-4">@{{order_supplier.number}}</div>
                         </div>
-
+                        <br>
                         <div class="col-sm-12">
                             <div class="col-sm-2 text-right"><label> 廠商交貨日</label></div>
                             <div class="col-sm-4">

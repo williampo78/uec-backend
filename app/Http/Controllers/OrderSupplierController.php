@@ -166,17 +166,19 @@ class OrderSupplierController extends Controller
                 ]);
                 break;
             case 'order_supplier' :
-                // $status = $this->universalService->getStatusCode();
                 $data = $this->orderSupplierService->getOrderSupplierById($in['id']);
-                // $data['warehouse_name'] = $warehouse[$data['warehouse_id']]['name'] ?? '';
-                // $data['status'] = $status[$data['status']]?? '';
-                // echo "OK@@".json_encode($data);
                 return response()->json([
                     'status' => true,
                     'reqData' => $in,
                     'orderSupplier' => $data ,
                 ]);
                 break ;
+            case 'del_order_supplier' :
+                return response()->json([
+                    'status' => true,
+                    'reqData' => $in,
+                ]);
+                break ; 
             default:
                 # code...
                 break;

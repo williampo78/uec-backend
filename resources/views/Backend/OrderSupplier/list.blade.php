@@ -162,8 +162,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <button style="" class="btn btn-info btn-sm toggle-show-model"
-                                data-toggle="modal" data-target="#row_detail">SHOW
+                                <button style="display:none;" class="btn btn-info btn-sm toggle-show-model"
+                                    data-toggle="modal" data-target="#row_detail">SHOW
                                 </button>
                                 @foreach ($data['order_supplier'] as $k => $v)
                                     <tr>
@@ -174,8 +174,7 @@
                                         </form>
                                         <td>
                                             {{-- @if ($share_role_auth['auth_query']) --}}
-                                            <button class="btn btn-info btn-sm"
-                                             @click="showBtn({{$v['id']}})"><i
+                                            <button class="btn btn-info btn-sm" @click="showBtn({{ $v['id'] }})"><i
                                                     class="fa fa-search"></i></button>
                                             {{-- @endif --}}
 
@@ -190,7 +189,7 @@
 
                                             {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
                                             <button class="btn btn-danger btn-sm" type="button"
-                                                onclick="del({{ $v['id'] }} , '{{ $v['number'] }}' );">刪除</button>
+                                                @click="delBtn({{ $v['id'] }})">刪除</button>
                                             {{-- @endif --}}
                                         </td>
                                         <td>{{ $v['trade_date'] }}</td>
@@ -224,11 +223,14 @@
             methods: {
                 showBtn(id) {
                     var req = this;
-                    axios.post('/backend/order_supplier/ajax',{ "type":"order_supplier" , _token:'{{ csrf_token() }}' ,'id':id})
+                    axios.post('/backend/order_supplier/ajax', {
+                            "type": "order_supplier",
+                            _token: '{{ csrf_token() }}',
+                            'id': id
+                        })
                         .then(function(response) {
-                            req.order_supplier = response.data.orderSupplier ;
-                            // console.log(req.order_supplier) ; 
-                            console.log(response.data.orderSupplier) ; 
+                            req.order_supplier = response.data.orderSupplier;
+                            console.log(response.data.orderSupplier);
                             $('.toggle-show-model').click();
                             return req;
                         })
@@ -237,26 +239,23 @@
                         })
                 },
                 delBtn(id) {
+                    console.log(id);
                     var checkDel = confirm('你確定要刪除嗎？');
-                    // if (checkDel) {
-                    //     axios({
-                    //             method: 'delete',
-                    //             url: '/backend/requisitions_purchase/' + id
-                    //         }).then(function(response) {
-                    //             if (response.data.status) {
-                    //                 alert('刪除成功');
-                    //                 history.go(0);
-                    //             }
-                    //         })
-                    //         .catch(function(error) {
-                    //             console.log('ERROR');
-                    //         })
-                    //     console.log('刪除');
-                    // } else {
-                    //     console.log('不刪除');
-                    // }
-
-                    // console.log(id);
+                    if (checkDel) {
+                        axios.post('/backend/order_supplier/ajax', {
+                                "type": "del_order_supplier",
+                                _token: '{{ csrf_token() }}',
+                                'id': id
+                            })
+                            .then(function(response) {
+                                console.log(response);
+                            })
+                            .catch(function(error) {
+                                console.log('ERROR');
+                            })
+                    } else {
+                        console.log('不刪除');
+                    }
                 }
 
             },

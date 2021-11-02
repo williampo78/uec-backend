@@ -63,8 +63,8 @@ class OrderSupplierService
 
     public function getOrderSupplierById($id){
         return OrderSupplier::select(DB::raw('order_supplier.*'), 
-        DB::raw('requisitions_purchase.warehouse_id as warehouse_id') ,
-        DB::raw('warehouse.name as warehouse_name') ,
+         DB::raw('requisitions_purchase.warehouse_id as warehouse_id') ,
+         DB::raw('warehouse.name as warehouse_name') ,
          DB::raw('supplier.name as supplier_name'),
          DB::raw('requisitions_purchase.number as requisitions_purchase_number')
          )
@@ -73,6 +73,13 @@ class OrderSupplierService
         ->leftJoin('requisitions_purchase' ,'requisitions_purchase.id', '=' , 'order_supplier.requisitions_purchase_id')
         ->leftJoin('warehouse' , 'warehouse.id' , '=' , 'warehouse_id')
         ->first();
+    }
+    
+    public function delOrderSupplierById($id){
+        // $result =  OrderSupplier::select(DB::raw('order_supplier.*') )
+        // echo $id  ; 
+        // OrderSupplier::where('id', '=', $id)->delete();
+        
     }
 
     public function getOrderSupplierDetail($order_supplier_id){
