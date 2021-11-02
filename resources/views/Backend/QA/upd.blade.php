@@ -111,18 +111,17 @@
 
 @section('js')
     <script>
+
         ClassicEditor.create( document.querySelector( '#editor' ), {
 
             ckfinder: {
                 // Upload the images to the server using the CKFinder QuickUpload command.
-                uploadUrl: "https://uecbackend.u-ark.com/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token={{csrf_token()}}"
+                uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
-/*
                 headers: {
-                    'X-CSRF-TOKEN': '{{--csrf_token()--}}',
-                    Authorization: 'Bearer <JSON Web Token>'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 }
-*/
+
             },
         })
             .then( editor => {

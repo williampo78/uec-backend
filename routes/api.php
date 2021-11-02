@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\IndexController;
+use App\Http\Controllers\api\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,5 +19,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/footer', [IndexController::class, 'index']);
+Route::group(['prefix'=>'v1'], function (){
+    Route::get('/footer', [IndexController::class, 'index']);
+    Route::get('/footer/{id}', [IndexController::class, 'getContent']);
+    Route::post('/footer/contact', [IndexController::class, 'postContact']);
+});
 
