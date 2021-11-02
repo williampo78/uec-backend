@@ -63,11 +63,9 @@ class OrderSupplierController extends Controller
         foreach ($data['requisitions_purchase'] as $key => $val) {
             $data['requisitions_purchase'][$key]->text = $val->number;
         }
-//        $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
+//      $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
         $data['tax'] = $this->universalService->getTaxList();
-
         $data['act'] = 'add';
-
         return view('Backend.OrderSupplier.input', compact('data'));
     }
 
@@ -85,7 +83,7 @@ class OrderSupplierController extends Controller
         if (isset($data['status_code'])) {
             $act = $data['status_code'];
         }
-
+        // dd($data) ;
         $this->orderSupplierService->updateOrderSupplier($data, 'add');
 
         return view('backend.success', compact('route_name', 'act'));
@@ -112,14 +110,12 @@ class OrderSupplierController extends Controller
     {
         $supplier = new SupplierService();
         $data['supplier'] = $supplier->getSupplier();
-        $data['requisitions_purchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchaseList();
-        $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
-        $data['tax'] = $this->universalService->getTaxList();
-
+        $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id)->toArray();
+        $data['order_supplier_detail'] = $this->orderSupplierService->getOrderSupplierDetail($id)->toArray();
         $data['act'] = 'upd';
         $data['id'] = $id;
-
-        return view('Backend.OrderSupplier.input', compact('data'));
+        dump($data) ;
+        return view('Backend.OrderSupplier.update', compact('data'));
     }
 
     /**
@@ -137,7 +133,6 @@ class OrderSupplierController extends Controller
         $data['id'] = $id;
 
         $this->orderSupplierService->updateOrderSupplier($data, 'upd');
-
         return view('backend.success', compact('route_name', 'act'));
     }
 
@@ -167,7 +162,6 @@ class OrderSupplierController extends Controller
                 $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($in['id']); //請購單內的品項
                 return response()->json([
                     'status' => true,
-                    'msg' => 'Hi 今天過得好嗎' ,
                     'reqData' => $in,
                     'requisitionsPurchase' => $requisitionsPurchase , 
                     'requisitionsPurchaseDetail' => $requisitionsPurchaseDetail,
