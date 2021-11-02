@@ -68,11 +68,11 @@ class OrderSupplierService
          DB::raw('supplier.name as supplier_name'),
          DB::raw('requisitions_purchase.number as requisitions_purchase_number')
          )
-                            ->where('order_supplier.id' , $id)
-                            ->leftJoin('supplier' , 'supplier.id' , '=' , 'order_supplier.supplier_id')
-                            ->leftJoin('requisitions_purchase' ,'requisitions_purchase.id', '=' , 'order_supplier.requisitions_purchase_id')
-                            ->leftJoin('warehouse' , 'warehouse.id' , '=' , 'warehouse_id')
-                            ->first();
+        ->where('order_supplier.id' , $id)
+        ->leftJoin('supplier' , 'supplier.id' , '=' , 'order_supplier.supplier_id')
+        ->leftJoin('requisitions_purchase' ,'requisitions_purchase.id', '=' , 'order_supplier.requisitions_purchase_id')
+        ->leftJoin('warehouse' , 'warehouse.id' , '=' , 'warehouse_id')
+        ->first();
     }
 
     public function getOrderSupplierDetail($order_supplier_id){
