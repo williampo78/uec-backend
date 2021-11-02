@@ -85,7 +85,6 @@ class OrderSupplierController extends Controller
         }
         // dd($data) ;
         $this->orderSupplierService->updateOrderSupplier($data, 'add');
-
         return view('backend.success', compact('route_name', 'act'));
     }
 
@@ -114,7 +113,6 @@ class OrderSupplierController extends Controller
         $data['order_supplier_detail'] = $this->orderSupplierService->getOrderSupplierDetail($id)->toArray();
         $data['act'] = 'upd';
         $data['id'] = $id;
-        dump($data) ;
         return view('Backend.OrderSupplier.update', compact('data'));
     }
 
@@ -167,7 +165,20 @@ class OrderSupplierController extends Controller
                     'requisitionsPurchaseDetail' => $requisitionsPurchaseDetail,
                 ]);
                 break;
-
+            case 'order_supplier' :
+                $data = $this->orderSupplierService->getOrderSupplierById($in['id']);
+                return response()->json([
+                    'status' => true,
+                    'reqData' => $in,
+                    'orderSupplier' => $data ,
+                ]);
+                break ;
+            case 'del_order_supplier' :
+                return response()->json([
+                    'status' => true,
+                    'reqData' => $in,
+                ]);
+                break ; 
             default:
                 # code...
                 break;
