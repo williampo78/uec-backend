@@ -175,7 +175,6 @@ class OrderSupplierController extends Controller
                     'status' => true,
                     'reqData' => $in,
                     'orderSupplier' => $data ,
-                    'id' => $in['id']
                 ]);
                 break ;
             default:

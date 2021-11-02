@@ -16,7 +16,6 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-6">
@@ -163,6 +162,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <button style="" class="btn btn-info btn-sm toggle-show-model"
+                                data-toggle="modal" data-target="#row_detail">SHOW
+                                </button>
                                 @foreach ($data['order_supplier'] as $k => $v)
                                     <tr>
                                         <form id="del-{{ $v['id'] }}"
@@ -172,10 +174,8 @@
                                         </form>
                                         <td>
                                             {{-- @if ($share_role_auth['auth_query']) --}}
-                                            <button style="display:none" class="toggle-show-model" data-toggle="modal"
-                                                data-target="#row_detail">SHOW
-                                            </button>
-                                            <button class="btn btn-info btn-sm" @click="showBtn({{$v['id']}})"><i
+                                            <button class="btn btn-info btn-sm"
+                                             @click="showBtn({{$v['id']}})"><i
                                                     class="fa fa-search"></i></button>
                                             {{-- @endif --}}
 
@@ -226,8 +226,11 @@
                     var req = this;
                     axios.post('/backend/order_supplier/ajax',{ "type":"order_supplier" , _token:'{{ csrf_token() }}' ,'id':id})
                         .then(function(response) {
-                            console.log(req.order_supplier) ; 
-                            console.log(response.data) ; 
+                            req.order_supplier = response.data.orderSupplier ;
+                            // console.log(req.order_supplier) ; 
+                            console.log(response.data.orderSupplier) ; 
+                            $('.toggle-show-model').click();
+                            return req;
                         })
                         .catch(function(error) {
                             console.log('ERROR');
