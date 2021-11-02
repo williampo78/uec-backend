@@ -26,4 +26,4 @@ Route::group(['prefix'=>'v1'], function (){
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
 });
 
-Route::get('area', [DradviceController::class, 'area']);
+Route::get('/area', [DradviceController::class, 'area']);
