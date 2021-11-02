@@ -62,23 +62,34 @@ class OrderSupplierService
     }
 
     public function getOrderSupplierById($id){
-        return OrderSupplier::select(DB::raw('order_supplier.*') , DB::raw('supplier.name as supplier_name'))
+        return OrderSupplier::select(DB::raw('order_supplier.*'), 
+        DB::raw('requisitions_purchase.warehouse_id as warehouse_id') ,
+        DB::raw('warehouse.name as warehouse_name') ,
+         DB::raw('supplier.name as supplier_name'),
+         DB::raw('requisitions_purchase.number as requisitions_purchase_number')
+         )
                             ->where('order_supplier.id' , $id)
                             ->leftJoin('supplier' , 'supplier.id' , '=' , 'order_supplier.supplier_id')
+                            ->leftJoin('requisitions_purchase' ,'requisitions_purchase.id', '=' , 'order_supplier.requisitions_purchase_id')
+                            ->leftJoin('warehouse' , 'warehouse.id' , '=' , 'warehouse_id')
                             ->first();
     }
 
     public function getOrderSupplierDetail($order_supplier_id){
-        return OrderSupplierDetail::select( DB::raw('order_supplier_detail.id as id'),DB::raw('item.name as item_name'), DB::raw('order_supplier_detail.item_unit as item_unit') , DB::raw('order_supplier_detail.item_price as item_price') ,
-                                            DB::raw('requisitions_purchase_detail.item_qty as rp_item_qty') , DB::raw('order_supplier_detail.original_subtotal_price as original_subtotal_price') , 'is_giveaway' , DB::raw('order_supplier_detail.item_qty as item_qty'),
-                                            DB::raw('requisitions_purchase_detail.id as requisitions_purchase_detail_id') , 'purchase_qty' , 'order_supplier_detail.subtotal_price' , 'order_supplier_detail.item_number')
-                                ->where('order_supplier_id' , $order_supplier_id)
+        return OrderSupplierDetail::select( DB::raw('order_supplier_detail.*'),
+        DB::raw('requisitions_purchase_detail.item_qty as rp_item_qty') , 
+        'is_giveaway' , 
+        DB::raw('requisitions_purchase_detail.id as requisitions_purchase_detail_id') , 
+        'purchase_qty' , 
+        'order_supplier_detail.item_number' , 
+        )                        ->where('order_supplier_id' , $order_supplier_id)
                                 ->leftJoin('item' , 'item.id' , '=' , 'order_supplier_detail.item_id')
                                 ->leftJoin('requisitions_purchase_detail' , 'order_supplier_detail.requisitions_purchase_dtl_id' , '=' , 'requisitions_purchase_detail.requisitions_purchase_id')
                                 ->get();
     }
 
     public function updateOrderSupplier($data , $act){
+
         $now = Carbon::now();
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
@@ -119,6 +130,7 @@ class OrderSupplierService
             OrderSupplier::where('id' , $data['id'])->update($orderSupplierData);
             $order_supplier_id  = $data['id'] ;
         }
+
         $orderSupplierDetailData = [];
         $requisitionsPurchaseDetailData = [];
         $item = $this->universalService->idtokey($this->itemService->getItemList());
