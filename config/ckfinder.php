@@ -77,7 +77,7 @@ $config['backends']['laravel_logs'] = array(
 );
 
 // Backends
-/*
+
 $config['backends']['default'] = array(
     'name'         => 'default',
     'adapter'      => 'local',
@@ -87,7 +87,7 @@ $config['backends']['default'] = array(
     'chmodFolders' => 0755,
     'filesystemEncoding' => 'UTF-8'
 );
-*/
+
 $config['backends']['awss3'] = array(
     'name' => 'awss3',
     'adapter' => 's3',
@@ -109,7 +109,7 @@ $config['resourceTypes'][] = array(
     'maxSize' => '1M',
     'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',
     'deniedExtensions' => '',
-    'backend' => 'awss3',
+    'backend' => 'default',
 );
 
 $config['resourceTypes'][] = array(
