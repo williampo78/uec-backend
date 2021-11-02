@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Models\WebContents;
 use App\Services\UniversalService;
 use Illuminate\Http\Request;
 use App\Services\WebContentsService;
+use App\Services\APIService;
 
 class IndexController extends Controller
 {
 
     private $webContentsService;
+    private $apiService;
 
-    public function __construct(WebContentsService $webContentsService, UniversalService $universalService)
+    public function __construct(WebContentsService $webContentsService, UniversalService $universalService, APIService $apiService)
     {
         $this->webContentsService = $webContentsService;
         $this->universalService = $universalService;
+        $this->apiService = $apiService;
     }
 
     public function index()
@@ -30,7 +34,6 @@ class IndexController extends Controller
                 $items[$v['parent_code']][$k]['content_name'] = $v['content_name'];
                 $items[$v['parent_code']][$k]['content_target'] = $v['content_target'];
                 $items[$v['parent_code']][$k]['content_url'] = $v['content_url'];
-                $items[$v['parent_code']][$k]['content_text'] = $v['content_text'];
             }
 
             $data[] = array(
@@ -41,4 +44,31 @@ class IndexController extends Controller
         }
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'reuslt' => $data]);
     }
+
+    public function getContent($id)
+    {
+        $status = false;
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $content = WebContents::where('id', '=', $id)->where('content_target', '=', 'H')->get()->toArray();
+        if (sizeof($content) > 0) {
+            $data[] = array(
+                "content_id" => $content[0]['id'], //9
+                "content_name" => $content[0]['content_name'], //會員服務條款
+                "content_text" => $content[0]['content_text']//html內容
+            );
+            $status= true;
+        } else {
+            $data = [];
+            $status = false;
+            $err = '201';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'reuslt' => $data]);
+    }
+
+    public function postContact(Request $request)
+    {
+
+    }
+
 }
