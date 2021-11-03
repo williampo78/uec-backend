@@ -42,7 +42,7 @@ class OrderSupplierController extends Controller
             $getData['select_start_date'] = Carbon::now()->subMonth()->toDateString();
             $getData['select_end_date'] = Carbon::now()->toDateString();
         }
-        
+
 
         $data['getData'] = $getData;
         $data['user_id'] = Auth::user()->id;
@@ -85,7 +85,7 @@ class OrderSupplierController extends Controller
         }
         // dd($data) ;
         $this->orderSupplierService->updateOrderSupplier($data, 'add');
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -131,7 +131,7 @@ class OrderSupplierController extends Controller
         $data['id'] = $id;
 
         $this->orderSupplierService->updateOrderSupplier($data, 'upd');
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -147,7 +147,7 @@ class OrderSupplierController extends Controller
 
         OrderSupplier::destroy($id);
 
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     public function ajax(Request $request)
@@ -161,7 +161,7 @@ class OrderSupplierController extends Controller
                 return response()->json([
                     'status' => true,
                     'reqData' => $in,
-                    'requisitionsPurchase' => $requisitionsPurchase , 
+                    'requisitionsPurchase' => $requisitionsPurchase ,
                     'requisitionsPurchaseDetail' => $requisitionsPurchaseDetail,
                 ]);
                 break;
@@ -178,7 +178,7 @@ class OrderSupplierController extends Controller
                     'status' => true,
                     'reqData' => $in,
                 ]);
-                break ; 
+                break ;
             default:
                 # code...
                 break;

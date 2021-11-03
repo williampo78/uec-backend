@@ -88,7 +88,7 @@ class QuotationController extends Controller
 
         $this->quotationService->addQuotation($data);
 
-        return view('backend.success' , compact('route_name','act'));
+        return view('Backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -136,7 +136,7 @@ class QuotationController extends Controller
 
         $this->quotationService->updateQuotation($data);
 
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**
@@ -152,7 +152,7 @@ class QuotationController extends Controller
 
         Quotation::destroy($id);
 
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     public function ajax(Request $request){

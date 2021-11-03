@@ -56,7 +56,7 @@ class RolesController extends Controller
         $act = 'add';
         $route_name = 'roles';
         $this->rolesPermission->addRole($input, $act);
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
 
     }
 
@@ -105,7 +105,7 @@ class RolesController extends Controller
         $route_name = 'roles';
         $input['id'] = $id;
         $this->rolesPermission->addRole($input, $act);
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**

@@ -64,7 +64,7 @@ class UsersController extends Controller
         $act = 'add';
         $route_name = 'users';
         $this->usersService->addUser($input, $act);
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
 
     }
 
@@ -110,7 +110,7 @@ class UsersController extends Controller
         $route_name = 'users';
         $input['id'] = $id;
         $this->usersService->addUser($input, $act);
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -164,7 +164,7 @@ class UsersController extends Controller
         if ($request->input(['profile']) == 1) {
             return view('Backend.example');
         } else {
-            return view('backend.success', compact('route_name', 'act'));
+            return view('Backend.success', compact('route_name', 'act'));
         }
     }
 

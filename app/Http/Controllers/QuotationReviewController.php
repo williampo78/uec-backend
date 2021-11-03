@@ -109,7 +109,7 @@ class QuotationReviewController extends Controller
         $data['id'] = $id;
         $this->reviewService->updateReview($data , 'QUOTATION');
 
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**

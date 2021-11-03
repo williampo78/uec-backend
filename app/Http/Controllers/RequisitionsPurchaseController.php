@@ -88,7 +88,7 @@ class RequisitionsPurchaseController extends Controller
         $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input()); //創建請購單
         $act = 'add';
         $route_name = 'requisitions_purchase';
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -148,7 +148,7 @@ class RequisitionsPurchaseController extends Controller
         $result = $this->requisitionsPurchaseService->updateRequisitionsPurchase($request->input()); //創建請購單
         $act = 'upd';
         $route_name = 'requisitions_purchase';
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
