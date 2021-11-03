@@ -20,27 +20,10 @@ class DradviceController extends Controller
      */
     public function area()
     {
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://18.178.42.56:8020/area.json',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-
         $status = false;
         $err = null;
         $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiService->getArea();
         if ($response) {
             $status= true;
             $response = json_decode($response, true);
@@ -50,5 +33,30 @@ class DradviceController extends Controller
             $err = '201';
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $response]);
+    }
+
+    /*
+     * 會員登入
+     * @param : 帳號, 密碼
+     * @author Rowena
+     */
+    public function memberLogin(Request $request)
+    {
+        $status = false;
+        $err = null;
+        $input['mobile'] = $request->mobile;
+        $input['password'] = $request->password;
+        $fields = json_encode($input);
+        $response = $this->apiService->memberLogin($fields);
+        $result = json_decode($response, true);
+        $error_code = $this->apiService->getErrorCode();
+        if ($result['status']=='200') {
+            $status= true;
+        } else {
+            $status = false;
+            $err = $result['status'];
+            $result['data'] = [];
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $result['data']]);
     }
 }

@@ -7,7 +7,6 @@ namespace App\Services;
 class APIService
 {
 
-
     /**
      * 取得錯誤代碼
      * @param
@@ -19,8 +18,66 @@ class APIService
             '' => null,
             '201' => '傳入無效的參數',
             '202' => '無效的Token',
-            '203' => '無效的請求方式'
+            '203' => '無效的請求方式',
+            '401' => '密碼錯誤',
+            '404' => '資料不存在'
         ];
         return $code;
+    }
+
+    /*
+     * 取得縣市鄉鎮
+     * method: GET
+     * @return json
+     */
+    public function getArea()
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'http://18.178.42.56:8020/area.json',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
+
+    /*
+     * 會員登入
+     * method: POST
+     * @return json
+     */
+    public function memberLogin($input)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://stgapi.dradvice.com.tw/crm/v1/members/login',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>$input,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
     }
 }
