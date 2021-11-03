@@ -68,7 +68,7 @@ class QuotationController extends Controller
         $data['supplier'] = $supplier->getSupplier();
         $data['act'] = 'add';
 
-        return view('backend.quotation.add', compact('data'));
+        return view('Backend.Quotation.add', compact('data'));
     }
 
     /**
@@ -117,7 +117,7 @@ class QuotationController extends Controller
         $data['act'] = 'upd';
         $data['id'] = $id;
 
-        return view('backend.quotation.add', compact('data'));
+        return view('Backend.Quotation.add', compact('data'));
     }
 
     /**
