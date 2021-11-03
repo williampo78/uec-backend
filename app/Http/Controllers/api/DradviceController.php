@@ -4,8 +4,16 @@ namespace App\Http\Controllers\api;
 
 use Illuminate\Http\Request;
 
+use App\Services\APIService;
 class DradviceController extends Controller
 {
+
+    private $apiService;
+
+    public function __construct(APIService $apiService)
+    {
+        $this->apiService = $apiService;
+    }
 
     /**
      * 縣市鄉鎮下拉選單
@@ -29,6 +37,19 @@ class DradviceController extends Controller
         $response = curl_exec($curl);
 
         curl_close($curl);
-        return $response;
+
+        $status = false;
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+
+        if ($response) {
+            $status= true;
+            $response = json_decode($response, true);
+        } else {
+            $response = [];
+            $status = false;
+            $err = '201';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'reuslt' => $response]);
     }
 }
