@@ -184,8 +184,8 @@
                                             {{-- @endif --}}
 
                                             <button class="btn btn-warning btn-sm" data-toggle="modal"
-                                                data-target="#row_supplier_deliver" data-id="{{ $v['id'] }}"
-                                                onclick="row_supplier_deliver({{ $v['id'] }});">預進日</button>
+                                                data-target="#row_supplier_deliver"
+                                                @click="supplier_deliver({{ $v['id'] }} , '{{ $v['expect_deliver_date'] }}','{{ $v['supplier_deliver_date'] }}','{{ $v['number'] }}')">預進日</button>
 
                                             {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
                                             <button class="btn btn-danger btn-sm" type="button"
@@ -239,7 +239,6 @@
                         })
                 },
                 delBtn(id) {
-                    console.log(id);
                     var checkDel = confirm('你確定要刪除嗎？');
                     if (checkDel) {
                         axios.post('/backend/order_supplier/ajax', {
@@ -248,11 +247,11 @@
                                 'id': id
                             })
                             .then(function(response) {
-                                if(response.data.result){
-                                    alert('刪除成功') ;
-                                    history.go(0) ;
-                                }else{
-                                    alert('刪除失敗') ;
+                                if (response.data.result) {
+                                    alert('刪除成功');
+                                    history.go(0);
+                                } else {
+                                    alert('刪除失敗');
                                 }
                                 console.log(response);
                             })
@@ -262,6 +261,13 @@
                     } else {
                         console.log('不刪除');
                     }
+                },
+                supplier_deliver(id, expect_deliver_date, supplier_deliver_date,number) {
+                    $('#supplier_deliver_date').val(supplier_deliver_date);
+                    $('#expect_deliver_date').val(expect_deliver_date);
+                    $('.show_number').html(number) ; 
+                    alert('尚未串接完成')  ;
+                    // console.log(number) ; 
                 }
 
             },
@@ -279,6 +285,12 @@
                 format: 'YYYY-MM-DD',
             });
             $('#datetimepicker2').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#supplier_deliver_date_dp').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#expect_deliver_date_dp').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
         });
