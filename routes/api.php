@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\IndexController;
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\DradviceController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,3 +26,4 @@ Route::group(['prefix'=>'v1'], function (){
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
 });
 
+Route::get('/area', [DradviceController::class, 'area']);

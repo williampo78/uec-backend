@@ -113,7 +113,7 @@ class RequisitionsPurchaseReviewController extends Controller
 
         $this->review_service->updateReview($data , 'REQUISITION_PUR');
 
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**

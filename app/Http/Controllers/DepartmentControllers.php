@@ -54,7 +54,7 @@ class DepartmentControllers extends Controller
         $this->departmentService->addDepartment($input);
         $act = 'add';
         $route_name = 'department';
-        return view('backend.success' , compact('route_name','act'));
+        return view('Backend.success' , compact('route_name','act'));
 
     }
 
@@ -97,7 +97,7 @@ class DepartmentControllers extends Controller
         $this->departmentService->updateDepartment($input, $id);
         $act = 'upd';
         $route_name = 'department';
-        return view('backend.success' , compact('route_name','act'));
+        return view('Backend.success' , compact('route_name','act'));
 
 
     }

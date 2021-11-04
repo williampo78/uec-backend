@@ -61,7 +61,7 @@ class CategoryController extends Controller
 
         $rs = Category::insert($data);
 
-        return view('backend.success' , compact('route_name','act'));
+        return view('Backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -105,7 +105,7 @@ class CategoryController extends Controller
         Category::where('id' ,$id)->update($data);
         $route_name = 'category';
         $act = 'upd';
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**

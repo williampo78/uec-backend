@@ -42,7 +42,7 @@ class IndexController extends Controller
                 "field_items" => $items[$v['parent_code']]
             );
         }
-        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'reuslt' => $data]);
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data]);
     }
 
     public function getContent($id)
@@ -63,7 +63,7 @@ class IndexController extends Controller
             $status = false;
             $err = '201';
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'reuslt' => $data]);
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
     }
 
     public function postContact(Request $request)

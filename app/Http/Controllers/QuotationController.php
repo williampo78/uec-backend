@@ -68,7 +68,7 @@ class QuotationController extends Controller
         $data['supplier'] = $supplier->getSupplier();
         $data['act'] = 'add';
 
-        return view('backend.quotation.add', compact('data'));
+        return view('Backend.Quotation.add', compact('data'));
     }
 
     /**
@@ -88,7 +88,7 @@ class QuotationController extends Controller
 
         $this->quotationService->addQuotation($data);
 
-        return view('backend.success' , compact('route_name','act'));
+        return view('Backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -117,7 +117,7 @@ class QuotationController extends Controller
         $data['act'] = 'upd';
         $data['id'] = $id;
 
-        return view('backend.quotation.add', compact('data'));
+        return view('Backend.Quotation.add', compact('data'));
     }
 
     /**
@@ -136,7 +136,7 @@ class QuotationController extends Controller
 
         $this->quotationService->updateQuotation($data);
 
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**
@@ -152,7 +152,7 @@ class QuotationController extends Controller
 
         Quotation::destroy($id);
 
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     public function ajax(Request $request){

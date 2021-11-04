@@ -71,7 +71,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group" id="div_email">
                                                 <label for="content_name">問題解答 <span class="text-danger">*</span></label>
-                                                <textarea class="form-control validate[required]" rows="5" name="content_text"></textarea>
+                                                <textarea class="form-control validate[required]" rows="5" id="editor" name="content_text"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -101,6 +101,19 @@
 
 @section('js')
     <script>
+
+        ClassicEditor.create( document.querySelector( '#editor' ), {
+
+            ckfinder: {
+                // Upload the images to the server using the CKFinder QuickUpload command.
+                uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                }
+
+            },
+        })
         $(function () {
             $("#new-form").validationEngine();
             $("select").select2();

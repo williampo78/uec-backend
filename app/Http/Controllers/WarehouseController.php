@@ -52,7 +52,7 @@ class WarehouseController extends Controller
         unset($data['_token']);
         $rs = Warehouse::insert($data);
 
-        return view('backend.success' , compact('route_name','act'));
+        return view('Backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -94,7 +94,7 @@ class WarehouseController extends Controller
         Warehouse::where('id' ,$id)->update($data);
         $route_name = 'warehouse';
         $act = 'upd';
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**

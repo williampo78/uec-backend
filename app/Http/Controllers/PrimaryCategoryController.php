@@ -53,7 +53,7 @@ class PrimaryCategoryController extends Controller
 
         $rs = PrimaryCategory::insert($data);
 
-        return view('backend.success' , compact('route_name','act'));
+        return view('Backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -95,7 +95,7 @@ class PrimaryCategoryController extends Controller
         PrimaryCategory::where('id' ,$id)->update($data);
         $route_name = 'primary_category';
         $act = 'upd';
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**

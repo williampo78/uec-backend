@@ -57,7 +57,7 @@ class QAController extends Controller
         $route_name = 'qa';
         $input['apply_to'] = 'QA';
         $this->webContentsService->addWebContent($input, $act);
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -100,7 +100,7 @@ class QAController extends Controller
         $input['id'] = $id;
         $input['apply_to'] = 'QA';
         $result = $this->webContentsService->addWebContent($input, $act);
-        return view('backend.success', compact('route_name', 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
