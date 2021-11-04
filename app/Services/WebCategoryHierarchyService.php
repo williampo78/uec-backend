@@ -13,7 +13,6 @@ class WebCategoryHierarchyService
 
     }
     public function web_Category_Hierarchy_Bylevel($parent_id=null){
-
       return CategoryHierarchy::where('parent_id' , $parent_id)->get();
     }
 }

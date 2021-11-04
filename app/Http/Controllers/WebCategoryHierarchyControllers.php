@@ -18,9 +18,8 @@ class WebCategoryHierarchyControllers extends Controller
      */
     public function index()
     {
-        $result = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel();
-        
-        return view('Backend.WebCategoryHierarchy.index');
+        $result['category_level_1'] = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel();
+        return view('Backend.WebCategoryHierarchy.index' , $result);
     }
 
     /**
@@ -87,5 +86,8 @@ class WebCategoryHierarchyControllers extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function GetCategory(){
+        
     }
 }

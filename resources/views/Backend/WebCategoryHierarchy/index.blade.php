@@ -20,10 +20,11 @@
             </div>
         </div>
         <div class="row" id="web_category_hierarchy">
+            <button type="button" @click="test()">TEST BTN</button>
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-body row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-4 ">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <h4 style="font-weight:bold;">大分類</h4>
@@ -45,21 +46,22 @@
                                         <th class="col-sm-8">功能</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody v-for="(level_1_obj, level_1_key) in category_level_1">
                                     <tr>
                                         <td style="vertical-align:middle">
                                             <i class="fa fa-list"></i>
-                                            大分類A
+                                            @{{ level_1_obj . category_name }}
                                         </td>
                                         <td>
                                             <div class="row">
-                                                <div class="col-sm-5">
-                                                    <button type="button" class="btn btn-primary">展中類</button>
+                                                <div class="col-sm-4">
+                                                    <button type="button" class="btn btn-primary"
+                                                        @click="GetCategory(level_1_obj.id,'2')">展開類</button>
                                                 </div>
-                                                <div class="col-sm-3">
+                                                <div class="col-sm-4">
                                                     <button type="button" class="btn btn-warning">編輯</button>
                                                 </div>
-                                                <div class="col-sm-3">
+                                                <div class="col-sm-4">
                                                     <button type="button" class="btn btn-danger">刪除</button>
                                                 </div>
                                             </div>
@@ -161,26 +163,47 @@
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 @endsection
-<script>
-    var requisitions = Vue.extend({
-        data: function() {
-            return {
-                requisitions_purchase: {},
-                
-            }
-        },
-        methods: {
-            ItemListAdd() {},
-        }
-        mounted: function() {},
-        computed: {},
-    });
+@section('js')
+    <script>
+        var requisitions = Vue.extend({
+            data: function() {
+                return {
+                    category_level_1: @json($category_level_1),
+                    category_level_2: [],
+                    category_level_3: [],
+                }
+            },
+            methods: {
+                test() {
+                    console.log(this.category_level_1);
+                },
+                GetCategory(id,level) {
+                    var req = async () => {
+                        const response = await axios.post('/backend/web_category_hierarchy/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'getRequisitionsPurchase',
+                            id: id,
+                            level:level,
+                            type:'GetCategory',
+                        });
+                        
+                    }
+                    req();
+                },
+            },
+            mounted: function() {
+                console.log('TEST');
+            },
+            computed: {
 
-    new requisitions().$mount('#web_category_hierarchy');
-</script>
+            },
+        });
+
+        new requisitions().$mount('#web_category_hierarchy');
+    </script>
+@endsection
