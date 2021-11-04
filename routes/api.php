@@ -26,5 +26,12 @@ Route::group(['prefix'=>'v1'], function (){
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
 });
 
+Route::group(['prefix' => 'auth', 'namespace' => 'App\Http\Controllers\api'], function () {
+    Route::get('/', 'AuthController@me')->name('me');
+    Route::post('logout', 'AuthController@logout')->name('logout');
+});
+
 Route::get('area', [DradviceController::class, 'area']);
+
+Route::post('login', [AuthController::class,'login']);
 Route::post('members/login', [DradviceController::class, 'memberLogin']);
