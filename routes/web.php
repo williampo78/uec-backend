@@ -15,6 +15,7 @@ use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\QuotationReviewController;
 use App\Http\Controllers\OrderSupplierController;
 use App\Http\Controllers\ContactControllers ;
+use App\Http\Controllers\WebCategoryHierarchyControllers ; 
 use Illuminate\Support\Facades\Route;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 
@@ -71,6 +72,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/user_profile', [UsersController::class, 'updateProfile']);
     Route::post('/users/ajax',[UsersController::class,'ajaxDetail']);
     Route::resource('/qa',QAController::class, ['names' => ['index' => 'qa']]);
+    Route::resource('/web_category_hierarchy',WebCategoryHierarchyControllers::class, ['names' => ['index' => 'web_category_hierarchy']]) ; 
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
