@@ -248,6 +248,12 @@
                                 'id': id
                             })
                             .then(function(response) {
+                                if(response.data.result){
+                                    alert('刪除成功') ;
+                                    history.go(0) ;
+                                }else{
+                                    alert('刪除失敗') ;
+                                }
                                 console.log(response);
                             })
                             .catch(function(error) {

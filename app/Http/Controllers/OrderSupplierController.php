@@ -42,8 +42,6 @@ class OrderSupplierController extends Controller
             $getData['select_start_date'] = Carbon::now()->subMonth()->toDateString();
             $getData['select_end_date'] = Carbon::now()->toDateString();
         }
-        
-
         $data['getData'] = $getData;
         $data['user_id'] = Auth::user()->id;
 
@@ -174,42 +172,17 @@ class OrderSupplierController extends Controller
                 ]);
                 break ;
             case 'del_order_supplier' :
+                $result = $this->orderSupplierService->delOrderSupplierById($in['id']) ;
                 return response()->json([
                     'status' => true,
                     'reqData' => $in,
+                    'result' =>$result ,
                 ]);
                 break ; 
             default:
                 # code...
                 break;
         }
-
-        // $rs = $request->all();
-
-        // $data = [];
-        // $supplier = new SupplierService();
-        // $supplier = $this->universalService->idtokey($supplier->getSupplier());
-        // $warehouse = new WarehouseService();
-        // $warehouse = $this->universalService->idtokey($warehouse->getWarehouseList());
-
-        // if ($rs['get_type'] == 'order_supplier'){
-        //     $status = $this->universalService->getStatusCode();
-        //     $data = $this->orderSupplierService->getOrderSupplierById($rs['id']);
-        //     $data['warehouse_name'] = $warehouse[$data['warehouse_id']]['name'] ?? '';
-        //     $data['status'] = $status[$data['status']]?? '';
-        // }elseif ($rs['get_type'] == 'requisitions_purchase_detail'){
-        //     $data = $this->requisitionsPurchaseService->getRequisitionPurchaseDetailForOrderSupplier($rs['requisitions_purchase_id']);
-        // }elseif ($rs['get_type'] == 'requisitions_purchase'){
-        //     $tax = $this->universalService->getTaxList();
-        //     $data = $this->requisitionsPurchaseService->getRequisitionPurchaseById($rs['requisitions_purchase_id']);
-        //     $data['supplier_name'] = $supplier[$data['supplier_id']]['name'] ?? '';
-        //     $data['warehouse_name'] = $warehouse[$data['warehouse_id']]['name'] ?? '';
-        //     $data['tax_name'] = $tax[$data['tax']] ?? '';
-        // }elseif ($rs['get_type'] == 'order_supplier_detail'){
-        //     $data = $this->orderSupplierService->getOrderSupplierDetail($rs['id']);
-        // }
-
-        // echo "OK@@".json_encode($data);
     }
 
     public function ajaxDelItem($id)

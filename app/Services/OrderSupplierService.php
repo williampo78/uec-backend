@@ -75,11 +75,15 @@ class OrderSupplierService
         ->first();
     }
     
+    /*
+    *每次刪除採購單要更改請購單的畫面
+    */
     public function delOrderSupplierById($id){
-        // $result =  OrderSupplier::select(DB::raw('order_supplier.*') )
-        // echo $id  ; 
-        // OrderSupplier::where('id', '=', $id)->delete();
-        
+        $OrderSupplier = $this->getOrderSupplierById($id);
+        $requisitions_purchase_id = $OrderSupplier->requisitions_purchase_id ; 
+        RequisitionsPurchase::where('id' ,  $requisitions_purchase_id)->update(['is_transfer' => 0 ]);
+        OrderSupplier::where('id', '=', $id)->delete();        
+        return true ;
     }
 
     public function getOrderSupplierDetail($order_supplier_id){
