@@ -2,12 +2,14 @@
 @section('title', '分類階層管理')
 @section('content')
     <style>
-        h4{
-            font-weight:bold;
+        h4 {
+            font-weight: bold;
         }
-        h4 span{
-            color: blue  ;
+
+        h4 span {
+            color: blue;
         }
+
     </style>
     <!--列表-->
     <div id="page-wrapper">
@@ -17,7 +19,7 @@
                 <h1 class="page-header"><i class="fa fa-bank"></i>分類階層管理</h1>
             </div>
         </div>
-        <div class="row">
+        <div class="row" id="web_category_hierarchy">
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-body row">
@@ -165,3 +167,20 @@
         </div>
     </div>
 @endsection
+<script>
+    var requisitions = Vue.extend({
+        data: function() {
+            return {
+                requisitions_purchase: {},
+                
+            }
+        },
+        methods: {
+            ItemListAdd() {},
+        }
+        mounted: function() {},
+        computed: {},
+    });
+
+    new requisitions().$mount('#web_category_hierarchy');
+</script>

@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Services\WebCategoryHierarchyService ; 
 class WebCategoryHierarchyControllers extends Controller
 {
+    private $webCategoryHierarchyService;
+
+    public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService){
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -13,6 +18,8 @@ class WebCategoryHierarchyControllers extends Controller
      */
     public function index()
     {
+        $result = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel();
+        
         return view('Backend.WebCategoryHierarchy.index');
     }
 
