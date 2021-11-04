@@ -155,7 +155,7 @@
                     $.each( obj, function( key, value )
                     {
                         if (value.review_result==0){
-                            var reslut = '已駁回';
+                            var result = '已駁回';
                         }else if(value.review_result==1){
                             var result = '已核准';
                         }
@@ -164,7 +164,7 @@
                             "<td>" + (key+1) + "</td>" +
                             "<td>" + value.user_name + "</td>" +
                             "<td>" + (value.review_at || '')+ "</td>" +
-                            "<td>" + (reslut || '') + "</td>" +
+                            "<td>" + (result || '') + "</td>" +
                             "<td>" + (value.review_remark || '')+ "</td>" +
                             "</tr>";
                     });

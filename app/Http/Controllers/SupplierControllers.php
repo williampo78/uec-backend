@@ -27,9 +27,9 @@ class SupplierControllers extends Controller
     }
     public function index()
     {
-        $reslut = [];
-        $reslut['supplier'] = $this->supplierService->getSupplier();
-        return view('Backend.Supplier.list', $reslut);
+        $result = [];
+        $result['supplier'] = $this->supplierService->getSupplier();
+        return view('Backend.Supplier.list', $result);
     }
 
     /**
@@ -39,8 +39,8 @@ class SupplierControllers extends Controller
      */
     public function create()
     {
-        $reslut['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        return view('Backend.Supplier.input', $reslut);
+        $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
+        return view('Backend.Supplier.input', $result);
     }
 
     /**
@@ -53,7 +53,7 @@ class SupplierControllers extends Controller
     {
         $input = $request->input();
 
-        $reslut = $this->supplierService->addSupplier($input);
+        $result = $this->supplierService->addSupplier($input);
         return redirect(route('supplier'));
     }
 
@@ -78,11 +78,11 @@ class SupplierControllers extends Controller
      */
     public function edit($id)
     {
-        $reslut = [];
-        $reslut['Supplier'] = $this->supplierService->showSupplier($id);
-        $reslut['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        $reslut['Contact'] = $this->contactService->getContact('Supplier',$id);
-        return view('Backend.Supplier.input', $reslut);
+        $result = [];
+        $result['Supplier'] = $this->supplierService->showSupplier($id);
+        $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
+        $result['Contact'] = $this->contactService->getContact('Supplier',$id);
+        return view('Backend.Supplier.input', $result);
     }
 
     /**
