@@ -24,6 +24,11 @@
     <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
     <link rel="stylesheet" href="{{asset('asset/js/DataTables/datatables.min.css')}}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <style>
+    [v-cloak] {
+        display: none;
+    }
+    </style>
 </head>
 
 <body>

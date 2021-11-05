@@ -19,8 +19,8 @@
                 <h1 class="page-header"><i class="fa fa-bank"></i>分類階層管理</h1>
             </div>
         </div>
-        <div class="row" id="web_category_hierarchy">
-            <button type="button" @click="test()">TEST BTN</button>
+        <div class="row" id="web_category_hierarchy" v-cloak>
+            {{-- <button type="button" @click="test()">TEST BTN</button> --}}
             <div>
                 <div class="panel panel-default container-fluid">
                     <div class="container-fluid">
@@ -106,7 +106,7 @@
                                                 <div class="row">
                                                     <div class="col-sm-5">
                                                         <button type="button" class="btn btn-primary"
-                                                            @click="GetCategory(level_2_obj,'2')">展開小類</button>
+                                                            @click="GetCategory(level_2_obj,'2')">展小類</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-warning">編輯</button>
@@ -300,7 +300,10 @@
                 }
             },
             mounted: function() {
-
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    return false;
+                }
             },
             computed: {
 

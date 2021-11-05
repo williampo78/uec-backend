@@ -17,4 +17,7 @@ class WebCategoryHierarchyService
     {
         return CategoryHierarchy::where('parent_id', $parent_id)->get();
     }
+    public function add_Category_Hierarchy($in){
+        $in ; 
+    }
 }
