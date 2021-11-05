@@ -32,6 +32,7 @@ Route::group(['prefix' => 'auth', 'namespace' => 'App\Http\Controllers\api'], fu
 });
 
 Route::get('area', [DradviceController::class, 'area']);
+Route::get('area/{all}', [DradviceController::class, 'area']);
 
 Route::post('login', [AuthController::class,'login']);
 Route::post('members/login', [DradviceController::class, 'memberLogin']);
