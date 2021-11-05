@@ -18,12 +18,12 @@ class DradviceController extends Controller
     /**
      * 縣市鄉鎮下拉選單
      */
-    public function area()
+    public function area($all = null)
     {
         $status = false;
         $err = null;
         $error_code = $this->apiService->getErrorCode();
-        $response = $this->apiService->getArea();
+        $response = $this->apiService->getArea($all);
         if ($response) {
             $status= true;
             $response = json_decode($response, true);

@@ -30,12 +30,16 @@ class APIService
      * method: GET
      * @return json
      */
-    public function getArea()
+    public function getArea($all = null)
     {
         $curl = curl_init();
-
+        if ($all) {
+            $url = 'https://api.aidradvice.asia/area-all.json'; //(含離島，會員個資維護可能有離島)
+        } else {
+                $url = 'https://api.aidradvice.asia/area.json'; //(排除離島，商城配送不支援離島)
+        }
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://18.178.42.56:8020/area.json',
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
