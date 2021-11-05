@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
-use App\Services\WebCategoryHierarchyService ; 
+
 class WebCategoryHierarchyControllers extends Controller
 {
     private $webCategoryHierarchyService;
 
-    public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService){
+    public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService)
+    {
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
     }
     /**
@@ -19,7 +21,7 @@ class WebCategoryHierarchyControllers extends Controller
     public function index()
     {
         $result['category_level_1'] = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel();
-        return view('Backend.WebCategoryHierarchy.index' , $result);
+        return view('Backend.WebCategoryHierarchy.index', $result);
     }
 
     /**
@@ -87,7 +89,26 @@ class WebCategoryHierarchyControllers extends Controller
     {
         //
     }
-    public function GetCategory(){
+    public function GetCategory()
+    {
+
+    }
+    public function ajax(Request $request)
+    {
+        $in = $request->input() ;
         
+        switch ($in['type']) {
+            case 'GetCategory': // 取得子分類
+                $result = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel($in['id']);
+                break;
+            default:
+                # code...
+                break;
+        }
+        return response()->json([
+            'status' => true,
+            'in' => $request->input(),
+            'result' => $result 
+        ]);
     }
 }
