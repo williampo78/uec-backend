@@ -7,7 +7,7 @@
         }
 
         h4 span {
-            color: blue;
+            color: darkturquoise;
         }
 
     </style>
@@ -34,7 +34,7 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-warning btn-sm " data-toggle="modal"
-                                            data-target="#addCategory">新增大類</a>
+                                            data-target="#addCategory" @click="addCategoryModelShow('1')">新增大類</a>
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-success btn-sm">儲存</a>
@@ -58,7 +58,7 @@
                                                 <div class="row">
                                                     <div class="col-sm-4">
                                                         <button type="button" class="btn btn-primary"
-                                                            @click="GetCategory(level_1_obj,'1')">展開類</button>
+                                                            @click="GetCategory(level_1_obj,'1')">展中類</button>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <button type="button" class="btn btn-warning">編輯</button>
@@ -81,10 +81,11 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-warning btn-sm">新增中類</a>
+                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal"
+                                            data-target="#addCategory" @click="addCategoryModelShow('2')">新增中類</a>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-success btn-sm">儲存</a>
+                                        <a class="btn btn-block btn-success btn-sm" @click="">儲存</a>
                                     </div>
                                 </div>
                                 <hr>
@@ -105,7 +106,7 @@
                                                 <div class="row">
                                                     <div class="col-sm-5">
                                                         <button type="button" class="btn btn-primary"
-                                                            @click="GetCategory(level_2_obj,'2')">小分類</button>
+                                                            @click="GetCategory(level_2_obj,'2')">展開小類</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-warning">編輯</button>
@@ -132,7 +133,8 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-warning btn-sm">新增小類</a>
+                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal"
+                                            data-target="#addCategory" @click="addCategoryModelShow('3')">新增小類</a>
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-success btn-sm">儲存</a>
@@ -179,20 +181,32 @@
         var requisitions = Vue.extend({
             data: function() {
                 return {
+                    //list 
                     category_level_1: @json($category_level_1),
                     category_level_2: [],
                     category_level_3: [],
+                    //view title 
                     category_level_2_title: '',
                     category_level_3_title: '',
+                    //點擊顯示的物件 讓子表去拿父表物件 
+                    category_level_1_obj: [],
+                    category_level_2_obj: [],
+                    //暫存的新增
+                    addCategory: {
+                        show_title: '',
+                        category_level: '',
+                        parent_id: '',
+                        category_name: '',
+                    },
+                    //
+                    msg: {
+                        receiver_name: ''
+                    },
                 }
             },
             methods: {
                 test() {
-                    // this.category_level_2_title = 'A01' ;
-                    // this.category_level_3_title = 'A02' ;
-                    // console.log(this.category_level_1);
-                    // console.log(this.category_level_2);
-                    // console.log(this.category_level_3);
+                    console.log(this.addCategory);
                 },
                 GetCategory(obj, level) { //取得子分類
                     var dataFunction = this;
@@ -208,12 +222,13 @@
                             case '1':
                                 dataFunction.category_level_2 = response.data.result;
                                 dataFunction.category_level_2_title = obj.category_name;
+                                dataFunction.category_level_1_obj = obj;
                                 break;
                             case '2':
                                 dataFunction.category_level_3 = response.data.result;
                                 dataFunction.category_level_3_title = obj.category_name;
+                                dataFunction.category_level_2_obj = obj;
                                 break;
-
                             default:
                                 break;
                         }
@@ -221,9 +236,71 @@
                     }
                     req();
                 },
+                addCategoryModelShow(level) {
+                    var addCategory = this.addCategory;
+                    this.msg.receiver_name = ''; // empty error msg 
+                    addCategory.category_name = '';
+                    addCategory.category_level = level;
+                    switch (level) {
+                        case '1':
+                            addCategory.category_level = level;
+                            addCategory.show_title = '大分類';
+                            break;
+                        case '2':
+                            addCategory.category_level = level;
+                            addCategory.show_title = this.category_level_2_title + '的中分類';
+                            addCategory.parent_id = this.category_level_1_obj.id;
+                            break;
+                        case '3':
+                            // addCategory.show_title = '小分類' ;
+                            addCategory.show_title = this.category_level_2_title + ' > ' + this
+                                .category_level_3_title + '的小分類';
+                            addCategory.parent_id = this.category_level_2_obj.id;
+                            break;
+                    }
+                },
+                addCategoryToList() {
+                    var checkstatus = true;
+                    if (this.addCategory.category_name == '') {
+                        checkstatus = false;
+                        this.msg.receiver_name = '不能為空喔';
+                    }
+                    if (checkstatus) {
+                        switch (this.addCategory.category_level) {
+                            case '1':
+                                this.category_level_1.push({
+                                    id: '',
+                                    category_level: this.addCategory.category_level,
+                                    parent_id: this.addCategory.parent_id,
+                                    category_name: this.addCategory.category_name
+                                });
+                                break;
+                            case '2':
+                                this.category_level_2.push({
+                                    id: '',
+                                    category_level: this.addCategory.category_level,
+                                    parent_id: this.addCategory.parent_id,
+                                    category_name: this.addCategory.category_name
+                                });
+                                break;
+                            case '3':
+                                this.category_level_3.push({
+                                    id: '',
+                                    category_level: this.addCategory.category_level,
+                                    parent_id: this.addCategory.parent_id,
+                                    category_name: this.addCategory.category_name
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+
+                        $('.hidden-model').click();
+                    }
+                }
             },
             mounted: function() {
-                console.log('TEST');
+
             },
             computed: {
 
