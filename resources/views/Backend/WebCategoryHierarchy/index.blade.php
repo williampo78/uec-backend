@@ -6,7 +6,7 @@
             font-weight: bold;
         }
 
-        h4 span {
+        h4 .title_color {
             color: darkturquoise;
         }
 
@@ -63,7 +63,7 @@
                                                     <div class="col-sm-4">
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
                                                             data-target="#addCategory"
-                                                            @click="CategoryModelShow('2','edit','level_2_obj')">編輯</button>
+                                                            @click="CategoryModelShow('1','edit',level_1_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <button type="button" class="btn btn-danger">刪除</button>
@@ -79,7 +79,7 @@
                                 <div class="row">
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <h4> 【<span>@{{ category_level_2_title }}</span>】的中分類</h4>
+                                            <h4> 【<span class="title_color">@{{ category_level_2_title }}</span>】的中分類</h4>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
@@ -111,9 +111,9 @@
                                                             @click="GetCategory(level_2_obj,'2')">展小類</button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button @click="" type="button" class="btn btn-warning"
+                                                        <button type="button" class="btn btn-warning"
                                                             data-toggle="modal" data-target="#addCategory"
-                                                            @click="CategoryModelShow('2','edit','level_2_obj')">編輯</button>
+                                                            @click="CategoryModelShow('2','edit',level_2_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-danger">刪除</button>
@@ -129,7 +129,7 @@
                                 <div class="row">
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <h4> 【<span>@{{ category_level_3_title }}</span>】的小分類</h4>
+                                            <h4> 【<span class="title_color">@{{ category_level_3_title }}</span>】的小分類</h4>
                                             <div v-if="category_level_3_title">
                                             </div>
                                             <div v-else>
@@ -163,7 +163,7 @@
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
                                                             data-target="#addCategory"
-                                                            @click="CategoryModelShow('3','edit','level_3_obj')">編輯</button>
+                                                            @click="CategoryModelShow('3','edit',level_3_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-danger">刪除</button>
@@ -204,6 +204,8 @@
                         category_level: '',
                         parent_id: '',
                         category_name: '',
+                        old_category_name : '' ,
+                        act :''
                     },
                     //
                     msg: {
@@ -244,27 +246,31 @@
                     req();
                 },
                 CategoryModelShow(level, act, obj) {
-                    var addCategory = this.addCategory;
-                    this.msg.receiver_name = ''; // empty error msg 
-                    addCategory.category_name = '';
-                    addCategory.category_level = level;
-                    addCategory.act = act;
-                    
+                    // empty data
+                    this.msg.receiver_name = ''; 
+                    this.addCategory.category_name = '';
+                    this.addCategory.id = '' ; 
+                    this.addCategory.category_level = level;
+                    this.addCategory.act = act;
+                    if(act == 'edit'){
+                        this.addCategory.old_category_name = obj.category_name ; 
+                        this.addCategory.id = obj.id ; 
+                    }
                     switch (level) {
                         case '1':
-                            addCategory.category_level = level;
-                            addCategory.show_title = '大分類';
+                            this.addCategory.category_level = level;
+                            this.addCategory.show_title = '大分類';
                             break;
                         case '2':
-                            addCategory.category_level = level;
-                            addCategory.show_title = this.category_level_2_title + '的中分類';
-                            addCategory.parent_id = this.category_level_1_obj.id;
+                            this.addCategory.category_level = level;
+                            this.addCategory.show_title = this.category_level_2_title + '的中分類';
+                            this.addCategory.parent_id = this.category_level_1_obj.id;
                             break;
                         case '3':
                             // addCategory.show_title = '小分類' ;
-                            addCategory.show_title = this.category_level_2_title + ' > ' + this
+                            this.addCategory.show_title = this.category_level_2_title + ' > ' + this
                                 .category_level_3_title + '的小分類';
-                            addCategory.parent_id = this.category_level_2_obj.id;
+                            this.addCategory.parent_id = this.category_level_2_obj.id;
                             break;
                     }
                 },
@@ -282,10 +288,11 @@
                         type = 'EditCategory';
                     }
                     // console.log('TEST');
-                    var addAjax = async () => {
+                    var PostAjax = async () => {
                         const response = await axios.post('/backend/web_category_hierarchy/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: type,
+                            id:this.addCategory.id,
                             category_level: this.addCategory.category_level,
                             parent_id: this.addCategory.parent_id,
                             category_name: this.addCategory.category_name,
@@ -296,6 +303,9 @@
                                 break;
                             case '2':
                                 this.category_level_2 = response.data.result;
+                                if(this.addCategory.act =='edit'){
+                                    this.category_level_2 
+                                }
                                 break;
                             case '3':
                                 this.category_level_3 = response.data.result;
@@ -305,7 +315,7 @@
                         }
                     }
                     if (checkstatus) {
-                        addAjax();
+                        PostAjax();
                         $('.hidden-model').click();
                     }
 
