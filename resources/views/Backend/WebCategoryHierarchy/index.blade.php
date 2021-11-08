@@ -215,7 +215,7 @@
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'getRequisitionsPurchase',
                             id: obj.id,
-                            level: level,
+                            category_level: category_level,
                             type: 'GetCategory',
                         });
                         switch (level) {
@@ -265,7 +265,16 @@
                         checkstatus = false;
                         this.msg.receiver_name = '不能為空喔';
                     }
-                    if (checkstatus) {
+                    // console.log('TEST');
+                    var addAjax = async () => {
+                        const response = await axios.post('/backend/web_category_hierarchy/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'AddCategory',
+                            category_level: this.addCategory.category_level,
+                            parent_id:this.addCategory.parent_id , 
+                            category_name:this.addCategory.category_name,
+                        });
+                        console.log(response) ; 
                         switch (this.addCategory.category_level) {
                             case '1':
                                 this.category_level_1.push({
@@ -293,17 +302,23 @@
                                 break;
                             default:
                                 break;
-                        }
 
-                        $('.hidden-model').click();
+                        }
                     }
+
+                    if (checkstatus) {
+                        addAjax();
+                    }
+
+                    $('.hidden-model').click();
+
                 }
             },
             mounted: function() {
-                if (event.keyCode == 13) {
-                    event.preventDefault();
-                    return false;
-                }
+                // if (event.keyCode == 13) {
+                //     event.preventDefault();
+                //     return false;
+                // }
             },
             computed: {
 
