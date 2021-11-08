@@ -110,7 +110,7 @@ class WebCategoryHierarchyControllers extends Controller
         return response()->json([
             'status' => true,
             'in' => $request->input(),
-            'result' => $result 
+            'result' => $result ,
         ]);
     }
 }

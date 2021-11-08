@@ -208,7 +208,7 @@
                 test() {
                     console.log(this.addCategory);
                 },
-                GetCategory(obj, level) { //取得子分類
+                GetCategory(obj, category_level) { //取得子分類
                     var dataFunction = this;
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_hierarchy/ajax', {
@@ -218,7 +218,7 @@
                             category_level: category_level,
                             type: 'GetCategory',
                         });
-                        switch (level) {
+                        switch (category_level) {
                             case '1':
                                 dataFunction.category_level_2 = response.data.result;
                                 dataFunction.category_level_2_title = obj.category_name;
@@ -271,34 +271,18 @@
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'AddCategory',
                             category_level: this.addCategory.category_level,
-                            parent_id:this.addCategory.parent_id , 
-                            category_name:this.addCategory.category_name,
+                            parent_id: this.addCategory.parent_id,
+                            category_name: this.addCategory.category_name,
                         });
-                        console.log(response) ; 
                         switch (this.addCategory.category_level) {
                             case '1':
-                                this.category_level_1.push({
-                                    id: '',
-                                    category_level: this.addCategory.category_level,
-                                    parent_id: this.addCategory.parent_id,
-                                    category_name: this.addCategory.category_name
-                                });
+                                this.category_level_1 = response.data.result;
                                 break;
                             case '2':
-                                this.category_level_2.push({
-                                    id: '',
-                                    category_level: this.addCategory.category_level,
-                                    parent_id: this.addCategory.parent_id,
-                                    category_name: this.addCategory.category_name
-                                });
+                                this.category_level_2 = response.data.result;
                                 break;
                             case '3':
-                                this.category_level_3.push({
-                                    id: '',
-                                    category_level: this.addCategory.category_level,
-                                    parent_id: this.addCategory.parent_id,
-                                    category_name: this.addCategory.category_name
-                                });
+                                this.category_level_3 = response.data.result;
                                 break;
                             default:
                                 break;
