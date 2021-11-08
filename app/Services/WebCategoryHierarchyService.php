@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CategoryHierarchy;
+use App\Models\CategoryProducts;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -65,6 +66,32 @@ class WebCategoryHierarchyService
         }
         return CategoryHierarchy::where('parent_id', $in['parent_id'])->get();
     }
+    public function del_Category_Hierarchy($in)
+    {
+        $resut = [];
+        $CategoryProductsCount = CategoryProducts::where('web_category_hierarchy_id', $in['id'])->get()->count();
+        $CategoryHierarchyCount = CategoryHierarchy::where('parent_id', $in['id'])->get()->count();
+        $resut['Msg_Hierarchy'] = '';
+        $resut['Msg_Products'] = '';
+        $resut['Msg'] = '';
+
+        $resut['status'] = true;
+        if ($CategoryHierarchyCount !== 0) {
+            $resut['Msg_Hierarchy'] = '請將該分類底下的分類清空才能執行該操作';
+            $resut['status'] = false;
+        }
+        if ($CategoryProductsCount !== 0) {
+            $resut['Msg_Products'] = '請先將分類階層有使用到該分類的品項刪除,才能執行該操作';
+            $resut['status'] = false;
+        }
+        if ($resut['status']) {
+            CategoryHierarchy::where('id', $in['id'])->delete();
+            $resut['status'] = true;
+            $resut['Msg'] = '刪除成功';
+        }
+        return $resut;
+    }
+
     public function getSort($in)
     {
 
@@ -72,8 +99,10 @@ class WebCategoryHierarchyService
             ->where('category_level', $in['category_level'])
             ->orderBy('sort', 'desc')
             ->first();
-        $query->sort += 1;
-        $resut = $query->sort;
-        return $resut;
+        $sort = 0;
+        if ($query !== null) {
+            $sort = $query->sort += 1;
+        }
+        return $sort;
     }
 }

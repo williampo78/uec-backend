@@ -66,7 +66,7 @@
                                                             @click="CategoryModelShow('1','edit',level_1_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-4">
-                                                        <button type="button" class="btn btn-danger">刪除</button>
+                                                        <button type="button" class="btn btn-danger" @click="DelCategory(level_1_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -119,7 +119,7 @@
                                                             @click="CategoryModelShow('2','edit',level_2_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger">刪除</button>
+                                                        <button type="button" class="btn btn-danger" @click="DelCategory(level_2_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -172,7 +172,7 @@
                                                             @click="CategoryModelShow('3','edit',level_3_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger">刪除</button>
+                                                        <button type="button" class="btn btn-danger" @click="DelCategory(level_3_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -255,6 +255,34 @@
                     }
                     req();
                 },
+                DelCategory(id){
+                    var DelAjax = async () => {
+                        const response = await axios.post('/backend/web_category_hierarchy/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'DelCategory',
+                            id: id,
+                        });
+                        if(response.data.result.Msg_Hierarchy !== ''){
+                            alert(response.data.result.Msg_Hierarchy) ; 
+                        }
+                        if(response.data.result.Msg_Products !== ''){
+                            alert(response.data.result.Msg_Products) ; 
+                        }
+                        if(response.data.result.status){
+                            alert(response.data.result.Msg) ; 
+                            history.go(0);
+                        }
+                        console.log(response) ;
+                        // response.data.result.Msg_Hierarchy =
+                        // alert(response.data.result.Msg) ; 
+                        // console.log() ;
+                    }
+                    var Sure = confirm('你確定要刪除該分類嗎?');
+                    if(Sure){
+                        DelAjax() ; 
+                    }
+                    // console.log(id) ; 
+                },
                 CategoryModelShow(level, act, obj) {
                     // empty data
                     this.msg.receiver_name = '';
@@ -308,6 +336,7 @@
                             parent_id: this.addCategory.parent_id,
                             category_name: this.addCategory.category_name,
                         });
+                        console.log(response);
                         switch (this.addCategory.category_level) {
                             case '1':
                                 this.category_level_1 = response.data.result;
@@ -338,6 +367,7 @@
                     }
 
                 }
+                
             },
             mounted: function() {
                 // if (event.keyCode == 13) {
