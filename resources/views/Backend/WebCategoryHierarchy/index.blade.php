@@ -34,7 +34,7 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-warning btn-sm " data-toggle="modal"
-                                            data-target="#addCategory" @click="addCategoryModelShow('1')">新增大類</a>
+                                            data-target="#addCategory" @click="CategoryModelShow('1','add')">新增大類</a>
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-success btn-sm">儲存</a>
@@ -61,7 +61,9 @@
                                                             @click="GetCategory(level_1_obj,'1')">展中類</button>
                                                     </div>
                                                     <div class="col-sm-4">
-                                                        <button type="button" class="btn btn-warning">編輯</button>
+                                                        <button type="button" class="btn btn-warning" data-toggle="modal"
+                                                            data-target="#addCategory"
+                                                            @click="CategoryModelShow('2','edit','level_2_obj')">編輯</button>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <button type="button" class="btn btn-danger">刪除</button>
@@ -82,7 +84,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-warning btn-sm" data-toggle="modal"
-                                            data-target="#addCategory" @click="addCategoryModelShow('2')">新增中類</a>
+                                            data-target="#addCategory" @click="CategoryModelShow('2','add')">新增中類</a>
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-success btn-sm" @click="">儲存</a>
@@ -109,7 +111,9 @@
                                                             @click="GetCategory(level_2_obj,'2')">展小類</button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-warning">編輯</button>
+                                                        <button @click="" type="button" class="btn btn-warning"
+                                                            data-toggle="modal" data-target="#addCategory"
+                                                            @click="CategoryModelShow('2','edit','level_2_obj')">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-danger">刪除</button>
@@ -134,7 +138,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-warning btn-sm" data-toggle="modal"
-                                            data-target="#addCategory" @click="addCategoryModelShow('3')">新增小類</a>
+                                            data-target="#addCategory" @click="CategoryModelShow('3','add')">新增小類</a>
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-success btn-sm">儲存</a>
@@ -157,7 +161,9 @@
                                             <td>
                                                 <div class="row">
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-warning">編輯</button>
+                                                        <button type="button" class="btn btn-warning" data-toggle="modal"
+                                                            data-target="#addCategory"
+                                                            @click="CategoryModelShow('3','edit','level_3_obj')">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-danger">刪除</button>
@@ -172,7 +178,7 @@
                     </div>
                 </div>
             </div>
-            @include('Backend.WebCategoryHierarchy.addcategory')
+            @include('Backend.WebCategoryHierarchy.input_model_category')
         </div>
     </div>
 @endsection
@@ -193,6 +199,7 @@
                     category_level_2_obj: [],
                     //暫存的新增
                     addCategory: {
+                        id: '',
                         show_title: '',
                         category_level: '',
                         parent_id: '',
@@ -236,11 +243,13 @@
                     }
                     req();
                 },
-                addCategoryModelShow(level) {
+                CategoryModelShow(level, act, obj) {
                     var addCategory = this.addCategory;
                     this.msg.receiver_name = ''; // empty error msg 
                     addCategory.category_name = '';
                     addCategory.category_level = level;
+                    addCategory.act = act;
+                    
                     switch (level) {
                         case '1':
                             addCategory.category_level = level;
@@ -259,17 +268,24 @@
                             break;
                     }
                 },
-                addCategoryToList() {
+                CategoryToList() { //新增編輯
                     var checkstatus = true;
+                    var type = '';
                     if (this.addCategory.category_name == '') {
                         checkstatus = false;
                         this.msg.receiver_name = '不能為空喔';
+                    }
+
+                    if (this.addCategory.act == 'add') {
+                        type = 'AddCategory';
+                    } else {
+                        type = 'EditCategory';
                     }
                     // console.log('TEST');
                     var addAjax = async () => {
                         const response = await axios.post('/backend/web_category_hierarchy/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
-                            type: 'AddCategory',
+                            type: type,
                             category_level: this.addCategory.category_level,
                             parent_id: this.addCategory.parent_id,
                             category_name: this.addCategory.category_name,
@@ -286,15 +302,12 @@
                                 break;
                             default:
                                 break;
-
                         }
                     }
-
                     if (checkstatus) {
                         addAjax();
+                        $('.hidden-model').click();
                     }
-
-                    $('.hidden-model').click();
 
                 }
             },

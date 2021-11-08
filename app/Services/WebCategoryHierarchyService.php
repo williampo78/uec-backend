@@ -45,6 +45,9 @@ class WebCategoryHierarchyService
         }        
         return CategoryHierarchy::where('parent_id', $in['parent_id'])->get();
     }
+    public function edit_Category_Hierarchy($in){
+
+    }
     public function getSort($in){
         
         $query = CategoryHierarchy::where('parent_id', $in['parent_id'])

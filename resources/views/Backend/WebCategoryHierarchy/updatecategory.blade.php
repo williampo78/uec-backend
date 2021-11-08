@@ -1,5 +1,5 @@
       {{-- modal div --}}
-      <div class="modal fade" id="addCategory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+      <div class="modal fade" id="updatecategory" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
           aria-hidden="true">
           <div class="modal-dialog">
               <div class="modal-content modal-primary panel-primary">
@@ -24,12 +24,12 @@
                               </div> --}}
                           </div>
                           <br>
-                          {{-- <div class="row">
+                          <div class="row">
                               <div class="col-sm-2 "><label> 分類原名稱</label></div>
                               <div class="col-sm-4 ">
                                   <input name="receiver_name" id="receiver_name" value="" class="form-control">
                               </div>
-                          </div> --}}
+                          </div>
                           <br>
                           <div class="row">
                               <div class="col-sm-2 "><label> 分類名稱</label></div>

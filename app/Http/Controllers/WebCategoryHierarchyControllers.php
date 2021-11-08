@@ -103,6 +103,10 @@ class WebCategoryHierarchyControllers extends Controller
                 break;
             case 'AddCategory':
                 $result = $this->webCategoryHierarchyService->add_Category_Hierarchy($in) ;  
+            case 'EditCategory':
+                // $result = $this->webCategoryHierarchyService->edit_Category_Hierarchy($in) ;
+                $result = 'edit' ; 
+                 
             default:
                 # code...
                 break;
