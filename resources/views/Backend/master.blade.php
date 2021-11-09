@@ -90,6 +90,7 @@
 <link rel="stylesheet" href="{{asset('asset/css/validationEngine.jquery.css')}}">
 <link href="{{asset('asset/css/editor.css')}}" rel="stylesheet">
 <script>
+    var RoleAuthJson = @json($share_role_auth) ; 
     $(document).ready(function () {
         $('#table_list').DataTable();
     });

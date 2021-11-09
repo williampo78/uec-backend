@@ -12,7 +12,7 @@
 
         .ondragover {
             background: #b7e0fb !important;
-            transition: background-color 1s;
+            transition: background-color 0.5s;
         }
 
     </style>
@@ -38,11 +38,13 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-warning btn-sm " data-toggle="modal"
-                                            data-target="#addCategory" @click="CategoryModelShow('1','add')">新增大類</a>
+                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal"
+                                            v-show="RoleAuthJson.auth_create" data-target="#addCategory"
+                                            @click="CategoryModelShow('1','add')">新增大類</a>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-success btn-sm" @click="SaveSort('1')">儲存</a>
+                                        <a class="btn btn-block btn-success btn-sm" v-show="RoleAuthJson.auth_update"
+                                            @click="SaveSort('1')">儲存</a>
                                     </div>
                                 </div>
                                 <hr>
@@ -54,7 +56,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(level_1_obj, level_1_key) in category_level_1" @dragstart="drag"
+                                        <tr v-for="(level_1_obj, level_1_key) in category_level_1 " @dragstart="drag"
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
                                             :data-index="level_1_key" :data-level="'1'">
                                             <td style="vertical-align:middle">
@@ -69,12 +71,13 @@
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
-                                                            data-target="#addCategory"
+                                                            data-target="#addCategory" v-show="RoleAuthJson.auth_update"
                                                             @click="CategoryModelShow('1','edit',level_1_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <button type="button" class="btn btn-danger"
-                                                            @click="DelCategory(level_1_obj.id)">刪除</button>
+                                                            @click="DelCategory(level_1_obj.id)"
+                                                            v-show="RoleAuthJson.auth_delete">刪除</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -92,13 +95,14 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <button class="btn btn-block btn-warning btn-sm" data-toggle="modal"
-                                            data-target="#addCategory" @click="CategoryModelShow('2','add')"
+                                        <button class="btn btn-block btn-warning btn-sm" v-show="RoleAuthJson.auth_create"
+                                            data-toggle="modal" data-target="#addCategory"
+                                            @click="CategoryModelShow('2','add')"
                                             :disabled="disabled.disabled_level_2 == 1">新增中類</button>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-success btn-sm" @click="SaveSort('2')"
-                                            :disabled="disabled.disabled_level_2 == 1">儲存</a>
+                                        <a class="btn btn-block btn-success btn-sm" v-show="RoleAuthJson.auth_update"
+                                            @click="SaveSort('2')" :disabled="disabled.disabled_level_2 == 1">儲存</a>
                                     </div>
                                 </div>
                                 <hr>
@@ -126,10 +130,12 @@
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
                                                             data-target="#addCategory"
-                                                            @click="CategoryModelShow('2','edit',level_2_obj)">編輯</button>
+                                                            v-show="RoleAuthJson.auth_update"
+                                                            @click="CategoryModelShow('2','edit',level_2_obj)">編輯
+                                                        </button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger"
+                                                        <button type="button" class="btn btn-danger" v-show="RoleAuthJson.auth_delete"
                                                             @click="DelCategory(level_2_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
@@ -152,12 +158,14 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-warning btn-sm" data-toggle="modal"
-                                            data-target="#addCategory" @click="CategoryModelShow('3','add')"
+                                        <a class="btn btn-block btn-warning btn-sm" v-show="RoleAuthJson.auth_create"
+                                            data-toggle="modal" data-target="#addCategory"
+                                            @click="CategoryModelShow('3','add')"
                                             :disabled="disabled.disabled_level_3 == 1">新增小類</a>
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-success btn-sm"
+                                        v-show="RoleAuthJson.auth_update"
                                             :disabled="disabled.disabled_level_3 == 1" @click="SaveSort('2')">儲存</a>
                                     </div>
                                 </div>
@@ -182,10 +190,12 @@
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
                                                             data-target="#addCategory"
+                                                            v-show="RoleAuthJson.auth_update"
                                                             @click="CategoryModelShow('3','edit',level_3_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-danger"
+                                                        v-show="RoleAuthJson.auth_delete"
                                                             @click="DelCategory(level_3_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
@@ -207,6 +217,15 @@
         var requisitions = Vue.extend({
             data: function() {
                 return {
+                    RoleAuthJson: RoleAuthJson, //腳色權限
+                    // RoleAuthJson: {
+                    //     auth_create: 0,
+                    //     auth_delete: 0,
+                    //     auth_export: 0,
+                    //     auth_query: 0,
+                    //     auth_update: 0,
+                    //     auth_void: 0,
+                    // },
                     //list 
                     category_level_1: @json($category_level_1),
                     category_level_2: [],
@@ -449,21 +468,17 @@
                             const response = await axios.post('/backend/web_category_hierarchy/ajax', {
                                 _token: $('meta[name="csrf-token"]').attr('content'),
                                 type: 'SortCategory',
-                                JsonData: JSON.stringify(InData) ,
+                                JsonData: JSON.stringify(InData),
                             });
-                            console.log(response) ; 
+                            console.log(response);
                         }
 
-                        SeveSortAjax() ; 
+                        SeveSortAjax();
                     }
                 }
 
             },
             mounted: function() {
-                // if (event.keyCode == 13) {
-                //     event.preventDefault();
-                //     return false;
-                // }
             },
             watch: {
                 //監聽是否要將新增儲存開放點擊
