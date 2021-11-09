@@ -11,7 +11,8 @@
         }
 
         .ondragover {
-            background: #b7e9fb !important;
+            background: #b7e0fb !important;
+            transition: background-color 1s;
         }
 
     </style>
