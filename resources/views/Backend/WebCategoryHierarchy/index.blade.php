@@ -110,9 +110,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(level_2_obj, level_2_key) in category_level_2"  
-                                        @dragstart="drag" @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                        :data-index="level_2_key" :data-level="'2'">
+                                        <tr v-for="(level_2_obj, level_2_key) in category_level_2" @dragstart="drag"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            :data-index="level_2_key" :data-level="'2'">
                                             <td style="vertical-align:middle">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_2_obj . category_name }}
@@ -170,9 +170,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(level_3_obj, level_3_key) in category_level_3"
-                                        @dragstart="drag" @dragover='dragover' @dragleave='dragleave' @drop="drop"  draggable="true"
-                                        :data-index="level_3_key" :data-level="'3'">
+                                        <tr v-for="(level_3_obj, level_3_key) in category_level_3" @dragstart="drag"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            :data-index="level_3_key" :data-level="'3'">
                                             <td style="vertical-align:middle">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_3_obj . category_name }}
@@ -251,20 +251,28 @@
                             category_level: category_level,
                             type: 'GetCategory',
                         });
-                        switch (category_level) {
-                            case '1':
-                                dataFunction.category_level_2 = response.data.result;
-                                dataFunction.category_level_2_title = obj.category_name;
-                                dataFunction.category_level_1_obj = obj;
-                                break;
-                            case '2':
-                                dataFunction.category_level_3 = response.data.result;
-                                dataFunction.category_level_3_title = obj.category_name;
-                                dataFunction.category_level_2_obj = obj;
-                                break;
-                            default:
-                                break;
-                        }
+                        // category_level_2_title = '';
+                        // category_level_3_title = '';
+                        // category_level_2 = [];
+                        // category_level_3 = [];
+                        // category_level_1_obj = [];
+                        // category_level_2_obj = [],
+                            switch (category_level) {
+                                case '1':
+                                    this.category_level_3_title = '';
+                                    this.category_level_3 = [];
+                                    dataFunction.category_level_2 = response.data.result;
+                                    dataFunction.category_level_2_title = obj.category_name;
+                                    dataFunction.category_level_1_obj = obj;
+                                    break;
+                                case '2':
+                                    dataFunction.category_level_3 = response.data.result;
+                                    dataFunction.category_level_3_title = obj.category_name;
+                                    dataFunction.category_level_2_obj = obj;
+                                    break;
+                                default:
+                                    break;
+                            }
                         // console.log(response.data);
                     }
                     req();
@@ -384,7 +392,7 @@
                 drag(eve) {
                     eve.dataTransfer.setData("text", eve.target.dataset.index);
                     eve.dataTransfer.setData("level", eve.target.dataset.level);
-                    console.log(eve.target.dataset.level) ;
+                    console.log(eve.target.dataset.level);
 
                 },
                 dragover(eve) {
@@ -403,8 +411,8 @@
                     var level = eve.dataTransfer.getData("level");
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
-                    console.log('觸發 : ' + targetlevel) ; 
-                    console.log('拖拉 : ' + level) ; 
+                    console.log('觸發 : ' + targetlevel);
+                    console.log('拖拉 : ' + level);
                     if (targetlevel !== level) {
                         alert('母湯歐北來');
                     } else {
