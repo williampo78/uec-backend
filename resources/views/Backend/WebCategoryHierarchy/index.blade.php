@@ -123,7 +123,7 @@
                                             </td>
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-sm-5" v-show="UecConfig.web_category_hierarchy_levels == '2' ">
+                                                    <div class="col-sm-5" v-show="UecConfig.web_category_hierarchy_levels == '3' ">
                                                         <button type="button" class="btn btn-primary"
                                                             @click="GetCategory(level_2_obj,'2')">展小類</button>
                                                     </div>
@@ -145,7 +145,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="col-sm-4" v-show="UecConfig.web_category_hierarchy_levels == '2' ">
+                            <div class="col-sm-4" v-show="UecConfig.web_category_hierarchy_levels == '3' ">
                                 <div class="row">
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -417,6 +417,8 @@
                     var level = eve.dataTransfer.getData("level");
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
+                    console.log(level) ; 
+                    console.log(targetlevel) ; 
                     if (targetlevel !== level) {
                         alert('不能跨分類喔!');
                     } else {
@@ -432,7 +434,7 @@
                                 this.category_level_2.splice(targetIndex, 0, item)
                                 break;
                             case '3':
-                                var item = this.category_level_2[index];
+                                var item = this.category_level_3[index];
                                 this.category_level_3.splice(index, 1)
                                 this.category_level_3.splice(targetIndex, 0, item)
                                 break;
