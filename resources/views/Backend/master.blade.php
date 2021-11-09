@@ -5,46 +5,47 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('asset/img/uarklogo.ico') }}"/>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('asset/img/uarklogo.ico') }}" />
     <title>@yield('title')</title>
-    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-treefy.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/sb-admin-2.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}" />
+    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-treefy.css') }}" />
+    <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/sb-admin-2.css') }}" />
     <link rel="stylesheet"
-          href="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/timeline.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('asset/js/template/bower_components/morrisjs/morris.css') }}"/>
+        href="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/timeline.css') }}" />
+    <link rel="stylesheet" href="{{ asset('asset/js/template/bower_components/morrisjs/morris.css') }}" />
     <link rel="stylesheet"
-          href="{{ asset('asset/js/template/bower_components/bootstrap-datetimepicker-master/build/css/bootstrap-datetimepicker.css') }}"/>
+        href="{{ asset('asset/js/template/bower_components/bootstrap-datetimepicker-master/build/css/bootstrap-datetimepicker.css') }}" />
     <link rel="stylesheet"
-          href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}"/>
+        href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
-    <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}"/>
-    <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
-    <link rel="stylesheet" href="{{asset('asset/js/DataTables/datatables.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}" />
+    <link rel="stylesheet" href="{{ asset('asset/css/select2-bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/js/DataTables/datatables.min.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <style>
-    [v-cloak] {
-        display: none;
-    }
+        [v-cloak] {
+            display: none;
+        }
+
     </style>
 </head>
 
 <body>
-@auth
+    @auth
 
-    @include('Backend.menu')
+        @include('Backend.menu')
 
-    @if(session()->has('message'))
-        <div class="alert alert-success">
-            {{ session()->get('message') }}
-        </div>
-    @endif
-@endauth
-@guest
-@endguest
-@yield('content')
+        @if (session()->has('message'))
+            <div class="alert alert-success">
+                {{ session()->get('message') }}
+            </div>
+        @endif
+    @endauth
+    @guest
+    @endguest
+    @yield('content')
 </body>
 <script src="{{ asset('asset/js/template/bower_components/jquery/dist/jquery.js') }}"></script>
 <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
@@ -60,10 +61,10 @@
 <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
 <script src="{{ asset('asset/js/select2.min.js') }}"></script>
 {{-- <script src="{{ asset('//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.full.js') }}"> </script> --}}
-{{--<script src="{{ asset('asset/js/ckeditor/ckeditor.js') }}"></script>--}}
-{{--<script src="{{ asset('asset/js/ckfinder/ckfinder.js') }}"></script>--}}
+{{-- <script src="{{ asset('asset/js/ckeditor/ckeditor.js') }}"></script> --}}
+{{-- <script src="{{ asset('asset/js/ckfinder/ckfinder.js') }}"></script> --}}
 
-{{--<script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script>--}}
+{{-- <script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script> --}}
 <script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>
 
 
@@ -83,16 +84,18 @@
 <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
-<script src="{{asset('asset/js/jquery.validationEngine.js')}}"></script>
-<script src="{{asset('asset/js/jquery.validationEngine-zh_TW.js')}}"></script>
-<script src="{{asset('https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js')}}"></script>
+<script src="{{ asset('asset/js/jquery.validationEngine.js') }}"></script>
+<script src="{{ asset('asset/js/jquery.validationEngine-zh_TW.js') }}"></script>
+<script src="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js') }}"></script>
 
-<link rel="stylesheet" href="{{asset('asset/css/validationEngine.jquery.css')}}">
-<link href="{{asset('asset/css/editor.css')}}" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('asset/css/validationEngine.jquery.css') }}">
+<link href="{{ asset('asset/css/editor.css') }}" rel="stylesheet">
 <script>
-    var RoleAuthJson = @json($share_role_auth) ; 
-    var UecConfig = @json(Config('uec')) ;
-    $(document).ready(function () {
+    @isset($share_role_auth)
+    var RoleAuthJson =  @json($share_role_auth) ; 
+    @endisset
+    var UecConfig = @json(Config('uec'));
+    $(document).ready(function() {
         $('#table_list').DataTable();
     });
 </script>
