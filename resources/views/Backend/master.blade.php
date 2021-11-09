@@ -24,6 +24,11 @@
     <link rel="stylesheet" href="{{asset('asset/css/select2-bootstrap.css')}}">
     <link rel="stylesheet" href="{{asset('asset/js/DataTables/datatables.min.css')}}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <style>
+    [v-cloak] {
+        display: none;
+    }
+    </style>
 </head>
 
 <body>
@@ -85,6 +90,8 @@
 <link rel="stylesheet" href="{{asset('asset/css/validationEngine.jquery.css')}}">
 <link href="{{asset('asset/css/editor.css')}}" rel="stylesheet">
 <script>
+    var RoleAuthJson = @json($share_role_auth) ; 
+    var UecConfig = @json(Config('uec')) ;
     $(document).ready(function () {
         $('#table_list').DataTable();
     });

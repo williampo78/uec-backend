@@ -108,7 +108,6 @@ class RoleService
                 'auth_export' => $roles[$code]['auth_export'],
             ];
         }
-
         return $data;
     }
 }
