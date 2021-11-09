@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\IndexController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\DradviceController;
+use App\Http\Controllers\api\TestInfoController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -20,19 +22,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix'=>'v1'], function (){
+Route::group(['prefix' => 'v1'], function () {
     Route::get('/footer', [IndexController::class, 'index']);
     Route::get('/footer/{id}', [IndexController::class, 'getContent']);
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
 });
 
-Route::group(['prefix' => 'auth', 'namespace' => 'App\Http\Controllers\api'], function () {
-    Route::get('/', 'AuthController@me')->name('me');
-    Route::post('logout', 'AuthController@logout')->name('logout');
+Route::group(['middleware' =>'jwt.member'], function () {
+    Route::get('me', [AuthController::class, 'me']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
+
+    Route::get('profile', [AuthController::class, 'profile']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
 Route::get('area/{all}', [DradviceController::class, 'area']);
 
-Route::post('login', [AuthController::class,'login']);
-Route::post('members/login', [DradviceController::class, 'memberLogin']);
+Route::post('members/login', [AuthController::class, 'login']);
+//Route::post('members/login', [DradviceController::class, 'memberLogin']);

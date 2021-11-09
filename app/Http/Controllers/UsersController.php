@@ -48,7 +48,7 @@ class UsersController extends Controller
     {
         $data['suppliers'] = $this->supplierService->getSupplier();
         $data['roles'] = $this->rolePermissionService->getRoles("");
-        return view('Backend.users.add', compact('data'));
+        return view('Backend.Users.add', compact('data'));
     }
 
     /**

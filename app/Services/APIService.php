@@ -84,4 +84,30 @@ class APIService
         curl_close($curl);
         return $response;
     }
+
+    /*
+     * 查詢會員資料
+     * method: GET
+     * @return json
+     */
+    public function getMemberInfo($input)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://stgapi.dradvice.com.tw/crm/v1/members/'.$input,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
 }

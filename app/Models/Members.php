@@ -11,6 +11,8 @@ class Members extends Authenticatable implements JWTSubject
 {
     use Notifiable;
     protected $table = 'members';
+
+    protected $guarded = [];
     /**
      * 取得 JWT 辨識字串
      *
