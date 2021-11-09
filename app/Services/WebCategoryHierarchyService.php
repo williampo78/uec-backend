@@ -20,7 +20,7 @@ class WebCategoryHierarchyService
      */
     public function web_Category_Hierarchy_Bylevel($parent_id = null)
     {
-        return CategoryHierarchy::where('parent_id', $parent_id)->orderBy('sort', 'desc')->get();
+        return CategoryHierarchy::where('parent_id', $parent_id)->orderBy('sort', 'ASC')->get();
     }
     public function add_Category_Hierarchy($in)
     {
@@ -64,7 +64,7 @@ class WebCategoryHierarchyService
             Log::info($e);
             return false;
         }
-        return CategoryHierarchy::where('parent_id', $in['parent_id'])->get();
+        return CategoryHierarchy::where('parent_id', $in['parent_id'])->orderBy('sort', 'ASC')->get();
     }
     public function del_Category_Hierarchy($in)
     {
@@ -91,7 +91,13 @@ class WebCategoryHierarchyService
         }
         return $resut;
     }
-
+    public function sort_Category_Hierarchy($in){
+        $sort = json_decode($in['JsonData'],true) ;
+        foreach($sort as $key => $val){
+            CategoryHierarchy::where('id', $val['id'])->update(['sort' => $key]);
+        }
+      return  true ; 
+    }
     public function getSort($in)
     {
 
@@ -105,4 +111,5 @@ class WebCategoryHierarchyService
         }
         return $sort;
     }
+
 }

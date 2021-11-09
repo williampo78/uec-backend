@@ -42,7 +42,7 @@
                                             data-target="#addCategory" @click="CategoryModelShow('1','add')">新增大類</a>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-success btn-sm">儲存</a>
+                                        <a class="btn btn-block btn-success btn-sm" @click="SaveSort('1')">儲存</a>
                                     </div>
                                 </div>
                                 <hr>
@@ -97,7 +97,7 @@
                                             :disabled="disabled.disabled_level_2 == 1">新增中類</button>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-success btn-sm" @click=""
+                                        <a class="btn btn-block btn-success btn-sm" @click="SaveSort('2')"
                                             :disabled="disabled.disabled_level_2 == 1">儲存</a>
                                     </div>
                                 </div>
@@ -158,7 +158,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <a class="btn btn-block btn-success btn-sm"
-                                            :disabled="disabled.disabled_level_3 == 1">儲存</a>
+                                            :disabled="disabled.disabled_level_3 == 1" @click="SaveSort('2')">儲存</a>
                                     </div>
                                 </div>
                                 <hr>
@@ -251,28 +251,22 @@
                             category_level: category_level,
                             type: 'GetCategory',
                         });
-                        // category_level_2_title = '';
-                        // category_level_3_title = '';
-                        // category_level_2 = [];
-                        // category_level_3 = [];
-                        // category_level_1_obj = [];
-                        // category_level_2_obj = [],
-                            switch (category_level) {
-                                case '1':
-                                    this.category_level_3_title = '';
-                                    this.category_level_3 = [];
-                                    dataFunction.category_level_2 = response.data.result;
-                                    dataFunction.category_level_2_title = obj.category_name;
-                                    dataFunction.category_level_1_obj = obj;
-                                    break;
-                                case '2':
-                                    dataFunction.category_level_3 = response.data.result;
-                                    dataFunction.category_level_3_title = obj.category_name;
-                                    dataFunction.category_level_2_obj = obj;
-                                    break;
-                                default:
-                                    break;
-                            }
+                        switch (category_level) {
+                            case '1':
+                                this.category_level_3_title = '';
+                                this.category_level_3 = [];
+                                dataFunction.category_level_2 = response.data.result;
+                                dataFunction.category_level_2_title = obj.category_name;
+                                dataFunction.category_level_1_obj = obj;
+                                break;
+                            case '2':
+                                dataFunction.category_level_3 = response.data.result;
+                                dataFunction.category_level_3_title = obj.category_name;
+                                dataFunction.category_level_2_obj = obj;
+                                break;
+                            default:
+                                break;
+                        }
                         // console.log(response.data);
                     }
                     req();
@@ -411,10 +405,8 @@
                     var level = eve.dataTransfer.getData("level");
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
-                    console.log('觸發 : ' + targetlevel);
-                    console.log('拖拉 : ' + level);
                     if (targetlevel !== level) {
-                        alert('母湯歐北來');
+                        alert('不能跨分類喔!');
                     } else {
                         switch (level) {
                             case '1':
@@ -437,6 +429,33 @@
                         }
                     }
 
+                },
+                SaveSort(level) {
+                    switch (level) {
+                        case '1':
+                            var InData = this.category_level_1;
+                            break;
+                        case '2':
+                            var InData = this.category_level_2;
+                            break;
+                        case '3':
+                            var InData = this.category_level_3;
+                            break;
+                        default:
+                            break;
+                    }
+                    if (InData.length > 0) {
+                        let SeveSortAjax = async () => {
+                            const response = await axios.post('/backend/web_category_hierarchy/ajax', {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                type: 'SortCategory',
+                                JsonData: JSON.stringify(InData) ,
+                            });
+                            console.log(response) ; 
+                        }
+
+                        SeveSortAjax() ; 
+                    }
                 }
 
             },

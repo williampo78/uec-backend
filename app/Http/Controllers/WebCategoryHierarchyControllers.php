@@ -110,6 +110,9 @@ class WebCategoryHierarchyControllers extends Controller
             case 'DelCategory' : 
                 $result = $this->webCategoryHierarchyService->del_Category_Hierarchy($in) ;
                 break;
+            case 'SortCategory':
+                $result = $this->webCategoryHierarchyService->sort_Category_Hierarchy($in) ; 
+                break ; 
             default:
                 # code...
                 break;
