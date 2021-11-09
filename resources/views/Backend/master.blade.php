@@ -91,6 +91,7 @@
 <link href="{{asset('asset/css/editor.css')}}" rel="stylesheet">
 <script>
     var RoleAuthJson = @json($share_role_auth) ; 
+    var UecConfig = @json(Config('uec')) ;
     $(document).ready(function () {
         $('#table_list').DataTable();
     });

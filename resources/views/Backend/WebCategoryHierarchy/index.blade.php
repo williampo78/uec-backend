@@ -30,7 +30,7 @@
                 <div class="panel panel-default container-fluid">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-sm-4 ">
+                            <div class="col-sm-4">
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <h4 style="font-weight:bold;">大分類</h4>
@@ -123,7 +123,7 @@
                                             </td>
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-sm-5">
+                                                    <div class="col-sm-5" v-show="UecConfig.web_category_hierarchy_levels == '2' ">
                                                         <button type="button" class="btn btn-primary"
                                                             @click="GetCategory(level_2_obj,'2')">展小類</button>
                                                     </div>
@@ -145,7 +145,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-4" v-show="UecConfig.web_category_hierarchy_levels == '2' ">
                                 <div class="row">
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -218,15 +218,8 @@
             data: function() {
                 return {
                     RoleAuthJson: RoleAuthJson, //腳色權限
-                    // RoleAuthJson: {
-                    //     auth_create: 0,
-                    //     auth_delete: 0,
-                    //     auth_export: 0,
-                    //     auth_query: 0,
-                    //     auth_update: 0,
-                    //     auth_void: 0,
-                    // },
-                    //list 
+                    UecConfig:UecConfig,//後臺設定
+                    //list
                     category_level_1: @json($category_level_1),
                     category_level_2: [],
                     category_level_3: [],
