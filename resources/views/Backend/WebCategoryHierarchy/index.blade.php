@@ -10,6 +10,10 @@
             color: darkturquoise;
         }
 
+        .ondragover {
+            background: #b7e9fb !important;
+        }
+
     </style>
     <!--列表-->
     <div id="page-wrapper">
@@ -48,8 +52,10 @@
                                             <th class="col-sm-8">功能</th>
                                         </tr>
                                     </thead>
-                                    <tbody v-for="(level_1_obj, level_1_key) in category_level_1">
-                                        <tr>
+                                    <tbody>
+                                        <tr v-for="(level_1_obj, level_1_key) in category_level_1" @dragstart="drag"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            :data-index="level_1_key" :data-level="'1'">
                                             <td style="vertical-align:middle">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_1_obj . category_name }}
@@ -66,7 +72,8 @@
                                                             @click="CategoryModelShow('1','edit',level_1_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-4">
-                                                        <button type="button" class="btn btn-danger" @click="DelCategory(level_1_obj.id)">刪除</button>
+                                                        <button type="button" class="btn btn-danger"
+                                                            @click="DelCategory(level_1_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -101,8 +108,10 @@
                                             <th class="col-sm-8">功能</th>
                                         </tr>
                                     </thead>
-                                    <tbody v-for="(level_2_obj, level_2_key) in category_level_2">
-                                        <tr>
+                                    <tbody>
+                                        <tr v-for="(level_2_obj, level_2_key) in category_level_2"  
+                                        @dragstart="drag" @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                        :data-index="level_2_key" :data-level="'2'">
                                             <td style="vertical-align:middle">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_2_obj . category_name }}
@@ -119,7 +128,8 @@
                                                             @click="CategoryModelShow('2','edit',level_2_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger" @click="DelCategory(level_2_obj.id)">刪除</button>
+                                                        <button type="button" class="btn btn-danger"
+                                                            @click="DelCategory(level_2_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -158,8 +168,10 @@
                                             <th class="col-sm-8">功能</th>
                                         </tr>
                                     </thead>
-                                    <tbody v-for="(level_3_obj, level_3_key) in category_level_3">
-                                        <tr>
+                                    <tbody>
+                                        <tr v-for="(level_3_obj, level_3_key) in category_level_3"
+                                        @dragstart="drag" @dragover='dragover' @dragleave='dragleave' @drop="drop"  draggable="true"
+                                        :data-index="level_3_key" :data-level="'3'">
                                             <td style="vertical-align:middle">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_3_obj . category_name }}
@@ -172,7 +184,8 @@
                                                             @click="CategoryModelShow('3','edit',level_3_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger" @click="DelCategory(level_3_obj.id)">刪除</button>
+                                                        <button type="button" class="btn btn-danger"
+                                                            @click="DelCategory(level_3_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -255,31 +268,31 @@
                     }
                     req();
                 },
-                DelCategory(id){
+                DelCategory(id) {
                     var DelAjax = async () => {
                         const response = await axios.post('/backend/web_category_hierarchy/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'DelCategory',
                             id: id,
                         });
-                        if(response.data.result.Msg_Hierarchy !== ''){
-                            alert(response.data.result.Msg_Hierarchy) ; 
+                        if (response.data.result.Msg_Hierarchy !== '') {
+                            alert(response.data.result.Msg_Hierarchy);
                         }
-                        if(response.data.result.Msg_Products !== ''){
-                            alert(response.data.result.Msg_Products) ; 
+                        if (response.data.result.Msg_Products !== '') {
+                            alert(response.data.result.Msg_Products);
                         }
-                        if(response.data.result.status){
-                            alert(response.data.result.Msg) ; 
+                        if (response.data.result.status) {
+                            alert(response.data.result.Msg);
                             history.go(0);
                         }
-                        console.log(response) ;
+                        console.log(response);
                         // response.data.result.Msg_Hierarchy =
                         // alert(response.data.result.Msg) ; 
                         // console.log() ;
                     }
                     var Sure = confirm('你確定要刪除該分類嗎?');
-                    if(Sure){
-                        DelAjax() ; 
+                    if (Sure) {
+                        DelAjax();
                     }
                     // console.log(id) ; 
                 },
@@ -366,8 +379,57 @@
                         $('.hidden-model').click();
                     }
 
+                },
+                drag(eve) {
+                    eve.dataTransfer.setData("text", eve.target.dataset.index);
+                    eve.dataTransfer.setData("level", eve.target.dataset.level);
+                    console.log(eve.target.dataset.level) ;
+
+                },
+                dragover(eve) {
+                    eve.preventDefault()
+                    eve.target.parentNode.classList.add('ondragover')
+                },
+                dragleave(eve) {
+                    eve.preventDefault()
+                    eve.target.parentNode.classList.remove('ondragover')
+                    // eve.target.classList.remove('ondragover')
+                },
+                drop(eve) {
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.remove('ondragover')
+                    var index = eve.dataTransfer.getData("text");
+                    var level = eve.dataTransfer.getData("level");
+                    let targetIndex = eve.target.parentNode.dataset.index;
+                    let targetlevel = eve.target.parentNode.dataset.level;
+                    console.log('觸發 : ' + targetlevel) ; 
+                    console.log('拖拉 : ' + level) ; 
+                    if (targetlevel !== level) {
+                        alert('母湯歐北來');
+                    } else {
+                        switch (level) {
+                            case '1':
+                                var item = this.category_level_1[index];
+                                this.category_level_1.splice(index, 1)
+                                this.category_level_1.splice(targetIndex, 0, item)
+                                break;
+                            case '2':
+                                var item = this.category_level_2[index];
+                                this.category_level_2.splice(index, 1)
+                                this.category_level_2.splice(targetIndex, 0, item)
+                                break;
+                            case '3':
+                                var item = this.category_level_2[index];
+                                this.category_level_3.splice(index, 1)
+                                this.category_level_3.splice(targetIndex, 0, item)
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
                 }
-                
+
             },
             mounted: function() {
                 // if (event.keyCode == 13) {
