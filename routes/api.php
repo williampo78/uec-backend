@@ -28,16 +28,21 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
 });
 
-Route::group(['middleware' =>'jwt.member'], function () {
+Route::group(['middleware' => 'jwt.member'], function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 
-    Route::get('profile', [AuthController::class, 'profile']);
+    Route::get('/members/profile', [AuthController::class, 'profile']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
 Route::get('area/{all}', [DradviceController::class, 'area']);
 
-Route::post('members/login', [AuthController::class, 'login']);
+//Route::post('members/login', [AuthController::class, 'login']);
 //Route::post('members/login', [DradviceController::class, 'memberLogin']);
+
+
+Route::group(['prefix' => 'members'], function () {
+    Route::post('/login', [AuthController::class, 'login']);
+});
