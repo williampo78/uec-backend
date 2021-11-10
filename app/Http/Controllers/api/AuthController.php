@@ -97,7 +97,7 @@ class AuthController extends Controller
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $token = JWTAuth::getToken();
-        $member = Members::where('api_token','=', $token)->get();
+        $member = Members::where('api_token', '=', $token)->get();
         if ($member) {
             $message = 'token有效';
             $status = true;
@@ -107,7 +107,7 @@ class AuthController extends Controller
             $err = '203';
         }
 
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => ['message'=>$message]]);
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => ['message' => $message]]);
     }
 
     public function logout()
@@ -115,23 +115,21 @@ class AuthController extends Controller
 
         $token = JWTAuth::getToken();
         //dd($token);
-        $member = Members::where('api_token','=',$token)->get();
+        $member = Members::where('api_token', '=', $token)->get();
         if (JWTAuth::parseToken()->invalidate()) {
             $message = 'token已失效';
-            Members::where('id' , $member[0]['id'])->update(['api_token'=>'']);
+            Members::where('id', $member[0]['id'])->update(['api_token' => '']);
             //Members::where('id', '=', $member[0]['id'])->delete();
         }
-        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => ['message'=>$message]]);
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => ['message' => $message]]);
 
     }
 
-    public function profile()
+    public function profile(Request $request)
     {
         $err = null;
         $error_code = $this->apiService->getErrorCode();
-        $token = JWTAuth::getToken();
-        $member = Members::where('api_token','=', $token)->get();
-        $response = $this->apiService->getMemberInfo($member[0]['member_id']);
+        $response = $this->apiService->getMemberInfo($request->member);
         $result = json_decode($response, true);
         $data = [];
         $data['mobile'] = $result['data']['mobile'];
@@ -160,7 +158,7 @@ class AuthController extends Controller
             $err = '404';
             return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' =>  $data]);
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
     }
 

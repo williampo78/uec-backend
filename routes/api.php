@@ -6,7 +6,7 @@ use App\Http\Controllers\api\IndexController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\DradviceController;
 use App\Http\Controllers\api\TestInfoController;
-
+use App\Http\Controllers\api\MemberInfoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,6 +34,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::post('refresh', [AuthController::class, 'refresh']);
 
     Route::get('/members/profile', [AuthController::class, 'profile']);
+    Route::resource('/membership',MemberInfoController::class, ['names' => ['index' => 'membership']]);
 });
 
 Route::get('area', [DradviceController::class, 'area']);

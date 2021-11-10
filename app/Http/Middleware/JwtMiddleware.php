@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Members;
 use Closure;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -19,7 +20,12 @@ class JwtMiddleware
     {
         try {
             //$member = JWTAuth::getToken();
-            $member = JWTAuth::parseToken()->authenticate();
+
+            $token = JWTAuth::getToken();
+            $member = Members::where('api_token','=', $token)->get();
+            //$member = JWTAuth::parseToken()->authenticate();
+
+            $request->merge(array("member" => $member[0]['member_id']));
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
                 return response()->json(['status' => 'Token is Invalid']);
