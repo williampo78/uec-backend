@@ -11,10 +11,10 @@
         }
 
         .ondragover {
-            background: #b7e0fb !important;
-            transition: background-color 0.5s;
+            /* background: #b7e0fb !important; */
+            /* transition: background-color 0.5s; */
+            background: #ce1f59 !important;
         }
-
     </style>
     <!--列表-->
     <div id="page-wrapper">
@@ -57,24 +57,24 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(level_1_obj, level_1_key) in category_level_1 " @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" 
-                                            :data-index="level_1_key" :data-level="'1'" draggable="false">
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop"  draggable="true"
+                                            :data-index="level_1_key" :data-level="'1'" >
                                             <td style="vertical-align:middle">
-                                                <i class="fa fa-list"></i>
+                                                <i class="fa fa-list" ></i>
                                                 @{{ level_1_obj . category_name }}
                                             </td>
                                             <td>
                                                 <div class="row">
                                                     <div class="col-sm-4" >
                                                         <button type="button" class="btn btn-primary"
-                                                            @click="GetCategory(level_1_obj,'1')">展中類</button>
+                                                            @click="GetCategory(level_1_obj,'1')" >展中類</button>
                                                     </div>
-                                                    <div class="col-sm-4">
+                                                    <div class="col-sm-4" >
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
                                                             data-target="#addCategory" v-show="RoleAuthJson.auth_update"
                                                             @click="CategoryModelShow('1','edit',level_1_obj)">編輯</button>
                                                     </div>
-                                                    <div class="col-sm-4">
+                                                    <div class="col-sm-4" >
                                                         <button type="button" class="btn btn-danger"
                                                             @click="DelCategory(level_1_obj.id)"
                                                             v-show="RoleAuthJson.auth_delete">刪除</button>
@@ -419,11 +419,13 @@
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
                     // console.log(this) 
-                    console.log(eve) ; 
+                    console.log(eve)
+                    console.log('eve :' + eve) ; 
                     console.log(eve.target.parentNode.dataset);
                     console.log('drop index :'+ index) ; 
                     console.log('dataTransfer get :' + level) ; 
-                    console.log('targetlevel:' + targetlevel) ; 
+                    console.log('targetlevel:' + targetlevel) ;
+                    console.log('parentElement:' + eve.target.parentElement) ;  
                     if (targetlevel !== level) {
                         alert('不能跨分類喔!');
                     } else {
