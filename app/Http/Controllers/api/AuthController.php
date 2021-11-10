@@ -134,7 +134,7 @@ class AuthController extends Controller
         $response = $this->apiService->getMemberInfo($member[0]['member_id']);
         $result = json_decode($response, true);
         $data = [];
-        $data['mobile'] = $result['data']['id'];
+        $data['mobile'] = $result['data']['mobile'];
         $data['name'] = $result['data']['name'];
         $data['email'] = $result['data']['email'];
         $data['birthday'] = $result['data']['birthday'];
