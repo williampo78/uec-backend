@@ -11,10 +11,10 @@
         }
 
         .ondragover {
-            background: #b7e0fb !important;
-            transition: background-color 0.5s;
+            /* background: #b7e0fb !important; */
+            /* transition: background-color 0.5s; */
+            background: #ce1f59 !important;
         }
-
     </style>
     <!--列表-->
     <div id="page-wrapper">
@@ -57,24 +57,24 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(level_1_obj, level_1_key) in category_level_1 " @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                            :data-index="level_1_key" :data-level="'1'">
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop"  draggable="true"
+                                            :data-index="level_1_key" :data-level="'1'" >
                                             <td style="vertical-align:middle">
-                                                <i class="fa fa-list"></i>
+                                                <i class="fa fa-list" ></i>
                                                 @{{ level_1_obj . category_name }}
                                             </td>
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-sm-4">
+                                                    <div class="col-sm-4" >
                                                         <button type="button" class="btn btn-primary"
-                                                            @click="GetCategory(level_1_obj,'1')">展中類</button>
+                                                            @click="GetCategory(level_1_obj,'1')" >展中類</button>
                                                     </div>
-                                                    <div class="col-sm-4">
+                                                    <div class="col-sm-4" >
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
                                                             data-target="#addCategory" v-show="RoleAuthJson.auth_update"
                                                             @click="CategoryModelShow('1','edit',level_1_obj)">編輯</button>
                                                     </div>
-                                                    <div class="col-sm-4">
+                                                    <div class="col-sm-4" >
                                                         <button type="button" class="btn btn-danger"
                                                             @click="DelCategory(level_1_obj.id)"
                                                             v-show="RoleAuthJson.auth_delete">刪除</button>
@@ -115,9 +115,9 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(level_2_obj, level_2_key) in category_level_2" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" 
                                             :data-index="level_2_key" :data-level="'2'">
-                                            <td style="vertical-align:middle">
+                                            <td style="vertical-align:middle" :data-index="level_2_key" :data-level="'2'" draggable="true">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_2_obj . category_name }}
                                             </td>
@@ -182,7 +182,7 @@
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
                                             :data-index="level_3_key" :data-level="'3'">
                                             <td style="vertical-align:middle">
-                                                <i class="fa fa-list"></i>
+                                                <i class="fa fa-list" ></i>
                                                 @{{ level_3_obj . category_name }}
                                             </td>
                                             <td>
@@ -396,10 +396,11 @@
 
                 },
                 drag(eve) {
-                    eve.dataTransfer.setData("text", eve.target.dataset.index);
-                    eve.dataTransfer.setData("level", eve.target.dataset.level);
-                    console.log(eve.target.dataset.level);
-
+                    console.log(eve.target.dataset.index) ; 
+                    console.log(eve.target.dataset.level) ; 
+                    console.log('----------------') ; 
+                    eve.dataTransfer.setData("text/index", eve.target.dataset.index);
+                    eve.dataTransfer.setData("text/level", eve.target.dataset.level);
                 },
                 dragover(eve) {
                     eve.preventDefault()
@@ -413,12 +414,18 @@
                 drop(eve) {
                     eve.preventDefault();
                     eve.target.parentNode.classList.remove('ondragover')
-                    var index = eve.dataTransfer.getData("text");
-                    var level = eve.dataTransfer.getData("level");
+                    var index = eve.dataTransfer.getData("text/index");
+                    var level = eve.dataTransfer.getData("text/level");
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
-                    console.log(level) ; 
-                    console.log(targetlevel) ; 
+                    // console.log(this) 
+                    console.log(eve)
+                    console.log('eve :' + eve) ; 
+                    console.log(eve.target.parentNode.dataset);
+                    console.log('drop index :'+ index) ; 
+                    console.log('dataTransfer get :' + level) ; 
+                    console.log('targetlevel:' + targetlevel) ;
+                    console.log('parentElement:' + eve.target.parentElement) ;  
                     if (targetlevel !== level) {
                         alert('不能跨分類喔!');
                     } else {
