@@ -57,15 +57,15 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(level_1_obj, level_1_key) in category_level_1 " @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                            :data-index="level_1_key" :data-level="'1'">
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" 
+                                            :data-index="level_1_key" :data-level="'1'" draggable="false">
                                             <td style="vertical-align:middle">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_1_obj . category_name }}
                                             </td>
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-sm-4">
+                                                    <div class="col-sm-4" >
                                                         <button type="button" class="btn btn-primary"
                                                             @click="GetCategory(level_1_obj,'1')">展中類</button>
                                                     </div>
@@ -115,9 +115,9 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(level_2_obj, level_2_key) in category_level_2" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" 
                                             :data-index="level_2_key" :data-level="'2'">
-                                            <td style="vertical-align:middle">
+                                            <td style="vertical-align:middle" :data-index="level_2_key" :data-level="'2'" draggable="true">
                                                 <i class="fa fa-list"></i>
                                                 @{{ level_2_obj . category_name }}
                                             </td>
@@ -411,17 +411,19 @@
                     eve.target.parentNode.classList.remove('ondragover')
                     // eve.target.classList.remove('ondragover')
                 },
-                drop(eve,test) {
-                    console.log(test) ; 
+                drop(eve) {
                     eve.preventDefault();
                     eve.target.parentNode.classList.remove('ondragover')
                     var index = eve.dataTransfer.getData("text/index");
                     var level = eve.dataTransfer.getData("text/level");
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
+                    // console.log(this) 
+                    console.log(eve) ; 
+                    console.log(eve.target.parentNode.dataset);
                     console.log('drop index :'+ index) ; 
                     console.log('dataTransfer get :' + level) ; 
-                    console.log('targetlevel :' + targetlevel) ; 
+                    console.log('targetlevel:' + targetlevel) ; 
                     if (targetlevel !== level) {
                         alert('不能跨分類喔!');
                     } else {
