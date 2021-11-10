@@ -11,9 +11,9 @@
         }
 
         .ondragover {
-            /* background: #b7e0fb !important; */
-            /* transition: background-color 0.5s; */
-            background: #ce1f59 !important;
+            background: #b7e0fb !important;
+            transition: background-color 0.5s;
+            /* background: #ce1f59 !important; */
         }
     </style>
     <!--列表-->
