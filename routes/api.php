@@ -6,7 +6,7 @@ use App\Http\Controllers\api\IndexController;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\DradviceController;
 use App\Http\Controllers\api\TestInfoController;
-
+use App\Http\Controllers\api\MemberInfoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -28,16 +28,23 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
 });
 
-Route::group(['middleware' =>'jwt.member'], function () {
+Route::group(['middleware' => 'jwt.member'], function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 
-    Route::get('profile', [AuthController::class, 'profile']);
+    Route::get('/members/profile', [AuthController::class, 'profile']);
+    Route::post('/membership', [AuthController::class, 'profile']);
+   // Route::resource('/membership',MemberInfoController::class, ['names' => ['index' => 'membership']]);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
 Route::get('area/{all}', [DradviceController::class, 'area']);
 
-Route::post('members/login', [AuthController::class, 'login']);
+//Route::post('members/login', [AuthController::class, 'login']);
 //Route::post('members/login', [DradviceController::class, 'memberLogin']);
+
+
+Route::group(['prefix' => 'members'], function () {
+    Route::post('/login', [AuthController::class, 'login']);
+});
