@@ -26,6 +26,20 @@ class APIService
     }
 
     /*
+     * 取得url
+     * @return string
+     */
+    public function getURL()
+    {
+        if (config('uec.isTesting')) {
+            return 'https://stgapi.dradvice.com.tw';
+        } else {
+            return 'https://stgapi.dradvice.com.tw';
+        }
+
+    }
+
+    /*
      * 取得縣市鄉鎮
      * method: GET
      * @return json
@@ -36,7 +50,7 @@ class APIService
         if ($all) {
             $url = 'https://api.aidradvice.asia/area-all.json'; //(含離島，會員個資維護可能有離島)
         } else {
-                $url = 'https://api.aidradvice.asia/area.json'; //(排除離島，商城配送不支援離島)
+            $url = 'https://api.aidradvice.asia/area.json'; //(排除離島，商城配送不支援離島)
         }
         curl_setopt_array($curl, array(
             CURLOPT_URL => $url,
@@ -65,7 +79,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://stgapi.dradvice.com.tw/crm/v1/members/login',
+            CURLOPT_URL => $this->getURL().'/crm/v1/members/login',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -73,7 +87,7 @@ class APIService
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>$input,
+            CURLOPT_POSTFIELDS => $input,
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
             ),
@@ -95,7 +109,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://stgapi.dradvice.com.tw/crm/v1/members/'.$input,
+            CURLOPT_URL => $this->getURL().'/crm/v1/members/' . $input,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

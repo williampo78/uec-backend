@@ -27,6 +27,7 @@ class AuthController extends Controller
 
     public function login()
     {
+
         $err = null;
         $credentials = request(['mobile', 'password']);
 
