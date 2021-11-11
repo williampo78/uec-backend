@@ -7,6 +7,7 @@ use App\Models\Members;
 use App\Services\APIService;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Auth;
 
 class MemberInfoController extends Controller
 {
@@ -69,12 +70,13 @@ class MemberInfoController extends Controller
         //
     }
 
-    public function profile(Request $request)
+    public function profile()
     {
+        $member_id = Auth::guard('api')->user()->member_id;
 
         $err = null;
         $error_code = $this->apiService->getErrorCode();
-        $response = $this->apiService->getMemberInfo($request->member);
+        $response = $this->apiService->getMemberInfo($member_id);
         $result = json_decode($response, true);
         $data = [];
         $data['mobile'] = $result['data']['mobile'];
@@ -104,6 +106,43 @@ class MemberInfoController extends Controller
             return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
+
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $data = [];
+        $data['name'] = $request['name'];
+        $data['email'] = $request['email'];
+        $data['birthday'] = $request['birthday'];
+        $data['sex'] = $request['sex'];
+        $data['zipCode'] = $request['zipCode'];
+        $data['cityId'] = $request['cityId'];
+        $data['districtId'] = $request['districtId'];
+        $data['address'] = $request['address'];
+
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiService->updateMemberInfo($data);
+        $result = json_decode($response, true);
+
+        try {
+            if ($result['status'] == '200') {
+                return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $result['message']]);
+            } else {
+                $err = $result['status'];
+                if ($result['error']['email']) {
+                    $message = $result['error']['email'];
+                } else {
+                    $message = $result['message'];
+                }
+                return response()->json(['status' => false, 'error_code' => $result['status'], 'error_msg' => $message, 'result' => []]);
+            }
+        } catch (JWTException $e) {
+            Log::info($e);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+        }
 
     }
 }
