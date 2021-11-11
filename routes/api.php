@@ -34,7 +34,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::post('refresh', [AuthController::class, 'refresh']);
 
     Route::get('/members/profile', [AuthController::class, 'profile']);
-    Route::post('/membership', [AuthController::class, 'profile']);
+    Route::post('/membership', [MemberInfoController::class, 'profile']);
    // Route::resource('/membership',MemberInfoController::class, ['names' => ['index' => 'membership']]);
 });
 

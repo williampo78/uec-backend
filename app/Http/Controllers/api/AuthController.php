@@ -42,12 +42,14 @@ class AuthController extends Controller
                 $status = true;
                 $tmp = Members::where('member_id', '=', $result['data']['id'])->first();
                 if (!is_null($tmp)) {
-                    $token = JWTAuth::fromSubject($tmp);
+                    //$token = JWTAuth::fromSubject($tmp);
+                    $token = Auth::guard('api')->fromUser($tmp);
                     Members::where('id', $tmp['id'])->update(['api_token' => $token]);
                 } else {
                     $credentials['member_id'] = $result['data']['id'];
                     $member = Members::create($credentials);
-                    $token = JWTAuth::fromSubject($member);
+                    //$token = JWTAuth::fromSubject($member);
+                    $token = Auth::guard('api')->fromUser($member);
                     Members::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
                 }
                 unset($result['data']['id']);

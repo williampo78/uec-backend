@@ -19,6 +19,7 @@ class JwtMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
+        dd(Auth::guard('api')->user());
         try {
             if ($request->bearerToken()) {
                 $token = $request->bearerToken();
