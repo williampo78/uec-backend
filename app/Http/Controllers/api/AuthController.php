@@ -129,7 +129,7 @@ class AuthController extends Controller
         Auth::guard('api')->logout();
 
         $message = '登出成功';
-        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => ['message' => $message]]);
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $message]);
 
     }
 }
