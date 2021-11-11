@@ -26,7 +26,7 @@ class APIService
     }
 
     /*
-     * 取得url
+     * 取得 crm api url
      * @return string
      */
     public function getURL()
