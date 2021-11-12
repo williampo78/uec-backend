@@ -19,8 +19,8 @@ class WebCategoryProductsControllers extends Controller
     public function index()
     {
         $result['category_products_list'] = $this->webCategoryHierarchyService->web_category_products() ; 
-        dd($result) ; 
-        return view('Backend.WebCategoryProducts.list');
+        // dd($result) ; 
+        return view('Backend.WebCategoryProducts.list',$result) ;
     }
 
     /**
@@ -63,7 +63,11 @@ class WebCategoryProductsControllers extends Controller
      */
     public function edit($id)
     {
-        //
+        $result = [] ; 
+        $in = [] ; 
+        $in['id'] = $id ; 
+        $result['category_products'] = $this->webCategoryHierarchyService->web_category_products($in) ; 
+        return view('Backend.WebCategoryProducts.input',$result) ;
     }
 
     /**

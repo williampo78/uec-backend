@@ -18,7 +18,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="col-sm-2">
-                                        <h5>供應商</h5>
+                                        <h5>分類名稱</h5>
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="company_number" id="company_number" value="">
@@ -51,7 +51,8 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-2">
-                                <a class="btn btn-block btn-warning btn-sm" href="{{route('web_category_products.create')}}"><i class="fa fa-plus"></i> 創建</a>
+                                <a class="btn btn-block btn-warning btn-sm"
+                                    href="{{ route('web_category_products.create') }}"><i class="fa fa-plus"></i> 創建</a>
                             </div>
                         </div>
                         <hr>
@@ -69,29 +70,33 @@
                                 <button style="display:none;" class="btn btn-info btn-sm toggle-show-model"
                                     data-toggle="modal" data-target="#row_detail">SHOW
                                 </button>
-                                <tr>
-                                    <form id="del" method="post">
-                                        @method('DELETE')
-                                        @csrf
-                                    </form>
-                                    <td>
-                                        {{-- @if ($share_role_auth['auth_query']) --}}
-                                        <button class="btn btn-info btn-sm"><i class="fa fa-search"></i></button>
-                                        {{-- @endif --}}
+                                {{-- {{$category_products_list}} --}}
+                                @foreach ($category_products_list as $key => $val)
+                                    <tr>
+                                        <form id="del" method="post">
+                                            @method('DELETE')
+                                            @csrf
+                                        </form>
+                                        <td>
+                                            {{-- @if ($share_role_auth['auth_query']) --}}
+                                            <button class="btn btn-info btn-sm"><i class="fa fa-search"></i></button>
+                                            {{-- @endif --}}
 
-                                        {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
-                                        <a class="btn btn-info btn-sm" href="">修改</a>
-                                        {{-- @endif --}}
+                                            {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
+                                            <a class="btn btn-info btn-sm" href="{{route('web_category_products.edit',$val->id)}}">修改</a>
+                                            {{-- @endif --}}
 
-                                        {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
-                                        <button class="btn btn-danger btn-sm" type="button">刪除</button>
-                                        {{-- @endif --}}
-                                    </td>
-                                    <td>TEST</td>
-                                    <td>TEST</td>
-                                    <td>TEST</td>
-                                    <td>TEST</td>
-                                </tr>
+                                            {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
+                                            <button class="btn btn-danger btn-sm" type="button">刪除</button>
+                                            {{-- @endif --}}
+                                        </td>
+                                        <td>{{$val->id}}</td>
+                                        <td>{{$val->name}}</td>
+                                        <td>{{$val->active}}</td>
+                                        <td>{{$val->content_type}}</td>
+                                    </tr>
+                                @endforeach
+
                             </tbody>
                         </table>
                     </div>
@@ -106,23 +111,23 @@
 @section('js')
     <script>
         var products = Vue.extend({
-                    data: function() {
-                        return {}
-                    },
-                    methods: {},
-                    mounted: function() {
-            
-                        $("#status").select2({
-                            allowClear: true,
-                            theme: "bootstrap",
-                            placeholder: "請選擇"
-                        });
-                    
-                    },
-                    computed: {},
-                        
-                    });
+            data: function() {
+                return {}
+            },
+            methods: {},
+            mounted: function() {
 
-                new products().$mount('#web_category_products');
+                $("#status").select2({
+                    allowClear: true,
+                    theme: "bootstrap",
+                    placeholder: "請選擇"
+                });
+
+            },
+            computed: {},
+
+        });
+
+        new products().$mount('#web_category_products');
     </script>
 @endsection
