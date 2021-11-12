@@ -129,7 +129,7 @@ class APIService
 
     /*
      * 修改會員資料
-     * method: GET
+     * method: PATCH
      * @return json
      */
     public function updateMemberInfo($input)
@@ -146,6 +146,36 @@ class APIService
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'PATCH',
             CURLOPT_POSTFIELDS => json_encode($input),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
+
+    /*
+     * 修改會員資料
+     * method: POST
+     * @return json
+     */
+    public function changeMemberPassWord($input)
+    {
+        $curl = curl_init();
+        $member_id = Auth::guard('api')->user()->member_id;
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/members/'.$member_id.'/change-password',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>json_encode($input),
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
             ),

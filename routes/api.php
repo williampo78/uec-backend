@@ -35,7 +35,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
 
     Route::post('/membership', [MemberInfoController::class, 'profile']);
     Route::put('/membership', [MemberInfoController::class, 'updateProfile']);
-   // Route::resource('/membership',MemberInfoController::class, ['names' => ['index' => 'membership']]);
+    Route::put('/membership/changePassWord', [MemberInfoController::class, 'changePassWord']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
