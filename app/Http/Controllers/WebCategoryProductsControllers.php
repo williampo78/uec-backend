@@ -67,7 +67,7 @@ class WebCategoryProductsControllers extends Controller
         $in = [] ; 
         $in['id'] = $id ; 
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0] ; 
-        $result['products_v']  =  $this->webCategoryHierarchyService->category_products($id) ; 
+        $result['category_products']  =  $this->webCategoryHierarchyService->category_products($id) ; 
         return view('Backend.WebCategoryProducts.input',$result) ;
     }
 

@@ -128,12 +128,14 @@ class WebCategoryHierarchyService
         
     
         if($confi_levels == 2){
-            $query = "SELECT level_two.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active, level_two.content_type ,level_two.level_three ,level_two.meta_description ,level_two.content_type
+            $query = "SELECT level_two.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active, 
+            level_two.content_type ,level_two.level_three ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
             FROM (SELECT * WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ".$whereID.") level_two ON level_two.parent_id = level_one.id
             ".$where." ORDER BY level_one.category_name, level_two.category_name";
         }else{
-            $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active, level_three.content_type  ,level_three.meta_title ,level_three.meta_description,level_three.content_type
+            $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active, 
+            level_three.content_type  ,level_three.meta_title ,level_three.meta_description,level_three.content_type ,level_three.meta_keywords
             FROM ( SELECT id , category_name FROM web_category_hierarchy WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ) level_two ON level_two.parent_id = level_one.id
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 ".$whereID.") level_three ON level_three.parent_id = level_two.id
@@ -144,9 +146,12 @@ class WebCategoryHierarchyService
         return DB::select($query);
     }
     public function category_products($id){
-        return $id; 
-         
-        // return DB::table('products_v')->where()->get() ; 
+
+        $resut =  CategoryProducts::where('web_category_hierarchy_id' , $id)
+        ->select('web_category_products.id as id' , 'web_category_products.product_id as product_id' , 'products_v.*')
+        ->join('products_v', 'products_v.id', '=', 'web_category_products.product_id')
+        ->get();
+        return $resut ; 
     }
 
 }

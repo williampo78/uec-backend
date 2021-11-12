@@ -29,18 +29,19 @@
                     <button style="display:none;" class="btn btn-info btn-sm toggle-show-model" data-toggle="modal"
                         data-target="#row_detail">SHOW
                     </button>
-                    <tr>
+                    <tr
+                    v-for="(category_product, category_products_key) in category_products " >
                         <form id="del" method="post">
                             @method('DELETE') 
                             @csrf
                         </form>
-                        <td>TEST</td>
-                        <td>TEST</td>
-                        <td>TEST</td>
-                        <td>TEST</td>
-                        <td>TEST</td>
-                        <td>TEST</td>
-                        <td>TEST</td>
+                        <td>@{{category_products_key}}</td>
+                        <td>@{{category_product.id}}</td>
+                        <td>@{{category_product.product_no}}</td>
+                        <td>@{{category_product.product_name}}</td>
+                        <td>@{{category_product.start_launched_at}} ~ @{{category_product.end_launched_at}}</td>
+                        <td>@{{category_product.launched_status}}</td>
+                        <td>@{{category_product.gross_margin}}</td>
                         <td>
                             <button class="btn btn-danger btn-sm" type="button">刪除</button>
                         </td>

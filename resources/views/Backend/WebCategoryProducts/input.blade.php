@@ -60,7 +60,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_doc_number">
                                             <label for="doc_number">網頁關鍵字</label>
-                                            <input class="form-control" name="number" id="number">
+                                            <input class="form-control" name="meta_keyword" id="meta_keyword" value="{{$category_hierarchy_content->meta_keywords}}">
                                         </div>
                                     </div>
                                 </div>
@@ -109,7 +109,7 @@
         var products = Vue.extend({
             data: function() {
                 return {
-                    
+                    category_products:@json($category_products)
                 }
             },
             methods: {},
