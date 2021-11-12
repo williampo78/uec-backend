@@ -113,7 +113,7 @@ class WebCategoryHierarchyService
         return $sort;
     }
     //取得開關分類判斷輸出內容
-    public function web_category_products($input = array())
+    public function category_hierarchy_content($input = array())
     {
         $confi_levels = config('uec.web_category_hierarchy_levels') ; 
         $whereID = '';
@@ -128,19 +128,25 @@ class WebCategoryHierarchyService
         
     
         if($confi_levels == 2){
-            $query = "SELECT level_two.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active, level_two.content_type 
-            FROM (SELECT id , category_name FROM web_category_hierarchy WHERE category_level = 1 ) level_one
-            JOIN ( SELECT id, category_name, parent_id, content_type, active FROM web_category_hierarchy WHERE category_level = 2 ".$whereID.") level_two ON level_two.parent_id = level_one.id
+            $query = "SELECT level_two.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active, level_two.content_type ,level_two.level_three ,level_two.meta_description ,level_two.content_type
+            FROM (SELECT * WHERE category_level = 1 ) level_one
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ".$whereID.") level_two ON level_two.parent_id = level_one.id
             ".$where." ORDER BY level_one.category_name, level_two.category_name";
         }else{
-            $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_two.active, level_two.content_type 
+            $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active, level_three.content_type  ,level_three.meta_title ,level_three.meta_description,level_three.content_type
             FROM ( SELECT id , category_name FROM web_category_hierarchy WHERE category_level = 1 ) level_one
-            JOIN ( SELECT id, category_name, parent_id, content_type, active FROM web_category_hierarchy WHERE category_level = 2 ) level_two ON level_two.parent_id = level_one.id
-            JOIN ( SELECT id, category_name, parent_id, content_type, active FROM web_category_hierarchy WHERE category_level = 3 ".$whereID.") level_three ON level_three.parent_id = level_two.id
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ) level_two ON level_two.parent_id = level_one.id
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 ".$whereID.") level_three ON level_three.parent_id = level_two.id
             ".$where." ORDER BY level_one.category_name, level_two.category_name , level_three.category_name";
         }
         
+        
         return DB::select($query);
+    }
+    public function category_products($id){
+        return $id; 
+         
+        // return DB::table('products_v')->where()->get() ; 
     }
 
 }
