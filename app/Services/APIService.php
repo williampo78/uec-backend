@@ -4,6 +4,8 @@
 namespace App\Services;
 
 
+use Illuminate\Support\Facades\Auth;
+
 class APIService
 {
 
@@ -26,7 +28,7 @@ class APIService
     }
 
     /*
-     * 取得url
+     * 取得 crm api url
      * @return string
      */
     public function getURL()
@@ -79,7 +81,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/login',
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/login',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -109,7 +111,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/' . $input,
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/' . $input,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -117,6 +119,66 @@ class APIService
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
+
+    /*
+     * 修改會員資料
+     * method: PATCH
+     * @return json
+     */
+    public function updateMemberInfo($input)
+    {
+        $curl = curl_init();
+        $member_id = Auth::guard('api')->user()->member_id;
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/members/'.$member_id,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'PATCH',
+            CURLOPT_POSTFIELDS => json_encode($input),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+    }
+
+    /*
+     * 修改會員資料
+     * method: POST
+     * @return json
+     */
+    public function changeMemberPassWord($input)
+    {
+        $curl = curl_init();
+        $member_id = Auth::guard('api')->user()->member_id;
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/members/'.$member_id.'/change-password',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
         ));
 
         $response = curl_exec($curl);

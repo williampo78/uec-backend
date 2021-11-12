@@ -30,12 +30,12 @@ Route::group(['prefix' => 'v1'], function () {
 
 Route::group(['middleware' => 'jwt.member'], function () {
     Route::get('me', [AuthController::class, 'me']);
-    Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('/members/logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
 
-    Route::get('/members/profile', [AuthController::class, 'profile']);
-    Route::post('/membership', [AuthController::class, 'profile']);
-   // Route::resource('/membership',MemberInfoController::class, ['names' => ['index' => 'membership']]);
+    Route::post('/membership', [MemberInfoController::class, 'profile']);
+    Route::put('/membership', [MemberInfoController::class, 'updateProfile']);
+    Route::put('/membership/changePassWord', [MemberInfoController::class, 'changePassWord']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);

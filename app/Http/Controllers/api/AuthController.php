@@ -42,12 +42,14 @@ class AuthController extends Controller
                 $status = true;
                 $tmp = Members::where('member_id', '=', $result['data']['id'])->first();
                 if (!is_null($tmp)) {
-                    $token = JWTAuth::fromSubject($tmp);
+                    //$token = JWTAuth::fromSubject($tmp);
+                    $token = Auth::guard('api')->fromUser($tmp);
                     Members::where('id', $tmp['id'])->update(['api_token' => $token]);
                 } else {
                     $credentials['member_id'] = $result['data']['id'];
                     $member = Members::create($credentials);
-                    $token = JWTAuth::fromSubject($member);
+                    //$token = JWTAuth::fromSubject($member);
+                    $token = Auth::guard('api')->fromUser($member);
                     Members::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
                 }
                 unset($result['data']['id']);
@@ -111,9 +113,10 @@ class AuthController extends Controller
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => ['message' => $message]]);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
 
+        /*
         $token = JWTAuth::getToken();
         //dd($token);
         $member = Members::where('api_token', '=', $token)->get();
@@ -122,45 +125,11 @@ class AuthController extends Controller
             Members::where('id', $member[0]['id'])->update(['api_token' => '']);
             //Members::where('id', '=', $member[0]['id'])->delete();
         }
-        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => ['message' => $message]]);
+        */
+        Auth::guard('api')->logout();
+
+        $message = '登出成功';
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $message]);
 
     }
-
-    public function profile(Request $request)
-    {
-        $err = null;
-        $error_code = $this->apiService->getErrorCode();
-        $response = $this->apiService->getMemberInfo($request->member);
-        $result = json_decode($response, true);
-        $data = [];
-        $data['mobile'] = $result['data']['mobile'];
-        $data['name'] = $result['data']['name'];
-        $data['email'] = $result['data']['email'];
-        $data['birthday'] = $result['data']['birthday'];
-        $data['sex'] = $result['data']['sex'];
-        $data['sexName'] = $result['data']['sexName'];
-        $data['zipCode'] = $result['data']['zipCode'];
-        $data['cityId'] = $result['data']['cityId'];
-        $data['cityName'] = $result['data']['cityName'];
-        $data['districtId'] = $result['data']['districtId'];
-        $data['districtName'] = $result['data']['districtName'];
-        $data['address'] = $result['data']['address'];
-        try {
-            if ($result['status'] == '200') {
-                $status = true;
-            } else {
-                $status = false;
-                $err = $result['status'];
-                $result['data'] = [];
-                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
-            }
-        } catch (JWTException $e) {
-            Log::info($e);
-            $err = '404';
-            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
-        }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
-
-    }
-
 }
