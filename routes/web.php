@@ -23,7 +23,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\QAController;
-
+use App\Http\Controllers\WebCategoryProductsControllers ;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -74,6 +74,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/qa',QAController::class, ['names' => ['index' => 'qa']]);
     Route::resource('/web_category_hierarchy',WebCategoryHierarchyControllers::class, ['names' => ['index' => 'web_category_hierarchy']]) ;
     Route::post('/web_category_hierarchy/ajax',[WebCategoryHierarchyControllers::class,'ajax']) ;
+    Route::resource('/web_category_products',WebCategoryProductsControllers::class,['names' => ['index' => 'web_category_products']]) ; 
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
