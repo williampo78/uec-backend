@@ -7,6 +7,7 @@ use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\DradviceController;
 use App\Http\Controllers\api\TestInfoController;
 use App\Http\Controllers\api\MemberInfoController;
+use App\Http\Controllers\api\PointInfoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -36,6 +37,8 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::post('/membership', [MemberInfoController::class, 'profile']);
     Route::put('/membership', [MemberInfoController::class, 'updateProfile']);
     Route::put('/membership/changePassWord', [MemberInfoController::class, 'changePassWord']);
+    Route::post('/membership/point', [PointInfoController::class, 'point']);
+    Route::post('/membership/expiringPoint', [PointInfoController::class, 'expiringPoint']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
