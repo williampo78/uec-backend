@@ -8,13 +8,15 @@ use App\Services\APIService;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Auth;
+use App\Services\APIWebService;
 
 class MemberInfoController extends Controller
 {
 
-    public function __construct(APIService $apiService)
+    public function __construct(APIService $apiService, APIWebService $apiWebService)
     {
         $this->apiService = $apiService;
+        $this->apiWebService = $apiWebService;
     }
 
     /**
@@ -202,6 +204,27 @@ class MemberInfoController extends Controller
             $err = '404';
             return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
+
+    }
+
+    /*
+     * 查詢會員收件人資料 (會員編號)
+     * @param  int  $id
+     */
+    public function notes()
+    {
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiWebService->getMemberNotes();
+        $result = json_decode($response, true);
+        if (count($result) > 0) {
+            $status = true;
+        } else {
+            $status = false;
+            $err = '404';
+            $list['list'] = [];
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
 
     }
 }
