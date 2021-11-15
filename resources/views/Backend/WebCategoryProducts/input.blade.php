@@ -5,12 +5,15 @@
         .modal-dialog {
             max-width: 100%;
         }
-        #products_model_list_info{
-            display:none;
-        }
-        #products_model_list_paginate{
+
+        #products_model_list_info {
             display: none;
         }
+
+        #products_model_list_paginate {
+            display: none;
+        }
+
     </style>
     <div class="row">
         <div class="col-sm-12">
@@ -129,17 +132,14 @@
             },
             methods: {},
             mounted: function() {
-                $("#status").select2({
-                    allowClear: true,
-                    theme: "bootstrap",
-                    placeholder: "請選擇"
-                });
+
                 $('#datetimepicker').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
                 $('#datetimepicker2').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
+                // console.log('TEST') ; 
                 // $('#products_model_list').DataTable({
                 //     "lengthChange": false
                 // });
@@ -154,6 +154,11 @@
         $(document).ready(function() {
             $('#products_model_list').DataTable({
                 "lengthChange": false
+            });
+            $("#supplier").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
             });
         });
     </script>

@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\WebCategoryHierarchyService;
+use App\Services\SupplierService;
+
 class WebCategoryProductsControllers extends Controller
 {
     private $webCategoryHierarchyService;
-    public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService)
+    private $supplierService ;
+    public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService,
+    SupplierService $supplierService)
     {
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
+        $this->supplierService = $supplierService ; 
     }
     /**
      * Display a listing of the resource.
@@ -69,6 +74,7 @@ class WebCategoryProductsControllers extends Controller
         $in['id'] = $id ; 
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0] ; 
         $result['category_products_list']  =  $this->webCategoryHierarchyService->category_products($id) ; 
+        $result['supplier'] = $this->supplierService->getSupplier() ;
         return view('Backend.WebCategoryProducts.input',$result) ;
     }
 
