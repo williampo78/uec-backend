@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Console\Input\Input;
 
 class WebCategoryHierarchyService
 {
@@ -120,18 +121,20 @@ class WebCategoryHierarchyService
         $where = '' ; 
 
         if(isset($input['id']) && $input['id'] !== ''){
-            $whereID = "AND id = " . $input['id'] ; 
+            $whereID .= "AND id = " . $input['id'] ; 
+        }
+        if(isset($input['active']) && $input['active'] !== ''){
+            $whereID .= " AND active = " .$input['active'] ; 
         }
         if(isset($input['keyword']) && $input['keyword'] !== ''){
             $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%".$input['keyword']."%' " ;
         }
-        
     
         if($confi_levels == 2){
             $query = "SELECT level_two.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active, 
             level_two.content_type ,level_two.level_three ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
             FROM (SELECT * WHERE category_level = 1 ) level_one
-            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ".$whereID.") level_two ON level_two.parent_id = level_one.id
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_ level = 2 ".$whereID.") level_two ON level_two.parent_id = level_one.id
             ".$where." ORDER BY level_one.category_name, level_two.category_name";
         }else{
             $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active, 

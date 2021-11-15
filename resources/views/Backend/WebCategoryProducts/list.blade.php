@@ -14,14 +14,14 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
+                        <form role="form" id="select-form" method="GET" action="{{route('web_category_products')}}" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="col-sm-2">
                                         <h5>分類名稱</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="company_number" id="company_number" value="">
+                                        <input class="form-control" name="keyword" id="keyword" value="{{request()->input('keyword')}}">
                                     </div>
                                 </div>
                                 <div class="col-sm-3">
@@ -29,11 +29,10 @@
                                         <h5>狀態</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="status" id="status">
+                                        <select class="form-control js-select2" name="active" id="active">
                                             <option value=''>無</option>
-                                            <option value='on'>開啟</option>
-                                            <option value='off'>關閉</option>
-
+                                            <option value='1'  {{ request()->input('active') == '1'? 'selected="selected"' : '' }}>開啟</option>
+                                            <option value='0'  {{ request()->input('active') == '0'? 'selected="selected"' : '' }}>關閉</option>
                                         </select>
                                     </div>
                                 </div>
@@ -49,13 +48,13 @@
 
                     <!-- Table list -->
                     <div class="panel-body">
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-sm-2">
                                 <a class="btn btn-block btn-warning btn-sm"
                                     href="{{ route('web_category_products.create') }}"><i class="fa fa-plus"></i> 創建</a>
                             </div>
                         </div>
-                        <hr>
+                        <hr> --}}
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
                                 <tr>
@@ -71,7 +70,7 @@
                                     data-toggle="modal" data-target="#row_detail">SHOW
                                 </button>
                                 {{-- {{$category_products_list}} --}}
-                                @foreach ($category_products_list as $key => $val)
+                                @foreach ($category_hierarchy_content as $key => $val)
                                     <tr>
                                         <form id="del" method="post">
                                             @method('DELETE')
@@ -86,8 +85,8 @@
                                             <a class="btn btn-info btn-sm" href="{{route('web_category_products.edit',$val->id)}}">修改</a>
                                             {{-- @endif --}}
 
-                                            {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
-                                            <button class="btn btn-danger btn-sm" type="button">刪除</button>
+                                            {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v[created_by'] == $data['user_id']) --}}
+                                            <button class="btn btn-danger btn-sm" type="button">刪除</button>'
                                             {{-- @endif --}}
                                         </td>
                                         <td>{{$val->id}}</td>
@@ -116,8 +115,7 @@
             },
             methods: {},
             mounted: function() {
-
-                $("#status").select2({
+                $("#active").select2({
                     allowClear: true,
                     theme: "bootstrap",
                     placeholder: "請選擇"

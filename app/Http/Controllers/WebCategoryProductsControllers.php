@@ -16,9 +16,10 @@ class WebCategoryProductsControllers extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content() ; 
+        $request = $request->input() ; 
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($request) ; 
         // dd($result) ; 
         return view('Backend.WebCategoryProducts.list',$result) ;
     }

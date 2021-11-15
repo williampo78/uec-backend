@@ -5,10 +5,11 @@
 <div class="tab-content">
     <div id="content_type_p" class="tab-pane fade in active ">
         <div class="panel-body col-sm-12">
+            
             <div class="row">
                 <div class="col-sm-2">
-                    <a class="btn btn-block btn-warning btn-sm" href="{{ route('web_category_products.create') }}"><i
-                            class="fa fa-plus"></i> 新增商品</a>
+                    <button type="button" class="btn btn-block btn-warning btn-sm" data-toggle="modal"
+                    data-target="#row_detail" ><i class="fa fa-plus"></i> 新增商品</button>
                 </div>
             </div>
             <hr>
@@ -26,9 +27,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <button style="display:none;" class="btn btn-info btn-sm toggle-show-model" data-toggle="modal"
-                        data-target="#row_detail">SHOW
-                    </button>
                     <tr
                     v-for="(category_product, category_products_key) in category_products " >
                         <form id="del" method="post">
@@ -50,6 +48,7 @@
             </table>
         </div>
     </div>
+    @include('Backend.WebCategoryProducts.detail')
     {{-- <div id="content_type_m" class="tab-pane fade in">
         <div style="height: 500px">
             賣場內容

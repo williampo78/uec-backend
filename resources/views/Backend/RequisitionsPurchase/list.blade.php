@@ -160,20 +160,20 @@
                                 @foreach ($requisitionsPurchase as $obj)
                                     <tr>
                                         <td>
-                                            {{--@if($share_role_auth['auth_query'])--}}
+                                            {{-- @if ($share_role_auth['auth_query']) --}}
                                             <button class="btn btn-info btn-sm" @click="showBtn({{ $obj->id }})"><i
                                                     class="fa fa-search"></i></button>
-                                            {{--@endif--}}
-                                            {{--@if($share_role_auth['auth_update'] && $v['status_code']=='DRAFTED' && $v['created_by']==$data['user_id'])--}}
+                                            {{-- @endif --}}
+                                            {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
 
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('requisitions_purchase') }}/{{ $obj->id }}/edit/">修改</a>
-                                            {{--@endif--}}
-                                            {{--@if($share_role_auth['auth_delete'] && $v['status_code']=='DRAFTED'&& $v['created_by']==$data['user_id'])--}}
+                                            {{-- @endif --}}
+                                            {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
 
                                             <button class="btn btn-danger btn-sm"
                                                 @click="delBtn({{ $obj->id }})">刪除</button>
-                                            {{--@endif--}}
+                                            {{-- @endif --}}
                                         </td>
                                         </td>
                                         <td>{{ $obj->trade_date }} </td>
