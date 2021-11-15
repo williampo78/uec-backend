@@ -156,5 +156,10 @@ class WebCategoryHierarchyService
         ->get();
         return $resut ; 
     }
+    public function get_products_v(){
+        
+        $resut = DB::table('products_v')->get()->toArray() ; 
+        return $resut ;
+    }   
 
 }

@@ -53,7 +53,6 @@
             賣場內容
         </div>
     </div> --}}
-    @include('Backend.WebCategoryProducts.detail')
 
 </div>
 

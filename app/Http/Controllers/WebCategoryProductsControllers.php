@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\WebCategoryHierarchyService;
 use App\Services\SupplierService;
+use App\Services\WebCategoryHierarchyService;
+use Illuminate\Http\Request;
 
 class WebCategoryProductsControllers extends Controller
 {
     private $webCategoryHierarchyService;
-    private $supplierService ;
+    private $supplierService;
     public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService,
-    SupplierService $supplierService)
-    {
+        SupplierService $supplierService) {
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
-        $this->supplierService = $supplierService ; 
+        $this->supplierService = $supplierService;
     }
     /**
      * Display a listing of the resource.
@@ -23,10 +22,10 @@ class WebCategoryProductsControllers extends Controller
      */
     public function index(Request $request)
     {
-        $request = $request->input() ; 
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($request) ; 
-        // dd($result) ; 
-        return view('Backend.WebCategoryProducts.list',$result) ;
+        $request = $request->input();
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($request);
+        // dd($result) ;
+        return view('Backend.WebCategoryProducts.list', $result);
     }
 
     /**
@@ -69,13 +68,13 @@ class WebCategoryProductsControllers extends Controller
      */
     public function edit($id)
     {
-        $result = [] ; 
-        $in = [] ; 
-        $in['id'] = $id ; 
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0] ; 
-        $result['category_products_list']  =  $this->webCategoryHierarchyService->category_products($id) ; 
-        $result['supplier'] = $this->supplierService->getSupplier() ;
-        return view('Backend.WebCategoryProducts.input',$result) ;
+        $result = [];
+        $in = [];
+        $in['id'] = $id;
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
+        $result['category_products_list'] = $this->webCategoryHierarchyService->category_products($id);
+        $result['supplier'] = $this->supplierService->getSupplier();
+        return view('Backend.WebCategoryProducts.input', $result);
     }
 
     /**
@@ -103,6 +102,25 @@ class WebCategoryProductsControllers extends Controller
     public function GetCategory()
     {
 
+    }
+    public function Ajax(Request $request)
+    {
+        $in = $request->input();
+        $result = [];
+        switch ($in['type']) {
+            case 'getProductsList':
+                $result['data'] = $this->webCategoryHierarchyService->get_products_v();
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        return response()->json([
+            'status' => true,
+            'in' => $request->input(),
+            'result' => $result,
+        ]);
     }
 
 }

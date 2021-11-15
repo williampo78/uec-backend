@@ -75,6 +75,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/web_category_hierarchy',WebCategoryHierarchyControllers::class, ['names' => ['index' => 'web_category_hierarchy']]) ;
     Route::post('/web_category_hierarchy/ajax',[WebCategoryHierarchyControllers::class,'ajax']) ;
     Route::resource('/web_category_products',WebCategoryProductsControllers::class,['names' => ['index' => 'web_category_products']]) ; 
+    Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ; 
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

@@ -19,7 +19,7 @@
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">請輸入下列欄位資料</div>
-                <div class="panel-body" id="category_hierarchy_content_input">
+                <div class="panel-body" id="category_hierarchy_content_input" v-cloak>
                     <form role="form" id="new-form" method="POST"
                         action="{{ route('web_category_products.update', $category_hierarchy_content->id) }}"
                         enctype="multipart/form-data" novalidate="novalidate">
@@ -105,6 +105,7 @@
                                     </div>
                                 </div>
                                 @include('Backend.WebCategoryProducts.tab_list')
+                                @include('Backend.WebCategoryProducts.detail')
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -127,24 +128,77 @@
         var products = Vue.extend({
             data: function() {
                 return {
-                    category_products_list: @json($category_products_list)
+                    category_products_list: @json($category_products_list) ,
+                    select_req :{
+                        // supplier_id :$('#supplier').val() ,
+                        product_no : '' ,
+                        product_name: '',
+                        selling_price_min:'',
+                        selling_price_max:'',
+                    },
+                    result_products:[{}] , 
                 }
             },
-            methods: {},
+            methods: {
+                productsGetAjax(){
+                    var create_start_date = $('input[name="create_start_date"]').val() ;
+                    var create_end_date = $('input[name="create_end_date"]').val() ;
+                    var select_start_date = $('input[name="select_start_date"]').val() ;
+                    var select_end_date = $('input[name="select_end_date"]').val() ;
+                    
+                    var req = async () => {
+                        const response = await axios.post('/backend/web_category_products/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'getProductsList',
+                            product_no:this.select_req.product_no , 
+                            product_name:this.product_name,
+                            selling_price_min:this.selling_price_min,
+                            selling_price_max:this.selling_price_max,
+                            create_start_date:create_start_date,
+                            create_end_date:create_end_date,
+                            select_start_date:select_start_date,
+                            select_end_date:select_end_date,
+                        });
+                        
+                        this.result_products = response.data.result.data  ;
+                        console.log(this.result_products) ; 
+                    }
+                    req();
+                    // console.log('test') ; 
+                },
+                TESTFUNCTION(){
+                    var create_start_date = $('input[name="create_start_date"]').val() ;
+                    var create_end_date = $('input[name="create_end_date"]').val() ;
+                    var select_start_date = $('input[name="select_start_date"]').val() ;
+                    var select_end_date = $('input[name="select_end_date"]').val() ;
+                    
+                    console.log(create_start_date,create_end_date,select_start_date,select_end_date) ; 
+                    console.log(this.select_req) ; 
+                }
+            },
             mounted: function() {
 
-                $('#datetimepicker').datetimepicker({
+                $('#create_start_date').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-                $('#datetimepicker2').datetimepicker({
+                $('#create_end_date').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-                // console.log('TEST') ; 
+                $('#select_start_date').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
+                $('#select_end_date').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
+            
+                $("#supplier").select2({
+                    allowClear: true,
+                    theme: "bootstrap",
+                    placeholder: "請選擇"
+                });
                 // $('#products_model_list').DataTable({
                 //     "lengthChange": false
                 // });
-
-
             },
             computed: {},
 
@@ -152,14 +206,8 @@
 
         new products().$mount('#category_hierarchy_content_input');
         $(document).ready(function() {
-            $('#products_model_list').DataTable({
-                "lengthChange": false
-            });
-            $("#supplier").select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
+
+
         });
     </script>
 @endsection
