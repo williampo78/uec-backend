@@ -1,6 +1,6 @@
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#content_type_p">商品</a></li>
-    <li><a data-toggle="tab" href="#content_type_m">賣場</a></li>
+    {{-- <li><a data-toggle="tab" href="#content_type_m">賣場</a></li> --}}
 </ul>
 <div class="tab-content">
     <div id="content_type_p" class="tab-pane fade in active ">
@@ -49,10 +49,10 @@
             </table>
         </div>
     </div>
-    <div id="content_type_m" class="tab-pane fade in">
+    {{-- <div id="content_type_m" class="tab-pane fade in">
         <div style="height: 500px">
             賣場內容
         </div>
-    </div>
+    </div> --}}
 </div>
 <input type="hidden" id="status" v-model="status" name="status">
