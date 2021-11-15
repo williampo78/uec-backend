@@ -37,8 +37,14 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::post('/membership', [MemberInfoController::class, 'profile']);
     Route::put('/membership', [MemberInfoController::class, 'updateProfile']);
     Route::put('/membership/changePassWord', [MemberInfoController::class, 'changePassWord']);
+
     Route::post('/membership/point', [PointInfoController::class, 'point']);
     Route::post('/membership/expiringPoint', [PointInfoController::class, 'expiringPoint']);
+
+    Route::post('/membership/notes', [MemberInfoController::class, 'createNotes']);
+    Route::get('/membership/notes', [MemberInfoController::class, 'notes']);
+    Route::put('/membership/{id}/notes', [MemberInfoController::class, 'updateNotes']);
+    Route::delete('/membership/{id}/notes', [MemberInfoController::class, 'deleteNotes']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
