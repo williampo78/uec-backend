@@ -1,7 +1,11 @@
 @extends('Backend.master')
 @section('title', '分類階層內容管理')
 @section('content')
-
+    <style>
+     .modal-dialog{
+        max-width: 100% ;
+     }
+    </style>
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-default">
@@ -30,13 +34,15 @@
                                                 <label for="doc_number">狀態 <span class="redtext">*</span></label>
                                             </div>
                                             <div class="col-sm-4 form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="active"
-                                                    id="inlineRadio1" value="1" {{$category_hierarchy_content->active  == 1 ? "checked='checked'" : ''}}>
+                                                <input class="form-check-input" type="radio" name="active" id="inlineRadio1"
+                                                    value="1"
+                                                    {{ $category_hierarchy_content->active == 1 ? "checked='checked'" : '' }}>
                                                 <label class="form-check-label" for="inlineRadio1">開啟</label>
                                             </div>
                                             <div class="col-sm-4 form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="active"
-                                                    id="inlineRadio2" value="0"  {{$category_hierarchy_content->active  == 0 ? "checked='checked'" : ''}}>
+                                                <input class="form-check-input" type="radio" name="active" id="inlineRadio2"
+                                                    value="0"
+                                                    {{ $category_hierarchy_content->active == 0 ? "checked='checked'" : '' }}>
                                                 <label class="form-check-label" for="inlineRadio2">關閉</label>
                                             </div>
                                         </div>
@@ -46,13 +52,15 @@
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_doc_number">
                                             <label for="doc_number">網頁標題</label>
-                                            <input class="form-control" name="meta_title" id="meta_title" value="{{$category_hierarchy_content->meta_title}}">
+                                            <input class="form-control" name="meta_title" id="meta_title"
+                                                value="{{ $category_hierarchy_content->meta_title }}">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_doc_number">
                                             <label for="doc_number">網頁描述</label>
-                                            <input class="form-control" name="meta_description" id="meta_description" value="{{$category_hierarchy_content->meta_description}}">
+                                            <input class="form-control" name="meta_description" id="meta_description"
+                                                value="{{ $category_hierarchy_content->meta_description }}">
                                         </div>
                                     </div>
                                 </div>
@@ -60,7 +68,8 @@
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_doc_number">
                                             <label for="doc_number">網頁關鍵字</label>
-                                            <input class="form-control" name="meta_keyword" id="meta_keyword" value="{{$category_hierarchy_content->meta_keywords}}">
+                                            <input class="form-control" name="meta_keyword" id="meta_keyword"
+                                                value="{{ $category_hierarchy_content->meta_keywords }}">
                                         </div>
                                     </div>
                                 </div>
@@ -72,7 +81,7 @@
                                                 <div class="col-sm-4 form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="content_type"
                                                         id="content_type1" value="P" checked="checked">
-                                                    <label class="form-check-label" for="content_type1" >指定商品</label>
+                                                    <label class="form-check-label" for="content_type1">指定商品</label>
                                                 </div>
                                                 {{-- <div class="col-sm-4 form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="content_type"
@@ -109,7 +118,7 @@
         var products = Vue.extend({
             data: function() {
                 return {
-                    category_products:@json($category_products)
+                    category_products: @json($category_products)
                 }
             },
             methods: {},
@@ -119,6 +128,12 @@
                     allowClear: true,
                     theme: "bootstrap",
                     placeholder: "請選擇"
+                });
+                $('#datetimepicker').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
+                $('#datetimepicker2').datetimepicker({
+                    format: 'YYYY-MM-DD',
                 });
 
             },

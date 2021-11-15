@@ -48,11 +48,13 @@
             </table>
         </div>
     </div>
-    @include('Backend.WebCategoryProducts.detail')
     {{-- <div id="content_type_m" class="tab-pane fade in">
         <div style="height: 500px">
             賣場內容
         </div>
     </div> --}}
+    @include('Backend.WebCategoryProducts.detail')
+
 </div>
+
 <input type="hidden" id="status" v-model="status" name="status">
