@@ -2,9 +2,15 @@
 @section('title', '分類階層內容管理')
 @section('content')
     <style>
-     .modal-dialog{
-        max-width: 100% ;
-     }
+        .modal-dialog {
+            max-width: 100%;
+        }
+        #products_model_list_info{
+            display:none;
+        }
+        #products_model_list_paginate{
+            display: none;
+        }
     </style>
     <div class="row">
         <div class="col-sm-12">
@@ -118,12 +124,11 @@
         var products = Vue.extend({
             data: function() {
                 return {
-                    category_products: @json($category_products)
+                    category_products_list: @json($category_products_list)
                 }
             },
             methods: {},
             mounted: function() {
-
                 $("#status").select2({
                     allowClear: true,
                     theme: "bootstrap",
@@ -135,6 +140,10 @@
                 $('#datetimepicker2').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
+                // $('#products_model_list').DataTable({
+                //     "lengthChange": false
+                // });
+
 
             },
             computed: {},
@@ -142,5 +151,10 @@
         });
 
         new products().$mount('#category_hierarchy_content_input');
+        $(document).ready(function() {
+            $('#products_model_list').DataTable({
+                "lengthChange": false
+            });
+        });
     </script>
 @endsection

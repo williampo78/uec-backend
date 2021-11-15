@@ -5,7 +5,7 @@
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-user"></i> 使用者</h4>
+                <h4 class="modal-title" id="myModalLabel"> 新增商品</h4>
                 <input type='hidden' name="get_modal_id" id="get_modal_id" value="" />
             </div>
             <div class="row">
@@ -130,12 +130,11 @@
                                             <h5>筆數限制</h5>
                                         </div>
                                         <div class="col-sm-4">
-
-                                            <input placeholder="模糊查詢" class="form-control" name="company_number"
-                                                id="company_number" value="">
+                                            <input class="form-control" name="company_number"
+                                                id="company_number" type="number" value="100"  max="100" min="0" readonly>
                                         </div>
-
                                     </div>
+                                    <div class="col-sm-6"></div>
                                 </div>
                             </form>
                         </div>
@@ -150,7 +149,7 @@
                                     <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>關閉</button>
                             </div>
                             <hr>
-                            <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
+                            <table class="table table-striped table-bordered table-hover" style="width:100%" id="products_model_list" data-page-length='100'>
                                 <thead>
                                     <tr>
                                         <th>項次</th>
@@ -165,7 +164,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @for ($i = 0; $i < 50 ; $i++)
                                     <tr>
+                                        <td>{{$i}}</td>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -174,6 +176,8 @@
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                    @endfor
+                                  
                                 </tbody>
                             </table>
                         </div>

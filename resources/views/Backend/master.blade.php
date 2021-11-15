@@ -97,6 +97,7 @@
     var UecConfig = @json(Config('uec'));
     $(document).ready(function() {
         $('#table_list').DataTable();
+        
     });
 </script>
 @yield('js')

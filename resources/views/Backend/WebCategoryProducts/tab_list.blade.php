@@ -28,18 +28,18 @@
                 </thead>
                 <tbody>
                     <tr
-                    v-for="(category_product, category_products_key) in category_products " >
+                    v-for="(category_products_list, category_products_list_key) in category_products_list " >
                         <form id="del" method="post">
                             @method('DELETE') 
                             @csrf
                         </form>
-                        <td>@{{category_products_key}}</td>
-                        <td>@{{category_product.id}}</td>
-                        <td>@{{category_product.product_no}}</td>
-                        <td>@{{category_product.product_name}}</td>
-                        <td>@{{category_product.start_launched_at}} ~ @{{category_product.end_launched_at}}</td>
-                        <td>@{{category_product.launched_status}}</td>
-                        <td>@{{category_product.gross_margin}}</td>
+                        <td>@{{category_products_list_key}}</td>
+                        <td>@{{category_products_list.id}}</td>
+                        <td>@{{category_products_list.product_no}}</td>
+                        <td>@{{category_products_list.product_name}}</td>
+                        <td>@{{category_products_list.start_launched_at}} ~ @{{category_products_list.end_launched_at}}</td>
+                        <td>@{{category_products_list.launched_status}}</td>
+                        <td>@{{category_products_list.gross_margin}}</td>
                         <td>
                             <button class="btn btn-danger btn-sm" type="button">刪除</button>
                         </td>
