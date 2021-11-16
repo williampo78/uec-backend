@@ -27,12 +27,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                    v-for="(category_products_list, category_products_list_key) in category_products_list " >
-                        <form id="del" method="post">
-                            @method('DELETE') 
-                            @csrf
-                        </form>
+                    <tr v-for="(category_products_list, category_products_list_key) in category_products_list " >
                         <td>@{{category_products_list_key +1}}</td>
                         <td>@{{category_products_list.product_no}}</td>
                         <td>@{{category_products_list.product_name}}</td>
@@ -41,7 +36,7 @@
                         <td>@{{category_products_list.launched_status}}</td>
                         <td>@{{category_products_list.gross_margin}}</td>
                         <td>
-                            <button class="btn btn-danger btn-sm" type="button">刪除</button>
+                            <button class="btn btn-danger btn-sm" type="button" @click="del_category_products_list(category_products_list_key)">刪除</button>
                         </td>
                     </tr>
                 </tbody>

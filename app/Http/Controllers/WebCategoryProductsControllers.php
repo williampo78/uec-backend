@@ -86,7 +86,11 @@ class WebCategoryProductsControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $in = $request->input() ;
+        $result = $this->webCategoryHierarchyService->edit_category_hierarchy_content($in,$id) ;
+        $route_name = 'web_category_products';
+        $act = 'add';
+        return view('Backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -113,6 +117,9 @@ class WebCategoryProductsControllers extends Controller
                 foreach($result['data'] as $key => $val){
                     $result['data'][$key]->check_use =  0 ;
                 } ; 
+                break;
+            case 'DelProductsList' :
+                $result['data'] = $this->webCategoryHierarchyService->del_category_hierarchy_content($in['id']) ;
                 break;
             default:
                 # code...

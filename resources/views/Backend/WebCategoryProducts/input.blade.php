@@ -23,8 +23,7 @@
                     <form role="form" id="new-form" method="POST"
                         action="{{ route('web_category_products.update', $category_hierarchy_content->id) }}"
                         enctype="multipart/form-data" novalidate="novalidate">
-                        {{ method_field('PUT') }}
-                        {{ csrf_field() }}
+                        @method('PUT')
                         @csrf
                         <div class="row">
                             <!-- 欄位 -->
@@ -82,6 +81,8 @@
                                         </div>
                                     </div>
                                 </div>
+                                <textarea style="display:none" name="category_products_list_json" cols="30"
+                                    rows="10">@{{ category_products_list }}</textarea>
                                 <hr>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -105,18 +106,19 @@
                                     </div>
                                 </div>
                                 @include('Backend.WebCategoryProducts.tab_list')
-                                @include('Backend.WebCategoryProducts.detail')
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <button class="btn btn-success" type="button">儲存</button>
-                                            <button class="btn btn-danger" type="button">取消</button>
+                                            <button type="button" class="btn btn-success" @click="submit">儲存</button>
+                                            <a class="btn btn-danger" type="button"
+                                                href="{{ route('web_category_products') }}">取消</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </form>
+                    @include('Backend.WebCategoryProducts.detail')
                 </div>
             </div>
         </div>
@@ -145,10 +147,10 @@
                     var create_end_date = $('input[name="create_end_date"]').val();
                     var select_start_date = $('input[name="select_start_date"]').val();
                     var select_end_date = $('input[name="select_end_date"]').val();
-                    var filter_product_id =  [] ; 
+                    var filter_product_id = [];
                     this.category_products_list.find((todo, index) => {
-                        filter_product_id.push(todo.product_id) ; 
-                    })                    
+                        filter_product_id.push(todo.product_id);
+                    })
                     // console.log(filter_product_id)  ; 
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_products/ajax', {
@@ -162,9 +164,9 @@
                             create_end_date: create_end_date,
                             select_start_date: select_start_date,
                             select_end_date: select_end_date,
-                            filter_product_id:filter_product_id, //排除掉 ID 
+                            filter_product_id: filter_product_id, //排除掉 ID 
                         });
-                        console.log(response) ; 
+                        console.log(response);
                         this.result_products = response.data.result.data;
                     }
                     req();
@@ -175,7 +177,7 @@
                     var findthis = this.result_products.find((todo, index) => {
                         if (todo.check_use == 1) {
                             this.category_products_list.push({
-                                id: '',
+                                web_category_products_id: '',
                                 agent_id: todo.agent_id,
                                 created_date: todo.created_date,
                                 end_launched_at: todo.end_launched_at,
@@ -201,19 +203,42 @@
                     let new_array = this.result_products.filter(function(obj) {
                         return obj.del == 0;
                     });
-                    this.result_products = new_array ; 
-                    
+                    this.result_products = new_array;
+
                 },
-                check_all(act){
-                    var  status = '';
-                    if(act == 'allon'){
-                        status = 1 ;
-                    }else if (act == 'alloff'){
-                        status = 0 ; 
+                check_all(act) {
+                    var status = '';
+                    if (act == 'allon') {
+                        status = 1;
+                    } else if (act == 'alloff') {
+                        status = 0;
                     }
                     var findthis = this.result_products.find((todo, index) => {
-                        todo.check_use = status ; 
+                        todo.check_use = status;
                     })
+                },
+                submit() {
+                    $("#new-form").submit();
+                },
+                del_category_products_list(index) {
+                    var yes = confirm('你確定要刪除嗎？');
+                    if (yes) {
+                        var del_data = this.category_products_list[index];
+                        if (del_data.web_category_products_id !== '') {
+                            var req = async () => {
+                                const response = await axios.post('/backend/web_category_products/ajax', {
+                                    _token: $('meta[name="csrf-token"]').attr('content'),
+                                    type: 'DelProductsList',
+                                    id: del_data.web_category_products_id,
+                                });
+                                console.log(response) ; 
+                            };
+                            req();
+                        }
+                        this.category_products_list.splice(index, 1);
+                    } 
+
+                    // console.log(this.category_products_list[index]) ; 
                 },
                 TESTFUNCTION() {
                     var create_start_date = $('input[name="create_start_date"]').val();

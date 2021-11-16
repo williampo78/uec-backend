@@ -13,7 +13,7 @@
                     <div class="panel panel-default">
                         <!-- 功能按鈕(新增) -->
                         <div class="panel-heading">
-                            <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
+                            <div>
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="col-sm-3">
@@ -141,7 +141,7 @@
                                             style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
 
                         <!-- Table list -->
