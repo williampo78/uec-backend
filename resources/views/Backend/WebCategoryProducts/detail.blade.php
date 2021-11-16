@@ -76,7 +76,7 @@
                                             <div class="form-group" id="">
                                                 <div class='input-group date' id='create_start_date'>
                                                     <input type='text' class="form-control" name="create_start_date"
-                                                        value="{{ date('Y-m-d') }}" />
+                                                        value="" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -89,7 +89,7 @@
                                         <div class="col-sm-4">
                                             <div class='input-group date' id='create_end_date'>
                                                 <input type='text' class="form-control" name="create_end_date"
-                                                    value="{{ date('Y-m-d') }}" />
+                                                    value="" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -104,7 +104,7 @@
                                             <div class="form-group" id="">
                                                 <div class='input-group date' id='select_start_date'>
                                                     <input type='text' class="form-control" name="select_start_date"
-                                                        value="{{ date('Y-m-d') }}" />
+                                                        value="" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -117,7 +117,7 @@
                                         <div class="col-sm-4">
                                             <div class='input-group date' id='select_end_date'>
                                                 <input type='text' class="form-control" name="select_end_date"
-                                                    value="{{ date('Y-m-d') }}" />
+                                                    value="" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -150,18 +150,17 @@
                                 <div class="col-sm-12">
                                     <button type="button" class="btn btn-success"
                                         @click="productsForCategory">儲存</button>
-                                    <button type="button" class="btn btn-success" data-dismiss="modal">儲存並關閉</button>
+                                    <button type="button" class="btn btn-success" @click="productsForCategory" data-dismiss="modal">儲存並關閉</button>
                                     <button type="button" class="btn btn-danger" data-dismiss="modal"><i
                                             class="fa fa-fw fa-close"></i>關閉</button>
-                                    <button type="button" @click="TESTFUNCTION">測試按鈕</button>
-
+                                    {{-- <button type="button" @click="TESTFUNCTION">測試按鈕</button> --}}
                                 </div>
                                 <div class="col-sm-12">
                                     <hr>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">全勾選</button>
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">全取消</button>
+                                    <button type="button" class="btn btn-primary" @click="check_all('allon')">全勾選</button>
+                                    <button type="button" class="btn btn-primary" @click="check_all('alloff')">全取消</button>
                                 </div>
                             </div>
                             <br>
@@ -183,7 +182,7 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(product, result_products_key) in result_products">
-                                        <td>項次</td>
+                                        <td>@{{result_products_key +1}}</td>
                                         <td>
                                             <div class="text-center">
                                                 <input type="checkbox" class="big-checkbox"

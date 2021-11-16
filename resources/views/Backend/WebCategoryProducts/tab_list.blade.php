@@ -33,10 +33,10 @@
                             @method('DELETE') 
                             @csrf
                         </form>
-                        <td>@{{category_products_list_key}}</td>
-                        <td>@{{category_products_list.id}}</td>
+                        <td>@{{category_products_list_key +1}}</td>
                         <td>@{{category_products_list.product_no}}</td>
                         <td>@{{category_products_list.product_name}}</td>
+                        <td>@{{category_products_list.selling_price}}</td>
                         <td>@{{category_products_list.start_launched_at}} ~ @{{category_products_list.end_launched_at}}</td>
                         <td>@{{category_products_list.launched_status}}</td>
                         <td>@{{category_products_list.gross_margin}}</td>

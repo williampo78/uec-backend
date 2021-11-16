@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Input\Input;
+use Tymon\JWTAuth\Claims\Issuer;
 
 class WebCategoryHierarchyService
 {
@@ -149,16 +150,49 @@ class WebCategoryHierarchyService
         return DB::select($query);
     }
     public function category_products($id){
-
         $resut =  CategoryProducts::where('web_category_hierarchy_id' , $id)
         ->select('web_category_products.id as id' , 'web_category_products.product_id as product_id' , 'products_v.*')
         ->join('products_v', 'products_v.id', '=', 'web_category_products.product_id')
         ->get();
         return $resut ; 
     }
-    public function get_products_v(){
-        $resut = DB::table('products_v')->select(DB::raw('products_v.*'),DB::raw('supplier.name as supplier_name'))->leftJoin('supplier', 'products_v.supplier_id', '=', 'supplier.id')->get()->toArray() ; 
-        return $resut ;
+    public function get_products_v($in){
+        $agent_id = Auth::user()->agent_id;
+        $query = DB::table('products_v')
+        ->select(DB::raw('products_v.*'),DB::raw('supplier.name as supplier_name'))
+        ->leftJoin('supplier', 'products_v.supplier_id', '=', 'supplier.id') 
+        ->where('products_v.agent_id' , $agent_id) ;
+        if(isset($in['create_start_date'] ) && isset($in['create_end_date'])){
+            if($in['create_start_date'] !=='' && $in['create_end_date'] !== ''){
+                $query->where('products_v.created_date', '>=', $in['create_start_date'])
+                      ->where('products_v.created_date', '<=', $in['create_end_date']);
+            };
+        };
+        if(isset($in['filter_product_id']) && $in['filter_product_id'] !== ''){
+            $query->whereNotIn('products_v.id',$in['filter_product_id']) ; 
+        } ; 
+        if(isset($in['product_no']) && $in['product_no'] !==''){
+            $query->where('product_no',$in['product_no']); 
+        };
+        if(isset($in['select_start_date']) && isset($in['select_end_date'])){
+            if($in['select_start_date'] !=='' && $in['select_end_date'] !== ''){
+                $query->where('start_launched_at' ,'>=' ,$in['select_start_date'])
+                      ->where('end_launched_at','<=' ,$in['select_start_date']);
+            };
+        }
+        if(isset($in['supplier_id']) && $in['supplier_id'] !== ''){
+            $query->where('products_v.supplier_id',$in['supplier_id']) ;
+        }
+        if(isset($in['product_name']) && $in['product_name'] !== ''){
+            $query->where('products_v.product_name' , $in['product_name']);
+        }
+        if(isset($in['selling_price_max']) && $in['selling_price_max'] !== ''){
+            $query->where('products_v.selling_price', '>=', $in['selling_price_max']);
+        }
+        if(isset($in['selling_price_min']) && $in['selling_price_min'] !== ''){
+            $query->where('products_v.selling_price', '<=', $in['selling_price_min']);
+        }
+        return $query->get() ;
     }   
 
 }

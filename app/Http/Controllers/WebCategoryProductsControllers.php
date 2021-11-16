@@ -109,7 +109,7 @@ class WebCategoryProductsControllers extends Controller
         $result = [];
         switch ($in['type']) {
             case 'getProductsList':
-                $result['data'] = $this->webCategoryHierarchyService->get_products_v();
+                $result['data'] = $this->webCategoryHierarchyService->get_products_v($in);
                 foreach($result['data'] as $key => $val){
                     $result['data'][$key]->check_use =  0 ;
                 } ; 
