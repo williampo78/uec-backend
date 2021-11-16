@@ -6,6 +6,8 @@ namespace App\Services;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MemberNotes;
+use App\Models\MemberCollections;
+use App\Models\ProductPhotos;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +22,7 @@ class APIWebService
     public function getMemberNotes()
     {
         $member_id = Auth::guard('api')->user()->member_id;
-        $member_notes = MemberNotes::select('id', 'note_type', 'name', 'mobile', 'telephone', 'telephone_ext', 'email', 'zip_code', 'city_id', 'district_id', 'address', 'cvs_type', 'cvs_store_no', 'is_default')
+        $member_notes = MemberNotes::select('id', 'note_type', 'name', 'mobile', 'telephone', 'telephone_ext', 'email', 'zip_code', 'city_id', 'city_name', 'district_id', 'district_name', 'address', 'cvs_type', 'cvs_store_no', 'is_default')
             ->where('member_id', '=', $member_id)->get();
         return $member_notes;
     }
@@ -35,7 +37,7 @@ class APIWebService
     {
         $member_id = Auth::guard('api')->user()->member_id;
 
-        $data = MemberNotes::where('id' , $id)->where('member_id' , $member_id)->get()->toArray();
+        $data = MemberNotes::where('id', $id)->where('member_id', $member_id)->get()->toArray();
         if (count($data) == 0) {
             return false;
         }
@@ -85,7 +87,7 @@ class APIWebService
     {
         $member_id = Auth::guard('api')->user()->member_id;
 
-        $data = MemberNotes::where('id' , $id)->where('member_id' , $member_id)->get()->toArray();
+        $data = MemberNotes::where('id', $id)->where('member_id', $member_id)->get()->toArray();
         if (count($data) == 0) {
             return false;
         }
@@ -154,6 +156,28 @@ class APIWebService
         }
 
         return $result;
+    }
+
+
+    /**
+     * 取得會員收藏商品
+     * @param
+     * @return string
+     */
+    public function getMemberCollections()
+    {
+        $member_id = Auth::guard('api')->user()->member_id;
+        $collects = DB::table('member_collections')->select('products.product_name', 'products.selling_price','products.list_price')
+            ->Join('products','member_collections.product_id','=','products.id')
+            ->leftJoin(DB::raw("(select main(sort) as sort, photo_name,product_id
+                          from products
+                          group by sort
+                        ) as photo"),
+                function ($join) {
+                    $join->on('photo.product_id', '=', 'products.id');
+                })
+            ->where('member_collections.member_id', '=', $member_id)->get();
+        return $collects;
     }
 
 }
