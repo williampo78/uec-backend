@@ -231,14 +231,12 @@
                                     type: 'DelProductsList',
                                     id: del_data.web_category_products_id,
                                 });
-                                console.log(response) ; 
                             };
                             req();
                         }
                         this.category_products_list.splice(index, 1);
                     } 
 
-                    // console.log(this.category_products_list[index]) ; 
                 },
                 TESTFUNCTION() {
                     var create_start_date = $('input[name="create_start_date"]').val();

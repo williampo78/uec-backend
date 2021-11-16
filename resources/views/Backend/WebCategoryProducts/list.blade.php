@@ -91,8 +91,19 @@
                                         </td>
                                         <td>{{$val->id}}</td>
                                         <td>{{$val->name}}</td>
-                                        <td>{{$val->active}}</td>
-                                        <td>{{$val->content_type}}</td>
+                                        <td>
+                                            @if($val->active == 0)
+                                                關閉
+                                            @else
+                                                開啟
+                                            @endif
+                                        </td>
+                                        <td>
+                                        @if($val->content_type == 'M')
+                                        @elseif($val->content_type == 'P')
+                                        指定商品
+                                        @endif                                        
+                                        </td>
                                     </tr>
                                 @endforeach
 
