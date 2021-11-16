@@ -1,29 +1,30 @@
 <?php
 
-use App\Http\Controllers\AdminControllers;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\QAController;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\ItemControllers;
-use App\Http\Controllers\LoginAuthController;
-use App\Http\Controllers\DepartmentControllers;
-use App\Http\Controllers\SupplierTypeControllers ;
-use App\Http\Controllers\WarehouseController ;
-use App\Http\Controllers\PrimaryCategoryController;
+use App\Http\Controllers\RolesController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\AdminControllers;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\RequisitionsPurchaseController;
-use App\Http\Controllers\RequisitionsPurchaseReviewController;
+use App\Http\Controllers\ContactControllers ;
+use App\Http\Controllers\LoginAuthController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers;
-use App\Http\Controllers\QuotationReviewController;
+use App\Http\Controllers\WarehouseController ;
+use App\Http\Controllers\DepartmentControllers;
 use App\Http\Controllers\OrderSupplierController;
-use App\Http\Controllers\ContactControllers ;
-use App\Http\Controllers\WebCategoryHierarchyControllers ;
-use Illuminate\Support\Facades\Route;
-use CKSource\CKFinderBridge\Controller\CKFinderController;
+use App\Http\Controllers\SupplierTypeControllers ;
+use App\Http\Controllers\PrimaryCategoryController;
 
-use App\Http\Controllers\TestController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\QAController;
+use App\Http\Controllers\QuotationReviewController;
+use App\Http\Controllers\AdvertisementBlockController;
+use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\WebCategoryProductsControllers ;
+use App\Http\Controllers\WebCategoryHierarchyControllers ;
+use CKSource\CKFinderBridge\Controller\CKFinderController;
+use App\Http\Controllers\RequisitionsPurchaseReviewController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -74,8 +75,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/qa',QAController::class, ['names' => ['index' => 'qa']]);
     Route::resource('/web_category_hierarchy',WebCategoryHierarchyControllers::class, ['names' => ['index' => 'web_category_hierarchy']]) ;
     Route::post('/web_category_hierarchy/ajax',[WebCategoryHierarchyControllers::class,'ajax']) ;
-    Route::resource('/web_category_products',WebCategoryProductsControllers::class,['names' => ['index' => 'web_category_products']]) ; 
-    Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ; 
+    Route::resource('/web_category_products',WebCategoryProductsControllers::class,['names' => ['index' => 'web_category_products']]) ;
+    Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ;
+
+    Route::resource('/advertisemsement_block', AdvertisementBlockController::class, ['names' => ['index' => 'advertisemsement_block']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
