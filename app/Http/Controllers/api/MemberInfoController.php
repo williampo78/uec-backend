@@ -10,6 +10,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Auth;
 use App\Services\APIWebService;
 use Validator;
+
 class MemberInfoController extends Controller
 {
 
@@ -262,7 +263,7 @@ class MemberInfoController extends Controller
             'address' => 'required',
         ], $messages);
 
-        if ($v->fails()){
+        if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
@@ -335,7 +336,7 @@ class MemberInfoController extends Controller
             'address' => 'required',
         ], $messages);
 
-        if ($v->fails()){
+        if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
@@ -372,6 +373,43 @@ class MemberInfoController extends Controller
             $list = [];
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+
+    }
+
+
+    /*
+     * 新增會員商品收藏資料 (商品編號)
+     * @param  int  $id
+     */
+    public function createCollections(Request $request)
+    {
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $messages = [
+            'product_id.required' => '商品編號不能為空',
+        ];
+
+        $v = Validator::make($request->all(), [
+            'product_id' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+        $response = $this->apiWebService->createMemberCollections($request);
+        if ($response == 'isExist') {
+            $status = false;
+            $err = '405';
+            $data = '';
+        } else if ($response == 'success') {
+            $status = true;
+            $data = '新增成功';
+        } else {
+            $status = false;
+            $err = '401';
+            $data = '';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
     }
 }

@@ -46,7 +46,7 @@ class APIWebService
             if ($input['is_default'] == 1) {//設為預設時，將其他同note_type設為0
                 $webData = [];
                 $webData['is_default'] = 0;
-                MemberNotes::where('id', $id)->where('member_id', $member_id)->where('note_type', '=',$input['note_type'])->update($webData);
+                MemberNotes::where('member_id', $member_id)->where('note_type', '=', $input['note_type'])->update($webData);
             }
             $webData = [];
             $webData['note_type'] = $input['note_type'];
@@ -172,17 +172,56 @@ class APIWebService
     public function getMemberCollections()
     {
         $member_id = Auth::guard('api')->user()->member_id;
-        $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price','products.list_price')
-            ->Join('products','member_collections.product_id','=','products.id')
+        $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price', 'products.list_price')
+            ->Join('products', 'member_collections.product_id', '=', 'products.id')
             ->where('member_collections.member_id', '=', $member_id)->get();
 
         foreach ($collects as $collect) {
             $photo = ProductPhotos::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first()->toArray();
-            $discount = ceil(($collect->selling_price / $collect->list_price)*100);
-            $collection[] = array('product_id'=>$collect->id,'product_name'=>$collect->product_name, 'selling_price'=>intval($collect->selling_price),'product_discount'=>intval($discount), 'product_photo'=>$photo['photo_name']);
+            $discount = ceil(($collect->selling_price / $collect->list_price) * 100);
+            $collection[] = array('product_id' => $collect->id, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'product_discount' => intval($discount), 'product_photo' => $photo['photo_name']);
         }
 
         return json_encode($collection);
     }
 
+
+    /**
+     * 新增會員收藏商品
+     * @param
+     * @return string
+     */
+    public function createMemberCollections($input)
+    {
+        $member_id = Auth::guard('api')->user()->member_id;
+        $now = Carbon::now();
+        $data = MemberCollections::where('product_id', $input['product_id'])->where('member_id', $member_id)->get()->toArray();
+        if (count($data) > 0) {
+            return 'isExist';
+        }
+        DB::beginTransaction();
+        try {
+            $webData = [];
+            $webData['member_id'] = $member_id;
+            $webData['product_id'] = $input['product_id'];
+            $webData['status'] = 0;
+            $webData['created_by'] = $member_id;
+            $webData['updated_by'] = -1;
+            $webData['created_at'] = $now;
+            $webData['updated_at'] = $now;
+            $new_id = MemberCollections::insertGetId($webData);
+            DB::commit();
+            if ($new_id > 0) {
+                $result = 'success';
+            } else {
+                $result = 'fail';
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = 'fail';
+        }
+
+        return $result;
+    }
 }
