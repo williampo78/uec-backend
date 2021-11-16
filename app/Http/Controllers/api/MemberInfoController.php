@@ -351,4 +351,28 @@ class MemberInfoController extends Controller
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
     }
+
+
+    /*
+     * 查詢會員商品收藏資料
+     * @param
+     */
+    public function collections()
+    {
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiWebService->getMemberCollections();
+        $result = json_decode($response, true);
+        if (count($result) > 0) {
+            $status = true;
+            $list = $result;
+        } else {
+            $status = false;
+            $err = '404';
+            $list = [];
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+
+    }
 }
+

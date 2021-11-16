@@ -167,17 +167,17 @@ class APIWebService
     public function getMemberCollections()
     {
         $member_id = Auth::guard('api')->user()->member_id;
-        $collects = DB::table('member_collections')->select('products.product_name', 'products.selling_price','products.list_price')
+        $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price','products.list_price')
             ->Join('products','member_collections.product_id','=','products.id')
-            ->leftJoin(DB::raw("(select main(sort) as sort, photo_name,product_id
-                          from products
-                          group by sort
-                        ) as photo"),
-                function ($join) {
-                    $join->on('photo.product_id', '=', 'products.id');
-                })
             ->where('member_collections.member_id', '=', $member_id)->get();
-        return $collects;
+
+        foreach ($collects as $collect) {
+            $photo = ProductPhotos::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first()->toArray();
+            $discount = ceil(($collect->selling_price / $collect->list_price)*100);
+            $collection[] = array('product_id'=>$collect->id,'product_name'=>$collect->product_name, 'selling_price'=>intval($collect->selling_price),'product_discount'=>intval($discount), 'product_photo'=>$photo['photo_name']);
+        }
+
+        return json_encode($collection);
     }
 
 }
