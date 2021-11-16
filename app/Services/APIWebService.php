@@ -43,6 +43,11 @@ class APIWebService
         }
         DB::beginTransaction();
         try {
+            if ($input['is_default'] == 1) {//設為預設時，將其他同note_type設為0
+                $webData = [];
+                $webData['is_default'] = 0;
+                MemberNotes::where('id', $id)->where('member_id', $member_id)->where('note_type', '=',$input['note_type'])->update($webData);
+            }
             $webData = [];
             $webData['note_type'] = $input['note_type'];
             $webData['email'] = $input['email'];
