@@ -157,8 +157,7 @@ class WebCategoryHierarchyService
         return $resut ; 
     }
     public function get_products_v(){
-        
-        $resut = DB::table('products_v')->get()->toArray() ; 
+        $resut = DB::table('products_v')->select(DB::raw('products_v.*'),DB::raw('supplier.name as supplier_name'))->leftJoin('supplier', 'products_v.supplier_id', '=', 'supplier.id')->get()->toArray() ; 
         return $resut ;
     }   
 

@@ -20,7 +20,7 @@
                                             <h5>供應商</h5>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control js-select2-department" name="supplier"
+                                            <select class="form-control js-select2-department" name="suvplier"
                                                 id="supplier">
                                                 @foreach ($supplier as $val)
                                                     <option value='{{ $val['id'] }}'>{{ $val['name'] }}</option>
@@ -148,7 +148,8 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-success" data-dismiss="modal">儲存</button>
+                                    <button type="button" class="btn btn-success"
+                                        @click="productsForCategory">儲存</button>
                                     <button type="button" class="btn btn-success" data-dismiss="modal">儲存並關閉</button>
                                     <button type="button" class="btn btn-danger" data-dismiss="modal"><i
                                             class="fa fa-fw fa-close"></i>關閉</button>
@@ -185,17 +186,18 @@
                                         <td>項次</td>
                                         <td>
                                             <div class="text-center">
-                                                <input style="width: 20px;height: 20px;" type="checkbox" id="cbox1"
-                                                    value="first_checkbox">
+                                                <input type="checkbox" class="big-checkbox"
+                                                    style="width: 20px;height: 20px;" v-model="product.check_use"
+                                                    :true-value="1" :false-value="0">
                                             </div>
                                         </td>
-                                        <td>@{{product.product_no}}</td>
-                                        <td>@{{product . product_name }}</td>
-                                        <td>@{{product . product_name }}</td>
-                                        <td>@{{product . start_launched_at}}</td>
-                                        <td>@{{product . launched_status_desc}}</td>
-                                        <td>@{{product . gross_margin}}</td>
-                                        <td>@{{product . supplier_id}}</td>
+                                        <td>@{{ product . product_no }}</td>
+                                        <td>@{{ product . product_name }}</td>
+                                        <td>@{{ product . product_name }}</td>
+                                        <td>@{{ product . start_launched_at }}</td>
+                                        <td>@{{ product . launched_status_desc }}</td>
+                                        <td>@{{ product . gross_margin }}</td>
+                                        <td>@{{ product . supplier_name }}</td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -128,52 +128,83 @@
         var products = Vue.extend({
             data: function() {
                 return {
-                    category_products_list: @json($category_products_list) ,
-                    select_req :{
+                    category_products_list: @json($category_products_list),
+                    select_req: {
                         // supplier_id :$('#supplier').val() ,
-                        product_no : '' ,
+                        product_no: '',
                         product_name: '',
-                        selling_price_min:'',
-                        selling_price_max:'',
+                        selling_price_min: '',
+                        selling_price_max: '',
                     },
-                    result_products:[{}] , 
+                    result_products: [],
                 }
             },
             methods: {
-                productsGetAjax(){
-                    var create_start_date = $('input[name="create_start_date"]').val() ;
-                    var create_end_date = $('input[name="create_end_date"]').val() ;
-                    var select_start_date = $('input[name="select_start_date"]').val() ;
-                    var select_end_date = $('input[name="select_end_date"]').val() ;
-                    
+                productsGetAjax() {
+                    var create_start_date = $('input[name="create_start_date"]').val();
+                    var create_end_date = $('input[name="create_end_date"]').val();
+                    var select_start_date = $('input[name="select_start_date"]').val();
+                    var select_end_date = $('input[name="select_end_date"]').val();
+
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'getProductsList',
-                            product_no:this.select_req.product_no , 
-                            product_name:this.product_name,
-                            selling_price_min:this.selling_price_min,
-                            selling_price_max:this.selling_price_max,
-                            create_start_date:create_start_date,
-                            create_end_date:create_end_date,
-                            select_start_date:select_start_date,
-                            select_end_date:select_end_date,
+                            product_no: this.select_req.product_no,
+                            product_name: this.product_name,
+                            selling_price_min: this.selling_price_min,
+                            selling_price_max: this.selling_price_max,
+                            create_start_date: create_start_date,
+                            create_end_date: create_end_date,
+                            select_start_date: select_start_date,
+                            select_end_date: select_end_date,
                         });
-                        
-                        this.result_products = response.data.result.data  ;
-                        console.log(this.result_products) ; 
+
+
+                        this.result_products = response.data.result.data;
                     }
                     req();
-                    // console.log('test') ; 
                 },
-                TESTFUNCTION(){
-                    var create_start_date = $('input[name="create_start_date"]').val() ;
-                    var create_end_date = $('input[name="create_end_date"]').val() ;
-                    var select_start_date = $('input[name="select_start_date"]').val() ;
-                    var select_end_date = $('input[name="select_end_date"]').val() ;
+                productsForCategory() {
+                    let list = [];
+                    let readyDel = [];
+                    var findthis = this.result_products.find((todo, index) => {
+                        if (todo.check_use == 1) {
+                            this.category_products_list.push({
+                                id: '',
+                                agent_id: todo.agent_id,
+                                created_date: todo.created_date,
+                                end_launched_at: todo.end_launched_at,
+                                gross_margin: todo.gross_margin,
+                                product_id: todo.id,
+                                item_cost: todo.item_cost,
+                                launched_status: todo.launched_status,
+                                launched_status_desc: todo.launched_status_desc,
+                                product_name: todo.product_name,
+                                product_no: todo.product_no,
+                                selling_price: todo.selling_price,
+                                start_launched_at: todo.start_launched_at,
+                                stock_type: todo.stock_type,
+                                supplier_id: todo.supplier_id,
+                            });
+                            readyDel.push(index);
+                            todo.del = 1;
+                        } else {
+                            todo.del = 0;
+                        }
+                    })
+
+                    let new_array = this.result_products.filter(function(obj) {
+                        return obj.del == 0;
+                    });
+                    this.result_products = new_array ; 
                     
-                    console.log(create_start_date,create_end_date,select_start_date,select_end_date) ; 
-                    console.log(this.select_req) ; 
+                },
+                TESTFUNCTION() {
+                    var create_start_date = $('input[name="create_start_date"]').val();
+                    var create_end_date = $('input[name="create_end_date"]').val();
+                    var select_start_date = $('input[name="select_start_date"]').val();
+                    var select_end_date = $('input[name="select_end_date"]').val();
                 }
             },
             mounted: function() {
@@ -190,7 +221,7 @@
                 $('#select_end_date').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-            
+
                 $("#supplier").select2({
                     allowClear: true,
                     theme: "bootstrap",
