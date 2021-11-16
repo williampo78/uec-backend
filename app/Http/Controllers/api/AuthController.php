@@ -15,7 +15,7 @@ use App\Models\Members;
 use App\Services\APIService;
 use Log;
 use Illuminate\Support\Facades\Config;
-
+use Validator;
 class AuthController extends Controller
 {
     public function __construct(APIService $apiService)
@@ -30,6 +30,20 @@ class AuthController extends Controller
 
         $err = null;
         $credentials = request(['mobile', 'password']);
+
+        $messages = [
+            'mobile.required' => '帳號不能為空',
+            'password.required' => '密碼不能為空',
+        ];
+
+        $v = Validator::make($credentials, [
+            'mobile' => 'required',
+            'password' => 'required',
+        ], $messages);
+
+        if ($v->fails()){
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
 
         $fields = json_encode($credentials);
         $response = $this->apiService->memberLogin($fields);
