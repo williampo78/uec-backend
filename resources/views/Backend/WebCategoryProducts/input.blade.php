@@ -15,110 +15,117 @@
         }
 
     </style>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">請輸入下列欄位資料</div>
-                <div class="panel-body" id="category_hierarchy_content_input" v-cloak>
-                    <form role="form" id="new-form" method="POST"
-                        action="{{ route('web_category_products.update', $category_hierarchy_content->id) }}"
-                        enctype="multipart/form-data" novalidate="novalidate">
-                        @method('PUT')
-                        @csrf
-                        <div class="row">
-                            <!-- 欄位 -->
-                            <div class="col-sm-12">
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group" id="div_doc_number">
-                                            <label for="doc_number">分類 <span class="redtext">*</span></label>
-                                            <input class="form-control" name="id" id="id"
-                                                value="{{ $category_hierarchy_content->name }}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-group" id="div_doc_number">
-                                            <div class="col-sm-12">
-                                                <label for="doc_number">狀態 <span class="redtext">*</span></label>
-                                            </div>
-                                            <div class="col-sm-4 form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="active" id="inlineRadio1"
-                                                    value="1"
-                                                    {{ $category_hierarchy_content->active == 1 ? "checked='checked'" : '' }}>
-                                                <label class="form-check-label" for="inlineRadio1">開啟</label>
-                                            </div>
-                                            <div class="col-sm-4 form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="active" id="inlineRadio2"
-                                                    value="0"
-                                                    {{ $category_hierarchy_content->active == 0 ? "checked='checked'" : '' }}>
-                                                <label class="form-check-label" for="inlineRadio2">關閉</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group" id="div_doc_number">
-                                            <label for="doc_number">網頁標題</label>
-                                            <input class="form-control" name="meta_title" id="meta_title"
-                                                value="{{ $category_hierarchy_content->meta_title }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-group" id="div_doc_number">
-                                            <label for="doc_number">網頁描述</label>
-                                            <input class="form-control" name="meta_description" id="meta_description"
-                                                value="{{ $category_hierarchy_content->meta_description }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group" id="div_doc_number">
-                                            <label for="doc_number">網頁關鍵字</label>
-                                            <input class="form-control" name="meta_keyword" id="meta_keyword"
-                                                value="{{ $category_hierarchy_content->meta_keywords }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                <textarea style="display:none" name="category_products_list_json" cols="30"
-                                    rows="10">@{{ category_products_list }}</textarea>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-sm-12">
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1 class="page-header"><i class="fa fa-list"></i>分類階層內容編輯</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">請輸入下列欄位資料</div>
+                    <div class="panel-body" id="category_hierarchy_content_input" v-cloak>
+                        <form role="form" id="new-form" method="POST"
+                            action="{{ route('web_category_products.update', $category_hierarchy_content->id) }}"
+                            enctype="multipart/form-data" novalidate="novalidate">
+                            @method('PUT')
+                            @csrf
+                            <div class="row">
+                                <!-- 欄位 -->
+                                <div class="col-sm-12">
+                                    <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_doc_number">
-                                                <div class="col-sm-4 form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="content_type"
-                                                        id="content_type1" value="P" checked="checked">
-                                                    <label class="form-check-label" for="content_type1">指定商品</label>
+                                                <label for="doc_number">分類 <span class="redtext">*</span></label>
+                                                <input class="form-control" name="id" id="id"
+                                                    value="{{ $category_hierarchy_content->name }}" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group" id="div_doc_number">
+                                                <div class="col-sm-12">
+                                                    <label for="doc_number">狀態 <span class="redtext">*</span></label>
                                                 </div>
-                                                {{-- <div class="col-sm-4 form-check form-check-inline">
+                                                <div class="col-sm-4 form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="active"
+                                                        id="inlineRadio1" value="1"
+                                                        {{ $category_hierarchy_content->active == 1 ? "checked='checked'" : '' }}>
+                                                    <label class="form-check-label" for="inlineRadio1">開啟</label>
+                                                </div>
+                                                <div class="col-sm-4 form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="active"
+                                                        id="inlineRadio2" value="0"
+                                                        {{ $category_hierarchy_content->active == 0 ? "checked='checked'" : '' }}>
+                                                    <label class="form-check-label" for="inlineRadio2">關閉</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group" id="div_doc_number">
+                                                <label for="doc_number">網頁標題</label>
+                                                <input class="form-control" name="meta_title" id="meta_title"
+                                                    value="{{ $category_hierarchy_content->meta_title }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group" id="div_doc_number">
+                                                <label for="doc_number">網頁描述</label>
+                                                <input class="form-control" name="meta_description" id="meta_description"
+                                                    value="{{ $category_hierarchy_content->meta_description }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group" id="div_doc_number">
+                                                <label for="doc_number">網頁關鍵字</label>
+                                                <input class="form-control" name="meta_keyword" id="meta_keyword"
+                                                    value="{{ $category_hierarchy_content->meta_keywords }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <textarea style="display:none" name="category_products_list_json" cols="30"
+                                        rows="10">@{{ category_products_list }}</textarea>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="form-group" id="div_doc_number">
+                                                    <div class="col-sm-4 form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="content_type"
+                                                            id="content_type1" value="P" checked="checked">
+                                                        <label class="form-check-label" for="content_type1">指定商品</label>
+                                                    </div>
+                                                    {{-- <div class="col-sm-4 form-check form-check-inline">
                                                     <input class="form-check-input" type="radio" name="content_type"
                                                         id="content_type2" value="0">
                                                     <label class="form-check-label" for="content_type2">指定賣場</label>
                                                 </div> --}}
+                                                </div>
+                                                <div class="col-sm-6">
+                                                </div>
                                             </div>
-                                            <div class="col-sm-6">
-                                            </div>
+                                            <hr>
                                         </div>
-                                        <hr>
                                     </div>
-                                </div>
-                                @include('Backend.WebCategoryProducts.tab_list')
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-success" @click="submit">儲存</button>
-                                            <a class="btn btn-danger" type="button"
-                                                href="{{ route('web_category_products') }}">取消</a>
+                                    @include('Backend.WebCategoryProducts.tab_list')
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <button type="button" class="btn btn-success" @click="submit">儲存</button>
+                                                <a class="btn btn-danger" type="button"
+                                                    href="{{ route('web_category_products') }}">取消</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                    @include('Backend.WebCategoryProducts.input_detail')
+                        </form>
+                        @include('Backend.WebCategoryProducts.input_detail')
+                    </div>
                 </div>
             </div>
         </div>
@@ -235,7 +242,7 @@
                             req();
                         }
                         this.category_products_list.splice(index, 1);
-                    } 
+                    }
 
                 },
                 TESTFUNCTION() {

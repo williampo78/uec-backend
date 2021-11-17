@@ -6,7 +6,7 @@
     <!-- 表頭名稱 -->
     <div class="row">
         <div class="col-sm-12">
-            <h1 class="page-header"><i class="fa fa-bank"></i>分類階層內容管理</h1>
+            <h1 class="page-header"><i class="fa fa-list"></i>分類階層內容管理</h1>
         </div>
     </div>
     <div class="row">
