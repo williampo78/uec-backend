@@ -7,6 +7,8 @@ use App\Services\UniversalService;
 use Illuminate\Http\Request;
 use App\Services\WebContentsService;
 use App\Services\APIService;
+use Mail;
+use Validator;
 
 class IndexController extends Controller
 {
@@ -68,6 +70,36 @@ class IndexController extends Controller
 
     public function postContact(Request $request)
     {
+        $messages = [
+            'contact_name.required' => '姓名不能為空',
+            'content_email.required' => 'E-mail不能為空',
+            'content_mobile.required' => '手機不能為空',
+            'content_text.required' => '問題/意見不能為空',
+        ];
+
+        $v = Validator::make($request->all(), [
+            'contact_name' => 'required',
+            'content_email' => 'required',
+            'content_mobile' => 'required',
+            'content_text' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
+
+        //通知客服
+        $data = array();
+        $data['name'] =  $request['contact_name'];
+        $data['email'] = $request['content_email'];
+        $data['mobile']= $request['content_mobile'];
+        $data['tel'] =   $request['content_tel'];
+        $data['content_text'] = $request['content_text'];
+
+        Mail::send('mail.contact', $data, function ($message ) use($data) {
+            $message->to(array("rowena@u-ark.com"))->subject(config('uec.mailPrefix').' 與我們聯繫');
+        });
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => '信件發送成功']);
 
     }
 

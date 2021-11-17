@@ -378,7 +378,7 @@ class MemberInfoController extends Controller
 
 
     /*
-     * 新增會員商品收藏資料 (商品編號)
+     * 新增刪除會員商品收藏資料 (商品編號)
      * @param  int  $id
      */
     public function createCollections(Request $request)
@@ -387,23 +387,26 @@ class MemberInfoController extends Controller
         $error_code = $this->apiService->getErrorCode();
         $messages = [
             'product_id.required' => '商品編號不能為空',
+            'status.required' => '設定狀態不能為空',
         ];
 
         $v = Validator::make($request->all(), [
             'product_id' => 'required',
+            'status' => 'required',
         ], $messages);
 
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
+
         $response = $this->apiWebService->createMemberCollections($request);
-        if ($response == 'isExist') {
-            $status = false;
-            $err = '405';
-            $data = '';
-        } else if ($response == 'success') {
+        if ($response == 'success') {
             $status = true;
-            $data = '新增成功';
+            $data = ($request['status'] == 0 ? '加入' : '移除') . '收藏成功';
+        } elseif ($response=='203') {
+            $status = false;
+            $err = $response;
+            $data = '';
         } else {
             $status = false;
             $err = '401';
@@ -412,5 +415,6 @@ class MemberInfoController extends Controller
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
     }
+
 }
 

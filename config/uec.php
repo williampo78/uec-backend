@@ -13,4 +13,5 @@ return array(
      *
     */
     'isTesting' => env('UEC_TEST', 'true'),
+    'mailPrefix' => "[ 電商測試 ]",
 );

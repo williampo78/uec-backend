@@ -171,6 +171,7 @@ class APIWebService
      */
     public function getMemberCollections()
     {
+        $collection = [];
         $member_id = Auth::guard('api')->user()->member_id;
         $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price', 'products.list_price')
             ->Join('products', 'member_collections.product_id', '=', 'products.id')
@@ -187,7 +188,7 @@ class APIWebService
 
 
     /**
-     * 新增會員收藏商品
+     * 新增/刪除會員收藏商品
      * @param
      * @return string
      */
@@ -197,19 +198,30 @@ class APIWebService
         $now = Carbon::now();
         $data = MemberCollections::where('product_id', $input['product_id'])->where('member_id', $member_id)->get()->toArray();
         if (count($data) > 0) {
-            return 'isExist';
+            $act = 'upd';
+        } else {
+            $act = 'add';
         }
         DB::beginTransaction();
         try {
             $webData = [];
             $webData['member_id'] = $member_id;
             $webData['product_id'] = $input['product_id'];
-            $webData['status'] = 0;
+            $webData['status'] = $input['status'];
             $webData['created_by'] = $member_id;
             $webData['updated_by'] = -1;
             $webData['created_at'] = $now;
             $webData['updated_at'] = $now;
-            $new_id = MemberCollections::insertGetId($webData);
+            if ($act == 'add') {
+                if ($input['status'] == '-1') {
+                    return '203';
+                }
+                $new_id = MemberCollections::insertGetId($webData);
+            } else if ($act =='upd') {
+                MemberCollections::where('product_id', $input['product_id'])->where('member_id', $member_id)->update($webData);
+                $new_id = $input['product_id'];
+            }
+
             DB::commit();
             if ($new_id > 0) {
                 $result = 'success';
