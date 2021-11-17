@@ -122,7 +122,7 @@ class WebCategoryProductsControllers extends Controller
                 $result['data'] = $this->webCategoryHierarchyService->del_category_hierarchy_content($in['id']);
                 break;
             case 'show_category_products':
-                $result['data']['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in['id'])[0];
+                $result['data']['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
                 $result['data']['category_products_list'] = $this->webCategoryHierarchyService->category_products($in['id']);
                 break;
             default:
