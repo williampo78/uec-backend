@@ -128,7 +128,15 @@
         data: function () {
             return {
                 category_products_list:[] , 
-                category_hierarchy_content:[], 
+                category_hierarchy_content:{
+                    active:0,
+                    content_type:'',
+                    id:'',
+                    meta_description:'',
+                    meta_keywords:'',
+                    meta_title:'',
+                    name:'',
+                }, 
             }
         },
         methods: {
@@ -139,9 +147,11 @@
                             type: 'show_category_products',
                             id:id,
                         });
+                        console.log(id) ;
                         this.category_products_list =  response.data.result.data.category_products_list;
                         this.category_hierarchy_content =  response.data.result.data.category_hierarchy_content;    
-                        console.log(response);
+                    
+                        console.log(response.data.result.data.category_hierarchy_content);
                     }
                     req();
                 // console.log(this.category_products_list) ;
