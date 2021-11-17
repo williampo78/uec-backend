@@ -3,17 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\ProductsService;
 
 class ProductsControllers extends Controller
 {
+    private $productsService;
+
+    public function __construct(ProductsService $productsService)
+    {
+        $this->productsService = $productsService;
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('Backend.Products.list');
+        $in = $request->input() ; 
+        $result = $this->productsService->get_Products($request) ; 
+
+        return view('Backend.Products.list',$result);
     }
 
     /**
@@ -23,7 +33,7 @@ class ProductsControllers extends Controller
      */
     public function create()
     {
-        //
+        return view('Backend.Products.input');
     }
 
     /**
