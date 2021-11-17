@@ -13,14 +13,14 @@
                     <div class="panel panel-default">
                         <!-- 功能按鈕(新增) -->
                         <div class="panel-heading">
-                            <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
+                            <div>
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="col-sm-3">
                                             <h5>供應商</h5>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control js-select2-department" name="supplier"
+                                            <select class="form-control js-select2-department" name="suvplier"
                                                 id="supplier">
                                                 @foreach ($supplier as $val)
                                                     <option value='{{ $val['id'] }}'>{{ $val['name'] }}</option>
@@ -76,7 +76,7 @@
                                             <div class="form-group" id="">
                                                 <div class='input-group date' id='create_start_date'>
                                                     <input type='text' class="form-control" name="create_start_date"
-                                                        value="{{ date('Y-m-d') }}" />
+                                                        value="" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -89,7 +89,7 @@
                                         <div class="col-sm-4">
                                             <div class='input-group date' id='create_end_date'>
                                                 <input type='text' class="form-control" name="create_end_date"
-                                                    value="{{ date('Y-m-d') }}" />
+                                                    value="" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -104,7 +104,7 @@
                                             <div class="form-group" id="">
                                                 <div class='input-group date' id='select_start_date'>
                                                     <input type='text' class="form-control" name="select_start_date"
-                                                        value="{{ date('Y-m-d') }}" />
+                                                        value="" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -117,7 +117,7 @@
                                         <div class="col-sm-4">
                                             <div class='input-group date' id='select_end_date'>
                                                 <input type='text' class="form-control" name="select_end_date"
-                                                    value="{{ date('Y-m-d') }}" />
+                                                    value="" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -141,26 +141,29 @@
                                             style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
 
                         <!-- Table list -->
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-success" data-dismiss="modal">儲存</button>
-                                    <button type="button" class="btn btn-success" data-dismiss="modal">儲存並關閉</button>
+                                    <button type="button" class="btn btn-success"
+                                        @click="productsForCategory">儲存</button>
+                                    <button type="button" class="btn btn-success" @click="productsForCategory"
+                                        data-dismiss="modal">儲存並關閉</button>
                                     <button type="button" class="btn btn-danger" data-dismiss="modal"><i
                                             class="fa fa-fw fa-close"></i>關閉</button>
-                                    <button type="button" @click="TESTFUNCTION">測試按鈕</button>
-
+                                    {{-- <button type="button" @click="TESTFUNCTION">測試按鈕</button> --}}
                                 </div>
                                 <div class="col-sm-12">
                                     <hr>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">全勾選</button>
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">全取消</button>
+                                    <button type="button" class="btn btn-primary"
+                                        @click="check_all('allon')">全勾選</button>
+                                    <button type="button" class="btn btn-primary"
+                                        @click="check_all('alloff')">全取消</button>
                                 </div>
                             </div>
                             <br>
@@ -182,20 +185,21 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(product, result_products_key) in result_products">
-                                        <td>項次</td>
+                                        <td>@{{ result_products_key + 1 }}</td>
                                         <td>
                                             <div class="text-center">
-                                                <input style="width: 20px;height: 20px;" type="checkbox" id="cbox1"
-                                                    value="first_checkbox">
+                                                <input type="checkbox" class="big-checkbox"
+                                                    style="width: 20px;height: 20px;" v-model="product.check_use"
+                                                    :true-value="1" :false-value="0">
                                             </div>
                                         </td>
-                                        <td>@{{product.product_no}}</td>
-                                        <td>@{{product . product_name }}</td>
-                                        <td>@{{product . product_name }}</td>
-                                        <td>@{{product . start_launched_at}}</td>
-                                        <td>@{{product . launched_status_desc}}</td>
-                                        <td>@{{product . gross_margin}}</td>
-                                        <td>@{{product . supplier_id}}</td>
+                                        <td>@{{ product . product_no }}</td>
+                                        <td>@{{ product . product_name }}</td>
+                                        <td>@{{ product . product_name }}</td>
+                                        <td>@{{ product . start_launched_at }}</td>
+                                        <td>@{{ product . launched_status_desc }}</td>
+                                        <td>@{{ product . gross_margin }}</td>
+                                        <td>@{{ product . supplier_name }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -208,4 +212,5 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+
 <!-- /.modal -->
