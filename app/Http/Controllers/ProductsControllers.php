@@ -13,10 +13,7 @@ class ProductsControllers extends Controller
      */
     public function index()
     {
-        echo 'IN OUT' ;
-
-        return view(); 
-        //
+        return view('Backend.Products.list');
     }
 
     /**
