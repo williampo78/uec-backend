@@ -30,9 +30,9 @@ Route::group(['prefix' => 'v1'], function () {
 });
 
 Route::group(['middleware' => 'jwt.member'], function () {
-    Route::get('me', [AuthController::class, 'me']);
+    //Route::get('me', [AuthController::class, 'me']);
     Route::post('/members/logout', [AuthController::class, 'logout']);
-    Route::post('refresh', [AuthController::class, 'refresh']);
+    //Route::post('refresh', [AuthController::class, 'refresh']);
 
     Route::post('/membership', [MemberInfoController::class, 'profile']);
     Route::put('/membership', [MemberInfoController::class, 'updateProfile']);
@@ -45,14 +45,14 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::get('/membership/notes', [MemberInfoController::class, 'notes']);
     Route::put('/membership/{id}/notes', [MemberInfoController::class, 'updateNotes']);
     Route::delete('/membership/{id}/notes', [MemberInfoController::class, 'deleteNotes']);
+
+    Route::get('/membership/collections', [MemberInfoController::class, 'collections']);
+    Route::delete('/membership/collections', [MemberInfoController::class, 'deleteCollections']);
+    Route::post('/membership/collections', [MemberInfoController::class, 'createCollections']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
 Route::get('area/{all}', [DradviceController::class, 'area']);
-
-//Route::post('members/login', [AuthController::class, 'login']);
-//Route::post('members/login', [DradviceController::class, 'memberLogin']);
-
 
 Route::group(['prefix' => 'members'], function () {
     Route::post('/login', [AuthController::class, 'login']);
