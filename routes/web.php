@@ -17,7 +17,7 @@ use App\Http\Controllers\DepartmentControllers;
 use App\Http\Controllers\OrderSupplierController;
 use App\Http\Controllers\SupplierTypeControllers ;
 use App\Http\Controllers\PrimaryCategoryController;
-
+use App\Http\Controllers\ProductsControllers;
 use App\Http\Controllers\QuotationReviewController;
 use App\Http\Controllers\AdvertisementBlockController;
 use App\Http\Controllers\RequisitionsPurchaseController;
@@ -41,6 +41,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/', [AdminControllers::class, 'index'])->name('backend-home');
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
+    Route::resource('/products', ProductsControllers::class, ['names' => ['index' => 'products']]);
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
     Route::resource('/supplier', SupplierControllers::class, ['names' => ['index' => 'supplier']]);
@@ -77,7 +78,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/web_category_hierarchy/ajax',[WebCategoryHierarchyControllers::class,'ajax']) ;
     Route::resource('/web_category_products',WebCategoryProductsControllers::class,['names' => ['index' => 'web_category_products']]) ;
     Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ;
-
     Route::resource('/advertisemsement_block', AdvertisementBlockController::class, ['names' => ['index' => 'advertisemsement_block']]);
 });
 
