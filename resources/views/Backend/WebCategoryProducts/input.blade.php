@@ -118,7 +118,7 @@
                             </div>
                         </div>
                     </form>
-                    @include('Backend.WebCategoryProducts.detail')
+                    @include('Backend.WebCategoryProducts.input_detail')
                 </div>
             </div>
         </div>

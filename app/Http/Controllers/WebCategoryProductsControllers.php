@@ -86,11 +86,11 @@ class WebCategoryProductsControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        $in = $request->input() ;
-        $result = $this->webCategoryHierarchyService->edit_category_hierarchy_content($in,$id) ;
+        $in = $request->input();
+        $result = $this->webCategoryHierarchyService->edit_category_hierarchy_content($in, $id);
         $route_name = 'web_category_products';
         $act = 'add';
-        return view('Backend.success' , compact('route_name','act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -114,12 +114,16 @@ class WebCategoryProductsControllers extends Controller
         switch ($in['type']) {
             case 'getProductsList':
                 $result['data'] = $this->webCategoryHierarchyService->get_products_v($in);
-                foreach($result['data'] as $key => $val){
-                    $result['data'][$key]->check_use =  0 ;
-                } ; 
+                foreach ($result['data'] as $key => $val) {
+                    $result['data'][$key]->check_use = 0;
+                };
                 break;
-            case 'DelProductsList' :
-                $result['data'] = $this->webCategoryHierarchyService->del_category_hierarchy_content($in['id']) ;
+            case 'DelProductsList':
+                $result['data'] = $this->webCategoryHierarchyService->del_category_hierarchy_content($in['id']);
+                break;
+            case 'show_category_products':
+                $result['data']['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in['id'])[0];
+                $result['data']['category_products_list'] = $this->webCategoryHierarchyService->category_products($in['id']);
                 break;
             default:
                 # code...

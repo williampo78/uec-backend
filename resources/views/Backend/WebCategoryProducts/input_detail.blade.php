@@ -150,7 +150,8 @@
                                 <div class="col-sm-12">
                                     <button type="button" class="btn btn-success"
                                         @click="productsForCategory">儲存</button>
-                                    <button type="button" class="btn btn-success" @click="productsForCategory" data-dismiss="modal">儲存並關閉</button>
+                                    <button type="button" class="btn btn-success" @click="productsForCategory"
+                                        data-dismiss="modal">儲存並關閉</button>
                                     <button type="button" class="btn btn-danger" data-dismiss="modal"><i
                                             class="fa fa-fw fa-close"></i>關閉</button>
                                     {{-- <button type="button" @click="TESTFUNCTION">測試按鈕</button> --}}
@@ -159,8 +160,10 @@
                                     <hr>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-primary" @click="check_all('allon')">全勾選</button>
-                                    <button type="button" class="btn btn-primary" @click="check_all('alloff')">全取消</button>
+                                    <button type="button" class="btn btn-primary"
+                                        @click="check_all('allon')">全勾選</button>
+                                    <button type="button" class="btn btn-primary"
+                                        @click="check_all('alloff')">全取消</button>
                                 </div>
                             </div>
                             <br>
@@ -182,7 +185,7 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(product, result_products_key) in result_products">
-                                        <td>@{{result_products_key +1}}</td>
+                                        <td>@{{ result_products_key + 1 }}</td>
                                         <td>
                                             <div class="text-center">
                                                 <input type="checkbox" class="big-checkbox"
@@ -209,4 +212,5 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+
 <!-- /.modal -->
