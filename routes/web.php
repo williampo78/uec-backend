@@ -78,6 +78,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/web_category_products',WebCategoryProductsControllers::class,['names' => ['index' => 'web_category_products']]) ;
     Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ;
 
+    // 廣告版位
     Route::resource('/advertisemsement_block', AdvertisementBlockController::class, ['names' => ['index' => 'advertisemsement_block']]);
 });
 

@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '供應商資料')
+@section('title', '廣告版位')
 
 @section('content')
     <!--新增-->
@@ -17,26 +17,18 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕 -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
+                        <form role="form" id="select-form" method="GET" action="">
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="col-sm-3">
                                         <h5>適用頁面</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2-department" name="supplier" id="supplier">
-                                            {{-- @foreach ($data['supplier'] as $v)
-                                                <option value='{{ $v['id'] }}'
-                                                    {{ isset($data['getData']['supplier']) && $v['id'] == $data['getData']['supplier'] ? 'selected' : '' }}>
-                                                    {{ $v['name'] }}</option>
-                                            @endforeach --}}
-                                            <option value=''></option>
-                                            <option value='index_page'
-                                                {{ isset($data['getData']['status']) && $data['getData']['status'] == 'drafted' ? 'selected' : '' }}>
-                                                首頁</option>
-                                            <option value='product_page'
-                                                {{ isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing' ? 'selected' : '' }}>
-                                                商品頁</option>
+                                        <select class="form-control js-select2-applicable-page" name="applicable_page" id="applicable_page">
+                                            <option></option>
+                                            @foreach ($applicable_page as $obj)
+                                                <option value='{{ $obj->code }}' {{ isset($query_data['applicable_page']) && $obj->code == $query_data['applicable_page'] ? 'selected' : '' }}>{{ $obj->description }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -46,14 +38,10 @@
                                         <h5>適用設備</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="status" id="status">
+                                        <select class="form-control js-select2-device" name="device" id="device">
                                             <option value=''></option>
-                                            <option value='desktop'
-                                                {{ isset($data['getData']['status']) && $data['getData']['status'] == 'drafted' ? 'selected' : '' }}>
-                                                Desktop</option>
-                                            <option value='mobile'
-                                                {{ isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing' ? 'selected' : '' }}>
-                                                Mobile</option>
+                                            <option value='desktop' {{ isset($query_data['device']) && $query_data['device'] == 'desktop' ? 'selected' : '' }}>Desktop</option>
+                                            <option value='mobile' {{ isset($query_data['device']) && $query_data['device'] == 'mobile' ? 'selected' : '' }}>Mobile</option>
                                         </select>
                                     </div>
                                 </div>
@@ -63,14 +51,10 @@
                                         <h5>狀態</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="status" id="status">
+                                        <select class="form-control js-select2-status" name="status" id="status">
                                             <option value=''></option>
-                                            <option value='enabled'
-                                                {{ isset($data['getData']['status']) && $data['getData']['status'] == 'drafted' ? 'selected' : '' }}>
-                                                啟用</option>
-                                            <option value='disabled'
-                                                {{ isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing' ? 'selected' : '' }}>
-                                                關閉</option>
+                                            <option value='enabled' {{ isset($query_data['status']) && $query_data['status'] == 'enabled' ? 'selected' : '' }}>啟用</option>
+                                            <option value='disabled' {{ isset($query_data['status']) && $query_data['status'] == 'disabled' ? 'selected' : '' }}>關閉</option>
                                         </select>
                                     </div>
                                 </div>
@@ -78,7 +62,7 @@
                                 <div class="col-sm-2 text-right">
                                     <div class="col-sm-12">
                                         {{-- @if ($share_role_auth['auth_query']) --}}
-                                        <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                            <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
                                         {{-- @endif --}}
                                     </div>
                                 </div>
@@ -108,63 +92,40 @@
                                     @foreach ($ad_slots as $obj)
                                         <tr>
                                             <td>
-                                                <button class="btn btn-info btn-sm supplier_detail_show"
-                                                    data-supplier="{{ $obj->id }}">
-                                                    <i class="fa fa-search"></i>
-                                                    <button data-toggle="modal" id="hideShowMod" style="display:none;"
-                                                        data-target="#supplier_detail">Click me</button>
+                                                {{-- @if ($share_role_auth['auth_query']) --}}
+                                                    <button type="button" class="btn btn-info btn-sm slot_detail" data-toggle="modal" data-target="#slot_detail"  data-slot="{{ $obj->id }}">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+                                                {{-- @endif --}}
 
-                                                </button>
-
-                                                @if ($share_role_auth['auth_update'])
-                                                    <a class="btn btn-info btn-sm"
-                                                        href="{{ route('supplier') }}/{{ $obj->id }}/edit" value="1">
-                                                        <i class="fa fa-pencil"></i>
+                                                {{-- @if ($share_role_auth['auth_update']) --}}
+                                                    <a class="btn btn-info btn-sm" href="{{ route('supplier') }}/{{ $obj->id }}/edit" value="1">
+                                                        編輯
                                                     </a>
-                                                @endif
+                                                {{-- @endif --}}
                                             </td>
                                             <td>{{ $obj->description }}</td>
                                             <td>{{ $obj->slot_code }}</td>
                                             <td>{{ $obj->slot_desc }}</td>
                                             <td>
                                                 @if ($obj->is_mobile_applicable)
-                                                    V
+                                                    <i class="fa fa-check"></i>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($obj->is_desktop_applicable)
-                                                    V
+                                                    <i class="fa fa-check"></i>
                                                 @endif
                                             </td>
                                             <td>
-                                                {{--I：圖檔(image)、II：母子圖檔(image+image)、T：文字(text)、S：商品、IS：圖檔+商品、X：非人工上稿--}}
-                                                @switch($obj->slot_type)
-                                                    @case('I')
-                                                        圖檔
-                                                        @break
-                                                    @case('II')
-                                                        母子圖檔
-                                                        @break
-                                                    @case('T')
-                                                        文字
-                                                        @break
-                                                    @case('S')
-                                                        商品
-                                                        @break
-                                                    @case('IS')
-                                                        圖檔 + 商品
-                                                        @break
-                                                    @case('X')
-                                                        非人工上稿
-                                                        @break
-                                                @endswitch
+                                                @isset($slot_type_option[$obj->slot_type])
+                                                    {{ $slot_type_option[$obj->slot_type] }}
+                                                @endisset
                                             </td>
                                             <td>
-                                                @if ($obj->active)
-                                                    啟用
-                                                @else
-                                                    關閉
-                                                @endif
+                                                @isset($active_option[$obj->active])
+                                                    {{ $active_option[$obj->active] }}
+                                                @endisset
                                             </td>
                                             <td>{{ $obj->remark }}</td>
                                         </tr>
@@ -177,125 +138,71 @@
                 </div>
             </div>
         </div>
+        @include('Backend.Advertisement.detail')
+        <!-- /.modal -->
 
-    <div class="modal fade" id="supplier_detail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-fw fa-gear"></i>供應商基本資料</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 供應商編號</label></div>
-                                <div class="col-sm-4" id="show_display_number"></div>
-                                <div class="col-sm-2"><label> 供應商簡稱</label></div>
-                                <div class="col-sm-4" id="show_short_name"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 完整名稱</label></div>
-                                <div class="col-sm-4" id="show_name"></div>
-                                <div class="col-sm-2"><label> 付款條件</label></div>
-                                <div class="col-sm-4" id="show_pay_condition_id"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 公司統編</label></div>
-                                <div class="col-sm-4" id="show_company_number"></div>
-                                <div class="col-sm-2"><label> 負責人名稱</label></div>
-                                <div class="col-sm-4" id="show_contact_name"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 電子信箱</label></div>
-                                <div class="col-sm-4" id="show_email"></div>
-                                <div class="col-sm-2"><label> 聯絡電話</label></div>
-                                <div class="col-sm-4" id="show_telephone"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 傳真號碼</label></div>
-                                <div class="col-sm-4" id="show_fax"></div>
-                                <div class="col-sm-2"><label> 手機號碼</label></div>
-                                <div class="col-sm-4" id="show_cell_phone"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 地址</label></div>
-                                <div class="col-sm-10" id="show_address"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 地址2</label></div>
-                                <div class="col-sm-10" id="show_address2"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 地址3</label></div>
-                                <div class="col-sm-10" id="show_address3"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 地址4</label></div>
-                                <div class="col-sm-10" id="show_address4"></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 地址5</label></div>
-                                <div class="col-sm-10" id="show_address5"></div>
-                            </div>
-                            {{-- <div class="row form-group">
-                                <div class="col-sm-2"><label> 收款銀行</label></div>
-                                <div class="col-sm-4" id="bank_name"></div>
-                                <div class="col-sm-2"><label> 支行名稱</label></div>
-                                <div class="col-sm-4" id=""></div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 銀行戶名</label></div>
-                                <div class="col-sm-4" id=""></div>
-                                <div class="col-sm-2"><label> 銀行帳號</label></div>
-                                <div class="col-sm-4" id=""></div>
-                            </div> --}}
-                            <div class="row form-group">
-                                <div class="col-sm-2"><label> 備註</label></div>
-                                <div class="col-sm-10" id="show_remark"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
-                        關閉</button>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
 
 @section('js')
-    {{-- <script>
-        $(document).ready(function() {
-            var supplier_json = @json($supplier);
-            $('.supplier_detail_show').click(function() {
-                var supplier_id = $(this).data("supplier");
-                $.each(supplier_json, function(index, val) {
-                    if (supplier_id == val.id) {
-                        $('#show_display_number').html(val.display_number);
-                        $('#show_short_name').html(val.short_name);
-                        $('#show_name').html(val.name);
-                        $('#show_pay_condition_id').html(val.pay_condition_id);
-                        $('#show_email').html(val.email);
-                        $('#show_telephone').html(val.telephone);
-                        $('#show_fax').html(val.fax);
-                        $('#show_cell_phone').html(val.cell_phone);
-                        $('#show_address').html(val.address);
-                        $('#show_address2').html(val.address2);
-                        $('#show_address3').html(val.address3);
-                        $('#show_address4').html(val.address4);
-                        $('#show_address5').html(val.address5);
-                        $('#show_remark').html(val.address5);
-                        $('#hideShowMod').trigger("click");
-                        return false;
-                    }
-                });
-            })
+    <script>
+        $(function() {
+            $('.js-select2-applicable-page').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: '',
+            });
+
+            $('.js-select2-device').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: '',
+            });
+
+            $('.js-select2-status').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: '',
+            });
+
+            let ad_slots_json = @json($ad_slots);
+            let slot_type_option_json = @json($slot_type_option);
+
+            $('.slot_detail').on('click', function() {
+                    let slot_id = $(this).attr("data-slot");
+
+                    $.each(ad_slots_json, function(index, val) {
+                        if (slot_id == val.id) {
+                            $('#show_applicable_page').val(val.description);
+                            $('#show_slot_code').val(val.slot_code);
+                            $('#show_slot_desc').val(val.slot_desc);
+
+                            if (val.is_mobile_applicable) {
+                                $('#is_mobile_applicable_enabled').prop('checked', true);
+                            } else {
+                                $('#is_mobile_applicable_disabled').prop('checked', true);
+                            }
+
+                            if (val.is_desktop_applicable) {
+                                $('#is_desktop_applicable_enabled').prop('checked', true);
+                            } else {
+                                $('#is_desktop_applicable_disabled').prop('checked', true);
+                            }
+
+                            $('#show_slot_type').val(slot_type_option_json[val.slot_type]);
+
+                            if (val.active) {
+                                $('#active_enabled').prop('checked', true);
+                            } else {
+                                $('#active_disabled').prop('checked', true);
+                            }
+
+                            $('#remark').val(val.remark);
+
+                            return;
+                        }
+                    });
+            });
         });
-    </script> --}}
+    </script>
 @endsection
