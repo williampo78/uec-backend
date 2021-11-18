@@ -88,8 +88,8 @@ class APIProductServices
                         $data3[$key3]["meta_title"] = $value3["meta_title"];
                         $data3[$key3]["meta_description"] = $value3["meta_description"];
                         $data3[$key3]["meta_keywords"] = $value3["meta_keywords"];
-                        $data2[$key2]["cateInfo"] = $data3;
                     }
+                    $data2[$key2]["cateInfo"] = $data3;
                 } elseif ($config_levels == 2) {
                     $data2[$key2]["type"] = $value2["type"];
                     $data2[$key2]["meta_title"] = $value2["meta_title"];
@@ -99,7 +99,6 @@ class APIProductServices
             }
             $data[$key1]["cateInfo"] = $data2;
         }
-
         return $data;
     }
 
