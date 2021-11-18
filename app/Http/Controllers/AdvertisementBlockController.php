@@ -8,15 +8,15 @@ use App\Services\LookupValuesVService;
 
 class AdvertisementBlockController extends Controller
 {
-    private $_advertisementService;
-    private $_lookupValuesVService;
+    private $advertisementService;
+    private $lookupValuesVService;
 
     public function __construct(
         AdvertisementService $advertisementService,
         LookupValuesVService $lookupValuesVService
     ) {
-        $this->_advertisementService = $advertisementService;
-        $this->_lookupValuesVService = $lookupValuesVService;
+        $this->advertisementService = $advertisementService;
+        $this->lookupValuesVService = $lookupValuesVService;
     }
 
     /**
@@ -33,11 +33,9 @@ class AdvertisementBlockController extends Controller
         $query_data['device'] = $request->query('device');
         $query_data['status'] = $request->query('status');
 
-        $result['ad_slots'] = $this->_advertisementService->getSlots($query_data);
-        $result['applicable_page'] = $this->_lookupValuesVService->getApplicablePage();
+        $result['ad_slots'] = $this->advertisementService->getSlots($query_data);
+        $result['applicable_page'] = $this->lookupValuesVService->getApplicablePage();
         $result['query_data'] = $query_data;
-        $result['slot_type_option'] = $this->_advertisementService->getSlotTypeOption();
-        $result['active_option'] = $this->_advertisementService->getActiveOption();
 
         return view('Backend.Advertisement.list', $result);
     }
@@ -82,7 +80,11 @@ class AdvertisementBlockController extends Controller
      */
     public function edit($id)
     {
-        //
+        $result = [];
+
+        $result['ad_slot'] = $this->advertisementService->getSlotById($id);
+
+        return view('Backend.Advertisement.update', $result);
     }
 
     /**
@@ -94,7 +96,14 @@ class AdvertisementBlockController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input_data = $request->only(['active', 'remark']);
+        $input_data['id'] = $id;
+
+        $this->advertisementService->updateSlot($input_data);
+
+        $route_name = 'advertisemsement_block';
+        $act = 'upd';
+        return view('Backend.success', compact('route_name' , 'act'));
     }
 
     /**

@@ -2,12 +2,21 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use App\Models\AdSlots;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AdvertisementService
 {
+    /**
+     * 取得廣告版位資料
+     *
+     * @param array $query_data
+     * @return object
+     */
     public function getSlots($query_data)
     {
         $agent_id = Auth::user()->agent_id;
@@ -59,24 +68,21 @@ class AdvertisementService
         return $result;
     }
 
-    public function getSlotTypeOption()
+    public function updateSlot($input_data)
     {
-        //版位類型，I：圖檔(image)、II：母子圖檔(image+image)、T：文字(text)、S：商品、IS：圖檔+商品、X：非人工上稿
-        return [
-            'I' => '圖檔',
-            'II' => '母子圖檔',
-            'T' => '文字',
-            'S' => '商品',
-            'IS' => '圖檔 + 商品',
-            'X' => '非人工上稿',
-        ];
-    }
+        $user_id = Auth::user()->id;
+        $now = Carbon::now()->timestamp;
 
-    public function getActiveOption()
-    {
-        return [
-            1 => '啟用',
-            0 => '關閉',
-        ];
+        try {
+            AdSlots::findOrFail($input_data['id'])->update([
+                'slot_desc' => $input_data['slot_desc'],
+                'active' => $input_data['active'],
+                'remark' => $input_data['remark'],
+                'updated_by' => $user_id,
+                'updated_at' => $now,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            Log::info($e);
+        }
     }
 }

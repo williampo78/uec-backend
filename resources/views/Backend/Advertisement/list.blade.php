@@ -99,7 +99,7 @@
                                                 {{-- @endif --}}
 
                                                 {{-- @if ($share_role_auth['auth_update']) --}}
-                                                    <a class="btn btn-info btn-sm" href="{{ route('supplier') }}/{{ $obj->id }}/edit" value="1">
+                                                    <a class="btn btn-info btn-sm" href="{{ route('advertisemsement_block.edit' , $obj->id) }}">
                                                         編輯
                                                     </a>
                                                 {{-- @endif --}}
@@ -118,16 +118,16 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @isset($slot_type_option[$obj->slot_type])
-                                                    {{ $slot_type_option[$obj->slot_type] }}
+                                                @isset(config('uec.ad_slot_type_option')[$obj->slot_type])
+                                                    {{ config('uec.ad_slot_type_option')[$obj->slot_type] }}
                                                 @endisset
                                             </td>
                                             <td>
-                                                @isset($active_option[$obj->active])
-                                                    {{ $active_option[$obj->active] }}
+                                                @isset(config('uec.active_option')[$obj->active])
+                                                    {{ config('uec.active_option')[$obj->active] }}
                                                 @endisset
                                             </td>
-                                            <td>{{ $obj->remark }}</td>
+                                            <td>{!! nl2br(e($obj->remark)) !!}</td>
                                         </tr>
                                     @endforeach
 
@@ -166,7 +166,7 @@
             });
 
             let ad_slots_json = @json($ad_slots);
-            let slot_type_option_json = @json($slot_type_option);
+            let slot_type_option_json = @json(config('uec.ad_slot_type_option'));
 
             $('.slot_detail').on('click', function() {
                     let slot_id = $(this).attr("data-slot");
