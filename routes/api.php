@@ -47,7 +47,6 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::delete('/membership/{id}/notes', [MemberInfoController::class, 'deleteNotes']);
 
     Route::get('/membership/collections', [MemberInfoController::class, 'collections']);
-    Route::delete('/membership/collections', [MemberInfoController::class, 'deleteCollections']);
     Route::post('/membership/collections', [MemberInfoController::class, 'createCollections']);
 });
 

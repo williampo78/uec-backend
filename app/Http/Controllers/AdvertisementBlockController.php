@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\AdvertisementService;
+use App\Services\LookupValuesVService;
 
 class AdvertisementBlockController extends Controller
 {
     private $_advertisementService;
+    private $_lookupValuesVService;
 
-    public function __construct(AdvertisementService $advertisementService) {
+    public function __construct(
+        AdvertisementService $advertisementService,
+        LookupValuesVService $lookupValuesVService
+    ) {
         $this->_advertisementService = $advertisementService;
+        $this->_lookupValuesVService = $lookupValuesVService;
     }
 
     /**
@@ -18,15 +24,20 @@ class AdvertisementBlockController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $result = [];
+        $query_data = [];
 
-        $result['ad_slots'] = $this->_advertisementService->getSlots();
+        $query_data['applicable_page'] = $request->query('applicable_page');
+        $query_data['device'] = $request->query('device');
+        $query_data['status'] = $request->query('status');
 
-        // 適用頁面
-        $plucked = $result['ad_slots']->pluck('description', 'applicable_page')->all();
-        $result['applicable_page'] = array_unique($plucked);
+        $result['ad_slots'] = $this->_advertisementService->getSlots($query_data);
+        $result['applicable_page'] = $this->_lookupValuesVService->getApplicablePage();
+        $result['query_data'] = $query_data;
+        $result['slot_type_option'] = $this->_advertisementService->getSlotTypeOption();
+        $result['active_option'] = $this->_advertisementService->getActiveOption();
 
         return view('Backend.Advertisement.list', $result);
     }
