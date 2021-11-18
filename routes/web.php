@@ -42,6 +42,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
     Route::resource('/products', ProductsControllers::class, ['names' => ['index' => 'products']]);
+    Route::get('/productsTest',[ProductsControllers::class,'testview']) ;
+    Route::post('/upload_img',[ProductsControllers::class,'upload_img']) ; 
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
     Route::resource('/supplier', SupplierControllers::class, ['names' => ['index' => 'supplier']]);

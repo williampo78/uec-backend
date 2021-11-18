@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\ProductsService;
-
+use Storage ;
 class ProductsControllers extends Controller
 {
     private $productsService;
@@ -91,4 +91,29 @@ class ProductsControllers extends Controller
     {
         //
     }
+    public function testview(){        
+        return view('Backend.Products.test');
+    }
+    public function upload_img(Request $request){
+        if($request->hasFile('photo')){//判斷照片
+            $s3 = Storage::disk('s3');
+            $photo = $request->file('photo') ;
+            if($s3->put('/photo',$photo)){
+                return 'success';
+            }
+            return "S3 faild";
+        }
+        // dd($request);
+        // if($request->hasFile('photo')){
+        //     $s3 = Storage::disk('s3');
+        //     $photo = $request->file('photo');
+
+        //     if($s3->put('/photo',$photo)){
+        //         return 'success';
+        //     }
+        //     return "S3 faild";
+        // }
+        // return "no file";
+    }
+
 }
