@@ -8,6 +8,7 @@ use App\Http\Controllers\api\DradviceController;
 use App\Http\Controllers\api\TestInfoController;
 use App\Http\Controllers\api\MemberInfoController;
 use App\Http\Controllers\api\PointInfoController;
+use App\Http\Controllers\api\ProductController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,6 +28,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/footer', [IndexController::class, 'index']);
     Route::get('/footer/{id}', [IndexController::class, 'getContent']);
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
+
+    Route::get('/product/category', [ProductController::class, 'getCategory']);
 });
 
 Route::group(['middleware' => 'jwt.member'], function () {
