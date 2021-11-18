@@ -12,6 +12,7 @@
         "laravel/framework": "^8.54",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "league/flysystem-aws-s3-v3": "~1.0",
         "mavinoo/laravel-batch": "^2.2",
         "nesbot/carbon": "^2.53",
         "tymon/jwt-auth": "^1.0"

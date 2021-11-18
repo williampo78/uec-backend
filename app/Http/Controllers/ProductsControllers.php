@@ -3,22 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\AdvertisementService;
-use App\Services\LookupValuesVService;
-
-class AdvertisementBlockController extends Controller
+use App\Services\ProductsService;
+use Storage ;
+class ProductsControllers extends Controller
 {
-    private $_advertisementService;
-    private $_lookupValuesVService;
+    private $productsService;
 
-    public function __construct(
-        AdvertisementService $advertisementService,
-        LookupValuesVService $lookupValuesVService
-    ) {
-        $this->_advertisementService = $advertisementService;
-        $this->_lookupValuesVService = $lookupValuesVService;
+    public function __construct(ProductsService $productsService)
+    {
+        $this->productsService = $productsService;
     }
-
     /**
      * Display a listing of the resource.
      *
@@ -26,20 +20,10 @@ class AdvertisementBlockController extends Controller
      */
     public function index(Request $request)
     {
-        $result = [];
-        $query_data = [];
+        $in = $request->input() ; 
+        $result = $this->productsService->get_Products($request) ; 
 
-        $query_data['applicable_page'] = $request->query('applicable_page');
-        $query_data['device'] = $request->query('device');
-        $query_data['status'] = $request->query('status');
-
-        $result['ad_slots'] = $this->_advertisementService->getSlots($query_data);
-        $result['applicable_page'] = $this->_lookupValuesVService->getApplicablePage();
-        $result['query_data'] = $query_data;
-        $result['slot_type_option'] = $this->_advertisementService->getSlotTypeOption();
-        $result['active_option'] = $this->_advertisementService->getActiveOption();
-
-        return view('Backend.Advertisement.list', $result);
+        return view('Backend.Products.list',$result);
     }
 
     /**
@@ -49,7 +33,7 @@ class AdvertisementBlockController extends Controller
      */
     public function create()
     {
-        //
+        return view('Backend.Products.input');
     }
 
     /**
@@ -107,4 +91,29 @@ class AdvertisementBlockController extends Controller
     {
         //
     }
+    public function testview(){        
+        return view('Backend.Products.test');
+    }
+    public function upload_img(Request $request){
+        if($request->hasFile('photo')){//判斷照片
+            $s3 = Storage::disk('s3');
+            $photo = $request->file('photo') ;
+            if($s3->put('/photo',$photo)){
+                return 'success';
+            }
+            return "S3 faild";
+        }
+        // dd($request);
+        // if($request->hasFile('photo')){
+        //     $s3 = Storage::disk('s3');
+        //     $photo = $request->file('photo');
+
+        //     if($s3->put('/photo',$photo)){
+        //         return 'success';
+        //     }
+        //     return "S3 faild";
+        // }
+        // return "no file";
+    }
+
 }

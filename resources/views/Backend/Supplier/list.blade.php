@@ -53,10 +53,10 @@
                                                 <button class="btn btn-info btn-sm supplier_detail_show"
                                                     data-supplier="{{ $obj->id }}">
                                                     <i class="fa fa-search"></i>
-                                                    <button data-toggle="modal" id="hideShowMod" style="display:none;"
-                                                        data-target="#supplier_detail">Click me</button>
-
                                                 </button>
+                                                <button data-toggle="modal" id="hideShowMod" style="display:none;"
+                                                data-target="#supplier_detail">Click me</button>
+
                                                 @if($share_role_auth['auth_update'])
                                                 <a class="btn btn-info btn-sm"
                                                     href="{{ route('supplier') }}/{{ $obj->id }}/edit" value="1">

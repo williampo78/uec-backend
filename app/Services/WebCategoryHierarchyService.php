@@ -195,22 +195,23 @@ class WebCategoryHierarchyService
     }
     public function edit_category_hierarchy_content($in, $id)
     {
-        $resut = false ; 
+        $resut = false;
         $category_products_list = json_decode($in['category_products_list_json'], true);
         $user_id = Auth::user()->id;
         $now = Carbon::now();
-  
+
         DB::beginTransaction();
-        try{
+
+        try {
             CategoryHierarchy::where('id', $id)->update([
                 'active' => $in['active'],
-                'meta_title' => $in['meta_title'] ,
-                'meta_description' => $in['meta_description'] , 
+                'meta_title' => $in['meta_title'],
+                'meta_description' => $in['meta_description'],
                 'meta_keywords' => $in['meta_keyword'],
                 'content_type' => $in['content_type'],
             ]);
             foreach ($category_products_list as $key => $val) {
-                if ($val['id'] == '') {
+                if (!isset($val['web_category_products_id']) || $val['web_category_products_id'] == '') {
                     DB::table('web_category_products')->insert([
                         'web_category_hierarchy_id' => $id,
                         'product_id' => $val['product_id'],
@@ -223,17 +224,18 @@ class WebCategoryHierarchyService
                 }
             }
             DB::commit();
-            $resut = true ; 
+            $resut = true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
-            $resut = false ; 
+            $resut = false;
         }
-        return $resut ; 
+        return $resut;
     }
 
-    public function del_category_hierarchy_content($id){
-       return DB::table('web_category_products')->where('id', $id)->delete();
+    public function del_category_hierarchy_content($id)
+    {
+        return DB::table('web_category_products')->where('id', $id)->delete();
     }
 
 }
