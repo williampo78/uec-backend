@@ -49,15 +49,14 @@
     @yield('content')
 
     <script src="{{ asset('asset/js/template/bower_components/jquery/dist/jquery.js') }}"></script>
+    <script src="{{ asset('asset/js/DataTables/datatables.js') }}"></script>
+    <script src="{{ asset('asset/js/DataTables/Buttons-1.5.6/js/buttons.bootstrap.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}">
     </script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/collapse.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/transition.js') }}"></script>
     <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
-    <script src="{{ asset('asset/js/DataTables/datatables.js') }}"></script>
-    <script src="{{ asset('asset/js/DataTables/Buttons-1.5.6/js/buttons.bootstrap.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/moment-develop/moment.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
     <script src="{{ asset('asset/js/select2.min.js') }}"></script>
@@ -84,11 +83,10 @@
     <script src="{{ asset('asset/js/init.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <script src="{{ asset('asset/js/jquery.validationEngine.js') }}"></script>
     <script src="{{ asset('asset/js/jquery.validationEngine-zh_TW.js') }}"></script>
-    <script src="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js') }}"></script>
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
+    <script src="{{ asset('asset/js/axios.min.js') }}"></script>
 
     <link rel="stylesheet" href="{{ asset('asset/css/validationEngine.jquery.css') }}">
     <link href="{{ asset('asset/css/editor.css') }}" rel="stylesheet">

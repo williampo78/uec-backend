@@ -111,7 +111,10 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button class="btn btn-success" type="button" id="btn-save"><i class="fa fa-save"></i> 儲存</button>
+                                                @if ($share_role_auth['auth_update'])
+                                                    <button class="btn btn-success" type="button" id="btn-save"><i class="fa fa-save"></i> 儲存</button>
+                                                @endif
+
                                                 <button class="btn btn-danger" type="button" id="btn-cancel"><i class="fa fa-ban"></i> 取消</button>
                                             </div>
                                         </div>
@@ -124,20 +127,21 @@
             </div>
         </div>
     </div>
-
-    @section('js')
-        <script>
-            $(function () {
-                $("#update-form").validationEngine();
-
-                $('#btn-save').on('click', function () {
-                    $("#update-form").submit();
-                });
-
-                $('#btn-cancel').on('click', function () {
-                    location.href = "{{ route('advertisemsement_block') }}";
-                });
-            });
-        </script>
-    @endsection
 @endsection
+
+@section('js')
+    <script>
+        $(function () {
+            $("#update-form").validationEngine();
+
+            $('#btn-save').on('click', function () {
+                $("#update-form").submit();
+            });
+
+            $('#btn-cancel').on('click', function () {
+                location.href = "{{ route('advertisemsement_block') }}";
+            });
+        });
+    </script>
+@endsection
+

@@ -43,7 +43,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
     Route::resource('/products', ProductsControllers::class, ['names' => ['index' => 'products']]);
     Route::get('/productsTest',[ProductsControllers::class,'testview']) ;
-    Route::post('/upload_img',[ProductsControllers::class,'upload_img']) ; 
+    Route::post('/upload_img',[ProductsControllers::class,'upload_img']) ;
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
     Route::resource('/supplier', SupplierControllers::class, ['names' => ['index' => 'supplier']]);
@@ -82,6 +82,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ;
     // 廣告版位
     Route::resource('/advertisemsement_block', AdvertisementBlockController::class, ['names' => ['index' => 'advertisemsement_block']]);
+    Route::post('/advertisemsement_block/ajax', [AdvertisementBlockController::class, 'ajax']);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

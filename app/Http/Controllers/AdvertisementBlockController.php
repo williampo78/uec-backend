@@ -31,7 +31,7 @@ class AdvertisementBlockController extends Controller
 
         $query_data['applicable_page'] = $request->query('applicable_page');
         $query_data['device'] = $request->query('device');
-        $query_data['status'] = $request->query('status');
+        $query_data['active'] = $request->query('active');
 
         $result['ad_slots'] = $this->advertisementService->getSlots($query_data);
         $result['applicable_page'] = $this->lookupValuesVService->getApplicablePage();
@@ -115,5 +115,16 @@ class AdvertisementBlockController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function ajax(Request $request)
+    {
+        $slot_id = $request->input('slot_id');
+
+        $ad_slot = $this->advertisementService->getSlotById($slot_id);
+
+        return response()->json([
+            'ad_slot' => $ad_slot,
+        ]);
     }
 }
