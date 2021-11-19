@@ -19,9 +19,11 @@
 
                 <form action="upload_img" method="post" enctype="multipart/form-data">
                     @csrf
-                    <input type="file" name="photo">
+                    <input type="file" name="photo[]" multiple>
                     <button type="submit">按我按我</button>
                 </form>
+
+                <img style="width: 200px ; height:200px; " src="" alt="">
 {{-- 
                 <form class="form-horizontal" role="form" id="new-form" method="POST" action="/upload_img"
                     enctype="multipart/form-data" novalidate="novalidate">
