@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use Storage;
 
 class ImageUploadService
@@ -29,22 +30,23 @@ class ImageUploadService
                 $result['image'] = $storage_s3->put($path, $file, 'public');
             }
             $result['status'] = true;
-        } catch (\Exception $th) {
+        } catch (\Exception $e) {
+            Log::error($e);
             $result['status'] = false;
         }
         return $result;
     }
     /**
-     *  經由 Storage find Img URl 
+     *  經由 Storage find Img URl
      */
     public function getImage($file_name = null)
-    {   
-        if(empty($file_name)){
-            return false ; 
-        }else{
+    {
+        if (empty($file_name)) {
+            return false ;
+        } else {
             $storage_s3 = Storage::disk('s3');
             return $storage_s3->url($file_name);
-        }   
+        }
     }
-    
+
 }
