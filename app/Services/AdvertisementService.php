@@ -39,10 +39,10 @@ class AdvertisementService
             }
         }
 
-        if (!empty($query_data['status'])) {
-            if ($query_data['status'] == 'enabled') {
+        if (!empty($query_data['active'])) {
+            if ($query_data['active'] == 'enabled') {
                 $result = $result->where('ad_slots.active', 1);
-            } elseif ($query_data['status'] == 'disabled') {
+            } elseif ($query_data['active'] == 'disabled') {
                 $result = $result->where('ad_slots.active', 0);
             }
         }
@@ -75,7 +75,6 @@ class AdvertisementService
 
         try {
             AdSlots::findOrFail($input_data['id'])->update([
-                'slot_desc' => $input_data['slot_desc'],
                 'active' => $input_data['active'],
                 'remark' => $input_data['remark'],
                 'updated_by' => $user_id,

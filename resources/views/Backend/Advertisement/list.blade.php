@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '廣告版位')
+@section('title', '廣告版位管理')
 
 @section('content')
     <!--新增-->
@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-truck"></i>廣告版位</h1>
+                <h1 class="page-header"><i class="fa fa-list"></i>廣告版位管理</h1>
             </div>
         </div>
 
@@ -51,19 +51,19 @@
                                         <h5>狀態</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2-status" name="status" id="status">
+                                        <select class="form-control js-select2-active" name="active" id="active">
                                             <option value=''></option>
-                                            <option value='enabled' {{ isset($query_data['status']) && $query_data['status'] == 'enabled' ? 'selected' : '' }}>啟用</option>
-                                            <option value='disabled' {{ isset($query_data['status']) && $query_data['status'] == 'disabled' ? 'selected' : '' }}>關閉</option>
+                                            <option value='enabled' {{ isset($query_data['active']) && $query_data['active'] == 'enabled' ? 'selected' : '' }}>啟用</option>
+                                            <option value='disabled' {{ isset($query_data['active']) && $query_data['active'] == 'disabled' ? 'selected' : '' }}>關閉</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-2 text-right">
                                     <div class="col-sm-12">
-                                        {{-- @if ($share_role_auth['auth_query']) --}}
+                                        @if ($share_role_auth['auth_query'])
                                             <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
-                                        {{-- @endif --}}
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -73,8 +73,7 @@
                     <!-- Table list -->
                     <div class="panel-body">
                         <div id="table_list_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-                            <table class="table table-striped table-bordered table-hover" style="width:100%"
-                                id="table_list">
+                            <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                                 <thead>
                                     <tr role="row">
                                         <th class="col-sm-1 ">功能</th>
@@ -92,17 +91,17 @@
                                     @foreach ($ad_slots as $obj)
                                         <tr>
                                             <td>
-                                                {{-- @if ($share_role_auth['auth_query']) --}}
-                                                    <button type="button" class="btn btn-info btn-sm slot_detail" data-toggle="modal" data-target="#slot_detail"  data-slot="{{ $obj->id }}">
+                                                @if ($share_role_auth['auth_query'])
+                                                    <button type="button" class="btn btn-info btn-sm slot_detail" data-slot="{{ $obj->id }}">
                                                         <i class="fa fa-search"></i>
                                                     </button>
-                                                {{-- @endif --}}
+                                                @endif
 
-                                                {{-- @if ($share_role_auth['auth_update']) --}}
+                                                @if ($share_role_auth['auth_update'])
                                                     <a class="btn btn-info btn-sm" href="{{ route('advertisemsement_block.edit' , $obj->id) }}">
                                                         編輯
                                                     </a>
-                                                {{-- @endif --}}
+                                                @endif
                                             </td>
                                             <td>{{ $obj->description }}</td>
                                             <td>{{ $obj->slot_code }}</td>
@@ -159,49 +158,52 @@
                 placeholder: '',
             });
 
-            $('.js-select2-status').select2({
+            $('.js-select2-active').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: '',
             });
 
-            let ad_slots_json = @json($ad_slots);
             let slot_type_option_json = @json(config('uec.ad_slot_type_option'));
 
             $('.slot_detail').on('click', function() {
-                    let slot_id = $(this).attr("data-slot");
+                let slot_id = $(this).attr("data-slot");
 
-                    $.each(ad_slots_json, function(index, val) {
-                        if (slot_id == val.id) {
-                            $('#show_applicable_page').val(val.description);
-                            $('#show_slot_code').val(val.slot_code);
-                            $('#show_slot_desc').val(val.slot_desc);
+                axios.post('/backend/advertisemsement_block/ajax', {
+                    slot_id: slot_id
+                })
+                .then(function (response) {
+                    $('#modal_applicable_page').val(response.data.ad_slot.description);
+                    $('#modal_slot_code').val(response.data.ad_slot.slot_code);
+                    $('#modal_slot_desc').val(response.data.ad_slot.slot_desc);
 
-                            if (val.is_mobile_applicable) {
-                                $('#is_mobile_applicable_enabled').prop('checked', true);
-                            } else {
-                                $('#is_mobile_applicable_disabled').prop('checked', true);
-                            }
+                    if (response.data.ad_slot.is_mobile_applicable) {
+                        $('#modal_is_mobile_applicable_enabled').prop('checked', true);
+                    } else {
+                        $('#modal_is_mobile_applicable_disabled').prop('checked', true);
+                    }
 
-                            if (val.is_desktop_applicable) {
-                                $('#is_desktop_applicable_enabled').prop('checked', true);
-                            } else {
-                                $('#is_desktop_applicable_disabled').prop('checked', true);
-                            }
+                    if (response.data.ad_slot.is_desktop_applicable) {
+                        $('#modal_is_desktop_applicable_enabled').prop('checked', true);
+                    } else {
+                        $('#modal_is_desktop_applicable_disabled').prop('checked', true);
+                    }
 
-                            $('#show_slot_type').val(slot_type_option_json[val.slot_type]);
+                    $('#modal_slot_type').val(slot_type_option_json[response.data.ad_slot.slot_type]);
 
-                            if (val.active) {
-                                $('#active_enabled').prop('checked', true);
-                            } else {
-                                $('#active_disabled').prop('checked', true);
-                            }
+                    if (response.data.ad_slot.active) {
+                        $('#modal_active_enabled').prop('checked', true);
+                    } else {
+                        $('#modal_active_disabled').prop('checked', true);
+                    }
 
-                            $('#remark').val(val.remark);
+                    $('#modal_remark').val(response.data.ad_slot.remark);
 
-                            return;
-                        }
-                    });
+                    $('#slot_detail').modal('show');
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
             });
         });
     </script>
