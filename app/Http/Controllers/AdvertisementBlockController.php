@@ -37,7 +37,7 @@ class AdvertisementBlockController extends Controller
         $result['applicable_page'] = $this->lookupValuesVService->getApplicablePage();
         $result['query_data'] = $query_data;
 
-        return view('Backend.Advertisement.list', $result);
+        return view('Backend.Advertisement.Block.list', $result);
     }
 
     /**
@@ -84,7 +84,7 @@ class AdvertisementBlockController extends Controller
 
         $result['ad_slot'] = $this->advertisementService->getSlotById($id);
 
-        return view('Backend.Advertisement.update', $result);
+        return view('Backend.Advertisement.Block.update', $result);
     }
 
     /**
