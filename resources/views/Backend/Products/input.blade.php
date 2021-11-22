@@ -441,7 +441,7 @@
                     </div>
                     <hr>
                     <div class="" id="SkuComponent">
-                        <button @click="testdescartes" type="button">測試Descartes function</button>
+                        {{-- <button @click="testdescartes" type="button">測試Descartes function</button> --}}
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <div class="col-sm-2 ">
@@ -562,6 +562,7 @@
                                 </div>
                             </div>
                         </div>
+                        <textarea name="" id="" cols="30" rows="10">@{{ SkuList }}</textarea>
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -578,8 +579,8 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(Sku, SkuKey) in SkuList">
-                                    <td>米色</td>
-                                    <td>S</td>
+                                    <td>@{{ Sku . spec_1_value }}</td>
+                                    <td>@{{ Sku . spec_2_value }}</td>
                                     <td><input class="form-control" id="keyword" value="" readonly></td>
                                     <td><input class="form-control" id="keyword" value=""></td>
                                     <td><input class="form-control" id="keyword" value=""></td>
@@ -641,43 +642,57 @@
                 DelSpecList(key) {
                     console.log(key);
                 },
-                testdescartes() {
-                    console.log('Test Descartes');
+                AddSkuList() {
                     let spac_1 = [];
                     let spac_2 = [];
-                
-                    this.SpecList.spec_1.map(function(value, key) {
-                        spac_1.push(value.name) ;
+                    this.SkuList = [] ;
+                    var skuList = this.SkuList;
+                    var specList = this.SpecList;
+
+                    specList.spec_1.map(function(value, key) {
+                        spac_1.push(key);
                     });
-                    this.SpecList.spec_2.map(function(value, key) {
-                        spac_2.push(value.name) ;
+                    specList.spec_2.map(function(value, key) {
+                        spac_2.push(key);
                     });
-                    let cartesian =  (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
-                    let output = cartesian(spac_1,spac_2);
-                    console.log(output)
-                    return output;
+
+                    let cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+                    let output = cartesian(spac_1, spac_2);
+                    output.map(function(value, key) {
+                        spac_1_key = value[0];
+                        spac_2_key = value[1];
+                        let find_spac_obj_1 = specList.spec_1[spac_1_key];
+                        let find_spac_obj_2 = specList.spec_2[spac_2_key];
+                        skuList.push({
+                            check_key : spac_1_key+''+ spac_2_key,
+                            sort: skuList.length,
+                            spec_1_value: find_spac_obj_1.name,
+                            spec_2_value: find_spac_obj_2.name,
+                            item_no: '',
+                            supplier_item_no: '',
+                            ean: '',
+                            pos_item_no: '',
+                            safty_qty: 0,
+                            is_additional_purchase: 0,
+                            status: 0,
+                        })
+                    });
+                    return this.SkuList;
                 },
             },
             computed: {
-                // descartes() { //笛卡兒積演算法
-                //     let arr = [];
-                //     // //先將optionsData資料整理成陣列
-                //     const check = this.optionsData.map((item, index, array) => {
-                //         addindex2 = [];
-                //         item.value.map((item2, index2, array2) => {
-                //             addindex2.push(index2);
-                //         });
-                //         arr[index] = addindex2;
-                //     });
-                //     //執行公式
-                //     let res = arr.reduce((a, b) =>
-                //         a.map(x => b.map(y => x.concat(y)))
-                //         .reduce((a, b) => a.concat(b), []), [
-                //             []
-                //         ]);
-                //     return res;
-                // },
-            }
+
+            },
+            watch: {
+                SpecList: {
+                    handler(val) {
+                        this.AddSkuList() ;
+                        return this.SkuList ;
+                        // console.log(val) ;
+                    },
+                    deep: true
+                }
+            },
         })
         new SkuComponent().$mount('#SkuComponent')
     </script>
