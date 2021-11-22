@@ -429,58 +429,256 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row form-group " style="border-width:1px; border-style:solid;">
+                        @for ($i = 0; $i < 3; $i++)
+                            <div class="col-sm-3 col-md-2">
+                                <div class="thumbnail">
+                                    <img src="https://testucareupload.s3.ap-northeast-2.amazonaws.com/photo/1/eiOwWLuOsaE6iW9rWgn10tgu4hUPSTnroJx58gZg.jpg"
+                                        alt="">
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
                     <hr>
-                    <div class="row form-group">
-                        <div class="col-sm-12">
-                            <div class="col-sm-1 no-pa">
-                                <label class="control-label"></label>
+                    <div class="" id="SkuComponent">
+                        <button @click="testdescartes" type="button">測試Descartes function</button>
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-2 ">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="inlineRadioOptions" id="" value="option1"> 單規格
+                                    </label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                        一維多規格
+                                    </label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
+                                        二維多規格
+                                    </label>
+                                </div>
                             </div>
-                            <div class="col-sm-2">
-                                <label class="radio-inline">
-                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 單規格
-                                </label>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="radio-inline">
-                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> 一維多規格
-                                </label>
-                            </div>
-                            <div class="col-sm-2">
-                                <label class="radio-inline">
-                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3"> 二維多規格
-                                </label>
-                            </div>
+
                         </div>
                         <div class="row form-group">
                             <div class="col-sm-6">
-                                <table class="table table-striped table-bordered table-hover" >
+                                <div class="col-sm-2 no-pa">
+                                    <label class="control-label">規格一<span class="redtext">*</span></label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <select class="form-control js-select2" name="active" id="active">
+                                        <option value="">顏色</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="col-sm-2 no-pa">
+                                    <label class="control-label">規格二<span class="redtext">*</span></label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <select class="form-control js-select2" name="active" id="active">
+                                        <option value="">尺寸</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- 二維多規格 --}}
+                        <div class="row form-group">
+                            <div class="col-sm-6">
+                                <table class="table table-striped table-bordered table-hover">
                                     <thead>
                                         <tr>
-                                            <th>功能</th>
+                                            <th><button class="btn btn-primary btn-sm" type="button"
+                                                    @click="AddSpecToSkuList('1')">新增項目</button></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-        
-                                        {{-- {{$category_products_list}} --}}
-                                        <tr>
-                                            <td>A</td>        
+                                        <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1">
+                                            <td>
+                                                <div class="col-sm-1">
+                                                    <label class="control-label"><i style="font-size: 20px;"
+                                                            class="fa fa-list"></i></label>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" v-model="spec_1.name">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_1_key)">刪除</button>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="col-sm-6">
-                                
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <button class="btn btn-primary btn-sm" type="button"
+                                                    @click="AddSpecToSkuList('2')">新增項目</button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{-- {{$category_products_list}} --}}
+                                        <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2">
+                                            <td>
+                                                <div class="col-sm-1">
+                                                    <label class="control-label"><i style="font-size: 20px;"
+                                                            class="fa fa-list"></i></label>
+                                                </div>
+                                                {{-- <div class="col-sm-2">
+                                                <h3><i class="fa fa-list"></i></h3>
+                                            </div> --}}
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" v-model="spec_2.name">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_2_key)">刪除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
+                        <div class="row form-group">
+                            <div class="col-sm-6">
+                                <div class="col-sm-2 no-pa">
+                                    <label class="control-label">安全庫存量</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                </div>
+                                <div class="cola-sm-2">
+                                    <button class="btn btn-primary btn-sm" type="button">套用</button>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%">規格一</th>
+                                    <th style="width: 10%">規格二</th>
+                                    <th style="width: 15%">Item編號</th>
+                                    <th style="width: 10%">廠商貨號</th>
+                                    <th style="width: 10%">國際條碼</th>
+                                    <th style="width: 10%">POS品號</th>
+                                    <th style="width: 10%">安全庫存量*</th>
+                                    <th style="width: 10%">是否追加*</th>
+                                    <th style="width: 10%">狀態*</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(Sku, SkuKey) in SkuList">
+                                    <td>米色</td>
+                                    <td>S</td>
+                                    <td><input class="form-control" id="keyword" value="" readonly></td>
+                                    <td><input class="form-control" id="keyword" value=""></td>
+                                    <td><input class="form-control" id="keyword" value=""></td>
+                                    <td><input class="form-control" id="keyword" value=""></td>
+                                    <td><input class="form-control" id="keyword" value=""></td>
+                                    <td>
+                                        <select class="form-control js-select2" name="active" id="active">
+                                            <option value="">是</option>
+                                            <option value="">否</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control js-select2" name="active" id="active">
+                                            <option value="">啟用</option>
+                                            <option value="">停用</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                    {{-- 二維多規格結束 --}}
                 </form>
             </div>
         </div>
-
     </div>
 @endsection
-
 @section('js')
     <script>
+        var SkuComponent = Vue.extend({
+            data: function() {
+                return {
+                    Spec: { // 選擇的規格
+                        spec_1: '',
+                        spec_2: '',
+                    },
+                    SpecList: {
+                        spec_1: [],
+                        spec_2: [],
+                    },
+                    SkuList: [],
+                }
+            },
+            methods: {
+                AddSpecToSkuList(spec_type) {
+                    if (spec_type == '1') {
+                        this.SpecList.spec_1.push({
+                            name: '',
+                            sort: this.SpecList.spec_1.length,
+                        });
+                    } else if (spec_type == '2') {
+                        this.SpecList.spec_2.length;
+                        this.SpecList.spec_2.push({
+                            name: '',
+                            sort: this.SpecList.spec_2.length,
+                        });
+                    }
+                },
+                DelSpecList(key) {
+                    console.log(key);
+                },
+                testdescartes() {
+                    console.log('Test Descartes');
+                    let spac_1 = [];
+                    let spac_2 = [];
+                
+                    this.SpecList.spec_1.map(function(value, key) {
+                        spac_1.push(value.name) ;
+                    });
+                    this.SpecList.spec_2.map(function(value, key) {
+                        spac_2.push(value.name) ;
+                    });
+                    let cartesian =  (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+                    let output = cartesian(spac_1,spac_2);
+                    console.log(output)
+                    return output;
+                },
+            },
+            computed: {
+                // descartes() { //笛卡兒積演算法
+                //     let arr = [];
+                //     // //先將optionsData資料整理成陣列
+                //     const check = this.optionsData.map((item, index, array) => {
+                //         addindex2 = [];
+                //         item.value.map((item2, index2, array2) => {
+                //             addindex2.push(index2);
+                //         });
+                //         arr[index] = addindex2;
+                //     });
+                //     //執行公式
+                //     let res = arr.reduce((a, b) =>
+                //         a.map(x => b.map(y => x.concat(y)))
+                //         .reduce((a, b) => a.concat(b), []), [
+                //             []
+                //         ]);
+                //     return res;
+                // },
+            }
+        })
+        new SkuComponent().$mount('#SkuComponent')
     </script>
 @endsection

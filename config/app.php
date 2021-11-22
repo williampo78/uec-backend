@@ -235,6 +235,7 @@ return [
         'Batch' => Mavinoo\Batch\BatchFacade::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'ImageUpload' => App\Facades\ImageUpload::class,
     ],
 
 ];

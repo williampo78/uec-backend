@@ -418,14 +418,7 @@
                     var level = eve.dataTransfer.getData("text/level");
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
-                    // console.log(this) 
-                    console.log(eve)
-                    console.log('eve :' + eve) ; 
-                    console.log(eve.target.parentNode.dataset);
-                    console.log('drop index :'+ index) ; 
-                    console.log('dataTransfer get :' + level) ; 
-                    console.log('targetlevel:' + targetlevel) ;
-                    console.log('parentElement:' + eve.target.parentElement) ;  
+                    
                     if (targetlevel !== level) {
                         alert('不能跨分類喔!');
                     } else {
@@ -449,7 +442,6 @@
                                 break;
                         }
                     }
-
                 },
                 SaveSort(level) {
                     switch (level) {

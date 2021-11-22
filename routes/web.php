@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminControllers;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactControllers ;
 use App\Http\Controllers\LoginAuthController;
+use App\Http\Controllers\ProductsControllers;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierControllers;
 use App\Http\Controllers\WarehouseController ;
@@ -17,9 +18,9 @@ use App\Http\Controllers\DepartmentControllers;
 use App\Http\Controllers\OrderSupplierController;
 use App\Http\Controllers\SupplierTypeControllers ;
 use App\Http\Controllers\PrimaryCategoryController;
-use App\Http\Controllers\ProductsControllers;
 use App\Http\Controllers\QuotationReviewController;
 use App\Http\Controllers\AdvertisementBlockController;
+use App\Http\Controllers\AdvertisementLaunchController;
 use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\WebCategoryProductsControllers ;
 use App\Http\Controllers\WebCategoryHierarchyControllers ;
@@ -43,7 +44,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/signOut', [AdminControllers::class, 'signOut'])->name('signOut');
     Route::resource('/products', ProductsControllers::class, ['names' => ['index' => 'products']]);
     Route::get('/productsTest',[ProductsControllers::class,'testview']) ;
-    Route::post('/upload_img',[ProductsControllers::class,'upload_img']) ; 
+    Route::post('/upload_img',[ProductsControllers::class,'upload_img']) ;
     Route::resource('/admin', AdminControllers::class);
     Route::resource('/item', ItemControllers::class, ['names' => ['index' => 'item']]);
     Route::resource('/supplier', SupplierControllers::class, ['names' => ['index' => 'supplier']]);
@@ -82,6 +83,9 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ;
     // 廣告版位
     Route::resource('/advertisemsement_block', AdvertisementBlockController::class, ['names' => ['index' => 'advertisemsement_block']]);
+    Route::post('/advertisemsement_block/ajax', [AdvertisementBlockController::class, 'ajax']);
+    // 廣告上架
+    Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, ['names' => ['index' => 'advertisemsement_launch']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
