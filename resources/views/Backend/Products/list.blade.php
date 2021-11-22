@@ -170,7 +170,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-
                                 {{-- {{$category_products_list}} --}}
                                 <tr>
                                     <form id="del" method="post">
@@ -196,10 +195,7 @@
                                     <td></td>
                                     <td></td>
                                     <td></td>
-
                                 </tr>
-
-
                             </tbody>
                         </table>
                     </div>

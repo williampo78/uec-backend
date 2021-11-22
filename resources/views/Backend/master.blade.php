@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="{{ asset('asset/css/select2-bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/js/DataTables/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css" crossorigin="anonymous">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <style>
         [v-cloak] {
@@ -60,14 +61,7 @@
     <script src="{{ asset('asset/js/template/bower_components/moment-develop/moment.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
     <script src="{{ asset('asset/js/select2.min.js') }}"></script>
-    {{-- <script src="{{ asset('//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.full.js') }}"> </script> --}}
-    {{-- <script src="{{ asset('asset/js/ckeditor/ckeditor.js') }}"></script> --}}
-    {{-- <script src="{{ asset('asset/js/ckfinder/ckfinder.js') }}"></script> --}}
-
-    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/30.0.0/classic/ckeditor.js"></script> --}}
     <script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>
-
-
     <script src="{{ asset('asset/js/jquery.validate.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
     <script src="{{ asset('asset/js/clipboard.min.js') }}"></script>
