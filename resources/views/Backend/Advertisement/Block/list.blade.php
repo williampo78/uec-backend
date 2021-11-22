@@ -137,7 +137,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Advertisement.detail')
+        @include('Backend.Advertisement.Block.detail')
         <!-- /.modal -->
 
     </div>

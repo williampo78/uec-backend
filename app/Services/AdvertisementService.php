@@ -14,8 +14,8 @@ class AdvertisementService
     /**
      * 取得廣告版位資料
      *
-     * @param array $query_data
-     * @return object
+     * @param array $query_data 查詢參數
+     * @return object ORM物件
      */
     public function getSlots($query_data)
     {
