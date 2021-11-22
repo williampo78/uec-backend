@@ -7,6 +7,7 @@ use App\Services\UniversalService;
 use Illuminate\Http\Request;
 use App\Services\WebContentsService;
 use App\Services\APIService;
+use App\Services\APIIndexServices;
 use Mail;
 use Validator;
 
@@ -15,12 +16,14 @@ class IndexController extends Controller
 
     private $webContentsService;
     private $apiService;
+    private $apiIndexService;
 
-    public function __construct(WebContentsService $webContentsService, UniversalService $universalService, APIService $apiService)
+    public function __construct(WebContentsService $webContentsService, UniversalService $universalService, APIService $apiService, APIIndexServices $apiIndexService)
     {
         $this->webContentsService = $webContentsService;
         $this->universalService = $universalService;
         $this->apiService = $apiService;
+        $this->apiIndexService = $apiIndexService;
     }
 
     public function index()
@@ -101,6 +104,12 @@ class IndexController extends Controller
         });
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => '信件發送成功']);
 
+    }
+
+    public function getAdSlots()
+    {
+        $result = $this->apiIndexService->getIndex();
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $result]);
     }
 
 }

@@ -30,6 +30,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
 
     Route::get('/product/category', [ProductController::class, 'getCategory']);
+    Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
 });
 
 Route::group(['middleware' => 'jwt.member'], function () {

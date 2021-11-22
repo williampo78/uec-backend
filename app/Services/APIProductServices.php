@@ -21,7 +21,6 @@ class APIProductServices
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
 
-        $now = date("Y-m-d H:i");
         //根據階層顯示層級資料
         if ($config_levels == '3') {
             $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.* from `web_category_products` cate_prod
@@ -30,7 +29,7 @@ class APIProductServices
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
                     where cate.`active`=1
-                    and date_format(prod.`start_launched_at`,'%Y-%m-%d %H:%i') <='" . $now . "' and date_format(prod.`end_launched_at`,'%Y-%m-%d') >='" . $now . "'
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`
                     group by cate.`id`
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
         } elseif ($config_levels == '2') {
@@ -39,7 +38,7 @@ class APIProductServices
                     inner join `products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     where cate.`active`=1
-                    and date_format(prod.`start_launched_at`,'%Y-%m-%d %H:%i') <='" . $now . "' and date_format(prod.`end_launched_at`,'%Y-%m-%d') >='" . $now . "'
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`
                     group by cate.`id`
                     order by cate1.`sort`, cate.`sort`";
         }
@@ -102,5 +101,46 @@ class APIProductServices
         return $data;
     }
 
+    /*
+     * 取得商品資訊 (上架審核通過 & 上架期間內)
+     */
+    public function getProducts()
+    {
+        $strSQL = "SELECT p.*,
+                    (SELECT photo_name
+                     FROM product_photos
+                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
+                    FROM products AS p
+                    where p.approval_status = 'APPROVED'
+                    and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+        $products = DB::select($strSQL);
+        $data = [];
+        foreach ($products as $product) {
+            $data[$product->id] = $product;
+        }
+        return $data;
+    }
 
+    /*
+     * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
+     */
+    public function getWebCategoryProducts($category = null)
+    {
+        $strSQL = "select web_category_products.web_category_hierarchy_id, p.*,
+                    (SELECT photo_name
+                    FROM product_photos
+                    WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
+                    from web_category_products
+                    inner join products p on p.id=web_category_products.product_id
+                    where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+        if ($category) {
+            $strSQL .= "and web_category_products.web_category_hierarchy_id=".$category;
+        }
+        $products = DB::select($strSQL);
+        $data = [];
+        foreach ($products as $product) {
+            $data[$product->web_category_hierarchy_id][$product->id] = $product;
+        }
+        return $data;
+    }
 }
