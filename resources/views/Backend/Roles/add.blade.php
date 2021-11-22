@@ -89,81 +89,83 @@
                                                         </div>
                                                     </div>
                                                     <div class="panel-body">
-                                                        @foreach($data['permissionDetail'][$main['id']]['id'] as $k=>$sub)
-                                                            <div class="row">
-                                                                <div class="col-sm-3">
-                                                                    <input type="checkbox"
-                                                                           id="auth_index_{{$sub}}"
-                                                                           name="auth_index[]" value="{{$sub}}">
-                                                                    <label
-                                                                        for="auth_index_{{$sub}}"><i
-                                                                            class="fa {{$data['permissionDetail'][$main['id']]['icon'][$k]}} fa-fw"></i> {{$data['permissionDetail'][$main['id']]['name'][$k]}}
-                                                                    </label>
+                                                        @if(isset($data['permissionDetail'][$main['id']]['id']))
+                                                            @foreach($data['permissionDetail'][$main['id']]['id'] as $k=>$sub)
+                                                                <div class="row">
+                                                                    <div class="col-sm-3">
+                                                                        <input type="checkbox"
+                                                                               id="auth_index_{{$sub}}"
+                                                                               name="auth_index[]" value="{{$sub}}">
+                                                                        <label
+                                                                            for="auth_index_{{$sub}}"><i
+                                                                                class="fa {{$data['permissionDetail'][$main['id']]['icon'][$k]}} fa-fw"></i> {{$data['permissionDetail'][$main['id']]['name'][$k]}}
+                                                                        </label>
 
-                                                                </div>
-                                                                <div class="col-sm-9">
-                                                                    <div class="row">
-                                                                        <div class="col-sm-12">
-                                                                            <div class="col-sm-2">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    id="auth_query_{{$sub}}"
-                                                                                    name="auth_query_{{$sub}}"
-                                                                                    value="1">
-                                                                                <label
-                                                                                    for="auth_query_{{$sub}}">查詢</label>
-                                                                            </div>
-                                                                            <div class="col-sm-2">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    id="auth_create_{{$sub}}"
-                                                                                    name="auth_create_{{$sub}}"
-                                                                                    value="1">
-                                                                                <label
-                                                                                    for="auth_create_{{$sub}}">新增</label>
-                                                                            </div>
-                                                                            <div class="col-sm-2">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    id="auth_update_{{$sub}}"
-                                                                                    name="auth_update_{{$sub}}"
-                                                                                    value="1">
-                                                                                <label
-                                                                                    for="auth_update_{{$sub}}">修改</label>
-                                                                            </div>
-                                                                            <div class="col-sm-2">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    id="auth_delete_{{$sub}}"
-                                                                                    name="auth_delete_{{$sub}}"
-                                                                                    value="1">
-                                                                                <label
-                                                                                    for="auth_delete_{{$sub}}">刪除</label>
-                                                                            </div>
-                                                                            <div class="col-sm-2">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    id="auth_void_{{$sub}}"
-                                                                                    name="auth_void_{{$sub}}"
-                                                                                    value="1">
-                                                                                <label
-                                                                                    for="auth_void_{{$sub}}">作廢</label>
-                                                                            </div>
-                                                                            <div class="col-sm-2">
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    id="auth_export_{{$sub}}"
-                                                                                    name="auth_export_{{$sub}}"
-                                                                                    value="1">
-                                                                                <label
-                                                                                    for="auth_export_{{$sub}}">批次匯出</label>
+                                                                    </div>
+                                                                    <div class="col-sm-9">
+                                                                        <div class="row">
+                                                                            <div class="col-sm-12">
+                                                                                <div class="col-sm-2">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id="auth_query_{{$sub}}"
+                                                                                        name="auth_query_{{$sub}}"
+                                                                                        value="1">
+                                                                                    <label
+                                                                                        for="auth_query_{{$sub}}">查詢</label>
+                                                                                </div>
+                                                                                <div class="col-sm-2">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id="auth_create_{{$sub}}"
+                                                                                        name="auth_create_{{$sub}}"
+                                                                                        value="1">
+                                                                                    <label
+                                                                                        for="auth_create_{{$sub}}">新增</label>
+                                                                                </div>
+                                                                                <div class="col-sm-2">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id="auth_update_{{$sub}}"
+                                                                                        name="auth_update_{{$sub}}"
+                                                                                        value="1">
+                                                                                    <label
+                                                                                        for="auth_update_{{$sub}}">修改</label>
+                                                                                </div>
+                                                                                <div class="col-sm-2">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id="auth_delete_{{$sub}}"
+                                                                                        name="auth_delete_{{$sub}}"
+                                                                                        value="1">
+                                                                                    <label
+                                                                                        for="auth_delete_{{$sub}}">刪除</label>
+                                                                                </div>
+                                                                                <div class="col-sm-2">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id="auth_void_{{$sub}}"
+                                                                                        name="auth_void_{{$sub}}"
+                                                                                        value="1">
+                                                                                    <label
+                                                                                        for="auth_void_{{$sub}}">作廢</label>
+                                                                                </div>
+                                                                                <div class="col-sm-2">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        id="auth_export_{{$sub}}"
+                                                                                        name="auth_export_{{$sub}}"
+                                                                                        value="1">
+                                                                                    <label
+                                                                                        for="auth_export_{{$sub}}">批次匯出</label>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                            <hr style="margin-top:3px;"/>
-                                                        @endforeach
+                                                                <hr style="margin-top:3px;"/>
+                                                            @endforeach
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
