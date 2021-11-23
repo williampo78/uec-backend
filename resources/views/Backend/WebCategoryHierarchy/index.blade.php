@@ -15,6 +15,9 @@
             transition: background-color 0.5s;
             /* background: #ce1f59 !important; */
         }
+        .elements-box >tr > td > *{
+            pointer-events: none;
+        }
     </style>
     <!--列表-->
     <div id="page-wrapper">
@@ -57,24 +60,24 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(level_1_obj, level_1_key) in category_level_1 " @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop"  draggable="true"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
                                             :data-index="level_1_key" :data-level="'1'" >
                                             <td style="vertical-align:middle">
-                                                <i class="fa fa-list" ></i>
+                                                <i class="fa fa-list"></i>
                                                 @{{ level_1_obj . category_name }}
                                             </td>
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-sm-4" >
+                                                    <div class="col-sm-4">
                                                         <button type="button" class="btn btn-primary"
-                                                            @click="GetCategory(level_1_obj,'1')" >展中類</button>
+                                                            @click="GetCategory(level_1_obj,'1')">展中類</button>
                                                     </div>
-                                                    <div class="col-sm-4" >
+                                                    <div class="col-sm-4">
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
                                                             data-target="#addCategory" v-show="RoleAuthJson.auth_update"
                                                             @click="CategoryModelShow('1','edit',level_1_obj)">編輯</button>
                                                     </div>
-                                                    <div class="col-sm-4" >
+                                                    <div class="col-sm-4">
                                                         <button type="button" class="btn btn-danger"
                                                             @click="DelCategory(level_1_obj.id)"
                                                             v-show="RoleAuthJson.auth_delete">刪除</button>
@@ -164,8 +167,7 @@
                                             :disabled="disabled.disabled_level_3 == 1">新增小類</a>
                                     </div>
                                     <div class="col-sm-3">
-                                        <a class="btn btn-block btn-success btn-sm"
-                                        v-show="RoleAuthJson.auth_update"
+                                        <a class="btn btn-block btn-success btn-sm" v-show="RoleAuthJson.auth_update"
                                             :disabled="disabled.disabled_level_3 == 1" @click="SaveSort('2')">儲存</a>
                                     </div>
                                 </div>
@@ -396,29 +398,33 @@
 
                 },
                 drag(eve) {
-                    console.log(eve.target.dataset.index) ; 
-                    console.log(eve.target.dataset.level) ; 
-                    console.log('----------------') ; 
+                    console.log(eve.target.dataset.index);
+                    console.log(eve.target.dataset.level);
+                    console.log('----------------');
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/level", eve.target.dataset.level);
+                    $('tbody').addClass('elements-box')
                 },
                 dragover(eve) {
-                    eve.preventDefault()
-                    eve.target.parentNode.classList.add('ondragover')
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.add('ondragover') ; 
+
                 },
                 dragleave(eve) {
-                    eve.preventDefault()
-                    eve.target.parentNode.classList.remove('ondragover')
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.remove('ondragover');
+                    // $('tbody').removeClass('elements-box')
+
                     // eve.target.classList.remove('ondragover')
                 },
                 drop(eve) {
-                    eve.preventDefault();
-                    eve.target.parentNode.classList.remove('ondragover')
+                    eve.target.parentNode.classList.remove('ondragover') ;
+                    $('tbody').removeClass('elements-box')
+                    eve.target.parentNode.parentNode.classList.remove('elements-box') ; 
                     var index = eve.dataTransfer.getData("text/index");
                     var level = eve.dataTransfer.getData("text/level");
                     let targetIndex = eve.target.parentNode.dataset.index;
                     let targetlevel = eve.target.parentNode.dataset.level;
-                    
                     if (targetlevel !== level) {
                         alert('不能跨分類喔!');
                     } else {
@@ -442,6 +448,7 @@
                                 break;
                         }
                     }
+
                 },
                 SaveSort(level) {
                     switch (level) {
@@ -472,8 +479,7 @@
                 }
 
             },
-            mounted: function() {
-            },
+            mounted: function() {},
             watch: {
                 //監聽是否要將新增儲存開放點擊
                 category_level_2_title: function() {

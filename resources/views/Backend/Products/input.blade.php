@@ -492,8 +492,11 @@
                                 <table class="table table-striped table-bordered table-hover">
                                     <thead>
                                         <tr>
-                                            <th><button class="btn btn-primary btn-sm" type="button"
-                                                    @click="AddSpecToSkuList('1')">新增項目</button></th>
+                                            <th>
+                                                <button class="btn btn-primary btn-sm" type="button"
+                                                    @click="AddSpecToSkuList('1')">新增項目
+                                                </button>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -562,7 +565,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea name="" id="" cols="30" rows="10">@{{ SkuList }}</textarea>
+                        {{-- <textarea name="" id="" cols="30" rows="10">@{{ SkuList }}</textarea> --}}
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -641,10 +644,10 @@
                         });
                     }
                 },
-                DelSpecList(key) {
+                DelSpecList(key) { //刪除規格
                     console.log(key);
                 },
-                AddSkuList() {
+                AddSkuList() {  //新增規格
                     let spac_1 = [];
                     let spac_2 = [];
                     var skuList = this.SkuList;
@@ -668,7 +671,8 @@
                         let only_key_isset = skuList.filter(data => data.spec_1_only_key === find_spac_obj_1.only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
                         if (only_key_isset.length == 0) {
                             skuList.push({
-                                check_key: spac_1_key + '' + spac_2_key,
+                                id: '',
+                                sort_key: spac_1_key + '' + spac_2_key,
                                 sort: skuList.length,
                                 spec_1_value: find_spac_obj_1.name,
                                 spec_2_value: find_spac_obj_2.name,
@@ -682,16 +686,19 @@
                                 is_additional_purchase: 0,
                                 status: 0,
                             })
-                        }else{
-                            only_key_isset[0].spec_1_value  = find_spac_obj_1.name ; 
-                            only_key_isset[0].spec_2_value  = find_spac_obj_2.name ; 
-                            only_key_isset[0].spec_1_only_key  = find_spac_obj_1.only_key ; 
-                            only_key_isset[0].spec_2_only_key  = find_spac_obj_2.only_key ; 
+                        } else {
+                            only_key_isset[0].spec_1_value = find_spac_obj_1.name;
+                            only_key_isset[0].spec_2_value = find_spac_obj_2.name;
+                            only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
+                            only_key_isset[0].spec_2_only_key = find_spac_obj_2.only_key;
                         }
 
                     });
+                    skuList.sort((a, b) => a.sort_key - b.sort_key ); //重新排序
                     return this.SkuList;
                 },
+                
+
             },
             computed: {
 
