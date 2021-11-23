@@ -366,7 +366,6 @@
                             parent_id: this.addCategory.parent_id,
                             category_name: this.addCategory.category_name,
                         });
-                        console.log(response);
                         switch (this.addCategory.category_level) {
                             case '1':
                                 this.category_level_1 = response.data.result;
@@ -398,9 +397,6 @@
 
                 },
                 drag(eve) {
-                    console.log(eve.target.dataset.index);
-                    console.log(eve.target.dataset.level);
-                    console.log('----------------');
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/level", eve.target.dataset.level);
                     $('tbody').addClass('elements-box')
@@ -413,9 +409,6 @@
                 dragleave(eve) {
                     eve.preventDefault();
                     eve.target.parentNode.classList.remove('ondragover');
-                    // $('tbody').removeClass('elements-box')
-
-                    // eve.target.classList.remove('ondragover')
                 },
                 drop(eve) {
                     eve.target.parentNode.classList.remove('ondragover') ;

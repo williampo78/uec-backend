@@ -6,6 +6,16 @@
             padding: 0px;
         }
 
+        .ondragover {
+            background: #b7e0fb !important;
+            transition: background-color 0.5s;
+            /* background: #ce1f59 !important; */
+        }
+
+        .elements-box>tr>td>* {
+            pointer-events: none;
+        }
+
     </style>
     <div id="page-wrapper">
         <div class="row">
@@ -440,7 +450,7 @@
                         @endfor
                     </div>
                     <hr>
-                    <div class="" id="SkuComponent">
+                    <div id="SkuComponent">
                         {{-- <button @click="testdescartes" type="button">測試Descartes function</button> --}}
                         <div class="row form-group">
                             <div class="col-sm-12">
@@ -500,7 +510,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1">
+                                        <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            :data-index="spec_1_key" :data-type="'spec_1'">
                                             <td>
                                                 <div class="col-sm-1">
                                                     <label class="control-label"><i style="font-size: 20px;"
@@ -530,7 +542,9 @@
                                     </thead>
                                     <tbody>
                                         {{-- {{$category_products_list}} --}}
-                                        <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2">
+                                        <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
+                                        @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                        :data-index="spec_2_key" :data-type="'spec_2'">
                                             <td>
                                                 <div class="col-sm-1">
                                                     <label class="control-label"><i style="font-size: 20px;"
@@ -647,7 +661,8 @@
                 DelSpecList(key) { //刪除規格
                     console.log(key);
                 },
-                AddSkuList() {  //新增規格
+                AddSkuList() { //新增規格
+                    console.log('新增規格的function 觸發') ; 
                     let spac_1 = [];
                     let spac_2 = [];
                     var skuList = this.SkuList;
@@ -659,7 +674,7 @@
                     specList.spec_2.map(function(value, key) {
                         spac_2.push(key);
                     });
-
+                
                     let cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
                     let output = cartesian(spac_1, spac_2);
                     output.map(function(value, key) {
@@ -668,7 +683,8 @@
                         let find_spac_obj_1 = specList.spec_1[spac_1_key];
                         let find_spac_obj_2 = specList.spec_2[spac_2_key];
                         //檢查原先是否有存在該筆規格
-                        let only_key_isset = skuList.filter(data => data.spec_1_only_key === find_spac_obj_1.only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
+                        let only_key_isset = skuList.filter(data => data.spec_1_only_key === find_spac_obj_1
+                            .only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
                         if (only_key_isset.length == 0) {
                             skuList.push({
                                 id: '',
@@ -687,17 +703,62 @@
                                 status: 0,
                             })
                         } else {
+                            console.log(find_spac_obj_1.name) ;
                             only_key_isset[0].spec_1_value = find_spac_obj_1.name;
                             only_key_isset[0].spec_2_value = find_spac_obj_2.name;
                             only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
                             only_key_isset[0].spec_2_only_key = find_spac_obj_2.only_key;
+                            only_key_isset[0].sort_key = spac_1_key + '' + spac_2_key ; 
                         }
 
                     });
-                    skuList.sort((a, b) => a.sort_key - b.sort_key ); //重新排序
+                    skuList.sort((a, b) => a.sort_key - b.sort_key); //重新排序
                     return this.SkuList;
                 },
-                
+                drag(eve) {
+                    $('tbody').addClass('elements-box')
+                    eve.dataTransfer.setData("text/index", eve.target.dataset.index);
+                    eve.dataTransfer.setData("text/type", eve.target.dataset.type);
+                },
+                dragover(eve) {
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.add('ondragover');
+                },
+                dragleave(eve) {
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.remove('ondragover');
+                },
+                drop(eve) {
+                    eve.target.parentNode.classList.remove('ondragover');
+                    $('tbody').removeClass('elements-box');
+                    var index = eve.dataTransfer.getData("text/index");
+                    var type = eve.dataTransfer.getData("text/type");
+                    let targetIndex = eve.target.parentNode.dataset.index;
+                    let targetType = eve.target.parentNode.dataset.type;
+                    if (targetType !== type) {
+                        console.log('不能跨類別');
+                    } else {
+                        switch (targetType) {
+                            case 'spec_1':
+                                var item = this.SpecList.spec_1[index];
+                                this.SpecList.spec_1.splice(index, 1);
+                                this.SpecList.spec_1.splice(targetIndex, 0, item);
+                                break;
+                            case 'spec_2':
+                                var item = this.SpecList.spec_2[index];
+                                this.SpecList.spec_2.splice(index, 1)
+                                this.SpecList.spec_2.splice(targetIndex, 0, item)
+                                break;
+                            default:
+                                break;
+                        }
+                    
+                        // this.AddSkuList();
+                    }
+                    // console.log(this.SpecList) ; 
+
+                    // console.log(index,type) ; 
+                },
 
             },
             computed: {
