@@ -630,12 +630,14 @@
                         this.SpecList.spec_1.push({
                             name: '',
                             sort: this.SpecList.spec_1.length,
+                            only_key: Math.random().toString(36).substring(8),
                         });
                     } else if (spec_type == '2') {
                         this.SpecList.spec_2.length;
                         this.SpecList.spec_2.push({
                             name: '',
                             sort: this.SpecList.spec_2.length,
+                            only_key: Math.random().toString(36).substring(8),
                         });
                     }
                 },
@@ -645,7 +647,6 @@
                 AddSkuList() {
                     let spac_1 = [];
                     let spac_2 = [];
-                    this.SkuList = [] ;
                     var skuList = this.SkuList;
                     var specList = this.SpecList;
 
@@ -663,19 +664,31 @@
                         spac_2_key = value[1];
                         let find_spac_obj_1 = specList.spec_1[spac_1_key];
                         let find_spac_obj_2 = specList.spec_2[spac_2_key];
-                        skuList.push({
-                            check_key : spac_1_key+''+ spac_2_key,
-                            sort: skuList.length,
-                            spec_1_value: find_spac_obj_1.name,
-                            spec_2_value: find_spac_obj_2.name,
-                            item_no: '',
-                            supplier_item_no: '',
-                            ean: '',
-                            pos_item_no: '',
-                            safty_qty: 0,
-                            is_additional_purchase: 0,
-                            status: 0,
-                        })
+                        //檢查原先是否有存在該筆規格
+                        let only_key_isset = skuList.filter(data => data.spec_1_only_key === find_spac_obj_1.only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
+                        if (only_key_isset.length == 0) {
+                            skuList.push({
+                                check_key: spac_1_key + '' + spac_2_key,
+                                sort: skuList.length,
+                                spec_1_value: find_spac_obj_1.name,
+                                spec_2_value: find_spac_obj_2.name,
+                                spec_1_only_key: find_spac_obj_1.only_key,
+                                spec_2_only_key: find_spac_obj_2.only_key,
+                                item_no: '',
+                                supplier_item_no: '',
+                                ean: '',
+                                pos_item_no: '',
+                                safty_qty: 0,
+                                is_additional_purchase: 0,
+                                status: 0,
+                            })
+                        }else{
+                            only_key_isset[0].spec_1_value  = find_spac_obj_1.name ; 
+                            only_key_isset[0].spec_2_value  = find_spac_obj_2.name ; 
+                            only_key_isset[0].spec_1_only_key  = find_spac_obj_1.only_key ; 
+                            only_key_isset[0].spec_2_only_key  = find_spac_obj_2.only_key ; 
+                        }
+
                     });
                     return this.SkuList;
                 },
@@ -686,9 +699,8 @@
             watch: {
                 SpecList: {
                     handler(val) {
-                        this.AddSkuList() ;
-                        return this.SkuList ;
-                        // console.log(val) ;
+                        this.AddSkuList();
+                        return this.SkuList;
                     },
                     deep: true
                 }
