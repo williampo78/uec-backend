@@ -12,9 +12,10 @@
             /* background: #ce1f59 !important; */
         }
 
-        .elements-box > tr > td >* {
+        .elements-box>tr>td>* {
             pointer-events: none;
         }
+
     </style>
     <div id="page-wrapper">
         <div class="row">
@@ -434,19 +435,28 @@
                             <div class="col-sm-10">
                                 {{-- <label for="exampleInputFile">商品圖檔</label> --}}
                                 <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                <input type="file" id="exampleInputFile">
+                                {{-- <input type="file" id="exampleInputFile"> --}}
+
                             </div>
                         </div>
                     </div>
-                    <div class="row form-group " style="border-width:1px; border-style:solid;">
-                        @for ($i = 0; $i < 3; $i++)
-                            <div class="col-sm-3 col-md-2">
-                                <div class="thumbnail">
-                                    <img src="https://testucareupload.s3.ap-northeast-2.amazonaws.com/photo/1/eiOwWLuOsaE6iW9rWgn10tgu4hUPSTnroJx58gZg.jpg"
-                                        alt="">
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            @for ($i = 0; $i < 15; $i++)
+                                <div class="col-sm-3 col-md-3">
+                                    <div class="thumbnail">
+                                        <img src="https://testucareupload.s3.ap-northeast-2.amazonaws.com/photo/1/Nk6WOCsmv3GPxE4ZnLUIw4RIvjedqIfl9YaauCU9.jpg"
+                                            alt="">
+
+                                        <div class="caption">
+                                            <p>檔案格式:</p>
+                                            <p>檔案大小:</p>
+                                            <p><a href="#" class="btn btn-danger pull-right" role="button">刪除</a></p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        @endfor
+                            @endfor
+                        </div>
                     </div>
                     <hr>
                     <div id="SkuComponent">
@@ -542,8 +552,8 @@
                                     <tbody>
                                         {{-- {{$category_products_list}} --}}
                                         <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
-                                        @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                        :data-index="spec_2_key" :data-type="'spec_2'">
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            :data-index="spec_2_key" :data-type="'spec_2'">
                                             <td>
                                                 <div class="col-sm-1">
                                                     <label class="control-label"><i style="font-size: 20px;"
@@ -657,15 +667,15 @@
                         });
                     }
                 },
-                DelSpecList(obj,type,index) { //刪除規格
-                    if(type == 'spec_1') {
+                DelSpecList(obj, type, index) { //刪除規格
+                    if (type == 'spec_1') {
                         this.SpecList.spec_1.splice(index, 1);
-                        let new_SkuList = this.SkuList.filter(data => data.spec_1_only_key !== obj.only_key );
-                        this.SkuList = new_SkuList ; 
-                    }else if (type == 'spec_2'){  
+                        let new_SkuList = this.SkuList.filter(data => data.spec_1_only_key !== obj.only_key);
+                        this.SkuList = new_SkuList;
+                    } else if (type == 'spec_2') {
                         this.SpecList.spec_2.splice(index, 1);
-                        let new_SkuList = this.SkuList.filter(data => data.spec_2_only_key !== obj.only_key );
-                        this.SkuList = new_SkuList ; 
+                        let new_SkuList = this.SkuList.filter(data => data.spec_2_only_key !== obj.only_key);
+                        this.SkuList = new_SkuList;
                     }
                 },
                 AddSkuList() { //新增規格
@@ -680,7 +690,7 @@
                     specList.spec_2.map(function(value, key) {
                         spac_2.push(key);
                     });
-                
+
                     let cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
                     let output = cartesian(spac_1, spac_2);
                     output.map(function(value, key) {
@@ -713,7 +723,7 @@
                             only_key_isset[0].spec_2_value = find_spac_obj_2.name;
                             only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
                             only_key_isset[0].spec_2_only_key = find_spac_obj_2.only_key;
-                            only_key_isset[0].sort_key = spac_1_key + '' + spac_2_key ; 
+                            only_key_isset[0].sort_key = spac_1_key + '' + spac_2_key;
                         }
 
                     });
@@ -721,13 +731,13 @@
                     return this.SkuList;
                 },
                 drag(eve) {
-                    console.log('drag') ; 
+                    console.log('drag');
                     $('tbody').addClass('elements-box')
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
                 },
                 dragover(eve) {
-                    console.log('dragover') ; 
+                    console.log('dragover');
                     eve.preventDefault();
                     eve.target.parentNode.classList.add('ondragover');
                 },
@@ -777,6 +787,15 @@
                 }
             },
         })
-        new SkuComponent().$mount('#SkuComponent')
+        new SkuComponent().$mount('#SkuComponent');
+        var ImageUpload = Vue.extend({
+            data: function() {
+                return {}
+            },
+            methods: {},
+            computed: {},
+            watch: {},
+        })
+        new SkuComponent().$mount('#ImageUploadBox');
     </script>
 @endsection
