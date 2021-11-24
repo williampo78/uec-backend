@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class AdSlots extends Model
 {
     use HasFactory;
+    
     protected $table = 'ad_slots';
     protected $guarded = [];
 }
