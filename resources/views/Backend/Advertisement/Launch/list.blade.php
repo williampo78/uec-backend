@@ -26,11 +26,11 @@
                                     <div class="col-sm-9">
                                         <select class="form-control js-select2-block" name="block" id="block">
                                             <option></option>
-                                            @isset($blocks)
-                                                @foreach ($blocks as $key => $value)
-                                                    <option value='{{ $key }}'
-                                                        {{ isset($query_data['block']) && $key == $query_data['block'] ? 'selected' : '' }}>
-                                                        {{ $value }}</option>
+                                            @isset($ad_slots)
+                                                @foreach ($ad_slots as $obj)
+                                                    <option value='{{ $obj->id }}'
+                                                        {{ isset($query_data['block']) && $obj->id == $query_data['block'] ? 'selected' : '' }}>
+                                                        【{{ $obj->slot_code }}】{{ $obj->slot_desc }}</option>
                                                 @endforeach
                                             @endisset
                                         </select>

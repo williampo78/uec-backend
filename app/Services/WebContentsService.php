@@ -39,6 +39,10 @@ class WebContentsService
         if (isset($data['active'])) {
             $webcontents->where('active', $data['active']);
         }
+
+        if (isset($data['target'])) {
+            $webcontents->where('content_target', $data['target']);
+        }
         $webcontents = $webcontents->orderBy('parent_code', 'asc')->orderBy('sort', 'asc')->get();
         return $webcontents;
     }
@@ -59,6 +63,16 @@ class WebContentsService
             $webData['content_target'] = isset($inputdata['content_target'])?$inputdata['content_target']:null;
             $webData['content_url'] = isset($inputdata['content_url'])?$inputdata['content_url']:null;
             $webData['content_text'] = $inputdata['content_text'];
+            if ($inputdata['apply_to'] == 'FOOTER') {
+                if ($webData['content_target'] == 'S') {
+                    $webData['content_text'] = null;
+                } else if ($webData['content_target'] =='H') {
+                    $webData['content_url'] = null;
+                } else {
+                    $webData['content_url'] = null;
+                    $webData['content_text'] = null;
+                }
+            }
             $webData['created_by'] = $user_id;
             $webData['created_at'] = $now;
             $webData['updated_by'] = $user_id;

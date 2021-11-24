@@ -54,7 +54,7 @@
                                     <label>是</label>
                                 </div>
                                 <div class="col-sm-4">
-                                    <input type="radio"  name="modal_is_desktop_applicable" id="modal_is_desktop_applicable_disabled" disabled>
+                                    <input type="radio" name="modal_is_desktop_applicable" id="modal_is_desktop_applicable_disabled" disabled>
                                     <label>否</label>
                                 </div>
                             </div>
