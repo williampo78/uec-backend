@@ -16,6 +16,29 @@
             pointer-events: none;
         }
 
+        .img-box {
+            height: 160px;
+            /*can be anything*/
+            width: 160px;
+            /*can be anything*/
+            position: relative;
+            background-color: rgb(90, 86, 86) ;
+            border: 1px solid black ;
+        }
+
+        img {
+            max-height: 100%;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+
     </style>
     <div id="page-wrapper">
         <div class="row">
@@ -427,35 +450,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row form-group">
-                        <div class="col-sm-12">
-                            <div class="col-sm-1 no-pa">
-                                <label class="control-label">商品圖檔</label>
-                            </div>
-                            <div class="col-sm-10">
-                                {{-- <label for="exampleInputFile">商品圖檔</label> --}}
-                                <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                {{-- <input type="file" id="exampleInputFile"> --}}
-
+                    <div id="ImageUploadBox">
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1 no-pa">
+                                    <label class="control-label">商品圖檔</label>
+                                </div>
+                                <div class="col-sm-10">
+                                    <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
+                                    <input type="file" @change="fileSelected" multiple>
+                                </div>
+                                <button @click="imagesCheck" type="button">測試按鈕</button>
                             </div>
                         </div>
-                    </div>
-                    <div class="row form-group">
-                        <div class="col-sm-12">
-                            @for ($i = 0; $i < 15; $i++)
-                                <div class="col-sm-3 col-md-3">
-                                    <div class="thumbnail">
-                                        <img src="https://testucareupload.s3.ap-northeast-2.amazonaws.com/photo/1/Nk6WOCsmv3GPxE4ZnLUIw4RIvjedqIfl9YaauCU9.jpg"
-                                            alt="">
+                        <div class="row form-group">
+                            {{-- <div class="col-sm-12"> --}}
 
-                                        <div class="caption">
-                                            <p>檔案格式:</p>
-                                            <p>檔案大小:</p>
-                                            <p><a href="#" class="btn btn-danger pull-right" role="button">刪除</a></p>
-                                        </div>
+                            <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
+                                <div class="thumbnail">
+                                    <div class="img-box"> 
+                                        <img :ref="'image'">
+                                    </div>
+                                    <div class="caption">
+                                        <p>檔案名稱: @{{ image . name }}</p>
+                                        <p>檔案大小:</p>
+                                        <p><a href="#" class="btn btn-danger" role="button">刪除</a>
+                                        </p>
                                     </div>
                                 </div>
-                            @endfor
+                            </div>
+                            {{-- </div> --}}
                         </div>
                     </div>
                     <hr>
@@ -520,7 +544,7 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop()" draggable="true"
                                             :data-index="spec_1_key" :data-type="'spec_1'">
                                             <td>
                                                 <div class="col-sm-1">
@@ -629,7 +653,7 @@
                         </table>
                     </div>
                     {{-- 二維多規格結束 --}}
-                </form>
+                </form>              
             </div>
         </div>
     </div>
@@ -731,20 +755,20 @@
                     return this.SkuList;
                 },
                 drag(eve) {
-                    console.log('drag');
                     $('tbody').addClass('elements-box')
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
                 },
                 dragover(eve) {
-                    console.log('dragover');
                     eve.preventDefault();
                     eve.target.parentNode.classList.add('ondragover');
+                    $('tbody').addClass('elements-box');
+
                 },
                 dragleave(eve) {
-                    console.log('dragleave')
                     eve.preventDefault();
                     eve.target.parentNode.classList.remove('ondragover');
+                    $('tbody').removeClass('elements-box');
                 },
                 drop(eve) {
                     eve.target.parentNode.classList.remove('ondragover');
@@ -790,12 +814,40 @@
         new SkuComponent().$mount('#SkuComponent');
         var ImageUpload = Vue.extend({
             data: function() {
-                return {}
+                return {
+                    images: [],
+                }
             },
-            methods: {},
-            computed: {},
-            watch: {},
+            methods: {
+                fileSelected(e) {
+                    let vm = this;
+                    var selectedFiles = e.target.files;
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        this.images.push(selectedFiles[i]);
+                    }
+                    for (let i = 0; i < this.images.length; i++) {
+                        let reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.$refs.image[i].src = reader.result;
+                        };
+                        reader.readAsDataURL(this.images[i]);
+                    }
+                    e.target.value = '' ; 
+                },
+                imagesCheck() {
+                    console.log('-----------------------') ; 
+                    console.log(this.images) ;
+                },
+            },
+            computed: {
+                images(){
+                    console.log('MB') ;
+                }
+            },
+            watch: {
+
+            },
         })
-        new SkuComponent().$mount('#ImageUploadBox');
+        new ImageUpload().$mount('#ImageUploadBox');
     </script>
 @endsection
