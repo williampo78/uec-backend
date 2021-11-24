@@ -73,39 +73,13 @@ class AuthController extends Controller
             } else {
                 $status = false;
                 $err = $result['status'];
-                $result['data'] = [];
-                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error'])?$result['error']:[])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
             $err = '404';
             return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
-
-        /*
-        //Request is validated
-        //Crean token
-        try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Login credentials are invalid.',
-                ], 400);
-            }
-        } catch (JWTException $e) {
-            return $credentials;
-            return response()->json([
-                'success' => false,
-                'message' => 'Could not create token.',
-            ], 500);
-        }
-
-        //Token created, return with success response and jwt token
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-        ]);
-        */
 
     }
 
@@ -144,6 +118,35 @@ class AuthController extends Controller
 
         $message = '登出成功';
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $message]);
+
+    }
+
+    public function registration(Request $request)
+    {
+        $err = null;
+        $credentials = request(['mobile', 'name', 'email', 'password', 'birthday', 'sex', 'registeredSource', 'recommendSource', 'identityNo']);
+
+        $messages = [
+            'mobile.required' => '帳號不能為空',
+            'name.required' => '姓名不能為空',
+            'password.required' => '密碼不能為空',
+            'birthday.required' => '生日不能為空',
+            'sex.required' => '性別不能為空',
+            'registeredSource.required' => '來源不能為空',
+        ];
+
+        $v = Validator::make($credentials, [
+            'mobile' => 'required',
+            'name' => 'required',
+            'password' => 'required',
+            'birthday' => 'required',
+            'sex' => 'required',
+            'registeredSource' => 'required',
+        ], $messages);
+
+        if ($v->fails()){
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
 
     }
 }
