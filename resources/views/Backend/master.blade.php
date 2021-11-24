@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('asset/img/uarklogo.ico') }}" />
     <title>@yield('title')</title>
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}" />
@@ -24,14 +26,24 @@
     <link rel="stylesheet" href="{{ asset('asset/css/select2-bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/js/DataTables/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css" crossorigin="anonymous">
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <link rel="stylesheet" href="{{ asset('asset/css/jquery.fancybox.min.css') }}">
+    <link rel="stylesheet" src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
+    <link rel="stylesheet" href="{{ asset('asset/css/validationEngine.jquery.css') }}">
+    <link rel="stylesheet" href="{{ asset('asset/css/editor.css') }}">
+
     <style>
         [v-cloak] {
             display: none;
         }
 
+        .select2-results__options {
+            max-height: 500px !important;
+        }
     </style>
+
+    @yield('style')
 </head>
 
 <body>
@@ -45,8 +57,10 @@
             </div>
         @endif
     @endauth
+
     @guest
     @endguest
+
     @yield('content')
 
     <script src="{{ asset('asset/js/template/bower_components/jquery/dist/jquery.js') }}"></script>
@@ -68,8 +82,6 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.debug.js"></script>
-    <link href="{{ asset('asset/css/jquery.fancybox.min.css') }}" rel="stylesheet">
-    <link src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/morrisjs/morris.min.js') }}"></script>
@@ -81,9 +93,8 @@
     <script src="{{ asset('asset/js/jquery.validationEngine-zh_TW.js') }}"></script>
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
     <script src="{{ asset('asset/js/axios.min.js') }}"></script>
+    <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
 
-    <link rel="stylesheet" href="{{ asset('asset/css/validationEngine.jquery.css') }}">
-    <link href="{{ asset('asset/css/editor.css') }}" rel="stylesheet">
     <script>
         @isset($share_role_auth)
         var RoleAuthJson =  @json($share_role_auth) ;
@@ -94,6 +105,7 @@
 
         });
     </script>
+
     @yield('js')
 </body>
 </html>
