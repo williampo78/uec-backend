@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '網站內容')
+@section('title', '商城頁面內容管理')
 
 @section('content')
     <!--列表-->
@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-image"></i> 網站內容</h1>
+                <h1 class="page-header"><i class="fa fa-image"></i> 商城頁面內容管理</h1>
             </div>
         </div>
 

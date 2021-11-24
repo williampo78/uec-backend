@@ -1,12 +1,12 @@
 @extends('Backend.master')
 
-@section('title', '網站內容')
+@section('title', '商城頁面內容管理')
 
 @section('content')
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 網站內容 新增資料</h1>
+                <h1 class="page-header"><i class="fa fa-plus"></i> 商城頁面內容管理 新增資料</h1>
             </div>
         </div>
         <!-- /.row -->
