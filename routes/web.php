@@ -26,6 +26,7 @@ use App\Http\Controllers\WebCategoryProductsControllers ;
 use App\Http\Controllers\WebCategoryHierarchyControllers ;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
+use App\Http\Controllers\WebContentsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -86,6 +87,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/advertisemsement_block/ajax', [AdvertisementBlockController::class, 'ajax']);
     // 廣告上架
     Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, ['names' => ['index' => 'advertisemsement_launch']]);
+    Route::resource('/webcontents',WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

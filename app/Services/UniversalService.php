@@ -110,4 +110,20 @@ class UniversalService
         return $data;
     }
 
+    /*
+     * 取得FOOTER 類型
+     * Author: Rowena
+     * Return: string
+     */
+    public function getFooterContentTarget()
+    {
+        $data =  [
+            'S' => '站內連結' ,
+            'B' => '另開視窗' ,
+            'H' => '單一圖文'
+        ];
+
+        return $data;
+    }
+
 }
