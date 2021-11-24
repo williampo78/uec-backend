@@ -25,9 +25,12 @@ $menus = App\Services\PermissionService::GetUserMenu();
                         <ul class="dropdown-menu">
                             @foreach($menus['subMenu'][$menu['mainID']] as $subMenu)
                             <li>
-                                <a href="{{route($subMenu['code'])}}">
-                                    <i class="fa {{$subMenu['icon']}} fa-fw"></i>
-                                    {{$subMenu['subMenu']}} </a>
+                                @if (Route::has($subMenu['code']))
+                                    <a href="{{route($subMenu['code'])}}">
+                                        <i class="fa {{$subMenu['icon']}} fa-fw"></i>
+                                        {{$subMenu['subMenu']}} </a>
+                                @endif
+
                             </li>
                             @endforeach
                         </ul>
