@@ -22,8 +22,8 @@
             width: 160px;
             /*can be anything*/
             position: relative;
-            background-color: rgb(90, 86, 86) ;
-            border: 1px solid black ;
+            background-color: rgb(90, 86, 86);
+            border: 1px solid black;
         }
 
         img {
@@ -465,15 +465,16 @@
                         </div>
                         <div class="row form-group">
                             {{-- <div class="col-sm-12"> --}}
-
-                            <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
-                                <div class="thumbnail">
-                                    <div class="img-box"> 
+                            <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key" >
+                                <div class="thumbnail" @dragstart="drag"
+                                @dragover='dragover' @dragleave='dragleave' @drop="drop" :data-index="key"
+                                :data-type="'image'" draggable="true">
+                                    <div class="img-box">
                                         <img :ref="'image'">
                                     </div>
                                     <div class="caption">
                                         <p>檔案名稱: @{{ image . name }}</p>
-                                        <p>檔案大小:</p>
+                                        <p>檔案大小:@{{ image . sizeConvert }}</p>
                                         <p><a href="#" class="btn btn-danger" role="button">刪除</a>
                                         </p>
                                     </div>
@@ -653,7 +654,7 @@
                         </table>
                     </div>
                     {{-- 二維多規格結束 --}}
-                </form>              
+                </form>
             </div>
         </div>
     </div>
@@ -832,18 +833,57 @@
                         };
                         reader.readAsDataURL(this.images[i]);
                     }
-                    e.target.value = '' ; 
+                    this.images.map(function(value, key) {
+                        value.sizeConvert = vm.formatBytes(value.size);
+                    });
+                    e.target.value = '';
                 },
                 imagesCheck() {
-                    console.log('-----------------------') ; 
-                    console.log(this.images) ;
+                    console.log('-----------------------');
+                    console.log(this.images);
+                },
+                formatBytes(bytes, decimals = 2) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const dm = decimals < 0 ? 0 : decimals;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                },
+                drag(eve) {
+                    eve.dataTransfer.setData("text/index", eve.target.dataset.index);
+                    eve.dataTransfer.setData("text/type", eve.target.dataset.type);
+                    console.log(eve.target.dataset.index) ; 
+                },
+                dragover(eve) {
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.add('ondragover');
+
+                },
+                dragleave(eve) {
+                    eve.target.parentNode.classList.remove('ondragover');
+                    eve.preventDefault();
+                },
+                drop(eve) {
+                    let vm = this;
+                    eve.target.parentNode.classList.remove('ondragover');
+                    var index = eve.dataTransfer.getData("text/index");
+                    var type = eve.dataTransfer.getData("text/type");
+                    let targetIndex = eve.target.parentNode.dataset.index;
+                    let targetType = eve.target.parentNode.dataset.type;
+                    var item = this.images[index];
+                    this.images.splice(index, 1);
+                    this.images.splice(targetIndex, 0, item);
+                    for (let i = 0; i < this.images.length; i++) {
+                        let reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.$refs.image[i].src = reader.result;
+                        };
+                        reader.readAsDataURL(this.images[i]);
+                    }
                 },
             },
-            computed: {
-                images(){
-                    console.log('MB') ;
-                }
-            },
+            computed: {},
             watch: {
 
             },
