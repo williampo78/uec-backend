@@ -12,10 +12,9 @@
             /* background: #ce1f59 !important; */
         }
 
-        .elements-box>tr>td>* {
+        .elements-box > tr > td >* {
             pointer-events: none;
         }
-
     </style>
     <div id="page-wrapper">
         <div class="row">
@@ -523,7 +522,7 @@
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <button class="btn btn-danger btn-sm" type="button"
-                                                        @click="DelSpecList(spec_1_key)">刪除</button>
+                                                        @click="DelSpecList(spec_1 ,'spec_1' , spec_1_key)">刪除</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -558,7 +557,7 @@
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <button class="btn btn-danger btn-sm" type="button"
-                                                        @click="DelSpecList(spec_2_key)">刪除</button>
+                                                        @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -598,11 +597,11 @@
                                 <tr v-for="(Sku, SkuKey) in SkuList">
                                     <td>@{{ Sku . spec_1_value }}</td>
                                     <td>@{{ Sku . spec_2_value }}</td>
-                                    <td><input class="form-control" id="keyword" value="" readonly></td>
-                                    <td><input class="form-control" id="keyword" value=""></td>
-                                    <td><input class="form-control" id="keyword" value=""></td>
-                                    <td><input class="form-control" id="keyword" value=""></td>
-                                    <td><input class="form-control" id="keyword" value=""></td>
+                                    <td><input class="form-control" v-model="Sku.item_no" readonly></td>
+                                    <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
+                                    <td><input class="form-control" v-model="Sku.ean"></td>
+                                    <td><input class="form-control" v-model="Sku.pos_item_no"></td>
+                                    <td><input class="form-control" v-model="Sku.safty_qty"></td>
                                     <td>
                                         <select class="form-control js-select2" name="active" id="active">
                                             <option value="">是</option>
@@ -658,11 +657,18 @@
                         });
                     }
                 },
-                DelSpecList(key) { //刪除規格
-                    console.log(key);
+                DelSpecList(obj,type,index) { //刪除規格
+                    if(type == 'spec_1') {
+                        this.SpecList.spec_1.splice(index, 1);
+                        let new_SkuList = this.SkuList.filter(data => data.spec_1_only_key !== obj.only_key );
+                        this.SkuList = new_SkuList ; 
+                    }else if (type == 'spec_2'){  
+                        this.SpecList.spec_2.splice(index, 1);
+                        let new_SkuList = this.SkuList.filter(data => data.spec_2_only_key !== obj.only_key );
+                        this.SkuList = new_SkuList ; 
+                    }
                 },
                 AddSkuList() { //新增規格
-                    console.log('新增規格的function 觸發') ; 
                     let spac_1 = [];
                     let spac_2 = [];
                     var skuList = this.SkuList;
@@ -703,7 +709,6 @@
                                 status: 0,
                             })
                         } else {
-                            console.log(find_spac_obj_1.name) ;
                             only_key_isset[0].spec_1_value = find_spac_obj_1.name;
                             only_key_isset[0].spec_2_value = find_spac_obj_2.name;
                             only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
@@ -716,15 +721,18 @@
                     return this.SkuList;
                 },
                 drag(eve) {
+                    console.log('drag') ; 
                     $('tbody').addClass('elements-box')
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
                 },
                 dragover(eve) {
+                    console.log('dragover') ; 
                     eve.preventDefault();
                     eve.target.parentNode.classList.add('ondragover');
                 },
                 dragleave(eve) {
+                    console.log('dragleave')
                     eve.preventDefault();
                     eve.target.parentNode.classList.remove('ondragover');
                 },
@@ -752,12 +760,7 @@
                             default:
                                 break;
                         }
-                    
-                        // this.AddSkuList();
                     }
-                    // console.log(this.SpecList) ; 
-
-                    // console.log(index,type) ; 
                 },
 
             },
