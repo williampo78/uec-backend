@@ -59,4 +59,9 @@ Route::get('area/{all}', [DradviceController::class, 'area']);
 
 Route::group(['prefix' => 'members'], function () {
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/registration', [AuthController::class, 'registration']);
+    Route::post('/memberStatus', [AuthController::class, 'getMemberStatus']);
+    Route::post('/sendSms', [AuthController::class, 'sendSMS']);
+    Route::post('/verifySms', [AuthController::class, 'verifySMS']);
+    Route::post('/memberBasic', [AuthController::class, 'memberBasic']);
 });

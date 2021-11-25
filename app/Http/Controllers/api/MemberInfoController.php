@@ -81,39 +81,35 @@ class MemberInfoController extends Controller
     public function profile()
     {
         $member_id = Auth::guard('api')->user()->member_id;
-
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $response = $this->apiService->getMemberInfo($member_id);
         $result = json_decode($response, true);
         $data = [];
-        $data['mobile'] = $result['data']['mobile'];
-        $data['name'] = $result['data']['name'];
-        $data['email'] = $result['data']['email'];
-        $data['birthday'] = $result['data']['birthday'];
-        $data['sex'] = $result['data']['sex'];
-        $data['sexName'] = $result['data']['sexName'];
-        $data['zipCode'] = $result['data']['zipCode'];
-        $data['cityId'] = $result['data']['cityId'];
-        $data['cityName'] = $result['data']['cityName'];
-        $data['districtId'] = $result['data']['districtId'];
-        $data['districtName'] = $result['data']['districtName'];
-        $data['address'] = $result['data']['address'];
         try {
             if ($result['status'] == '200') {
-                $status = true;
+                $data['mobile'] = $result['data']['mobile'];
+                $data['name'] = $result['data']['name'];
+                $data['email'] = $result['data']['email'];
+                $data['birthday'] = $result['data']['birthday'];
+                $data['sex'] = $result['data']['sex'];
+                $data['sexName'] = $result['data']['sexName'];
+                $data['zipCode'] = $result['data']['zipCode'];
+                $data['cityId'] = $result['data']['cityId'];
+                $data['cityName'] = $result['data']['cityName'];
+                $data['districtId'] = $result['data']['districtId'];
+                $data['districtName'] = $result['data']['districtName'];
+                $data['address'] = $result['data']['address'];
+                return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
             } else {
-                $status = false;
                 $err = $result['status'];
-                $result['data'] = [];
-                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
             $err = '404';
             return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
     }
 
@@ -139,15 +135,13 @@ class MemberInfoController extends Controller
 
         try {
             if ($result['status'] == '200') {
+                if ($request['status'] == 'logout') {
+                    Auth::guard('api')->logout();
+                }
                 return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $result['message']]);
             } else {
                 $err = $result['status'];
-                if ($result['error']['email']) {
-                    $message = $result['error']['email'];
-                } else {
-                    $message = $result['message'];
-                }
-                return response()->json(['status' => false, 'error_code' => $result['status'], 'error_msg' => $message, 'result' => []]);
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
@@ -173,33 +167,11 @@ class MemberInfoController extends Controller
         try {
             if ($result['status'] == '200') {
                 return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $result['message']]);
-            } elseif ($result['status'] == '400') {
-                /*
-                $message = '';
-                if (isset($result['error']['password'])) {
-                    $message = $result['error']['password'];
-                }
-                if (isset($result['error']['oldPassword'])) {
-                    $message .= $result['error']['oldPassword'];
-                }
-                if (isset($result['error']['newPassword'])) {
-                    $message .= $result['error']['newPassword'];
-                }
-                */
-                $message = '密碼格式錯誤';
-                return response()->json(['status' => false, 'error_code' => $result['status'], 'error_msg' => $message, 'result' => []]);
-            } elseif ($result['status'] == '401') {
-                $message = '密碼錯誤';
-                return response()->json(['status' => false, 'error_code' => $result['status'], 'error_msg' => $message, 'result' => []]);
-            } elseif ($result['status'] == '404') {
-                $message = '系統忙碌中，請稍後再試)';
-                return response()->json(['status' => false, 'error_code' => $result['status'], 'error_msg' => $message, 'result' => []]);
+
             } else {
                 $err = $result['status'];
-                $message = $result['message'];
-                return response()->json(['status' => false, 'error_code' => $result['status'], 'error_msg' => $message, 'result' => []]);
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
             }
-            return response()->json(['status' => false, 'error_code' => $result['status'], 'error_msg' => $message, 'result' => []]);
         } catch (JWTException $e) {
             Log::info($e);
             $err = '404';
@@ -403,7 +375,7 @@ class MemberInfoController extends Controller
         if ($response == 'success') {
             $status = true;
             $data = ($request['status'] == 0 ? '加入' : '移除') . '收藏成功';
-        } elseif ($response=='203') {
+        } elseif ($response == '203') {
             $status = false;
             $err = $response;
             $data = '';
