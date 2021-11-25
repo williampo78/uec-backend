@@ -4,20 +4,24 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Services\ProductsService;
 use App\Services\AdvertisementService;
 use App\Services\WebCategoryHierarchyService;
 
 class AdvertisementLaunchController extends Controller
 {
-    private $advertisementService;
-    private $webCategoryHierarchyService;
+    private $advertisement_service;
+    private $web_category_hierarchy_service;
+    private $product_service;
 
     public function __construct(
-        AdvertisementService $advertisementService,
-        WebCategoryHierarchyService $webCategoryHierarchyService
+        AdvertisementService $advertisement_service,
+        WebCategoryHierarchyService $web_category_hierarchy_service,
+        ProductsService $product_service
     ) {
-        $this->advertisementService = $advertisementService;
-        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
+        $this->advertisement_service = $advertisement_service;
+        $this->web_category_hierarchy_service = $web_category_hierarchy_service;
+        $this->product_service = $product_service;
     }
 
     /**
@@ -33,15 +37,15 @@ class AdvertisementLaunchController extends Controller
 
         $query_data = $request->only(['block', 'launch_status', 'start_at', 'end_at']);
 
-        $ad_slots = $this->advertisementService->getSlots();
-        $ad_slot_contents = $this->advertisementService->getSlotContents($query_data);
+        $ad_slots = $this->advertisement_service->getSlots();
+        $ad_slot_contents = $this->advertisement_service->getSlotContents($query_data);
 
         $ad_slot_contents = $ad_slot_contents->map(function ($obj, $key) {
             /*
-                上下架狀態
-                當前時間在上架時間內，且廣告上架內容的狀態為啟用，列為上架
-                其他為下架
-            */
+            上下架狀態
+            當前時間在上架時間內，且廣告上架內容的狀態為啟用，列為上架
+            其他為下架
+             */
             $obj->launch_status = (Carbon::now()->between($obj->start_at, $obj->end_at) && $obj->slot_content_active == 1) ? '上架' : '下架';
 
             return $obj;
@@ -63,13 +67,15 @@ class AdvertisementLaunchController extends Controller
     {
         $result = [];
 
-        $ad_slots = $this->advertisementService->getSlots();
-        $product_category = $this->webCategoryHierarchyService->category_hierarchy_content([
-            'active' => 1
+        $ad_slots = $this->advertisement_service->getSlots();
+        $product_category = $this->web_category_hierarchy_service->category_hierarchy_content([
+            'active' => 1,
         ]);
+        $products = $this->product_service->getProducts();
 
         $result['ad_slots'] = $ad_slots;
         $result['product_category'] = $product_category;
+        $result['products'] = $products;
 
         return view('Backend.Advertisement.Launch.add', $result);
     }
@@ -84,7 +90,7 @@ class AdvertisementLaunchController extends Controller
     {
         $input_data = $request->except('_token');
 
-        $this->advertisementService->addSlotContents($input_data);
+        $this->advertisement_service->addSlotContents($input_data);
 
     }
 
