@@ -16,6 +16,28 @@
             pointer-events: none;
         }
 
+        .img-box {
+            height: 160px;
+            /*can be anything*/
+            width: 160px;
+            /*can be anything*/
+            position: relative;
+            background-color: rgb(90, 86, 86);
+            border: 1px solid black;
+        }
+
+        .img-box img {
+            max-height: 100%;
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
     </style>
     <div id="page-wrapper">
         <div class="row">
@@ -427,35 +449,40 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row form-group">
-                        <div class="col-sm-12">
-                            <div class="col-sm-1 no-pa">
-                                <label class="control-label">商品圖檔</label>
-                            </div>
-                            <div class="col-sm-10">
-                                {{-- <label for="exampleInputFile">商品圖檔</label> --}}
-                                <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                {{-- <input type="file" id="exampleInputFile"> --}}
-
+                    <div id="ImageUploadBox">
+                        <div class="row form-group">
+                            <div class="col-sm-12">
+                                <div class="col-sm-1 no-pa">
+                                    <label class="control-label">商品圖檔</label>
+                                </div>
+                                <div class="col-sm-10">
+                                    <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
+                                    <input type="file" @change="fileSelected" multiple>
+                                </div>
+                                <button @click="imagesCheck" type="button">測試按鈕</button>
                             </div>
                         </div>
-                    </div>
-                    <div class="row form-group">
-                        <div class="col-sm-12">
-                            @for ($i = 0; $i < 15; $i++)
-                                <div class="col-sm-3 col-md-3">
-                                    <div class="thumbnail">
-                                        <img src="https://testucareupload.s3.ap-northeast-2.amazonaws.com/photo/1/Nk6WOCsmv3GPxE4ZnLUIw4RIvjedqIfl9YaauCU9.jpg"
-                                            alt="">
-
-                                        <div class="caption">
-                                            <p>檔案格式:</p>
-                                            <p>檔案大小:</p>
-                                            <p><a href="#" class="btn btn-danger pull-right" role="button">刪除</a></p>
-                                        </div>
+                        <div class="row form-group">
+                            {{-- <div class="col-sm-12"> --}}
+                            <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key" >
+                                <div class="thumbnail" @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
+                                    @drop="drop" :data-index="key" :data-type="'image'" draggable="true" style="pointer-events: auto;">
+                                    <div class="img-box" style="pointer-events: none;">
+                                        <img :ref="'image'">
+                                    </div>
+                                    <div class="caption" style="pointer-events: none;">
+                                        <p>檔案名稱: @{{ image . name }}</p>
+                                        <p>檔案大小:@{{ image . sizeConvert }}</p>
+                                        <p>
+                                            排序: @{{key+1}}
+                                            <button class="btn btn-danger pull-right btn-events-none" type="button" @click="delImages(key)" style="pointer-events: auto;">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </p>
                                     </div>
                                 </div>
-                            @endfor
+                            </div>
+                            {{-- </div> --}}
                         </div>
                     </div>
                     <hr>
@@ -519,6 +546,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+
                                         <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
                                             :data-index="spec_1_key" :data-type="'spec_1'">
@@ -532,7 +560,7 @@
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <button class="btn btn-danger btn-sm" type="button"
-                                                        @click="DelSpecList(spec_1 ,'spec_1' , spec_1_key)">刪除</button>
+                                                        @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -559,9 +587,6 @@
                                                     <label class="control-label"><i style="font-size: 20px;"
                                                             class="fa fa-list"></i></label>
                                                 </div>
-                                                {{-- <div class="col-sm-2">
-                                                <h3><i class="fa fa-list"></i></h3>
-                                            </div> --}}
                                                 <div class="col-sm-9">
                                                     <input class="form-control" v-model="spec_2.name">
                                                 </div>
@@ -731,28 +756,29 @@
                     return this.SkuList;
                 },
                 drag(eve) {
-                    console.log('drag');
                     $('tbody').addClass('elements-box')
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
+                    $('tbody').addClass('elements-box')
                 },
                 dragover(eve) {
-                    console.log('dragover');
                     eve.preventDefault();
                     eve.target.parentNode.classList.add('ondragover');
+                    $('tbody').addClass('elements-box');
+
                 },
                 dragleave(eve) {
-                    console.log('dragleave')
                     eve.preventDefault();
                     eve.target.parentNode.classList.remove('ondragover');
+                    $('tbody').removeClass('elements-box');
                 },
                 drop(eve) {
                     eve.target.parentNode.classList.remove('ondragover');
                     $('tbody').removeClass('elements-box');
                     var index = eve.dataTransfer.getData("text/index");
-                    var type = eve.dataTransfer.getData("text/type");
+                    var type  = eve.dataTransfer.getData("text/type");
                     let targetIndex = eve.target.parentNode.dataset.index;
-                    let targetType = eve.target.parentNode.dataset.type;
+                    let targetType  = eve.target.parentNode.dataset.type;
                     if (targetType !== type) {
                         console.log('不能跨類別');
                     } else {
@@ -790,12 +816,83 @@
         new SkuComponent().$mount('#SkuComponent');
         var ImageUpload = Vue.extend({
             data: function() {
-                return {}
+                return {
+                    images: [],
+                }
             },
-            methods: {},
+            methods: {
+                fileSelected(e) {
+                    let vm = this;
+                    var selectedFiles = e.target.files;
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        this.images.push(selectedFiles[i]);
+                    }
+                    this.adjustTheDisplay();
+                    this.images.map(function(value, key) {
+                        value.sizeConvert = vm.formatBytes(value.size);
+                    });
+                    e.target.value = '';
+                },
+                delImages(index) {
+                    this.$delete(this.images, index);
+                    this.adjustTheDisplay();
+                },
+                imagesCheck() {
+                    console.log('-----------------------');
+                    console.log(this.images);
+                },
+                formatBytes(bytes, decimals = 2) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const dm = decimals < 0 ? 0 : decimals;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                },
+                drag(eve) {
+                    console.log('eve.index:' + eve.target.dataset.index);
+                    eve.dataTransfer.setData("text/index", eve.target.dataset.index);
+                    eve.dataTransfer.setData("text/type", eve.target.dataset.type);
+                    $('.btn-events-none').css('pointer-events', 'none');
+                },
+                dragover(eve) {
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.add('ondragover');
+                    $('.btn-events-none').css('pointer-events', 'auto');
+
+                },
+                dragleave(eve) {
+                    eve.target.parentNode.classList.remove('ondragover');
+                    $('.btn-events-none').css('pointer-events', 'auto');
+                    eve.preventDefault();
+                },
+                drop(eve) {
+                    let vm = this;
+                    $('.btn-events-none').css('pointer-events', 'auto');
+                    eve.target.parentNode.classList.remove('ondragover');
+                    var index = eve.dataTransfer.getData("text/index");
+                    var type = eve.dataTransfer.getData("text/type");
+                    let targetIndex = eve.target.dataset.index;
+                    let targetType = eve.target.dataset.type;
+                    var item = this.images[index];
+                    this.images.splice(index, 1);
+                    this.images.splice(targetIndex, 0, item);
+                    this.adjustTheDisplay();
+                },
+                adjustTheDisplay() {
+                    for (let i = 0; i < this.images.length; i++) {
+                        let reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.$refs.image[i].src = reader.result;
+                        };
+                        reader.readAsDataURL(this.images[i]);
+                    }
+                }
+
+            },
             computed: {},
             watch: {},
         })
-        new SkuComponent().$mount('#ImageUploadBox');
+        new ImageUpload().$mount('#ImageUploadBox');
     </script>
 @endsection

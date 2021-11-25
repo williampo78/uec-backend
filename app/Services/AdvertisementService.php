@@ -99,6 +99,12 @@ class AdvertisementService
         }
     }
 
+    /**
+     * 取得廣告上架資料
+     *
+     * @param array $query_data
+     * @return object ORM物件
+     */
     public function getSlotContents($query_data = [])
     {
         $agent_id = Auth::user()->agent_id;
@@ -194,6 +200,12 @@ class AdvertisementService
         return $result;
     }
 
+    /**
+     * 新增廣告上架資料
+     *
+     * @param array $input_data
+     * @return void
+     */
     public function addSlotContents($input_data)
     {
         $agent_id = Auth::user()->agent_id;
@@ -231,6 +243,7 @@ class AdvertisementService
 
             $content_data['active'] = $input_data['active'];
 
+            // 使用者自定義版位，可自訂主色、icon、標題
             if ($slot['is_user_defined'] == 1) {
                 if (isset($input_data['slot_color_code'])) {
                     $content_data['slot_color_code'] = $input_data['slot_color_code'];
@@ -264,134 +277,179 @@ class AdvertisementService
 
             $slot_contents_id = AdSlotContents::insertGetId($content_data);
 
-            switch ($slot['slot_type']) {
-                // 圖檔
-                case 'I':
-                    if (isset($input_data['image_block_id'])) {
-                        foreach ($input_data['image_block_id'] as $key => $value) {
-                            $detail_data = [];
-                            $detail_data['ad_slot_content_id'] = $slot_contents_id;
-                            $detail_data['data_type'] = 'IMG';
-                            $detail_data['created_by'] = $user_id;
-                            $detail_data['updated_by'] = $user_id;
-                            $detail_data['created_at'] = $now;
-                            $detail_data['updated_at'] = $now;
+            // 新增圖檔資料 (圖檔 or 圖檔+商品)
+            if ($slot['slot_type'] == 'I' || $slot['slot_type'] == 'IS') {
+                if (isset($input_data['image_block_id'])) {
+                    foreach ($input_data['image_block_id'] as $key => $value) {
+                        $detail_data = [];
+                        $detail_data['ad_slot_content_id'] = $slot_contents_id;
+                        $detail_data['data_type'] = 'IMG';
+                        $detail_data['created_by'] = $user_id;
+                        $detail_data['updated_by'] = $user_id;
+                        $detail_data['created_at'] = $now;
+                        $detail_data['updated_at'] = $now;
 
-                            if (isset($input_data['image_block_sort'][$key])) {
-                                $detail_data['sort'] = $input_data['image_block_sort'][$key];
-                            }
-
-                            if (isset($input_data['image_block_image_alt'][$key])) {
-                                $detail_data['image_alt'] = $input_data['image_block_image_alt'][$key];
-                            }
-
-                            if (isset($input_data['image_block_image_title'][$key])) {
-                                $detail_data['image_title'] = $input_data['image_block_image_title'][$key];
-                            }
-
-                            if (isset($input_data['image_block_image_abstract'][$key])) {
-                                $detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key];
-                            }
-
-                            if (isset($input_data['image_block_image_action'][$key])) {
-                                $detail_data['image_action'] = $input_data['image_block_image_action'][$key];
-
-                                switch ($input_data['image_block_image_action'][$key]) {
-                                    // URL
-                                    case 'U':
-                                        if (isset($input_data['image_block_target_url'][$key])) {
-                                            $detail_data['target_url'] = $input_data['image_block_target_url'][$key];
-                                        }
-                                        break;
-                                    // 商品分類頁
-                                    case 'C':
-                                        if (isset($input_data['image_block_target_cate_hierarchy_id'][$key])) {
-                                            $detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key];
-                                        }
-                                        break;
-                                }
-                            }
-
-                            if (isset($input_data['image_block_is_target_blank'][$key])
-                                && $input_data['image_block_is_target_blank'][$key] == 'enabled') {
-                                $detail_data['is_target_blank'] = 1;
-                            }
-
-                            if (isset($input_data['image_block_image_name'][$key])) {
-                                try {
-                                    $image_name_path = $input_data['image_block_image_name'][$key]->storePublicly($file_path, 's3');
-                                } catch (\Exception $e) {
-                                    Log::error($e);
-                                }
-
-                                if (isset($image_name_path)) {
-                                    $detail_data['image_name'] = $image_name_path;
-                                }
-                            }
-
-                            AdSlotContentDetails::insert($detail_data);
+                        if (isset($input_data['image_block_sort'][$key])) {
+                            $detail_data['sort'] = $input_data['image_block_sort'][$key];
                         }
-                    }
-                    break;
-                // 文字
-                case 'T':
-                    if (isset($input_data['text_block_id'])) {
-                        foreach ($input_data['text_block_id'] as $key => $value) {
-                            $detail_data = [];
-                            $detail_data['ad_slot_content_id'] = $slot_contents_id;
-                            $detail_data['data_type'] = 'TXT';
-                            $detail_data['created_by'] = $user_id;
-                            $detail_data['updated_by'] = $user_id;
-                            $detail_data['created_at'] = $now;
-                            $detail_data['updated_at'] = $now;
 
-                            if (isset($input_data['text_block_sort'][$key])) {
-                                $detail_data['sort'] = $input_data['text_block_sort'][$key];
-                            }
-
-                            if (isset($input_data['text_block_texts'][$key])) {
-                                $detail_data['texts'] = $input_data['text_block_texts'][$key];
-                            }
-
-                            if (isset($input_data['text_block_image_action'][$key])) {
-                                $detail_data['image_action'] = $input_data['text_block_image_action'][$key];
-
-                                switch ($input_data['text_block_image_action'][$key]) {
-                                    // URL
-                                    case 'U':
-                                        if (isset($input_data['text_block_target_url'][$key])) {
-                                            $detail_data['target_url'] = $input_data['text_block_target_url'][$key];
-                                        }
-                                        break;
-                                    // 商品分類頁
-                                    case 'C':
-                                        if (isset($input_data['text_block_target_cate_hierarchy_id'][$key])) {
-                                            $detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key];
-                                        }
-                                        break;
-                                }
-                            }
-
-                            if (isset($input_data['text_block_is_target_blank'][$key])
-                                && $input_data['text_block_is_target_blank'][$key] == 'enabled') {
-                                $detail_data['is_target_blank'] = 1;
-                            }
-
-                            AdSlotContentDetails::insert($detail_data);
+                        if (isset($input_data['image_block_image_alt'][$key])) {
+                            $detail_data['image_alt'] = $input_data['image_block_image_alt'][$key];
                         }
+
+                        if (isset($input_data['image_block_image_title'][$key])) {
+                            $detail_data['image_title'] = $input_data['image_block_image_title'][$key];
+                        }
+
+                        if (isset($input_data['image_block_image_abstract'][$key])) {
+                            $detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key];
+                        }
+
+                        if (isset($input_data['image_block_image_action'][$key])) {
+                            $detail_data['image_action'] = $input_data['image_block_image_action'][$key];
+
+                            switch ($input_data['image_block_image_action'][$key]) {
+                                // URL
+                                case 'U':
+                                    if (isset($input_data['image_block_target_url'][$key])) {
+                                        $detail_data['target_url'] = $input_data['image_block_target_url'][$key];
+                                    }
+                                    break;
+                                // 商品分類頁
+                                case 'C':
+                                    if (isset($input_data['image_block_target_cate_hierarchy_id'][$key])) {
+                                        $detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key];
+                                    }
+                                    break;
+                            }
+                        }
+
+                        if (isset($input_data['image_block_is_target_blank'][$key])
+                            && $input_data['image_block_is_target_blank'][$key] == 'enabled') {
+                            $detail_data['is_target_blank'] = 1;
+                        }
+
+                        if (isset($input_data['image_block_image_name'][$key])) {
+                            try {
+                                $image_name_path = $input_data['image_block_image_name'][$key]->storePublicly($file_path, 's3');
+                            } catch (\Exception $e) {
+                                Log::error($e);
+                            }
+
+                            if (isset($image_name_path)) {
+                                $detail_data['image_name'] = $image_name_path;
+                            }
+                        }
+
+                        AdSlotContentDetails::insert($detail_data);
                     }
-                    break;
-                // 商品
-                case 'S':
-
-                    break;
-                // 圖檔+商品
-                case 'IS':
-
-                    break;
+                }
             }
 
-            // dd($input_data);
+            // 新增文字資料
+            if ($slot['slot_type'] == 'T') {
+                if (isset($input_data['text_block_id'])) {
+                    foreach ($input_data['text_block_id'] as $key => $value) {
+                        $detail_data = [];
+                        $detail_data['ad_slot_content_id'] = $slot_contents_id;
+                        $detail_data['data_type'] = 'TXT';
+                        $detail_data['created_by'] = $user_id;
+                        $detail_data['updated_by'] = $user_id;
+                        $detail_data['created_at'] = $now;
+                        $detail_data['updated_at'] = $now;
+
+                        if (isset($input_data['text_block_sort'][$key])) {
+                            $detail_data['sort'] = $input_data['text_block_sort'][$key];
+                        }
+
+                        if (isset($input_data['text_block_texts'][$key])) {
+                            $detail_data['texts'] = $input_data['text_block_texts'][$key];
+                        }
+
+                        if (isset($input_data['text_block_image_action'][$key])) {
+                            $detail_data['image_action'] = $input_data['text_block_image_action'][$key];
+
+                            switch ($input_data['text_block_image_action'][$key]) {
+                                // URL
+                                case 'U':
+                                    if (isset($input_data['text_block_target_url'][$key])) {
+                                        $detail_data['target_url'] = $input_data['text_block_target_url'][$key];
+                                    }
+                                    break;
+                                // 商品分類頁
+                                case 'C':
+                                    if (isset($input_data['text_block_target_cate_hierarchy_id'][$key])) {
+                                        $detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key];
+                                    }
+                                    break;
+                            }
+                        }
+
+                        if (isset($input_data['text_block_is_target_blank'][$key])
+                            && $input_data['text_block_is_target_blank'][$key] == 'enabled') {
+                            $detail_data['is_target_blank'] = 1;
+                        }
+
+                        AdSlotContentDetails::insert($detail_data);
+                    }
+                }
+            }
+
+            // 新增商品資料 (商品 or 圖檔+商品)
+            if ($slot['slot_type'] == 'S' || $slot['slot_type'] == 'IS') {
+                if (isset($input_data['product_assigned_type'])) {
+                    switch ($input_data['product_assigned_type']) {
+                        // 指定商品
+                        case 'P':
+                            if (isset($input_data['product_block_product_id'])) {
+                                foreach ($input_data['product_block_product_id'] as $key => $value) {
+                                    $detail_data = [];
+                                    $detail_data['ad_slot_content_id'] = $slot_contents_id;
+                                    $detail_data['data_type'] = 'PRD';
+                                    $detail_data['created_by'] = $user_id;
+                                    $detail_data['updated_by'] = $user_id;
+                                    $detail_data['created_at'] = $now;
+                                    $detail_data['updated_at'] = $now;
+
+                                    if (isset($input_data['product_block_product_sort'][$key])) {
+                                        $detail_data['sort'] = $input_data['product_block_product_sort'][$key];
+                                    }
+
+                                    if (isset($input_data['product_block_product_product_id'][$key])) {
+                                        $detail_data['product_id'] = $input_data['product_block_product_product_id'][$key];
+                                    }
+
+                                    AdSlotContentDetails::insert($detail_data);
+                                }
+                            }
+                            break;
+                        // 指定分類
+                        case 'C':
+                            if (isset($input_data['product_block_category_id'])) {
+                                foreach ($input_data['product_block_category_id'] as $key => $value) {
+                                    $detail_data = [];
+                                    $detail_data['ad_slot_content_id'] = $slot_contents_id;
+                                    $detail_data['data_type'] = 'PRD';
+                                    $detail_data['created_by'] = $user_id;
+                                    $detail_data['updated_by'] = $user_id;
+                                    $detail_data['created_at'] = $now;
+                                    $detail_data['updated_at'] = $now;
+
+                                    if (isset($input_data['product_block_category_sort'][$key])) {
+                                        $detail_data['sort'] = $input_data['product_block_category_sort'][$key];
+                                    }
+
+                                    if (isset($input_data['product_block_product_web_category_hierarchy_id'][$key])) {
+                                        $detail_data['web_category_hierarchy_id'] = $input_data['product_block_product_web_category_hierarchy_id'][$key];
+                                    }
+
+                                    AdSlotContentDetails::insert($detail_data);
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
 
             DB::commit();
         } catch (\Exception $e) {
