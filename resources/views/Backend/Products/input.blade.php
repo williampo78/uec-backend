@@ -26,7 +26,7 @@
             border: 1px solid black;
         }
 
-        img {
+        .img-box img {
             max-height: 100%;
             max-width: 100%;
             width: auto;
@@ -38,7 +38,6 @@
             right: 0;
             margin: auto;
         }
-
     </style>
     <div id="page-wrapper">
         <div class="row">
@@ -466,16 +465,19 @@
                         <div class="row form-group">
                             {{-- <div class="col-sm-12"> --}}
                             <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key" >
-                                <div class="thumbnail" @dragstart="drag"
-                                @dragover='dragover' @dragleave='dragleave' @drop="drop" :data-index="key"
-                                :data-type="'image'" draggable="true">
-                                    <div class="img-box">
+                                <div class="thumbnail" @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
+                                    @drop="drop" :data-index="key" :data-type="'image'" draggable="true" style="pointer-events: auto;">
+                                    <div class="img-box" style="pointer-events: none;">
                                         <img :ref="'image'">
                                     </div>
-                                    <div class="caption">
+                                    <div class="caption" style="pointer-events: none;">
                                         <p>檔案名稱: @{{ image . name }}</p>
                                         <p>檔案大小:@{{ image . sizeConvert }}</p>
-                                        <p><a href="#" class="btn btn-danger" role="button">刪除</a>
+                                        <p>
+                                            排序: @{{key+1}}
+                                            <button class="btn btn-danger pull-right btn-events-none" type="button" @click="delImages(key)" style="pointer-events: auto;">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
                                         </p>
                                     </div>
                                 </div>
@@ -544,8 +546,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+
                                         <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop()" draggable="true"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
                                             :data-index="spec_1_key" :data-type="'spec_1'">
                                             <td>
                                                 <div class="col-sm-1">
@@ -557,7 +560,7 @@
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <button class="btn btn-danger btn-sm" type="button"
-                                                        @click="DelSpecList(spec_1 ,'spec_1' , spec_1_key)">刪除</button>
+                                                        @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -584,9 +587,6 @@
                                                     <label class="control-label"><i style="font-size: 20px;"
                                                             class="fa fa-list"></i></label>
                                                 </div>
-                                                {{-- <div class="col-sm-2">
-                                                <h3><i class="fa fa-list"></i></h3>
-                                            </div> --}}
                                                 <div class="col-sm-9">
                                                     <input class="form-control" v-model="spec_2.name">
                                                 </div>
@@ -759,6 +759,7 @@
                     $('tbody').addClass('elements-box')
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
+                    $('tbody').addClass('elements-box')
                 },
                 dragover(eve) {
                     eve.preventDefault();
@@ -775,9 +776,9 @@
                     eve.target.parentNode.classList.remove('ondragover');
                     $('tbody').removeClass('elements-box');
                     var index = eve.dataTransfer.getData("text/index");
-                    var type = eve.dataTransfer.getData("text/type");
+                    var type  = eve.dataTransfer.getData("text/type");
                     let targetIndex = eve.target.parentNode.dataset.index;
-                    let targetType = eve.target.parentNode.dataset.type;
+                    let targetType  = eve.target.parentNode.dataset.type;
                     if (targetType !== type) {
                         console.log('不能跨類別');
                     } else {
@@ -826,17 +827,15 @@
                     for (let i = 0; i < selectedFiles.length; i++) {
                         this.images.push(selectedFiles[i]);
                     }
-                    for (let i = 0; i < this.images.length; i++) {
-                        let reader = new FileReader();
-                        reader.onload = (e) => {
-                            this.$refs.image[i].src = reader.result;
-                        };
-                        reader.readAsDataURL(this.images[i]);
-                    }
+                    this.adjustTheDisplay();
                     this.images.map(function(value, key) {
                         value.sizeConvert = vm.formatBytes(value.size);
                     });
                     e.target.value = '';
+                },
+                delImages(index) {
+                    this.$delete(this.images, index);
+                    this.adjustTheDisplay();
                 },
                 imagesCheck() {
                     console.log('-----------------------');
@@ -851,29 +850,36 @@
                     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                 },
                 drag(eve) {
+                    console.log('eve.index:' + eve.target.dataset.index);
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
-                    console.log(eve.target.dataset.index) ; 
+                    $('.btn-events-none').css('pointer-events', 'none');
                 },
                 dragover(eve) {
                     eve.preventDefault();
                     eve.target.parentNode.classList.add('ondragover');
+                    $('.btn-events-none').css('pointer-events', 'auto');
 
                 },
                 dragleave(eve) {
                     eve.target.parentNode.classList.remove('ondragover');
+                    $('.btn-events-none').css('pointer-events', 'auto');
                     eve.preventDefault();
                 },
                 drop(eve) {
                     let vm = this;
+                    $('.btn-events-none').css('pointer-events', 'auto');
                     eve.target.parentNode.classList.remove('ondragover');
                     var index = eve.dataTransfer.getData("text/index");
                     var type = eve.dataTransfer.getData("text/type");
-                    let targetIndex = eve.target.parentNode.dataset.index;
-                    let targetType = eve.target.parentNode.dataset.type;
+                    let targetIndex = eve.target.dataset.index;
+                    let targetType = eve.target.dataset.type;
                     var item = this.images[index];
                     this.images.splice(index, 1);
                     this.images.splice(targetIndex, 0, item);
+                    this.adjustTheDisplay();
+                },
+                adjustTheDisplay() {
                     for (let i = 0; i < this.images.length; i++) {
                         let reader = new FileReader();
                         reader.onload = (e) => {
@@ -881,12 +887,11 @@
                         };
                         reader.readAsDataURL(this.images[i]);
                     }
-                },
-            },
-            computed: {},
-            watch: {
+                }
 
             },
+            computed: {},
+            watch: {},
         })
         new ImageUpload().$mount('#ImageUploadBox');
     </script>
