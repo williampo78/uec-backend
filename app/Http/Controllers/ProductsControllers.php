@@ -21,7 +21,8 @@ class ProductsControllers extends Controller
     public function index(Request $request)
     {
         $in = $request->input() ; 
-        $result = $this->productsService->get_Products($request) ; 
+        $result = [] ; 
+        // $result = $this->productsService->get_Products($request) ; 
 
         return view('Backend.Products.list',$result);
     }
