@@ -138,7 +138,7 @@ class APIService
         $curl = curl_init();
         $member_id = Auth::guard('api')->user()->member_id;
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/'.$member_id,
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/' . $member_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -159,7 +159,7 @@ class APIService
     }
 
     /*
-     * 修改會員資料
+     * 修改會員密碼
      * method: POST
      * @return json
      */
@@ -168,7 +168,7 @@ class APIService
         $curl = curl_init();
         $member_id = Auth::guard('api')->user()->member_id;
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/'.$member_id.'/change-password',
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/' . $member_id . '/change-password',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -176,7 +176,7 @@ class APIService
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_POSTFIELDS => json_encode($input),
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
             ),
@@ -198,7 +198,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/'.$input.'/point-logs',
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/' . $input . '/point-logs',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -224,7 +224,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/'.$input.'/expiring-point-logs',
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/' . $input . '/expiring-point-logs',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -238,5 +238,160 @@ class APIService
 
         curl_close($curl);
         return $response;
+    }
+
+    /*
+     * 會員註冊
+     * method: POST
+     * @return json
+     */
+    public function memberRegistration($input, $token)
+    {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/members',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: '.$token,
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+
+    }
+
+    /*
+     * 會員註冊 (查詢會員簡訊驗證狀態)
+     * method: GET
+     * @return json
+     */
+    public function getMemberSMSStatus($input)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/members/get-status?mobile='.$input,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+
+    }
+
+
+    /*
+     * 會員註冊 (發送驗證簡訊)
+     * method: POST
+     * @return json
+     */
+    public function sendMemberSMS($input)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/auth/sms/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+
+    }
+
+    /*
+     * 會員註冊 (驗證簡訊)
+     * method: POST
+     * @return json
+     */
+    public function verifyMemberSMS($input)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/auth/sms/verify',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+
+    }
+
+    /*
+     * 查詢會員基本
+     * method: GET
+     * @return json
+     */
+    public function memberBsic($input, $token)
+    {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL().'/crm/v1/members/basic?mobile='.$input,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: '.$token,
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
+
     }
 }

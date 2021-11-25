@@ -24,28 +24,22 @@ class PointInfoController extends Controller
     public function point()
     {
         $member_id = Auth::guard('api')->user()->member_id;
-
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $response = $this->apiService->getPointInfo($member_id);
         $result = json_decode($response, true);
         try {
             if ($result['status'] == '200') {
-                $status = true;
-                $message = '';
+                return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => null, 'result' => $result['data']]);
             } else {
-                $status = false;
                 $err = $result['status'];
-                $message = $result['message'];
-                $result['data'] = [];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error'])?$result['error']:[])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
             $err = '404';
             return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $message, 'result' => $result['data']]);
-
     }
 
 
@@ -56,27 +50,21 @@ class PointInfoController extends Controller
     public function expiringPoint()
     {
         $member_id = Auth::guard('api')->user()->member_id;
-
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $response = $this->apiService->getExpiringPointInfo($member_id);
         $result = json_decode($response, true);
         try {
             if ($result['status'] == '200') {
-                $status = true;
-                $message = '';
+                return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => null, 'result' => $result['data']]);
             } else {
-                $status = false;
                 $err = $result['status'];
-                $message = $result['message'];
-                $result['data'] = [];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error'])?$result['error']:[])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
             $err = '404';
             return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $message, 'result' => $result['data']]);
-
     }
 }

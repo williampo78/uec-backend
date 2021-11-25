@@ -16,6 +16,7 @@ use App\Services\APIService;
 use Log;
 use Illuminate\Support\Facades\Config;
 use Validator;
+
 class AuthController extends Controller
 {
     public function __construct(APIService $apiService)
@@ -41,7 +42,7 @@ class AuthController extends Controller
             'password' => 'required',
         ], $messages);
 
-        if ($v->fails()){
+        if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
         }
 
@@ -73,7 +74,7 @@ class AuthController extends Controller
             } else {
                 $status = false;
                 $err = $result['status'];
-                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error'])?$result['error']:[])]);
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
@@ -121,10 +122,119 @@ class AuthController extends Controller
 
     }
 
+    public function getMemberStatus(Request $request)
+    {
+        $credentials = request(['mobile']);
+
+        $messages = [
+            'mobile.required' => '手機不能為空',
+        ];
+
+        $v = Validator::make($credentials, [
+            'mobile' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+
+        $response = $this->apiService->getMemberSMSStatus($request['mobile']);
+        $result = json_decode($response, true);
+        try {
+            if ($result['status'] == '200') {
+                return response()->json(['status' => true, 'error_code' => null, 'message' => $result['message'], 'result' => $result['data']]);
+            } else {
+                $err = $result['status'];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
+            }
+        } catch (JWTException $e) {
+            Log::info($e);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+        }
+
+    }
+
+    public function sendSms(Request $request)
+    {
+        $credentials = request(['mobile']);
+
+        $messages = [
+            'mobile.required' => '手機不能為空',
+        ];
+
+        $v = Validator::make($credentials, [
+            'mobile' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $data = [];
+        $data['mobile'] = $request['mobile'];
+        $response = $this->apiService->sendMemberSMS($data);
+        $result = json_decode($response, true);
+        try {
+            if ($result['status'] == '200') {
+                return response()->json(['status' => true, 'error_code' => null, 'message' => $result['message'], 'result' => []]);
+            } else {
+                $err = $result['status'];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
+            }
+        } catch (JWTException $e) {
+            Log::info($e);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+        }
+
+    }
+
+    public function verifySMS(Request $request)
+    {
+        $credentials = request(['mobile', 'code']);
+
+        $messages = [
+            'mobile.required' => '手機不能為空',
+            'code.required' => '驗證碼不能為空',
+        ];
+
+        $v = Validator::make($credentials, [
+            'mobile' => 'required',
+            'code' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $data = [];
+        $data['mobile'] = $request['mobile'];
+        $data['code'] = $request['code'];
+        $response = $this->apiService->verifyMemberSMS($data);
+        $result = json_decode($response, true);
+        try {
+            if ($result['status'] == '200') {
+                return response()->json(['status' => true, 'error_code' => null, 'message' => $result['message'], 'result' => $result['data']]);
+            } else {
+                $err = $result['status'];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
+            }
+        } catch (JWTException $e) {
+            Log::info($e);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+        }
+
+    }
+
     public function registration(Request $request)
     {
-        $err = null;
-        $credentials = request(['mobile', 'name', 'email', 'password', 'birthday', 'sex', 'registeredSource', 'recommendSource', 'identityNo']);
+        $credentials = request(['mobile', 'name', 'email', 'password', 'birthday', 'sex', 'registeredSource']);
 
         $messages = [
             'mobile.required' => '帳號不能為空',
@@ -132,7 +242,7 @@ class AuthController extends Controller
             'password.required' => '密碼不能為空',
             'birthday.required' => '生日不能為空',
             'sex.required' => '性別不能為空',
-            'registeredSource.required' => '來源不能為空',
+            'registeredSource.required' => '註冊來源不能為空',
         ];
 
         $v = Validator::make($credentials, [
@@ -144,9 +254,94 @@ class AuthController extends Controller
             'registeredSource' => 'required',
         ], $messages);
 
-        if ($v->fails()){
+        if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
         }
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
 
+        $data = [];
+        $data['mobile'] = $request['mobile'];
+        $data['name'] = $request['name'];
+        $data['password'] = $request['password'];
+        $data['email'] = $request['email'];
+        $data['birthday'] = $request['birthday'];
+        $data['sex'] = $request['sex'];
+        $data['registeredSource'] = $request['registeredSource'];
+        $token = $request->server->getHeaders()['AUTHORIZATION'];
+        $response = $this->apiService->memberRegistration($data, $token);
+        $result = json_decode($response, true);
+        try {
+            if ($result['status'] == '201') {
+                $tmp = Members::where('member_id', '=', $result['data']['id'])->first();
+                if (!is_null($tmp)) {
+                    $token = Auth::guard('api')->fromUser($tmp);
+                    Members::where('id', $tmp['id'])->update(['api_token' => $token]);
+                } else {
+                    $credentials['member_id'] = $result['data']['id'];
+                    $member = Members::create($credentials);
+                    $token = Auth::guard('api')->fromUser($member);
+                    Members::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
+                }
+                $result['data']['_token'] = $token;
+                return response()->json(['status' => true, 'error_code' => null, 'message' => '新增成功', 'result' => $result['data']]);
+            } else {
+                $err = $result['status'];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
+            }
+        } catch (JWTException $e) {
+            Log::info($e);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+        }
     }
+
+    public function memberBasic(Request $request)
+    {
+        $credentials = request(['mobile']);
+
+        $messages = [
+            'mobile.required' => '手機不能為空',
+        ];
+
+        $v = Validator::make($credentials, [
+            'mobile' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+
+        $data = [];
+        $token = $request->server->getHeaders()['AUTHORIZATION'];
+        $response = $this->apiService->memberBsic($request['mobile'], $token);
+        $result = json_decode($response, true);
+        try {
+            if ($result['status'] == '200') {
+                $tmp = Members::where('member_id', '=', $result['data']['id'])->first();
+                if (!is_null($tmp)) {
+                    $token = Auth::guard('api')->fromUser($tmp);
+                    Members::where('id', $tmp['id'])->update(['api_token' => $token]);
+                } else {
+                    $credentials['member_id'] = $result['data']['id'];
+                    $member = Members::create($credentials);
+                    $token = Auth::guard('api')->fromUser($member);
+                    Members::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
+                }
+                $result['data']['_token'] = $token;
+                return response()->json(['status' => true, 'error_code' => null, 'message' => $result['message'], 'result' => $result['data']]);
+            } else {
+                $err = $result['status'];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
+            }
+        } catch (JWTException $e) {
+            Log::info($e);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+        }
+    }
+
+
 }
