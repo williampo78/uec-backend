@@ -39,17 +39,63 @@
             margin: auto;
         }
 
+        .theme-color {
+            color: #138cde;
+        }
+
+        .sysinfo-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .sysinfo {
+            position: fixed;
+            top: 15vh;
+            right: 20px;
+            z-index: 20;
+        }
+
+        .sysinfo ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sysinfo-content {
+            margin: 0;
+        }
+
+        .sysinfo-li {
+            padding: 10px 15px;
+            border-left: solid 4px #aaaaaa;
+            color: #aaaaaa;
+            line-height: 1.3;
+            cursor: pointer;
+        }
+
+        .sysinfo-activie {
+            color: #138cde;
+            border-left: solid 4px #138cde;
+        }
+
     </style>
-    <div class="side-bar">
-        <nav class="navigation">
+    <div class="sysinfo">
+        <div class="sysinfo-title theme-color">基本檔</div>
+        <div class="sysinfo-content">
             <ul>
-                <li>
-                    <a href="#page-1">基本資訊</a>
-                    <br>
-                    <a href="#page-2">規格</a>
-                </li>
+                <a href="#page-1">
+                    <li class="sysinfo-li sysinfo-activie" id="click-page-1">
+                        前台資料
+                    </li>
+                </a>
+                <a href="#page-2">
+                    <li class="sysinfo-li" id="click-page-2">
+                        規格
+                    </li>
+                </a>
+                {{-- <li></li> --}}
             </ul>
-        </nav>
+        </div>
     </div>
 
     <div id="page-wrapper">
@@ -569,7 +615,8 @@
                     var specList = this.SpecList;
                     if (this.products.spec_dimension == 1) {
                         specList.spec_1.map(function(value, key) {
-                            let only_key_isset = skuList.filter(data => data.spec_1_only_key === value.only_key);
+                            let only_key_isset = skuList.filter(data => data.spec_1_only_key === value
+                                .only_key);
                             if (only_key_isset.length == 0) {
                                 skuList.push({
                                     id: '',
@@ -816,24 +863,39 @@
         window.onscroll = function() {
             var page_1 = document.getElementById("page-1"); //獲取到導航欄id
             var page_2 = document.getElementById("page-2"); //獲取到導航欄id
+            var page_1_btn = document.getElementById("click-page-1");
+            var page_2_btn = document.getElementById("click-page-2");
+
             //使用JS原生物件，獲取元素的Class樣式列表
             var titleClientRect_1 = page_1.getBoundingClientRect();
             var titleClientRect_2 = page_2.getBoundingClientRect();
 
             if ((titleClientRect_1.top - titleClientRect_1.height) < 0) {
-                // console.log("show 1") ; 
+                var page_1_status = true;
             } else {
-                // console.log("hide 1") ; 
+                var page_1_status = false;
             }
-
-            if ((titleClientRect_2.top - titleClientRect_2.height) < 0) {
-                // console.log("show 2") ; 
+            // console.log(titleClientRect_2.top - titleClientRect_2.height) ;
+            if ((titleClientRect_2.top - titleClientRect_2.height) < 400) {
+                var page_2_status = true;
             } else {
-                // console.log("hide 2") ;
+                var page_2_status = false;
             }
-
-
+            if (page_1_status && page_2_status == false) {
+                if (!page_1_btn.classList.contains('sysinfo-activie')) {
+                    page_1_btn.classList.add("sysinfo-activie")
+                }
+                if (page_2_btn.classList.contains('sysinfo-activie')) {
+                    page_2_btn.classList.remove("sysinfo-activie")
+                }
+            } else {
+                if (!page_2_btn.classList.contains('sysinfo-activie')) {
+                    page_2_btn.classList.add("sysinfo-activie")
+                }
+                if (page_1_btn.classList.contains('sysinfo-activie')) {
+                    page_1_btn.classList.remove("sysinfo-activie")
+                }
+            }
         }
-        // Get all sections that have an ID defined
     </script>
 @endsection
