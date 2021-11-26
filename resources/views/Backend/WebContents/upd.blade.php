@@ -153,7 +153,19 @@
                 }
             });
         })
-
+        ClassicEditor.create( document.querySelector( '#editor' ), {
+            ckfinder: {
+                // Upload the images to the server using the CKFinder QuickUpload command.
+                uploadUrl: "https://uecbackend.u-ark.com/ckfinder/connector?command=QuickUpload&type=Images&responseType=json"
+            },
+        })
+            .then( editor => {
+                console.log( 'Editor was initialized', editor );
+            })
+            .catch( err => {
+                console.error( err.stack );
+            });
+/*
         ClassicEditor.create( document.querySelector( '#editor' ), {
 
             ckfinder: {
@@ -172,5 +184,7 @@
             .catch( err => {
                 console.error( err.stack );
             });
+
+ */
     </script>
 @endsection

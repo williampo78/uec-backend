@@ -105,11 +105,11 @@ $config['defaultResourceTypes'] = 'Images';
 
 $config['resourceTypes'][] = array(
     'name' => 'Images',
-    'directory' => 'webcontents/post',
+    'directory' => 'webcontents/',
     'maxSize' => '1M',
     'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',
     'deniedExtensions' => '',
-    'backend' => 'default',
+    'backend' => 'awss3',
 );
 
 $config['resourceTypes'][] = array(
