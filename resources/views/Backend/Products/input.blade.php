@@ -39,17 +39,63 @@
             margin: auto;
         }
 
+        .theme-color {
+            color: #138cde;
+        }
+
+        .sysinfo-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .sysinfo {
+            position: fixed;
+            top: 15vh;
+            right: 20px;
+            z-index: 20;
+        }
+
+        .sysinfo ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sysinfo-content {
+            margin: 0;
+        }
+
+        .sysinfo-li {
+            padding: 10px 15px;
+            border-left: solid 4px #aaaaaa;
+            color: #aaaaaa;
+            line-height: 1.3;
+            cursor: pointer;
+        }
+
+        .sysinfo-activie {
+            color: #138cde;
+            border-left: solid 4px #138cde;
+        }
+
     </style>
-    <div class="side-bar">
-        <nav class="navigation">
+    <div class="sysinfo">
+        <div class="sysinfo-title theme-color">基本檔</div>
+        <div class="sysinfo-content">
             <ul>
-                <li>
-                    <a href="#page-1">基本資訊</a>
-                    <br>
-                    <a href="#page-2">規格</a>
-                </li>
+                <a href="#page-1">
+                    <li class="sysinfo-li sysinfo-activie" id="click-page-1">
+                        前台資料
+                    </li>
+                </a>
+                <a href="#page-2">
+                    <li class="sysinfo-li" id="click-page-2">
+                        規格
+                    </li>
+                </a>
+                {{-- <li></li> --}}
             </ul>
-        </nav>
+        </div>
     </div>
 
     <div id="page-wrapper">
@@ -73,19 +119,19 @@
                                 </div>
                                 <div class="col-sm-3 ">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 買斷
+                                        <input type="radio" name="stock_type" value="A" checked> 買斷
                                         [A]
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> 寄售
+                                        <input type="radio" name="stock_type" value="B"> 寄售
                                         [B]
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
+                                        <input type="radio" name="stock_type" value="T">
                                         轉單[T]
                                     </label>
                                 </div>
@@ -95,7 +141,7 @@
                                     <label class="control-label ">商品序號</label><span class="redtext">*</span>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control" name="product_no" readonly>
                                 </div>
 
                             </div>
@@ -106,8 +152,10 @@
                                     <label class="control-label">供應商<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <select class="form-control js-select2" name="active" id="active">
-                                        <option value="">無</option>
+                                    <select class="form-control supplier_id" name="supplier_id">
+                                        @foreach ($supplier as $val)
+                                            <option value="{{ $val->id }}">{{ $val->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -116,7 +164,7 @@
                                     <label class="control-label">商品名稱<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="product_name" value="">
                                 </div>
                             </div>
                         </div>
@@ -126,8 +174,9 @@
                                     <label class="control-label">課稅別<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <select class="form-control js-select2" name="active" id="active">
-                                        <option value="">無</option>
+                                    <select class="form-control tax_type" name="tax_type">
+                                        <option value="TAXABLE">應稅(5%)</option>
+                                        <option value="NON_TAXABLE">免稅</option>
                                     </select>
                                 </div>
                             </div>
@@ -136,7 +185,7 @@
                                     <label class="control-label">POS分類<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="category_id" id="category_id" value="">
                                 </div>
                             </div>
                         </div>
@@ -146,7 +195,7 @@
                                     <label class="control-label">品牌<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <select class="form-control js-select2" name="active" id="active">
+                                    <select class="form-control brand_id" name="brand_id" id="brand_id">
                                         <option value="">無</option>
                                     </select>
                                 </div>
@@ -569,7 +618,8 @@
                     var specList = this.SpecList;
                     if (this.products.spec_dimension == 1) {
                         specList.spec_1.map(function(value, key) {
-                            let only_key_isset = skuList.filter(data => data.spec_1_only_key === value.only_key);
+                            let only_key_isset = skuList.filter(data => data.spec_1_only_key === value
+                                .only_key);
                             if (only_key_isset.length == 0) {
                                 skuList.push({
                                     id: '',
@@ -813,27 +863,55 @@
             watch: {},
         })
         new ImageUpload().$mount('#ImageUploadBox');
+        // 捲動功能
         window.onscroll = function() {
             var page_1 = document.getElementById("page-1"); //獲取到導航欄id
             var page_2 = document.getElementById("page-2"); //獲取到導航欄id
+            var page_1_btn = document.getElementById("click-page-1");
+            var page_2_btn = document.getElementById("click-page-2");
+
             //使用JS原生物件，獲取元素的Class樣式列表
             var titleClientRect_1 = page_1.getBoundingClientRect();
             var titleClientRect_2 = page_2.getBoundingClientRect();
 
             if ((titleClientRect_1.top - titleClientRect_1.height) < 0) {
-                // console.log("show 1") ; 
+                var page_1_status = true;
             } else {
-                // console.log("hide 1") ; 
+                var page_1_status = false;
             }
-
-            if ((titleClientRect_2.top - titleClientRect_2.height) < 0) {
-                // console.log("show 2") ; 
+            // console.log(titleClientRect_2.top - titleClientRect_2.height) ;
+            if ((titleClientRect_2.top - titleClientRect_2.height) < 400) {
+                var page_2_status = true;
             } else {
-                // console.log("hide 2") ;
+                var page_2_status = false;
             }
-
-
+            if (page_1_status && page_2_status == false) {
+                if (!page_1_btn.classList.contains('sysinfo-activie')) {
+                    page_1_btn.classList.add("sysinfo-activie")
+                }
+                if (page_2_btn.classList.contains('sysinfo-activie')) {
+                    page_2_btn.classList.remove("sysinfo-activie")
+                }
+            } else {
+                if (!page_2_btn.classList.contains('sysinfo-activie')) {
+                    page_2_btn.classList.add("sysinfo-activie")
+                }
+                if (page_1_btn.classList.contains('sysinfo-activie')) {
+                    page_1_btn.classList.remove("sysinfo-activie")
+                }
+            }
         }
-        // Get all sections that have an ID defined
+        $(document).ready(function() {
+            $(".supplier_id").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $(".tax_type").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+        });
     </script>
 @endsection

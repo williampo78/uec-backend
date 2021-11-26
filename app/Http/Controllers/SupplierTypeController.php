@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\SupplierTypeService;
 use Illuminate\Http\Request;
 
-class SupplierTypeControllers extends Controller
+class SupplierTypeController extends Controller
 {
     protected $SupplierTypeService;
     /**

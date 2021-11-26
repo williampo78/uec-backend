@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ContactService;
 use Illuminate\Http\Request;
-use phpDocumentor\Reflection\DocBlock\Tags\Var_;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use App\Services\PermissionService;
 
-class ContactControllers extends Controller
+class AdminController extends Controller
 {
-    private $contactService ; 
-    public function __construct(
-        ContactService $contactService) {
-        $this->contactService = $contactService;
-    }
+    protected $PermissionService;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct(PermissionService $permission)
+    {
+        $this->permission = $permission;
+    }
     public function index()
     {
-        //
+//        $user = Auth::user();
+        return view('Backend.example');
     }
 
     /**
@@ -88,11 +90,11 @@ class ContactControllers extends Controller
     {
         //
     }
-    public function ajax_del_contact(Request $request)
-    {
-        $table_name =  $request->input('table_name') ; 
-        $id =  $request->input('id') ; 
-        $this->contactService->delContact($table_name,$id);
-        return response()->json(['success' => 'true' , 'table_name' => $table_name , 'id'=>$id]);
+
+    public function signOut() {
+        Session::flush();
+        Auth::logout();
+
+        return Redirect('/');
     }
 }

@@ -3,26 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use App\Services\PermissionService;
+use App\Services\ProductsService;
+use App\Services\SupplierService ; 
+use ImageUpload ;
 
-class AdminControllers extends Controller
+class ProductsController extends Controller
 {
-    protected $PermissionService;
+    private $productsService;
+    public function __construct(ProductsService $productsService,
+    SupplierService $supplierService)
+    {
+        $this->productsService = $productsService;
+        $this->supplierService = $supplierService;
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct(PermissionService $permission)
+    public function index(Request $request)
     {
-        $this->permission = $permission;
-    }
-    public function index()
-    {
-//        $user = Auth::user();
-        return view('Backend.example');
+        $in = $request->input() ; 
+        
+        $result = [] ; 
+    
+        // $result = $this->productsService->get_Products($request) ; 
+
+        return view('Backend.Products.list',$result);
     }
 
     /**
@@ -32,7 +39,9 @@ class AdminControllers extends Controller
      */
     public function create()
     {
-        //
+        $result = [] ; 
+        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        return view('Backend.Products.input',$result);
     }
 
     /**
@@ -90,11 +99,17 @@ class AdminControllers extends Controller
     {
         //
     }
+    public function testview(){  
+        $result = [] ; 
+        $filename = '' ; 
+        $result['web_url'] = ImageUpload::getImage($filename) ? '' : '' ; 
+        return view('Backend.Products.test',$result);
 
-    public function signOut() {
-        Session::flush();
-        Auth::logout();
-
-        return Redirect('/');
     }
+    public function upload_img(Request $request){
+        $file = $request->file('photo') ; 
+        $path = '/photo/1' ; 
+        $upload = ImageUpload::uploadImage($file,$path) ; 
+    }
+
 }

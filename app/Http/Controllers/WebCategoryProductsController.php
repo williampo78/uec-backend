@@ -6,7 +6,7 @@ use App\Services\SupplierService;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 
-class WebCategoryProductsControllers extends Controller
+class WebCategoryProductsController extends Controller
 {
     private $webCategoryHierarchyService;
     private $supplierService;
