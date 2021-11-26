@@ -565,56 +565,87 @@
                     }
                 },
                 AddSkuList() { //新增規格
-                    let spac_1 = [];
-                    let spac_2 = [];
                     var skuList = this.SkuList;
                     var specList = this.SpecList;
+                    if (this.products.spec_dimension == 1) {
+                        specList.spec_1.map(function(value, key) {
+                            let only_key_isset = skuList.filter(data => data.spec_1_only_key === value.only_key);
+                            if (only_key_isset.length == 0) {
+                                skuList.push({
+                                    id: '',
+                                    sort_key: key,
+                                    sort: skuList.length,
+                                    spec_1_value: value.name,
+                                    spec_1_only_key: value.only_key,
+                                    item_no: '',
+                                    supplier_item_no: '',
+                                    ean: '',
+                                    pos_item_no: '',
+                                    safty_qty: 0,
+                                    is_additional_purchase: 0,
+                                    status: 0,
+                                })
+                            } else {
+                                only_key_isset[0].spec_1_value = value.name;
+                                only_key_isset[0].spec_1_only_key = value.only_key;
+                                only_key_isset[0].sort_key = key;
+                            }
+                        })
 
-                    specList.spec_1.map(function(value, key) {
-                        spac_1.push(key);
-                    });
-                    specList.spec_2.map(function(value, key) {
-                        spac_2.push(key);
-                    });
 
-                    let cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
-                    let output = cartesian(spac_1, spac_2);
-                    output.map(function(value, key) {
-                        spac_1_key = value[0];
-                        spac_2_key = value[1];
-                        let find_spac_obj_1 = specList.spec_1[spac_1_key];
-                        let find_spac_obj_2 = specList.spec_2[spac_2_key];
-                        //檢查原先是否有存在該筆規格
-                        let only_key_isset = skuList.filter(data => data.spec_1_only_key === find_spac_obj_1
-                            .only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
-                        if (only_key_isset.length == 0) {
-                            skuList.push({
-                                id: '',
-                                sort_key: spac_1_key + '' + spac_2_key,
-                                sort: skuList.length,
-                                spec_1_value: find_spac_obj_1.name,
-                                spec_2_value: find_spac_obj_2.name,
-                                spec_1_only_key: find_spac_obj_1.only_key,
-                                spec_2_only_key: find_spac_obj_2.only_key,
-                                item_no: '',
-                                supplier_item_no: '',
-                                ean: '',
-                                pos_item_no: '',
-                                safty_qty: 0,
-                                is_additional_purchase: 0,
-                                status: 0,
-                            })
-                        } else {
-                            only_key_isset[0].spec_1_value = find_spac_obj_1.name;
-                            only_key_isset[0].spec_2_value = find_spac_obj_2.name;
-                            only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
-                            only_key_isset[0].spec_2_only_key = find_spac_obj_2.only_key;
-                            only_key_isset[0].sort_key = spac_1_key + '' + spac_2_key;
-                        }
+                    } else if (this.products.spec_dimension == 2) {
+                        let spac_1 = [];
+                        let spac_2 = [];
 
-                    });
-                    skuList.sort((a, b) => a.sort_key - b.sort_key); //重新排序
-                    return this.SkuList;
+
+                        specList.spec_1.map(function(value, key) {
+                            spac_1.push(key);
+                        });
+                        specList.spec_2.map(function(value, key) {
+                            spac_2.push(key);
+                        });
+
+                        let cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+                        let output = cartesian(spac_1, spac_2);
+                        output.map(function(value, key) {
+                            spac_1_key = value[0];
+                            spac_2_key = value[1];
+                            let find_spac_obj_1 = specList.spec_1[spac_1_key];
+                            let find_spac_obj_2 = specList.spec_2[spac_2_key];
+                            //檢查原先是否有存在該筆規格
+                            let only_key_isset = skuList.filter(data => data.spec_1_only_key ===
+                                find_spac_obj_1
+                                .only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
+                            if (only_key_isset.length == 0) {
+                                skuList.push({
+                                    id: '',
+                                    sort_key: spac_1_key + '' + spac_2_key,
+                                    sort: skuList.length,
+                                    spec_1_value: find_spac_obj_1.name,
+                                    spec_2_value: find_spac_obj_2.name,
+                                    spec_1_only_key: find_spac_obj_1.only_key,
+                                    spec_2_only_key: find_spac_obj_2.only_key,
+                                    item_no: '',
+                                    supplier_item_no: '',
+                                    ean: '',
+                                    pos_item_no: '',
+                                    safty_qty: 0,
+                                    is_additional_purchase: 0,
+                                    status: 0,
+                                })
+                            } else {
+                                only_key_isset[0].spec_1_value = find_spac_obj_1.name;
+                                only_key_isset[0].spec_2_value = find_spac_obj_2.name;
+                                only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
+                                only_key_isset[0].spec_2_only_key = find_spac_obj_2.only_key;
+                                only_key_isset[0].sort_key = spac_1_key + '' + spac_2_key;
+                            }
+
+                        });
+                        skuList.sort((a, b) => a.sort_key - b.sort_key); //重新排序
+                        return this.SkuList;
+                    }
+
                 },
                 drag(eve) {
                     $('tbody').addClass('elements-box')
@@ -678,7 +709,7 @@
                             spec_1: '',
                             spec_2: '',
                         };
-                        this.SpecList =  {
+                        this.SpecList = {
                             spec_1: [],
                             spec_2: [],
                         }
@@ -687,7 +718,7 @@
                                 this.SkuList = [{}];
                                 break;
                             case '1': //一維多規格
-                                this.SkuList = [{}];
+                                this.SkuList = [];
                                 break;
                             case '2': //二維多規格
                                 this.SkuList = [];
