@@ -47,244 +47,18 @@
                             <div class="row">
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
-
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <div class="form-group">
-                                                <label for="slot">版位 <span style="color:red;">*</span></label>
-                                                <select class="form-control js-select2-slot validate[required]" name="slot"
-                                                    id="slot">
-                                                    <option></option>
-                                                    @isset($ad_slots)
-                                                        @foreach ($ad_slots as $obj)
-                                                            <option value='{{ $obj->id }}'
-                                                                data-is-user-defined="{{ $obj->is_user_defined }}"
-                                                                data-slot-type="{{ $obj->slot_type }}">
-                                                                【{{ $obj->slot_code }}】{{ $obj->slot_desc }}</option>
-                                                        @endforeach
-                                                    @endisset
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label>上架時間 <span style="color:red;">*</span></label>
-                                                <div class="row">
-                                                    <div class="col-sm-5 text-center">
-                                                        <div class='input-group date' id='datetimepicker_start_at'>
-                                                            <input type='text'
-                                                                class="form-control datetimepicker-input validate[required]"
-                                                                data-target="#datetimepicker_start_at" name="start_at"
-                                                                id="start_at" value="" autocomplete="off" />
-                                                            <span class="input-group-addon"
-                                                                data-target="#datetimepicker_start_at"
-                                                                data-toggle="datetimepicker">
-                                                                <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-sm-1 text-center">
-                                                        <h5>～</h5>
-                                                    </div>
-                                                    <div class="col-sm-5 text-center">
-                                                        <div class='input-group date' id='datetimepicker_end_at'>
-                                                            <input type='text'
-                                                                class="form-control datetimepicker-input validate[required]"
-                                                                data-target="#datetimepicker_end_at" name="end_at"
-                                                                id="end_at" value="" autocomplete="off" />
-                                                            <span class="input-group-addon"
-                                                                data-target="#datetimepicker_end_at"
-                                                                data-toggle="datetimepicker">
-                                                                <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-group">
-                                                <label>狀態 <span style="color:red;">*</span></label>
-                                                <div class="row">
-                                                    <div class="col-sm-4">
-                                                        <label class="radio-inline">
-                                                            <input class="validate[required]" type="radio" name="active"
-                                                                id="active_enabled" checked value="1" />啟用
-                                                        </label>
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        <label class="radio-inline">
-                                                            <input class="validate[required]" type="radio" name="active"
-                                                                id="active_disabled" value="0" />關閉
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label for="slot_color_code">版位主色 (例：#00BB00)</label>
-                                                <input class="form-control colorpicker validate[required]" type="text"
-                                                    id="slot_color_code" name="slot_color_code" value="" disabled autocomplete="off" />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label for="slot_icon_name">版位icon</label>
-                                                <input class="validate[required]" type="file" id="slot_icon_name"
-                                                    name="slot_icon_name" disabled />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label for="slot_title">版位標題</label>
-                                                <input class="form-control validate[required]" type="text" id="slot_title"
-                                                    name="slot_title" value="" disabled />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr style="border-top: 1px solid gray;" />
-
-                                    <div id="image-block" style="display: none;">
-                                        <div class="table-responsive">
-                                            <table class='table table-striped table-bordered table-hover'
-                                                style='width:100%'>
-                                                <thead>
-                                                    <tr>
-                                                        <th class="text-nowrap">排序</th>
-                                                        <th class="text-nowrap">圖片</th>
-                                                        <th class="text-nowrap">alt</th>
-                                                        <th class="text-nowrap">標題</th>
-                                                        <th class="text-nowrap">摘要</th>
-                                                        <th class="text-nowrap">連結內容</th>
-                                                        <th class="text-nowrap">另開視窗</th>
-                                                        <th class="text-nowrap">功能</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <input type="hidden" id="image-block-row-no" value="0" />
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <button type="button" class="btn btn-warning" id="btn-new-image"><i
-                                                class="fa fa-plus"></i> 新增圖檔</button>
-                                        <hr style="border-top: 1px solid gray;" />
-                                    </div>
-
-                                    <div id="text-block" style="display: none;">
-                                        <div class="table-responsive">
-                                            <table class='table table-striped table-bordered table-hover'
-                                                style='width:100%'>
-                                                <thead>
-                                                    <tr>
-                                                        <th class="text-nowrap">排序</th>
-                                                        <th class="text-nowrap">文字</th>
-                                                        <th class="text-nowrap">連結內容</th>
-                                                        <th class="text-nowrap">另開視窗</th>
-                                                        <th class="text-nowrap">功能</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <input type="hidden" id="text-block-row-no" value="0" />
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <button type="button" class="btn btn-warning" id="btn-new-text"><i
-                                                class="fa fa-plus"></i> 新增文字</button>
-                                        <hr style="border-top: 1px solid gray;" />
-                                    </div>
-
-                                    <div id="product-block" style="display: none;">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <label class="radio-inline">
-                                                    <input class="validate[required]" type="radio"
-                                                        name="product_assigned_type" id="product_assigned_type_product"
-                                                        checked value="P" />指定商品
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input class="validate[required]" type="radio"
-                                                        name="product_assigned_type" id="product_assigned_type_category"
-                                                        value="C" />指定分類
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <br />
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <!-- Nav tabs -->
-                                                <ul class="nav nav-tabs" id="product-block-tab">
-                                                    <li class="active">
-                                                        <a href="#tab-product" data-toggle="tab">商品</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="#tab-category" data-toggle="tab">分類</a>
-                                                    </li>
-                                                </ul>
-
-                                                <!-- Tab panes -->
-                                                <div class="tab-content">
-                                                    <div class="tab-pane fade in active" id="tab-product">
-                                                        <div class="table-responsive">
-                                                            <table class='table table-striped table-bordered table-hover'
-                                                                style='width:100%'>
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="text-nowrap">排序</th>
-                                                                        <th class="text-nowrap">商品</th>
-                                                                        <th class="text-nowrap">功能</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <input type="hidden" id="product-block-product-row-no"
-                                                                        value="0" />
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <button type="button" class="btn btn-warning"
-                                                            id="btn-new-product-product"><i class="fa fa-plus"></i>
-                                                            新增商品</button>
-                                                    </div>
-                                                    <div class="tab-pane fade" id="tab-category">
-                                                        <div class="table-responsive">
-                                                            <table class='table table-striped table-bordered table-hover'
-                                                                style='width:100%'>
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="text-nowrap">排序</th>
-                                                                        <th class="text-nowrap">分類</th>
-                                                                        <th class="text-nowrap">功能</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <input type="hidden" id="product-block-category-row-no"
-                                                                        value="0" />
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                        <button type="button" class="btn btn-warning"
-                                                            id="btn-new-product-category"><i class="fa fa-plus"></i>
-                                                            新增分類</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr style="border-top: 1px solid gray;" />
-                                    </div>
+                                    @include('Backend.Advertisement.Launch.slot_block')
+                                    @include('Backend.Advertisement.Launch.image_block')
+                                    @include('Backend.Advertisement.Launch.text_block')
+                                    @include('Backend.Advertisement.Launch.product_block')
 
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                {{-- @if ($share_role_auth['auth_create']) --}}
-                                                <button class="btn btn-success" type="button" id="btn-save"><i
-                                                        class="fa fa-save"></i> 儲存</button>
-                                                {{-- @endif --}}
+                                                @if ($share_role_auth['auth_create'])
+                                                    <button class="btn btn-success" type="button" id="btn-save"><i
+                                                            class="fa fa-save"></i> 儲存</button>
+                                                @endif
 
                                                 <button class="btn btn-danger" type="button" id="btn-cancel"><i
                                                         class="fa fa-ban"></i> 取消</button>
@@ -300,9 +74,25 @@
         </div>
     </div>
 
+
+
+
+@endsection
+
 @section('js')
     <script>
         $(function() {
+            // 版位下拉選項
+            let ad_slots = @json($ad_slots);
+            let ad_slots_select_option = '';
+
+            $.each(ad_slots, function(key, value) {
+                ad_slots_select_option += `
+                        <option value='${value['id']}' data-is-user-defined="${value['is_user_defined']}" data-slot-type="${value['slot_type']}">【${value['slot_code']}】${value['slot_desc']}</option>
+                    `;
+            });
+
+            // 商品分類下拉選項
             let product_category = @json($product_category);
             let product_category_select_option = '';
 
@@ -312,6 +102,7 @@
                     `;
             });
 
+            // 商品下拉選項
             let products = @json($products);
             let products_select_option = '';
 
@@ -321,7 +112,24 @@
                     `;
             });
 
-            $("#create-form").validationEngine();
+            // 添加資料
+            $('#slot').append(ad_slots_select_option).prev('label').append(' <span style="color:red;">*</span>');
+            $('#start_at').parents('.form-group').children('label').append(' <span style="color:red;">*</span>');
+            $('#active_enabled').parents('.form-group').children('label').append(
+                ' <span style="color:red;">*</span>');
+            $('#image-block table > thead th').filter(function(i) {
+                return $.inArray(i, [0, 1, 5]) > -1;
+            }).append(' <span style="color:red;">*</span>');
+
+            // 加入欄位驗證
+            $('#slot').addClass('validate[required]');
+            $('#start_at').addClass('validate[required]');
+            $('#end_at').addClass('validate[required]');
+            $('#active_enabled').addClass('validate[required]');
+            $('#active_disabled').addClass('validate[required]');
+            $('#slot_color_code').addClass('validate[required]');
+            $('#slot_icon_name').addClass('validate[required]');
+            $('#slot_title').addClass('validate[required]');
 
             $('.js-select2-slot').select2({
                 allowClear: true,
@@ -369,6 +177,7 @@
                 }
             });
 
+            // 選擇版位
             $('#slot').on('change', function() {
                 let element = $(this).find('option:selected');
                 let is_user_defined = element.attr('data-is-user-defined');
@@ -523,6 +332,9 @@
                 });
 
                 $('#image-block-row-no').val(parseInt(image_block_row_no) + 1);
+
+                // 加入欄位驗證
+                //$(`#image-block table > tbody [name="image_block_sort[${image_block_row_no}]"]`).addClass('validate[required]');
             });
 
             // 刪除圖檔
@@ -695,6 +507,10 @@
                 $(this).parents('tr').remove();
             });
 
+            $("#create-form").validationEngine({
+                scroll: false,
+            });
+
             $('#btn-save').on('click', function() {
                 $("#create-form").submit();
             });
@@ -704,6 +520,4 @@
             });
         });
     </script>
-@endsection
-
 @endsection
