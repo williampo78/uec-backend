@@ -7,7 +7,7 @@ use App\Services\SupplierService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class ItemControllers extends Controller
+class ItemController extends Controller
 {
     private $itemService;
     private $categoryService;

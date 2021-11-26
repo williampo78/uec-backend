@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use App\Services\ContactService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Services\DepartmentService;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 
-class DepartmentControllers extends Controller
+class ContactController extends Controller
 {
-    private $departmentService;
-    public function __construct(DepartmentService $DepartmentService)
-    {
-        $this->departmentService = $DepartmentService;
+    private $contactService ; 
+    public function __construct(
+        ContactService $contactService) {
+        $this->contactService = $contactService;
     }
     /**
      * Display a listing of the resource.
@@ -21,11 +20,7 @@ class DepartmentControllers extends Controller
      */
     public function index()
     {
-
-        $data = [];
-        $data['department'] = $this->departmentService->getDepartment();
-        return view('Backend.Department.list', compact('data'), compact('data'));
-
+        //
     }
 
     /**
@@ -35,8 +30,7 @@ class DepartmentControllers extends Controller
      */
     public function create()
     {
-        return view('Backend.Department.input');
-
+        //
     }
 
     /**
@@ -47,15 +41,7 @@ class DepartmentControllers extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->input();
-        unset($input['_token']);
-        $input['created_by'] = Auth::user()->id;
-        $input['created_at'] = Carbon::now();
-        $this->departmentService->addDepartment($input);
-        $act = 'add';
-        $route_name = 'department';
-        return view('Backend.success' , compact('route_name','act'));
-
+        //
     }
 
     /**
@@ -77,8 +63,7 @@ class DepartmentControllers extends Controller
      */
     public function edit($id)
     {
-        $data['department'] = $this->departmentService->showDepartment($id);
-        return view('Backend.Department.input', $data);
+        //
     }
 
     /**
@@ -90,16 +75,7 @@ class DepartmentControllers extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->input();
-        unset($input['_token']);
-        unset($input['_method']);
-        $input['updated_by'] = Auth::user()->id;
-        $this->departmentService->updateDepartment($input, $id);
-        $act = 'upd';
-        $route_name = 'department';
-        return view('Backend.success' , compact('route_name','act'));
-
-
+        //
     }
 
     /**
@@ -111,5 +87,12 @@ class DepartmentControllers extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function ajax_del_contact(Request $request)
+    {
+        $table_name =  $request->input('table_name') ; 
+        $id =  $request->input('id') ; 
+        $this->contactService->delContact($table_name,$id);
+        return response()->json(['success' => 'true' , 'table_name' => $table_name , 'id'=>$id]);
     }
 }

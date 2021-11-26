@@ -7,7 +7,7 @@ use App\Services\SupplierService;
 use App\Services\SupplierTypeService;
 use Illuminate\Http\Request;
 
-class SupplierControllers extends Controller
+class SupplierController extends Controller
 {
     private $supplierService;
     private $supplierTypeService;

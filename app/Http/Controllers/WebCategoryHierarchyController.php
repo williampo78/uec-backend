@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 
-class WebCategoryHierarchyControllers extends Controller
+class WebCategoryHierarchyController extends Controller
 {
     private $webCategoryHierarchyService;
 
