@@ -890,7 +890,7 @@
                 }
             } else {
                 if (!page_2_btn.classList.contains('sysinfo-activie')) {
-                    page_2_btn.classList.add("sysinfo-activie")
+                    page_2_btn.classList.add("sysinfo-activie") 
                 }
                 if (page_1_btn.classList.contains('sysinfo-activie')) {
                     page_1_btn.classList.remove("sysinfo-activie")
