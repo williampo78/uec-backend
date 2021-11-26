@@ -166,10 +166,10 @@
 
             let slot_type_option_json = @json(config('uec.ad_slot_type_option'));
 
-            $('.slot_detail').on('click', function() {
+            $('#table_list tbody').on('click', '.slot_detail', function() {
                 let slot_id = $(this).attr("data-slot");
 
-                axios.post('/backend/advertisemsement_block/ajax', {
+                axios.post('/backend/advertisemsement_block/ajax/detail', {
                     slot_id: slot_id
                 })
                 .then(function (response) {

@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\AdSlotContentDetails;
-use App\Models\AdSlotContents;
-use App\Models\AdSlots;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
+use App\Models\AdSlots;
+use App\Facades\ImageUpload;
+use App\Models\AdSlotContents;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\AdSlotContentDetails;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AdvertisementService
 {
@@ -100,7 +101,7 @@ class AdvertisementService
     }
 
     /**
-     * 取得廣告上架資料
+     * 取得廣告上架全部資料
      *
      * @param array $query_data
      * @return object ORM物件
@@ -109,7 +110,7 @@ class AdvertisementService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = AdSlots::select(
+        $result = AdSlotContents::select(
             'ad_slots.slot_code',
             'ad_slots.slot_desc',
             'ad_slots.applicable_page',
@@ -140,7 +141,7 @@ class AdvertisementService
             'ad_slot_contents.updated_at AS slot_content_updated_at',
             'lookup_values_v.description',
         )
-            ->join('ad_slot_contents', 'ad_slot_contents.slot_id', '=', 'ad_slots.id')
+            ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
             ->leftJoin('lookup_values_v', 'ad_slots.applicable_page', '=', 'lookup_values_v.code')
             ->where('ad_slots.agent_id', $agent_id)
             ->where('ad_slot_contents.agent_id', $agent_id)
@@ -196,6 +197,75 @@ class AdvertisementService
         $result = $result->orderBy("ad_slots.applicable_page", "asc")
             ->orderBy("ad_slots.slot_code", "asc")
             ->get();
+
+        return $result;
+    }
+
+    /**
+     * 取得廣告上架單筆資料
+     *
+     * @param int $id
+     * @return object ORM物件
+     */
+    public function getSlotContentById($id)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $result = [];
+
+        $result['content'] = AdSlotContents::select(
+            'ad_slots.slot_code',
+            'ad_slots.slot_desc',
+            'ad_slots.applicable_page',
+            'ad_slots.is_mobile_applicable',
+            'ad_slots.is_desktop_applicable',
+            'ad_slots.slot_type',
+            'ad_slots.remark',
+            'ad_slots.is_user_defined',
+            'ad_slots.id AS slot_id',
+            'ad_slots.active AS slot_active',
+            'ad_slots.agent_id AS slot_agent_id',
+            'ad_slots.created_by AS slot_created_by',
+            'ad_slots.updated_by AS slot_updated_by',
+            'ad_slots.created_at AS slot_created_at',
+            'ad_slots.updated_at AS slot_updated_at',
+            'ad_slot_contents.start_at',
+            'ad_slot_contents.end_at',
+            'ad_slot_contents.slot_color_code',
+            'ad_slot_contents.slot_icon_name',
+            'ad_slot_contents.slot_title',
+            'ad_slot_contents.product_assigned_type',
+            'ad_slot_contents.id AS slot_content_id',
+            'ad_slot_contents.active AS slot_content_active',
+            'ad_slot_contents.agent_id AS slot_content_agent_id',
+            'ad_slot_contents.created_by AS slot_content_created_by',
+            'ad_slot_contents.updated_by AS slot_content_updated_by',
+            'ad_slot_contents.created_at AS slot_content_created_at',
+            'ad_slot_contents.updated_at AS slot_content_updated_at',
+            'lookup_values_v.description',
+        )
+            ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
+            ->leftJoin('lookup_values_v', 'ad_slots.applicable_page', '=', 'lookup_values_v.code')
+            ->where('ad_slots.agent_id', $agent_id)
+            ->where('ad_slot_contents.agent_id', $agent_id)
+            ->where('lookup_values_v.agent_id', $agent_id)
+            ->where('lookup_values_v.type_code', 'APPLICABLE_PAGE')
+            ->find($id);
+
+        $result['detail'] = AdSlotContentDetails::where('ad_slot_content_id', $id)
+            ->orderBy('sort', 'ASC')
+            ->get();
+
+        if (isset($result['content']['slot_icon_name'])) {
+            $result['content']['slot_icon_name'] = ImageUpload::getImage($result['content']['slot_icon_name']) ?: '';
+        }
+
+        if ($result['content']['slot_type'] == 'I' || $result['content']['slot_type'] == 'IS') {
+            foreach ($result['detail'] as $key => $value) {
+                if (isset($value['image_name'])) {
+                    $result['detail'][$key]['image_name'] = ImageUpload::getImage($value['image_name']) ?: '';
+                }
+            }
+        }
 
         return $result;
     }

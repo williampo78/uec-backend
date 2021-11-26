@@ -2,13 +2,14 @@
 <html lang="zh-tw">
 
 <head>
+    <title>@yield('title')</title>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('asset/img/uarklogo.ico') }}" />
-    <title>@yield('title')</title>
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-treefy.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/sb-admin-2.css') }}" />
@@ -27,7 +28,8 @@
     <link rel="stylesheet" href="{{ asset('asset/js/DataTables/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css"
+        crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('asset/css/jquery.fancybox.min.css') }}">
     <link rel="stylesheet" src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
     <link rel="stylesheet" href="{{ asset('asset/css/validationEngine.jquery.css') }}">
@@ -41,6 +43,7 @@
         .select2-results__options {
             max-height: 500px !important;
         }
+
     </style>
 
     @yield('style')
@@ -61,7 +64,9 @@
     @guest
     @endguest
 
-    @yield('content')
+    <div class="container-fluid">
+        @yield('content')
+    </div>
 
     <script src="{{ asset('asset/js/template/bower_components/jquery/dist/jquery.js') }}"></script>
     <script src="{{ asset('asset/js/DataTables/datatables.js') }}"></script>
@@ -97,7 +102,7 @@
 
     <script>
         @isset($share_role_auth)
-        var RoleAuthJson =  @json($share_role_auth) ;
+            var RoleAuthJson = @json($share_role_auth) ;
         @endisset
         var UecConfig = @json(Config('uec'));
         $(document).ready(function() {
@@ -108,4 +113,5 @@
 
     @yield('js')
 </body>
+
 </html>

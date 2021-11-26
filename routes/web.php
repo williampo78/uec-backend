@@ -82,11 +82,15 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/web_category_hierarchy/ajax',[WebCategoryHierarchyControllers::class,'ajax']) ;
     Route::resource('/web_category_products',WebCategoryProductsControllers::class,['names' => ['index' => 'web_category_products']]) ;
     Route::post('/web_category_products/ajax',[WebCategoryProductsControllers::class,'ajax']) ;
+
     // 廣告版位
     Route::resource('/advertisemsement_block', AdvertisementBlockController::class, ['names' => ['index' => 'advertisemsement_block']]);
-    Route::post('/advertisemsement_block/ajax', [AdvertisementBlockController::class, 'ajax']);
+    Route::post('/advertisemsement_block/ajax/detail', [AdvertisementBlockController::class, 'getDetailByAjax']);
+
     // 廣告上架
     Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, ['names' => ['index' => 'advertisemsement_launch']]);
+    Route::post('/advertisemsement_launch/ajax/detail', [AdvertisementLaunchController::class, 'getDetailByAjax']);
+
     Route::resource('/webcontents',WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 });
 
