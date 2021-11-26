@@ -13,6 +13,6 @@ class EncryptCookies extends Middleware
      */
     protected $except = [
         // 避免 Laravel 加密 CKFinder 的 cookie
-        //'ckCsrfToken',
+        'ckCsrfToken',
     ];
 }
