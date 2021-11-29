@@ -153,19 +153,7 @@
                 }
             });
         })
-        ClassicEditor.create( document.querySelector( '#editor' ), {
-            ckfinder: {
-                // Upload the images to the server using the CKFinder QuickUpload command.
-                uploadUrl: "ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-        })
-            .then( editor => {
-                console.log( 'Editor was initialized', editor );
-            })
-            .catch( err => {
-                console.error( err.stack );
-            });
-/*
+
         ClassicEditor.create( document.querySelector( '#editor' ), {
 
             ckfinder: {
@@ -178,13 +166,5 @@
 
             },
         })
-            .then( editor => {
-                console.log( 'Editor was initialized', editor );
-            })
-            .catch( err => {
-                console.error( err.stack );
-            });
-
- */
     </script>
 @endsection
