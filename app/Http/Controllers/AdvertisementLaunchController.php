@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Facades\ImageUpload;
 use Illuminate\Http\Request;
 use App\Services\ProductsService;
+use Illuminate\Support\Facades\Log;
 use App\Services\AdvertisementService;
 use App\Services\WebCategoryHierarchyService;
 
@@ -31,11 +33,10 @@ class AdvertisementLaunchController extends Controller
      */
     public function index(Request $request)
     {
-        $result = [];
         $query_data = [];
         $ad_slots = [];
 
-        $query_data = $request->only(['block', 'launch_status', 'start_at', 'end_at']);
+        $query_data = $request->only(['slot_id', 'launch_status', 'start_at', 'end_at']);
 
         $ad_slots = $this->advertisement_service->getSlots();
         $ad_slot_contents = $this->advertisement_service->getSlotContents($query_data);
@@ -51,11 +52,10 @@ class AdvertisementLaunchController extends Controller
             return $obj;
         });
 
-        $result['ad_slots'] = $ad_slots;
-        $result['ad_slot_contents'] = $ad_slot_contents;
-        $result['query_data'] = $query_data;
-
-        return view('Backend.Advertisement.Launch.list', $result);
+        return view(
+            'Backend.Advertisement.Launch.list',
+            compact('ad_slots', 'ad_slot_contents', 'query_data')
+        );
     }
 
     /**
@@ -65,17 +65,14 @@ class AdvertisementLaunchController extends Controller
      */
     public function create()
     {
-        $result = [];
-
         $ad_slots = $this->advertisement_service->getSlots();
         $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
         $products = $this->product_service->getProducts();
 
-        $result['ad_slots'] = $ad_slots;
-        $result['product_category'] = $product_category;
-        $result['products'] = $products;
-
-        return view('Backend.Advertisement.Launch.add', $result);
+        return view(
+            'Backend.Advertisement.Launch.add',
+            compact('ad_slots', 'product_category', 'products')
+        );
     }
 
     /**
@@ -86,14 +83,20 @@ class AdvertisementLaunchController extends Controller
      */
     public function store(Request $request)
     {
+        // return back();
         $input_data = $request->except('_token');
 
-        $this->advertisement_service->addSlotContents($input_data);
+        if (! $this->advertisement_service->addSlotContents($input_data)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
 
         $route_name = 'advertisemsement_launch';
         $act = 'add';
 
-        return view('Backend.success', compact('route_name' , 'act'));
+        return view(
+            'Backend.success',
+            compact('route_name', 'act')
+        );
     }
 
     /**
@@ -115,7 +118,58 @@ class AdvertisementLaunchController extends Controller
      */
     public function edit($id)
     {
-        //
+        $result = [];
+
+        $ad_slot_content = $this->advertisement_service->getSlotContentById($id);
+
+        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? ImageUpload::getImage($ad_slot_content['content']->slot_icon_name) : null;
+
+        // 整理給前端的資料
+        $ad_slot_content['content'] = $ad_slot_content['content']->only([
+            'slot_code',
+            'slot_desc',
+            'slot_type',
+            'start_at',
+            'end_at',
+            'slot_color_code',
+            'slot_icon_name_url',
+            'slot_title',
+            'product_assigned_type',
+            'slot_content_active',
+            'is_user_defined',
+            'product_assigned_type',
+            'slot_content_id',
+        ]);
+
+        foreach ($ad_slot_content['details'] as $key => $obj) {
+            $obj->image_name_url = !empty($obj->image_name) ? ImageUpload::getImage($obj->image_name) : null;
+
+            // 整理給前端的資料
+            $ad_slot_content['details'][$key] = $obj->only([
+                'id',
+                'data_type',
+                'sort',
+                'texts',
+                'image_name_url',
+                'image_alt',
+                'image_title',
+                'image_abstract',
+                'image_action',
+                'is_target_blank',
+                'product_id',
+                'web_category_hierarchy_id',
+                'target_url',
+                'target_cate_hierarchy_id',
+            ]);
+        }
+
+        $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
+        $products = $this->product_service->getProducts();
+
+        return view(
+            'Backend.Advertisement.Launch.update',
+            compact('ad_slot_content', 'product_category', 'products')
+        );
     }
 
     /**
@@ -125,9 +179,22 @@ class AdvertisementLaunchController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $slot_content_id)
     {
-        //
+        $input_data = $request->except('_token', '_method');
+        $input_data['slot_content_id'] = $slot_content_id;
+
+        if (! $this->advertisement_service->updateSlotContents($input_data)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        $route_name = 'advertisemsement_launch';
+        $act = 'upd';
+
+        return view(
+            'Backend.success',
+            compact('route_name', 'act')
+        );
     }
 
     /**
@@ -145,9 +212,11 @@ class AdvertisementLaunchController extends Controller
     {
         $slot_content_id = $request->input('slot_content_id');
 
+        // 取得商品分類
         $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
         $product_category_format = array_column($product_category, 'name', 'id');
 
+        // 取得商品
         $products = $this->product_service->getProducts();
         $products_format = [];
         foreach ($products as $value) {
@@ -155,70 +224,75 @@ class AdvertisementLaunchController extends Controller
         }
 
         $ad_slot_content = $this->advertisement_service->getSlotContentById($slot_content_id);
-        $content = $ad_slot_content['content']->toArray();
 
-        $result = [];
-        $result['content'] = array_filter($content, function($key) {
-            return in_array($key, [
-                'slot_code',
-                'slot_desc',
-                'is_mobile_applicable',
-                'is_desktop_applicable',
-                'slot_type',
-                'is_user_defined',
-                'start_at',
-                'end_at',
-                'slot_color_code',
-                'slot_icon_name',
-                'slot_title',
-                'product_assigned_type',
-                'slot_content_active',
-                'description',
+        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? ImageUpload::getImage($ad_slot_content['content']->slot_icon_name) : null;
+
+        // 整理給前端的資料
+        $ad_slot_content['content'] = $ad_slot_content['content']->only([
+            'slot_code',
+            'slot_desc',
+            'slot_type',
+            'start_at',
+            'end_at',
+            'slot_color_code',
+            'slot_icon_name_url',
+            'slot_title',
+            'product_assigned_type',
+            'slot_content_active',
+        ]);
+
+        foreach ($ad_slot_content['details'] as $key => $obj) {
+            $obj->image_name_url = !empty($obj->image_name) ? ImageUpload::getImage($obj->image_name) : null;
+            $obj->product = !empty($obj->product_id) ? $products_format[$obj->product_id] ?? null : null;
+            $obj->product_category = !empty($obj->web_category_hierarchy_id) ? $product_category_format[$obj->web_category_hierarchy_id] ?? null : null;
+
+            switch ($obj->image_action) {
+                // URL
+                case 'U':
+                    $obj->link_content = $obj->target_url;
+                    break;
+                // 商品分類
+                case 'C':
+                    $obj->link_content = $product_category_format[$obj->target_cate_hierarchy_id];
+                    break;
+                default:
+                    $obj->link_content = null;
+                    break;
+            }
+
+            // 整理給前端的資料
+            $ad_slot_content['details'][$key] = $obj->only([
+                'data_type',
+                'sort',
+                'texts',
+                'image_name_url',
+                'image_alt',
+                'image_title',
+                'image_abstract',
+                'image_action',
+                'is_target_blank',
+                'product',
+                'product_category',
+                'link_content',
             ]);
-        }, ARRAY_FILTER_USE_KEY);
-
-        foreach ($ad_slot_content['detail'] as $key => $value) {
-            $detail = $value->toArray();
-
-            $result['detail'][$key] = array_filter($detail, function($key) {
-                return in_array($key, [
-                    'data_type',
-                    'sort',
-                    'texts',
-                    'image_name',
-                    'image_alt',
-                    'image_title',
-                    'image_abstract',
-                    'image_action',
-                    'is_target_blank',
-                ]);
-            }, ARRAY_FILTER_USE_KEY);
-
-            $result['detail'][$key]['product'] = null;
-            $result['detail'][$key]['product_category'] = null;
-            $result['detail'][$key]['link_content'] = null;
-
-            if (isset($detail['product_id'])) {
-                $result['detail'][$key]['product'] = $products_format[$detail['product_id']];
-            }
-
-            if (isset($detail['web_category_hierarchy_id'])) {
-                $result['detail'][$key]['product_category'] = $product_category_format[$detail['web_category_hierarchy_id']];
-            }
-
-            if (isset($detail['image_action'])) {
-                switch ($detail['image_action']) {
-                    case 'U':
-                        $result['detail'][$key]['link_content'] = $detail['target_url'];
-                        break;
-
-                    case 'C':
-                        $result['detail'][$key]['link_content'] = $product_category_format[$detail['target_cate_hierarchy_id']];
-                        break;
-                }
-            }
         }
 
-        return response()->json($result);
+        return response()->json($ad_slot_content);
+    }
+
+    public function canPassActiveValidation(Request $request)
+    {
+        $active = $request->input('active');
+        $slot_id = $request->input('slot_id');
+        $start_at = $request->input('start_at');
+        $end_at = $request->input('end_at');
+
+        $result = [];
+
+        if ($active == 0) {
+            return response()->json(['status' => true]);
+        }
+
+        return response()->json(['status' => true]);
     }
 }

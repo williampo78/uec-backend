@@ -90,6 +90,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     // 廣告上架
     Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, ['names' => ['index' => 'advertisemsement_launch']]);
     Route::post('/advertisemsement_launch/ajax/detail', [AdvertisementLaunchController::class, 'getDetailByAjax']);
+    Route::post('/advertisemsement_launch/ajax/canPassActiveValidation', [AdvertisementLaunchController::class, 'canPassActiveValidation']);
 
     Route::resource('/webcontents',WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 });

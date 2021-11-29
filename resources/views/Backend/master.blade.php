@@ -81,7 +81,9 @@
     <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
     <script src="{{ asset('asset/js/select2.min.js') }}"></script>
     <script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>
-    <script src="{{ asset('asset/js/jquery.validate.js') }}"></script>
+    <script src="{{ asset('asset/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('asset/js/additional-methods.min.js') }}"></script>
+    <script src="{{ asset('asset/js/messages_zh_TW.min.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
     <script src="{{ asset('asset/js/clipboard.min.js') }}"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
