@@ -72,7 +72,7 @@
 
                     <!-- Table list -->
                     <div class="panel-body">
-                        <div id="table_list_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
                             <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                                 <thead>
                                     <tr role="row">

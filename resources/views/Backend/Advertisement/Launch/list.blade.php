@@ -33,12 +33,12 @@
                                         <h5>版位</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2-block" name="block" id="block">
+                                        <select class="form-control js-select2-slot-id" name="slot_id" id="slot_id">
                                             <option></option>
                                             @isset($ad_slots)
                                                 @foreach ($ad_slots as $obj)
                                                     <option value='{{ $obj->id }}'
-                                                        {{ isset($query_data['block']) && $obj->id == $query_data['block'] ? 'selected' : '' }}>
+                                                        {{ isset($query_data['slot_id']) && $obj->id == $query_data['slot_id'] ? 'selected' : '' }}>
                                                         【{{ $obj->slot_code }}】{{ $obj->slot_desc }}</option>
                                                 @endforeach
                                             @endisset
@@ -122,7 +122,7 @@
                             @endif
                         </div>
                         <hr />
-                        <div id="table_list_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
                                 id="table_list">
                                 <thead>
@@ -144,7 +144,7 @@
                                                 <td>
                                                     @if ($share_role_auth['auth_query'])
                                                         <button type="button" class="btn btn-info btn-sm slot_content_detail"
-                                                            data-slot-content="{{ $obj->slot_content_id }}">
+                                                            data-slot-content-id="{{ $obj->slot_content_id }}">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     @endif
@@ -196,7 +196,7 @@
 @section('js')
     <script>
         $(function() {
-            $('.js-select2-block').select2({
+            $('.js-select2-slot-id').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: '',
@@ -231,16 +231,14 @@
             });
 
             $('#table_list tbody').on('click', '.slot_content_detail',function() {
-                let slot_content_id = $(this).attr("data-slot-content");
+                let slot_content_id = $(this).attr("data-slot-content-id");
 
                 axios.post('/backend/advertisemsement_launch/ajax/detail', {
                         slot_content_id: slot_content_id
                     })
                     .then(function(response) {
                         let content = response.data.content;
-                        let detail = response.data.detail;
-                        console.log(content);
-                        console.log(detail);
+                        let details = response.data.details;
 
                         $('#modal-slot').empty().append(`【${content.slot_code}】${content.slot_desc}`);
                         $('#modal-start-at-end-at').empty().append(
@@ -258,9 +256,9 @@
                             $('#modal-slot-color-code').empty().append(`<i class="fa fa-times"></i>`);
                         }
 
-                        if (content.slot_icon_name) {
+                        if (content.slot_icon_name_url) {
                             $('#modal-slot-icon-name').empty().append(
-                                `<img src="${content.slot_icon_name}" class="img-responsive" width="400" height="400" />`);
+                                `<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`);
                         } else {
                             $('#modal-slot-icon-name').empty().append(`<i class="fa fa-times"></i>`);
                         }
@@ -271,6 +269,7 @@
                             $('#modal-slot-title').empty().append(`<i class="fa fa-times"></i>`);
                         }
 
+                        // 選擇顯示的區塊
                         switch (content.slot_type) {
                             // 圖檔
                             case 'I':
@@ -312,30 +311,27 @@
                                 break;
                         }
 
-                        $.each(detail, function(key, value) {
+                        $.each(details, function(key, value) {
                             let sort = value.sort ? value.sort : '<i class="fa fa-times"></i>';
-                            let image_name = value.image_name ? `<img src="${value.image_name}" class="img-responsive" width="400" height="400" />` : '<i class="fa fa-times"></i>';
+                            let image_name_url = value.image_name_url ? `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` : '<i class="fa fa-times"></i>';
                             let image_alt = value.image_alt ? value.image_alt : '<i class="fa fa-times"></i>';
                             let image_title = value.image_title ? value.image_title : '<i class="fa fa-times"></i>';
                             let image_abstract = value.image_abstract ? value.image_abstract : '<i class="fa fa-times"></i>';
                             let link_content = '<i class="fa fa-times"></i>';
 
-                            if (value.image_action && value.link_content) {
-                                switch (value.image_action) {
-                                    case 'U':
-                                        link_content = `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
-                                        break;
-
-                                    case 'C':
-                                        link_content = `商品分類: ${value.link_content}`;
-                                        break;
-                                }
+                            switch (value.image_action) {
+                                // URL
+                                case 'U':
+                                    link_content = `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
+                                    break;
+                                // 商品分類
+                                case 'C':
+                                    link_content = `商品分類: ${value.link_content}`;
+                                    break;
                             }
 
                             let is_target_blank = value.is_target_blank == 1 ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
                             let texts = value.texts ? value.texts : '<i class="fa fa-times"></i>';
-                            let product = value.product ? value.product : '<i class="fa fa-times"></i>';
-                            let product_category = value.product_category ? value.product_category : '<i class="fa fa-times"></i>';
 
                             switch (value.data_type) {
                                 case 'IMG':
@@ -345,7 +341,7 @@
                                                 ${sort}
                                             </td>
                                             <td>
-                                                ${image_name}
+                                                ${image_name_url}
                                             </td>
                                             <td>
                                                 ${image_alt}
@@ -384,38 +380,41 @@
                                     `);
                                     break;
                                 case 'PRD':
-                                    if (content.product_assigned_type) {
-                                        switch (content.product_assigned_type) {
-                                            case 'P':
-                                                $('#product-block-tab a[href="#tab-product"]').tab('show').parent().addClass('active').show().siblings().removeClass('active').hide();
+                                    switch (content.product_assigned_type) {
+                                        case 'P':
+                                            $('#product-block-tab a[href="#tab-product"]').tab('show').parent().siblings().hide();
 
+                                            if (value.product) {
                                                 $('#tab-product table > tbody').append(`
                                                     <tr>
                                                         <td>
                                                             ${sort}
                                                         </td>
                                                         <td>
-                                                            ${product}
+                                                            ${value.product}
                                                         </td>
                                                     </tr>
                                                 `);
-                                                break;
+                                            }
 
-                                            case 'C':
-                                                $('#product-block-tab a[href="#tab-category"]').tab('show').parent().addClass('active').show().siblings().removeClass('active').hide();
+                                            break;
 
+                                        case 'C':
+                                            $('#product-block-tab a[href="#tab-category"]').tab('show').parent().siblings().hide();
+
+                                            if (value.product_category) {
                                                 $('#tab-category table > tbody').append(`
                                                     <tr>
                                                         <td>
                                                             ${sort}
                                                         </td>
                                                         <td>
-                                                            ${product_category}
+                                                            ${value.product_category}
                                                         </td>
                                                     </tr>
                                                 `);
-                                                break;
-                                        }
+                                            }
+                                            break;
                                     }
                                     break;
                             }

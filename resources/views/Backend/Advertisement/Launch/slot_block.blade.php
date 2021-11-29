@@ -3,17 +3,17 @@
         <div class="col-sm-3">
             <div class="form-group">
                 <label for="slot">版位</label>
-                <select class="form-control js-select2-slot" name="slot" id="slot">
+                <select class="form-control js-select2-slot-id" name="slot_id" id="slot_id">
                     <option></option>
                 </select>
             </div>
         </div>
 
         <div class="col-sm-6">
-            <div class="form-group">
-                <label>上架時間</label>
-                <div class="row">
-                    <div class="col-sm-5 text-center">
+            <label>上架時間</label>
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="form-group">
                         <div class='input-group date' id='datetimepicker_start_at'>
                             <input type='text' class="form-control datetimepicker-input"
                                 data-target="#datetimepicker_start_at" name="start_at" id="start_at" value=""
@@ -24,10 +24,12 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-sm-1 text-center">
-                        <h5>～</h5>
-                    </div>
-                    <div class="col-sm-5 text-center">
+                </div>
+                <div class="col-sm-1">
+                    <h5>～</h5>
+                </div>
+                <div class="col-sm-5">
+                    <div class="form-group">
                         <div class='input-group date' id='datetimepicker_end_at'>
                             <input type='text' class="form-control datetimepicker-input"
                                 data-target="#datetimepicker_end_at" name="end_at" id="end_at" value=""
