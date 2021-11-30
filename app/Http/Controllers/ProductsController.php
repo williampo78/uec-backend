@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\ProductsService;
 use App\Services\SupplierService ; 
+use App\Services\BrandsService ; 
 use ImageUpload ;
 
 class ProductsController extends Controller
 {
     private $productsService;
     public function __construct(ProductsService $productsService,
-    SupplierService $supplierService)
+    SupplierService $supplierService , 
+    BrandsService $brandsService)
     {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
+        $this->brandsService = $brandsService ; 
     }
     /**
      * Display a listing of the resource.
@@ -41,6 +44,7 @@ class ProductsController extends Controller
     {
         $result = [] ; 
         $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['brands'] = $this->brandsService->getBrands() ;
         return view('Backend.Products.input',$result);
     }
 
@@ -52,6 +56,8 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->input()) ; 
+
         //
     }
 

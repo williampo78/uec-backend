@@ -196,7 +196,9 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <select class="form-control brand_id" name="brand_id" id="brand_id">
-                                        <option value="">無</option>
+                                        @foreach ($brands as $val)
+                                            <option value="{{ $val->id }}">{{ $val->brand_name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -205,7 +207,7 @@
                                     <label class="control-label">商品型號</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="model" value="">
                                 </div>
                             </div>
                         </div>
@@ -216,7 +218,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio4" value="option4"> 宅配
+                                        <input type="radio" name="lgst_method" value="HOME" checked> 宅配
                                     </label>
                                 </div>
                             </div>
@@ -226,7 +228,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio4" value="option4"> 常溫
+                                        <input type="radio" name="lgst_temperature" value="NORMAL" checked> 常溫
                                     </label>
                                 </div>
                             </div>
@@ -237,7 +239,7 @@
                                     <label class="control-label">單位<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="uom">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -245,7 +247,7 @@
                                     <label class="control-label">最小採購量</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="min_purchase_qty" type="number" min="0" value="0">
                                 </div>
                             </div>
                         </div>
@@ -256,17 +258,18 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 無
+                                        <input type="radio" name="has_expiry_date" value="0" checked> 無
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                        <input type="radio" name="has_expiry_date" value="1">
                                         有，天數
                                     </label>
                                 </div>
+                                {{-- 效期控管的天數 --}}
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="expiry_days" value="">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -274,7 +277,8 @@
                                     <label class="control-label">允收期(天)</label>
                                 </div>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input type="number" class="form-control" name="expiry_receiving_days" min="0"
+                                        value="0">
                                 </div>
                             </div>
                         </div>
@@ -285,17 +289,17 @@
                                 </div>
                                 <div class="col-sm-3 ">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 一般品
+                                        <input type="radio" name="product_type" value="N" checked> 一般品
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> 贈品
+                                        <input type="radio" name="product_type" value="G"> 贈品
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3"> 加購品
+                                        <input type="radio" name="product_type" value="A"> 加購品
                                     </label>
                                 </div>
                             </div>
@@ -305,12 +309,12 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 是
+                                        <input type="radio" name="is_discontinued" id="inlineRadio1" value="1"> 是
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3"> 否
+                                        <input type="radio" name="is_discontinued" id="inlineRadio3" value="0" checked> 否
                                     </label>
                                 </div>
                             </div>
@@ -324,19 +328,19 @@
                                     <label class="control-label">長</label>
                                 </div>
                                 <div class="col-sm-2">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="length" type="number" min="0" value="0">
                                 </div>
                                 <div class="col-sm-1">
                                     <label class="control-label">寬</label>
                                 </div>
                                 <div class="col-sm-2 ">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="width" type="number" min="0" value="0">
                                 </div>
                                 <div class="col-sm-1">
                                     <label class="control-label">高</label>
                                 </div>
                                 <div class="col-sm-2">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="height" type="number" min="0" value="0">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -344,7 +348,7 @@
                                     <label class="control-label">重量(公克)<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="weight" type="number" min="0" value="0">
                                 </div>
                             </div>
                         </div>
@@ -354,7 +358,7 @@
                                     <label class="control-label">市價(含稅)<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="list_price" type="number" min="0" value="0">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -362,7 +366,7 @@
                                     <label class="control-label">售價(含稅)<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="selling_price" type="number" min="0" value="0">
                                 </div>
                             </div>
                         </div>
@@ -372,7 +376,7 @@
                                     <label class="control-label">成本(含稅)</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control" name="" value="" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -380,7 +384,7 @@
                                     <label class="control-label">毛利(%)</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control" name="" value="" readonly>
                                 </div>
                             </div>
                         </div>
@@ -451,7 +455,7 @@
                                     <label class="control-label">商品簡述</label>
                                 </div>
                                 <div class="col-sm-10">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="product_brief_1">
                                 </div>
                             </div>
                         </div>
@@ -460,7 +464,7 @@
                                 <div class="col-sm-1 no-pa">
                                 </div>
                                 <div class="col-sm-10">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="product_brief_2">
                                 </div>
                             </div>
                         </div>
@@ -469,7 +473,7 @@
                                 <div class="col-sm-1 no-pa">
                                 </div>
                                 <div class="col-sm-10">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="product_brief_3">
                                 </div>
                             </div>
                         </div>
@@ -480,7 +484,7 @@
                                     <label class="control-label">專利字號</label>
                                 </div>
                                 <div class="col-sm-10">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="patent_no" value="">
                                 </div>
                             </div>
                         </div>
@@ -488,21 +492,21 @@
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <div class="col-sm-1 no-pa">
-                                    <label class="control-label">效期控管<span class="redtext">*</span></label>
+                                    <label class="control-label">保固期限<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-1">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> 無
+                                        <input type="radio" name="is_with_warranty" value="0" checked> 無
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
-                                        <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                        <input type="radio" name="is_with_warranty" value="1">
                                         有保固，天數
                                     </label>
                                 </div>
                                 <div class="col-sm-1 no-pa">
-                                    <input class="form-control" name="keyword" id="keyword" value="">
+                                    <input class="form-control" name="warranty_days">
                                 </div>
                             </div>
                         </div>
@@ -512,9 +516,8 @@
                                 <div class="col-sm-1 no-pa">
                                     <label class="control-label">保固範圍</label>
                                 </div>
-                                {{-- <textarea name="" id="" cols="30" rows="10"></textarea> --}}
                                 <div class="col-sm-11">
-                                    <textarea class="form-control" rows="10" cols="10"></textarea>
+                                    <textarea class="form-control" rows="10" cols="10" name="warranty_scope"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -527,9 +530,12 @@
                                     <div class="col-sm-10">
                                         <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                         <input type="file" @change="fileSelected" multiple>
+                                        <input type="file" :ref="'files'" name="files[]">
+
                                     </div>
                                 </div>
                             </div>
+                            {{-- <textarea name="images" id="" cols="30" rows="10">@{{images}}</textarea> --}}
                             <div class="row form-group">
                                 {{-- <div class="col-sm-12"> --}}
                                 <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
@@ -561,6 +567,7 @@
                         @include('Backend.Products.inputSpec')
                     </div>
                     {{-- 二維多規格結束 --}}
+                    <button class="btn btn-large btn-primary" type="submit">儲存</button>
                 </form>
             </div>
         </div>
@@ -787,15 +794,24 @@
             data: function() {
                 return {
                     images: [],
+                    images_files : [] ,
                 }
             },
             methods: {
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
+                    console.log(this.$refs.files.files.length) ; 
+                    if(this.$refs.files.files.length == 0){
+                        this.$refs.files.files = e.target.files;
+                    }else{
+                        this.$refs.files.files.push(selectedFiles)
+
+                    }
                     for (let i = 0; i < selectedFiles.length; i++) {
                         this.images.push(selectedFiles[i]);
                     }
+                    // this.images_files = e.target.files ;
                     this.adjustTheDisplay();
                     this.images.map(function(value, key) {
                         value.sizeConvert = vm.formatBytes(value.size);
@@ -837,6 +853,7 @@
                 },
                 drop(eve) {
                     let vm = this;
+                    
                     $('.btn-events-none').css('pointer-events', 'auto');
                     eve.target.parentNode.classList.remove('ondragover');
                     var index = eve.dataTransfer.getData("text/index");
@@ -852,7 +869,7 @@
                     for (let i = 0; i < this.images.length; i++) {
                         let reader = new FileReader();
                         reader.onload = (e) => {
-                            this.$refs.image[i].src = reader.result;
+                            this.$refs.image[i].src = reader.result; 
                         };
                         reader.readAsDataURL(this.images[i]);
                     }
@@ -908,6 +925,11 @@
                 placeholder: "請選擇"
             });
             $(".tax_type").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $(".brand_id").select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: "請選擇"
