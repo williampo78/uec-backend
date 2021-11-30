@@ -176,10 +176,10 @@ class APIWebService
         $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price', 'products.list_price')
             ->Join('products', 'member_collections.product_id', '=', 'products.id')
             ->where('member_collections.member_id', '=', $member_id)->get();
-
         foreach ($collects as $collect) {
             $photo = ProductPhotos::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first()->toArray();
-            $discount = ceil(($collect->selling_price / $collect->list_price) * 100);
+            $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));
+            //echo $discount;
             $collection[] = array('product_id' => $collect->id, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'product_discount' => intval($discount), 'product_photo' => $photo['photo_name']);
         }
 
@@ -217,7 +217,7 @@ class APIWebService
                     return '203';
                 }
                 $new_id = MemberCollections::insertGetId($webData);
-            } else if ($act =='upd') {
+            } else if ($act == 'upd') {
                 MemberCollections::where('product_id', $input['product_id'])->where('member_id', $member_id)->update($webData);
                 $new_id = $input['product_id'];
             }
