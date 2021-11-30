@@ -83,7 +83,6 @@ class AdvertisementLaunchController extends Controller
      */
     public function store(Request $request)
     {
-        // return back();
         $input_data = $request->except('_token');
 
         if (! $this->advertisement_service->addSlotContents($input_data)) {
@@ -118,8 +117,6 @@ class AdvertisementLaunchController extends Controller
      */
     public function edit($id)
     {
-        $result = [];
-
         $ad_slot_content = $this->advertisement_service->getSlotContentById($id);
 
         $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? ImageUpload::getImage($ad_slot_content['content']->slot_icon_name) : null;
@@ -139,6 +136,7 @@ class AdvertisementLaunchController extends Controller
             'is_user_defined',
             'product_assigned_type',
             'slot_content_id',
+            'slot_id',
         ]);
 
         foreach ($ad_slot_content['details'] as $key => $obj) {
@@ -286,13 +284,16 @@ class AdvertisementLaunchController extends Controller
         $slot_id = $request->input('slot_id');
         $start_at = $request->input('start_at');
         $end_at = $request->input('end_at');
-
-        $result = [];
+        $slot_content_id = $request->input('slot_content_id');
 
         if ($active == 0) {
             return response()->json(['status' => true]);
         }
 
-        return response()->json(['status' => true]);
+        if ($this->advertisement_service->canSlotContentActive($slot_id, $start_at, $end_at, $slot_content_id)) {
+            return response()->json(['status' => true]);
+        }
+
+        return response()->json(['status' => false]);
     }
 }
