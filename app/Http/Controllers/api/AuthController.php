@@ -273,15 +273,24 @@ class AuthController extends Controller
         $result = json_decode($response, true);
         try {
             if ($result['status'] == '201') {
-                $tmp = Members::where('member_id', '=', $result['data']['id'])->first();
-                if (!is_null($tmp)) {
-                    $token = Auth::guard('api')->fromUser($tmp);
-                    Members::where('id', $tmp['id'])->update(['api_token' => $token]);
-                } else {
-                    $credentials['member_id'] = $result['data']['id'];
-                    $member = Members::create($credentials);
-                    $token = Auth::guard('api')->fromUser($member);
-                    Members::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
+                $login['mobile'] = $data['mobile'];
+                $login['password'] = $data['password'];
+                $fields = json_encode($login);
+                $response = $this->apiService->memberLogin($fields);
+                $login_result = json_decode($response, true);
+                unset($login['mobile']);
+                unset($login['password']);
+                if ($login_result['status'] == '200') {
+                    $tmp = Members::where('member_id', '=', $login_result['data']['id'])->first();
+                    if (!is_null($tmp)) {
+                        $token = Auth::guard('api')->fromUser($tmp);
+                        Members::where('id', $tmp['id'])->update(['api_token' => $token]);
+                    } else {
+                        $login['member_id'] = $login_result['data']['id'];
+                        $member = Members::create($login);
+                        $token = Auth::guard('api')->fromUser($member);
+                        Members::where('member_id', '=', $login_result['data']['id'])->update(['api_token' => $token]);
+                    }
                 }
                 $result['data']['_token'] = $token;
                 return response()->json(['status' => true, 'error_code' => null, 'message' => '新增成功', 'result' => $result['data']]);
@@ -325,8 +334,7 @@ class AuthController extends Controller
                     $token = Auth::guard('api')->fromUser($tmp);
                     Members::where('id', $tmp['id'])->update(['api_token' => $token]);
                 } else {
-                    $credentials['member_id'] = $result['data']['id'];
-                    $member = Members::create($credentials);
+                    $member = Members::create($result['data']['id']);
                     $token = Auth::guard('api')->fromUser($member);
                     Members::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
                 }

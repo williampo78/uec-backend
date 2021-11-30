@@ -24,12 +24,6 @@
             border: 1px solid #ddd;
             padding: 30px;
         }
-
-        #image-block .select2-container,
-        #text-block .select2-container {
-            max-width: 9em !important;
-        }
-
     </style>
 @endsection
 

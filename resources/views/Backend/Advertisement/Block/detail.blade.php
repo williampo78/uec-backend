@@ -12,19 +12,19 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label>適用頁面</label>
-                            <input class="form-control" id="modal_applicable_page" readonly value="">
+                            <p class="form-control-static" id="modal_applicable_page"></p>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label>代碼</label>
-                            <input class="form-control" id="modal_slot_code" readonly value="">
+                            <p class="form-control-static" id="modal_slot_code"></p>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label>名稱</label>
-                            <input class="form-control" id="modal_slot_desc" readonly value="">
+                            <p class="form-control-static" id="modal_slot_desc"></p>
                         </div>
                     </div>
                 </div>
@@ -33,37 +33,19 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label>Mobile適用</label>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <input type="radio" name="modal_is_mobile_applicable" id="modal_is_mobile_applicable_enabled" disabled>
-                                    <label>是</label>
-                                </div>
-                                <div class="col-sm-4">
-                                    <input type="radio"  name="modal_is_mobile_applicable" id="modal_is_mobile_applicable_disabled" disabled>
-                                    <label>否</label>
-                                </div>
-                            </div>
+                            <p class="form-control-static" id="modal_is_mobile_applicable"></p>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label>Desktop適用</label>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <input type="radio" name="modal_is_desktop_applicable" id="modal_is_desktop_applicable_enabled" disabled>
-                                    <label>是</label>
-                                </div>
-                                <div class="col-sm-4">
-                                    <input type="radio" name="modal_is_desktop_applicable" id="modal_is_desktop_applicable_disabled" disabled>
-                                    <label>否</label>
-                                </div>
-                            </div>
+                            <p class="form-control-static" id="modal_is_desktop_applicable"></p>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label>上架類型</label>
-                            <input class="form-control" id="modal_slot_type" readonly value="">
+                            <p class="form-control-static" id="modal_slot_type"></p>
                         </div>
                     </div>
                 </div>
@@ -72,24 +54,17 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label>狀態</label>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <input type="radio" name="modal_active" id="modal_active_enabled" disabled>
-                                    <label>是</label>
-                                </div>
-                                <div class="col-sm-4">
-                                    <input type="radio"  name="modal_active" id="modal_active_disabled" disabled>
-                                    <label>否</label>
-                                </div>
-                            </div>
+                            <p class="form-control-static" id="modal_active"></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-sm-12">
-                        <label>備註</label>
-                        <textarea class="form-control" rows="3" id="modal_remark" readonly></textarea>
+                        <div class="form-group">
+                            <label>備註</label>
+                            <p class="form-control-static" id="modal_remark"></p>
+                        </div>
                     </div>
                 </div>
             </div>

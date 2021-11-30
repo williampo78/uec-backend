@@ -218,29 +218,37 @@ function addImageBlock(product_category_select_options = '', datas = {}) {
                             無連結
                         </label>
                     </div>
-                    <div class="form-inline text-nowrap">
-                        <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-4">
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="image_block_image_action[${image_block_row_no}]" value="U" />
                                     URL
                                 </label>
                             </div>
-                            <input type="text" class="form-control" name="image_block_target_url[${image_block_row_no}]" value="${target_url}" />
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="image_block_target_url[${image_block_row_no}]" value="${target_url}" />
+                            </div>
                         </div>
                     </div>
-                    <div class="form-inline text-nowrap">
-                        <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-4">
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="image_block_image_action[${image_block_row_no}]" value="C" />
                                     商品分類頁
                                 </label>
                             </div>
-                            <select class="form-control js-select2-image-block-product-category" name="image_block_target_cate_hierarchy_id[${image_block_row_no}]">
-                                <option></option>
-                                ${product_category_select_options}
-                            </select>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <select class="form-control js-select2-image-block-product-category" name="image_block_target_cate_hierarchy_id[${image_block_row_no}]">
+                                    <option></option>
+                                    ${product_category_select_options}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -299,29 +307,37 @@ function addTextBlock(product_category_select_options, datas = {}) {
                             無連結
                         </label>
                     </div>
-                    <div class="form-inline text-nowrap">
-                        <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-4">
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="text_block_image_action[${text_block_row_no}]" value="U" />
                                     URL
                                 </label>
                             </div>
-                            <input type="text" class="form-control" name="text_block_target_url[${text_block_row_no}]" value="${target_url}" />
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="text_block_target_url[${text_block_row_no}]" value="${target_url}" />
+                            </div>
                         </div>
                     </div>
-                    <div class="form-inline text-nowrap">
-                        <div class="form-group">
+                    <div class="row">
+                        <div class="col-sm-4">
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="text_block_image_action[${text_block_row_no}]" value="C" />
                                     商品分類頁
                                 </label>
                             </div>
-                            <select class="form-control js-select2-text-block-product-category" name="text_block_target_cate_hierarchy_id[${text_block_row_no}]">
-                                <option></option>
-                                ${product_category_select_options}
-                            </select>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <select class="form-control js-select2-text-block-product-category" name="text_block_target_cate_hierarchy_id[${text_block_row_no}]">
+                                    <option></option>
+                                    ${product_category_select_options}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>

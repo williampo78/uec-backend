@@ -81,23 +81,28 @@ class AdvertisementService
      * 更新廣告版位資料
      *
      * @param array $input_data
-     * @return void
+     * @return boolean
      */
     public function updateSlot($input_data)
     {
         $user_id = Auth::user()->id;
         $now = Carbon::now();
 
+        $update_data = [];
+        $update_data['active'] = $input_data['active'] ?? 1;
+        $update_data['remark'] = $input_data['remark'] ?? '';
+        $update_data['updated_by'] = $user_id;
+        $update_data['updated_at'] = $now;
+
         try {
-            AdSlots::findOrFail($input_data['id'])->update([
-                'active' => $input_data['active'],
-                'remark' => $input_data['remark'],
-                'updated_by' => $user_id,
-                'updated_at' => $now,
-            ]);
+            AdSlots::findOrFail($input_data['id'])->update($update_data);
         } catch (ModelNotFoundException $e) {
             Log::warning($e->getMessage());
+
+            return false;
         }
+
+        return true;
     }
 
     /**

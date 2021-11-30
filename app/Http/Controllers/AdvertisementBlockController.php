@@ -26,18 +26,17 @@ class AdvertisementBlockController extends Controller
      */
     public function index(Request $request)
     {
-        $result = [];
         $query_data = [];
 
-        $query_data['applicable_page'] = $request->query('applicable_page');
-        $query_data['device'] = $request->query('device');
-        $query_data['active'] = $request->query('active');
+        $query_data = $request->only(['applicable_page', 'device', 'active']);
 
-        $result['ad_slots'] = $this->advertisementService->getSlots($query_data);
-        $result['applicable_page'] = $this->lookupValuesVService->getApplicablePage();
-        $result['query_data'] = $query_data;
+        $ad_slots = $this->advertisementService->getSlots($query_data);
+        $applicable_page = $this->lookupValuesVService->getApplicablePage();
 
-        return view('Backend.Advertisement.Block.list', $result);
+        return view(
+            'Backend.Advertisement.Block.list',
+            compact('ad_slots', 'applicable_page', 'query_data')
+        );
     }
 
     /**
@@ -80,11 +79,9 @@ class AdvertisementBlockController extends Controller
      */
     public function edit($id)
     {
-        $result = [];
+        $ad_slot = $this->advertisementService->getSlotById($id);
 
-        $result['ad_slot'] = $this->advertisementService->getSlotById($id);
-
-        return view('Backend.Advertisement.Block.update', $result);
+        return view('Backend.Advertisement.Block.update', compact('ad_slot'));
     }
 
     /**
@@ -99,11 +96,17 @@ class AdvertisementBlockController extends Controller
         $input_data = $request->only(['active', 'remark']);
         $input_data['id'] = $id;
 
-        $this->advertisementService->updateSlot($input_data);
+        if (! $this->advertisementService->updateSlot($input_data)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
 
         $route_name = 'advertisemsement_block';
         $act = 'upd';
-        return view('Backend.success', compact('route_name' , 'act'));
+
+        return view(
+            'Backend.success',
+            compact('route_name' , 'act')
+        );
     }
 
     /**
@@ -122,6 +125,20 @@ class AdvertisementBlockController extends Controller
         $slot_id = $request->input('slot_id');
 
         $ad_slot = $this->advertisementService->getSlotById($slot_id);
+
+        $ad_slot->remark = nl2br($ad_slot->remark);
+
+        // 整理給前端的資料
+        $ad_slot = $ad_slot->only([
+            'active',
+            'description',
+            'is_desktop_applicable',
+            'is_mobile_applicable',
+            'remark',
+            'slot_code',
+            'slot_desc',
+            'slot_type',
+        ]);
 
         return response()->json([
             'ad_slot' => $ad_slot,
