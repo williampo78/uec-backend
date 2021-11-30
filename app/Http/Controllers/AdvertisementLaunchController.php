@@ -34,7 +34,6 @@ class AdvertisementLaunchController extends Controller
     public function index(Request $request)
     {
         $query_data = [];
-        $ad_slots = [];
 
         $query_data = $request->only(['slot_id', 'launch_status', 'start_at', 'end_at']);
 
@@ -278,6 +277,12 @@ class AdvertisementLaunchController extends Controller
         return response()->json($ad_slot_content);
     }
 
+    /**
+     * 是否可以通過廣告上架的狀態驗證
+     *
+     * @param Request $request
+     * @return boolean
+     */
     public function canPassActiveValidation(Request $request)
     {
         $active = $request->input('active');
@@ -287,13 +292,19 @@ class AdvertisementLaunchController extends Controller
         $slot_content_id = $request->input('slot_content_id');
 
         if ($active == 0) {
-            return response()->json(['status' => true]);
+            return response()->json(
+                ['status' => true]
+            );
         }
 
         if ($this->advertisement_service->canSlotContentActive($slot_id, $start_at, $end_at, $slot_content_id)) {
-            return response()->json(['status' => true]);
+            return response()->json(
+                ['status' => true]
+            );
         }
 
-        return response()->json(['status' => false]);
+        return response()->json(
+            ['status' => false]
+        );
     }
 }

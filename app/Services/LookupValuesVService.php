@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use SqlFormatter;
 use App\Models\Lookup_values_v;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class LookupValuesVService
@@ -11,12 +14,12 @@ class LookupValuesVService
     {
         $agent_id = Auth::user()->agent_id;
 
-        return Lookup_values_v::select('code', 'description')
-            ->where([
-                ['agent_id', '=', $agent_id],
-                ['type_code', '=', 'APPLICABLE_PAGE'],
-            ])
+        $result = Lookup_values_v::select('code', 'description')
+            ->where('agent_id', $agent_id)
+            ->where('type_code', 'APPLICABLE_PAGE')
             ->orderBy("code", "asc")
             ->get();
+
+        return $result;
     }
 }

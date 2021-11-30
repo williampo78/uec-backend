@@ -2,6 +2,16 @@
 
 @section('title', '廣告版位管理')
 
+@section('style')
+    <style>
+        .modal-body label,
+        .modal-body th {
+            color: blue;
+        }
+
+    </style>
+@endsection
+
 @section('content')
     <!--新增-->
     <div id="page-wrapper">
@@ -24,10 +34,13 @@
                                         <h5>適用頁面</h5>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2-applicable-page" name="applicable_page" id="applicable_page">
+                                        <select class="form-control js-select2-applicable-page" name="applicable_page"
+                                            id="applicable_page">
                                             <option></option>
                                             @foreach ($applicable_page as $obj)
-                                                <option value='{{ $obj->code }}' {{ isset($query_data['applicable_page']) && $obj->code == $query_data['applicable_page'] ? 'selected' : '' }}>{{ $obj->description }}</option>
+                                                <option value='{{ $obj->code }}'
+                                                    {{ isset($query_data['applicable_page']) && $obj->code == $query_data['applicable_page'] ? 'selected' : '' }}>
+                                                    {{ $obj->description }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -40,8 +53,12 @@
                                     <div class="col-sm-9">
                                         <select class="form-control js-select2-device" name="device" id="device">
                                             <option value=''></option>
-                                            <option value='desktop' {{ isset($query_data['device']) && $query_data['device'] == 'desktop' ? 'selected' : '' }}>Desktop</option>
-                                            <option value='mobile' {{ isset($query_data['device']) && $query_data['device'] == 'mobile' ? 'selected' : '' }}>Mobile</option>
+                                            <option value='desktop'
+                                                {{ isset($query_data['device']) && $query_data['device'] == 'desktop' ? 'selected' : '' }}>
+                                                Desktop</option>
+                                            <option value='mobile'
+                                                {{ isset($query_data['device']) && $query_data['device'] == 'mobile' ? 'selected' : '' }}>
+                                                Mobile</option>
                                         </select>
                                     </div>
                                 </div>
@@ -53,8 +70,12 @@
                                     <div class="col-sm-9">
                                         <select class="form-control js-select2-active" name="active" id="active">
                                             <option value=''></option>
-                                            <option value='enabled' {{ isset($query_data['active']) && $query_data['active'] == 'enabled' ? 'selected' : '' }}>啟用</option>
-                                            <option value='disabled' {{ isset($query_data['active']) && $query_data['active'] == 'disabled' ? 'selected' : '' }}>關閉</option>
+                                            <option value='enabled'
+                                                {{ isset($query_data['active']) && $query_data['active'] == 'enabled' ? 'selected' : '' }}>
+                                                啟用</option>
+                                            <option value='disabled'
+                                                {{ isset($query_data['active']) && $query_data['active'] == 'disabled' ? 'selected' : '' }}>
+                                                關閉</option>
                                         </select>
                                     </div>
                                 </div>
@@ -73,7 +94,8 @@
                     <!-- Table list -->
                     <div class="panel-body">
                         <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-                            <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
+                            <table class="table table-striped table-bordered table-hover" style="width:100%"
+                                id="table_list">
                                 <thead>
                                     <tr role="row">
                                         <th class="col-sm-1 ">功能</th>
@@ -92,13 +114,15 @@
                                         <tr>
                                             <td>
                                                 @if ($share_role_auth['auth_query'])
-                                                    <button type="button" class="btn btn-info btn-sm slot_detail" data-slot="{{ $obj->id }}">
+                                                    <button type="button" class="btn btn-info btn-sm slot_detail"
+                                                        data-slot="{{ $obj->id }}" title="檢視">
                                                         <i class="fa fa-search"></i>
                                                     </button>
                                                 @endif
 
                                                 @if ($share_role_auth['auth_update'])
-                                                    <a class="btn btn-info btn-sm" href="{{ route('advertisemsement_block.edit' , $obj->id) }}">
+                                                    <a class="btn btn-info btn-sm"
+                                                        href="{{ route('advertisemsement_block.edit', $obj->id) }}">
                                                         編輯
                                                     </a>
                                                 @endif
@@ -107,13 +131,17 @@
                                             <td>{{ $obj->slot_code }}</td>
                                             <td>{{ $obj->slot_desc }}</td>
                                             <td>
-                                                @if ($obj->is_mobile_applicable)
-                                                    <i class="fa fa-check"></i>
+                                                @if ($obj->is_mobile_applicable == 1)
+                                                    <i class="fa fa-check fa-lg"></i>
+                                                @else
+                                                    <i class="fa fa-times fa-lg"></i>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($obj->is_desktop_applicable)
-                                                    <i class="fa fa-check"></i>
+                                                @if ($obj->is_desktop_applicable == 1)
+                                                    <i class="fa fa-check fa-lg"></i>
+                                                @else
+                                                    <i class="fa fa-times fa-lg"></i>
                                                 @endif
                                             </td>
                                             <td>
@@ -170,40 +198,46 @@
                 let slot_id = $(this).attr("data-slot");
 
                 axios.post('/backend/advertisemsement_block/ajax/detail', {
-                    slot_id: slot_id
-                })
-                .then(function (response) {
-                    $('#modal_applicable_page').val(response.data.ad_slot.description);
-                    $('#modal_slot_code').val(response.data.ad_slot.slot_code);
-                    $('#modal_slot_desc').val(response.data.ad_slot.slot_desc);
+                        slot_id: slot_id
+                    })
+                    .then(function(response) {
+                        let ad_slot = response.data.ad_slot;
+                        
+                        $('#modal_applicable_page').empty().append(ad_slot.description);
+                        $('#modal_slot_code').empty().append(ad_slot.slot_code);
+                        $('#modal_slot_desc').empty().append(ad_slot.slot_desc);
 
-                    if (response.data.ad_slot.is_mobile_applicable) {
-                        $('#modal_is_mobile_applicable_enabled').prop('checked', true);
-                    } else {
-                        $('#modal_is_mobile_applicable_disabled').prop('checked', true);
-                    }
+                        if (ad_slot.is_mobile_applicable == 1) {
+                            $('#modal_is_mobile_applicable').empty().append(
+                                '<i class="fa fa-check fa-lg"></i>');
+                        } else {
+                            $('#modal_is_mobile_applicable').empty().append(
+                                '<i class="fa fa-times fa-lg"></i>');
+                        }
 
-                    if (response.data.ad_slot.is_desktop_applicable) {
-                        $('#modal_is_desktop_applicable_enabled').prop('checked', true);
-                    } else {
-                        $('#modal_is_desktop_applicable_disabled').prop('checked', true);
-                    }
+                        if (ad_slot.is_desktop_applicable == 1) {
+                            $('#modal_is_desktop_applicable').empty().append(
+                                '<i class="fa fa-check fa-lg"></i>');
+                        } else {
+                            $('#modal_is_desktop_applicable').empty().append(
+                                '<i class="fa fa-times fa-lg"></i>');
+                        }
 
-                    $('#modal_slot_type').val(slot_type_option_json[response.data.ad_slot.slot_type]);
+                        $('#modal_slot_type').empty().append(slot_type_option_json[ad_slot.slot_type]);
 
-                    if (response.data.ad_slot.active) {
-                        $('#modal_active_enabled').prop('checked', true);
-                    } else {
-                        $('#modal_active_disabled').prop('checked', true);
-                    }
+                        if (ad_slot.active == 1) {
+                            $('#modal_active').empty().append('啟用');
+                        } else {
+                            $('#modal_active').empty().append('關閉');
+                        }
 
-                    $('#modal_remark').val(response.data.ad_slot.remark);
+                        $('#modal_remark').empty().append(ad_slot.remark);
 
-                    $('#slot_detail').modal('show');
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                        $('#slot_detail').modal('show');
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
             });
         });
     </script>

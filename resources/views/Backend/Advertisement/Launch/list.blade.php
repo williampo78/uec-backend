@@ -73,7 +73,7 @@
                                             <div class='input-group date' id='datetimepicker_start_at'>
                                                 <input type='text' class="form-control datetimepicker-input"
                                                     data-target="#datetimepicker_start_at" name="start_at" id="start_at"
-                                                    value="{{ $query_data['start_at'] ?? '' }}" />
+                                                    value="{{ $query_data['start_at'] ?? '' }}" autocomplete="off" />
                                                 <span class="input-group-addon" data-target="#datetimepicker_start_at"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -89,7 +89,7 @@
                                             <div class='input-group date' id='datetimepicker_end_at'>
                                                 <input type='text' class="form-control datetimepicker-input"
                                                     data-target="#datetimepicker_end_at" name="end_at" id="end_at"
-                                                    value="{{ $query_data['end_at'] ?? '' }}" />
+                                                    value="{{ $query_data['end_at'] ?? '' }}" autocomplete="off" />
                                                 <span class="input-group-addon" data-target="#datetimepicker_end_at"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -144,7 +144,7 @@
                                                 <td>
                                                     @if ($share_role_auth['auth_query'])
                                                         <button type="button" class="btn btn-info btn-sm slot_content_detail"
-                                                            data-slot-content-id="{{ $obj->slot_content_id }}">
+                                                            data-slot-content-id="{{ $obj->slot_content_id }}" title="檢視">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     @endif
@@ -160,13 +160,17 @@
                                                 <td>{{ $obj->slot_code ?? '' }}</td>
                                                 <td>{{ $obj->slot_desc ?? '' }}</td>
                                                 <td>
-                                                    @if ($obj->is_mobile_applicable)
-                                                        <i class="fa fa-check"></i>
+                                                    @if ($obj->is_mobile_applicable == 1)
+                                                        <i class="fa fa-check fa-lg"></i>
+                                                    @else
+                                                        <i class="fa fa-times fa-lg"></i>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if ($obj->is_desktop_applicable)
-                                                        <i class="fa fa-check"></i>
+                                                    @if ($obj->is_desktop_applicable == 1)
+                                                        <i class="fa fa-check fa-lg"></i>
+                                                    @else
+                                                        <i class="fa fa-times fa-lg"></i>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -253,20 +257,20 @@
                         if (content.slot_color_code) {
                             $('#modal-slot-color-code').empty().append(`${content.slot_color_code}`);
                         } else {
-                            $('#modal-slot-color-code').empty().append(`<i class="fa fa-times"></i>`);
+                            $('#modal-slot-color-code').empty().append(`<i class="fa fa-times fa-lg"></i>`);
                         }
 
                         if (content.slot_icon_name_url) {
                             $('#modal-slot-icon-name').empty().append(
                                 `<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`);
                         } else {
-                            $('#modal-slot-icon-name').empty().append(`<i class="fa fa-times"></i>`);
+                            $('#modal-slot-icon-name').empty().append(`<i class="fa fa-times fa-lg"></i>`);
                         }
 
                         if (content.slot_title) {
                             $('#modal-slot-title').empty().append(`${content.slot_title}`);
                         } else {
-                            $('#modal-slot-title').empty().append(`<i class="fa fa-times"></i>`);
+                            $('#modal-slot-title').empty().append(`<i class="fa fa-times fa-lg"></i>`);
                         }
 
                         // 選擇顯示的區塊
@@ -311,13 +315,22 @@
                                 break;
                         }
 
+                        switch (content.product_assigned_type) {
+                            case 'P':
+                                $('#product-block-tab a[href="#tab-product"]').tab('show').parent().show().siblings().hide();
+                                break;
+                            case 'C':
+                                $('#product-block-tab a[href="#tab-category"]').tab('show').parent().show().siblings().hide();
+                                break;
+                        }
+
                         $.each(details, function(key, value) {
-                            let sort = value.sort ? value.sort : '<i class="fa fa-times"></i>';
-                            let image_name_url = value.image_name_url ? `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` : '<i class="fa fa-times"></i>';
-                            let image_alt = value.image_alt ? value.image_alt : '<i class="fa fa-times"></i>';
-                            let image_title = value.image_title ? value.image_title : '<i class="fa fa-times"></i>';
-                            let image_abstract = value.image_abstract ? value.image_abstract : '<i class="fa fa-times"></i>';
-                            let link_content = '<i class="fa fa-times"></i>';
+                            let sort = value.sort ? value.sort : '<i class="fa fa-times fa-lg"></i>';
+                            let image_name_url = value.image_name_url ? `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` : '<i class="fa fa-times fa-lg"></i>';
+                            let image_alt = value.image_alt ? value.image_alt : '<i class="fa fa-times fa-lg"></i>';
+                            let image_title = value.image_title ? value.image_title : '<i class="fa fa-times fa-lg"></i>';
+                            let image_abstract = value.image_abstract ? value.image_abstract : '<i class="fa fa-times fa-lg"></i>';
+                            let link_content = '<i class="fa fa-times fa-lg"></i>';
 
                             switch (value.image_action) {
                                 // URL
@@ -330,8 +343,8 @@
                                     break;
                             }
 
-                            let is_target_blank = value.is_target_blank == 1 ? '<i class="fa fa-check"></i>' : '<i class="fa fa-times"></i>';
-                            let texts = value.texts ? value.texts : '<i class="fa fa-times"></i>';
+                            let is_target_blank = value.is_target_blank == 1 ? '<i class="fa fa-check fa-lg"></i>' : '<i class="fa fa-times fa-lg"></i>';
+                            let texts = value.texts ? value.texts : '<i class="fa fa-times fa-lg"></i>';
 
                             switch (value.data_type) {
                                 case 'IMG':
@@ -382,8 +395,6 @@
                                 case 'PRD':
                                     switch (content.product_assigned_type) {
                                         case 'P':
-                                            $('#product-block-tab a[href="#tab-product"]').tab('show').parent().siblings().hide();
-
                                             if (value.product) {
                                                 $('#tab-product table > tbody').append(`
                                                     <tr>
@@ -396,12 +407,9 @@
                                                     </tr>
                                                 `);
                                             }
-
                                             break;
 
                                         case 'C':
-                                            $('#product-block-tab a[href="#tab-category"]').tab('show').parent().siblings().hide();
-
                                             if (value.product_category) {
                                                 $('#tab-category table > tbody').append(`
                                                     <tr>

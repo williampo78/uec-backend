@@ -14,21 +14,21 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label>版位</label>
-                                <p id="modal-slot"></p>
+                                <p class="form-control-static" id="modal-slot"></p>
                             </div>
                         </div>
 
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label>上架時間</label>
-                                <p id="modal-start-at-end-at"></p>
+                                <p class="form-control-static" id="modal-start-at-end-at"></p>
                             </div>
                         </div>
 
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label>狀態</label>
-                                <p id="modal-active"></p>
+                                <p class="form-control-static" id="modal-active"></p>
                             </div>
                         </div>
                     </div>
@@ -37,19 +37,19 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label>版位主色</label>
-                                <p id="modal-slot-color-code"></p>
+                                <p class="form-control-static" id="modal-slot-color-code"></p>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label>版位icon</label>
-                                <div id="modal-slot-icon-name"></div>
+                                <div class="form-control-static" id="modal-slot-icon-name"></div>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label>版位標題</label>
-                                <p id="modal-slot-title"></p>
+                                <p class="form-control-static" id="modal-slot-title"></p>
                             </div>
                         </div>
                     </div>
