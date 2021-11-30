@@ -744,4 +744,57 @@ class AdvertisementService
 
         return true;
     }
+
+    /**
+     * 廣告上架的狀態是否可啟用
+     *
+     * @param int $slot_id
+     * @param string $start_at
+     * @param string $end_at
+     * @param string $slot_content_id
+     * @return boolean
+     */
+    public function canSlotContentActive($slot_id, $start_at, $end_at, $slot_content_id = null)
+    {
+        $agent_id = Auth::user()->agent_id;
+
+        try {
+            /*
+             * 查詢上架開始、結束時間，是否在已存在的上下架時間範圍內且狀態為啟用。
+             * 如果要更新廣告上架資料，則需排除要更新的該筆資料檢查。
+             */
+            if (!empty($slot_id) && !empty($start_at) && !empty($end_at)) {
+                $start_at_format = Carbon::parse($start_at)->format('Y-m-d H:i:s');
+                $end_at_format = Carbon::parse($end_at)->format('Y-m-d H:i:s');
+
+                $result = AdSlotContents::where('agent_id', $agent_id)
+                    ->where('slot_id', $slot_id)
+                    ->where('active', 1)
+                    ->where(function ($query) use ($start_at_format, $end_at_format) {
+                        $query->where(function ($query) use ($start_at_format, $end_at_format) {
+                            $query->whereBetween('start_at', [$start_at_format, $end_at_format]);
+                        })
+                            ->orWhere(function ($query) use ($start_at_format, $end_at_format) {
+                                $query->whereBetween('end_at', [$start_at_format, $end_at_format]);
+                            })
+                            ->orWhere(function ($query) use ($start_at_format, $end_at_format) {
+                                $query->where('start_at', '<=', $start_at_format)
+                                    ->where('end_at', '>=', $end_at_format);
+                            });
+                    });
+
+                if (!empty($slot_content_id)) {
+                    $result = $result->where('id', '!=', $slot_content_id);
+                }
+
+                if ($result->count() <= 0) {
+                    return true;
+                }
+            }
+        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+            Log::warning($e->getMessage());
+        }
+
+        return false;
+    }
 }
