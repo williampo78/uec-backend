@@ -156,15 +156,15 @@
                 <td><input class="form-control" v-model="Sku.pos_item_no"></td>
                 <td><input class="form-control" v-model="Sku.safty_qty"></td>
                 <td>
-                    <select class="form-control js-select2" name="active" id="active">
-                        <option value="">是</option>
-                        <option value="">否</option>
+                    <select class="form-control js-select2" v-model="Sku.is_additional_purchase" id="active">
+                        <option value="1">是</option>
+                        <option value="0">否</option>
                     </select>
                 </td>
                 <td>
-                    <select class="form-control js-select2" name="active" id="active">
-                        <option value="">啟用</option>
-                        <option value="">停用</option>
+                    <select class="form-control js-select2" v-model="Sku.status" >
+                        <option value="1">啟用</option>
+                        <option value="0">停用</option>
                     </select>
                 </td>
             </tr>
