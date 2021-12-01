@@ -211,9 +211,17 @@
                     $('#slot_icon_name').prop('disabled', false);
                     $('#slot_title').prop('disabled', false);
 
-                    $('#slot_color_code').prev('label').append(' <span style="color:red;">*</span>');
-                    $('#slot_icon_name').closest('.form-group').find('label').append(' <span style="color:red;">*</span>');
-                    $('#slot_title').prev('label').append(' <span style="color:red;">*</span>');
+                    if ($('#slot_color_code').prev('label').find('span').length < 1) {
+                        $('#slot_color_code').prev('label').append(' <span style="color:red;">*</span>');
+                    }
+
+                    if ($('#slot_icon_name').closest('.form-group').find('label > span').length < 1) {
+                        $('#slot_icon_name').closest('.form-group').find('label').append(' <span style="color:red;">*</span>');
+                    }
+
+                    if ($('#slot_title').prev('label').find('span').length < 1) {
+                        $('#slot_title').prev('label').append(' <span style="color:red;">*</span>');
+                    }
 
                     validateUserDefinedBlock();
                 }
