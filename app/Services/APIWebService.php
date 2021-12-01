@@ -10,7 +10,7 @@ use App\Models\MemberCollections;
 use App\Models\ProductPhotos;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use Batch;
 class APIWebService
 {
 
@@ -225,6 +225,48 @@ class APIWebService
 
             DB::commit();
             if ($new_id > 0) {
+                $result = 'success';
+            } else {
+                $result = 'fail';
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = 'fail';
+        }
+
+        return $result;
+    }
+
+    /**
+     * 批次刪除會員收藏商品
+     * @param
+     * @return string
+     */
+    public function deleteMemberCollections($input)
+    {
+        $member_id = Auth::guard('api')->user()->member_id;
+        $now = Carbon::now();
+        DB::beginTransaction();
+        try {
+            $webData = [];
+            foreach ($input['product_id'] as $key=>$value){
+                $data = MemberCollections::where('product_id', $value)->where('member_id', $member_id)->get()->toArray();
+                $webData[$key] = [
+                    'id'=>$data[0]['id'],
+                    'member_id' => $member_id,
+                    'product_id' => $value,
+                    'status' => -1,
+                    'created_by' => $member_id,
+                    'updated_by' => -1,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+            $collectionInstance = new MemberCollections();
+            $upd = Batch::update($collectionInstance,$webData,'id');
+            DB::commit();
+            if ($upd > 0) {
                 $result = 'success';
             } else {
                 $result = 'fail';

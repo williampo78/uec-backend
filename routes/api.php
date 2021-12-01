@@ -52,6 +52,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
 
     Route::get('/membership/collections', [MemberInfoController::class, 'collections']);
     Route::post('/membership/collections', [MemberInfoController::class, 'createCollections']);
+    Route::post('/membership/collections/batchDelete', [MemberInfoController::class, 'batchDeleteCollections']);
 });
 
 Route::get('area', [DradviceController::class, 'area']);
