@@ -4,12 +4,14 @@ namespace App\Services;
 
 use App\Models\ProductItems;
 use App\Models\Products;
+use App\Models\ProductPhotos;
 use App\Services\UniversalService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use ImageUpload ;
 
 class ProductsService
 {
@@ -100,6 +102,22 @@ class ProductsService
 
                 ];
                 ProductItems::create($skuInsert);
+            }
+            $fileList = [] ;
+            $uploadPath = '/products/' . $products->id ; 
+            foreach($file['filedata'] as $key => $val){
+                $fileList[$key] = ImageUpload::uploadImage($val,$uploadPath) ; 
+            }
+            foreach($fileList as $key => $val) {
+                $insertImg = [
+                    'product_id' =>  $products->id,
+                    'photo_name' =>  $val['image'],
+                    'sort' => $key ,
+                    'created_by' => $user_id,
+                    'updated_by' => $user_id,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
             DB::commit();
             $result = true;
