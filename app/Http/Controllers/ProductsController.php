@@ -63,10 +63,9 @@ class ProductsController extends Controller
     {
         // dump($request->input() , $request->file()) ; 
         $this->productsService->addProducts($request->input(), $request->file()) ;
-        // exit ;
-        // dd($request->input()) ; 
-        // dd($request->file());
-        //
+        $act = 'add';
+        $route_name = 'products';
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**

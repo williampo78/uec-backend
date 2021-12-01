@@ -78,9 +78,8 @@ class ProductsService
                 'agent_id' => $agent_id,
             ];
             $products_id = Products::create($insert)->id;
-            $products = Products::where('id', 1000)->first();
+            $products = Products::findOrFail($products_id);
             foreach ($skuList as $key => $val) {
-                $val['item_no'];
                 $skuInsert = [
                     'agent_id' => $agent_id,
                     'product_id' => $products->id,
@@ -104,11 +103,13 @@ class ProductsService
             }
             DB::commit();
             $result = true;
-        } catch (ModelNotFoundException $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
             $result = false;
         }
+        
+        
         return $result;
     }
 
