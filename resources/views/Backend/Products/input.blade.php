@@ -185,7 +185,11 @@
                                     <label class="control-label">POS分類<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="category_id" id="category_id" value="">
+                                    <select class="form-control category_id" name="category_id">
+                                        @foreach ($pos as $key => $val)
+                                            <option value="{{$val->id}}}"> {{$val->name}}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -530,14 +534,12 @@
                                     <div class="col-sm-10">
                                         <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                         <input type="file" @change="fileSelected" multiple>
-                                        <input type="file" :ref="'files'" name="files[]">
-
+                                        <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
+                                            multiple>
                                     </div>
                                 </div>
                             </div>
-                            {{-- <textarea name="images" id="" cols="30" rows="10">@{{images}}</textarea> --}}
                             <div class="row form-group">
-                                {{-- <div class="col-sm-12"> --}}
                                 <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
                                     <div class="thumbnail" @dragstart="drag" @dragover='dragover'
                                         @dragleave='dragleave' @drop="drop" :data-index="key" :data-type="'image'"
@@ -794,24 +796,15 @@
             data: function() {
                 return {
                     images: [],
-                    images_files : [] ,
                 }
             },
             methods: {
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
-                    console.log(this.$refs.files.files.length) ; 
-                    if(this.$refs.files.files.length == 0){
-                        this.$refs.files.files = e.target.files;
-                    }else{
-                        this.$refs.files.files.push(selectedFiles)
-
-                    }
                     for (let i = 0; i < selectedFiles.length; i++) {
                         this.images.push(selectedFiles[i]);
                     }
-                    // this.images_files = e.target.files ;
                     this.adjustTheDisplay();
                     this.images.map(function(value, key) {
                         value.sizeConvert = vm.formatBytes(value.size);
@@ -853,7 +846,6 @@
                 },
                 drop(eve) {
                     let vm = this;
-                    
                     $('.btn-events-none').css('pointer-events', 'auto');
                     eve.target.parentNode.classList.remove('ondragover');
                     var index = eve.dataTransfer.getData("text/index");
@@ -866,15 +858,18 @@
                     this.adjustTheDisplay();
                 },
                 adjustTheDisplay() {
+                    let list = new DataTransfer();
                     for (let i = 0; i < this.images.length; i++) {
+                        list.items.add(this.images[i]);
                         let reader = new FileReader();
                         reader.onload = (e) => {
-                            this.$refs.image[i].src = reader.result; 
+                            this.$refs.image[i].src = reader.result;
                         };
                         reader.readAsDataURL(this.images[i]);
                     }
-                }
+                    this.$refs.images_files.files = list.files;
 
+                },
             },
             computed: {},
             watch: {},
@@ -930,6 +925,11 @@
                 placeholder: "請選擇"
             });
             $(".brand_id").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $(".category_id").select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: "請選擇"

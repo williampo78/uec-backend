@@ -18,9 +18,10 @@ class UniversalService
     /**
      * 取得單號
      * @param $type '單號類型 , quotation:報價單 , order_supplier:採購單
+     * @param $in 附加資訊 預設是null
      * @return string
      */
-    public function getDocNumber($type){
+    public function getDocNumber($type,$in = null){
         $dt = Carbon::now()->format('ymd');
         switch ($type){
             case 'quotation':
@@ -35,6 +36,11 @@ class UniversalService
                 $table = 'requisitions_purchase' ;
                 $title = 'PR' ;
                 break;
+            case  'products':
+                $stock_type = $in ;                 
+                $title = $stock_type;
+                $table = 'products' ;
+                break;
         }
         $rs = DB::table($table)->orderBy('id','DESC')->first();
 
@@ -43,8 +49,15 @@ class UniversalService
         }else{
             $serial = $rs->id + 1;
         }
-
-        $doc_number = $title . $dt . str_pad($serial,4,"0",STR_PAD_LEFT);;
+        //商品與其他不同
+        switch ($type) {
+            case 'products':
+                $doc_number = $title . str_pad($serial,6,"0",STR_PAD_LEFT);;
+                break;
+            default:
+                $doc_number = $title . $dt . str_pad($serial,4,"0",STR_PAD_LEFT);;
+                break;
+        }
 
         return $doc_number;
     }

@@ -131,7 +131,7 @@
             </div>
         </div>
     </div>
-    {{-- <textarea name="" id="" cols="30" rows="10">@{{ SkuList }}</textarea> --}}
+    <textarea style="display: none" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
     <table class="table table-striped table-bordered table-hover">
         <thead>
             <tr>
