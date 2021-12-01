@@ -175,7 +175,8 @@ class APIWebService
         $member_id = Auth::guard('api')->user()->member_id;
         $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price', 'products.list_price')
             ->Join('products', 'member_collections.product_id', '=', 'products.id')
-            ->where('member_collections.member_id', '=', $member_id)->get();
+            ->where('member_collections.member_id', '=', $member_id)
+            ->where('member_collections.status', '=', 0)->get();
         foreach ($collects as $collect) {
             $photo = ProductPhotos::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first()->toArray();
             $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));

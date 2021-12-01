@@ -191,7 +191,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Advertisement.launch.detail')
+        @include('Backend.Advertisement.Launch.detail')
         <!-- /.modal -->
 
     </div>
