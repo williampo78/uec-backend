@@ -300,8 +300,7 @@
                         }
 
                         if (value.target_cate_hierarchy_id) {
-                            $(`#image-block table > tbody [name="image_block_target_cate_hierarchy_id[${value.id}]"] option[value="${value.target_cate_hierarchy_id}"]`)
-                                .prop('selected', true);
+                            $(`#image-block table > tbody [name="image_block_target_cate_hierarchy_id[${value.id}]"]`).val(value.target_cate_hierarchy_id).trigger('change');
                         }
 
                         if (value.is_target_blank == 1) {
@@ -330,8 +329,7 @@
                         }
 
                         if (value.target_cate_hierarchy_id) {
-                            $(`#text-block table > tbody [name="text_block_target_cate_hierarchy_id[${value.id}]"] option[value="${value.target_cate_hierarchy_id}"]`)
-                                .prop('selected', true);
+                            $(`#text-block table > tbody [name="text_block_target_cate_hierarchy_id[${value.id}]"]`).val(value.target_cate_hierarchy_id).trigger('change');
                         }
 
                         if (value.is_target_blank == 1) {
@@ -343,15 +341,13 @@
                         if (value.product_id) {
                             addProductBlockProduct(product_select_options, value);
 
-                            $(`#tab-product table > tbody [name="product_block_product_product_id[${value.id}]"] option[value="${value.product_id}"]`)
-                                .prop('selected', true);
+                            $(`#tab-product table > tbody [name="product_block_product_product_id[${value.id}]"]`).val(value.product_id).trigger('change');
                         }
 
                         if (value.web_category_hierarchy_id) {
                             addProductBlockCategory(product_category_select_options, value);
 
-                            $(`#tab-category table > tbody [name="product_block_product_web_category_hierarchy_id[${value.id}]"] option[value="${value.web_category_hierarchy_id}"]`)
-                                .prop('selected', true);
+                            $(`#tab-category table > tbody [name="product_block_product_web_category_hierarchy_id[${value.id}]"]`).val(value.web_category_hierarchy_id).trigger('change');
                         }
                         break;
                 }

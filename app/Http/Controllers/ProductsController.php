@@ -5,16 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\ProductsService;
 use App\Services\SupplierService ; 
+use App\Services\BrandsService ; 
+use App\Services\WebCategoryHierarchyService ; 
 use ImageUpload ;
 
 class ProductsController extends Controller
 {
     private $productsService;
     public function __construct(ProductsService $productsService,
-    SupplierService $supplierService)
+    SupplierService $supplierService , 
+    BrandsService $brandsService,
+    WebCategoryHierarchyService $webCategoryHierarchyService)
     {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
+        $this->brandsService = $brandsService ; 
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService ; 
     }
     /**
      * Display a listing of the resource.
@@ -41,6 +47,9 @@ class ProductsController extends Controller
     {
         $result = [] ; 
         $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['brands'] = $this->brandsService->getBrands() ;
+        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();
+        // dd($result) ; 
         return view('Backend.Products.input',$result);
     }
 
@@ -52,6 +61,11 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
+        // dump($request->input() , $request->file()) ; 
+        $this->productsService->addProducts($request->input(), $request->file()) ;
+        // exit ;
+        // dd($request->input()) ; 
+        // dd($request->file());
         //
     }
 
