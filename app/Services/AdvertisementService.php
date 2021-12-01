@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Storage;
 
 class AdvertisementService
 {
+    private const SLOT_CONTENTS_UPLOAD_PATH_PREFIX = 'advertisement/launch/';
+
     /**
      * 取得廣告版位全部資料
      *
@@ -265,7 +267,6 @@ class AdvertisementService
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         $slot = $this->getSlotById($input_data['slot_id']);
-        $upload_path = "advertisement/{$slot->id}";
 
         DB::beginTransaction();
 
@@ -289,15 +290,9 @@ class AdvertisementService
                 $content_data['end_at'] = $end_at;
             }
 
-            // 使用者自定義版位，可自訂主色、icon、標題
+            // 使用者自定義版位，新增主色、標題
             if ($slot['is_user_defined'] == 1) {
                 $content_data['slot_color_code'] = $input_data['slot_color_code'] ?? null;
-
-                // 上傳圖片
-                if (isset($input_data['slot_icon_name'])) {
-                    $content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly($upload_path, 's3');
-                }
-
                 $content_data['slot_title'] = $input_data['slot_title'] ?? null;
             }
 
@@ -306,6 +301,18 @@ class AdvertisementService
             }
 
             $slot_contents_id = AdSlotContents::insertGetId($content_data);
+
+            // 使用者自定義版位，新增icon
+            if ($slot['is_user_defined'] == 1) {
+                $update_content_data = [];
+
+                // 上傳圖片
+                if (isset($input_data['slot_icon_name'])) {
+                    $update_content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id, 's3');
+                }
+
+                AdSlotContents::findOrFail($slot_contents_id)->update($update_content_data);
+            }
 
             // 新增圖檔資料 (圖檔 or 圖檔+商品)
             if ($slot['slot_type'] == 'I' || $slot['slot_type'] == 'IS') {
@@ -329,7 +336,7 @@ class AdvertisementService
 
                         // 上傳圖片
                         if (isset($input_data['image_block_image_name'][$key])) {
-                            $detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly($upload_path, 's3');
+                            $detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id, 's3');
                         }
 
                         AdSlotContentDetails::insert($detail_data);
@@ -424,7 +431,6 @@ class AdvertisementService
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         $slot_content = $this->getSlotContentById($input_data['slot_content_id']);
-        $upload_path = "advertisement/{$slot_content['content']->slot_id}";
 
         DB::beginTransaction();
 
@@ -454,7 +460,7 @@ class AdvertisementService
                 }
 
                 // 上傳新圖片
-                $update_content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly($upload_path, 's3');
+                $update_content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
             }
 
             AdSlotContents::findOrFail($slot_content['content']->slot_content_id)->update($update_content_data);
@@ -519,7 +525,7 @@ class AdvertisementService
                         ];
 
                         if (isset($input_data['image_block_image_name'][$key])) {
-                            $create_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly($upload_path, 's3');
+                            $create_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
                         }
 
                         AdSlotContentDetails::insert($create_detail_data);
@@ -549,7 +555,7 @@ class AdvertisementService
                             }
 
                             // 上傳圖片
-                            $update_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly($upload_path, 's3');
+                            $update_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
                         }
 
                         AdSlotContentDetails::findOrFail($key)->update($update_detail_data);

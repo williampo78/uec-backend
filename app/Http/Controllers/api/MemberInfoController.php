@@ -388,5 +388,42 @@ class MemberInfoController extends Controller
 
     }
 
+    /*
+     * 批次刪除會員商品收藏資料 (商品編號)
+     * @param  array(1,2,3)
+     */
+    public function batchDeleteCollections(Request $request)
+    {
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $messages = [
+            'product_id.required' => '商品編號不能為空'
+        ];
+
+        $v = Validator::make($request->all(), [
+            'product_id' => 'required'
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+
+        $response = $this->apiWebService->deleteMemberCollections($request);
+        if ($response == 'success') {
+            $status = true;
+            $data = '移除收藏成功';
+        } elseif ($response == '203') {
+            $status = false;
+            $err = $response;
+            $data = '';
+        } else {
+            $status = false;
+            $err = '401';
+            $data = '';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
+
+    }
+
 }
 
