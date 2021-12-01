@@ -37,7 +37,7 @@
                                         value="{{ isset($Supplier) ? $Supplier->id : '' }}">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_supplier_type">
-                                            <label for="supplier_type">供應商類別</label>
+                                            <label for="supplier_type">供應商類別 <span style="color:red;">*</span></label>
                                             <select class="form-control js-select2" name="supplier_type_id" id="">
                                                 @foreach ($SupplierType as $obj)
                                                     <option value='{{ $obj->id }}'
@@ -74,7 +74,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_name">
-                                            <label for="name">完整名稱</label>
+                                            <label for="name">完整名稱 <span style="color:red;">*</span></label>
                                             <input class="form-control" name="name" id="name"
                                                 value="{{ old('name') ?? (isset($Supplier) ? $Supplier->name : '') }}">
                                         </div>
@@ -360,7 +360,7 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button class="btn btn-success" type="button" @click="submitBtn"><i class="fa fa-check"></i> 完成</button>
+                                                <button class="btn btn-success" type="button" @click="submitBtn" id="btn-finish"><i class="fa fa-check"></i> 完成</button>
                                                 <a href="{{ route('supplier') }}" class="btn btn-danger"
                                                     id="btn-cancel"><i class="fa fa-ban"></i> 取消</a>
                                             </div>
@@ -403,7 +403,7 @@
                     var checkDel = confirm('你確定要刪除嗎？');
                     if (checkDel) {
                         this.$delete(this.contactData, key)
-                        if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
+                        if (id !== '') { //如果ID 不等於空 就 AJAX DEL
                             $.ajax({
                                 type: "POST",
                                 url: '/backend/contact/ajax/del',
@@ -432,6 +432,58 @@
         })
 
         new contact().$mount('#contact_table')
+
+        $('.js-select2').select2({
+            allowClear: true,
+            theme: "bootstrap",
+            placeholder: '',
+        });
+
+        // 驗證表單
+        $("#formData").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    $('#btn-finish').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    supplier_type_id: {
+                        required: true,
+                    },
+                    name: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    supplier_type_id: {
+                        required: "請選擇類型",
+                    },
+                    name: {
+                        required: "請填寫名稱",
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.closest(".form-group").length) {
+                        element.closest(".form-group").append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
     </script>
 @endsection
 @endsection

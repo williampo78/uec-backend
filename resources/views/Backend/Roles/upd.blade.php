@@ -19,8 +19,8 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form id="new-form" method="post" action="{{ route('roles.update' , $data['role']->id) }}"
-                              enctype="multipart/form-data">
+                        <form id="update-form" method="post" action="{{ route('roles.update', $data['role']->id) }}"
+                            enctype="multipart/form-data">
                             {{ method_field('PUT') }}
                             {{ csrf_field() }}
                             <div class="row">
@@ -32,8 +32,8 @@
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_name">
                                                 <label for="name">名稱 <span class="text-danger">*</span></label>
-                                                <input class="form-control validate[required]" name="role_name"
-                                                       id="role_name" value="{{$data['role']->role_name}}">
+                                                <input class="form-control" name="role_name" id="role_name"
+                                                    value="{{ $data['role']->role_name }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -41,18 +41,18 @@
                                                 <label for="name">狀態 <span class="text-danger">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-2">
-                                                        <input type="radio"
-                                                               name="active" id="active1"
-                                                               {{($data['role']->active==1?'checked':'')}}
-                                                               value="1">
-                                                        <label for="active1">啟用</label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="active" id="active1"
+                                                                {{ $data['role']->active == 1 ? 'checked' : '' }}
+                                                                value="1">啟用
+                                                        </label>
                                                     </div>
                                                     <div class="col-sm-2">
-                                                        <input type="radio"
-                                                               name="active" id="active0"
-                                                               {{($data['role']->active==0?'checked':'')}}
-                                                               value="0">
-                                                        <label for="active0">關閉</label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="active" id="active0"
+                                                                {{ $data['role']->active == 0 ? 'checked' : '' }}
+                                                                value="0">關閉
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -62,31 +62,32 @@
                                                 <label for="name">供應商專用 <span class="text-danger">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-2">
-                                                        <input type="radio"
-                                                               name="is_for_supplier" id="is_for_supplier1"
-                                                               {{($data['role']->is_for_supplier1==1?'checked':'')}}
-                                                               value="1">
-                                                        <label for="is_for_supplier1">是</label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="is_for_supplier" id="is_for_supplier1"
+                                                                {{ $data['role']->is_for_supplier1 == 1 ? 'checked' : '' }}
+                                                                value="1">是
+                                                        </label>
                                                     </div>
                                                     <div class="col-sm-2">
-                                                        <input type="radio"
-                                                               name="is_for_supplier" id="is_for_supplier0"
-                                                               {{($data['role']->is_for_supplier1==0?'checked':'')}}
-                                                               value="0">
-                                                        <label for="is_for_supplier0">否</label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="is_for_supplier" id="is_for_supplier0"
+                                                                {{ $data['role']->is_for_supplier1 == 0 ? 'checked' : '' }}
+                                                                value="0">否
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        @foreach($data['permission'] as $main)
+                                        @foreach ($data['permission'] as $main)
                                             <div class="col-sm-12">
                                                 <div class="panel panel-info">
                                                     <div class="panel-heading">
                                                         <div class="row">
                                                             <div class="col-sm-4">
-                                                                <i class="fa {{$main['icon']}} fa-fw"></i> {{$main['name']}}
+                                                                <i class="fa {{ $main['icon'] }} fa-fw"></i>
+                                                                {{ $main['name'] }}
                                                             </div>
                                                             <div class="col-sm-8">
                                                                 操作項目
@@ -94,89 +95,82 @@
                                                         </div>
                                                     </div>
                                                     <div class="panel-body">
-                                                        @if(isset($data['permissionDetail'][$main['id']]['id']))
-                                                            @foreach($data['permissionDetail'][$main['id']]['id'] as $k=>$sub)
+                                                        @if (isset($data['permissionDetail'][$main['id']]['id']))
+                                                            @foreach ($data['permissionDetail'][$main['id']]['id'] as $k => $sub)
                                                                 <div class="row">
                                                                     <div class="col-sm-3">
-                                                                        <input type="checkbox"
-                                                                               id="auth_index_{{$sub}}"
-                                                                               {{(isset($data['rolePermission'][$sub])?'checked':'')}}
-                                                                               name="auth_index[]" value="{{$sub}}">
-                                                                        <label
-                                                                            for="auth_index_{{$sub}}"><i
-                                                                                class="fa {{$data['permissionDetail'][$main['id']]['icon'][$k]}} fa-fw"></i> {{$data['permissionDetail'][$main['id']]['name'][$k]}}
+                                                                        <label class="checkbox-inline">
+                                                                            <input type="checkbox"
+                                                                                id="auth_index_{{ $sub }}"
+                                                                                {{ isset($data['rolePermission'][$sub]) ? 'checked' : '' }}
+                                                                                name="auth_index[]"
+                                                                                value="{{ $sub }}"><i
+                                                                                class="fa {{ $data['permissionDetail'][$main['id']]['icon'][$k] }} fa-fw"></i>
+                                                                            {{ $data['permissionDetail'][$main['id']]['name'][$k] }}
                                                                         </label>
-
                                                                     </div>
                                                                     <div class="col-sm-9">
                                                                         <div class="row">
                                                                             <div class="col-sm-12">
                                                                                 <div class="col-sm-2">
-
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        id="auth_query_{{$sub}}"
-                                                                                        {{(isset($data['rolePermission'][$sub]['auth_query']) && $data['rolePermission'][$sub]['auth_query'] ==1?'checked':'')}}
-                                                                                        name="auth_query_{{$sub}}"
-                                                                                        value="1">
-                                                                                    <label
-                                                                                        for="auth_query_{{$sub}}">查詢</label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input type="checkbox"
+                                                                                            id="auth_query_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_query']) && $data['rolePermission'][$sub]['auth_query'] == 1 ? 'checked' : '' }}
+                                                                                            name="auth_query_{{ $sub }}"
+                                                                                            value="1">查詢
+                                                                                    </label>
                                                                                 </div>
                                                                                 <div class="col-sm-2">
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        id="auth_create_{{$sub}}"
-                                                                                        {{(isset($data['rolePermission'][$sub]['auth_create']) && $data['rolePermission'][$sub]['auth_create'] ==1?'checked':'')}}
-                                                                                        name="auth_create_{{$sub}}"
-                                                                                        value="1">
-                                                                                    <label
-                                                                                        for="auth_create_{{$sub}}">新增</label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input type="checkbox"
+                                                                                            id="auth_create_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_create']) && $data['rolePermission'][$sub]['auth_create'] == 1 ? 'checked' : '' }}
+                                                                                            name="auth_create_{{ $sub }}"
+                                                                                            value="1">新增
+                                                                                    </label>
                                                                                 </div>
                                                                                 <div class="col-sm-2">
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        id="auth_update_{{$sub}}"
-                                                                                        {{(isset($data['rolePermission'][$sub]['auth_update']) && $data['rolePermission'][$sub]['auth_update'] ==1?'checked':'')}}
-                                                                                        name="auth_update_{{$sub}}"
-                                                                                        value="1">
-                                                                                    <label
-                                                                                        for="auth_update_{{$sub}}">修改</label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input type="checkbox"
+                                                                                            id="auth_update_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_update']) && $data['rolePermission'][$sub]['auth_update'] == 1 ? 'checked' : '' }}
+                                                                                            name="auth_update_{{ $sub }}"
+                                                                                            value="1">修改
+                                                                                    </label>
                                                                                 </div>
                                                                                 <div class="col-sm-2">
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        id="auth_delete_{{$sub}}"
-                                                                                        {{(isset($data['rolePermission'][$sub]['auth_delete']) && $data['rolePermission'][$sub]['auth_delete'] ==1?'checked':'')}}
-                                                                                        name="auth_delete_{{$sub}}"
-                                                                                        value="1">
-                                                                                    <label
-                                                                                        for="auth_delete_{{$sub}}">刪除</label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input type="checkbox"
+                                                                                            id="auth_delete_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_delete']) && $data['rolePermission'][$sub]['auth_delete'] == 1 ? 'checked' : '' }}
+                                                                                            name="auth_delete_{{ $sub }}"
+                                                                                            value="1">刪除
+                                                                                    </label>
                                                                                 </div>
                                                                                 <div class="col-sm-2">
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        id="auth_void_{{$sub}}"
-                                                                                        {{(isset($data['rolePermission'][$sub]['auth_void']) && $data['rolePermission'][$sub]['auth_void'] ==1?'checked':'')}}
-                                                                                        name="auth_void_{{$sub}}"
-                                                                                        value="1">
-                                                                                    <label
-                                                                                        for="auth_void_{{$sub}}">作廢</label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input type="checkbox"
+                                                                                            id="auth_void_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_void']) && $data['rolePermission'][$sub]['auth_void'] == 1 ? 'checked' : '' }}
+                                                                                            name="auth_void_{{ $sub }}"
+                                                                                            value="1">作廢
+                                                                                    </label>
                                                                                 </div>
                                                                                 <div class="col-sm-2">
-                                                                                    <input
-                                                                                        type="checkbox"
-                                                                                        id="auth_export_{{$sub}}"
-                                                                                        {{(isset($data['rolePermission'][$sub]['auth_export']) && $data['rolePermission'][$sub]['auth_export'] ==1?'checked':'')}}
-                                                                                        name="auth_export_{{$sub}}"
-                                                                                        value="1">
-                                                                                    <label
-                                                                                        for="auth_export_{{$sub}}">批次匯出</label>
+                                                                                    <label class="checkbox-inline">
+                                                                                        <input type="checkbox"
+                                                                                            id="auth_export_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_export']) && $data['rolePermission'][$sub]['auth_export'] == 1 ? 'checked' : '' }}
+                                                                                            name="auth_export_{{ $sub }}"
+                                                                                            value="1">批次匯出
+                                                                                    </label>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <hr style="margin-top:3px;"/>
+                                                                <hr style="margin-top:3px;" />
                                                             @endforeach
                                                         @endif
                                                     </div>
@@ -210,13 +204,54 @@
 
 @section('js')
     <script>
-        $(function () {
-            $("#new-form").validationEngine();
-            $("#btn-save").click(function () {
-                $("#new-form").submit();
+        $(function() {
+            $("#btn-save").click(function() {
+                $("#update-form").submit();
             });
-            $("#btn-cancel").click(function () {
-                window.location.href = '{{route("roles")}}';
+
+            $("#btn-cancel").click(function() {
+                window.location.href = '{{ route('roles') }}';
+            });
+
+            // 驗證表單
+            $("#update-form").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    $('#btn-save').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    role_name: {
+                        required: true,
+                    },
+                    active: {
+                        required: true,
+                    },
+                    is_for_supplier: {
+                        required: true,
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.closest(".form-group").length) {
+                        element.closest(".form-group").append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
             });
         })
     </script>

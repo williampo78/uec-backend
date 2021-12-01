@@ -99,11 +99,3 @@ span .errorMsg {
     width: 25px;
     height: 25px
 }
-
-.fa.fa-check {
-    color: green;
-}
-
-.fa.fa-times {
-    color: red;
-}
