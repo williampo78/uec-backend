@@ -18,6 +18,7 @@ class APIIndexServices
 
     public function getIndex()
     {
+        $s3 = config('filesystems.disks.s3.url');
         $products = $this->apiProductService->getProducts();
         $categoryProducts = $this->apiProductService->getWebCategoryProducts();
         $strSQL = "select ad1.`slot_code`, ad1.`slot_desc`, ad1.`slot_type`, ad1.`is_mobile_applicable`, ad1.`is_desktop_applicable`
@@ -35,19 +36,18 @@ class APIIndexServices
         $img_H080B = [];
         $prd_H080A = [];
         $prd_H080B = [];
-        $prod = [];
         foreach ($ads as $ad_slot) {
             if ($ad_slot->slot_type == 'T') {
-                 $data[$ad_slot->slot_code][] = array(
-                     'name' => $ad_slot->texts,
-                     'url' => $ad_slot->target_url,
-                     'target_blank' => $ad_slot->is_target_blank,
-                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                     'desktop_applicable' => $ad_slot->is_desktop_applicable
-                 );
+                $data[$ad_slot->slot_code][] = array(
+                    'name' => $ad_slot->texts,
+                    'url' => $ad_slot->target_url,
+                    'target_blank' => $ad_slot->is_target_blank,
+                    'mobile_applicable' => $ad_slot->is_mobile_applicable,
+                    'desktop_applicable' => $ad_slot->is_desktop_applicable
+                );
             } elseif ($ad_slot->slot_type == 'I') {
                 $data[$ad_slot->slot_code][] = array(
-                    'img_path' => $ad_slot->image_name,
+                    'img_path' => ($ad_slot->image_name?$s3.$ad_slot->image_name:null),
                     'img_alt' => $ad_slot->image_alt,
                     'img_title' => $ad_slot->image_title,
                     'img_abstract' => $ad_slot->image_abstract,
@@ -68,17 +68,17 @@ class APIIndexServices
                             'prod_name' => $product->product_name,
                             'prod_unit' => $product->uom,
                             'prod_price' => $product->selling_price,
-                            'prod_photo_path' => $product->displayPhoto,
+                            'prod_photo_path' => ($product->displayPhoto?$s3.$product->displayPhoto:null),
                         );
                     }
 
                     $data[$ad_slot->slot_code][] = array(
                         'slot_color_code' => $ad_slot->slot_color_code,
-                        'slot_icon_name' => $ad_slot->slot_icon_name,
+                        'slot_icon_name' => ($ad_slot->slot_icon_name?$s3.$ad_slot->slot_icon_name:null),
                         'slot_title' => $ad_slot->slot_title,
                         'mobile_applicable' => $ad_slot->is_mobile_applicable,
                         'desktop_applicable' => $ad_slot->is_desktop_applicable,
-                        'products'=>$product_info
+                        'products' => $product_info
                     );
                 }
             } elseif ($ad_slot->slot_type == '4') {
@@ -88,26 +88,26 @@ class APIIndexServices
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
                         'prod_unit' => $products[$ad_slot->product_id]->uom,
                         'prod_price' => $products[$ad_slot->product_id]->selling_price,
-                        'prod_photo_path' => $products[$ad_slot->product_id]->displayPhoto,
+                        'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto?$s3.$products[$ad_slot->product_id]->displayPhoto:null),
                         'mobile_applicable' => $ad_slot->is_mobile_applicable,
                         'desktop_applicable' => $ad_slot->is_desktop_applicable
                     );
                 }
             } elseif ($ad_slot->slot_type == '5') {
-                if ($ad_slot->data_type=='PRD' && isset($products[$ad_slot->product_id])){
-                    $prd_H080A[] =  array(
+                if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
+                    $prd_H080A[] = array(
                         'prod_id' => $products[$ad_slot->product_id]->product_no,
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
                         'prod_unit' => $products[$ad_slot->product_id]->uom,
                         'prod_price' => $products[$ad_slot->product_id]->selling_price,
-                        'prod_photo_path' => $products[$ad_slot->product_id]->displayPhoto,
+                        'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto?$s3.$products[$ad_slot->product_id]->displayPhoto:null),
                         'mobile_applicable' => $ad_slot->is_mobile_applicable,
                         'desktop_applicable' => $ad_slot->is_desktop_applicable
                     );
                 }
-                if ($ad_slot->data_type=='IMG'){
+                if ($ad_slot->data_type == 'IMG') {
                     $img_H080A[] = array(
-                        'img_path' => $ad_slot->image_name,
+                        'img_path' => ($ad_slot->image_name?$s3.$ad_slot->image_name:null),
                         'img_alt' => $ad_slot->image_alt,
                         'img_title' => $ad_slot->image_title,
                         'img_abstract' => $ad_slot->image_abstract,
@@ -121,20 +121,20 @@ class APIIndexServices
                     );
                 }
             } elseif ($ad_slot->slot_type == 'IS') {
-                if ($ad_slot->data_type=='PRD' && isset($products[$ad_slot->product_id])){
-                    $prd_H080B[] =  array(
+                if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
+                    $prd_H080B[] = array(
                         'prod_id' => $products[$ad_slot->product_id]->product_no,
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
                         'prod_unit' => $products[$ad_slot->product_id]->uom,
                         'prod_price' => $products[$ad_slot->product_id]->selling_price,
-                        'prod_photo_path' => $products[$ad_slot->product_id]->displayPhoto,
+                        'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto?$s3.$products[$ad_slot->product_id]->displayPhoto:null),
                         'mobile_applicable' => $ad_slot->is_mobile_applicable,
                         'desktop_applicable' => $ad_slot->is_desktop_applicable
                     );
                 }
-                if ($ad_slot->data_type=='IMG'){
+                if ($ad_slot->data_type == 'IMG') {
                     $img_H080B[] = array(
-                        'img_path' => $ad_slot->image_name,
+                        'img_path' => ($ad_slot->image_name?$s3.$ad_slot->image_name:null),
                         'img_alt' => $ad_slot->image_alt,
                         'img_title' => $ad_slot->image_title,
                         'img_abstract' => $ad_slot->image_abstract,
@@ -150,14 +150,22 @@ class APIIndexServices
             }
         }
 
-        $data['H080A'][] = array(
-            'images'=>$img_H080A,
-            'products'=>$prd_H080A
-        );
-        $data['H080B'][] = array(
-            'images'=>$img_H080B,
-            'products'=>$prd_H080B
-        );
+        if (!$img_H080A && !$prd_H080A) {
+            unset($data['H080A']);
+        } else {
+            $data['H080A'][] = array(
+                'images' => $img_H080A,
+                'products' => $prd_H080A
+            );
+        }
+        if (!$img_H080B && !$prd_H080B) {
+            unset($data['H080B']);
+        } else {
+            $data['H080B'][] = array(
+                'images' => $img_H080B,
+                'products' => $prd_H080B
+            );
+        }
         return $data;
     }
 

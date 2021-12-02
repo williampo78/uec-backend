@@ -4,7 +4,10 @@
 namespace App\Services;
 
 use App\Services\WebCategoryHierarchyService;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class APIProductServices
 {
@@ -71,34 +74,38 @@ class APIProductServices
 
         }
         $data = [];
-        foreach ($L1_data as $key1 => $value1) {
-            $data2 = [];
-            $data[$key1]["id"] = $value1["id"];
-            $data[$key1]["name"] = $value1["name"];
-            foreach ($L2_data[$key1] as $key2 => $value2) {
-                $data2[$key2]["id"] = $value2["id"];
-                $data2[$key2]["name"] = $value2["name"];
-                if ($config_levels == 3) {
-                    $data3 = [];
-                    foreach ($L3_data[$key1][$key2] as $key3 => $value3) {
-                        $data3[$key3]["id"] = $value3["id"];
-                        $data3[$key3]["name"] = $value3["name"];
-                        $data3[$key3]["type"] = $value3["type"];
-                        $data3[$key3]["meta_title"] = $value3["meta_title"];
-                        $data3[$key3]["meta_description"] = $value3["meta_description"];
-                        $data3[$key3]["meta_keywords"] = $value3["meta_keywords"];
+        if (!isset($L1_data)) {
+            return 404;
+        } else {
+            foreach ($L1_data as $key1 => $value1) {
+                $data2 = [];
+                $data[$key1]["id"] = $value1["id"];
+                $data[$key1]["name"] = $value1["name"];
+                foreach ($L2_data[$key1] as $key2 => $value2) {
+                    $data2[$key2]["id"] = $value2["id"];
+                    $data2[$key2]["name"] = $value2["name"];
+                    if ($config_levels == 3) {
+                        $data3 = [];
+                        foreach ($L3_data[$key1][$key2] as $key3 => $value3) {
+                            $data3[$key3]["id"] = $value3["id"];
+                            $data3[$key3]["name"] = $value3["name"];
+                            $data3[$key3]["type"] = $value3["type"];
+                            $data3[$key3]["meta_title"] = $value3["meta_title"];
+                            $data3[$key3]["meta_description"] = $value3["meta_description"];
+                            $data3[$key3]["meta_keywords"] = $value3["meta_keywords"];
+                        }
+                        $data2[$key2]["cateInfo"] = $data3;
+                    } elseif ($config_levels == 2) {
+                        $data2[$key2]["type"] = $value2["type"];
+                        $data2[$key2]["meta_title"] = $value2["meta_title"];
+                        $data2[$key2]["meta_description"] = $value2["meta_description"];
+                        $data2[$key2]["meta_keywords"] = $value2["meta_keywords"];
                     }
-                    $data2[$key2]["cateInfo"] = $data3;
-                } elseif ($config_levels == 2) {
-                    $data2[$key2]["type"] = $value2["type"];
-                    $data2[$key2]["meta_title"] = $value2["meta_title"];
-                    $data2[$key2]["meta_description"] = $value2["meta_description"];
-                    $data2[$key2]["meta_keywords"] = $value2["meta_keywords"];
                 }
+                $data[$key1]["cateInfo"] = $data2;
             }
-            $data[$key1]["cateInfo"] = $data2;
+            return $data;
         }
-        return $data;
     }
 
     /*
@@ -134,13 +141,112 @@ class APIProductServices
                     inner join products p on p.id=web_category_products.product_id
                     where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
         if ($category) {
-            $strSQL .= "and web_category_products.web_category_hierarchy_id=".$category;
+            $strSQL .= "and web_category_products.web_category_hierarchy_id=" . $category;
         }
         $products = DB::select($strSQL);
         $data = [];
         foreach ($products as $product) {
-            $data[$product->web_category_hierarchy_id][$product->id] = $product;
+            $data[$product->web_category_hierarchy_id][] = $product;
         }
         return $data;
+    }
+
+    /*
+     * 分類總覽的商品搜尋結果 (上架審核通過 & 上架期間內)
+     */
+    public function categorySearchResult($category = null, $size = 10, $page = 1)
+    {
+        $now = Carbon::now();
+        $s3 = config('filesystems.disks.s3.url');
+        $products = self::getWebCategoryProducts($category);
+        $promotion = self::getPromotion('product_card');
+        $login = Auth::guard('api')->check();
+        if ($login) {
+            $member_id = Auth::guard('api')->user()->member_id;
+            $collection = true;
+            $cart = true;
+        } else {
+            $collection = false;
+            $cart = false;
+        }
+        foreach ($products[$category] as $product) {
+            $promotional = [];
+            if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
+                $promotion_desc = $product->promotion_desc;
+            } else {
+                $promotion_desc = null;
+            }
+            $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
+
+            if (isset($promotion[$product->id])) {
+                foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
+                    $promotional[] = $Label->promotional_label;
+                }
+            }
+
+            $data[] = array(
+                'product_id' => $product->id,
+                'product_no' => $product->product_no,
+                'product_name' => $product->product_name,
+                'selling_price' => intval($product->selling_price),
+                'product_discount' => intval($discount),
+                'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                'promotion_desc' => $promotion_desc,
+                'promotion_label'=> (count($promotional)>0?$promotional:null),
+                'collections'=> $collection,
+                'cart'=> $cart
+            );
+        }
+        $searchResult = self::getPages($data, $size, $page);
+        return $searchResult;
+
+    }
+
+    /*
+     * 取分頁處理
+     */
+    public function getPages($data, $size, $page)
+    {
+        $amountOfPage = $size; //每頁顯示筆數
+        $totalRows = count($data);
+        $totalPages = ceil($totalRows / $amountOfPage);
+        $currentPage = $page < 0 ? 1 : $page;
+        $startRow = (($currentPage - 1) * $amountOfPage);
+        $endRow = (($currentPage) * $amountOfPage) - 1;
+        if ($currentPage > $totalPages) {//防止頁數錯誤
+            $p = $totalPages;
+            $startRow = (($p - 1) * $amountOfPage) - 1;
+            $endRow = $startRow;//(($p) * $amountOfPage) - 1;
+        }
+        $startRow = ($startRow < 0) ? 0 : $startRow;
+        $endRow = ($endRow > $totalRows - 1) ? $totalRows - 1 : $endRow;//處理最後一頁
+
+        for ($i = $startRow; $i <= $endRow; $i++) {
+            $list[] = $data[$i];
+        }
+
+        $result = array('totalRows' => $totalRows, 'totalPages' => $totalPages, 'currentPage' => $currentPage, 'list' => $list);
+        return $result;
+
+    }
+
+    /*
+     * 取得行銷促案資訊
+     */
+    public function getPromotion($type)
+    {
+        $strSQL = "select pcp.product_id, pc.*
+                from promotional_campaigns pc
+                inner join  promotional_campaign_products pcp on pcp.promotional_campaign_id=pc.id
+                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1 ";
+
+        $promotional = DB::select($strSQL);
+        $data = [];
+        foreach ($promotional as $promotion) {
+            //if ($type == 'product_card')
+            $data[$promotion->product_id][] = $promotion;
+        }
+        return $data;
+
     }
 }

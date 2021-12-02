@@ -35,7 +35,7 @@ class PermissionService
             ->join('permission_detail', 'permission_detail.id', '=', 'role_permission_details.permission_detail_id')
             ->join('permission', 'permission.id', '=', 'permission_detail.permission_id')
             ->where('permission.type', '=', 'menu')
-            ->orderBy('permission.id', 'asc')
+            ->orderBy('permission.sort', 'asc')
             ->orderBy('permission_detail.sort', 'asc')
             ->get()->toArray();
 

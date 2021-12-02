@@ -92,6 +92,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="panel-body">
+                                                        @if(isset($data['permissionDetail'][$main['id']]['id']))
                                                         @foreach($data['permissionDetail'][$main['id']]['id'] as $k=>$sub)
                                                             @if (isset($data['rolePermission'][$sub]))
                                                             <div class="row">
@@ -171,6 +172,7 @@
                                                             <hr style="margin-top:3px;"/>
                                                             @endif
                                                         @endforeach
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>

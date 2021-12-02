@@ -11,8 +11,14 @@ use App\Models\ProductPhotos;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Batch;
+
 class APIWebService
 {
+
+    public function __construct(ImageUploadService $imageUploadService)
+    {
+        $this->imageUploadService = $imageUploadService;
+    }
 
     /**
      * 取得會員收件人
@@ -171,6 +177,7 @@ class APIWebService
      */
     public function getMemberCollections()
     {
+        $s3 = config('filesystems.disks.s3.url');
         $collection = [];
         $member_id = Auth::guard('api')->user()->member_id;
         $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price', 'products.list_price')
@@ -181,7 +188,7 @@ class APIWebService
             $photo = ProductPhotos::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first()->toArray();
             $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));
             //echo $discount;
-            $collection[] = array('product_id' => $collect->id, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'product_discount' => intval($discount), 'product_photo' => $photo['photo_name']);
+            $collection[] = array('product_id' => $collect->id, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'product_discount' => intval($discount), 'product_photo' => ($photo['photo_name'] ? $s3 . $photo['photo_name'] : null));
         }
 
         return json_encode($collection);
@@ -250,10 +257,10 @@ class APIWebService
         DB::beginTransaction();
         try {
             $webData = [];
-            foreach ($input['product_id'] as $key=>$value){
+            foreach ($input['product_id'] as $key => $value) {
                 $data = MemberCollections::where('product_id', $value)->where('member_id', $member_id)->get()->toArray();
                 $webData[$key] = [
-                    'id'=>$data[0]['id'],
+                    'id' => $data[0]['id'],
                     'member_id' => $member_id,
                     'product_id' => $value,
                     'status' => -1,
@@ -264,7 +271,7 @@ class APIWebService
                 ];
             }
             $collectionInstance = new MemberCollections();
-            $upd = Batch::update($collectionInstance,$webData,'id');
+            $upd = Batch::update($collectionInstance, $webData, 'id');
             DB::commit();
             if ($upd > 0) {
                 $result = 'success';
