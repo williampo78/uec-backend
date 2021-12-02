@@ -90,6 +90,9 @@
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },

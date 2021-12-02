@@ -10,8 +10,8 @@
         </div>
         <!-- /.row -->
         <form method="POST" id="edit-form" action="{{ route('category.update' , $data['id']) }}">
-            {{ method_field('PUT') }}
-            {{ csrf_field() }}
+            @method('PUT')
+            @csrf
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-primary">
@@ -111,6 +111,9 @@
                 },
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");

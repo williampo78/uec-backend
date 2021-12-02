@@ -21,8 +21,8 @@
                             <form role="form" id="formData" method="POST"
                                 action="{{ route('supplier.update', $Supplier->id) }}" enctype="multipart/form-data"
                                 novalidate="novalidate">
-                                {{ method_field('PUT') }}
-                                {{ csrf_field() }}
+                                @method('PUT')
+                                @csrf
                             @else
                                 <form role="form" id="formData" method="post" action="{{ route('supplier') }}"
                                     enctype="multipart/form-data" novalidate="novalidate">
@@ -360,7 +360,7 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button class="btn btn-success" type="button" @click="submitBtn" id="btn-finish"><i class="fa fa-check"></i> 完成</button>
+                                                <button class="btn btn-success" type="button" @click="submitBtn" id="btn-save"><i class="fa fa-check"></i> 完成</button>
                                                 <a href="{{ route('supplier') }}" class="btn btn-danger"
                                                     id="btn-cancel"><i class="fa fa-ban"></i> 取消</a>
                                             </div>
@@ -443,7 +443,7 @@
         $("#formData").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    $('#btn-finish').prop('disabled', true);
+                    $('#btn-save').prop('disabled', true);
                     form.submit();
                 },
                 rules: {
@@ -479,6 +479,9 @@
                 },
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");

@@ -23,8 +23,8 @@
                             <form role="form" id="new-form" method="POST"
                                 action="{{ route('supplier_type.update', $ShowData['id']) }}"
                                 enctype="multipart/form-data" novalidate="novalidate">
-                                {{ method_field('PUT') }}
-                                {{ csrf_field() }}
+                                @method('PUT')
+                                @csrf
                             @else
                                 <form role="form" id="new-form" method="POST" action="{{ route('supplier_type') }}"
                                     enctype="multipart/form-data" novalidate="novalidate">
@@ -104,6 +104,9 @@
                 },
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");

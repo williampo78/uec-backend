@@ -23,8 +23,8 @@
                             <form role="form" id="new-form" method="post"
                                   action="{{ route('department.update', $department->id) }}"
                                   enctype="multipart/form-data">
-                                {{ method_field('PUT') }}
-                                {{ csrf_field() }}
+                                @method('PUT')
+                                @csrf
                         @else
                             <form role="form" id="new-form" method="post" action="{{route('department')}}"
                                   enctype="multipart/form-data">

@@ -23,15 +23,14 @@
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_account">
                                                 <label for="account">帳號 <span class="text-danger">*</span></label>
-                                                <input class="form-control validate[required, ajax[ajaxCaseCallPhp]]" name="user_account"
+                                                <input class="form-control" name="user_account"
                                                     id="user_account">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_user_name">
                                                 <label for="password">名稱 <span class="text-danger">*</span></label>
-                                                <input class="form-control validate[required]" name="user_name"
-                                                    id="user_name">
+                                                <input class="form-control" name="user_name" id="user_name">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -57,15 +56,14 @@
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_user_password">
                                                 <label for="name">密碼 <span class="text-danger">*</span></label>
-                                                <input class="form-control validate[required]" name="user_password"
-                                                    id="user_password" type="password">
+                                                <input class="form-control" name="user_password" id="user_password"
+                                                    type="password">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_email">
                                                 <label for="email">信箱 <span class="text-danger">*</span></label>
-                                                <input class="form-control validate[required]" name="user_email"
-                                                    id="user_email">
+                                                <input class="form-control" name="user_email" id="user_email">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -81,7 +79,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="row">
@@ -134,35 +131,108 @@
 @section('js')
     <script>
         $(function() {
-            $("#new-form").validationEngine();
-
             $('.js-select2').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: '請選擇',
             });
 
-            $("#btn-save").click(function() {
+            $("#btn-save").on('click', function() {
                 $("#new-form").submit();
             });
 
-            $("#btn-cancel").click(function() {
+            $("#btn-cancel").on('click', function() {
                 window.location.href = '{{ route('users') }}';
             });
 
-            $("input[id^=role_]").click(function() {
-                var count = 0;
-                $("input[name='role[]']").each(function() {
-                    if ($(this).prop("checked") == true) {
-                        count += parseInt($(this).attr('data-id'));
-                    }
-                });
-                if (count > 0) {
-                    $("#supplier_id").addClass('validate[required]');
-                } else {
-                    $("#supplier_id").removeClass('validate[required]');
+            $('input[name="role[]"]').on('click', function() {
+                if ($('input[name="role[]"][data-id="1"]:checked').length < 1) {
                     $("#supplier_id").val('').trigger('change');
                 }
+            });
+
+            // 驗證表單
+            $("#new-form").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    $('#btn-save').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    user_account: {
+                        required: true,
+                        remote: {
+                            url: "/backend/users/ajax/is-user-account-repeat",
+                            type: "post",
+                            dataType: "json",
+                            cache: false,
+                            data: {
+                                user_account: function() {
+                                    return $("#user_account").val();
+                                },
+                            },
+                            dataFilter: function(data, type) {
+                                if (data) {
+                                    let json_data = $.parseJSON(data);
+
+                                    if (json_data.status) {
+                                        return true;
+                                    }
+                                }
+
+                                return false;
+                            },
+                        },
+                    },
+                    user_name: {
+                        required: true,
+                    },
+                    active: {
+                        required: true,
+                    },
+                    user_password: {
+                        required: true,
+                    },
+                    user_email: {
+                        required: true,
+                    },
+                    supplier_id: {
+                        required: {
+                            depends: function(element) {
+                                return $('input[name="role[]"][data-id="1"]:checked').length > 0;
+                            }
+                        },
+                    },
+                },
+                messages: {
+                    user_account: {
+                        remote: "此帳號名稱已經被其他人使用",
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.closest(".form-group").length) {
+                        element.closest(".form-group").append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
             });
         })
     </script>

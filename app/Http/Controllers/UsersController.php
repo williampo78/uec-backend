@@ -124,21 +124,26 @@ class UsersController extends Controller
         //
     }
 
-    public function ajax(Request $request)
+    /**
+     * 檢查使用者帳號是否重複
+     *
+     * @param Request $request
+     * @return boolean
+     */
+    public function isUserAccountRepeat(Request $request)
     {
+        $user_account = $request->input('user_account');
+        $status = false;
 
-        $user_account = $request->input('fieldValue');
-        $validateId = $request->input('fieldId');
+        $user_count = Users::where('user_account', '=', $user_account)->count();
 
-        $arrayToJs = array();
-        $arrayToJs[0] = $validateId;
-        $arrayToJs[1] = true;
-        $userCount = Users::where('user_account', '=', $user_account)->count();
-        if ($userCount > 0) {
-            $arrayToJs[1] = false;
+        if ($user_count < 1) {
+            $status = true;
         }
-        echo json_encode($arrayToJs);
 
+        return response()->json(
+            ['status' => $status]
+        );
     }
 
     public function profile ()

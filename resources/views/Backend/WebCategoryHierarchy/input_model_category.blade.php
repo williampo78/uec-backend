@@ -39,9 +39,11 @@
                           <div class="row">
                               <div class="col-sm-2 "><label> 分類名稱</label></div>
                               <div class="col-sm-4 ">
-                                  <input name="receiver_name" id="receiver_name" v-model="addCategory.category_name"
-                                      class="form-control">
-                                  <p style="color: red">@{{ msg . receiver_name }}</p>
+                                  <div class="form-group">
+                                    <input name="receiver_name" id="receiver_name" v-model="addCategory.category_name"
+                                        class="form-control">
+                                    {{-- <span class="help-block">@{{ msg . receiver_name }}</span> --}}
+                                  </div>
                               </div>
                           </div>
                       </div>

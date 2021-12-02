@@ -10,8 +10,8 @@
         </div>
         <!-- /.row -->
         <form method="POST" id="edit-form" action="{{ route('primary_category.update' , $data['id']) }}">
-            {{ method_field('PUT') }}
-            {{ csrf_field() }}
+            @method('PUT')
+            @csrf
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-primary">
@@ -41,7 +41,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <button class="btn btn-success" type="submit" id="btn-finish"><i class="fa fa-check"></i> 完成</button>
+                                        <button class="btn btn-success" type="submit" id="btn-save"><i class="fa fa-check"></i> 完成</button>
                                         <a class="btn btn-danger" href="{{route('primary_category')}}"><i class="fa fa-ban"></i> 取消</a>
                                     </div>
                                 </div>
@@ -60,7 +60,7 @@
             $("#edit-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    $('#btn-finish').prop('disabled', true);
+                    $('#btn-save').prop('disabled', true);
                     form.submit();
                 },
                 rules: {
@@ -88,6 +88,9 @@
                 },
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");

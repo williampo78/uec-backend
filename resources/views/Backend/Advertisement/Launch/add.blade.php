@@ -117,7 +117,7 @@
                         required: true,
                         remote: {
                             param: {
-                                url: "/backend/advertisemsement_launch/ajax/canPassActiveValidation",
+                                url: "/backend/advertisemsement_launch/ajax/can-pass-active-validation",
                                 type: "post",
                                 dataType: "json",
                                 cache: false,
@@ -176,6 +176,9 @@
                 },
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
