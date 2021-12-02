@@ -32,9 +32,10 @@ class ProductsController extends Controller
         $in = $request->input() ; 
         
         $result = [] ; 
-    
-        // $result = $this->productsService->get_Products($request) ; 
-
+        
+        $result['products'] = $this->productsService->getProducts($request) ; 
+        // dd($result) ; 
+        // dd($result) ;
         return view('Backend.Products.list',$result);
     }
 

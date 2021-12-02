@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '使用者管理')
+@section('title', '商品主檔 -基本資訊管理')
 
 @section('content')
     <!--列表-->
@@ -146,8 +146,8 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-2">
-                                <a class="btn btn-block btn-warning btn-sm"
-                                    href="{{ route('products.create') }}"><i class="fa fa-plus"></i> 創建</a>
+                                <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}"><i
+                                        class="fa fa-plus"></i> 創建</a>
                             </div>
                         </div>
                         <hr>
@@ -170,32 +170,60 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach ($products as $key => $val)
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-info btn-sm toggle-show-model" data-toggle="modal"
+                                                data-target="#row_detail"><i class="fa fa-search"></i>
+                                            </button>
+                                            <a class="btn btn-info btn-sm"
+                                                href="{{ route('web_category_products.edit', '1') }}">修改</a>
+                                        </td>
+                                        <td>{{ $key += 1 }}</td>
+                                        <td>{{ $val->supplier_id }}</td>
+                                        <td>{{ $val->product_no }}</td>
+                                        <td>{{ $val->product_name }}</td>
+                                        <td>{{ $val->selling_price }}</td>
+                                        <td>等待確認</td>
+                                        <td>等待確認</td>
+                                        <td>
+                                            @switch($val->product_type)
+                                                @case('N')
+                                                    一般品
+                                                @break
+                                                @case('G')
+                                                    贈品
+                                                @break
+                                                @case('A')
+                                                    加購品
+                                                @break
+                                            @endswitch
+                                        </td>
+                                        <td>
+                                            {{ $val->created_at }}
+                                        </td>
+                                        <td>
+                                            @switch($val->approval_status)
+                                                @case('NA')
+                                                    無送審記錄
+                                                @break
+                                                @case('REVIEWING')
+                                                    簽核中
+                                                @break
+                                                @case('APPROVED')
+                                                    已核准
+                                                @break
+                                                @case('REJECTED')
+                                                    已駁回
+                                                @break
+                                            @endswitch
+                                        </td>
+                                        <td>{{ $val->start_launched_at }}</td>
+                                        <td>{{ $val->end_launched_at }}</td>
+                                    </tr>
+                                @endforeach
                                 {{-- {{$category_products_list}} --}}
-                                <tr>
-                                    <form id="del" method="post">
-                                        @method('DELETE')
-                                        @csrf
-                                    </form>
-                                    <td>
-                                        <button class="btn btn-info btn-sm toggle-show-model" data-toggle="modal"
-                                            data-target="#row_detail"><i class="fa fa-search"></i>
-                                        </button>
-                                        <a class="btn btn-info btn-sm"
-                                            href="{{ route('web_category_products.edit', '1') }}">修改</a>
-                                    </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -207,6 +235,5 @@
 
 @section('js')
     <script>
-
     </script>
 @endsection

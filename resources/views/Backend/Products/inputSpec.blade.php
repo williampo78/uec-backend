@@ -36,18 +36,22 @@
                 <label class="control-label">規格一<span class="redtext">*</span></label>
             </div>
             <div class="col-sm-9">
-                <select class="form-control js-select2" name="active" id="active">
-                    <option value="">顏色</option>
+                <select class="form-control js-select2" name="spec_1" id="spec_1">
+                    <option value="顏色">顏色</option>
+                    <option value="尺寸">尺寸</option>
+                    <option value="容量">容量</option>
                 </select>
             </div>
         </div>
-        <div class="col-sm-6"  v-if="products.spec_dimension == 2">
+        <div class="col-sm-6" v-if="products.spec_dimension == 2">
             <div class="col-sm-2 no-pa">
                 <label class="control-label">規格二<span class="redtext">*</span></label>
             </div>
             <div class="col-sm-9">
-                <select class="form-control js-select2" name="active" id="active">
-                    <option value="">尺寸</option>
+                <select class="form-control js-select2" name="spec_2" id="spec_2">
+                    <option value="顏色">顏色</option>
+                    <option value="尺寸">尺寸</option>
+                    <option value="容量">容量</option>
                 </select>
             </div>
         </div>
@@ -148,8 +152,8 @@
         </thead>
         <tbody>
             <tr v-for="(Sku, SkuKey) in SkuList">
-                <td v-if="products.spec_dimension >= 1" >@{{ Sku . spec_1_value }}</td>
-                <td v-if="products.spec_dimension == 2" >@{{ Sku . spec_2_value }}</td>
+                <td v-if="products.spec_dimension >= 1">@{{ Sku . spec_1_value }}</td>
+                <td v-if="products.spec_dimension == 2">@{{ Sku . spec_2_value }}</td>
                 <td><input class="form-control" v-model="Sku.item_no" readonly></td>
                 <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
                 <td><input class="form-control" v-model="Sku.ean"></td>
@@ -162,7 +166,7 @@
                     </select>
                 </td>
                 <td>
-                    <select class="form-control js-select2" v-model="Sku.status" >
+                    <select class="form-control js-select2" v-model="Sku.status">
                         <option value="1">啟用</option>
                         <option value="0">停用</option>
                     </select>

@@ -4,14 +4,12 @@ namespace App\Services;
 
 use App\Models\ProductItems;
 use App\Models\Products;
-use App\Models\ProductPhotos;
 use App\Services\UniversalService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use ImageUpload ;
+use ImageUpload;
 
 class ProductsService
 {
@@ -26,8 +24,7 @@ class ProductsService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = Products::where('agent_id', $agent_id)
-            ->get();
+        $result = Products::where('agent_id', $agent_id)->get();
 
         return $result;
     }
@@ -71,6 +68,8 @@ class ProductsService
                 'warranty_days' => $in['warranty_days'],
                 'warranty_scope' => $in['warranty_scope'],
                 'spec_dimension' => $in['spec_dimension'],
+                'spec_1' => $in['spec_1'],
+                'spec_2' => $in['spec_2'],
                 'selling_channel' => $in['selling_channel'],
                 'delivery_type' => $in['delivery_type'],
                 'created_by' => $user_id,
@@ -103,16 +102,16 @@ class ProductsService
                 ];
                 ProductItems::create($skuInsert);
             }
-            $fileList = [] ;
-            $uploadPath = '/products/' . $products->id ; 
-            foreach($file['filedata'] as $key => $val){
-                $fileList[$key] = ImageUpload::uploadImage($val,$uploadPath) ; 
+            $fileList = [];
+            $uploadPath = '/products/' . $products->id;
+            foreach ($file['filedata'] as $key => $val) {
+                $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath);
             }
-            foreach($fileList as $key => $val) {
+            foreach ($fileList as $key => $val) {
                 $insertImg = [
-                    'product_id' =>  $products->id,
-                    'photo_name' =>  $val['image'],
-                    'sort' => $key ,
+                    'product_id' => $products->id,
+                    'photo_name' => $val['image'],
+                    'sort' => $key,
                     'created_by' => $user_id,
                     'updated_by' => $user_id,
                     'created_at' => $now,
@@ -126,8 +125,7 @@ class ProductsService
             Log::warning($e->getMessage());
             $result = false;
         }
-        
-        
+
         return $result;
     }
 
