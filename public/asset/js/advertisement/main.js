@@ -186,7 +186,7 @@ function addImageBlock(product_category_select_options = '', datas = {}) {
             <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_id}">
             <td>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="image_block_sort[${image_block_row_no}]" value="${sort}" />
+                    <input type="number" class="form-control" name="image_block_sort[${image_block_row_no}]" value="${sort}" />
                 </div>
             </td>
             <td>
@@ -291,7 +291,7 @@ function addTextBlock(product_category_select_options, datas = {}) {
             <input type="hidden" name="text_block_id[${text_block_row_no}]" value="${text_block_id}">
             <td>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="text_block_sort[${text_block_row_no}]" value="${sort}" />
+                    <input type="number" class="form-control" name="text_block_sort[${text_block_row_no}]" value="${sort}" />
                 </div>
             </td>
             <td>
@@ -378,7 +378,7 @@ function addProductBlockProduct(product_select_options, datas = {}) {
             <input type="hidden" name="product_block_product_id[${product_block_product_row_no}]" value="${product_block_product_id}">
             <td>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="product_block_product_sort[${product_block_product_row_no}]" value="${sort}" />
+                    <input type="number" class="form-control" name="product_block_product_sort[${product_block_product_row_no}]" value="${sort}" />
                 </div>
             </td>
             <td>
@@ -416,7 +416,7 @@ function addProductBlockCategory(product_category_select_options, datas = {}) {
             <input type="hidden" name="product_block_category_id[${product_block_category_row_no}]" value="${product_block_category_id}">
             <td>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="product_block_category_sort[${product_block_category_row_no}]" value="${sort}" />
+                    <input type="number" class="form-control" name="product_block_category_sort[${product_block_category_row_no}]" value="${sort}" />
                 </div>
             </td>
             <td>

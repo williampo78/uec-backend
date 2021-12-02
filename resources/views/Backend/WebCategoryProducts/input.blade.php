@@ -26,7 +26,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body" id="category_hierarchy_content_input" v-cloak>
-                        <form role="form" id="new-form" method="POST"
+                        <form role="form" id="update-form" method="POST"
                             action="{{ route('web_category_products.update', $category_hierarchy_content->id) }}"
                             enctype="multipart/form-data" novalidate="novalidate">
                             @method('PUT')
@@ -44,20 +44,22 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_doc_number">
-                                                <div class="col-sm-12">
-                                                    <label for="doc_number">狀態 <span class="redtext">*</span></label>
-                                                </div>
-                                                <div class="col-sm-4 form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="active"
-                                                        id="inlineRadio1" value="1"
-                                                        {{ $category_hierarchy_content->active == 1 ? "checked='checked'" : '' }}>
-                                                    <label class="form-check-label" for="inlineRadio1">開啟</label>
-                                                </div>
-                                                <div class="col-sm-4 form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="active"
-                                                        id="inlineRadio2" value="0"
-                                                        {{ $category_hierarchy_content->active == 0 ? "checked='checked'" : '' }}>
-                                                    <label class="form-check-label" for="inlineRadio2">關閉</label>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <label for="doc_number">狀態 <span class="redtext">*</span></label>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="active" id="inlineRadio1" value="1"
+                                                                {{ $category_hierarchy_content->active == 1 ? "checked='checked'" : '' }}>開啟
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="active" id="inlineRadio2" value="0"
+                                                                {{ $category_hierarchy_content->active == 0 ? "checked='checked'" : '' }}>關閉
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -94,16 +96,18 @@
                                         <div class="col-sm-12">
                                             <div class="col-sm-6">
                                                 <div class="form-group" id="div_doc_number">
-                                                    <div class="col-sm-4 form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="content_type"
-                                                            id="content_type1" value="P" checked="checked">
-                                                        <label class="form-check-label" for="content_type1">指定商品</label>
+                                                    <div class="col-sm-4">
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="content_type"
+                                                                id="content_type1" value="P" checked="checked">指定商品
+                                                        </label>
                                                     </div>
-                                                    {{-- <div class="col-sm-4 form-check form-check-inline">
-                                                    <input class="form-check-input" type="radio" name="content_type"
-                                                        id="content_type2" value="0">
-                                                    <label class="form-check-label" for="content_type2">指定賣場</label>
-                                                </div> --}}
+                                                    {{-- <div class="col-sm-4">
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="content_type"
+                                                            id="content_type2" value="0">指定賣場
+                                                        </label>
+                                                    </div> --}}
                                                 </div>
                                                 <div class="col-sm-6">
                                                 </div>
@@ -115,7 +119,8 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button type="button" class="btn btn-success" @click="submit">儲存</button>
+                                                <button type="button" class="btn btn-success" @click="submit"
+                                                    id="btn-save">儲存</button>
                                                 <a class="btn btn-danger" type="button"
                                                     href="{{ route('web_category_products') }}">取消</a>
                                             </div>
@@ -158,7 +163,7 @@
                     this.category_products_list.find((todo, index) => {
                         filter_product_id.push(todo.product_id);
                     })
-                    // console.log(filter_product_id)  ; 
+                    // console.log(filter_product_id)  ;
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
@@ -171,7 +176,7 @@
                             create_end_date: create_end_date,
                             select_start_date: select_start_date,
                             select_end_date: select_end_date,
-                            filter_product_id: filter_product_id, //排除掉 ID 
+                            filter_product_id: filter_product_id, //排除掉 ID
                         });
                         console.log(response);
                         this.result_products = response.data.result.data;
@@ -225,7 +230,7 @@
                     })
                 },
                 submit() {
-                    $("#new-form").submit();
+                    $("#update-form").submit();
                 },
                 del_category_products_list(index) {
                     var yes = confirm('你確定要刪除嗎？');
@@ -275,6 +280,47 @@
                 // $('#products_model_list').DataTable({
                 //     "lengthChange": false
                 // });
+
+                // 驗證表單
+                $("#update-form").validate({
+                    // debug: true,
+                    submitHandler: function(form) {
+                        $('#btn-save').prop('disabled', true);
+                        form.submit();
+                    },
+                    rules: {
+                        id: {
+                            required: true,
+                        },
+                        active: {
+                            required: true,
+                        },
+                    },
+                    errorClass: "help-block",
+                    errorElement: "span",
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent());
+                            return;
+                        }
+
+                        if (element.closest(".form-group").length) {
+                            element.closest(".form-group").append(error);
+                            return;
+                        }
+
+                        error.insertAfter(element);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").addClass("has-error");
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                    success: function(label, element) {
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                });
             },
             computed: {},
 

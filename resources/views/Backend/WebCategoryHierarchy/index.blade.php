@@ -118,7 +118,7 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(level_2_obj, level_2_key) in category_level_2" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" 
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop"
                                             :data-index="level_2_key" :data-level="'2'">
                                             <td style="vertical-align:middle" :data-index="level_2_key" :data-level="'2'" draggable="true">
                                                 <i class="fa fa-list"></i>
@@ -225,10 +225,10 @@
                     category_level_1: @json($category_level_1),
                     category_level_2: [],
                     category_level_3: [],
-                    //view title 
+                    //view title
                     category_level_2_title: '',
                     category_level_3_title: '',
-                    //點擊顯示的物件 讓子表去拿父表物件 
+                    //點擊顯示的物件 讓子表去拿父表物件
                     category_level_1_obj: [],
                     category_level_2_obj: [],
                     //暫存的新增
@@ -304,14 +304,14 @@
                         }
                         console.log(response);
                         // response.data.result.Msg_Hierarchy =
-                        // alert(response.data.result.Msg) ; 
+                        // alert(response.data.result.Msg) ;
                         // console.log() ;
                     }
                     var Sure = confirm('你確定要刪除該分類嗎?');
                     if (Sure) {
                         DelAjax();
                     }
-                    // console.log(id) ; 
+                    // console.log(id) ;
                 },
                 CategoryModelShow(level, act, obj) {
                     // empty data
@@ -320,6 +320,10 @@
                     this.addCategory.id = '';
                     this.addCategory.category_level = level;
                     this.addCategory.act = act;
+
+                    // 關閉驗證
+                    $('#receiver_name').closest(".form-group").removeClass("has-error").find('span').hide();
+
                     if (act == 'edit') {
                         this.addCategory.old_category_name = obj.category_name;
                         this.addCategory.id = obj.id;
@@ -346,9 +350,13 @@
                 CategoryToList() { //新增編輯
                     var checkstatus = true;
                     var type = '';
+
+                    // 提交給驗證器驗證
+                    $('#productModal').submit();
+
                     if (this.addCategory.category_name == '') {
                         checkstatus = false;
-                        this.msg.receiver_name = '不能為空喔';
+                        // this.msg.receiver_name = '不能為空喔';
                     }
 
                     if (this.addCategory.act == 'add') {
@@ -403,7 +411,7 @@
                 },
                 dragover(eve) {
                     eve.preventDefault();
-                    eve.target.parentNode.classList.add('ondragover') ; 
+                    eve.target.parentNode.classList.add('ondragover') ;
 
                 },
                 dragleave(eve) {
@@ -413,7 +421,7 @@
                 drop(eve) {
                     eve.target.parentNode.classList.remove('ondragover') ;
                     $('tbody').removeClass('elements-box')
-                    eve.target.parentNode.parentNode.classList.remove('elements-box') ; 
+                    eve.target.parentNode.parentNode.classList.remove('elements-box') ;
                     var index = eve.dataTransfer.getData("text/index");
                     var level = eve.dataTransfer.getData("text/level");
                     let targetIndex = eve.target.parentNode.dataset.index;
@@ -472,7 +480,45 @@
                 }
 
             },
-            mounted: function() {},
+            mounted: function() {
+                // 驗證表單
+                $("#productModal").validate({
+                    // debug: true,
+                    submitHandler: function(form) {
+                        // $('#btn-save').prop('disabled', true);
+                        // form.submit();
+                    },
+                    rules: {
+                        receiver_name: {
+                            required: true,
+                        },
+                    },
+                    errorClass: "help-block",
+                    errorElement: "span",
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent());
+                            return;
+                        }
+
+                        if (element.closest(".form-group").length) {
+                            element.closest(".form-group").append(error);
+                            return;
+                        }
+
+                        error.insertAfter(element);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").addClass("has-error");
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                    success: function(label, element) {
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                });
+            },
             watch: {
                 //監聽是否要將新增儲存開放點擊
                 category_level_2_title: function() {

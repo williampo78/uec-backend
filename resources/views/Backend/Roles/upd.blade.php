@@ -21,8 +21,8 @@
                     <div class="panel-body">
                         <form id="update-form" method="post" action="{{ route('roles.update', $data['role']->id) }}"
                             enctype="multipart/form-data">
-                            {{ method_field('PUT') }}
-                            {{ csrf_field() }}
+                            @method('PUT')
+                            @csrf
                             <div class="row">
 
                                 <!-- 欄位 -->
@@ -40,14 +40,14 @@
                                             <div class="form-group" id="div_name">
                                                 <label for="name">狀態 <span class="text-danger">*</span></label>
                                                 <div class="row">
-                                                    <div class="col-sm-2">
+                                                    <div class="col-sm-3">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="active" id="active1"
                                                                 {{ $data['role']->active == 1 ? 'checked' : '' }}
                                                                 value="1">啟用
                                                         </label>
                                                     </div>
-                                                    <div class="col-sm-2">
+                                                    <div class="col-sm-3">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="active" id="active0"
                                                                 {{ $data['role']->active == 0 ? 'checked' : '' }}
@@ -205,11 +205,11 @@
 @section('js')
     <script>
         $(function() {
-            $("#btn-save").click(function() {
+            $("#btn-save").on('click', function() {
                 $("#update-form").submit();
             });
 
-            $("#btn-cancel").click(function() {
+            $("#btn-cancel").on('click', function() {
                 window.location.href = '{{ route('roles') }}';
             });
 
@@ -248,6 +248,9 @@
                 },
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");

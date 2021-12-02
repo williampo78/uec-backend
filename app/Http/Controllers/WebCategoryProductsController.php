@@ -74,7 +74,7 @@ class WebCategoryProductsController extends Controller
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
         $result['category_products_list'] = $this->webCategoryHierarchyService->category_products($id);
         $result['supplier'] = $this->supplierService->getSupplier();
-        
+
         return view('Backend.WebCategoryProducts.input', $result);
     }
 
@@ -90,7 +90,7 @@ class WebCategoryProductsController extends Controller
         $in = $request->input();
         $result = $this->webCategoryHierarchyService->edit_category_hierarchy_content($in, $id);
         $route_name = 'web_category_products';
-        $act = 'add';
+        $act = 'upd';
         return view('Backend.success', compact('route_name', 'act'));
     }
 
