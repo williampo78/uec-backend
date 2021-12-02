@@ -12,7 +12,6 @@
                 <h1 class="page-header"><i class="fa fa-cube"></i> 商品主檔 - 基本資訊管理</h1>
             </div>
         </div>
-
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default">
@@ -28,9 +27,9 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="stock_type" id="stock_type">
                                             <option value="">全部</option>
-                                            <option value="A">買斷</option>
-                                            <option value="B">寄售</option>
-                                            <option value="T">轉單</option>
+                                            <option value="A" {{ request()->input('stock_type') == 'A' ? 'selected' : '' ; }}>買斷</option>
+                                            <option value="B" {{ request()->input('stock_type') == 'B' ? 'selected' : '' ;}}>寄售</option>
+                                            <option value="T" {{ request()->input('stock_type') == 'T' ? 'selected'  : '' ;}}>轉單</option>
                                         </select>
                                     </div>
 
@@ -43,7 +42,6 @@
                                         <input class="form-control" name="product_no" id="product_no"
                                             value="{{ request()->input('product_no') }}">
                                     </div>
-
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="col-sm-3">
@@ -52,9 +50,11 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="supplier_id" id="supplier_id">
                                             <option value="">全部</option>
+                                            @foreach ($supplier as $val)
+                                            <option value="{{$val->id}}" {{ request()->input('supplier_id') == $val->id ? 'selected' : '' ; }}>{{$val->name}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
-
                                 </div>
                             </div>
                             <br>
@@ -66,9 +66,9 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="selling_channel" id="selling_channel">
                                             <option value="">全部</option>
-                                            <option value="EC">網路獨賣</option>
-                                            <option value="STORE">門市限定</option>
-                                            <option value="WHOLE">全通路</option>
+                                            <option value="EC" {{ request()->input('selling_channel') == 'EC' ? 'selected' : '' ; }}>網路獨賣</option>
+                                            <option value="STORE" {{ request()->input('selling_channel') == 'STORE' ? 'selected' : '' ; }}>門市限定</option>
+                                            <option value="WHOLE" {{ request()->input('selling_channel') == 'WHOLE' ? 'selected' : '' ; }}>全通路</option>
                                         </select>
                                     </div>
                                 </div>
@@ -89,9 +89,9 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="category_id" id="category_id">
                                             <option value="">全部</option>
-                                            <option value="EC">網路獨賣</option>
-                                            <option value="STORE">門市限定</option>
-                                            <option value="WHOLE">全通路</option>
+                                            @foreach ($pos as  $val)
+                                                <option value="{{$val->id}}"  {{ request()->input('category_id') == $val->id ? 'selected' : '' ; }}> {{$val->name}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -105,9 +105,9 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="lgst_method" id="lgst_method">
                                             <option value="">全部</option>
-                                            <option value="HOME">宅配</option>
-                                            <option value="FAMILY">全家取貨</option>
-                                            <option value="Store">門市取貨</option>
+                                            <option value="HOME" {{ request()->input('lgst_method') =='HOME' ? 'selected' : '' ; }}>宅配</option>
+                                            <option value="FAMILY" {{ request()->input('lgst_method') =='FAMILY' ? 'selected' : '' ; }}>全家取貨</option>
+                                            <option value="Store" {{ request()->input('lgst_method') =='Store' ? 'selected' : '' ; }}>門市取貨</option>
 
                                         </select>
                                     </div>
@@ -120,9 +120,9 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="product_type" id="product_type">
                                             <option value="">全部</option>
-                                            <option value="N">一般品</option>
-                                            <option value="G">贈品</option>
-                                            <option value="A">加購品</option>
+                                            <option value="N" {{ request()->input('product_type') == 'N' ? 'selected' : '' ; }}>一般品</option>
+                                            <option value="G" {{ request()->input('product_type') == 'G' ? 'selected' : '' ; }}>贈品</option>
+                                            <option value="A" {{ request()->input('product_type') == 'A' ? 'selected' : '' ; }}>加購品</option>
                                         </select>
                                     </div>
                                 </div>
@@ -133,10 +133,10 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="approval_status" id="approval_status">
                                             <option value="">全部</option>
-                                            <option value="NA">無送審記錄</option>
-                                            <option value="REVIEWING">簽核中</option>
-                                            <option value="APPROVED">已核准</option>
-                                            <option value="REJECTED">已駁回</option>
+                                            <option value="NA"  {{ request()->input('approval_status') == 'NA' ? 'selected' : '' ; }}>無送審記錄</option>
+                                            <option value="REVIEWING"  {{ request()->input('approval_status') == 'REVIEWING' ? 'selected' : '' ; }}>簽核中</option>
+                                            <option value="APPROVED"  {{ request()->input('approval_status') == 'APPROVED' ? 'selected' : '' ; }}>已核准</option>
+                                            <option value="REJECTED"  {{ request()->input('approval_status') == 'REJECTED' ? 'selected' : '' ; }}>已駁回</option>
                                         </select>
                                     </div>
                                 </div>

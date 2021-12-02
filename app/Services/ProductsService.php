@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ProductItems;
 use App\Models\Products;
+use App\Models\ProductPhotos;
 use App\Services\UniversalService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -72,7 +73,7 @@ class ProductsService
         if(isset($in['select_start_date']) && isset($in['select_end_date'])){
             $select_start_date = $in['select_start_date'] . ' 00:00:00' ; 
             $select_end_date = $in['select_end_date'] . ' 23:59:59'; 
-            $Products->whereDate('start_launched_at' , '>=' ,$select_start_date)
+            $Products->whereDate('start_launched_at' , '<=' ,$select_start_date)
                      ->whereDate('end_launched_at' , '>=' ,$select_end_date);
         }
         //筆數
@@ -81,7 +82,7 @@ class ProductsService
         }
 
         $result = $Products->get();
-        
+
         return $result;
     }
     public function addProducts($in, $file)
@@ -139,7 +140,7 @@ class ProductsService
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
-                    'product_id' => $products->id,
+                    'product_id' => $products_id,
                     'sort' => $val['sort'],
                     'spec_1_value' => $val['spec_1_value'],
                     'spec_2_value' => $val['spec_2_value'],
@@ -173,6 +174,7 @@ class ProductsService
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
+                ProductPhotos::create($insertImg) ; 
             }
             DB::commit();
             $result = true;

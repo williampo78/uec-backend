@@ -9,4 +9,5 @@ class ProductPhotos extends Model
 {
     use HasFactory;
     protected $table = 'product_photos';
+    protected $guarded = [];  
 }
