@@ -21,120 +21,171 @@
                         <form role="form" id="select-form" method="GET" action="{{ route('products') }}"
                             enctype="multipart/form-data">
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h5>庫存類型</h5>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="active" id="active">
-                                            <option value=''>無</option>
+                                    <div class="col-sm-8">
+                                        <select class="form-control js-select2" name="stock_type" id="stock_type">
+                                            <option value="">全部</option>
+                                            <option value="A">買斷</option>
+                                            <option value="B">寄售</option>
+                                            <option value="T">轉單</option>
                                         </select>
                                     </div>
 
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h5>商品序號</h5>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword"
-                                            value="{{ request()->input('keyword') }}">
+                                    <div class="col-sm-8">
+                                        <input class="form-control" name="product_no" id="product_no"
+                                            value="{{ request()->input('product_no') }}">
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <h5>供應商</h5>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control js-select2" name="supplier_id" id="supplier_id">
+                                            <option value="">全部</option>
+                                        </select>
                                     </div>
 
                                 </div>
                             </div>
                             <br>
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h5>商品通路</h5>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="active" id="active">
-                                            <option value=''>無</option>
+                                    <div class="col-sm-8">
+                                        <select class="form-control js-select2" name="selling_channel" id="selling_channel">
+                                            <option value="">全部</option>
+                                            <option value="EC">網路獨賣</option>
+                                            <option value="STORE">門市限定</option>
+                                            <option value="WHOLE">全通路</option>
                                         </select>
                                     </div>
-
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h5>商品名稱</h5>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword"
-                                            value="{{ request()->input('keyword') }}">
+                                    <div class="col-sm-8">
+                                        <input class="form-control" name="product_name" id="product_name"
+                                            value="{{ request()->input('product_name') }}">
                                     </div>
 
                                 </div>
-
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <h5>前台分類</h5>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control js-select2" name="category_id" id="category_id">
+                                            <option value="">全部</option>
+                                            <option value="EC">網路獨賣</option>
+                                            <option value="STORE">門市限定</option>
+                                            <option value="WHOLE">全通路</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <br>
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h5>配送方式</h5>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="active" id="active">
-                                            <option value=''>無</option>
+                                    <div class="col-sm-8">
+                                        <select class="form-control js-select2" name="lgst_method" id="lgst_method">
+                                            <option value="">全部</option>
+                                            <option value="HOME">宅配</option>
+                                            <option value="FAMILY">全家取貨</option>
+                                            <option value="Store">門市取貨</option>
+
                                         </select>
                                     </div>
 
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h5>商品類型</h5>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="active" id="active">
-                                            <option value=''>無</option>
+                                    <div class="col-sm-8">
+                                        <select class="form-control js-select2" name="product_type" id="product_type">
+                                            <option value="">全部</option>
+                                            <option value="N">一般品</option>
+                                            <option value="G">贈品</option>
+                                            <option value="A">加購品</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <h5>上架狀態</h5>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <select class="form-control js-select2" name="approval_status" id="approval_status">
+                                            <option value="">全部</option>
+                                            <option value="NA">無送審記錄</option>
+                                            <option value="REVIEWING">簽核中</option>
+                                            <option value="APPROVED">已核准</option>
+                                            <option value="REJECTED">已駁回</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
                             <br>
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
-                                        <h5>上架時間起</h5>
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <h5>上架時間</h5>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-8">
                                         <div class="form-group" id="div_select_start_date">
                                             <div class='input-group date' id='datetimepicker'>
                                                 <input type='text' class="form-control" name="select_start_date"
                                                     id="select_start_date"
-                                                    value="{{ $data['getData']['select_start_date'] ?? '' }}" />
+                                                    value="{{  request()->input('select_start_date')  ?? date('Y-m-d') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
                                             </div>
                                         </div>
+
                                     </div>
-                                    <div class="col-sm-1">
+                                    <div class="col-sm-1 text-center">
                                         <h5>～</h5>
                                     </div>
-                                    <div class="col-sm-4">
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="col-sm-8">
                                         <div class="form-group" id="div_select_end_date">
                                             <div class='input-group date' id='datetimepicker2'>
                                                 <input type='text' class="form-control" name="select_end_date"
                                                     id="select_end_date"
-                                                    value="{{ $data['getData']['select_end_date'] ?? '' }}" />
+                                                    value="{{ request()->input('select_end_date') ?? date('Y-m-d') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-4">
                                         <h5>查詢筆數上限</h5>
                                     </div>
-                                    <div class="col-sm-2">
-                                        <input class="form-control" name="keyword" id="keyword" readonly value="500">
+                                    <div class="col-sm-3">
+                                        <input class="form-control" name="limit" id="limit " readonly value="500">
                                     </div>
-                                    <div class="col-sm-7 text-right">
+                                    <div class="col-sm-5 text-right">
                                         <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
                                     </div>
                                 </div>
@@ -177,7 +228,7 @@
                                                 data-target="#row_detail"><i class="fa fa-search"></i>
                                             </button>
                                             <a class="btn btn-info btn-sm"
-                                                href="{{ route('web_category_products.edit', '1') }}">修改</a>
+                                                href="{{ route('products.edit', $val->id) }}">修改</a>
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_id }}</td>
@@ -235,5 +286,49 @@
 
 @section('js')
     <script>
+        $(document).ready(function() {
+            $("#stock_type").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#selling_channel").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#lgst_method").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#product_type").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#supplier_id").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#category_id").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $('#approval_status').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $('#datetimepicker').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#datetimepicker2').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+        
+        });
     </script>
 @endsection

@@ -20,12 +20,68 @@ class ProductsService
         $this->universalService = $universalService;
     }
 
-    public function getProducts($data = [])
+    public function getProducts($in = [])
     {
         $agent_id = Auth::user()->agent_id;
+        
+        $Products = Products::where('agent_id', $agent_id);
+        //庫存類型
+        if (isset($in['stock_type'])) {
+            $Products->where('stock_type', '=', $in['stock_type']);
+        }
+        //商品編號
+        if (isset($in['product_no'])) {
+            $product_no = explode(',',$in['product_no']);
+            foreach($product_no as $key => $val){
+                if($key == 0){
+                    $Products->where('product_no', 'like', '%' . $val . '%');
+                }else{
+                    $Products->orWhere('product_no', 'like', '%' . $val . '%');
+                }
+            }
+        }
+        //供應商
+        if (isset($in['supplier_id'])) {
+            $Products->where('supplier_id', $in['supplier_id']);
+        }
+        //商品通路
+        if(isset($in['selling_channel'])){
+            $Products->where('selling_channel', $in['selling_channel']);
+        }
+        //商品名稱
+        if (isset($in['product_name'])) {
+            $Products->where('product_name', 'like', '%' . $in['product_name'] . '%');
+        }
+        //前台分類
+        if(isset($in['category_id'])){
+            $Products->where('category_id' , $in['category_id']) ; 
+        }
+        //配送方式
+        if(isset($in['lgst_method'])){
+            $Products->where('lgst_method' , $in['lgst_method']) ; 
+        }
+        //商品類型
+        if(isset($in['product_type'])){
+            $Products->where('product_type' , $in['product_type']) ; 
+        }
+        //上架狀態
+        if(isset($in['approval_status'])){
+            $Products->where('approval_status' , $in['approval_status']) ; 
+        }
+        //上架 下架時間 
+        if(isset($in['select_start_date']) && isset($in['select_end_date'])){
+            $select_start_date = $in['select_start_date'] . ' 00:00:00' ; 
+            $select_end_date = $in['select_end_date'] . ' 23:59:59'; 
+            $Products->whereDate('start_launched_at' , '>=' ,$select_start_date)
+                     ->whereDate('end_launched_at' , '>=' ,$select_end_date);
+        }
+        //筆數
+        if(isset($in['limit'])){
+            $Products->limit($in['limit']) ; 
+        }
 
-        $result = Products::where('agent_id', $agent_id)->get();
-
+        $result = $Products->get();
+        
         return $result;
     }
     public function addProducts($in, $file)

@@ -31,9 +31,16 @@ class ProductsController extends Controller
     {
         $in = $request->input() ; 
         
-        $result = [] ; 
+        $result = [
+            'products' => [],
+        ] ; 
         
-        $result['products'] = $this->productsService->getProducts($request) ; 
+        if(count($in) !== 0 ){
+            $result['products'] = $this->productsService->getProducts($in) ; 
+        }
+        
+        
+
         // dd($result) ; 
         // dd($result) ;
         return view('Backend.Products.list',$result);
