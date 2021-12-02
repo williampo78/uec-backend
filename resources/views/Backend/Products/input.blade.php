@@ -1,5 +1,5 @@
 @extends('Backend.master')
-@section('title', '分類階層內容管理')
+@section('title', '商品主檔 - 新增基本資訊')
 @section('content')
     <style>
         .no-pa {
@@ -117,7 +117,7 @@
                                 <div class="col-sm-2 no-pa">
                                     <label class="control-label">庫存類型</label><span class="redtext">*</span>
                                 </div>
-                                <div class="col-sm-3 ">
+                                <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="stock_type" value="A" checked> 買斷
                                         [A]
@@ -187,7 +187,7 @@
                                 <div class="col-sm-9">
                                     <select class="form-control category_id" name="category_id">
                                         @foreach ($pos as $key => $val)
-                                            <option value="{{$val->id}}}"> {{$val->name}}</option>
+                                            <option value="{{ $val->id }}"> {{ $val->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -222,17 +222,39 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <label class="radio-inline">
+                                        <input type="radio" name="selling_channel" value="EC" checked> 網路獨賣
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="col-sm-2 no-pa">
+                                    <label class="control-label">溫層<span class="redtext">*</span></label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="lgst_temperature" value="NORMAL" checked> 常溫
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-6">
+                                <div class="col-sm-2 no-pa">
+                                    <label class="control-label">配送方式<span class="redtext">*</span></label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <label class="radio-inline">
                                         <input type="radio" name="lgst_method" value="HOME" checked> 宅配
                                     </label>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="col-sm-2 no-pa">
-                                    <label class="control-label">溫層</label>
+                                    <label class="control-label">商品交期<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
                                     <label class="radio-inline">
-                                        <input type="radio" name="lgst_temperature" value="NORMAL" checked> 常溫
+                                        <input type="radio" name="delivery_type" value="IN_STOCK" checked> 現貨
                                     </label>
                                 </div>
                             </div>
@@ -273,7 +295,7 @@
                                 </div>
                                 {{-- 效期控管的天數 --}}
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="expiry_days" value="">
+                                    <input class="form-control" name="expiry_days" value="0">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -641,8 +663,8 @@
                                     ean: '',
                                     pos_item_no: '',
                                     safty_qty: 0,
-                                    is_additional_purchase: 0,
-                                    status: 0,
+                                    is_additional_purchase: 1,
+                                    status: 1,
                                 })
                             } else {
                                 only_key_isset[0].spec_1_value = value.name;
@@ -689,8 +711,8 @@
                                     ean: '',
                                     pos_item_no: '',
                                     safty_qty: 0,
-                                    is_additional_purchase: 0,
-                                    status: 0,
+                                    is_additional_purchase: 1,
+                                    status: 1,
                                 })
                             } else {
                                 only_key_isset[0].spec_1_value = find_spac_obj_1.name;
@@ -892,7 +914,7 @@
                 var page_1_status = false;
             }
             // console.log(titleClientRect_2.top - titleClientRect_2.height) ;
-            if ((titleClientRect_2.top - titleClientRect_2.height) < 400) {
+            if ((titleClientRect_2.top - titleClientRect_2.height) < 300) {
                 var page_2_status = true;
             } else {
                 var page_2_status = false;

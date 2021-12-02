@@ -8,6 +8,15 @@
         .modal-body th {
             color: blue;
         }
+
+        .fa.fa-check {
+            color: green;
+        }
+
+        .fa.fa-times {
+            color: red;
+        }
+
     </style>
 @endsection
 
@@ -234,7 +243,7 @@
                 }
             });
 
-            $('#table_list tbody').on('click', '.slot_content_detail',function() {
+            $('#table_list tbody').on('click', '.slot_content_detail', function() {
                 let slot_content_id = $(this).attr("data-slot-content-id");
 
                 axios.post('/backend/advertisemsement_launch/ajax/detail', {
@@ -257,14 +266,17 @@
                         if (content.slot_color_code) {
                             $('#modal-slot-color-code').empty().append(`${content.slot_color_code}`);
                         } else {
-                            $('#modal-slot-color-code').empty().append(`<i class="fa fa-times fa-lg"></i>`);
+                            $('#modal-slot-color-code').empty().append(
+                                `<i class="fa fa-times fa-lg"></i>`);
                         }
 
                         if (content.slot_icon_name_url) {
                             $('#modal-slot-icon-name').empty().append(
-                                `<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`);
+                                `<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`
+                                );
                         } else {
-                            $('#modal-slot-icon-name').empty().append(`<i class="fa fa-times fa-lg"></i>`);
+                            $('#modal-slot-icon-name').empty().append(
+                                `<i class="fa fa-times fa-lg"></i>`);
                         }
 
                         if (content.slot_title) {
@@ -317,34 +329,46 @@
 
                         switch (content.product_assigned_type) {
                             case 'P':
-                                $('#product-block-tab a[href="#tab-product"]').tab('show').parent().show().siblings().hide();
+                                $('#product-block-tab a[href="#tab-product"]').tab('show').parent()
+                                    .show().siblings().hide();
                                 break;
                             case 'C':
-                                $('#product-block-tab a[href="#tab-category"]').tab('show').parent().show().siblings().hide();
+                                $('#product-block-tab a[href="#tab-category"]').tab('show').parent()
+                                    .show().siblings().hide();
                                 break;
                         }
 
                         $.each(details, function(key, value) {
-                            let sort = value.sort ? value.sort : '<i class="fa fa-times fa-lg"></i>';
-                            let image_name_url = value.image_name_url ? `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` : '<i class="fa fa-times fa-lg"></i>';
-                            let image_alt = value.image_alt ? value.image_alt : '<i class="fa fa-times fa-lg"></i>';
-                            let image_title = value.image_title ? value.image_title : '<i class="fa fa-times fa-lg"></i>';
-                            let image_abstract = value.image_abstract ? value.image_abstract : '<i class="fa fa-times fa-lg"></i>';
+                            let sort = value.sort ? value.sort :
+                                '<i class="fa fa-times fa-lg"></i>';
+                            let image_name_url = value.image_name_url ?
+                                `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` :
+                                '<i class="fa fa-times fa-lg"></i>';
+                            let image_alt = value.image_alt ? value.image_alt :
+                                '<i class="fa fa-times fa-lg"></i>';
+                            let image_title = value.image_title ? value.image_title :
+                                '<i class="fa fa-times fa-lg"></i>';
+                            let image_abstract = value.image_abstract ? value.image_abstract :
+                                '<i class="fa fa-times fa-lg"></i>';
                             let link_content = '<i class="fa fa-times fa-lg"></i>';
 
                             switch (value.image_action) {
                                 // URL
                                 case 'U':
-                                    link_content = `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
+                                    link_content =
+                                        `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
                                     break;
-                                // 商品分類
+                                    // 商品分類
                                 case 'C':
                                     link_content = `商品分類: ${value.link_content}`;
                                     break;
                             }
 
-                            let is_target_blank = value.is_target_blank == 1 ? '<i class="fa fa-check fa-lg"></i>' : '<i class="fa fa-times fa-lg"></i>';
-                            let texts = value.texts ? value.texts : '<i class="fa fa-times fa-lg"></i>';
+                            let is_target_blank = value.is_target_blank == 1 ?
+                                '<i class="fa fa-check fa-lg"></i>' :
+                                '<i class="fa fa-times fa-lg"></i>';
+                            let texts = value.texts ? value.texts :
+                                '<i class="fa fa-times fa-lg"></i>';
 
                             switch (value.data_type) {
                                 case 'IMG':

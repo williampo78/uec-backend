@@ -133,7 +133,7 @@
                         },
                         remote: {
                             param: {
-                                url: "/backend/advertisemsement_launch/ajax/canPassActiveValidation",
+                                url: "/backend/advertisemsement_launch/ajax/can-pass-active-validation",
                                 type: "post",
                                 dataType: "json",
                                 cache: false,
@@ -177,7 +177,7 @@
                         required: true,
                         remote: {
                             param: {
-                                url: "/backend/advertisemsement_launch/ajax/canPassActiveValidation",
+                                url: "/backend/advertisemsement_launch/ajax/can-pass-active-validation",
                                 type: "post",
                                 dataType: "json",
                                 cache: false,

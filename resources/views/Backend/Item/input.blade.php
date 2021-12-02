@@ -21,8 +21,8 @@
                         @if (isset($item))
                             <form role="form" id="new-form" method="POST" action="{{ route('item.update', $item->id) }}"
                                 enctype="multipart/form-data" novalidate="novalidate">
-                                {{ method_field('PUT') }}
-                                {{ csrf_field() }}
+                                @method('PUT')
+                                @csrf
                             @else
                                 <form role="form" id="new-form" method="POST" action="{{ route('item') }}"
                                     enctype="multipart/form-data" novalidate="novalidate">

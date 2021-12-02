@@ -11,8 +11,8 @@
                         <form role="form" id="new-form" method="POST"
                             action="{{ route('requisitions_purchase.update', $requisitionsPurchase->id) }}"
                             enctype="multipart/form-data" novalidate="novalidate">
-                            {{ method_field('PUT') }}
-                            {{ csrf_field() }}
+                            @method('PUT')
+                            @csrf
                         @else
                             <form role="form" id="new-form" method="post"
                                 action="{{ route('requisitions_purchase.store') }}" enctype="multipart/form-data">
@@ -280,7 +280,7 @@
                 ItemListDel(id, key) {
                     var checkDel = confirm('你確定要刪除嗎？');
                     if (checkDel) {
-                        if (id !== '') { //如果ID 不等於空 就 AJAX DEL 
+                        if (id !== '') { //如果ID 不等於空 就 AJAX DEL
                             axios({
                                     method: 'delete',
                                     url: '/backend/requisitions_purchase/' + id + '?&type=Detail'
@@ -371,7 +371,7 @@
                     var sum_price = 0;
                     $.each(details, function(key, obj) {
                         // details[key].item_price = 0  ;
-                        //原幣小計 = 單價 * 數量 
+                        //原幣小計 = 單價 * 數量
                         if (obj.is_gift == 1) { //如果是贈品則不計算單價
                             obj.subtotal_price = 0;
                         } else if (obj.item_qty > 0) {
@@ -403,7 +403,7 @@
                             requisitions_purchase.total_tax_price = 0; //稅額
                             break;
                     }
-                    requisitions_purchase.original_total_price = sum_price; //原幣總金額  
+                    requisitions_purchase.original_total_price = sum_price; //原幣總金額
                     requisitions_purchase.total_price = sum_price; //總金額
                     return details;
                 },
@@ -414,7 +414,7 @@
 
         new requisitions().$mount('#requisitions_vue_app');
 
-        //Vue Js 如果要用 select2 要另外寫 
+        //Vue Js 如果要用 select2 要另外寫
         Vue.component("select2", {
             props: ["options", "value", "details", "selectkey", "requisitions_purchase"],
             template: "#select2-template",

@@ -29,7 +29,7 @@
                                                              value="{{ $data['getData']['user_name']?? '' }}"></div>
                                 <div class="col-sm-1 text-right"><h5>狀態</h5></div>
                                 <div class="col-sm-2">
-                                    <select class="form-control js-select2" name="active" id="active">
+                                    <select class="form-control js-select2-active" name="active" id="active">
                                         <option
                                             value="1" {{ (isset($data['getData']['active']) && $data['getData']['active'] == '1')? 'selected':''  }}>
                                             啟用
@@ -107,6 +107,8 @@
 
 @section('js')
     <script>
-        $('select').select2();
+        $('.js-select2-active').select2({
+            theme: "bootstrap",
+        });
     </script>
 @endsection

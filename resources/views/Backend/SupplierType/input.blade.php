@@ -23,8 +23,8 @@
                             <form role="form" id="new-form" method="POST"
                                 action="{{ route('supplier_type.update', $ShowData['id']) }}"
                                 enctype="multipart/form-data" novalidate="novalidate">
-                                {{ method_field('PUT') }}
-                                {{ csrf_field() }}
+                                @method('PUT')
+                                @csrf
                             @else
                                 <form role="form" id="new-form" method="POST" action="{{ route('supplier_type') }}"
                                     enctype="multipart/form-data" novalidate="novalidate">
@@ -37,15 +37,15 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_supplier_type_code">
-                                            <label for="supplier_type_code">編號</label>
-                                            <input class="form-control validate[required]" name="code"
+                                            <label for="supplier_type_code">編號 <span style="color:red;">*</span></label>
+                                            <input class="form-control" name="code"
                                                 value="{{ isset($ShowData['code']) ? $ShowData['code'] : '' }}">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group" id="div_supplier_type_name">
-                                            <label for="supplier_type_name">供應商類別名稱</label>
-                                            <input class="form-control validate[required]" name="name"
+                                            <label for="supplier_type_name">供應商類別名稱 <span style="color:red;">*</span></label>
+                                            <input class="form-control" name="name"
                                                 value="{{ isset($ShowData['name']) ? $ShowData['name'] : '' }}">
                                         </div>
                                     </div>
@@ -72,7 +72,46 @@
 @section('js')
     <script>
         $(function () {
-            $("#new-form").validationEngine();
+            // 驗證表單
+            $("#new-form").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    $('#btn-save').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    code: {
+                        required: true,
+                    },
+                    name: {
+                        required: true,
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.closest(".form-group").length) {
+                        element.closest(".form-group").append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
         })
     </script>
 @endsection

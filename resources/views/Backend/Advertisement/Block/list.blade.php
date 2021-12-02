@@ -9,6 +9,14 @@
             color: blue;
         }
 
+        .fa.fa-check {
+            color: green;
+        }
+
+        .fa.fa-times {
+            color: red;
+        }
+
     </style>
 @endsection
 
@@ -202,7 +210,7 @@
                     })
                     .then(function(response) {
                         let ad_slot = response.data.ad_slot;
-                        
+
                         $('#modal_applicable_page').empty().append(ad_slot.description);
                         $('#modal_slot_code').empty().append(ad_slot.slot_code);
                         $('#modal_slot_desc').empty().append(ad_slot.slot_desc);

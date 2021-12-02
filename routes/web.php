@@ -70,13 +70,16 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/order_supplier/ajax' , [OrderSupplierController::class, 'ajax']);
 
     Route::resource('/test',TestController::class, ['names' => ['index' => 'test']]);
-    Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
     Route::resource('/roles',RolesController::class, ['names' => ['index' => 'roles']]);
+
+    // 使用者管理
+    Route::resource('/profile',UsersController::class, ['names' => ['index' => 'profile']]);
     Route::resource('/users',UsersController::class, ['names' => ['index' => 'users']]);
-    Route::get('/usersAjax', [UsersController::class, 'ajax']);     //驗證使用者帳號
+    Route::post('/users/ajax/is-user-account-repeat', [UsersController::class, 'isUserAccountRepeat']);     //驗證使用者帳號是否重複
     Route::get('/user_profile', [UsersController::class, 'profile']);
     Route::post('/user_profile', [UsersController::class, 'updateProfile']);
     Route::post('/users/ajax',[UsersController::class,'ajaxDetail']);
+
     Route::resource('/qa',QAController::class, ['names' => ['index' => 'qa']]);
     Route::resource('/web_category_hierarchy',WebCategoryHierarchyController::class, ['names' => ['index' => 'web_category_hierarchy']]) ;
     Route::post('/web_category_hierarchy/ajax',[WebCategoryHierarchyController::class,'ajax']) ;
@@ -90,10 +93,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     // 廣告上架
     Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, ['names' => ['index' => 'advertisemsement_launch']]);
     Route::post('/advertisemsement_launch/ajax/detail', [AdvertisementLaunchController::class, 'getDetailByAjax']);
-    Route::post('/advertisemsement_launch/ajax/canPassActiveValidation', [AdvertisementLaunchController::class, 'canPassActiveValidation']);
+    Route::post('/advertisemsement_launch/ajax/can-pass-active-validation', [AdvertisementLaunchController::class, 'canPassActiveValidation']);
 
     Route::resource('/webcontents',WebContentsController::class, ['names' => ['index' => 'webcontents']]);
-});
+}); 
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
 Route::post('custom-login', [LoginAuthController::class, 'customLogin'])->name('login.custom');

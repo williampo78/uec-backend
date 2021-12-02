@@ -1,16 +1,3 @@
-jQuery.validator.addMethod("greaterThan", function (value, element, params) {
-    if (!/Invalid|NaN/.test(new Date(value))) {
-        return new Date(value) > new Date(params);
-    }
-
-    return isNaN(value) && isNaN(params) ||
-        (Number(value) > Number(params));
-}, '必須大於 {0}');
-
-jQuery.validator.addMethod("dateGreaterThanNow", function (value, element, params) {
-    return new Date(value) > new Date();
-}, '必須大於目前時間');
-
 // 加入圖檔區塊欄位驗證
 function validateImageBlock(row_no) {
     $(`#image-block table > tbody [name="image_block_sort[${row_no}]"]`).rules("add", {
