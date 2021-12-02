@@ -107,6 +107,10 @@
 
 @section('js')
     <script>
-        $('select').select2();
+        $('.js-select2').select2({
+            allowClear: true,
+            theme: "bootstrap",
+            placeholder: '',
+        });
     </script>
 @endsection

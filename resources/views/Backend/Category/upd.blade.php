@@ -21,9 +21,9 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group" id="div_category">
-                                        <label for="category">主分類</label>
-                                        <select class="form-control js-select2 validate[required]" name="primary_category_id" id="category">
-                                            <option value="">請選擇</option>
+                                        <label for="category">主分類 <span style="color:red;">*</span></label>
+                                        <select class="form-control js-select2" name="primary_category_id" id="category">
+                                            <option value=""></option>
                                             @foreach($primary_category_list as $id => $v)
                                                 <option value='{{ $id }}' {{$data['primary_category_id']==$id? 'selected' : ''}}>{{ $v['name'] }}</option>
                                             @endforeach
@@ -37,14 +37,14 @@
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_number">
-                                                <label for="number">編號</label>
-                                                <input class="form-control validate[required]" name="number" id="number" value="{{$data['number']}}">
+                                                <label for="number">編號 <span style="color:red;">*</span></label>
+                                                <input class="form-control" name="number" id="number" value="{{$data['number']}}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_name">
-                                                <label for="name">名稱</label>
-                                                <input class="form-control validate[required]" name="name" id="name" value="{{$data['name']}}">
+                                                <label for="name">名稱 <span style="color:red;">*</span></label>
+                                                <input class="form-control" name="name" id="name" value="{{$data['name']}}">
                                             </div>
                                         </div>
                                     </div>
@@ -70,7 +70,52 @@
 @section('js')
     <script>
         $(function () {
-            $("#edit-form").validationEngine();
+            $('.js-select2').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: '請選擇',
+            });
+
+            // 驗證表單
+            $("#edit-form").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    $('#btn-save').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    primary_category_id: {
+                        required: true,
+                    },
+                    number: {
+                        required: true,
+                    },
+                    name: {
+                        required: true,
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.closest(".form-group").length) {
+                        element.closest(".form-group").append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
         })
     </script>
 @endsection
