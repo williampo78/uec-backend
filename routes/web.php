@@ -96,7 +96,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/advertisemsement_launch/ajax/can-pass-active-validation', [AdvertisementLaunchController::class, 'canPassActiveValidation']);
 
     Route::resource('/webcontents',WebContentsController::class, ['names' => ['index' => 'webcontents']]);
-});
+}); 
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
 Route::post('custom-login', [LoginAuthController::class, 'customLogin'])->name('login.custom');

@@ -7,11 +7,10 @@ use App\Models\Products;
 use App\Models\ProductPhotos;
 use App\Services\UniversalService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use ImageUpload ;
+use ImageUpload;
 
 class ProductsService
 {
@@ -22,12 +21,67 @@ class ProductsService
         $this->universalService = $universalService;
     }
 
-    public function getProducts($data = [])
+    public function getProducts($in = [])
     {
         $agent_id = Auth::user()->agent_id;
+        
+        $Products = Products::where('agent_id', $agent_id);
+        //庫存類型
+        if (isset($in['stock_type'])) {
+            $Products->where('stock_type', '=', $in['stock_type']);
+        }
+        //商品編號
+        if (isset($in['product_no'])) {
+            $product_no = explode(',',$in['product_no']);
+            foreach($product_no as $key => $val){
+                if($key == 0){
+                    $Products->where('product_no', 'like', '%' . $val . '%');
+                }else{
+                    $Products->orWhere('product_no', 'like', '%' . $val . '%');
+                }
+            }
+        }
+        //供應商
+        if (isset($in['supplier_id'])) {
+            $Products->where('supplier_id', $in['supplier_id']);
+        }
+        //商品通路
+        if(isset($in['selling_channel'])){
+            $Products->where('selling_channel', $in['selling_channel']);
+        }
+        //商品名稱
+        if (isset($in['product_name'])) {
+            $Products->where('product_name', 'like', '%' . $in['product_name'] . '%');
+        }
+        //前台分類
+        if(isset($in['category_id'])){
+            $Products->where('category_id' , $in['category_id']) ; 
+        }
+        //配送方式
+        if(isset($in['lgst_method'])){
+            $Products->where('lgst_method' , $in['lgst_method']) ; 
+        }
+        //商品類型
+        if(isset($in['product_type'])){
+            $Products->where('product_type' , $in['product_type']) ; 
+        }
+        //上架狀態
+        if(isset($in['approval_status'])){
+            $Products->where('approval_status' , $in['approval_status']) ; 
+        }
+        //上架 下架時間 
+        if(isset($in['select_start_date']) && isset($in['select_end_date'])){
+            $select_start_date = $in['select_start_date'] . ' 00:00:00' ; 
+            $select_end_date = $in['select_end_date'] . ' 23:59:59'; 
+            $Products->whereDate('start_launched_at' , '<=' ,$select_start_date)
+                     ->whereDate('end_launched_at' , '>=' ,$select_end_date);
+        }
+        //筆數
+        if(isset($in['limit'])){
+            $Products->limit($in['limit']) ; 
+        }
 
-        $result = Products::where('agent_id', $agent_id)
-            ->get();
+        $result = $Products->get();
 
         return $result;
     }
@@ -71,6 +125,8 @@ class ProductsService
                 'warranty_days' => $in['warranty_days'],
                 'warranty_scope' => $in['warranty_scope'],
                 'spec_dimension' => $in['spec_dimension'],
+                'spec_1' => $in['spec_1'],
+                'spec_2' => $in['spec_2'],
                 'selling_channel' => $in['selling_channel'],
                 'delivery_type' => $in['delivery_type'],
                 'created_by' => $user_id,
@@ -84,7 +140,7 @@ class ProductsService
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
-                    'product_id' => $products->id,
+                    'product_id' => $products_id,
                     'sort' => $val['sort'],
                     'spec_1_value' => $val['spec_1_value'],
                     'spec_2_value' => $val['spec_2_value'],
@@ -103,21 +159,22 @@ class ProductsService
                 ];
                 ProductItems::create($skuInsert);
             }
-            $fileList = [] ;
-            $uploadPath = '/products/' . $products->id ; 
-            foreach($file['filedata'] as $key => $val){
-                $fileList[$key] = ImageUpload::uploadImage($val,$uploadPath) ; 
+            $fileList = [];
+            $uploadPath = '/products/' . $products->id;
+            foreach ($file['filedata'] as $key => $val) {
+                $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath);
             }
-            foreach($fileList as $key => $val) {
+            foreach ($fileList as $key => $val) {
                 $insertImg = [
-                    'product_id' =>  $products->id,
-                    'photo_name' =>  $val['image'],
-                    'sort' => $key ,
+                    'product_id' => $products->id,
+                    'photo_name' => $val['image'],
+                    'sort' => $key,
                     'created_by' => $user_id,
                     'updated_by' => $user_id,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
+                ProductPhotos::create($insertImg) ; 
             }
             DB::commit();
             $result = true;
@@ -126,8 +183,7 @@ class ProductsService
             Log::warning($e->getMessage());
             $result = false;
         }
-        
-        
+
         return $result;
     }
 

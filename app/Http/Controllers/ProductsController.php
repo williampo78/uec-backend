@@ -31,12 +31,20 @@ class ProductsController extends Controller
     {
         $in = $request->input() ; 
         
-        $result = [] ; 
-    
-        // $result = $this->productsService->get_Products($request) ; 
+        $result = [
+            'products' => [],
+        ] ; 
+        
+        if(count($in) !== 0 ){
+            $result['products'] = $this->productsService->getProducts($in) ; 
+        }
+        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
 
+        // dd($result) ; 
+        // dd($result) ;
         return view('Backend.Products.list',$result);
-    }
+    } 
 
     /**
      * Show the form for creating a new resource.
@@ -49,7 +57,6 @@ class ProductsController extends Controller
         $result['supplier'] = $this->supplierService->getSupplier(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ;
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();
-        // dd($result) ; 
         return view('Backend.Products.input',$result);
     }
 
