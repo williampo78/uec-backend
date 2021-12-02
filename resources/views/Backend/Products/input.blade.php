@@ -1,5 +1,5 @@
 @extends('Backend.master')
-@section('title', '分類階層內容管理')
+@section('title', '商品主檔 - 新增基本資訊')
 @section('content')
     <style>
         .no-pa {
@@ -117,7 +117,7 @@
                                 <div class="col-sm-2 no-pa">
                                     <label class="control-label">庫存類型</label><span class="redtext">*</span>
                                 </div>
-                                <div class="col-sm-3 ">
+                                <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="stock_type" value="A" checked> 買斷
                                         [A]
@@ -187,7 +187,7 @@
                                 <div class="col-sm-9">
                                     <select class="form-control category_id" name="category_id">
                                         @foreach ($pos as $key => $val)
-                                            <option value="{{$val->id}}"> {{$val->name}}</option>
+                                            <option value="{{ $val->id }}"> {{ $val->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -914,7 +914,7 @@
                 var page_1_status = false;
             }
             // console.log(titleClientRect_2.top - titleClientRect_2.height) ;
-            if ((titleClientRect_2.top - titleClientRect_2.height) < 400) {
+            if ((titleClientRect_2.top - titleClientRect_2.height) < 300) {
                 var page_2_status = true;
             } else {
                 var page_2_status = false;
