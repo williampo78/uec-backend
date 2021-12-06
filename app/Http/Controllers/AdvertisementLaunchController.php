@@ -42,9 +42,9 @@ class AdvertisementLaunchController extends Controller
 
         $ad_slot_contents = $ad_slot_contents->map(function ($obj, $key) {
             /*
-            上下架狀態
-            當前時間在上架時間內，且廣告上架內容的狀態為啟用，列為上架
-            其他為下架
+             * 上下架狀態
+             * 當前時間在上架時間內，且廣告上架內容的狀態為啟用，列為上架
+             * 其他為下架
              */
             $obj->launch_status = (Carbon::now()->between($obj->start_at, $obj->end_at) && $obj->slot_content_active == 1) ? '上架' : '下架';
 

@@ -45,7 +45,7 @@ class RequisitionsPurchaseController extends Controller
     {
         $params['active'] = 0;
         $input = $request->input();
-        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($input);
         return view('Backend.RequisitionsPurchase.list', $result);
     }
@@ -66,7 +66,7 @@ class RequisitionsPurchaseController extends Controller
             'tax' => 0,
         ];
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
-        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['item'] = $this->itemService->getItem()->get(); //品項
         $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
         //select 2 套件需要text 辨別 option name
@@ -126,7 +126,7 @@ class RequisitionsPurchaseController extends Controller
         $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id);
         $result['requisitionsPurchaseDetail'] = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id);
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
-        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['item'] = $this->itemService->getItem()->get(); //品項
         foreach ($result['item'] as $key => $val) {
             $result['item'][$key]->text = $val->name;

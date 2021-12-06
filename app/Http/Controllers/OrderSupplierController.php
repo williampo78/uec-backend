@@ -35,7 +35,7 @@ class OrderSupplierController extends Controller
 
         $data = [];
         $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
+        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
         $data['order_supplier'] = ($getData) ? $this->orderSupplierService->getOrderSupplier($getData) : [];
         $data['status_code'] = $this->universalService->getStatusCode();
         if (!isset($getData['select_start_date']) || !isset($getData['select_end_date'])) {
@@ -58,7 +58,7 @@ class OrderSupplierController extends Controller
     public function create()
     {
         $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSupplier();
+        $data['supplier'] = $supplier->getSuppliers();
         $data['requisitions_purchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchaseList();
         foreach ($data['requisitions_purchase'] as $key => $val) {
             $data['requisitions_purchase'][$key]->text = $val->number;
@@ -108,7 +108,7 @@ class OrderSupplierController extends Controller
     public function edit($id)
     {
         $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSupplier();
+        $data['supplier'] = $supplier->getSuppliers();
         $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id)->toArray();
         $data['order_supplier_detail'] = $this->orderSupplierService->getOrderSupplierDetail($id)->toArray();
         $data['act'] = 'upd';

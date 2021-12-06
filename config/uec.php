@@ -15,7 +15,7 @@ return [
     'isTesting' => env('UEC_TEST', 'true'),
     'mailPrefix' => "[ 電商測試 ]",
 
-    // 版位類型，I：圖檔(image)、II：母子圖檔(image+image)、T：文字(text)、S：商品、IS：圖檔+商品、X：非人工上稿
+    // 版位類型
     'ad_slot_type_option' => [
         'I' => '圖檔',
         'II' => '母子圖檔',
@@ -29,5 +29,12 @@ return [
     'active_option' => [
         1 => '啟用',
         0 => '關閉',
+    ],
+
+    // 商品類型
+    'product_type_option' => [
+        'N' => '一般品',
+        'G' => '贈品',
+        'A' => '加購品',
     ],
 ];

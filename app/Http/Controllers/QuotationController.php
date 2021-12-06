@@ -43,7 +43,7 @@ class QuotationController extends Controller
 
         $data = [];
         $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
+        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
         $data['quotation'] = ($getData)? $this->quotationService->getQuotation($getData) : [];
         $data['status_code'] = $this->quotationService->getStatusCode();
         if (!isset($getData['select_start_date']) || !isset($getData['select_end_date'])){
@@ -65,7 +65,7 @@ class QuotationController extends Controller
     public function create()
     {
         $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSupplier();
+        $data['supplier'] = $supplier->getSuppliers();
         $data['act'] = 'add';
 
         return view('Backend.Quotation.add', compact('data'));
@@ -111,7 +111,7 @@ class QuotationController extends Controller
     public function edit($id)
     {
         $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSupplier();
+        $data['supplier'] = $supplier->getSuppliers();
         $data['quotation'] = $this->quotationService->getQuotationById($id);
         $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
         $data['act'] = 'upd';
@@ -166,7 +166,7 @@ class QuotationController extends Controller
             $quotationStatus = $this->quotationService->getStatusCode();
             $taxList = $this->quotationService->getTaxList();
             $supplier = new SupplierService();
-            $supplierList = $this->universalService->idtokey($supplier->getSupplier());
+            $supplierList = $this->universalService->idtokey($supplier->getSuppliers());
             $data = $this->quotationService->getQuotationById($rs['id']);
             $data['status_code'] = $quotationStatus[$data['status_code']] ?? '';
             $data['supplier_name'] = $supplierList[$data['supplier_id']]->name ?? '';
