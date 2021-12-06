@@ -28,7 +28,7 @@ class SupplierController extends Controller
     public function index()
     {
         $result = [];
-        $result['supplier'] = $this->supplierService->getSupplier();
+        $result['supplier'] = $this->supplierService->getSuppliers();
         return view('Backend.Supplier.list', $result);
     }
 
@@ -94,10 +94,10 @@ class SupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $contact_json = $request->input('contact_json') ; 
+        $contact_json = $request->input('contact_json') ;
         $input = $request->input();
         unset($input['contact_json']) ;
-        $this->contactService->createContact('tablename' , $contact_json) ; 
+        $this->contactService->createContact('tablename' , $contact_json) ;
         $result = $this->supplierService->updateSupplier($input, $id);
         return redirect(route('supplier'));
     }

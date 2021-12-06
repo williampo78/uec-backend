@@ -4,23 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\ProductsService;
-use App\Services\SupplierService ; 
-use App\Services\BrandsService ; 
-use App\Services\WebCategoryHierarchyService ; 
+use App\Services\SupplierService ;
+use App\Services\BrandsService ;
+use App\Services\WebCategoryHierarchyService ;
 use ImageUpload ;
 
 class ProductsController extends Controller
 {
     private $productsService;
     public function __construct(ProductsService $productsService,
-    SupplierService $supplierService , 
+    SupplierService $supplierService ,
     BrandsService $brandsService,
     WebCategoryHierarchyService $webCategoryHierarchyService)
     {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
-        $this->brandsService = $brandsService ; 
-        $this->webCategoryHierarchyService = $webCategoryHierarchyService ; 
+        $this->brandsService = $brandsService ;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService ;
     }
     /**
      * Display a listing of the resource.
@@ -29,22 +29,22 @@ class ProductsController extends Controller
      */
     public function index(Request $request)
     {
-        $in = $request->input() ; 
-        
+        $in = $request->input() ;
+
         $result = [
             'products' => [],
-        ] ; 
-        
+        ] ;
+
         if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ; 
+            $result['products'] = $this->productsService->getProducts($in) ;
         }
-        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
 
-        // dd($result) ; 
+        // dd($result) ;
         // dd($result) ;
         return view('Backend.Products.list',$result);
-    } 
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -53,8 +53,8 @@ class ProductsController extends Controller
      */
     public function create()
     {
-        $result = [] ; 
-        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result = [] ;
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ;
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();
         return view('Backend.Products.input',$result);
@@ -68,6 +68,7 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
+        // dump($request->input() , $request->file()) ;
         $this->productsService->addProducts($request->input(), $request->file()) ;
         $act = 'add';
         $route_name = 'products';
@@ -127,17 +128,17 @@ class ProductsController extends Controller
     {
         //
     }
-    public function testview(){  
-        $result = [] ; 
-        $filename = '' ; 
-        $result['web_url'] = ImageUpload::getImage($filename) ? '' : '' ; 
+    public function testview(){
+        $result = [] ;
+        $filename = '' ;
+        $result['web_url'] = ImageUpload::getImage($filename) ? '' : '' ;
         return view('Backend.Products.test',$result);
 
     }
     public function upload_img(Request $request){
-        $file = $request->file('photo') ; 
-        $path = '/photo/1' ; 
-        $upload = ImageUpload::uploadImage($file,$path) ; 
+        $file = $request->file('photo') ;
+        $path = '/photo/1' ;
+        $upload = ImageUpload::uploadImage($file,$path) ;
     }
 
 }

@@ -12,10 +12,24 @@ class SupplierService
     {
     }
 
-    public function getSupplier()
+    public function getSuppliers($query_data = [])
     {
         $agent_id = Auth::user()->agent_id;
-        return Supplier::where('agent_id', $agent_id)->where('active', 1)->get();
+        $result = [];
+
+        $result = Supplier::where('agent_id', $agent_id);
+
+        if (isset($query_data['active'])) {
+            if ($query_data['active'] == 1) {
+                $result = $result->where('active', 1);
+            } else {
+                $result = $result->where('active', 0);
+            }
+        }
+
+        $result = $result->get();
+
+        return $result;
     }
 
     public function addSupplier($inputdata)
@@ -41,7 +55,7 @@ class SupplierService
 
         return Supplier::where('id', $id)->update($input);
     }
- 
+
 
 
 }

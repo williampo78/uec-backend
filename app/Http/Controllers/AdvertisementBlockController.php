@@ -8,15 +8,15 @@ use App\Services\LookupValuesVService;
 
 class AdvertisementBlockController extends Controller
 {
-    private $advertisementService;
-    private $lookupValuesVService;
+    private $advertisement_service;
+    private $lookup_values_v_service;
 
     public function __construct(
-        AdvertisementService $advertisementService,
-        LookupValuesVService $lookupValuesVService
+        AdvertisementService $advertisement_service,
+        LookupValuesVService $lookup_values_v_service
     ) {
-        $this->advertisementService = $advertisementService;
-        $this->lookupValuesVService = $lookupValuesVService;
+        $this->advertisement_service = $advertisement_service;
+        $this->lookup_values_v_service = $lookup_values_v_service;
     }
 
     /**
@@ -30,12 +30,12 @@ class AdvertisementBlockController extends Controller
 
         $query_data = $request->only(['applicable_page', 'device', 'active']);
 
-        $ad_slots = $this->advertisementService->getSlots($query_data);
-        $applicable_page = $this->lookupValuesVService->getApplicablePage();
+        $ad_slots = $this->advertisement_service->getSlots($query_data);
+        $applicable_pages = $this->lookup_values_v_service->getApplicablePages();
 
         return view(
             'Backend.Advertisement.Block.list',
-            compact('ad_slots', 'applicable_page', 'query_data')
+            compact('ad_slots', 'applicable_pages', 'query_data')
         );
     }
 
@@ -79,7 +79,7 @@ class AdvertisementBlockController extends Controller
      */
     public function edit($id)
     {
-        $ad_slot = $this->advertisementService->getSlotById($id);
+        $ad_slot = $this->advertisement_service->getSlotById($id);
 
         return view('Backend.Advertisement.Block.update', compact('ad_slot'));
     }
@@ -96,7 +96,7 @@ class AdvertisementBlockController extends Controller
         $input_data = $request->only(['active', 'remark']);
         $input_data['id'] = $id;
 
-        if (! $this->advertisementService->updateSlot($input_data)) {
+        if (! $this->advertisement_service->updateSlot($input_data)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
@@ -124,7 +124,7 @@ class AdvertisementBlockController extends Controller
     {
         $slot_id = $request->input('slot_id');
 
-        $ad_slot = $this->advertisementService->getSlotById($slot_id);
+        $ad_slot = $this->advertisement_service->getSlotById($slot_id);
 
         $ad_slot->remark = nl2br($ad_slot->remark);
 

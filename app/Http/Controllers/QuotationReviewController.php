@@ -35,7 +35,7 @@ class QuotationReviewController extends Controller
     {
         $data['user_name'] = Auth::user()->user_name;
         $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
+        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
         $data['status_code'] = $this->quotationService->getStatusCode();
         $data['quotation'] = $this->quotationService->getQuotationReview();
 
@@ -83,7 +83,7 @@ class QuotationReviewController extends Controller
     {
         $data['id'] = $id;
         $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSupplier());
+        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
         $data['status_code'] = $this->quotationService->getStatusCode();
         $data['taxList'] = $this->quotationService->getTaxList();
         $data['quotation'] = $this->quotationService->getQuotationById($id);

@@ -183,11 +183,11 @@
                                         <h5>上架時間</h5>
                                     </div>
                                     <div class="col-sm-8">
-                                        <div class="form-group" id="div_select_start_date">
+                                        <div class="form-group" id="div_start_launched_at">
                                             <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="select_start_date"
-                                                    id="select_start_date"
-                                                    value="{{ request()->input('select_start_date') }}" />
+                                                <input type='text' class="form-control" name="start_launched_at"
+                                                    id="start_launched_at"
+                                                    value="{{ request()->input('start_launched_at') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -201,11 +201,11 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="col-sm-8">
-                                        <div class="form-group" id="div_select_end_date">
+                                        <div class="form-group" id="div_end_launched_at">
                                             <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="select_end_date"
-                                                    id="select_end_date"
-                                                    value="{{ request()->input('select_end_date') }}" />
+                                                <input type='text' class="form-control" name="end_launched_at"
+                                                    id="end_launched_at"
+                                                    value="{{ request()->input('end_launched_at') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>

@@ -40,7 +40,7 @@ class ItemController extends Controller
     public function create()
     {
         $category = $this->categoryService->getCategory(); //分類
-        $supplier = $this->supplierService->getSupplier(); //供應商
+        $supplier = $this->supplierService->getSuppliers(); //供應商
         $result['category'] = $category;
         $result['supplier'] = $supplier;
         return view('Backend.Item.input', $result);
@@ -88,7 +88,7 @@ class ItemController extends Controller
     public function edit($id)
     {
         $category = $this->categoryService->getCategory(); //分類
-        $supplier = $this->supplierService->getSupplier(); //供應商
+        $supplier = $this->supplierService->getSuppliers(); //供應商
         $item = $this->itemService->getItem(1, $id)->first(); //返回array
         $itemPhoto = $this->itemService->getItemPhoto($id);
         return view('Backend.Item.input', compact('item', 'category', 'supplier','itemPhoto'));
@@ -203,8 +203,8 @@ class ItemController extends Controller
     {
         $input = [] ;
         $input['type'] = $request->input('num') == 1 ? 'item' : 'item_photo' ;
-        $input['num']  = $request->input('num') ; 
-        $input['id']   = $request->input('id'); 
+        $input['num']  = $request->input('num') ;
+        $input['id']   = $request->input('id');
         $result = $this->itemService->delImage($input);
         if($result){
             return response()->json(['success'=>'true']);

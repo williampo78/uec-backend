@@ -46,7 +46,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $data['suppliers'] = $this->supplierService->getSupplier();
+        $data['suppliers'] = $this->supplierService->getSuppliers();
         $data['roles'] = $this->rolePermissionService->getRoles("");
         return view('Backend.Users.add', compact('data'));
     }
@@ -87,7 +87,7 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $data['suppliers'] = $this->supplierService->getSupplier();
+        $data['suppliers'] = $this->supplierService->getSuppliers();
         $data['roles'] = $this->rolePermissionService->getRoles("");
         $data['user'] = Users::find($id);
         $data['user_roles'] = $this->usersService->getUserRoles($id);
@@ -181,7 +181,7 @@ class UsersController extends Controller
         $data['user_active'] = $user['active']==1?'啟用':'關閉';
         $data['user_email'] = $user['user_email'];
 
-        $suppliers = $this->supplierService->getSupplier();
+        $suppliers = $this->supplierService->getSuppliers();
         $data['supplier'] = '';
         foreach ($suppliers as $item) {
             if ($user['supplier_id']== $item['id']) {

@@ -45,7 +45,7 @@
                                         <select class="form-control js-select2-applicable-page" name="applicable_page"
                                             id="applicable_page">
                                             <option></option>
-                                            @foreach ($applicable_page as $obj)
+                                            @foreach ($applicable_pages as $obj)
                                                 <option value='{{ $obj->code }}'
                                                     {{ isset($query_data['applicable_page']) && $obj->code == $query_data['applicable_page'] ? 'selected' : '' }}>
                                                     {{ $obj->description }}</option>

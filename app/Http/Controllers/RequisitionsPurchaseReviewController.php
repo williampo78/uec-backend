@@ -37,7 +37,7 @@ class RequisitionsPurchaseReviewController extends Controller
         $data = [];
         $data['user_name'] = Auth::user()->user_name;
         $supplier = new SupplierService();
-        $data['supplier'] = $this->universal_service->idtokey($supplier->getSupplier());
+        $data['supplier'] = $this->universal_service->idtokey($supplier->getSuppliers());
         $data['status_code'] = $this->universal_service->getStatusCode();
         $data['requisition_purchase'] = $this->requisition_purchase_service->getRequisitionsPurchaseReview();
 
@@ -87,7 +87,7 @@ class RequisitionsPurchaseReviewController extends Controller
         $data = [];
         $data['id'] = $id;
         $supplier = new SupplierService();
-        $data['supplier'] = $this->universal_service->idtokey($supplier->getSupplier());
+        $data['supplier'] = $this->universal_service->idtokey($supplier->getSuppliers());
         $data['status_code'] = $this->quotation_service->getStatusCode();
         $data['requisitions_purchase'] = $this->requisition_purchase_service->getRequisitionPurchaseById($id);
         $data['requisitions_purchase_detail'] = $this->requisition_purchase_service->getRequisitionPurchaseDetail($id);
