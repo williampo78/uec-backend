@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\Models\ProductItems;
-use App\Models\Products;
 use App\Models\ProductPhotos;
+use App\Models\Products;
+use App\Models\Product_items;
 use App\Services\UniversalService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class ProductsService
     public function getProducts($in = [])
     {
         $agent_id = Auth::user()->agent_id;
-        
+
         $Products = Products::where('agent_id', $agent_id);
         //庫存類型
         if (isset($in['stock_type'])) {
@@ -32,11 +33,11 @@ class ProductsService
         }
         //商品編號
         if (isset($in['product_no'])) {
-            $product_no = explode(',',$in['product_no']);
-            foreach($product_no as $key => $val){
-                if($key == 0){
+            $product_no = explode(',', $in['product_no']);
+            foreach ($product_no as $key => $val) {
+                if ($key == 0) {
                     $Products->where('product_no', 'like', '%' . $val . '%');
-                }else{
+                } else {
                     $Products->orWhere('product_no', 'like', '%' . $val . '%');
                 }
             }
@@ -46,7 +47,7 @@ class ProductsService
             $Products->where('supplier_id', $in['supplier_id']);
         }
         //商品通路
-        if(isset($in['selling_channel'])){
+        if (isset($in['selling_channel'])) {
             $Products->where('selling_channel', $in['selling_channel']);
         }
         //商品名稱
@@ -54,31 +55,31 @@ class ProductsService
             $Products->where('product_name', 'like', '%' . $in['product_name'] . '%');
         }
         //前台分類
-        if(isset($in['category_id'])){
-            $Products->where('category_id' , $in['category_id']) ; 
+        if (isset($in['category_id'])) {
+            $Products->where('category_id', $in['category_id']);
         }
         //配送方式
-        if(isset($in['lgst_method'])){
-            $Products->where('lgst_method' , $in['lgst_method']) ; 
+        if (isset($in['lgst_method'])) {
+            $Products->where('lgst_method', $in['lgst_method']);
         }
         //商品類型
-        if(isset($in['product_type'])){
-            $Products->where('product_type' , $in['product_type']) ; 
+        if (isset($in['product_type'])) {
+            $Products->where('product_type', $in['product_type']);
         }
         //上架狀態
-        if(isset($in['approval_status'])){
-            $Products->where('approval_status' , $in['approval_status']) ; 
+        if (isset($in['approval_status'])) {
+            $Products->where('approval_status', $in['approval_status']);
         }
-        //上架 下架時間 
-        if(isset($in['select_start_date']) && isset($in['select_end_date'])){
-            $select_start_date = $in['select_start_date'] . ' 00:00:00' ; 
-            $select_end_date = $in['select_end_date'] . ' 23:59:59'; 
-            $Products->whereDate('start_launched_at' , '<=' ,$select_start_date)
-                     ->whereDate('end_launched_at' , '>=' ,$select_end_date);
+        //上架 下架時間
+        if (isset($in['select_start_date']) && isset($in['select_end_date'])) {
+            $select_start_date = $in['select_start_date'] . ' 00:00:00';
+            $select_end_date = $in['select_end_date'] . ' 23:59:59';
+            $Products->whereDate('start_launched_at', '<=', $select_start_date)
+                ->whereDate('end_launched_at', '>=', $select_end_date);
         }
         //筆數
-        if(isset($in['limit'])){
-            $Products->limit($in['limit']) ; 
+        if (isset($in['limit'])) {
+            $Products->limit($in['limit']);
         }
 
         $result = $Products->get();
@@ -174,7 +175,7 @@ class ProductsService
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
-                ProductPhotos::create($insertImg) ; 
+                ProductPhotos::create($insertImg);
             }
             DB::commit();
             $result = true;
@@ -186,5 +187,49 @@ class ProductsService
 
         return $result;
     }
+    public function showProducts($id)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $products = Products::where('agent_id', $agent_id)->where('id', $id);
+        $result = $products->first();
+        return $result;
+    }
 
+    public function getProductItems($products_id)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $product_items = Product_items::where('agent_id', $agent_id)->where('product_id', $products_id);
+        $result = $product_items->get();
+        return $result;
+    }
+    public function getProductsPhoto($products_id)
+    {
+        $ProductPhotos = ProductPhotos::where('product_id', $products_id);
+        $result = $ProductPhotos->get();
+        return $result;
+    }
+    public function getProductSpac($products_id)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $sql_spac_1 = '
+        select distinct spec_1_value
+        from( select
+        sort , spec_1_value
+        from product_items
+        where product_id = ' . $products_id . '
+        order by sort ) spac_1_table ';
+
+        $sql_spac_2 = 'select distinct spec_1_value
+        from( select
+        sort , spec_1_value
+        from product_items
+        where product_id = ' . $products_id . '
+        order by sort ) spac_1_table
+        ';
+        $result = [] ;
+        $result['spac_1'] = DB::select($sql_spac_1);
+        $result['spac_2']  = DB::select($sql_spac_2);
+        return $result ;
+
+    }
 }

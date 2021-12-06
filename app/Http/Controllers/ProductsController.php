@@ -68,7 +68,6 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
-        // dump($request->input() , $request->file()) ; 
         $this->productsService->addProducts($request->input(), $request->file()) ;
         $act = 'add';
         $route_name = 'products';
@@ -83,7 +82,18 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        //
+        $result = [] ; 
+        $result['products'] = $this->productsService->showProducts($id) ; 
+        // dd($result['products']) ; 
+        $result['products_item'] = $this->productsService->getProductItems($id);
+        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
+        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
+        $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
+        
+        // dd($result) ; 
+        return view('Backend.Products.show',$result) ;
     }
 
     /**
