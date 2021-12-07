@@ -342,4 +342,54 @@ class APIProductServices
         return $data;
 
     }
+
+    /*
+     * 取得搜尋結果的上方分類
+     */
+    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
+    {
+
+        //分類總覽階層
+        $config_levels = config('uec.web_category_hierarchy_levels');
+        $strSQL = "select cate1.id, cate1.category_name
+                    from web_category_products
+                    inner join products p on p.id=web_category_products.product_id
+                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
+                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
+        if ($config_levels == 3) {
+            $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
+        }
+
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+
+        if ($keyword) {//依關鍵字搜尋
+            $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+            if ($config_levels == 3) {
+                $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
+            }
+            $strSQL .= ")";
+        }
+        if ($selling_price_min > 0 && $selling_price_max > 0) {//價格區間
+            $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
+        }
+
+        if ($category) {//依分類搜尋
+            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+        }
+        $products = DB::select($strSQL);
+        if ($products) {
+            $data = [];
+            $product_id = 0;
+            foreach ($products as $product) {
+                if ($product_id == $product->id) continue;
+                $data[] = array("category_id" => $product->id, 'category_name' => $product->category_name);
+                $product_id = $product->id;
+            }
+            return $data;
+        } else {
+            return '404';
+        }
+    }
 }
