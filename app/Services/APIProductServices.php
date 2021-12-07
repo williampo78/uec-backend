@@ -3,20 +3,26 @@
 
 namespace App\Services;
 
+use App\Services\APIWebService;
 use App\Services\WebCategoryHierarchyService;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Services\APICartServices;
 
 class APIProductServices
 {
 
     private $apiWebCategory;
+    private $apiWebService;
+    private $apiCartService;
 
-    public function __construct(WebCategoryHierarchyService $apiWebCategory)
+    public function __construct(WebCategoryHierarchyService $apiWebCategory, APIWebService $apiWebService, APICartServices $apiCartService)
     {
         $this->apiWebCategory = $apiWebCategory;
+        $this->apiWebService = $apiWebService;
+        $this->apiCartService = $apiCartService;
     }
 
     public function getCategory()
@@ -131,7 +137,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null)
     {
         $strSQL = "select web_category_products.web_category_hierarchy_id, p.*,
                     (SELECT photo_name
@@ -141,7 +147,10 @@ class APIProductServices
                     inner join products p on p.id=web_category_products.product_id
                     where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
         if ($category) {
-            $strSQL .= "and web_category_products.web_category_hierarchy_id=" . $category;
+            $strSQL .= "and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+        }
+        if ($selling_price_min > 0 && $selling_price_max > 0) {
+            $strSQL .= "and p.selling_price between ".$selling_price_min." and ".$selling_price_max;
         }
         $products = DB::select($strSQL);
         $data = [];
@@ -152,51 +161,146 @@ class APIProductServices
     }
 
     /*
-     * 分類總覽的商品搜尋結果 (上架審核通過 & 上架期間內)
+     * 分類總覽的商品搜尋結果 (上架審核通過 & 上架期間內 & 登入狀態)
      */
-    public function categorySearchResult($category = null, $size = 10, $page = 1)
+    public function categorySearchResult($input)
     {
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
-        $products = self::getWebCategoryProducts($category);
+        $category = $input['category'];
+        $size = $input['size'];
+        $page = $input['page'];
+        $selling_price_min = $input['price_min'];
+        $selling_price_max = $input['price_max'];
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max);
         $promotion = self::getPromotion('product_card');
         $login = Auth::guard('api')->check();
+        $collection = false;
+        $cart = false;
+        $is_collection = [];
+        $is_cart = [];
         if ($login) {
             $member_id = Auth::guard('api')->user()->member_id;
-            $collection = true;
-            $cart = true;
-        } else {
-            $collection = false;
-            $cart = false;
-        }
-        foreach ($products[$category] as $product) {
-            $promotional = [];
-            if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
-                $promotion_desc = $product->promotion_desc;
-            } else {
-                $promotion_desc = null;
+            if ($member_id > 0) {
+                $response = $this->apiWebService->getMemberCollections();
+                $is_collection = json_decode($response, true);
+                $response = $this->apiCartService->getCartInfo($member_id);
+                $is_cart = json_decode($response, true);
             }
-            $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
-
-            if (isset($promotion[$product->id])) {
-                foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
-                    $promotional[] = $Label->promotional_label;
+        }
+        //dd($products);
+        //$cate = explode(',', $category);
+        $product_id = 0;
+        foreach ($products as $cateID => $prod) {
+            foreach ($prod as $product) {
+                $promotional = [];
+                if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
+                    $promotion_desc = $product->promotion_desc;
+                } else {
+                    $promotion_desc = null;
                 }
-            }
+                $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
 
-            $data[] = array(
-                'product_id' => $product->id,
-                'product_no' => $product->product_no,
-                'product_name' => $product->product_name,
-                'selling_price' => intval($product->selling_price),
-                'product_discount' => intval($discount),
-                'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
-                'promotion_desc' => $promotion_desc,
-                'promotion_label'=> (count($promotional)>0?$promotional:null),
-                'collections'=> $collection,
-                'cart'=> $cart
-            );
+                if (isset($promotion[$product->id])) {
+                    foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
+                        $promotional[] = $Label->promotional_label;
+                    }
+                }
+
+                if (isset($is_collection)) {
+                    foreach ($is_collection as $k => $v) {
+                        if ($v['product_id'] == $product->id) {
+                            $collection = true;
+                        } else {
+                            $collection = false;
+                        }
+                    }
+                }
+                if (isset($is_cart)) {
+                    foreach ($is_cart as $k => $v) {
+                        if ($v['product_id'] == $product->id) {
+                            $cart = true;
+                        } else {
+                            $cart = false;
+                        }
+                    }
+                }
+                if ($product->id != $product_id) {
+                    $data[] = array(
+                        'product_id' => $product->id,
+                        'product_no' => $product->product_no,
+                        'product_name' => $product->product_name,
+                        'selling_price' => intval($product->selling_price),
+                        'product_discount' => intval($discount),
+                        'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                        'promotion_desc' => $promotion_desc,
+                        'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                        'collections' => $collection,
+                        'cart' => $cart
+                    );
+
+                    $product_id = $product->id;
+                }
+
+
+            }
         }
+        /*
+        foreach ($cate as $cateK => $cateV) {
+            foreach ($products[$cateV] as $product) {
+                $promotional = [];
+                if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
+                    $promotion_desc = $product->promotion_desc;
+                } else {
+                    $promotion_desc = null;
+                }
+                $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
+
+                if (isset($promotion[$product->id])) {
+                    foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
+                        $promotional[] = $Label->promotional_label;
+                    }
+                }
+
+                if (isset($is_collection)) {
+                    foreach ($is_collection as $k => $v) {
+                        if ($v['product_id'] == $product->id) {
+                            $collection = true;
+                        } else {
+                            $collection = false;
+                        }
+                    }
+                }
+                if (isset($is_cart)) {
+                    foreach ($is_cart as $k => $v) {
+                        if ($v['product_id'] == $product->id) {
+                            $cart = true;
+                        } else {
+                            $cart = false;
+                        }
+                    }
+                }
+                if ($product->id != $product_id) {
+                    $data[] = array(
+                        'product_id' => $product->id,
+                        'product_no' => $product->product_no,
+                        'product_name' => $product->product_name,
+                        'selling_price' => intval($product->selling_price),
+                        'product_discount' => intval($discount),
+                        'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                        'promotion_desc' => $promotion_desc,
+                        'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                        'collections' => $collection,
+                        'cart' => $cart
+                    );
+
+                    $product_id = $product->id;
+                }
+
+            }
+        }
+        */
+        array_multisort(array_column($data, 'selling_price'), SORT_DESC, $data);
         $searchResult = self::getPages($data, $size, $page);
         return $searchResult;
 
