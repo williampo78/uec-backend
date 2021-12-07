@@ -137,7 +137,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
     {
         $strSQL = "select web_category_products.web_category_hierarchy_id, p.*,
                     (SELECT photo_name
@@ -146,12 +146,19 @@ class APIProductServices
                     from web_category_products
                     inner join products p on p.id=web_category_products.product_id
                     where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
-        if ($category) {
-            $strSQL .= "and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+
+        if ($keyword) {//依關鍵字搜尋
+            $strSQL .= " and p.product_name like '%" . $keyword . "%'";
         }
-        if ($selling_price_min > 0 && $selling_price_max > 0) {
-            $strSQL .= "and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
+
+        if ($selling_price_min > 0 && $selling_price_max > 0) {//價格區間
+            $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
         }
+
+        if ($category) {//依分類搜尋
+            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+        }
+
         $products = DB::select($strSQL);
         $data = [];
         foreach ($products as $product) {
@@ -162,17 +169,19 @@ class APIProductServices
 
     /*
      * 分類總覽的商品搜尋結果 (上架審核通過 & 上架期間內 & 登入狀態)
+     * 關鍵字的商品搜尋結果 (上架審核通過 & 上架期間內 & 登入狀態)
      */
-    public function categorySearchResult($input)
+    public function searchResult($input)
     {
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
+        $keyword = $input['keyword'];
         $category = $input['category'];
         $size = $input['size'];
         $page = $input['page'];
         $selling_price_min = $input['price_min'];
         $selling_price_max = $input['price_max'];
-        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max);
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             $login = Auth::guard('api')->check();

@@ -31,7 +31,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('/product/category', [ProductController::class, 'getCategory']);
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
-    Route::post('/advanceSearch', [ProductController::class, 'getProductByCategory']);
+    Route::post('/advanceSearch', [ProductController::class, 'getProductSearchResult']);
 });
 
 Route::group(['middleware' => 'jwt.member'], function () {

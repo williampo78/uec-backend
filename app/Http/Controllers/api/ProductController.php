@@ -40,10 +40,10 @@ class ProductController extends Controller
     }
 
     /*
-     * 依分類搜尋產品
-     * 含價格區間搜尋
+     * 搜尋產品
+     * 關鍵字，分類，價格區間
      */
-    public function getProductByCategory(Request $request)
+    public function getProductSearchResult(Request $request)
     {
         $error_code = $this->apiService->getErrorCode();
 
@@ -70,16 +70,17 @@ class ProductController extends Controller
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
-        $result = $this->apiProductService->categorySearchResult($request);
+        $result = $this->apiProductService->searchResult($request);
         if ($result == '404') {
             $status = false;
             $err = '404';
             $list = [];
         } else {
             $status = true;
-            $err = '';
+            $err = null;
             $list = $result;
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
     }
+
 }
