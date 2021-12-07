@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\Models\ProductItems;
-use App\Models\Products;
 use App\Models\ProductPhotos;
+use App\Models\Products;
+use App\Models\Product_items;
 use App\Services\UniversalService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -16,75 +17,126 @@ class ProductsService
 {
     private $universalService;
 
-    public function __construct(UniversalService $universalService)
+    public function __construct()
     {
-        $this->universalService = $universalService;
+        $this->universalService = new UniversalService;
     }
 
-    public function getProducts($in = [])
+    public function getProducts($input_data = [])
     {
         $agent_id = Auth::user()->agent_id;
-        
-        $Products = Products::where('agent_id', $agent_id);
+
+        $products = Products::select('products.*', 'supplier.name AS supplier_name')
+            ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
+            ->where('products.agent_id', $agent_id);
+
         //庫存類型
-        if (isset($in['stock_type'])) {
-            $Products->where('stock_type', '=', $in['stock_type']);
+        if (isset($input_data['stock_type'])) {
+            $products->where('products.stock_type', '=', $input_data['stock_type']);
         }
-        //商品編號
-        if (isset($in['product_no'])) {
-            $product_no = explode(',',$in['product_no']);
-            foreach($product_no as $key => $val){
-                if($key == 0){
-                    $Products->where('product_no', 'like', '%' . $val . '%');
-                }else{
-                    $Products->orWhere('product_no', 'like', '%' . $val . '%');
+
+        //商品序號
+        if (isset($input_data['product_no'])) {
+            $product_no = explode(',', $input_data['product_no']);
+            $product_no = array_unique($product_no);
+
+            foreach ($product_no as $key => $val) {
+                if ($key == 0) {
+                    $products->where('products.product_no', 'like', '%' . $val . '%');
+                } else {
+                    $products->orWhere('products.product_no', 'like', '%' . $val . '%');
                 }
             }
         }
+
         //供應商
-        if (isset($in['supplier_id'])) {
-            $Products->where('supplier_id', $in['supplier_id']);
-        }
-        //商品通路
-        if(isset($in['selling_channel'])){
-            $Products->where('selling_channel', $in['selling_channel']);
-        }
-        //商品名稱
-        if (isset($in['product_name'])) {
-            $Products->where('product_name', 'like', '%' . $in['product_name'] . '%');
-        }
-        //前台分類
-        if(isset($in['category_id'])){
-            $Products->where('category_id' , $in['category_id']) ; 
-        }
-        //配送方式
-        if(isset($in['lgst_method'])){
-            $Products->where('lgst_method' , $in['lgst_method']) ; 
-        }
-        //商品類型
-        if(isset($in['product_type'])){
-            $Products->where('product_type' , $in['product_type']) ; 
-        }
-        //上架狀態
-        if(isset($in['approval_status'])){
-            $Products->where('approval_status' , $in['approval_status']) ; 
-        }
-        //上架 下架時間 
-        if(isset($in['select_start_date']) && isset($in['select_end_date'])){
-            $select_start_date = $in['select_start_date'] . ' 00:00:00' ; 
-            $select_end_date = $in['select_end_date'] . ' 23:59:59'; 
-            $Products->whereDate('start_launched_at' , '<=' ,$select_start_date)
-                     ->whereDate('end_launched_at' , '>=' ,$select_end_date);
-        }
-        //筆數
-        if(isset($in['limit'])){
-            $Products->limit($in['limit']) ; 
+        if (isset($input_data['supplier_id'])) {
+            $products->where('products.supplier_id', $input_data['supplier_id']);
         }
 
-        $result = $Products->get();
+        //商品通路
+        if (isset($input_data['selling_channel'])) {
+            $products->where('products.selling_channel', $input_data['selling_channel']);
+        }
+
+        //商品名稱
+        if (isset($input_data['product_name'])) {
+            $products->where('products.product_name', 'like', '%' . $input_data['product_name'] . '%');
+        }
+
+        //前台分類
+        if (isset($input_data['category_id'])) {
+            $products->where('products.category_id', $input_data['category_id']);
+        }
+
+        //配送方式
+        if (isset($input_data['lgst_method'])) {
+            $products->where('products.lgst_method', $input_data['lgst_method']);
+        }
+
+        //商品類型
+        if (isset($input_data['product_type'])) {
+            $products->where('products.product_type', $input_data['product_type']);
+        }
+
+        //上架狀態
+        if (isset($input_data['approval_status'])) {
+            $products->where('products.approval_status', $input_data['approval_status']);
+        }
+
+        try {
+            // 上架起始日
+            if (!empty($input_data['start_launched_at'])) {
+                $start_launched_at = Carbon::parse($input_data['start_launched_at'])->format('Y-m-d H:i:s');
+                $products->whereDate('products.start_launched_at', '>=', $start_launched_at);
+            }
+
+            // 上架結束日
+            if (!empty($input_data['end_launched_at'])) {
+                $end_launched_at = Carbon::parse($input_data['end_launched_at'])->format('Y-m-d H:i:s');
+                $end_launched_at = $end_launched_at . ' 23:59:59';
+                $products->whereDate('products.end_launched_at', '<=', $end_launched_at);
+            }
+        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+            Log::warning($e->getMessage());
+        }
+
+        // 最低售價
+        if (isset($input_data['selling_price_min'])) {
+            $products->where('products.selling_price', '>=', $input_data['selling_price_min']);
+        }
+
+        // 最高售價
+        if (isset($input_data['selling_price_max'])) {
+            $products->where('products.selling_price', '<=', $input_data['selling_price_max']);
+        }
+
+        try {
+            // 建檔日起始日期
+            if (!empty($input_data['start_created_at'])) {
+                $start_created_at = Carbon::parse($input_data['start_created_at'])->format('Y-m-d H:i:s');
+                $products->where('products.created_at', '>=', $start_created_at);
+            }
+
+            // 建檔日結束日期
+            if (!empty($input_data['end_created_at'])) {
+                $end_created_at = Carbon::parse($input_data['end_created_at'])->format('Y-m-d H:i:s');
+                $products->where('products.created_at', '<=', $end_created_at);
+            }
+        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+            Log::warning($e->getMessage());
+        }
+
+        //限制筆數
+        if (isset($input_data['limit'])) {
+            $products->limit($input_data['limit']);
+        }
+
+        $result = $products->get();
 
         return $result;
     }
+
     public function addProducts($in, $file)
     {
         $user_id = Auth::user()->id;
@@ -174,7 +226,7 @@ class ProductsService
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
-                ProductPhotos::create($insertImg) ; 
+                ProductPhotos::create($insertImg);
             }
             DB::commit();
             $result = true;
@@ -186,5 +238,49 @@ class ProductsService
 
         return $result;
     }
+    public function showProducts($id)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $products = Products::where('agent_id', $agent_id)->where('id', $id);
+        $result = $products->first();
+        return $result;
+    }
 
+    public function getProductItems($products_id)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $product_items = Product_items::where('agent_id', $agent_id)->where('product_id', $products_id);
+        $result = $product_items->get();
+        return $result;
+    }
+    public function getProductsPhoto($products_id)
+    {
+        $ProductPhotos = ProductPhotos::where('product_id', $products_id);
+        $result = $ProductPhotos->get();
+        return $result;
+    }
+    public function getProductSpac($products_id)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $sql_spac_1 = '
+        select distinct spec_1_value
+        from( select
+        sort , spec_1_value
+        from product_items
+        where product_id = ' . $products_id . '
+        order by sort ) spac_1_table ';
+
+        $sql_spac_2 = 'select distinct spec_1_value
+        from( select
+        sort , spec_1_value
+        from product_items
+        where product_id = ' . $products_id . '
+        order by sort ) spac_1_table
+        ';
+        $result = [] ;
+        $result['spac_1'] = DB::select($sql_spac_1);
+        $result['spac_2']  = DB::select($sql_spac_2);
+        return $result ;
+
+    }
 }
