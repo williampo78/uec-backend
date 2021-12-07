@@ -22,11 +22,12 @@ class ProductController extends Controller
     /*
      * 取得產品分類資料
      */
-    public function getCategory()
+    public function getCategory(Request $request)
     {
         $err = false;
         $error_code = $this->apiService->getErrorCode();
-        $result = $this->apiProductService->getCategory();
+        $keyword = ($request['keyword'] ? $request['keyword'] : '');
+        $result = $this->apiProductService->getCategory($keyword);
         if ($result == '404') {
             $status = false;
             $err = '404';
@@ -52,7 +53,7 @@ class ProductController extends Controller
             'price_max.numeric' => '最高價必須是數字',
         ];
 
-        $in ='';
+        $in = '';
         if ($request['price_min'] > 0 && $request['price_max'] > 0) {//價格區間
             if ($request['price_max'] < $request['price_min']) {
                 $messages = [
@@ -64,7 +65,7 @@ class ProductController extends Controller
 
         $v = Validator::make($request->all(), [
             'price_min' => 'numeric',
-            'price_max' => 'numeric'.$in,
+            'price_max' => 'numeric' . $in,
         ], $messages);
 
         if ($v->fails()) {

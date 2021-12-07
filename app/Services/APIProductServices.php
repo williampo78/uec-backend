@@ -25,7 +25,7 @@ class APIProductServices
         $this->apiCartService = $apiCartService;
     }
 
-    public function getCategory()
+    public function getCategory($keyword = null)
     {
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
@@ -38,8 +38,17 @@ class APIProductServices
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`
-                    group by cate.`id`
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`";
+            if ($keyword) {
+                $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+                if ($config_levels == 3) {
+                    $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+                }
+                $strSQL .= ")";
+            }
+            $strSQL .= " group by cate.`id`
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
         } elseif ($config_levels == '2') {
             $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.* from `web_category_products` cate_prod
@@ -47,8 +56,17 @@ class APIProductServices
                     inner join `products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`
-                    group by cate.`id`
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` ";
+            if ($keyword) {
+                $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+                if ($config_levels == 3) {
+                    $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+                }
+                $strSQL .= ")";
+            }
+            $strSQL .= " group by cate.`id`
                     order by cate1.`sort`, cate.`sort`";
         }
         $categorys = DB::select($strSQL);
@@ -139,16 +157,30 @@ class APIProductServices
      */
     public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
     {
+
+        //分類總覽階層
+        $config_levels = config('uec.web_category_hierarchy_levels');
         $strSQL = "select web_category_products.web_category_hierarchy_id, p.*,
                     (SELECT photo_name
                     FROM product_photos
                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
                     from web_category_products
                     inner join products p on p.id=web_category_products.product_id
-                    where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
+                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
+        if ($config_levels == 3) {
+            $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
+        }
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
 
         if ($keyword) {//依關鍵字搜尋
-            $strSQL .= " and p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+            if ($config_levels == 3) {
+                $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
+            }
+            $strSQL .= ")";
         }
 
         if ($selling_price_min > 0 && $selling_price_max > 0) {//價格區間
