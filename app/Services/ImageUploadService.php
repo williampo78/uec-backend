@@ -48,5 +48,9 @@ class ImageUploadService
             return $storage_s3->url($file_name);
         }
     }
+    public function getSize($file_name){
+        $storage_s3 = Storage::disk('s3');
+        return $storage_s3->size($file_name);
+    }
 
 }

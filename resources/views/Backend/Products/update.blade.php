@@ -77,7 +77,10 @@
             color: #138cde;
             border-left: solid 4px #138cde;
         }
-
+        .text-overflow-p{
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -598,7 +601,7 @@
                                     <div class="col-sm-10">
                                         <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                         <input type="file" @change="fileSelected" multiple>
-                                        <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
+                                        <input  type="file" :ref="'images_files'" name="filedata[]"
                                             multiple>
                                     </div>
                                     <textarea name="imgJson" id="" cols="30" rows="10">@{{images}}</textarea>
@@ -616,7 +619,7 @@
                                             <img :ref="'image'">
                                         </div>
                                         <div class="caption" style="pointer-events: none;">
-                                            <p>檔案名稱: @{{ image . name }}</p>
+                                            <p class="text-overflow-p">檔案名稱: @{{ image . name }}</p>
                                             <p>檔案大小:@{{ image . sizeConvert }}</p>
                                             <p>
                                                 排序: @{{ key + 1 }}
@@ -872,18 +875,20 @@
                    this.adjustTheDisplay() ; 
             },
             created () {
-                console.log('created');
+                vm = this ;
                 for (let i = 0; i < this.old_imges.length; i++) {
                         var data = this.file_cdn + this.old_imges[i].photo_name;
                         let metadata = {
                             type: 'image/jpeg',
                         };
-                        var filename = this.old_imges[i].photo_name.split('/') ; 
-                        let file = new File([data], filename[2], metadata);
-                        file.src = data ; 
-                        file.id = this.old_imges[i].id ; 
-                        this.images.push(file);
+                    var filename = this.old_imges[i].photo_name.split('/') ; 
+                    let file = new File([data], filename[2], metadata);
+                    file.src = data ; 
+                    file.id = this.old_imges[i].id ; 
+                    file.sizeConvert = vm.formatBytes(this.old_imges[i].photo_size)
+                    this.images.push(file);
                 }
+              
             },
             methods: {
                 fileSelected(e) {
@@ -953,7 +958,6 @@
                             this.$refs.image[i].src = reader.result;
                             };
                         }else{
-                            console.log(this.$refs.image) ; 
                             this.$refs.image[i].src = this.images[i].src ; 
                         }
                         reader.readAsDataURL(this.images[i]);

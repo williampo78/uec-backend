@@ -262,6 +262,9 @@ class ProductsService
     {
         $ProductPhotos = ProductPhotos::where('product_id', $products_id);
         $result = $ProductPhotos->get();
+        foreach($result as $key => $val) {
+            $val->photo_size = ImageUpload::getSize($val->photo_name);
+        };
         return $result;
     }
     public function getProductSpac($products_id)
