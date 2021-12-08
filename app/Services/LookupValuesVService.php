@@ -29,21 +29,22 @@ class LookupValuesVService
     /**
      * 取得行銷活動類型
      *
-     * @param string $level_code 活動階層(ALL:全部、PRD：單品、CART：滿額)
+     * @param array $query_datas
      * @return object
      */
-    public function getCampaignTypes($level_code = 'ALL')
+    public function getCampaignTypes($query_datas = [])
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = Lookup_values_v::select('code', 'description')
-            ->where('agent_id', $agent_id)
+        $result = Lookup_values_v::where('agent_id', $agent_id)
             ->where('type_code', 'CAMPAIGN_TYPE');
 
-        if ($level_code == 'PRD') {
-            $result = $result->where('udf_01', 'PRD');
-        } elseif ($level_code == 'CART') {
-            $result = $result->where('udf_01', 'CART');
+        if (!empty($query_datas['udf_01'])) {
+            $result = $result->where('udf_01', $query_datas['udf_01']);
+        }
+
+        if (!empty($query_datas['code'])) {
+            $result = $result->where('code', $query_datas['code']);
         }
 
         $result = $result->orderBy("sort", "asc")
