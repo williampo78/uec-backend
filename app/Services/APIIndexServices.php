@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\APIProductServices;
 
@@ -16,7 +17,7 @@ class APIIndexServices
         $this->apiProductService = $apiProductService;
     }
 
-    public function getIndex()
+    public function getIndex($params = null)
     {
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->apiProductService->getProducts();
@@ -27,8 +28,13 @@ class APIIndexServices
                 from `ad_slots` ad1
                 inner join `ad_slot_contents` ad2 on ad2.`slot_id`=ad1.`id`
                 inner join `ad_slot_content_details` ad3 on ad3.`ad_slot_content_id`=ad2.`id`
-                where current_timestamp() between ad2.`start_at` and ad2.`end_at` and ad1.`applicable_page`='HOME'
-                order by ad1.`slot_code`, ad3.`sort`";
+                where current_timestamp() between ad2.`start_at` and ad2.`end_at` ";
+        if ($params == 1) {
+            $strSQL .= " and ad1.`applicable_page` !='HOME'";
+        } else {
+            $strSQL .= " and ad1.`applicable_page` ='HOME'";
+        }
+        $strSQL .= " order by ad1.`slot_code`, ad3.`sort`";
 
         $ads = DB::select($strSQL);
         $data = [];

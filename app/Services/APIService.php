@@ -35,9 +35,9 @@ class APIService
     public function getURL()
     {
         if (config('uec.isTesting')) {
-            return 'https://stgapi.dradvice.com.tw';
+            return 'https://ssapi.dradvice.com.tw';
         } else {
-            return 'https://stgapi.dradvice.com.tw';
+            return 'https://ssapi.dradvice.com.tw';
         }
 
     }
