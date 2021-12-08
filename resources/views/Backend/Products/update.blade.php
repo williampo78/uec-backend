@@ -170,7 +170,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <input class="form-control" name="product_name"
-                                    value="{{ $products->product_name }}">
+                                        value="{{ $products->product_name }}">
                                 </div>
                             </div>
                         </div>
@@ -223,7 +223,7 @@
                                     <label class="control-label">商品型號</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="model" value=" {{ $products->model }}" >
+                                    <input class="form-control" name="model" value=" {{ $products->model }}">
                                 </div>
                             </div>
                         </div>
@@ -246,7 +246,7 @@
                                 <div class="col-sm-9">
                                     <label class="radio-inline">
                                         <input type="radio" name="lgst_temperature" value="NORMAL"
-                                        {{ $products->lgst_temperature == 'NORMAL' ? 'checked' : '' }}> 常溫
+                                            {{ $products->lgst_temperature == 'NORMAL' ? 'checked' : '' }}> 常溫
                                     </label>
                                 </div>
                             </div>
@@ -259,7 +259,7 @@
                                 <div class="col-sm-9">
                                     <label class="radio-inline">
                                         <input type="radio" name="lgst_method" value="HOME"
-                                        {{ $products->lgst_method == 'HOME' ? 'checked' : '' }}> 宅配
+                                            {{ $products->lgst_method == 'HOME' ? 'checked' : '' }}> 宅配
                                     </label>
                                 </div>
                             </div>
@@ -281,7 +281,7 @@
                                     <label class="control-label">單位<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="uom" value="{{ $products->uom }}" >
+                                    <input class="form-control" name="uom" value="{{ $products->uom }}">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -290,7 +290,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <input class="form-control" name="min_purchase_qty" type="number" min="0" value="0"
-                                    value="{{ $products->min_purchase_qty }}">
+                                        value="{{ $products->min_purchase_qty }}">
                                 </div>
                             </div>
                         </div>
@@ -380,21 +380,21 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <input class="form-control" name="length" type="number" min="0"
-                                        value="{{ $products->length }}" >
+                                        value="{{ $products->length }}">
                                 </div>
                                 <div class="col-sm-1">
                                     <label class="control-label">寬</label>
                                 </div>
                                 <div class="col-sm-2 ">
                                     <input class="form-control" name="width" type="number" min="0"
-                                        value="{{ $products->width }}" >
+                                        value="{{ $products->width }}">
                                 </div>
                                 <div class="col-sm-1">
                                     <label class="control-label">高</label>
                                 </div>
                                 <div class="col-sm-2">
                                     <input class="form-control" name="height" type="number" min="0"
-                                        value="{{ $products->height }}" >
+                                        value="{{ $products->height }}">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -414,7 +414,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <input class="form-control" name="list_price" type="number" min="0"
-                                    value="{{ $products->list_price }}">
+                                        value="{{ $products->list_price }}">
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -423,7 +423,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <input class="form-control" name="selling_price" type="number" min="0"
-                                    value="{{ $products->selling_price }}">
+                                        value="{{ $products->selling_price }}">
                                 </div>
                             </div>
                         </div>
@@ -469,7 +469,8 @@
                                     <label class="control-label">建檔人員</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control"  id="keyword" value="{{$products->updated_by_name}}" readonly>
+                                    <input class="form-control" id="keyword" value="{{ $products->updated_by_name }}"
+                                        readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -477,7 +478,8 @@
                                     <label class="control-label">建檔時間</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" id="keyword" value="{{$products->created_at}}" readonly>
+                                    <input class="form-control" id="keyword" value="{{ $products->created_at }}"
+                                        readonly>
                                 </div>
                             </div>
                         </div>
@@ -487,7 +489,8 @@
                                     <label class="control-label">修改人員</label>
                                 </div>
                                 <div class="col-sm-7">
-                                    <input class="form-control"  id="keyword" value="{{$products->updated_by_name}}"readonly>
+                                    <input class="form-control" id="keyword" value="{{ $products->updated_by_name }}"
+                                        readonly>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="control-label">
@@ -513,7 +516,7 @@
                                 </div>
                                 <div class="col-sm-10">
                                     <input class="form-control" name="product_brief_1"
-                                        value="{{ $products->product_brief_1 }}" >
+                                        value="{{ $products->product_brief_1 }}">
                                 </div>
                             </div>
                         </div>
@@ -569,7 +572,7 @@
                                 </div>
                                 <div class="col-sm-1 no-pa">
                                     <input class="form-control" name="warranty_days" min="0"
-                                        value="{{ $products->warranty_days }}" >
+                                        value="{{ $products->warranty_days }}">
                                 </div>
                             </div>
                         </div>
@@ -580,9 +583,9 @@
                                     <label class="control-label">保固範圍</label>
                                 </div>
                                 <div class="col-sm-11">
-                                    <textarea class="form-control" rows="10" cols="10" name="warranty_scope" >
-                                        {{ $products->warranty_scope }}
-                                    </textarea>
+                                    <textarea class="form-control" rows="10" cols="10" name="warranty_scope">
+                                            {{ $products->warranty_scope }}
+                                        </textarea>
                                 </div>
                             </div>
                         </div>
@@ -600,15 +603,19 @@
                                     </div>
                                 </div>
                             </div>
+                            <button class="" type="button" @click="testoldimg()">IMG load</button>
                             <div class="row form-group">
                                 <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
                                     <div class="thumbnail" @dragstart="drag" @dragover='dragover'
                                         @dragleave='dragleave' @drop="drop" :data-index="key" :data-type="'image'"
                                         draggable="true" style="pointer-events: auto;">
                                         <div class="img-box" style="pointer-events: none;">
-                                            <img :ref="'image'">
+                                            <img v-if="image.id !== '' "  :src="image.path" >
+                                            <img v-else :ref="'image'" >
                                         </div>
                                         <div class="caption" style="pointer-events: none;">
+                                            @{{image.path}}
+
                                             <p>檔案名稱: @{{ image . name }}</p>
                                             <p>檔案大小:@{{ image . sizeConvert }}</p>
                                             <p>
@@ -857,13 +864,28 @@
             data: function() {
                 return {
                     images: [],
+                    old_imges: @json($product_photos),
+                    file_cdn: @json(config('filesystems.disks.s3.url')),
                 }
             },
             methods: {
+                testoldimg() {
+                
+                    // console.log(this.old_imges);
+                    // console.log(this.images);
+                    // console.log(this.file_cdn);
+                    for (let i = 0; i < this.old_imges.length; i++) {
+                        this.old_imges[i].path = this.file_cdn + this.old_imges[i].photo_name;
+                        this.images.push(this.old_imges[i]);
+                    }
+                    // console.log(this.images) ; 
+                    // this.adjustTheDisplay();
+                },
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
                     for (let i = 0; i < selectedFiles.length; i++) {
+                        console.log(selectedFiles[i]) ; 
                         this.images.push(selectedFiles[i]);
                     }
                     this.adjustTheDisplay();
@@ -929,7 +951,6 @@
                         reader.readAsDataURL(this.images[i]);
                     }
                     this.$refs.images_files.files = list.files;
-
                 },
             },
             computed: {},
