@@ -601,21 +601,21 @@
                                         <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                             multiple>
                                     </div>
+                                    <textarea name="imgJson" id="" cols="30" rows="10">@{{images}}</textarea>
                                 </div>
                             </div>
-                            <button class="" type="button" @click="testoldimg()">IMG load</button>
                             <div class="row form-group">
                                 <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
+                                    {{-- @foreach ($product_photos as )
+                                        
+                                    @endforeach --}}
                                     <div class="thumbnail" @dragstart="drag" @dragover='dragover'
                                         @dragleave='dragleave' @drop="drop" :data-index="key" :data-type="'image'"
                                         draggable="true" style="pointer-events: auto;">
                                         <div class="img-box" style="pointer-events: none;">
-                                            <img v-if="image.id !== '' "  :src="image.path" >
-                                            <img v-else :ref="'image'" >
+                                            <img :ref="'image'">
                                         </div>
                                         <div class="caption" style="pointer-events: none;">
-                                            @{{image.path}}
-
                                             <p>檔案名稱: @{{ image . name }}</p>
                                             <p>檔案大小:@{{ image . sizeConvert }}</p>
                                             <p>
@@ -868,24 +868,28 @@
                     file_cdn: @json(config('filesystems.disks.s3.url')),
                 }
             },
+            mounted () {
+                   this.adjustTheDisplay() ; 
+            },
+            created () {
+                console.log('created');
+                for (let i = 0; i < this.old_imges.length; i++) {
+                        var data = this.file_cdn + this.old_imges[i].photo_name;
+                        let metadata = {
+                            type: 'image/jpeg',
+                        };
+                        var filename = this.old_imges[i].photo_name.split('/') ; 
+                        let file = new File([data], filename[2], metadata);
+                        file.src = data ; 
+                        file.id = this.old_imges[i].id ; 
+                        this.images.push(file);
+                }
+            },
             methods: {
-                testoldimg() {
-                
-                    // console.log(this.old_imges);
-                    // console.log(this.images);
-                    // console.log(this.file_cdn);
-                    for (let i = 0; i < this.old_imges.length; i++) {
-                        this.old_imges[i].path = this.file_cdn + this.old_imges[i].photo_name;
-                        this.images.push(this.old_imges[i]);
-                    }
-                    // console.log(this.images) ; 
-                    // this.adjustTheDisplay();
-                },
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
                     for (let i = 0; i < selectedFiles.length; i++) {
-                        console.log(selectedFiles[i]) ; 
                         this.images.push(selectedFiles[i]);
                     }
                     this.adjustTheDisplay();
@@ -911,7 +915,6 @@
                     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                 },
                 drag(eve) {
-                    console.log('eve.index:' + eve.target.dataset.index);
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
                     $('.btn-events-none').css('pointer-events', 'none');
@@ -945,15 +948,21 @@
                     for (let i = 0; i < this.images.length; i++) {
                         list.items.add(this.images[i]);
                         let reader = new FileReader();
-                        reader.onload = (e) => {
+                        if(!this.images[i].id){
+                            reader.onload = (e) => {
                             this.$refs.image[i].src = reader.result;
-                        };
+                            };
+                        }else{
+                            console.log(this.$refs.image) ; 
+                            this.$refs.image[i].src = this.images[i].src ; 
+                        }
                         reader.readAsDataURL(this.images[i]);
                     }
                     this.$refs.images_files.files = list.files;
                 },
             },
             computed: {},
+            
             watch: {},
         })
         new ImageUpload().$mount('#ImageUploadBox');
