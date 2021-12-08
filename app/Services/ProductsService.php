@@ -93,8 +93,8 @@ class ProductsService
 
             // 上架結束日
             if (!empty($input_data['end_launched_at'])) {
+                $input_data['end_launched_at'] = $input_data['end_launched_at'] . ' 23:59:59';
                 $end_launched_at = Carbon::parse($input_data['end_launched_at'])->format('Y-m-d H:i:s');
-                $end_launched_at = $end_launched_at . ' 23:59:59';
                 $products->whereDate('products.end_launched_at', '<=', $end_launched_at);
             }
         } catch (\Carbon\Exceptions\InvalidFormatException $e) {
@@ -120,6 +120,7 @@ class ProductsService
 
             // 建檔日結束日期
             if (!empty($input_data['end_created_at'])) {
+                $input_data['end_created_at'] = $input_data['end_created_at'] . ' 23:59:59';
                 $end_created_at = Carbon::parse($input_data['end_created_at'])->format('Y-m-d H:i:s');
                 $products->where('products.created_at', '<=', $end_created_at);
             }

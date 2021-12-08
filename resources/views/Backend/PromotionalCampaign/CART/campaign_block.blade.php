@@ -1,7 +1,7 @@
-<div id="campaign-block">
+<div id="campaign-block" class="form-horizontal">
     <div class="row">
         <div class="col-sm-6">
-            <div class="form-group display-flex-center">
+            <div class="form-group">
                 <div class="col-sm-2">
                     <label for="campaign_name" class="control-label">活動名稱 <span style="color: red;">*</span></label>
                 </div>
@@ -12,7 +12,7 @@
         </div>
 
         <div class="col-sm-6">
-            <div class="form-group display-flex-center">
+            <div class="form-group">
                 <div class="col-sm-2">
                     <label class="control-label">狀態 <span style="color: red;">*</span></label>
                 </div>
@@ -33,12 +33,12 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <div class="form-group display-flex-center">
+            <div class="form-group">
                 <div class="col-sm-2">
                     <label for="campaign_type" class="control-label">活動類型 <span style="color: red;">*</span></label>
                 </div>
                 <div class="col-sm-10">
-                    <select class="form-control js-select2-campaign-type" name="campaign_type" id="campaign_type">
+                    <select class="form-control" name="campaign_type" id="campaign_type">
                         <option></option>
                     </select>
                 </div>
@@ -47,22 +47,22 @@
         <div class="col-sm-6">
             <div class="row">
                 <div class="col-sm-5">
-                    <div class="form-group display-flex-center">
+                    <div class="form-group">
                         <div class="col-sm-5">
                             <label for="n_value" class="control-label">N (滿額) = <span style="color: red;">*</span></label>
                         </div>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" id="n_value" name="n_value" value="" />
+                            <input type="number" class="form-control" id="n_value" name="n_value" value="" min="0" />
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-7">
-                    <div class="form-group display-flex-center">
+                    <div class="form-group">
                         <div class="col-sm-3">
                             <label for="x_value" class="control-label">X (折扣) = <span style="color: red;">*</span></label>
                         </div>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" id="x_value" name="x_value" value="" />
+                            <input type="number" class="form-control" id="x_value" name="x_value" value="" />
                         </div>
                         <div class="col-sm-4">
                             <p class="form-control-static">打85折，輸入0.85</p>
@@ -76,7 +76,7 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <div class="form-group display-flex-center">
+            <div class="form-group">
                 <div class="col-sm-2">
                     <label for="start_at" class="control-label">上架時間起 <span style="color: red;">*</span></label>
                 </div>
@@ -92,7 +92,7 @@
             </div>
         </div>
         <div class="col-sm-6">
-            <div class="form-group display-flex-center">
+            <div class="form-group">
                 <div class="col-sm-2">
                     <label for="end_at" class="control-label">上架時間訖 <span style="color: red;">*</span></label>
                 </div>

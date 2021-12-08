@@ -55,7 +55,7 @@ class PromotionalCampaignCartController extends Controller
         // }
 
         $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns($query_data);
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes('CART');
+        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => 'CART']);
 
         // $promotional_campaigns = $promotional_campaigns->map(function ($obj, $key) {
         //     /*
@@ -81,7 +81,7 @@ class PromotionalCampaignCartController extends Controller
      */
     public function create()
     {
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes('CART');
+        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => 'CART']);
         $suppliers = $this->supplier_service->getSuppliers();
 
         return view(
@@ -98,7 +98,19 @@ class PromotionalCampaignCartController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input_data = $request->except('_token');
+
+        if (! $this->promotional_campaign_service->addPromotionalCampaign($input_data)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        $route_name = 'promotional_campaign_cart';
+        $act = 'add';
+
+        return view(
+            'Backend.success',
+            compact('route_name', 'act')
+        );
     }
 
     /**
