@@ -241,7 +241,11 @@ class ProductsService
     public function showProducts($id)
     {
         $agent_id = Auth::user()->agent_id;
-        $products = Products::where('agent_id', $agent_id)->where('id', $id);
+        $products = Products::select('products.*', 'updated_by_name.name AS updated_by_name' , 'created_by_name.name AS created_by_name')
+        ->leftJoin('user as created_by_name', 'products.created_by', '=', 'created_by_name.id')
+        ->leftJoin('user as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
+        ->where('products.agent_id', $agent_id)->where('products.id', $id);
+     
         $result = $products->first();
         return $result;
     }
