@@ -3,23 +3,29 @@
 
 namespace App\Services;
 
+use App\Services\APIWebService;
 use App\Services\WebCategoryHierarchyService;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Services\APICartServices;
 
 class APIProductServices
 {
 
     private $apiWebCategory;
+    private $apiWebService;
+    private $apiCartService;
 
-    public function __construct(WebCategoryHierarchyService $apiWebCategory)
+    public function __construct(WebCategoryHierarchyService $apiWebCategory, APIWebService $apiWebService, APICartServices $apiCartService)
     {
         $this->apiWebCategory = $apiWebCategory;
+        $this->apiWebService = $apiWebService;
+        $this->apiCartService = $apiCartService;
     }
 
-    public function getCategory()
+    public function getCategory($keyword = null)
     {
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
@@ -32,8 +38,17 @@ class APIProductServices
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`
-                    group by cate.`id`
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`";
+            if ($keyword) {
+                $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+                if ($config_levels == 3) {
+                    $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+                }
+                $strSQL .= ")";
+            }
+            $strSQL .= " group by cate.`id`
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
         } elseif ($config_levels == '2') {
             $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.* from `web_category_products` cate_prod
@@ -41,8 +56,17 @@ class APIProductServices
                     inner join `products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`
-                    group by cate.`id`
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` ";
+            if ($keyword) {
+                $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+                if ($config_levels == 3) {
+                    $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+                }
+                $strSQL .= ")";
+            }
+            $strSQL .= " group by cate.`id`
                     order by cate1.`sort`, cate.`sort`";
         }
         $categorys = DB::select($strSQL);
@@ -131,18 +155,42 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
     {
+
+        //分類總覽階層
+        $config_levels = config('uec.web_category_hierarchy_levels');
         $strSQL = "select web_category_products.web_category_hierarchy_id, p.*,
                     (SELECT photo_name
                     FROM product_photos
                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
                     from web_category_products
                     inner join products p on p.id=web_category_products.product_id
-                    where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
-        if ($category) {
-            $strSQL .= "and web_category_products.web_category_hierarchy_id=" . $category;
+                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
+                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
+        if ($config_levels == 3) {
+            $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+
+        if ($keyword) {//依關鍵字搜尋
+            $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+            if ($config_levels == 3) {
+                $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
+            }
+            $strSQL .= ")";
+        }
+
+        if ($selling_price_min > 0 && $selling_price_max > 0) {//價格區間
+            $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
+        }
+
+        if ($category) {//依分類搜尋
+            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+        }
+
         $products = DB::select($strSQL);
         $data = [];
         foreach ($products as $product) {
@@ -152,52 +200,97 @@ class APIProductServices
     }
 
     /*
-     * 分類總覽的商品搜尋結果 (上架審核通過 & 上架期間內)
+     * 分類總覽的商品搜尋結果 (上架審核通過 & 上架期間內 & 登入狀態)
+     * 關鍵字的商品搜尋結果 (上架審核通過 & 上架期間內 & 登入狀態)
      */
-    public function categorySearchResult($category = null, $size = 10, $page = 1)
+    public function searchResult($input)
     {
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
-        $products = self::getWebCategoryProducts($category);
-        $promotion = self::getPromotion('product_card');
-        $login = Auth::guard('api')->check();
-        if ($login) {
-            $member_id = Auth::guard('api')->user()->member_id;
-            $collection = true;
-            $cart = true;
-        } else {
+        $keyword = $input['keyword'];
+        $category = $input['category'];
+        $size = $input['size'];
+        $page = $input['page'];
+        $selling_price_min = $input['price_min'];
+        $selling_price_max = $input['price_max'];
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword);
+        if ($products) {
+            $promotion = self::getPromotion('product_card');
+            $login = Auth::guard('api')->check();
             $collection = false;
             $cart = false;
-        }
-        foreach ($products[$category] as $product) {
-            $promotional = [];
-            if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
-                $promotion_desc = $product->promotion_desc;
-            } else {
-                $promotion_desc = null;
-            }
-            $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
-
-            if (isset($promotion[$product->id])) {
-                foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
-                    $promotional[] = $Label->promotional_label;
+            $is_collection = [];
+            $is_cart = [];
+            if ($login) {
+                $member_id = Auth::guard('api')->user()->member_id;
+                if ($member_id > 0) {
+                    $response = $this->apiWebService->getMemberCollections();
+                    $is_collection = json_decode($response, true);
+                    $response = $this->apiCartService->getCartInfo($member_id);
+                    $is_cart = json_decode($response, true);
                 }
             }
 
-            $data[] = array(
-                'product_id' => $product->id,
-                'product_no' => $product->product_no,
-                'product_name' => $product->product_name,
-                'selling_price' => intval($product->selling_price),
-                'product_discount' => intval($discount),
-                'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
-                'promotion_desc' => $promotion_desc,
-                'promotion_label'=> (count($promotional)>0?$promotional:null),
-                'collections'=> $collection,
-                'cart'=> $cart
-            );
+            $product_id = 0;
+            foreach ($products as $cateID => $prod) {
+                foreach ($prod as $product) {
+                    $promotional = [];
+                    if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
+                        $promotion_desc = $product->promotion_desc;
+                    } else {
+                        $promotion_desc = null;
+                    }
+                    $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
+
+                    if (isset($promotion[$product->id])) {
+                        foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
+                            $promotional[] = $Label->promotional_label;
+                        }
+                    }
+
+                    if (isset($is_collection)) {
+                        foreach ($is_collection as $k => $v) {
+                            if ($v['product_id'] == $product->id) {
+                                $collection = true;
+                            } else {
+                                $collection = false;
+                            }
+                        }
+                    }
+                    if (isset($is_cart)) {
+                        foreach ($is_cart as $k => $v) {
+                            if ($v['product_id'] == $product->id) {
+                                $cart = true;
+                            } else {
+                                $cart = false;
+                            }
+                        }
+                    }
+                    if ($product->id != $product_id) {
+                        $data[] = array(
+                            'product_id' => $product->id,
+                            'product_no' => $product->product_no,
+                            'product_name' => $product->product_name,
+                            'selling_price' => intval($product->selling_price),
+                            'product_discount' => intval($discount),
+                            'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                            'promotion_desc' => $promotion_desc,
+                            'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            'collections' => $collection,
+                            'cart' => $cart
+                        );
+
+                        $product_id = $product->id;
+                    }
+
+
+                }
+            }
+            array_multisort(array_column($data, 'selling_price'), SORT_DESC, $data);
+            $searchResult = self::getPages($data, $size, $page);
+        } else {
+            $searchResult = '404';
         }
-        $searchResult = self::getPages($data, $size, $page);
         return $searchResult;
 
     }
@@ -248,5 +341,55 @@ class APIProductServices
         }
         return $data;
 
+    }
+
+    /*
+     * 取得搜尋結果的上方分類
+     */
+    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
+    {
+
+        //分類總覽階層
+        $config_levels = config('uec.web_category_hierarchy_levels');
+        $strSQL = "select cate1.id, cate1.category_name
+                    from web_category_products
+                    inner join products p on p.id=web_category_products.product_id
+                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
+                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
+        if ($config_levels == 3) {
+            $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
+        }
+
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+
+        if ($keyword) {//依關鍵字搜尋
+            $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+            if ($config_levels == 3) {
+                $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
+            }
+            $strSQL .= ")";
+        }
+        if ($selling_price_min > 0 && $selling_price_max > 0) {//價格區間
+            $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
+        }
+
+        if ($category) {//依分類搜尋
+            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+        }
+        $products = DB::select($strSQL);
+        if ($products) {
+            $data = [];
+            $product_id = 0;
+            foreach ($products as $product) {
+                if ($product_id == $product->id) continue;
+                $data[] = array("category_id" => $product->id, 'category_name' => $product->category_name);
+                $product_id = $product->id;
+            }
+            return $data;
+        } else {
+            return '404';
+        }
     }
 }
