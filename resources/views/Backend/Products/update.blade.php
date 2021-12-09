@@ -720,11 +720,22 @@
                                                             class="fa fa-list"></i></label>
                                                 </div>
                                                 <div class="col-sm-9">
-                                                    <input class="form-control" v-model="spec_1.name">
+                                                    <div v-if="spec_1.old_spec">
+                                                        <input class="form-control" v-model="spec_1.name" disabled>
+                                                    </div>
+                                                    <div v-else>
+                                                        <input class="form-control" v-model="spec_1.name">
+                                                    </div>
                                                 </div>
                                                 <div class="col-sm-2">
-                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                    <div v-if="spec_1.old_spec">
+                                                      
+                                                    </div>
+                                                    <div v-else>
+                                                        <button class="btn btn-danger btn-sm" type="button"
                                                         @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button>
+                                                    </div>
+                                                    
                                                 </div>
                                             </td>
                                         </tr>
@@ -747,15 +758,22 @@
                                             :data-type="'spec_2'">
                                             <td>
                                                 <div class="col-sm-1">
-                                                    <label class="control-label"><i style="font-size: 20px;"
-                                                            class="fa fa-list"></i></label>
+                                                    <label class="control-label"><i style="font-size: 20px;"class="fa fa-list"></i></label>
                                                 </div>
                                                 <div class="col-sm-9">
-                                                    <input class="form-control" v-model="spec_2.name">
+                                                    <div v-if="spec_2.old_spec">
+                                                        <input class="form-control" v-model="spec_2.name" disabled>
+                                                    </div>
+                                                    <div v-else>
+                                                        <input class="form-control" v-model="spec_2.name">
+                                                    </div>
                                                 </div>
-                                                <div class="col-sm-2">
-                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                <div class="col-sm-2" >
+                                                    <div v-if="spec_2.old_spec"></div>
+                                                    <div v-else>
+                                                        <button class="btn btn-danger btn-sm" type="button"
                                                         @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)" >刪除</button>
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -844,9 +862,19 @@
             mounted () {
             },
             created () {
-                this.SkuList = JSON.parse(this.product_spec_info.item_list) ;
-                console.log(JSON.parse(this.product_spec_info.spec_value_list)) ; 
-                this.SpecList = (JSON.parse(this.product_spec_info.spec_value_list)) ;
+                let spec_value_list = JSON.parse(this.product_spec_info.spec_value_list) ;
+                let item_list       = JSON.parse(this.product_spec_info.item_list) ;
+
+                spec_value_list.spec_1.map(function(value, key) {
+                        value.old_spec = 1 ; 
+                });
+                spec_value_list.spec_2.map(function(value, key) {
+                        value.old_spec = 1 ; 
+                });
+
+                this.SpecList = spec_value_list ;
+                this.SkuList = item_list ;
+
             },
             methods: {
                 change_safty_qty_all(){

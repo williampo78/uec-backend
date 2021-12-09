@@ -215,7 +215,6 @@ class ProductsService
                 $skuList[$key]['id'] = ProductItems::create($skuInsert)->id ; 
                 $skuList[$key]['item_no'] = $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT) ; 
             }
-
             Product_spec_info::create([
                 'product_id' => $products_id , 
                 'spec_value_list' => json_encode($specListJson) ,
