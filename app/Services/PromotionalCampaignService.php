@@ -223,13 +223,11 @@ class PromotionalCampaignService
             $create_data['updated_at'] = $now;
 
             if (!empty($input_data['start_at'])) {
-                $start_at = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
-                $create_data['start_at'] = $start_at;
+                $create_data['start_at'] = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
             }
 
             if (!empty($input_data['end_at'])) {
-                $end_at = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
-                $create_data['end_at'] = $end_at;
+                $create_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
             }
 
             $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['code' => $create_data['campaign_type']]);
@@ -287,6 +285,202 @@ class PromotionalCampaignService
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 更新行銷活動資料
+     *
+     * ﹝滿額﹞購物車滿N元，打X折 => CART01
+     * ﹝滿額﹞購物車滿N元，折X元 => CART02
+     * ﹝滿額﹞購物車滿N元，送贈品 => CART03
+     * ﹝滿額﹞指定商品滿N件，送贈品 => CART04
+     *
+     * @param array $input_data
+     * @return boolean
+     */
+    public function updatePromotionalCampaign($input_data)
+    {
+        $user_id = Auth::user()->id;
+        $now = Carbon::now();
+        $promotional_campaign = $this->getPromotionalCampaigns([
+            'id' => $input_data['promotional_campaign_id'],
+        ])->first();
+
+        DB::beginTransaction();
+
+        try {
+            $update_data = [];
+
+            // 活動名稱
+            if (isset($input_data['campaign_name'])) {
+                $update_data['campaign_name'] = $input_data['campaign_name'];
+            }
+
+            // 狀態
+            if (isset($input_data['active'])) {
+                $update_data['active'] = $input_data['active'];
+            }
+
+            // N (滿額)
+            if (isset($input_data['n_value'])) {
+                $update_data['n_value'] = $input_data['n_value'];
+            }
+
+            // X (折扣)
+            if (isset($input_data['x_value'])) {
+                $update_data['x_value'] = $input_data['x_value'];
+            }
+
+            // 適用對象
+            if (isset($input_data['target_groups'])) {
+                $update_data['target_groups'] = null;
+            }
+
+            // 備註
+            if (isset($input_data['remark'])) {
+                $update_data['remark'] = null;
+            }
+
+            $update_data['updated_by'] = $user_id;
+            $update_data['updated_at'] = $now;
+
+            // 上架開始時間
+            if (!empty($input_data['start_at'])) {
+                $update_data['start_at'] = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
+            }
+
+            // 上架結束時間
+            if (!empty($input_data['end_at'])) {
+                $update_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
+            }
+
+            PromotionalCampaigns::findOrFail($promotional_campaign->id)->update($update_data);
+
+            // 處理單品
+            if ($promotional_campaign->campaign_type == 'CART04') {
+                if (isset($input_data['prd_block_id'])) {
+                    $new_ids = array_keys($input_data['prd_block_id']);
+                    $old_ids = [];
+
+                    if (isset($promotional_campaign->products)) {
+                        $old_ids = $promotional_campaign->products->pluck('product_id')->all();
+                    }
+
+                    $delete_ids = array_diff($old_ids, $new_ids);
+                    $add_ids = array_diff($new_ids, $old_ids);
+
+                    // 移除資料
+                    if (isset($promotional_campaign->products) && !empty($delete_ids)) {
+                        foreach ($promotional_campaign->products as $obj) {
+                            if (in_array($obj->product_id, $delete_ids)) {
+                                PromotionalCampaignProducts::where('promotional_campaign_id', $promotional_campaign->id)
+                                    ->where('product_id', $obj->product_id)
+                                    ->delete();
+                            }
+                        }
+                    }
+
+                    // 新增、更新資料
+                    foreach ($input_data['prd_block_id'] as $id => $value) {
+                        // 新增資料
+                        if (in_array($id, $add_ids)) {
+                            $create_prd_data = [];
+                            $create_prd_data['promotional_campaign_id'] = $promotional_campaign->id;
+                            $create_prd_data['sort'] = 1;
+                            $create_prd_data['product_id'] = $id;
+                            $create_prd_data['created_by'] = $user_id;
+                            $create_prd_data['updated_by'] = $user_id;
+                            $create_prd_data['created_at'] = $now;
+                            $create_prd_data['updated_at'] = $now;
+
+                            PromotionalCampaignProducts::insert($create_prd_data);
+                        }
+                        // 更新資料
+                        else {
+                            $update_prd_data = [];
+                            $update_prd_data['sort'] = 1;
+                            $update_prd_data['updated_by'] = $user_id;
+                            $update_prd_data['updated_at'] = $now;
+
+                            PromotionalCampaignProducts::where('promotional_campaign_id', $promotional_campaign->id)
+                                ->where('product_id', $id)
+                                ->update($update_prd_data);
+                        }
+                    }
+                }
+            }
+
+            // 處理贈品
+            if ($promotional_campaign->campaign_type == 'CART03' || $promotional_campaign->campaign_type == 'CART04') {
+                if (isset($input_data['gift_block_id'])) {
+                    $new_ids = array_keys($input_data['gift_block_id']);
+                    $old_ids = [];
+
+                    if (isset($promotional_campaign->giveaways)) {
+                        $old_ids = $promotional_campaign->giveaways->pluck('product_id')->all();
+                    }
+
+                    $delete_ids = array_diff($old_ids, $new_ids);
+                    $add_ids = array_diff($new_ids, $old_ids);
+
+                    // 移除資料
+                    if (isset($promotional_campaign->giveaways) && !empty($delete_ids)) {
+                        foreach ($promotional_campaign->giveaways as $obj) {
+                            if (in_array($obj->product_id, $delete_ids)) {
+                                PromotionalCampaignGiveaways::where('promotional_campaign_id', $promotional_campaign->id)
+                                    ->where('product_id', $obj->product_id)
+                                    ->delete();
+                            }
+                        }
+                    }
+
+                    // 新增、更新資料
+                    foreach ($input_data['gift_block_id'] as $id => $value) {
+                        // 新增資料
+                        if (in_array($id, $add_ids)) {
+                            $create_gift_data = [];
+                            $create_gift_data['promotional_campaign_id'] = $promotional_campaign->id;
+                            $create_gift_data['sort'] = 1;
+                            $create_gift_data['product_id'] = $id;
+                            $create_gift_data['assigned_qty'] = $input_data['gift_block_assigned_qty'][$id] ?? 1;
+                            $create_gift_data['assigned_unit_price'] = 0;
+                            $create_gift_data['created_by'] = $user_id;
+                            $create_gift_data['updated_by'] = $user_id;
+                            $create_gift_data['created_at'] = $now;
+                            $create_gift_data['updated_at'] = $now;
+
+                            PromotionalCampaignGiveaways::insert($create_gift_data);
+                        }
+                        // 更新資料
+                        else {
+                            $update_gift_data = [];
+                            $update_gift_data['sort'] = 1;
+
+                            if (isset($input_data['gift_block_assigned_qty'][$id])) {
+                                $update_gift_data['assigned_qty'] = $input_data['gift_block_assigned_qty'][$id];
+                            }
+
+                            $update_gift_data['assigned_unit_price'] = 0;
+                            $update_gift_data['updated_by'] = $user_id;
+                            $update_gift_data['updated_at'] = $now;
+
+                            PromotionalCampaignGiveaways::where('promotional_campaign_id', $promotional_campaign->id)
+                                ->where('product_id', $id)
+                                ->update($update_gift_data);
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
 
             return false;
         }

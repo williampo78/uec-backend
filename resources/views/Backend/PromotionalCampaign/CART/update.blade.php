@@ -25,7 +25,7 @@
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
                         <form role="form" id="update-form" method="post"
-                            action="{{ route('promotional_campaign_cart.update', $promotional_campaigns->id) }}">
+                            action="{{ route('promotional_campaign_cart.update', $promotional_campaign->id) }}">
                             @method('PUT')
                             @csrf
 
@@ -183,26 +183,26 @@
 
             let suppliers = @json($suppliers);
             let product_type_option = @json(config('uec.product_type_option'));
-            let promotional_campaigns = @json($promotional_campaigns);
+            let promotional_campaign = @json($promotional_campaign);
 
-            $('#campaign_name').val(promotional_campaigns.campaign_name);
+            $('#campaign_name').val(promotional_campaign.campaign_name);
 
-            if (promotional_campaigns.active == 1) {
+            if (promotional_campaign.active == 1) {
                 $('#active_enabled').prop('checked', true);
             } else {
                 $('#active_disabled').prop('checked', true);
             }
 
             $('#campaign_type').empty().append(
-                `<option value="${promotional_campaigns.campaign_type}">${promotional_campaigns.description}</option>`
+                `<option value="${promotional_campaign.campaign_type}">${promotional_campaign.description}</option>`
             ).prop('disabled', true);
-            $('#n_value').val(promotional_campaigns.n_value);
-            $('#x_value').val(promotional_campaigns.x_value);
-            $('#start_at').val(promotional_campaigns.start_at);
-            $('#end_at').val(promotional_campaigns.end_at);
+            $('#n_value').val(promotional_campaign.n_value);
+            $('#x_value').val(promotional_campaign.x_value);
+            $('#start_at').val(promotional_campaign.start_at);
+            $('#end_at').val(promotional_campaign.end_at);
 
             // 活動類型
-            switch (promotional_campaigns.campaign_type) {
+            switch (promotional_campaign.campaign_type) {
                 // ﹝滿額﹞購物車滿N元，打X折
                 case 'CART01':
                     $('#prd-block').hide();
@@ -244,8 +244,8 @@
             var prd_modal_product_list = {}; // 單品modal清單中的商品
             var prd_product_list = {}; // 單品清單中的商品
 
-            if (promotional_campaigns.products) {
-                $.each(promotional_campaigns.products, function(id, product) {
+            if (promotional_campaign.products) {
+                $.each(promotional_campaign.products, function(id, product) {
                     prd_product_list[id] = product;
                 });
 
@@ -320,8 +320,8 @@
             var gift_modal_product_list = {}; // 贈品modal清單中的商品
             var gift_product_list = {}; // 贈品清單中的商品
 
-            if (promotional_campaigns.giveaways) {
-                $.each(promotional_campaigns.giveaways, function(id, product) {
+            if (promotional_campaign.giveaways) {
+                $.each(promotional_campaign.giveaways, function(id, product) {
                     gift_product_list[id] = product;
                 });
 

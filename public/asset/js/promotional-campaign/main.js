@@ -185,7 +185,7 @@ function renderPrdProductList(products) {
     });
 
     // 當下時間>=上架時間起，僅開放修改活動名稱、狀態、上架時間訖
-    if (new Date() >= new Date($("#start_at").val())) {
+    if (new Date() >= new Date($("#start_at").val()) && $("#start_at").is(':disabled')) {
         $(".btn-delete-prd").prop("disabled", true).parent("td").hide();
     }
 }
@@ -274,7 +274,7 @@ function renderGiftProductList(products) {
     });
 
     // 當下時間>=上架時間起，僅開放修改活動名稱、狀態、上架時間訖
-    if (new Date() >= new Date($("#start_at").val())) {
+    if (new Date() >= new Date($("#start_at").val()) && $("#start_at").is(':disabled')) {
         $('#gift-product-table > tbody [name^="gift_block_assigned_qty"]').prop(
             "disabled",
             true
