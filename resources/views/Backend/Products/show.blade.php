@@ -647,7 +647,6 @@
                                     </div>
                                 </div>
                                 <div class="row form-group">
-                                    @if ($products->spec_dimension >= '1')
                                         <div class="col-sm-6" v-if="products.spec_dimension >= 1">
                                             <div class="col-sm-2 no-pa">
                                                 <label class="control-label">規格一<span
@@ -664,9 +663,6 @@
                                                 </select>
                                             </div>
                                         </div>
-                                    @endif
-
-                                    @if ($products->spec_dimension == '2')
                                         <div class="col-sm-6" v-if="products.spec_dimension == 2">
                                             <div class="col-sm-2 no-pa">
                                                 <label class="control-label">規格二<span
@@ -676,14 +672,13 @@
                                                 <select class="form-control js-select2" name="spec_2" id="spec_2" disabled>
                                                     <option value="顏色" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
                                                         顏色</option>
-                                                    <option value="尺寸" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
+                                                    <option value="尺寸" {{ $products->spec_2 == '尺寸' ? 'selected' : '' }}>
                                                         尺寸</option>
-                                                    <option value="容量" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
+                                                    <option value="容量" {{ $products->spec_2 == '容量' ? 'selected' : '' }}>
                                                         容量</option>
                                                 </select>
                                             </div>
                                         </div>
-                                    @endif
                                 </div>
                                 {{-- 二維多規格 --}}
                                 <div class="row form-group">

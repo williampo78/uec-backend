@@ -610,7 +610,20 @@
                         spec_1: [],
                         spec_2: [],
                     },
-                    SkuList: [{}],
+                    SkuList: [{
+                        id: '',
+                        sort_key: 0,
+                        sort: 0,
+                        spec_1_value: 0,
+                        spec_1_only_key: 0,
+                        item_no: '',
+                        supplier_item_no: 0,
+                        ean: 0,
+                        pos_item_no: 0,
+                        safty_qty: 0,
+                        is_additional_purchase: 0,
+                        status: 0,
+                    }],
                     products: {
                         spec_dimension: 0,
                     }
@@ -796,7 +809,20 @@
                         }
                         switch (val) {
                             case '0': //單規格
-                                this.SkuList = [{}];
+                                this.SkuList = [{
+                                    id: '',
+                                    sort_key: 0,
+                                    sort: 0,
+                                    spec_1_value: 0,
+                                    spec_1_only_key: 0,
+                                    item_no: 0,
+                                    supplier_item_no: 0,
+                                    ean: 0,
+                                    pos_item_no: 0,
+                                    safty_qty: 0,
+                                    is_additional_purchase: 0,
+                                    status: 0,
+                                }];
                                 break;
                             case '1': //一維多規格
                                 this.SkuList = [];
