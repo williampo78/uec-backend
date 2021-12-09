@@ -261,11 +261,11 @@ class ProductsService
     public function getProductsPhoto($products_id)
     {
         $ProductPhotos = ProductPhotos::where('product_id', $products_id);
-        $result = $ProductPhotos->get();
-        foreach($result as $key => $val) {
-            $val->photo_size = ImageUpload::getSize($val->photo_name);
-        };
-        return $result;
+        $results = $ProductPhotos->get();
+        $results = $results->map(function($result){
+            $result->photo_size =ImageUpload::getSize($result -> photo_name) ;return $result ; 
+        });
+        return $results;
     }
     public function getProductSpac($products_id)
     {

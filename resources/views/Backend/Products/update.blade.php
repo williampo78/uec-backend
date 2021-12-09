@@ -637,7 +637,188 @@
                     </div>
                     <hr>
                     <div id="page-2">
-                        @include('Backend.Products.inputSpec')
+                        <div id="SkuComponent">
+                            <div class="row form-group">
+                                <div class="col-sm-12">
+                                    <div class="col-sm-2 ">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="spec_dimension" value="0"
+                                                {{ $products->spec_dimension == '0' ? 'checked' : 'disabled' }}>
+                                            單規格
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="spec_dimension" value="1"
+                                                {{ $products->spec_dimension == '1' ? 'checked' : 'disabled' }}>
+                                            一維多規格
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="spec_dimension" value="2"
+                                                {{ $products->spec_dimension == '2' ? 'checked' : 'disabled' }}>
+                                            二維多規格
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                    <div class="col-sm-6" v-if="products.spec_dimension >= 1">
+                                        <div class="col-sm-2 no-pa">
+                                            <label class="control-label">規格一<span
+                                                    class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2" name="spec_1" id="spec_1" disabled>
+                                                <option value="顏色" {{ $products->spec_1 == '顏色' ? 'selected' : '' }}>
+                                                    顏色</option>
+                                                <option value="尺寸" {{ $products->spec_1 == '尺寸' ? 'selected' : '' }}>
+                                                    尺寸</option>
+                                                <option value="容量" {{ $products->spec_1 == '容量' ? 'selected' : '' }}>
+                                                    容量</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6" v-if="products.spec_dimension == 2">
+                                        <div class="col-sm-2 no-pa">
+                                            <label class="control-label">規格二<span
+                                                    class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2" name="spec_2" id="spec_2" disabled>
+                                                <option value="顏色" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
+                                                    顏色</option>
+                                                <option value="尺寸" {{ $products->spec_2 == '尺寸' ? 'selected' : '' }}>
+                                                    尺寸</option>
+                                                <option value="容量" {{ $products->spec_2 == '容量' ? 'selected' : '' }}>
+                                                    容量</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                            </div>
+                            {{-- 二維多規格 --}}
+                            <div class="row form-group">
+                                <div class="col-sm-6" v-if="products.spec_dimension >= 1">
+                                    <table class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                            {{-- <tr>
+                                                <th>
+                                                    <button class="btn btn-primary btn-sm" type="button" @click="AddSpecToSkuList('1')">新增項目
+                                                    </button>
+                                                </th>
+                                            </tr> --}}
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($spac_list['spac_1'] as $val)
+                                                <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
+                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                    draggable="true" :data-index="spec_1_key" :data-type="'spec_1'">
+                                                    <td>
+                                                        <div class="col-sm-1">
+                                                            <label class="control-label"><i style="font-size: 20px;"
+                                                                    class="fa fa-list"></i></label>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input class="form-control"
+                                                                value="{{ $val->spec_1_value }}" disabled>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            {{-- <button class="btn btn-danger btn-sm" type="button"
+                                                            @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button> --}}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-sm-6" v-if="products.spec_dimension == 2">
+                                    <table class="table table-striped table-bordered table-hover">
+                                        <thead>
+
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($spac_list['spac_2'] as $val)
+                                                <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
+                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                    draggable="true" :data-index="spec_2_key" :data-type="'spec_2'">
+                                                    <td>
+                                                        <div class="col-sm-1">
+                                                            <label class="control-label"><i style="font-size: 20px;"
+                                                                    class="fa fa-list"></i></label>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input class="form-control"
+                                                                value="{{ $val->spec_1_value }}" disabled>
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            {{-- <button class="btn btn-danger btn-sm" type="button"
+                                                            @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button> --}}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-sm-6">
+                                    <div class="col-sm-2 no-pa">
+                                        <label class="control-label">安全庫存量</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" name="safty_qty_all" id="keyword" v-model="safty_qty_all" >
+                                    </div>
+                                    <div class="cola-sm-2">
+                                        <button class="btn btn-primary btn-sm" type="button" @click="change_safty_qty_all">套用</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <textarea style="display: none" name="SkuListdata" cols="30"
+                                rows="10">@{{ SkuList }}</textarea>
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th v-if="products.spec_dimension >= 1" style="width: 10%">規格一</th>
+                                        <th v-if="products.spec_dimension == 2" style="width: 10%">規格二</th>
+                                        <th style="width: 15%">Item編號</th>
+                                        <th style="width: 10%">廠商貨號</th>
+                                        <th style="width: 10%">國際條碼</th>
+                                        <th style="width: 10%">POS品號</th>
+                                        <th style="width: 10%">安全庫存量*</th>
+                                        <th style="width: 10%">是否追加*</th>
+                                        <th style="width: 10%">狀態*</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(Sku, SkuKey) in SkuList">
+                                        <td v-if="products.spec_dimension >= 1">@{{ Sku . spec_1_value }}</td>
+                                        <td v-if="products.spec_dimension == 2">@{{ Sku . spec_2_value }}</td>
+                                        <td><input class="form-control" v-model="Sku.item_no" readonly></td>
+                                        <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
+                                        <td><input class="form-control" v-model="Sku.ean"></td>
+                                        <td><input class="form-control" v-model="Sku.pos_item_no"></td>
+                                        <td><input class="form-control" v-model="Sku.safty_qty"></td>
+                                        <td>
+                                            <select class="form-control js-select2" v-model="Sku.is_additional_purchase" id="active">
+                                                <option value="1">是</option>
+                                                <option value="0">否</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control js-select2" v-model="Sku.status">
+                                                <option value="1">啟用</option>
+                                                <option value="0">停用</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     {{-- 二維多規格結束 --}}
                     <button class="btn btn-large btn-primary" type="submit">儲存</button>
@@ -659,13 +840,21 @@
                         spec_1: [],
                         spec_2: [],
                     },
-                    SkuList: [{}],
-                    products: {
-                        spec_dimension: 0,
-                    }
+                    SkuList: @json($products_item),
+                    products: @json($products),
+                    safty_qty_all:0 ,
                 }
             },
+            mounted () {
+                   console.log(this.products) ; 
+            },
             methods: {
+                change_safty_qty_all(){
+                    let change_num = this.safty_qty_all ;
+                    this.SkuList.map(function(value, key) {
+                        value.safty_qty = change_num ; 
+                    });
+                },
                 AddSpecToSkuList(spec_type) {
                     if (spec_type == '1') {
                         this.SpecList.spec_1.push({
