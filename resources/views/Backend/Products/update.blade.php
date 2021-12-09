@@ -602,10 +602,10 @@
                                     <div class="col-sm-10">
                                         <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                         <input type="file" @change="fileSelected" multiple>
-                                        <input  type="file" :ref="'images_files'" name="filedata[]"
+                                        <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                             multiple>
                                     </div>
-                                    <textarea name="imgJson" id="" cols="30" rows="10">@{{images}}</textarea>
+                                    <textarea style="display: none" name="imgJson" id="" cols="30" rows="10">@{{images}}</textarea>
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -639,7 +639,7 @@
                     <hr>
                     <div id="page-2">
                         <div id="SkuComponent">
-                            <textarea name="SpecListJson" id="" cols="30" rows="10">@{{SpecList}}</textarea>
+                            <textarea style="display: none" name="SpecListJson" id="" cols="30" rows="10">@{{SpecList}}</textarea>
                             <div class="row form-group">
                                 <div class="col-sm-12">
                                     <div class="col-sm-2 ">
@@ -796,7 +796,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <textarea style="display: none" name="SkuListdata" cols="30"
+                            <textarea style="display: none" style="display: none" name="SkuListdata" cols="30"
                                 rows="10">@{{ SkuList }}</textarea>
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>

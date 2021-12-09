@@ -146,12 +146,12 @@ class ProductsService
         $now = Carbon::now();
         $skuList = json_decode($in['SkuListdata'], true);
         $specListJson = json_decode($in['SpecListJson'], true);
-
+        $product_no = $this->universalService->getDocNumber('products', $in['stock_type']);
         DB::beginTransaction();
         try {
             $insert = [
                 'stock_type' => $in['stock_type'],
-                'product_no' => $this->universalService->getDocNumber('products', $in['stock_type']),
+                'product_no' => $product_no,
                 'supplier_id' => $in['supplier_id'],
                 'product_name' => $in['product_name'],
                 'tax_type' => $in['tax_type'],
@@ -201,7 +201,7 @@ class ProductsService
                     'spec_1_value' => $val['spec_1_value'] ?? '',
                     'spec_2_value' => $val['spec_2_value'] ?? '',
                     'item_no' => $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
-                    'supplier_item_no' => '',
+                    'supplier_item_no' => $val['supplier_item_no'],
                     'ean' => $val['ean'],
                     'pos_item_no' => $val['pos_item_no'],
                     'safty_qty' => $val['safty_qty'],
@@ -255,7 +255,7 @@ class ProductsService
     }
     public function editProducts($in, $file)
     {
-        $products_id = $in['id'] ;
+        $products_id = $in['id'];
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
@@ -263,105 +263,132 @@ class ProductsService
         $specListJson = json_decode($in['SpecListJson'], true);
         $imgJson = json_decode($in['imgJson'], true);
         // dd($in) ;
-        $update = [
-            'stock_type' => $in['stock_type'],
-            'supplier_id' => $in['supplier_id'],
-            'product_name' => $in['product_name'],
-            'tax_type' => $in['tax_type'],
-            'category_id' => $in['category_id'],
-            'brand_id' => $in['brand_id'],
-            'model' => $in['model'],
-            'lgst_method' => $in['lgst_method'],
-            'lgst_temperature' => $in['lgst_temperature'],
-            'uom' => $in['uom'],
-            'min_purchase_qty' => $in['min_purchase_qty'],
-            'has_expiry_date' => $in['has_expiry_date'],
-            'expiry_days' => $in['expiry_days'],
-            'expiry_receiving_days' => $in['expiry_receiving_days'],
-            'product_type' => $in['product_type'],
-            'is_discontinued' => $in['is_discontinued'],
-            'length' => $in['length'],
-            'width' => $in['width'],
-            'height' => $in['height'],
-            'weight' => $in['weight'],
-            'list_price' => $in['list_price'],
-            'selling_price' => $in['selling_price'],
-            'product_brief_1' => $in['product_brief_1'],
-            'product_brief_2' => $in['product_brief_2'],
-            'product_brief_3' => $in['product_brief_3'],
-            'patent_no' => $in['patent_no'],
-            'is_with_warranty' => $in['is_with_warranty'],
-            'warranty_days' => $in['warranty_days'],
-            'warranty_scope' => $in['warranty_scope'],
-            'spec_dimension' => $in['spec_dimension'],
-            'spec_1' => $in['spec_1'] ?? '',
-            'spec_2' => $in['spec_2'] ?? '',
-            'selling_channel' => $in['selling_channel'],
-            'delivery_type' => $in['delivery_type'],
-            'updated_by' => $user_id,
-            'updated_at' => $now,
-        ];
-        Products::where('id', $products_id)->update($update);
-        $uploadPath = '/products/' . $products_id;
-        foreach ($imgJson as $key => $val) {
-            if (isset($val['id'])) {
-                $updateImg = [
-                    'sort' => $key,
-                    'updated_by' => $user_id,
-                    'updated_at' => $now,
-                ];
-                ProductPhotos::where('id', $val['id'])->update($updateImg);
-            } else {
-                $ImageUpload = ImageUpload::uploadImage($file['filedata'][$key], $uploadPath);
-                $insertImg = [
-                    'product_id' => $products_id,
-                    'photo_name' => $ImageUpload['image'],
-                    'sort' => $key,
-                    'created_by' => $user_id,
-                    'updated_by' => $user_id,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-                ProductPhotos::create($insertImg);
+        DB::beginTransaction();
+        try {
+            $update = [
+                'stock_type' => $in['stock_type'],
+                'supplier_id' => $in['supplier_id'],
+                'product_name' => $in['product_name'],
+                'tax_type' => $in['tax_type'],
+                'category_id' => $in['category_id'],
+                'brand_id' => $in['brand_id'],
+                'model' => $in['model'],
+                'lgst_method' => $in['lgst_method'],
+                'lgst_temperature' => $in['lgst_temperature'],
+                'uom' => $in['uom'],
+                'min_purchase_qty' => $in['min_purchase_qty'],
+                'has_expiry_date' => $in['has_expiry_date'],
+                'expiry_days' => $in['expiry_days'],
+                'expiry_receiving_days' => $in['expiry_receiving_days'],
+                'product_type' => $in['product_type'],
+                'is_discontinued' => $in['is_discontinued'],
+                'length' => $in['length'],
+                'width' => $in['width'],
+                'height' => $in['height'],
+                'weight' => $in['weight'],
+                'list_price' => $in['list_price'],
+                'selling_price' => $in['selling_price'],
+                'product_brief_1' => $in['product_brief_1'],
+                'product_brief_2' => $in['product_brief_2'],
+                'product_brief_3' => $in['product_brief_3'],
+                'patent_no' => $in['patent_no'],
+                'is_with_warranty' => $in['is_with_warranty'],
+                'warranty_days' => $in['warranty_days'],
+                'warranty_scope' => $in['warranty_scope'],
+                'spec_dimension' => $in['spec_dimension'],
+                'spec_1' => $in['spec_1'] ?? '',
+                'spec_2' => $in['spec_2'] ?? '',
+                'selling_channel' => $in['selling_channel'],
+                'delivery_type' => $in['delivery_type'],
+                'updated_by' => $user_id,
+                'updated_at' => $now,
+            ];
+            Products::where('id', $products_id)->update($update);
+            $uploadPath = '/products/' . $products_id;
+            foreach ($imgJson as $key => $val) {
+                if (isset($val['id'])) {
+                    $updateImg = [
+                        'sort' => $key,
+                        'updated_by' => $user_id,
+                        'updated_at' => $now,
+                    ];
+                    ProductPhotos::where('id', $val['id'])->update($updateImg);
+                } else {
+                    $ImageUpload = ImageUpload::uploadImage($file['filedata'][$key], $uploadPath);
+                    $insertImg = [
+                        'product_id' => $products_id,
+                        'photo_name' => $ImageUpload['image'],
+                        'sort' => $key,
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                    ProductPhotos::create($insertImg);
+                }
             }
-        }
-        // dd($skuList) ;
-        $add_item_no = ProductItems::where('product_id' , $products_id)->max('item_no')  ;
-        dd($add_item_no) ; 
-        foreach ($skuList as $key => $val) {
-            if($val['id'] == ''){
-                // $skuInsert = [
-                //     'agent_id' => $agent_id,
-                //     'product_id' => $products_id,
-                //     'sort' => $val['sort'] ?? 0,
-                //     'spec_1_value' => $val['spec_1_value'] ?? '',
-                //     'spec_2_value' => $val['spec_2_value'] ?? '',
-                //     'item_no' => $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
-                //     'supplier_item_no' => '',
-                //     'ean' => $val['ean'],
-                //     'pos_item_no' => $val['pos_item_no'],
-                //     'safty_qty' => $val['safty_qty'],
-                //     'is_additional_purchase' => $val['is_additional_purchase'],
-                //     'status' => $val['status'],
-                //     'created_by' => $user_id,
-                //     'updated_by' => $user_id,
-                //     'created_at' => $now,
-                //     'updated_at' => $now,
-                // ];
-                // $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
-            }
-           
-            // $skuList[$key]['item_no'] = $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT);
-        }
-        // Product_spec_info::where('product_id', $products_id)->update([
-        //     'spec_value_list' => json_encode($specListJson),
-        //     'item_list' => json_encode($skuList),
-        //     'updated_by' => $user_id,
-        //     'updated_at' => $now,
-        // ]);
-        
-        exit;
+            // dd($skuList) ;
+            $add_item_no = ProductItems::where('product_id', $products_id)->count();
+            foreach ($skuList as $key => $val) {
+                if ($val['id'] == '') {
+                    $add_item_no += 1;
+                    dd($in['product_no'] . str_pad($add_item_no, 4, "0", STR_PAD_LEFT)) ; 
 
+                    $skuInsert = [
+                        'agent_id' => $agent_id,
+                        'product_id' => $products_id,
+                        'sort' => $val['sort'] ?? 0,
+                        'spec_1_value' => $val['spec_1_value'] ?? '',
+                        'spec_2_value' => $val['spec_2_value'] ?? '',
+                        'item_no' => $in['product_no'] . str_pad($add_item_no, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
+                        'supplier_item_no' => $val['supplier_item_no'],
+                        'ean' => $val['ean'],
+                        'pos_item_no' => $val['pos_item_no'],
+                        'safty_qty' => $val['safty_qty'],
+                        'is_additional_purchase' => $val['is_additional_purchase'],
+                        'status' => $val['status'],
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                    $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
+                    $skuList[$key]['item_no'] = $in['product_no'] . str_pad($add_item_no, 4, "0", STR_PAD_LEFT) ;
+                } else {
+                    $skuUpdate = [
+                        'agent_id' => $agent_id,
+                        'product_id' => $products_id,
+                        'sort' => $val['sort'] ?? 0,
+                        'spec_1_value' => $val['spec_1_value'] ?? '',
+                        'spec_2_value' => $val['spec_2_value'] ?? '',
+                        'supplier_item_no' => $val['supplier_item_no'],
+                        'ean' => $val['ean'],
+                        'pos_item_no' => $val['pos_item_no'],
+                        'safty_qty' => $val['safty_qty'],
+                        'is_additional_purchase' => $val['is_additional_purchase'],
+                        'status' => $val['status'],
+                        'updated_by' => $user_id,
+                        'updated_at' => $now,
+                    ];
+                    ProductItems::where('id', $val['id'])->update($skuUpdate);
+                }
+
+            }
+            Product_spec_info::where('product_id', $products_id)->update([
+                'spec_value_list' => json_encode($specListJson),
+                'item_list' => json_encode($skuList),
+                'updated_by' => $user_id,
+                'updated_at' => $now,
+            ]);
+
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::warning($e->getMessage());
+            $result = false;
+        }
+        return $result;
     }
     public function showProducts($id)
     {
