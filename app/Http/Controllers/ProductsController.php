@@ -7,7 +7,6 @@ use App\Services\ProductsService;
 use App\Services\SupplierService ;
 use App\Services\BrandsService ;
 use App\Services\WebCategoryHierarchyService ;
-use ImageUpload ;
 
 class ProductsController extends Controller
 {
@@ -41,8 +40,6 @@ class ProductsController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
 
-        // dd($result) ;
-        // dd($result) ;
         return view('Backend.Products.list',$result);
     }
 
@@ -86,7 +83,7 @@ class ProductsController extends Controller
         $result = [] ; 
         $result['products'] = $this->productsService->showProducts($id) ; 
         $result['products_item'] = $this->productsService->getProductItems($id);
-        $result['supplier'] = $this->supplierService->getSupplier(); //供應商
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
@@ -103,7 +100,16 @@ class ProductsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $result = [] ; 
+        $result['products'] = $this->productsService->showProducts($id) ; 
+        $result['products_item'] = $this->productsService->getProductItems($id);
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
+        $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
+        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
+        $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
+        // dd($result) ; exit ;
+        return view('Backend.Products.update',$result) ;
     }
 
     /**

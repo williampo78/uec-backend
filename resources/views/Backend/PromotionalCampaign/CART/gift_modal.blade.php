@@ -1,11 +1,11 @@
-<div class="modal fade" id="prd-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div class="modal fade" id="gift-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content modal-primary panel-primary">
 
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">新增單品</h4>
+                <h4 class="modal-title" id="myModalLabel">新增贈品</h4>
             </div>
 
             <div class="modal-body">
@@ -16,10 +16,10 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
-                                        <label for="prd-modal-supplier-id" class="control-label">供應商</label>
+                                        <label for="gift-modal-supplier-id" class="control-label">供應商</label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <select class="form-control select2-supplier-id" id="prd-modal-supplier-id">
+                                        <select class="form-control select2-supplier-id" id="gift-modal-supplier-id">
                                             <option></option>
                                         </select>
                                     </div>
@@ -28,10 +28,10 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
-                                        <label for="prd-modal-product-no" class="control-label">商品序號</label>
+                                        <label for="gift-modal-product-no" class="control-label">商品序號</label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <input class="form-control" id="prd-modal-product-no" placeholder="模糊查詢" />
+                                        <input class="form-control" id="gift-modal-product-no" placeholder="模糊查詢" />
                                     </div>
                                 </div>
                             </div>
@@ -41,10 +41,10 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
-                                        <label for="prd-modal-product-name" class="control-label">商品名稱</label>
+                                        <label for="gift-modal-product-name" class="control-label">商品名稱</label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <input class="form-control" id="prd-modal-product-name" placeholder="模糊查詢，至少輸入4碼" />
+                                        <input class="form-control" id="gift-modal-product-name" placeholder="模糊查詢，至少輸入4碼" />
                                     </div>
                                 </div>
                             </div>
@@ -54,13 +54,13 @@
                                         <label class="control-label">售價</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="number" class="form-control" id="prd-modal-selling-price-min">
+                                        <input type="number" class="form-control" id="gift-modal-selling-price-min">
                                     </div>
                                     <div class="col-sm-2 text-center">
                                         <label class="control-label">~</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="number" class="form-control" id="prd-modal-selling-price-max">
+                                        <input type="number" class="form-control" id="gift-modal-selling-price-max">
                                     </div>
                                 </div>
                             </div>
@@ -73,9 +73,9 @@
                                         <label class="control-label">建檔日</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-start-created-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-start-created-at" id="prd-modal-start-created-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-start-created-at" data-toggle="datetimepicker">
+                                        <div class='input-group date' id='datetimepicker-gift-modal-start-created-at'>
+                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-start-created-at" id="gift-modal-start-created-at" autocomplete="off" />
+                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-start-created-at" data-toggle="datetimepicker">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
                                         </div>
@@ -84,9 +84,9 @@
                                         <label class="control-label">~</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-end-created-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-end-created-at" id="prd-modal-end-created-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-end-created-at" data-toggle="datetimepicker">
+                                        <div class='input-group date' id='datetimepicker-gift-modal-end-created-at'>
+                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-end-created-at" id="gift-modal-end-created-at" autocomplete="off" />
+                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-end-created-at" data-toggle="datetimepicker">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
                                         </div>
@@ -99,9 +99,9 @@
                                         <label class="control-label">上架日期</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-start-launched-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-start-launched-at" id="prd-modal-start-launched-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-start-launched-at" data-toggle="datetimepicker">
+                                        <div class='input-group date' id='datetimepicker-gift-modal-start-launched-at'>
+                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-start-launched-at" id="gift-modal-start-launched-at" autocomplete="off" />
+                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-start-launched-at" data-toggle="datetimepicker">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
                                         </div>
@@ -110,9 +110,9 @@
                                         <label class="control-label">~</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-end-launched-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-end-launched-at" id="prd-modal-end-launched-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-end-launched-at" data-toggle="datetimepicker">
+                                        <div class='input-group date' id='datetimepicker-gift-modal-end-launched-at'>
+                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-end-launched-at" id="gift-modal-end-launched-at" autocomplete="off" />
+                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-end-launched-at" data-toggle="datetimepicker">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
                                         </div>
@@ -125,10 +125,10 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
-                                        <label for="prd-modal-product-type" class="control-label">商品類型</label>
+                                        <label for="gift-modal-product-type" class="control-label">商品類型</label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <select class="form-control select2-product-type" id="prd-modal-product-type">
+                                        <select class="form-control select2-product-type" id="gift-modal-product-type">
                                         </select>
                                     </div>
                                 </div>
@@ -136,13 +136,13 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
-                                        <label for="prd-modal-limit" class="control-label">筆數限制</label>
+                                        <label for="gift-modal-limit" class="control-label">筆數限制</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <input type="number" class="form-control" id="prd-modal-limit" value="100" max="100" min="0" readonly>
+                                        <input type="number" class="form-control" id="gift-modal-limit" value="100" max="100" min="0" readonly>
                                     </div>
                                     <div class="col-sm-6 text-right">
-                                        <button type="button" class="btn btn-warning" id="prd-modal-btn-search"><i class="fa fa-search"></i> 查詢</button>
+                                        <button type="button" class="btn btn-warning" id="gift-modal-btn-search"><i class="fa fa-search"></i> 查詢</button>
                                     </div>
                                 </div>
                             </div>
@@ -153,22 +153,22 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-success" id="prd-modal-btn-save"><i class="fa fa-save"></i> 儲存</button>
-                                <button type="button" class="btn btn-success" id="prd-modal-btn-save-and-close" data-dismiss="modal"><i class="fa fa-save"></i> 儲存並關閉</button>
+                                <button type="button" class="btn btn-success" id="gift-modal-btn-save"><i class="fa fa-save"></i> 儲存</button>
+                                <button type="button" class="btn btn-success" id="gift-modal-btn-save-and-close" data-dismiss="modal"><i class="fa fa-save"></i> 儲存並關閉</button>
                                 <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-ban"></i> 取消</button>
                             </div>
                             <div class="col-sm-12">
                                 <hr/>
                             </div>
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary" id="prd-modal-btn-check-all"><i class="fa fa-check"></i> 全勾選</button>
-                                <button type="button" class="btn btn-primary" id="prd-modal-btn-cancel-all"><i class="fa fa-close"></i> 全取消</button>
+                                <button type="button" class="btn btn-primary" id="gift-modal-btn-check-all"><i class="fa fa-check"></i> 全勾選</button>
+                                <button type="button" class="btn btn-primary" id="gift-modal-btn-cancel-all"><i class="fa fa-close"></i> 全取消</button>
                             </div>
                         </div>
                         <br/>
 
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered table-hover" style="width:100%" id="prd-modal-product-table">
+                            <table class="table table-striped table-bordered table-hover" style="width:100%" id="gift-modal-product-table">
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">項次</th>

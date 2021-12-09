@@ -93,8 +93,8 @@ class ProductsService
 
             // 上架結束日
             if (!empty($input_data['end_launched_at'])) {
+                $input_data['end_launched_at'] = $input_data['end_launched_at'] . ' 23:59:59';
                 $end_launched_at = Carbon::parse($input_data['end_launched_at'])->format('Y-m-d H:i:s');
-                $end_launched_at = $end_launched_at . ' 23:59:59';
                 $products->whereDate('products.end_launched_at', '<=', $end_launched_at);
             }
         } catch (\Carbon\Exceptions\InvalidFormatException $e) {
@@ -120,6 +120,7 @@ class ProductsService
 
             // 建檔日結束日期
             if (!empty($input_data['end_created_at'])) {
+                $input_data['end_created_at'] = $input_data['end_created_at'] . ' 23:59:59';
                 $end_created_at = Carbon::parse($input_data['end_created_at'])->format('Y-m-d H:i:s');
                 $products->where('products.created_at', '<=', $end_created_at);
             }
@@ -241,7 +242,11 @@ class ProductsService
     public function showProducts($id)
     {
         $agent_id = Auth::user()->agent_id;
-        $products = Products::where('agent_id', $agent_id)->where('id', $id);
+        $products = Products::select('products.*', 'updated_by_name.name AS updated_by_name' , 'created_by_name.name AS created_by_name')
+        ->leftJoin('user as created_by_name', 'products.created_by', '=', 'created_by_name.id')
+        ->leftJoin('user as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
+        ->where('products.agent_id', $agent_id)->where('products.id', $id);
+     
         $result = $products->first();
         return $result;
     }
@@ -256,8 +261,11 @@ class ProductsService
     public function getProductsPhoto($products_id)
     {
         $ProductPhotos = ProductPhotos::where('product_id', $products_id);
-        $result = $ProductPhotos->get();
-        return $result;
+        $results = $ProductPhotos->get();
+        $results = $results->map(function($result){
+            $result->photo_size =ImageUpload::getSize($result -> photo_name) ;return $result ; 
+        });
+        return $results;
     }
     public function getProductSpac($products_id)
     {

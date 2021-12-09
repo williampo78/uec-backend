@@ -2,13 +2,22 @@
 
 namespace App\Services;
 
-use App\Models\PromotionalCampaigns;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\PromotionalCampaigns;
+use Illuminate\Support\Facades\Auth;
+use App\Models\PromotionalCampaignProducts;
+use App\Models\PromotionalCampaignGiveaways;
 
 class PromotionalCampaignService
 {
+    private $lookup_values_v_service;
+
+    public function __construct() {
+        $this->lookup_values_v_service = new LookupValuesVService;
+    }
+
     /**
      * 取得行銷活動資料
      *
@@ -119,5 +128,110 @@ class PromotionalCampaignService
             ->get();
 
         return $result;
+    }
+
+    /**
+     * 新增行銷活動資料
+     *
+     * ﹝滿額﹞購物車滿N元，打X折 => CART01
+     * ﹝滿額﹞購物車滿N元，折X元 => CART02
+     * ﹝滿額﹞購物車滿N元，送贈品 => CART03
+     * ﹝滿額﹞指定商品滿N件，送贈品 => CART04
+     *
+     * @param array $input_data
+     * @return boolean
+     */
+    public function addPromotionalCampaign($input_data)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $user_id = Auth::user()->id;
+        $now = Carbon::now();
+
+        DB::beginTransaction();
+
+        try {
+            $create_data = [];
+            $create_data['agent_id'] = $agent_id;
+            $create_data['campaign_type'] = $input_data['campaign_type'] ?? null;
+            $create_data['campaign_name'] = $input_data['campaign_name'] ?? '';
+            $create_data['active'] = $input_data['active'] ?? 1;
+            $create_data['n_value'] = $input_data['n_value'] ?? null;
+            $create_data['target_groups'] = null;
+            $create_data['remark'] = null;
+            $create_data['created_by'] = $user_id;
+            $create_data['updated_by'] = $user_id;
+            $create_data['created_at'] = $now;
+            $create_data['updated_at'] = $now;
+
+            if (!empty($input_data['start_at'])) {
+                $start_at = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
+                $create_data['start_at'] = $start_at;
+            }
+
+            if (!empty($input_data['end_at'])) {
+                $end_at = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
+                $create_data['end_at'] = $end_at;
+            }
+
+            $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['code' => $create_data['campaign_type']]);
+            $campaign_type = $campaign_types->first();
+            $create_data['level_code'] = $campaign_type->udf_01;
+            $create_data['category_code'] = $campaign_type->udf_03;
+            $create_data['promotional_label'] = $campaign_type->udf_02;
+
+            // 折扣
+            if ($create_data['campaign_type'] == 'CART01' || $create_data['campaign_type'] == 'CART02') {
+                $create_data['x_value'] = $input_data['x_value'] ?? null;
+            }
+
+            $promotional_campaign_id = PromotionalCampaigns::insertGetId($create_data);
+
+            // 新增單品
+            if ($create_data['campaign_type'] == 'CART04') {
+                if (isset($input_data['prd_block_id'])) {
+                    foreach ($input_data['prd_block_id'] as $key => $value) {
+                        $create_prd_data = [];
+                        $create_prd_data['promotional_campaign_id'] = $promotional_campaign_id;
+                        $create_prd_data['sort'] = 1;
+                        $create_prd_data['product_id'] = $key;
+                        $create_prd_data['created_by'] = $user_id;
+                        $create_prd_data['updated_by'] = $user_id;
+                        $create_prd_data['created_at'] = $now;
+                        $create_prd_data['updated_at'] = $now;
+
+                        PromotionalCampaignProducts::insert($create_prd_data);
+                    }
+                }
+            }
+
+            // 新增贈品
+            if ($create_data['campaign_type'] == 'CART03' || $create_data['campaign_type'] == 'CART04') {
+                if (isset($input_data['gift_block_id'])) {
+                    foreach ($input_data['gift_block_id'] as $key => $value) {
+                        $create_gift_data = [];
+                        $create_gift_data['promotional_campaign_id'] = $promotional_campaign_id;
+                        $create_gift_data['sort'] = 1;
+                        $create_gift_data['product_id'] = $key;
+                        $create_gift_data['assigned_qty'] = $input_data['gift_block_assigned_qty'][$key] ?? 1;
+                        $create_gift_data['assigned_unit_price'] = 0;
+                        $create_gift_data['created_by'] = $user_id;
+                        $create_gift_data['updated_by'] = $user_id;
+                        $create_gift_data['created_at'] = $now;
+                        $create_gift_data['updated_at'] = $now;
+
+                        PromotionalCampaignGiveaways::insert($create_gift_data);
+                    }
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::warning($e->getMessage());
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -468,7 +468,7 @@
                                     <label class="control-label">建檔人員</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control"  id="keyword" value="{{$products->updated_by_name}}" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -476,7 +476,7 @@
                                     <label class="control-label">建檔時間</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control" id="keyword" value="{{$products->created_at}}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -486,7 +486,7 @@
                                     <label class="control-label">修改人員</label>
                                 </div>
                                 <div class="col-sm-7">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control"  id="keyword" value="{{$products->updated_by_name}}"readonly>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="control-label">
@@ -499,7 +499,7 @@
                                     <label class="control-label">修改時間</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control" name="keyword" id="keyword" value="{{$products->updated_at}}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -647,7 +647,6 @@
                                     </div>
                                 </div>
                                 <div class="row form-group">
-                                    @if ($products->spec_dimension >= '1')
                                         <div class="col-sm-6" v-if="products.spec_dimension >= 1">
                                             <div class="col-sm-2 no-pa">
                                                 <label class="control-label">規格一<span
@@ -664,9 +663,6 @@
                                                 </select>
                                             </div>
                                         </div>
-                                    @endif
-
-                                    @if ($products->spec_dimension == '2')
                                         <div class="col-sm-6" v-if="products.spec_dimension == 2">
                                             <div class="col-sm-2 no-pa">
                                                 <label class="control-label">規格二<span
@@ -676,14 +672,13 @@
                                                 <select class="form-control js-select2" name="spec_2" id="spec_2" disabled>
                                                     <option value="顏色" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
                                                         顏色</option>
-                                                    <option value="尺寸" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
+                                                    <option value="尺寸" {{ $products->spec_2 == '尺寸' ? 'selected' : '' }}>
                                                         尺寸</option>
-                                                    <option value="容量" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
+                                                    <option value="容量" {{ $products->spec_2 == '容量' ? 'selected' : '' }}>
                                                         容量</option>
                                                 </select>
                                             </div>
                                         </div>
-                                    @endif
                                 </div>
                                 {{-- 二維多規格 --}}
                                 <div class="row form-group">

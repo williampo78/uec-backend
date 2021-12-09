@@ -7,10 +7,6 @@
         .modal-dialog {
             max-width: 100%;
         }
-        .display-flex-center {
-            display:flex;
-            align-items:center;
-        }
     </style>
 @endsection
 
@@ -61,11 +57,12 @@
     </div>
 
     @include('Backend.PromotionalCampaign.CART.prd_modal')
+    @include('Backend.PromotionalCampaign.CART.gift_modal')
 @endsection
 
 @section('js')
     <script src="{{ asset('asset/js/promotional-campaign/main.js') }}"></script>
-    {{-- <script src="{{ asset('asset/js/advertisement/validate.js') }}"></script> --}}
+    <script src="{{ asset('asset/js/promotional-campaign/validate.js') }}"></script>
 
     <script>
         $(function() {
@@ -80,100 +77,107 @@
             $('#btn-cancel').on('click', function() {
                 location.href = "{{ route('promotional_campaign_cart') }}";
             });
-            /*
-                        // 驗證表單
-                        $("#create-form").validate({
-                            // debug: true,
-                            submitHandler: function(form) {
-                                $('#btn-save').prop('disabled', true);
-                                form.submit();
-                            },
-                            rules: {
-                                slot_id: {
-                                    required: true,
-                                },
-                                start_at: {
-                                    required: true,
-                                    dateGreaterThanNow: true,
-                                },
-                                end_at: {
-                                    required: true,
-                                    greaterThan: function() {
-                                        return $('#start_at').val();
-                                    },
-                                },
-                                active: {
-                                    required: true,
-                                    remote: {
-                                        param: {
-                                            url: "/backend/advertisemsement_launch/ajax/can-pass-active-validation",
-                                            type: "post",
-                                            dataType: "json",
-                                            cache: false,
-                                            data: {
-                                                slot_id: function() {
-                                                    return $("#slot_id").val();
-                                                },
-                                                start_at: function() {
-                                                    return $('#start_at').val();
-                                                },
-                                                end_at: function() {
-                                                    return $('#end_at').val();
-                                                },
-                                            },
-                                            dataFilter: function(data, type) {
-                                                if (data) {
-                                                    let json_data = $.parseJSON(data);
 
-                                                    if (json_data.status) {
-                                                        return true;
-                                                    }
-                                                }
+            // 驗證表單
+            $("#create-form").validate({
+                debug: true,
+                submitHandler: function(form) {
+                    $('#btn-save').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    campaign_name: {
+                        required: true,
+                    },
+                    active: {
+                        required: true,
+                    },
+                    campaign_type: {
+                        required: true,
+                    },
+                    start_at: {
+                        required: true,
+                        // dateGreaterThanNow: true,
+                    },
+                    end_at: {
+                        required: true,
+                        greaterThan: function() {
+                            return $('#start_at').val();
+                        },
+                    },
+                    n_value: {
+                        required: true,
+                        digits: true,
+                        min: 1,
+                    },
+                    x_value: {
+                        required: true,
+                        min: function() {
+                            if ($('#campaign_type').val() == 'CART01') {
+                                return 0.01;
+                            } else if ($('#campaign_type').val() == 'CART02') {
+                                return 1;
+                            }
 
-                                                return false;
-                                            },
-                                        },
-                                        depends: function(element) {
-                                            return $("#slot_id").val() && $('#start_at').val() && $('#end_at')
-                                                .val();
-                                        }
-                                    },
-                                },
+                            return 0;
+                        },
+                        max: {
+                            param: 0.99,
+                            depends: function(element) {
+                                return $('#campaign_type').val() == 'CART01';
                             },
-                            messages: {
-                                end_at: {
-                                    greaterThan: "結束時間必須大於開始時間",
-                                },
-                                active: {
-                                    remote: "同一個版位、同一個時間點只能有一組「啟用」的設定",
-                                },
+                        },
+                        maxlength: {
+                            param: 4,
+                            depends: function(element) {
+                                return $('#campaign_type').val() == 'CART01';
                             },
-                            errorClass: "help-block",
-                            errorElement: "span",
-                            errorPlacement: function(error, element) {
-                                if (element.parent('.input-group').length) {
-                                    error.insertAfter(element.parent());
-                                    return;
-                                }
+                        },
+                        digits: {
+                            depends: function(element) {
+                                return $('#campaign_type').val() == 'CART02';
+                            },
+                        },
+                        number: {
+                            depends: function(element) {
+                                return $('#campaign_type').val() == 'CART01';
+                            },
+                        },
+                    },
+                    target_groups: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    end_at: {
+                        greaterThan: "結束時間必須大於開始時間",
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
 
-                                if (element.closest(".form-group").length) {
-                                    element.closest(".form-group").append(error);
-                                    return;
-                                }
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
 
-                                error.insertAfter(element);
-                            },
-                            highlight: function(element, errorClass, validClass) {
-                                $(element).closest(".form-group").addClass("has-error");
-                            },
-                            unhighlight: function(element, errorClass, validClass) {
-                                $(element).closest(".form-group").removeClass("has-error");
-                            },
-                            success: function(label, element) {
-                                $(element).closest(".form-group").removeClass("has-error");
-                            },
-                        });
-            */
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
 
             let campaign_types = @json($campaign_types);
             let suppliers = @json($suppliers);
@@ -185,88 +189,174 @@
                 'product_type_option': product_type_option,
             });
 
+            var prd_modal_product_list = {}; // 單品modal清單中的商品
+            var prd_product_list = {}; // 單品清單中的商品
+
+            // 新增單品
             $('#btn-new-prd').on('click', function() {
-                $('#prd_modal').modal('show');
+                $('#prd-modal').modal('show');
             });
 
-            var exist_product = [];
+            // 單品modal商品全勾選
+            $('#prd-modal-btn-check-all').on('click', function() {
+                $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
+            });
 
-            $('#btn-search-product').on('click', function() {
-                let supplier_id = $('#supplier_id').val();
-                let product_no = $('#product_no').val();
-                let product_name = $('#product_name').val();
-                let selling_price_min = $('#selling_price_min').val();
-                let selling_price_max = $('#selling_price_max').val();
-                let start_created_at = $('#start_created_at').val();
-                let end_created_at = $('#end_created_at').val();
-                let start_launched_at = $('#start_launched_at').val();
-                let end_launched_at = $('#end_launched_at').val();
-                let product_type = $('#product_type').val();
-                let limit = $('#limit').val();
+            // 單品modal商品全取消
+            $('#prd-modal-btn-cancel-all').on('click', function() {
+                $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
+            });
 
-                console.log(supplier_id + ' ' + product_no + ' ' + product_name + ' ' + selling_price_min + ' ' + selling_price_max + ' ' + start_created_at + ' ' + end_created_at + ' ' + start_launched_at + ' ' + end_launched_at + ' ' + product_type + ' ' + limit + ' ' + exist_product);
+            // 單品modal儲存、儲存並關閉
+            $('#prd-modal-btn-save, #prd-modal-btn-save-and-close').on('click', function() {
+                // 取得單品modal清單中有勾選的商品
+                $('#prd-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(function () {
+                    let id = $(this).attr('data-id');
 
-                axios.post('/backend/promotional_campaign/ajax/products', {
-                    supplier_id: supplier_id,
-                    product_no: product_no,
-                    product_name: product_name,
-                    selling_price_min: selling_price_min,
-                    selling_price_max: selling_price_max,
-                    start_created_at: start_created_at,
-                    end_created_at: end_created_at,
-                    start_launched_at: start_launched_at,
-                    end_launched_at: end_launched_at,
-                    product_type: product_type,
-                    limit: limit,
-                    exist_product: exist_product,
-                })
-                .then(function(response) {
-                    console.log(response.data);
-                })
-                .catch(function(error) {
-                    console.log(error);
+                    prd_product_list[id] = prd_modal_product_list[id]; // 增加單品清單中的商品
+                    delete prd_modal_product_list[id]; // 移除單品modal清單中的商品
                 });
 
+                renderPrdProductList(prd_product_list);
+                renderPrdModalProductList(prd_modal_product_list);
             });
-            /*
-                        // 選擇版位
-                        $('#slot_id').on('change', function() {
-                            let element = $(this).find('option:selected');
-                            let is_user_defined = element.attr('data-is-user-defined');
-                            let slot_type = element.attr('data-slot-type');
 
-                            switch (slot_type) {
-                                // 圖檔
-                                case 'I':
-                                    $('#image-block').show();
-                                    $('#text-block').hide();
-                                    $('#product-block').hide();
-                                    break;
-                                    // 文字
-                                case 'T':
-                                    $('#image-block').hide();
-                                    $('#text-block').show();
-                                    $('#product-block').hide();
-                                    break;
-                                    // 商品
-                                case 'S':
-                                    $('#image-block').hide();
-                                    $('#text-block').hide();
-                                    $('#product-block').show();
-                                    break;
-                                    // 圖檔+商品
-                                case 'IS':
-                                    $('#image-block').show();
-                                    $('#text-block').hide();
-                                    $('#product-block').show();
-                                    break;
-                                default:
-                                    $('#image-block').hide();
-                                    $('#text-block').hide();
-                                    $('#product-block').hide();
-                                    break;
-                            }
-                        });*/
+            // 刪除單品清單中的商品
+            $(document).on('click', '.btn-delete-prd', function () {
+                if (confirm('確定要刪除嗎?')) {
+                    let id = $(this).closest('tr').attr('data-id');
+
+                    delete prd_product_list[id]; // 移除單品清單中的商品
+
+                    renderPrdProductList(prd_product_list);
+                }
+            });
+
+            // 單品modal搜尋
+            $('#prd-modal-btn-search').on('click', function() {
+                let query_datas = {
+                    'supplier_id': $('#prd-modal-supplier-id').val(),
+                    'product_no': $('#prd-modal-product-no').val(),
+                    'product_name': $('#prd-modal-product-name').val(),
+                    'selling_price_min': $('#prd-modal-selling-price-min').val(),
+                    'selling_price_max': $('#prd-modal-selling-price-max').val(),
+                    'start_created_at': $('#prd-modal-start-created-at').val(),
+                    'end_created_at': $('#prd-modal-end-created-at').val(),
+                    'start_launched_at': $('#prd-modal-start-launched-at').val(),
+                    'end_launched_at': $('#prd-modal-end-launched-at').val(),
+                    'product_type': $('#prd-modal-product-type').val(),
+                    'limit': $('#prd-modal-limit').val(),
+                    'exist_products': Object.keys(prd_product_list),
+                }
+
+                getProducts(query_datas).then(products => {
+                    prd_modal_product_list = products;
+
+                    renderPrdModalProductList(prd_modal_product_list);
+                });
+            });
+
+            var gift_modal_product_list = {}; // 贈品modal清單中的商品
+            var gift_product_list = {}; // 贈品清單中的商品
+
+            // 新增贈品
+            $('#btn-new-gift').on('click', function() {
+                $('#gift-modal').modal('show');
+            });
+
+            // 贈品modal商品全勾選
+            $('#gift-modal-btn-check-all').on('click', function() {
+                $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
+            });
+
+            // 贈品modal商品全取消
+            $('#gift-modal-btn-cancel-all').on('click', function() {
+                $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
+            });
+
+            // 贈品modal儲存、儲存並關閉
+            $('#gift-modal-btn-save, #gift-modal-btn-save-and-close').on('click', function() {
+                // 取得贈品modal清單中有勾選的商品
+                $('#gift-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(function () {
+                    let id = $(this).attr('data-id');
+
+                    gift_product_list[id] = gift_modal_product_list[id]; // 增加贈品清單中的商品
+                    delete gift_modal_product_list[id]; // 移除贈品modal清單中的商品
+                });
+
+                renderGiftProductList(gift_product_list);
+                renderGiftModalProductList(gift_modal_product_list);
+            });
+
+            // 刪除贈品清單中的商品
+            $(document).on('click', '.btn-delete-gift', function () {
+                if (confirm('確定要刪除嗎?')) {
+                    let id = $(this).closest('tr').attr('data-id');
+
+                    delete gift_product_list[id]; // 移除贈品清單中的商品
+
+                    renderGiftProductList(gift_product_list);
+                }
+            });
+
+            // 贈品modal搜尋
+            $('#gift-modal-btn-search').on('click', function() {
+                let query_datas = {
+                    'supplier_id': $('#gift-modal-supplier-id').val(),
+                    'product_no': $('#gift-modal-product-no').val(),
+                    'product_name': $('#gift-modal-product-name').val(),
+                    'selling_price_min': $('#gift-modal-selling-price-min').val(),
+                    'selling_price_max': $('#gift-modal-selling-price-max').val(),
+                    'start_created_at': $('#gift-modal-start-created-at').val(),
+                    'end_created_at': $('#gift-modal-end-created-at').val(),
+                    'start_launched_at': $('#gift-modal-start-launched-at').val(),
+                    'end_launched_at': $('#gift-modal-end-launched-at').val(),
+                    'product_type': $('#gift-modal-product-type').val(),
+                    'limit': $('#gift-modal-limit').val(),
+                    'exist_products': Object.keys(gift_product_list),
+                }
+
+                getProducts(query_datas).then(products => {
+                    gift_modal_product_list = products;
+
+                    renderGiftModalProductList(gift_modal_product_list);
+                });
+            });
+
+            // 選擇活動類型
+            $('#campaign_type').on('change', function() {
+                switch ($(this).val()) {
+                    // ﹝滿額﹞購物車滿N元，打X折
+                    case 'CART01':
+                        $('#prd-block').hide();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').show();
+                        break;
+                    // ﹝滿額﹞購物車滿N元，折X元
+                    case 'CART02':
+                        $('#prd-block').hide();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').hide();
+                        break;
+                    // ﹝滿額﹞購物車滿N元，送贈品
+                    case 'CART03':
+                        $('#prd-block').hide();
+                        $('#gift-block').show();
+                        $('#x_value').closest('.form-group').hide();
+                        break;
+                    // ﹝滿額﹞指定商品滿N件，送贈品
+                    case 'CART04':
+                        $('#prd-block').show();
+                        $('#gift-block').show();
+                        $('#x_value').closest('.form-group').hide();
+                        break;
+                    default:
+                        $('#prd-block').hide();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').show();
+                        break;
+                }
+            });
         });
     </script>
 @endsection
