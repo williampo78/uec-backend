@@ -6,6 +6,7 @@ use App\Models\ProductItems;
 use App\Models\ProductPhotos;
 use App\Models\Products;
 use App\Models\Product_items;
+use App\Models\Product_spec_info ;
 use App\Services\UniversalService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -144,6 +145,8 @@ class ProductsService
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
         $skuList = json_decode($in['SkuListdata'], true);
+        $specListJson = $in['SpecListJson'] ; 
+        
         DB::beginTransaction();
         try {
             $insert = [
@@ -188,8 +191,10 @@ class ProductsService
                 'updated_at' => $now,
                 'agent_id' => $agent_id,
             ];
+
             $products_id = Products::create($insert)->id;
             $products = Products::findOrFail($products_id);
+
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
@@ -208,10 +213,19 @@ class ProductsService
                     'updated_by' => $user_id,
                     'created_at' => $now,
                     'updated_at' => $now,
-
-                ];
-                ProductItems::create($skuInsert);
+                ];            
+                $skuList[$key]['id'] = ProductItems::create($skuInsert)->id ; 
             }
+
+            Product_spec_info::create([
+                'product_id' => $products_id , 
+                'spec_value_list' => $specListJson ,
+                'item_list' => json_encode($skuList) ,
+                'created_at' => $now, 
+                'updated_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
             $fileList = [];
             $uploadPath = '/products/' . $products->id;
             foreach ($file['filedata'] as $key => $val) {
@@ -236,7 +250,6 @@ class ProductsService
             Log::warning($e->getMessage());
             $result = false;
         }
-
         return $result;
     }
     public function showProducts($id)
@@ -290,5 +303,8 @@ class ProductsService
         $result['spac_2']  = DB::select($sql_spac_2);
         return $result ;
 
+    }
+    public function getProduct_spec_info($id){
+        
     }
 }

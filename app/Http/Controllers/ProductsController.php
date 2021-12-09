@@ -88,6 +88,7 @@ class ProductsController extends Controller
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
         $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
+        $result['Skulist'] = $this->productsService->
         // dump($result['spac_list']) ; exit ;
         return view('Backend.Products.show',$result) ;
     }
@@ -108,7 +109,7 @@ class ProductsController extends Controller
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
         $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
-        // dd($result) ; exit ;
+        // dd($result) ; 
         return view('Backend.Products.update',$result) ;
     }
 

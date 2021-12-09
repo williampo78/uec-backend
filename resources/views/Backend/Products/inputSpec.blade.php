@@ -57,6 +57,7 @@
         </div>
     </div>
     {{-- 二維多規格 --}}
+    <textarea name="SpecListJson" id="" cols="30" rows="10">@{{SpecList}}</textarea>
     <div class="row form-group">
         <div class="col-sm-6" v-if="products.spec_dimension >= 1">
             <table class="table table-striped table-bordered table-hover">

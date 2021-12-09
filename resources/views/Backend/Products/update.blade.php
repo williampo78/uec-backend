@@ -703,15 +703,14 @@
                                 <div class="col-sm-6" v-if="products.spec_dimension >= 1">
                                     <table class="table table-striped table-bordered table-hover">
                                         <thead>
-                                            {{-- <tr>
+                                            <tr>
                                                 <th>
                                                     <button class="btn btn-primary btn-sm" type="button" @click="AddSpecToSkuList('1')">新增項目
                                                     </button>
                                                 </th>
-                                            </tr> --}}
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($spac_list['spac_1'] as $val)
                                                 <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
                                                     @dragover='dragover' @dragleave='dragleave' @drop="drop"
                                                     draggable="true" :data-index="spec_1_key" :data-type="'spec_1'">
@@ -722,7 +721,7 @@
                                                         </div>
                                                         <div class="col-sm-9">
                                                             <input class="form-control"
-                                                                value="{{ $val->spec_1_value }}" disabled>
+                                                                value="" >
                                                         </div>
                                                         <div class="col-sm-2">
                                                             {{-- <button class="btn btn-danger btn-sm" type="button"
@@ -730,18 +729,20 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforeach
-
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="col-sm-6" v-if="products.spec_dimension == 2">
+                                <div class="col-sm-6" v-if="products.spec_dimension == '2'">
                                     <table class="table table-striped table-bordered table-hover">
                                         <thead>
-
+                                            <tr>
+                                                <th>
+                                                    <button class="btn btn-primary btn-sm" type="button" @click="AddSpecToSkuList('2')">新增項目
+                                                    </button>
+                                                </th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($spac_list['spac_2'] as $val)
                                                 <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
                                                     @dragover='dragover' @dragleave='dragleave' @drop="drop"
                                                     draggable="true" :data-index="spec_2_key" :data-type="'spec_2'">
@@ -752,7 +753,7 @@
                                                         </div>
                                                         <div class="col-sm-9">
                                                             <input class="form-control"
-                                                                value="{{ $val->spec_1_value }}" disabled>
+                                                                value="" >
                                                         </div>
                                                         <div class="col-sm-2">
                                                             {{-- <button class="btn btn-danger btn-sm" type="button"
@@ -760,7 +761,6 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -836,17 +836,16 @@
                         spec_1: '',
                         spec_2: '',
                     },
-                    SpecList: {
-                        spec_1: [],
-                        spec_2: [],
-                    },
+                    SpecList: @json($spac_list),
                     SkuList: @json($products_item),
                     products: @json($products),
                     safty_qty_all:0 ,
                 }
             },
             mounted () {
-                   console.log(this.products) ; 
+            },
+            created () {
+                console.log(this.SpecList)
             },
             methods: {
                 change_safty_qty_all(){
