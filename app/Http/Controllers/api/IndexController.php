@@ -112,4 +112,27 @@ class IndexController extends Controller
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $result]);
     }
 
+    public function getQA()
+    {
+        $level1 = $this->universalService->getFooterCategory('QA_CATEGORY');
+        $data = [];
+        $items = [];
+        foreach ($level1 as $code => $name) {
+            $input['code'] = $code;
+            $level2 = $this->webContentsService->getFooter($input, 'QA');
+            foreach ($level2 as $k => $v) {
+                $items[$k]['sort'] = $v['sort'];
+                $items[$k]['question'] = $v['content_name'];
+                $items[$k]['answer'] = $v['content_text'];
+            }
+
+            $data[] = array(
+                "code" => $code,
+                "name" => $name,
+                "list" => $items
+            );
+        }
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data]);
+    }
+
 }
