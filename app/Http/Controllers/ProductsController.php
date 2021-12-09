@@ -121,7 +121,10 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->productsService->editProducts($request->input(), $request->file()) ;
+        $act = 'upd';
+        $route_name = 'products';
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**

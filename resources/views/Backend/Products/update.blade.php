@@ -111,10 +111,11 @@
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="category_hierarchy_content_input">
                 <form class="form-horizontal" role="form" id="new-form" method="POST"
-                    action="{{ route('products.store') }}" enctype="multipart/form-data" novalidaten="ovalidate">
+                    action="{{ route('products.update', $products->id) }}" enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
+                    @method('PUT')
                     <div id="page-1">
-
+                        <input name="id" value="{{$products->id}}" style="display: none">
                         <div class="row form-group">
                             <div class="col-sm-6">
                                 <div class="col-sm-2 no-pa">
@@ -305,20 +306,20 @@
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="has_expiry_date" value="0"
-                                            {{ $products->expiry_days == '0' ? 'checked' : 'disabled' }}> 無
+                                            {{ $products->has_expiry_date == '0' ? 'checked' : 'disabled' }}> 無
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="has_expiry_date" value="1"
-                                            {{ $products->expiry_days == '1' ? 'checked' : 'disabled' }}>
+                                            {{ $products->has_expiry_date == '1' ? 'checked' : 'disabled' }}>
                                         有，天數
                                     </label>
                                 </div>
                                 {{-- 效期控管的天數 --}}
                                 <div class="col-sm-3">
                                     <input class="form-control" name="expiry_days"
-                                        value=" {{ $products->expiry_days }}" disabled>
+                                        value=" {{ $products->expiry_days }}" {{ $products->has_expiry_date == '1' ? 'checked' : 'readonly' }}>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -327,7 +328,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="number" class="form-control" name="expiry_receiving_days" min="0"
-                                        value="{{ $products->expiry_receiving_days }}" disabled>
+                                        value="{{ $products->expiry_receiving_days }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -638,6 +639,7 @@
                     <hr>
                     <div id="page-2">
                         <div id="SkuComponent">
+                            <textarea name="SpecListJson" id="" cols="30" rows="10">@{{SpecList}}</textarea>
                             <div class="row form-group">
                                 <div class="col-sm-12">
                                     <div class="col-sm-2 ">
