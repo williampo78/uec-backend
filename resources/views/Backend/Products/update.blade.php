@@ -711,24 +711,23 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                                <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
-                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                    draggable="true" :data-index="spec_1_key" :data-type="'spec_1'">
-                                                    <td>
-                                                        <div class="col-sm-1">
-                                                            <label class="control-label"><i style="font-size: 20px;"
-                                                                    class="fa fa-list"></i></label>
-                                                        </div>
-                                                        <div class="col-sm-9">
-                                                            <input class="form-control"
-                                                                value="" >
-                                                        </div>
-                                                        <div class="col-sm-2">
-                                                            {{-- <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button> --}}
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                            <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag" @dragover='dragover'
+                                            @dragleave='dragleave' @drop="drop" draggable="true" :data-index="spec_1_key"
+                                            :data-type="'spec_1'">
+                                            <td>
+                                                <div class="col-sm-1">
+                                                    <label class="control-label"><i style="font-size: 20px;"
+                                                            class="fa fa-list"></i></label>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" v-model="spec_1.name">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -743,24 +742,23 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                                <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
-                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                    draggable="true" :data-index="spec_2_key" :data-type="'spec_2'">
-                                                    <td>
-                                                        <div class="col-sm-1">
-                                                            <label class="control-label"><i style="font-size: 20px;"
-                                                                    class="fa fa-list"></i></label>
-                                                        </div>
-                                                        <div class="col-sm-9">
-                                                            <input class="form-control"
-                                                                value="" >
-                                                        </div>
-                                                        <div class="col-sm-2">
-                                                            {{-- <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button> --}}
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                            <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag" @dragover='dragover'
+                                            @dragleave='dragleave' @drop="drop" draggable="true" :data-index="spec_2_key"
+                                            :data-type="'spec_2'">
+                                            <td>
+                                                <div class="col-sm-1">
+                                                    <label class="control-label"><i style="font-size: 20px;"
+                                                            class="fa fa-list"></i></label>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" v-model="spec_2.name">
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)" >刪除</button>
+                                                </div>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -836,16 +834,19 @@
                         spec_1: '',
                         spec_2: '',
                     },
-                    SpecList: @json($spac_list),
+                    SpecList: [],
                     SkuList: @json($products_item),
                     products: @json($products),
+                    product_spec_info:@json($product_spec_info),
                     safty_qty_all:0 ,
                 }
             },
             mounted () {
             },
             created () {
-                console.log(this.SpecList)
+                this.SkuList = JSON.parse(this.product_spec_info.item_list) ;
+                console.log(JSON.parse(this.product_spec_info.spec_value_list)) ; 
+                this.SpecList = (JSON.parse(this.product_spec_info.spec_value_list)) ;
             },
             methods: {
                 change_safty_qty_all(){

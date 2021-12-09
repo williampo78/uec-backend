@@ -145,10 +145,10 @@ class ProductsService
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
         $skuList = json_decode($in['SkuListdata'], true);
-        $specListJson = $in['SpecListJson'] ; 
+        $specListJson = json_decode($in['SpecListJson'],true) ; 
         
         DB::beginTransaction();
-        try {
+        // try {
             $insert = [
                 'stock_type' => $in['stock_type'],
                 'product_no' => $this->universalService->getDocNumber('products', $in['stock_type']),
@@ -181,8 +181,8 @@ class ProductsService
                 'warranty_days' => $in['warranty_days'],
                 'warranty_scope' => $in['warranty_scope'],
                 'spec_dimension' => $in['spec_dimension'],
-                'spec_1' => $in['spec_1'],
-                'spec_2' => $in['spec_2'],
+                'spec_1' => $in['spec_1'] ?? '',
+                'spec_2' => $in['spec_2'] ?? '',
                 'selling_channel' => $in['selling_channel'],
                 'delivery_type' => $in['delivery_type'],
                 'created_by' => $user_id,
@@ -191,17 +191,15 @@ class ProductsService
                 'updated_at' => $now,
                 'agent_id' => $agent_id,
             ];
-
             $products_id = Products::create($insert)->id;
             $products = Products::findOrFail($products_id);
-
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
                     'product_id' => $products_id,
-                    'sort' => $val['sort'],
-                    'spec_1_value' => $val['spec_1_value'],
-                    'spec_2_value' => $val['spec_2_value'],
+                    'sort' => $val['sort'] ?? 0,
+                    'spec_1_value' => $val['spec_1_value'] ?? '',
+                    'spec_2_value' => $val['spec_2_value'] ?? '',
                     'item_no' => $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
                     'supplier_item_no' => '',
                     'ean' => $val['ean'],
@@ -215,11 +213,12 @@ class ProductsService
                     'updated_at' => $now,
                 ];            
                 $skuList[$key]['id'] = ProductItems::create($skuInsert)->id ; 
+                $skuList[$key]['item_no'] = $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT) ; 
             }
 
             Product_spec_info::create([
                 'product_id' => $products_id , 
-                'spec_value_list' => $specListJson ,
+                'spec_value_list' => json_encode($specListJson) ,
                 'item_list' => json_encode($skuList) ,
                 'created_at' => $now, 
                 'updated_at' => $now,
@@ -228,28 +227,31 @@ class ProductsService
             ]);
             $fileList = [];
             $uploadPath = '/products/' . $products->id;
-            foreach ($file['filedata'] as $key => $val) {
-                $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath);
+            if(isset($file['filedata'])){
+                foreach ($file['filedata'] as $key => $val) {
+                    $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath);
+                }
+                foreach ($fileList as $key => $val) {
+                    $insertImg = [
+                        'product_id' => $products->id,
+                        'photo_name' => $val['image'],
+                        'sort' => $key,
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                    ProductPhotos::create($insertImg);
+                }
             }
-            foreach ($fileList as $key => $val) {
-                $insertImg = [
-                    'product_id' => $products->id,
-                    'photo_name' => $val['image'],
-                    'sort' => $key,
-                    'created_by' => $user_id,
-                    'updated_by' => $user_id,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-                ProductPhotos::create($insertImg);
-            }
+           
             DB::commit();
             $result = true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::warning($e->getMessage());
-            $result = false;
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     Log::warning($e->getMessage());
+        //     $result = false;
+        // }
         return $result;
     }
     public function showProducts($id)
@@ -304,7 +306,8 @@ class ProductsService
         return $result ;
 
     }
-    public function getProduct_spec_info($id){
-        
+    public function getProduct_spec_info($product_id){
+        $result = Product_spec_info::where('product_id', $product_id)->first()->toArray();
+        return $result ;
     }
 }
