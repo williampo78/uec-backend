@@ -148,7 +148,7 @@ class ProductsService
         $specListJson = json_decode($in['SpecListJson'],true) ;
 
         DB::beginTransaction();
-        // try {
+        try {
             $insert = [
                 'stock_type' => $in['stock_type'],
                 'product_no' => $this->universalService->getDocNumber('products', $in['stock_type']),
@@ -246,11 +246,11 @@ class ProductsService
 
             DB::commit();
             $result = true;
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     Log::warning($e->getMessage());
-        //     $result = false;
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::warning($e->getMessage());
+            $result = false;
+        }
         return $result;
     }
     public function showProducts($id)
