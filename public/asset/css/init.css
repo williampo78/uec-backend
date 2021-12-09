@@ -6,8 +6,8 @@
 
 /* 停用或作廢時顯示 */
 .tr-deactive {
-    background-color: #AAAAAA !important;
-    color: #FFFFFF !important;
+    background-color: #aaaaaa !important;
+    color: #ffffff !important;
 }
 
 .form-signin {
@@ -97,5 +97,5 @@ span .errorMsg {
 
 .big-checkbox {
     width: 25px;
-    height: 25px
+    height: 25px;
 }

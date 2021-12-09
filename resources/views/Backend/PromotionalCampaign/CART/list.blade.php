@@ -175,27 +175,25 @@
                                                 <td>
                                                     {{-- @if ($share_role_auth['auth_query']) --}}
                                                         <button type="button" class="btn btn-info btn-sm promotional_campaign_detail"
-                                                            data-promotional-campaign-id="{{ $obj->promotional_campaigns_id }}" title="檢視">
+                                                            data-promotional-campaign-id="{{ $obj->id }}" title="檢視">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     {{-- @endif --}}
 
                                                     {{-- @if ($share_role_auth['auth_update']) --}}
                                                         <a class="btn btn-info btn-sm"
-                                                            href="{{ route('promotional_campaign_cart.edit', $obj->promotional_campaigns_id) }}">
+                                                            href="{{ route('promotional_campaign_cart.edit', $obj->id) }}">
                                                             編輯
                                                         </a>
                                                     {{-- @endif --}}
                                                 </td>
-                                                <td>{{ $count }}</td>
+                                                <td>{{ $count++ }}</td>
                                                 <td>{{ $obj->campaign_name ?? '' }}</td>
-                                                <td>{{ $obj->lookup_values_v_description ?? '' }}</td>
+                                                <td>{{ $obj->description ?? '' }}</td>
                                                 <td>
-                                                    @if ($obj->active == 1)
-                                                        生效
-                                                    @else
-                                                        失效
-                                                    @endif
+                                                    @isset(config('uec.active2_option')[$obj->active])
+                                                        {{ config('uec.active2_option')[$obj->active] }}
+                                                    @endisset
                                                 </td>
                                                 <td>
                                                     {{ $obj->start_at ?? '' }}
@@ -204,10 +202,6 @@
                                                     {{ $obj->end_at ?? '' }}
                                                 </td>
                                             </tr>
-
-                                            @php
-                                                $count++;
-                                            @endphp
                                         @endforeach
                                     @endisset
                                 </tbody>

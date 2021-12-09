@@ -246,7 +246,7 @@ class ProductsService
         ->leftJoin('user as created_by_name', 'products.created_by', '=', 'created_by_name.id')
         ->leftJoin('user as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
         ->where('products.agent_id', $agent_id)->where('products.id', $id);
-     
+
         $result = $products->first();
         return $result;
     }
@@ -290,5 +290,50 @@ class ProductsService
         $result['spac_2']  = DB::select($sql_spac_2);
         return $result ;
 
+    }
+
+    /**
+     * 重組商品資料
+     *
+     * @param collection $products
+     * @return collection
+     */
+    public function restructureProducts($products)
+    {
+        $products->transform(function ($obj, $key) {
+            // 上架日期
+            $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
+
+            // 售價
+            $obj->selling_price = number_format($obj->selling_price);
+
+            // 上架狀態
+            switch ($obj->approval_status) {
+                case 'NA':
+                    $obj->launched_status = '未設定';
+                    break;
+
+                case 'REVIEWING':
+                    $obj->launched_status = '上架申請';
+                    break;
+
+                case 'REJECTED':
+                    $obj->launched_status = '上架駁回';
+                    break;
+
+                case 'CANCELLED':
+                    $obj->launched_status = '商品下架';
+                    break;
+
+                case 'APPROVED':
+                    $obj->launched_status = Carbon::now()->between($obj->start_launched_at, $obj->end_launched_at) ? '商品上架' : '商品下架';
+                    break;
+            }
+
+            // 毛利
+            $obj->gross_margin = 10;
+
+            return $obj;
+        });
     }
 }
