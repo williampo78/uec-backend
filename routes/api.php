@@ -28,6 +28,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/footer', [IndexController::class, 'index']);
     Route::get('/footer/{id}', [IndexController::class, 'getContent']);
     Route::post('/footer/contact', [IndexController::class, 'postContact']);
+    Route::get('/qa', [IndexController::class, 'getQA']);
 
     Route::get('/product/category', [ProductController::class, 'getCategory']);
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
