@@ -1177,10 +1177,12 @@
                     let metadata = {
                         type: 'image/jpeg',
                     };
+                    console.log(this.old_imges[i]) ; 
                     var filename = this.old_imges[i].photo_name.split('/');
                     let file = new File([data], filename[2], metadata);
                     file.src = data;
                     file.id = this.old_imges[i].id;
+                    file.size = this.old_imges[i].photo_size ;
                     file.sizeConvert = vm.formatBytes(this.old_imges[i].photo_size)
                     this.images.push(file);
                 }
@@ -1207,7 +1209,11 @@
             }
             this.adjustTheDisplay();
             this.images.map(function (value, key) {
-                value.sizeConvert = vm.formatBytes(value.size);
+                if(value.id){
+
+                }else{
+                    value.sizeConvert = vm.formatBytes(value.size);
+                }
             });
             e.target.value = '';
         },

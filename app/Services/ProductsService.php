@@ -486,7 +486,7 @@ class ProductsService
 
     public function getProduct_spec_info($product_id)
     {
-        $result = Product_spec_info::where('product_id', $product_id)->first()->toArray();
+        $result = Product_spec_info::where('product_id', $product_id)->first();
         return $result;
     }
 }
