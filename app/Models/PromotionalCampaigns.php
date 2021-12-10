@@ -10,4 +10,5 @@ class PromotionalCampaigns extends Model
     use HasFactory;
 
     protected $table = 'promotional_campaigns';
+    protected $guarded = [];
 }

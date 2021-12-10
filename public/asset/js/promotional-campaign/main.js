@@ -168,7 +168,7 @@ function renderPrdProductList(products) {
         $("#prd-product-table > tbody").append(`
             <tr data-id="${id}">
                 <input type="hidden" name="prd_block_id[${id}]" value="${id}">
-                <td>${count}</td>
+                <td>${count++}</td>
                 <td>${product_no}</td>
                 <td>${product_name}</td>
                 <td>${selling_price}</td>
@@ -180,12 +180,10 @@ function renderPrdProductList(products) {
                 </td>
             </tr>
         `);
-
-        count++;
     });
 
     // 當下時間>=上架時間起，僅開放修改活動名稱、狀態、上架時間訖
-    if (new Date() >= new Date($("#start_at").val())) {
+    if (new Date() >= new Date($("#start_at").val()) && $("#start_at").is(':disabled')) {
         $(".btn-delete-prd").prop("disabled", true).parent("td").hide();
     }
 }
@@ -211,7 +209,7 @@ function renderPrdModalProductList(products) {
 
         $("#prd-modal-product-table > tbody").append(`
             <tr data-id="${id}">
-                <td>${count}</td>
+                <td>${count++}</td>
                 <td class="text-center">
                     <input type="checkbox" name="choose_product" style="width: 20px;height: 20px;cursor: pointer;" />
                 </td>
@@ -224,8 +222,6 @@ function renderPrdModalProductList(products) {
                 <td>${supplier_name}</td>
             </tr>
         `);
-
-        count++;
     });
 }
 
@@ -256,7 +252,7 @@ function renderGiftProductList(products) {
         $("#gift-product-table > tbody").append(`
             <tr data-id="${id}">
                 <input type="hidden" name="gift_block_id[${id}]" value="${id}">
-                <td>${count}</td>
+                <td>${count++}</td>
                 <td>${product_no}</td>
                 <td>${product_name}</td>
                 <td>
@@ -269,12 +265,10 @@ function renderGiftProductList(products) {
                 </td>
             </tr>
         `);
-
-        count++;
     });
 
     // 當下時間>=上架時間起，僅開放修改活動名稱、狀態、上架時間訖
-    if (new Date() >= new Date($("#start_at").val())) {
+    if (new Date() >= new Date($("#start_at").val()) && $("#start_at").is(':disabled')) {
         $('#gift-product-table > tbody [name^="gift_block_assigned_qty"]').prop(
             "disabled",
             true
@@ -306,7 +300,7 @@ function renderGiftModalProductList(products) {
 
         $("#gift-modal-product-table > tbody").append(`
             <tr data-id="${id}">
-                <td>${count}</td>
+                <td>${count++}</td>
                 <td class="text-center">
                     <input type="checkbox" name="choose_product" style="width: 20px;height: 20px;cursor: pointer;" />
                 </td>
@@ -319,8 +313,6 @@ function renderGiftModalProductList(products) {
                 <td>${supplier_name}</td>
             </tr>
         `);
-
-        count++;
     });
 }
 

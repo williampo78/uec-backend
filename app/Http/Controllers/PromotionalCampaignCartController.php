@@ -135,15 +135,15 @@ class PromotionalCampaignCartController extends Controller
      */
     public function edit($id)
     {
-        $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns([
+        $promotional_campaign = $this->promotional_campaign_service->getPromotionalCampaigns([
             'id' => $id,
             'level_code' => 'CART',
         ])->first();
         $suppliers = $this->supplier_service->getSuppliers();
 
-        if (isset($promotional_campaigns->products)) {
-            $this->products_service->restructureProducts($promotional_campaigns->products);
-            $promotional_campaigns->products = $promotional_campaigns->products->mapWithKeys(function ($product) {
+        if (isset($promotional_campaign->products)) {
+            $this->products_service->restructureProducts($promotional_campaign->products);
+            $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
                 return [
                     $product->product_id => $product->only([
                         'launched_at',
@@ -158,9 +158,9 @@ class PromotionalCampaignCartController extends Controller
             });
         }
 
-        if (isset($promotional_campaigns->giveaways)) {
-            $this->products_service->restructureProducts($promotional_campaigns->giveaways);
-            $promotional_campaigns->giveaways = $promotional_campaigns->giveaways->mapWithKeys(function ($giveaway) {
+        if (isset($promotional_campaign->giveaways)) {
+            $this->products_service->restructureProducts($promotional_campaign->giveaways);
+            $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
                 return [
                     $giveaway->product_id => $giveaway->only([
                         'launched_at',
@@ -178,7 +178,7 @@ class PromotionalCampaignCartController extends Controller
 
         return view(
             'Backend.PromotionalCampaign.CART.update',
-            compact('promotional_campaigns', 'suppliers')
+            compact('promotional_campaign', 'suppliers')
         );
     }
 
@@ -191,7 +191,20 @@ class PromotionalCampaignCartController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input_data = $request->except('_token', '_method');
+        $input_data['promotional_campaign_id'] = $id;
+
+        if (!$this->promotional_campaign_service->updatePromotionalCampaign($input_data)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        $route_name = 'promotional_campaign_cart';
+        $act = 'upd';
+
+        return view(
+            'Backend.success',
+            compact('route_name', 'act')
+        );
     }
 
     /**
@@ -203,5 +216,52 @@ class PromotionalCampaignCartController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getDetail(Request $request)
+    {
+        $promotional_campaign_id = $request->input('promotional_campaign_id');
+
+        $promotional_campaign = $this->promotional_campaign_service->getPromotionalCampaigns([
+            'id' => $promotional_campaign_id,
+            'level_code' => 'CART',
+        ])->first();
+
+        if (isset($promotional_campaign->products)) {
+            $this->products_service->restructureProducts($promotional_campaign->products);
+            $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
+                return [
+                    $product->product_id => $product->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                    ]),
+                ];
+            });
+        }
+
+        if (isset($promotional_campaign->giveaways)) {
+            $this->products_service->restructureProducts($promotional_campaign->giveaways);
+            $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
+                return [
+                    $giveaway->product_id => $giveaway->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                        'assigned_qty',
+                    ]),
+                ];
+            });
+        }
+
+        return response()->json($promotional_campaign);
     }
 }

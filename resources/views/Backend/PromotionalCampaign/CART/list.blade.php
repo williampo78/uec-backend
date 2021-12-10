@@ -35,8 +35,8 @@
                                             <h5>活動名稱</h5>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input class="form-control" name="campaign_name" id="campaign_name" value="{{ $query_data['campaign_name'] ?? '' }}"
-                                                placeholder="模糊查詢" />
+                                            <input class="form-control" name="campaign_name" id="campaign_name"
+                                                value="{{ $query_data['campaign_name'] ?? '' }}" placeholder="模糊查詢" />
                                         </div>
                                     </div>
                                 </div>
@@ -66,7 +66,8 @@
                                             <h5>活動類型</h5>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control js-select2-campaign-type" name="campaign_type" id="campaign_type">
+                                            <select class="form-control js-select2-campaign-type" name="campaign_type"
+                                                id="campaign_type">
                                                 <option></option>
                                                 @isset($campaign_types)
                                                     @foreach ($campaign_types as $obj)
@@ -80,7 +81,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <br/>
+                            <br />
 
                             <div class="row">
                                 <div class="col-sm-4">
@@ -122,7 +123,8 @@
                                             <h5>贈品序號</h5>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input class="form-control" name="product_no" id="product_no" value="{{ $query_data['product_no'] ?? '' }}" />
+                                            <input class="form-control" name="product_no" id="product_no"
+                                                value="{{ $query_data['product_no'] ?? '' }}" />
                                         </div>
                                     </div>
                                 </div>
@@ -131,7 +133,7 @@
                             <div class="row">
                                 <div class="col-sm-12 text-right">
                                     {{-- @if ($share_role_auth['auth_query']) --}}
-                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                    <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
                                     {{-- @endif --}}
                                 </div>
                             </div>
@@ -142,11 +144,11 @@
                     <div class="panel-body">
                         <div class="row">
                             {{-- @if ($share_role_auth['auth_create']) --}}
-                                <div class="col-sm-2">
-                                    <a href="{{ route('promotional_campaign_cart.create') }}"
-                                        class="btn btn-block btn-warning btn-sm" id="btn-create"><i
-                                            class="fa fa-plus"></i> 新增</a>
-                                </div>
+                            <div class="col-sm-2">
+                                <a href="{{ route('promotional_campaign_cart.create') }}"
+                                    class="btn btn-block btn-warning btn-sm" id="btn-create"><i class="fa fa-plus"></i>
+                                    新增</a>
+                            </div>
                             {{-- @endif --}}
                         </div>
                         <hr />
@@ -174,17 +176,18 @@
                                             <tr>
                                                 <td>
                                                     {{-- @if ($share_role_auth['auth_query']) --}}
-                                                        <button type="button" class="btn btn-info btn-sm promotional_campaign_detail"
-                                                            data-promotional-campaign-id="{{ $obj->id }}" title="檢視">
-                                                            <i class="fa fa-search"></i>
-                                                        </button>
+                                                    <button type="button"
+                                                        class="btn btn-info btn-sm promotional_campaign_detail"
+                                                        data-promotional-campaign-id="{{ $obj->id }}" title="檢視">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
                                                     {{-- @endif --}}
 
                                                     {{-- @if ($share_role_auth['auth_update']) --}}
-                                                        <a class="btn btn-info btn-sm"
-                                                            href="{{ route('promotional_campaign_cart.edit', $obj->id) }}">
-                                                            編輯
-                                                        </a>
+                                                    <a class="btn btn-info btn-sm"
+                                                        href="{{ route('promotional_campaign_cart.edit', $obj->id) }}">
+                                                        編輯
+                                                    </a>
                                                     {{-- @endif --}}
                                                 </td>
                                                 <td>{{ $count++ }}</td>
@@ -254,216 +257,105 @@
                 }
             });
 
-            $('#table_list tbody').on('click', '.slot_content_detail', function() {
-                let slot_content_id = $(this).attr("data-slot-content-id");
+            $('#table_list tbody').on('click', '.promotional_campaign_detail', function() {
+                let promotional_campaign_id = $(this).attr("data-promotional-campaign-id");
 
-                axios.post('/backend/advertisemsement_launch/ajax/detail', {
-                        slot_content_id: slot_content_id
+                axios.post('/backend/promotional_campaign_cart/ajax/detail', {
+                        promotional_campaign_id: promotional_campaign_id
                     })
                     .then(function(response) {
-                        let content = response.data.content;
-                        let details = response.data.details;
+                        let promotional_campaign = response.data;
 
-                        $('#modal-slot').empty().append(`【${content.slot_code}】${content.slot_desc}`);
-                        $('#modal-start-at-end-at').empty().append(
-                            `${content.start_at} ~ ${content.end_at}`);
+                        $('#modal-campaign-name').empty().append(
+                            `${promotional_campaign.campaign_name}`);
 
-                        if (content.slot_content_active == 1) {
-                            $('#modal-active').empty().append(`啟用`);
+                        if (promotional_campaign.active == 1) {
+                            $('#modal-active').empty().append(`生效`);
                         } else {
-                            $('#modal-active').empty().append(`關閉`);
+                            $('#modal-active').empty().append(`失效`);
                         }
 
-                        if (content.slot_color_code) {
-                            $('#modal-slot-color-code').empty().append(`${content.slot_color_code}`);
+                        $('#modal-campaign-type').empty().append(`${promotional_campaign.description}`);
+                        $('#modal-n-value').empty().append(`${promotional_campaign.n_value}`);
+
+                        if (promotional_campaign.x_value) {
+                            $('#modal-x-value').empty().append(`${promotional_campaign.x_value}`)
+                                .closest('.form-group').show();
                         } else {
-                            $('#modal-slot-color-code').empty().append(
-                                `<i class="fa fa-times fa-lg"></i>`);
+                            $('#modal-x-value').closest('.form-group').hide();
                         }
 
-                        if (content.slot_icon_name_url) {
-                            $('#modal-slot-icon-name').empty().append(
-                                `<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`
-                            );
-                        } else {
-                            $('#modal-slot-icon-name').empty().append(
-                                `<i class="fa fa-times fa-lg"></i>`);
-                        }
+                        $('#modal-start-at').empty().append(`${promotional_campaign.start_at}`);
+                        $('#modal-end-at').empty().append(`${promotional_campaign.end_at}`);
+                        $('#modal-target-groups').empty().append(`所有會員`);
 
-                        if (content.slot_title) {
-                            $('#modal-slot-title').empty().append(`${content.slot_title}`);
-                        } else {
-                            $('#modal-slot-title').empty().append(`<i class="fa fa-times fa-lg"></i>`);
-                        }
-
-                        // 選擇顯示的區塊
-                        switch (content.slot_type) {
-                            // 圖檔
-                            case 'I':
-                                $('#image-block').show();
-                                $('#text-block').hide();
-                                $('#product-block').hide();
-
-                                $('#image-block table > tbody').empty();
+                        // 活動類型
+                        switch (promotional_campaign.campaign_type) {
+                            // ﹝滿額﹞購物車滿N元，打X折
+                            case 'CART01':
+                                $('#prd-block').hide();
+                                $('#gift-block').hide();
                                 break;
-                                // 文字
-                            case 'T':
-                                $('#image-block').hide();
-                                $('#text-block').show();
-                                $('#product-block').hide();
-
-                                $('#text-block table > tbody').empty();
+                                // ﹝滿額﹞購物車滿N元，折X元
+                            case 'CART02':
+                                $('#prd-block').hide();
+                                $('#gift-block').hide();
                                 break;
-                                // 商品
-                            case 'S':
-                                $('#image-block').hide();
-                                $('#text-block').hide();
-                                $('#product-block').show();
+                                // ﹝滿額﹞購物車滿N元，送贈品
+                            case 'CART03':
+                                $('#prd-block').hide();
+                                $('#gift-block').show();
 
-                                $('#product-block table > tbody').empty();
+                                $("#gift-product-table > tbody").empty();
                                 break;
-                                // 圖檔+商品
-                            case 'IS':
-                                $('#image-block').show();
-                                $('#text-block').hide();
-                                $('#product-block').show();
+                                // ﹝滿額﹞指定商品滿N件，送贈品
+                            case 'CART04':
+                                $('#prd-block').show();
+                                $('#gift-block').show();
 
-                                $('#image-block table > tbody').empty();
-                                $('#product-block table > tbody').empty();
+                                $("#prd-product-table > tbody").empty();
+                                $("#gift-product-table > tbody").empty();
                                 break;
                             default:
-                                $('#image-block').hide();
-                                $('#text-block').hide();
-                                $('#product-block').hide();
+                                $('#prd-block').hide();
+                                $('#gift-block').hide();
                                 break;
                         }
 
-                        switch (content.product_assigned_type) {
-                            case 'P':
-                                $('#product-block-tab a[href="#tab-product"]').tab('show').parent()
-                                    .show().siblings().hide();
-                                break;
-                            case 'C':
-                                $('#product-block-tab a[href="#tab-category"]').tab('show').parent()
-                                    .show().siblings().hide();
-                                break;
+                        if (promotional_campaign.products) {
+                            let count = 1;
+
+                            $.each(promotional_campaign.products, function(id, product) {
+                                $("#prd-product-table > tbody").append(`
+                                    <tr>
+                                        <td>${count++}</td>
+                                        <td>${product.product_no}</td>
+                                        <td>${product.product_name}</td>
+                                        <td>${product.selling_price}</td>
+                                        <td>${product.launched_at}</td>
+                                        <td>${product.launched_status}</td>
+                                        <td>${product.gross_margin}</td>
+                                    </tr>
+                                `);
+                            });
                         }
 
-                        $.each(details, function(key, value) {
-                            let sort = value.sort ? value.sort :
-                                '<i class="fa fa-times fa-lg"></i>';
-                            let image_name_url = value.image_name_url ?
-                                `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` :
-                                '<i class="fa fa-times fa-lg"></i>';
-                            let image_alt = value.image_alt ? value.image_alt :
-                                '<i class="fa fa-times fa-lg"></i>';
-                            let image_title = value.image_title ? value.image_title :
-                                '<i class="fa fa-times fa-lg"></i>';
-                            let image_abstract = value.image_abstract ? value.image_abstract :
-                                '<i class="fa fa-times fa-lg"></i>';
-                            let link_content = '<i class="fa fa-times fa-lg"></i>';
+                        if (promotional_campaign.giveaways) {
+                            let count = 1;
 
-                            switch (value.image_action) {
-                                // URL
-                                case 'U':
-                                    link_content =
-                                        `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
-                                    break;
-                                    // 商品分類
-                                case 'C':
-                                    link_content = `商品分類: ${value.link_content}`;
-                                    break;
-                            }
+                            $.each(promotional_campaign.giveaways, function(id, product) {
+                                $("#gift-product-table > tbody").append(`
+                                    <tr>
+                                        <td>${count++}</td>
+                                        <td>${product.product_no}</td>
+                                        <td>${product.product_name}</td>
+                                        <td>${product.assigned_qty}</td>
+                                    </tr>
+                                `);
+                            });
+                        }
 
-                            let is_target_blank = value.is_target_blank == 1 ?
-                                '<i class="fa fa-check fa-lg"></i>' :
-                                '<i class="fa fa-times fa-lg"></i>';
-                            let texts = value.texts ? value.texts :
-                                '<i class="fa fa-times fa-lg"></i>';
-
-                            switch (value.data_type) {
-                                case 'IMG':
-                                    $('#image-block table > tbody').append(`
-                                        <tr>
-                                            <td>
-                                                ${sort}
-                                            </td>
-                                            <td>
-                                                ${image_name_url}
-                                            </td>
-                                            <td>
-                                                ${image_alt}
-                                            </td>
-                                            <td>
-                                                ${image_title}
-                                            </td>
-                                            <td>
-                                                ${image_abstract}
-                                            </td>
-                                            <td>
-                                                ${link_content}
-                                            </td>
-                                            <td>
-                                                ${is_target_blank}
-                                            </td>
-                                        </tr>
-                                    `);
-                                    break;
-                                case 'TXT':
-                                    $('#text-block table > tbody').append(`
-                                        <tr>
-                                            <td>
-                                                ${sort}
-                                            </td>
-                                            <td>
-                                                ${texts}
-                                            </td>
-                                            <td>
-                                                ${link_content}
-                                            </td>
-                                            <td>
-                                                ${is_target_blank}
-                                            </td>
-                                        </tr>
-                                    `);
-                                    break;
-                                case 'PRD':
-                                    switch (content.product_assigned_type) {
-                                        case 'P':
-                                            if (value.product) {
-                                                $('#tab-product table > tbody').append(`
-                                                    <tr>
-                                                        <td>
-                                                            ${sort}
-                                                        </td>
-                                                        <td>
-                                                            ${value.product}
-                                                        </td>
-                                                    </tr>
-                                                `);
-                                            }
-                                            break;
-
-                                        case 'C':
-                                            if (value.product_category) {
-                                                $('#tab-category table > tbody').append(`
-                                                    <tr>
-                                                        <td>
-                                                            ${sort}
-                                                        </td>
-                                                        <td>
-                                                            ${value.product_category}
-                                                        </td>
-                                                    </tr>
-                                                `);
-                                            }
-                                            break;
-                                    }
-                                    break;
-                            }
-                        });
-
-                        $('#slot_content_detail').modal('show');
+                        $('#promotional_campaign_detail').modal('show');
                     })
                     .catch(function(error) {
                         console.log(error);
