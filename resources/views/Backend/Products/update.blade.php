@@ -916,8 +916,8 @@
             </div>
         </div>
         {{-- 二維多規格結束 --}}
-        <button class="btn btn-large btn-primary" type="submit">儲存</button>
-        </form>
+        <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
+    </form>
     </div>
 </div>
 </div>
@@ -933,9 +933,9 @@
                 },
                 SpecList: [],
                 SkuList: @json($products_item),
-            products: @json($products),
-            product_spec_info: @json($product_spec_info),
-            safty_qty_all: 0,
+                products: @json($products),
+                product_spec_info: @json($product_spec_info),
+                safty_qty_all: 0,
                 }
     },
         mounted() {
@@ -1174,33 +1174,70 @@
             vm = this ;
             for(let i = 0; i< this.old_imges.length; i++) {
                 var data = this.file_cdn + this.old_imges[i].photo_name;
-    let metadata = {
-        type: 'image/jpeg',
-    };
-    var filename = this.old_imges[i].photo_name.split('/');
-    let file = new File([data], filename[2], metadata);
-    file.src = data;
-    file.id = this.old_imges[i].id;
-    file.sizeConvert = vm.formatBytes(this.old_imges[i].photo_size)
-    this.images.push(file);
+                    let metadata = {
+                        type: 'image/jpeg',
+                    };
+                    console.log(this.old_imges[i]) ; 
+                    var filename = this.old_imges[i].photo_name.split('/');
+                    let file = new File([data], filename[2], metadata);
+                    file.src = data;
+                    file.id = this.old_imges[i].id;
+                    file.size = this.old_imges[i].photo_size ;
+                    file.sizeConvert = vm.formatBytes(this.old_imges[i].photo_size)
+                    this.images.push(file);
                 }
-              
             },
     methods: {
         fileSelected(e) {
             let vm = this;
             var selectedFiles = e.target.files;
+            if(selectedFiles.length + this.images.length > 15){
+                alert('不能超過15張照片')  ;
+                e.target.value = '';
+                return false  ;
+            }
             for (let i = 0; i < selectedFiles.length; i++) {
-                this.images.push(selectedFiles[i]);
+                let type = selectedFiles[i].type ; 
+    
+                if(selectedFiles[i].size > 1048576){
+                    alert('照片名稱:'+selectedFiles[i].name +'已經超出大小') ;
+                }else if(type !== 'image/jpeg' && type!== 'image/png'){
+                    alert('照片名稱:'+selectedFiles[i].name +'格式錯誤') ;
+                }else{
+                    this.images.push(selectedFiles[i]);
+                }
             }
             this.adjustTheDisplay();
             this.images.map(function (value, key) {
-                value.sizeConvert = vm.formatBytes(value.size);
+                if(value.id){
+
+                }else{
+                    value.sizeConvert = vm.formatBytes(value.size);
+                }
             });
             e.target.value = '';
         },
         delImages(index) {
-            this.$delete(this.images, index);
+            var yes = confirm('你確定要刪除嗎？');
+            if (yes) {
+                console.log(this.images); 
+                if(this.images[index].id){
+                    axios.post('/backend/del_photos', {
+                        id: this.images[index].id,
+                        _token: '{{ csrf_token() }}',
+                        type:'products',
+                    })
+                    .then(function(response) {
+                    
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+                    this.$delete(this.images, index);
+                }else{
+                    this.$delete(this.images, index);
+                }
+            } 
             this.adjustTheDisplay();
         },
         imagesCheck() {
@@ -1325,6 +1362,101 @@
             theme: "bootstrap",
             placeholder: "請選擇"
         });
+        $(document).on("click", "#save_data", function() {
+                $(".safty_qty_va").each(function(){
+                    console.log('safty_qty_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                        digits: true,
+                    });
+                })
+                $(".spec_1_va").each(function(){
+                    console.log('spec_1_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                $(".spec_2_va").each(function(){
+                    console.log('spec_2_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                $( "#new-form" ).submit()
+            })
+
+      $("#new-form").validate({
+        //   debug: true,
+          submitHandler: function(form) {
+                $('#save_data').prop('disabled', true);
+                form.submit();
+          },
+          rules: {
+              product_name: {
+                  required: true,
+              },
+              supplier_id: {
+                  required: true,
+              },
+              tax_type: {
+                  required: true,
+              },
+              category_id: {
+                  required: true,
+              },
+              brand_id: {
+                  required: true,
+              },
+              uom: {
+                  required: true,
+              },
+              //長
+              length: {
+                  required: true,
+                  digits: true,
+              },
+              width: {
+                  required: true,
+                  digits: true,
+              },
+              height: {
+                  required: true,
+                  digits: true,
+              },
+              list_price: {
+                  required: true,
+                  digits: true,
+              },
+              selling_price: {
+                  required: true,
+                  digits: true,
+              }
+          },
+          errorClass: "help-block",
+          errorElement: "span",
+          errorPlacement: function(error, element) {
+              if (element.parent('.input-group').length || element.is(':radio')) {
+                  error.insertAfter(element.parent());
+                  return;
+              }
+
+              if (element.is('select')) {
+                  element.parent().append(error);
+                  return;
+              }
+
+              error.insertAfter(element);
+          },
+          highlight: function(element, errorClass, validClass) {
+              $(element).closest(".form-group").addClass("has-error");
+          },
+          // unhighlight: function(element, errorClass, validClass) {
+          //     $(element).closest(".form-group").removeClass("has-error");
+          // },
+          success: function(label, element) {
+              $(element).closest(".form-group").removeClass("has-error");
+          },
+      });
     });
 </script>
 @endsection

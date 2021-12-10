@@ -35,44 +35,6 @@
             margin: auto;
         }
 
-        .theme-color {
-            color: #138cde;
-        }
-
-        .sysinfo-title {
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .sysinfo {
-            position: fixed;
-            top: 15vh;
-            right: 20px;
-            z-index: 20;
-        }
-
-        .sysinfo ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .sysinfo-content {
-            margin: 0;
-        }
-
-        .sysinfo-li {
-            padding: 10px 15px;
-            border-left: solid 4px #aaaaaa;
-            color: #aaaaaa;
-            line-height: 1.3;
-            cursor: pointer;
-        }
-
-        .sysinfo-activie {
-            color: #138cde;
-            border-left: solid 4px #138cde;
-        }
 
     </style>
     <div class="sysinfo">
@@ -103,10 +65,10 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="category_hierarchy_content_input">
-                <form class="form-horizontal" role="form" id="new-form" method="POST"
-                    action="{{ route('products.store') }}" enctype="multipart/form-data" novalidaten="ovalidate">
+                <form role="form" id="new-form" method="POST" action="{{ route('products.store') }}"
+                    enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
-                    <div id="page-1">
+                    <div id="page-1" class="form-horizontal">
 
                         <div class="row ">
                             <div class="col-sm-6">
@@ -254,7 +216,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
@@ -604,7 +566,7 @@
                                         </label>
                                     </div>
                                     <div class="col-sm-1 ">
-                                        <input class="form-control" name="warranty_days">
+                                        <input class="form-control" name="warranty_days" min="0" value="0">
                                     </div>
                                 </div>
                             </div>
@@ -633,7 +595,7 @@
                                         </div>
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                            <input type="file" @change="fileSelected" multiple>
+                                            <input type="file" @change="fileSelected" multiple accept=".jpg,.jpeg,.png">
                                             <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                                 multiple>
                                         </div>
@@ -666,11 +628,12 @@
                         </div>
                     </div>
                     <hr>
+
                     <div id="page-2">
                         @include('Backend.Products.inputSpec')
                     </div>
                     {{-- 二維多規格結束 --}}
-                    <button class="btn btn-large btn-primary" type="submit">儲存</button>
+                    <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
                 </form>
             </div>
         </div>
@@ -705,10 +668,17 @@
                     }],
                     products: {
                         spec_dimension: 0,
-                    }
+                    },
+                    safty_qty_all: 0,
                 }
             },
             methods: {
+                change_safty_qty_all() {
+                    let change_num = this.safty_qty_all;
+                    this.SkuList.map(function(value, key) {
+                        value.safty_qty = change_num;
+                    });
+                },
                 AddSpecToSkuList(spec_type) {
                     if (spec_type == '1') {
                         this.SpecList.spec_1.push({
@@ -716,11 +686,6 @@
                             sort: this.SpecList.spec_1.length,
                             only_key: Math.random().toString(36).substring(8),
                         });
-                        // .rules("add", {
-                        // required: true,
-                        // digits: true,
-                        // });
-
                     } else if (spec_type == '2') {
                         this.SpecList.spec_2.length;
                         this.SpecList.spec_2.push({
@@ -744,6 +709,7 @@
                 AddSkuList() { //新增規格
                     var skuList = this.SkuList;
                     var specList = this.SpecList;
+
                     if (this.products.spec_dimension == 1) {
                         specList.spec_1.map(function(value, key) {
                             let only_key_isset = skuList.filter(data => data.spec_1_only_key === value
@@ -821,9 +787,7 @@
 
                         });
                         skuList.sort((a, b) => a.sort_key - b.sort_key); //重新排序
-                        return this.SkuList;
                     }
-
                 },
                 drag(eve) {
                     $('tbody').addClass('elements-box')
@@ -931,17 +895,24 @@
                 }
             },
             methods: {
-                change_safty_qty_all(){
-                    let change_num = this.safty_qty_all ;
-                    this.SkuList.map(function(value, key) {
-                        value.safty_qty = change_num ; 
-                    });
-                },
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
+                    if(selectedFiles.length + this.images.length > 15){
+                        alert('不能超過15張照片')  ;
+                        e.target.value = '';
+                        return false  ;
+                    }
                     for (let i = 0; i < selectedFiles.length; i++) {
-                        this.images.push(selectedFiles[i]);
+                        let type = selectedFiles[i].type ; 
+             
+                        if(selectedFiles[i].size > 1048576){
+                            alert('照片名稱:'+selectedFiles[i].name +'已經超出大小') ;
+                        }else if(type !== 'image/jpeg' && type!== 'image/png'){
+                            alert('照片名稱:'+selectedFiles[i].name +'格式錯誤') ;
+                        }else{
+                            this.images.push(selectedFiles[i]);
+                        }
                     }
                     this.adjustTheDisplay();
                     this.images.map(function(value, key) {
@@ -949,7 +920,8 @@
                     });
                     e.target.value = '';
                 },
-                delImages(index) {
+                delImages(index) 
+                {
                     this.$delete(this.images, index);
                     this.adjustTheDisplay();
                 },
@@ -1074,11 +1046,34 @@
             });
             // 驗證表單
             // product_name
+            $(document).on("click", "#save_data", function() {
+                $(".safty_qty_va").each(function(){
+                    console.log('safty_qty_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                        digits: true,
+                    });
+                })
+                $(".spec_1_va").each(function(){
+                    console.log('spec_1_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                $(".spec_2_va").each(function(){
+                    console.log('spec_2_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                $( "#new-form" ).submit();
+            })
+
             $("#new-form").validate({
-                debug: true,
+                // debug: true,
                 submitHandler: function(form) {
-                    // $('#btn-save').prop('disabled', true);
-                    // form.submit();
+                    $('#save_data').prop('disabled', true);
+                    form.submit();
                 },
                 rules: {
                     product_name: {
@@ -1087,9 +1082,39 @@
                     supplier_id: {
                         required: true,
                     },
-                    // product_name: {
-                    //     required: true,
-                    // },
+                    tax_type: {
+                        required: true,
+                    },
+                    category_id: {
+                        required: true,
+                    },
+                    brand_id: {
+                        required: true,
+                    },
+                    uom: {
+                        required: true,
+                    },
+                    //長
+                    length: {
+                        required: true,
+                        digits: true,
+                    },
+                    width: {
+                        required: true,
+                        digits: true,
+                    },
+                    height: {
+                        required: true,
+                        digits: true,
+                    },
+                    list_price: {
+                        required: true,
+                        digits: true,
+                    },
+                    selling_price: {
+                        required: true,
+                        digits: true,
+                    }
                 },
                 errorClass: "help-block",
                 errorElement: "span",
@@ -1109,13 +1134,14 @@
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
+                // unhighlight: function(element, errorClass, validClass) {
+                //     $(element).closest(".form-group").removeClass("has-error");
+                // },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
+
         });
     </script>
 @endsection

@@ -137,17 +137,5 @@ class ProductsController extends Controller
     {
         //
     }
-    public function testview(){
-        $result = [] ;
-        $filename = '' ;
-        $result['web_url'] = ImageUpload::getImage($filename) ? '' : '' ;
-        return view('Backend.Products.test',$result);
-
-    }
-    public function upload_img(Request $request){
-        $file = $request->file('photo') ;
-        $path = '/photo/1' ;
-        $upload = ImageUpload::uploadImage($file,$path) ;
-    }
 
 }

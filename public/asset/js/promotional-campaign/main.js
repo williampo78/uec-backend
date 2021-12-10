@@ -1,30 +1,5 @@
 // 初始化資料
-function init(datas = {}) {
-    let campaign_types = datas.campaign_types ? datas.campaign_types : "";
-    let suppliers = datas.suppliers ? datas.suppliers : "";
-    let product_type_option = datas.product_type_option
-        ? datas.product_type_option
-        : "";
-
-    if (campaign_types) {
-        let campaign_type_select_options =
-            getCampaignTypeSelectOptions(campaign_types);
-        $("#campaign_type").append(campaign_type_select_options);
-    }
-
-    let supplier_select_options = getSupplierSelectOptions(suppliers);
-    $("#prd-modal-supplier-id").append(supplier_select_options);
-    $("#gift-modal-supplier-id").append(supplier_select_options);
-
-    let product_type_select_options =
-        getProductTypeSelectOptions(product_type_option);
-    $("#prd-modal-product-type").append(product_type_select_options);
-    $("#gift-modal-product-type").append(product_type_select_options);
-    $('#prd-modal-product-type option[value="A"]').remove(); // 移除加購品
-    $('#prd-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
-    $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
-    $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
-
+function init() {
     $("#campaign_type").select2({
         allowClear: true,
         theme: "bootstrap",
@@ -108,43 +83,75 @@ function init(datas = {}) {
     });
 }
 
-// 取得活動類型下拉選項
-function getCampaignTypeSelectOptions(datas) {
-    let options = "";
+// 渲染活動類型
+function renderCampaignType(campaign_types) {
+    // 清空活動類型
+    $("#campaign_type").empty().append(`
+        <option></option>
+    `);
 
-    $.each(datas, function (key, value) {
-        options += `
+    $.each(campaign_types, function (key, value) {
+        // 活動類型加入選項
+        $("#campaign_type").append(`
             <option value='${value["code"]}'>${value["description"]}</option>
-        `;
+        `);
     });
-
-    return options;
 }
 
-// 取得供應商下拉選項
-function getSupplierSelectOptions(datas) {
-    let options = "";
+// 渲染單品modal的供應商
+function renderPrdModalSupplier(suppliers) {
+    // 清空單品modal的供應商
+    $("#prd-modal-supplier-id").empty().append(`
+        <option></option>
+    `);
 
-    $.each(datas, function (key, value) {
-        options += `
+    $.each(suppliers, function (key, value) {
+        // 單品modal的供應商加入選項
+        $("#prd-modal-supplier-id").append(`
             <option value='${value["id"]}'>【${value["display_number"]}】 ${value["name"]}</option>
-        `;
+        `);
     });
-
-    return options;
 }
 
-// 取得商品類型下拉選項
-function getProductTypeSelectOptions(datas) {
-    let options = "";
+// 渲染贈品modal的供應商
+function renderGiftModalSupplier(suppliers) {
+    // 清空贈品modal的供應商
+    $("#gift-modal-supplier-id").empty().append(`
+        <option></option>
+    `);
 
-    $.each(datas, function (key, value) {
-        options += `
-            <option value='${key}'>${value}</option>
-        `;
+    $.each(suppliers, function (key, value) {
+        // 贈品modal的供應商加入選項
+        $("#gift-modal-supplier-id").append(`
+            <option value='${value["id"]}'>【${value["display_number"]}】 ${value["name"]}</option>
+        `);
     });
+}
 
-    return options;
+// 渲染單品modal的商品類型
+function renderPrdModalProductType(product_types) {
+    // 清空單品modal的商品類型
+    $("#prd-modal-product-type").empty();
+
+    $.each(product_types, function (key, value) {
+        // 單品modal的商品類型加入選項
+        $("#prd-modal-product-type").append(`
+            <option value='${key}'>${value}</option>
+        `);
+    });
+}
+
+// 渲染贈品modal的商品類型
+function renderGiftModalProductType(product_types) {
+    // 清空贈品modal的商品類型
+    $("#gift-modal-product-type").empty();
+
+    $.each(product_types, function (key, value) {
+        // 贈品modal的商品類型加入選項
+        $("#gift-modal-product-type").append(`
+            <option value='${key}'>${value}</option>
+        `);
+    });
 }
 
 // 渲染單品的商品清單
