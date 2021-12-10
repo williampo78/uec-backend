@@ -226,8 +226,8 @@ class APIProductServices
                 if ($member_id > 0) {
                     $response = $this->apiWebService->getMemberCollections();
                     $is_collection = json_decode($response, true);
-                    $response = $this->apiCartService->getCartInfo($member_id);
-                    $is_cart = json_decode($response, true);
+                    //$response = $this->apiCartService->getCartInfo($member_id);
+                    //$is_cart = json_decode($response, true);
                 }
             }
 
@@ -257,6 +257,7 @@ class APIProductServices
                             }
                         }
                     }
+                    /*加入購物車未定版，待確認後資料要改成取 shopping_cart_details => item_id
                     if (isset($is_cart)) {
                         foreach ($is_cart as $k => $v) {
                             if ($v['product_id'] == $product->id) {
@@ -265,7 +266,7 @@ class APIProductServices
                                 $cart = false;
                             }
                         }
-                    }
+                    }*/
                     if ($product->id != $product_id) {
                         $data[] = array(
                             'product_id' => $product->id,
@@ -282,7 +283,6 @@ class APIProductServices
 
                         $product_id = $product->id;
                     }
-
 
                 }
             }
