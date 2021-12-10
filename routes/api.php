@@ -9,6 +9,8 @@ use App\Http\Controllers\api\TestInfoController;
 use App\Http\Controllers\api\MemberInfoController;
 use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\ProductController;
+use App\Http\Controllers\api\ShoppingController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,12 +36,11 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
     Route::post('/advanceSearch', [ProductController::class, 'getProductSearchResult']);
     Route::post('/advanceSearchCategory', [ProductController::class, 'getProductSearchResultCategory']);
+
 });
 
 Route::group(['middleware' => 'jwt.member'], function () {
-    //Route::get('me', [AuthController::class, 'me']);
     Route::post('/members/logout', [AuthController::class, 'logout']);
-    //Route::post('refresh', [AuthController::class, 'refresh']);
 
     Route::post('/membership', [MemberInfoController::class, 'profile']);
     Route::put('/membership', [MemberInfoController::class, 'updateProfile']);
@@ -56,6 +57,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::get('/membership/collections', [MemberInfoController::class, 'collections']);
     Route::post('/membership/collections', [MemberInfoController::class, 'createCollections']);
     Route::post('/membership/collections/batchDelete', [MemberInfoController::class, 'batchDeleteCollections']);
+
 });
 
 Route::get('area', [DradviceController::class, 'area']);
@@ -68,4 +70,8 @@ Route::group(['prefix' => 'members'], function () {
     Route::post('/sendSms', [AuthController::class, 'sendSMS']);
     Route::post('/verifySms', [AuthController::class, 'verifySMS']);
     Route::post('/memberBasic', [AuthController::class, 'memberBasic']);
+});
+
+Route::group(['prefix'=>'shopping'], function (){
+    Route::get('/getCartCount', [ShoppingController::class, 'getCartCount']);
 });
