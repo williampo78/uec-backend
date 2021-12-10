@@ -103,10 +103,10 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="category_hierarchy_content_input">
-                <form class="form-horizontal" role="form" id="new-form" method="POST"
-                    action="{{ route('products.store') }}" enctype="multipart/form-data" novalidaten="ovalidate">
+                <form role="form" id="new-form" method="POST" action="{{ route('products.store') }}"
+                    enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
-                    <div id="page-1">
+                    <div id="page-1" class="form-horizontal">
 
                         <div class="row ">
                             <div class="col-sm-6">
@@ -254,7 +254,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
@@ -604,7 +604,7 @@
                                         </label>
                                     </div>
                                     <div class="col-sm-1 ">
-                                        <input class="form-control" name="warranty_days">
+                                        <input class="form-control" name="warranty_days" min="0" value="0">
                                     </div>
                                 </div>
                             </div>
@@ -666,11 +666,12 @@
                         </div>
                     </div>
                     <hr>
+
                     <div id="page-2">
                         @include('Backend.Products.inputSpec')
                     </div>
                     {{-- 二維多規格結束 --}}
-                    <button class="btn btn-large btn-primary" type="submit">儲存</button>
+                    <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
                 </form>
             </div>
         </div>
@@ -705,10 +706,17 @@
                     }],
                     products: {
                         spec_dimension: 0,
-                    }
+                    },
+                    safty_qty_all: 0,
                 }
             },
             methods: {
+                change_safty_qty_all() {
+                    let change_num = this.safty_qty_all;
+                    this.SkuList.map(function(value, key) {
+                        value.safty_qty = change_num;
+                    });
+                },
                 AddSpecToSkuList(spec_type) {
                     if (spec_type == '1') {
                         this.SpecList.spec_1.push({
@@ -744,6 +752,7 @@
                 AddSkuList() { //新增規格
                     var skuList = this.SkuList;
                     var specList = this.SpecList;
+
                     if (this.products.spec_dimension == 1) {
                         specList.spec_1.map(function(value, key) {
                             let only_key_isset = skuList.filter(data => data.spec_1_only_key === value
@@ -821,9 +830,7 @@
 
                         });
                         skuList.sort((a, b) => a.sort_key - b.sort_key); //重新排序
-                        return this.SkuList;
                     }
-
                 },
                 drag(eve) {
                     $('tbody').addClass('elements-box')
@@ -931,12 +938,7 @@
                 }
             },
             methods: {
-                change_safty_qty_all(){
-                    let change_num = this.safty_qty_all ;
-                    this.SkuList.map(function(value, key) {
-                        value.safty_qty = change_num ; 
-                    });
-                },
+
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
@@ -1074,6 +1076,31 @@
             });
             // 驗證表單
             // product_name
+            $("#save_data").click(function() {
+          
+                $(".safty_qty_va").each(function(){
+                    $(this).rules("add", {
+                        required: true,
+                        digits: true,
+                    });
+                })
+                $(".spec_1_va").each(function(){
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                $(".spec_2_va").each(function(){
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                // $(".spec_va").each(function(){
+                //     $(this).rules("add", {
+                //     required: true,
+                // });
+
+                $("#new-form").submit();
+            })
             $("#new-form").validate({
                 debug: true,
                 submitHandler: function(form) {
@@ -1087,9 +1114,39 @@
                     supplier_id: {
                         required: true,
                     },
-                    // product_name: {
-                    //     required: true,
-                    // },
+                    tax_type: {
+                        required: true,
+                    },
+                    category_id: {
+                        required: true,
+                    },
+                    brand_id: {
+                        required: true,
+                    },
+                    uom: {
+                        required: true,
+                    },
+                    //長
+                    length: {
+                        required: true,
+                        digits: true,
+                    },
+                    width: {
+                        required: true,
+                        digits: true,
+                    },
+                    height: {
+                        required: true,
+                        digits: true,
+                    },
+                    list_price: {
+                        required: true,
+                        digits: true,
+                    },
+                    selling_price: {
+                        required: true,
+                        digits: true,
+                    }
                 },
                 errorClass: "help-block",
                 errorElement: "span",
@@ -1109,13 +1166,14 @@
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
+                // unhighlight: function(element, errorClass, validClass) {
+                //     $(element).closest(".form-group").removeClass("has-error");
+                // },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
+
         });
     </script>
 @endsection
