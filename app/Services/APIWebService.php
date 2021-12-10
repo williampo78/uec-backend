@@ -200,7 +200,7 @@ class APIWebService
      * @param
      * @return string
      */
-    public function createMemberCollections($input)
+    public function setMemberCollections($input)
     {
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();

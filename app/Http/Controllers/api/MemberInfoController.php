@@ -353,7 +353,7 @@ class MemberInfoController extends Controller
      * 新增刪除會員商品收藏資料 (商品編號)
      * @param  int  $id
      */
-    public function createCollections(Request $request)
+    public function setCollections(Request $request)
     {
         $err = null;
         $error_code = $this->apiService->getErrorCode();
@@ -371,7 +371,7 @@ class MemberInfoController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
-        $response = $this->apiWebService->createMemberCollections($request);
+        $response = $this->apiWebService->setMemberCollections($request);
         if ($response == 'success') {
             $status = true;
             $data = ($request['status'] == 0 ? '加入' : '移除') . '收藏成功';

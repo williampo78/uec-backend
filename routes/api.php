@@ -55,9 +55,12 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::delete('/membership/{id}/notes', [MemberInfoController::class, 'deleteNotes']);
 
     Route::get('/membership/collections', [MemberInfoController::class, 'collections']);
-    Route::post('/membership/collections', [MemberInfoController::class, 'createCollections']);
+    Route::post('/membership/collections', [MemberInfoController::class, 'setCollections']);
     Route::post('/membership/collections/batchDelete', [MemberInfoController::class, 'batchDeleteCollections']);
 
+    Route::group(['prefix'=>'shopping'], function (){
+        Route::post('/setMemberCart', [ShoppingController::class, 'setCart']);
+    });
 });
 
 Route::get('area', [DradviceController::class, 'area']);
