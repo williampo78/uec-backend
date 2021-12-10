@@ -3,6 +3,8 @@
 
 namespace App\Services;
 
+use App\Models\ProductPhotos;
+use App\Models\ProductItems;
 use App\Services\APIWebService;
 use App\Services\WebCategoryHierarchyService;
 use GuzzleHttp\Psr7\Request;
@@ -336,8 +338,11 @@ class APIProductServices
         $promotional = DB::select($strSQL);
         $data = [];
         foreach ($promotional as $promotion) {
-            //if ($type == 'product_card')
-            $data[$promotion->product_id][] = $promotion;
+            if ($type == 'product_card') {
+                $data[$promotion->product_id][] = $promotion;
+            } else if ($type == 'product_content') {
+                $data[$promotion->category_code][] = $promotion;
+            }
         }
         return $data;
 
@@ -391,5 +396,36 @@ class APIProductServices
         } else {
             return '404';
         }
+    }
+
+    /*
+     * 取得商品資料內容頁
+     */
+    public function getProduct($id)
+    {
+        //產品主檔基本資訊
+        $product = self::getProducts();
+
+        //行銷促案資訊
+        $promotion_type = [];
+        $promotions = self::getPromotion('product_content');
+        foreach ($promotions as $category => $promotion) {
+            foreach ($promotion as $item){
+                if ($item->product_id == $id) {
+                    $promotion_type[$category][] = $item;
+                }
+            }
+        }
+
+        //產品圖檔
+        $ProductPhotos = ProductPhotos::where('product_id', $id)->orderBy('sort', 'asc')->get();
+        foreach ($ProductPhotos as $photo) {
+            $photos[] = $photo->photo_name;
+        }
+
+        //產品規格
+        $ProductSpec = ProductItems::where('product_id', $id)->orderBy('sort', 'asc')->get();
+        $product[$id]->spec_dimension;
+        dd($ProductSpec);
     }
 }

@@ -33,6 +33,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/qa', [IndexController::class, 'getQA']);
 
     Route::get('/product/category', [ProductController::class, 'getCategory']);
+    Route::get('/product/{id}', [ProductController::class, 'getProduct']);
+
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
     Route::post('/advanceSearch', [ProductController::class, 'getProductSearchResult']);
     Route::post('/advanceSearchCategory', [ProductController::class, 'getProductSearchResultCategory']);

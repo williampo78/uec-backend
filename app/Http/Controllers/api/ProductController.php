@@ -133,4 +133,25 @@ class ProductController extends Controller
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
     }
 
+    /*
+     * 取得產品內容頁
+     * @param  int  $id
+     */
+    public function getProduct($id)
+    {
+        $err = false;
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductService->getProduct($id);
+        if ($result == '404') {
+            $status = false;
+            $err = '404';
+            $list = [];
+        } else {
+            $status = true;
+            $err = '';
+            $list = $result;
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+    }
+
 }
