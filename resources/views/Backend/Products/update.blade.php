@@ -1212,7 +1212,26 @@
             e.target.value = '';
         },
         delImages(index) {
-            this.$delete(this.images, index);
+            var yes = confirm('你確定要刪除嗎？');
+            if (yes) {
+                console.log(this.images); 
+                if(this.images[index].id){
+                    axios.post('/backend/del_photos', {
+                        id: this.images[index].id,
+                        _token: '{{ csrf_token() }}',
+                        type:'products',
+                    })
+                    .then(function(response) {
+                    
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+                    this.$delete(this.images, index);
+                }else{
+                    this.$delete(this.images, index);
+                }
+            } 
             this.adjustTheDisplay();
         },
         imagesCheck() {

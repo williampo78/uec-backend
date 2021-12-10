@@ -958,7 +958,8 @@
                     });
                     e.target.value = '';
                 },
-                delImages(index) {
+                delImages(index) 
+                {
                     this.$delete(this.images, index);
                     this.adjustTheDisplay();
                 },
