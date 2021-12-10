@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\Models\Lookup_values_v;
 use App\Models\Quotation;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Models\Users;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UniversalService
 {
@@ -21,9 +21,10 @@ class UniversalService
      * @param $in 附加資訊 預設是null
      * @return string
      */
-    public function getDocNumber($type,$in = null){
+    public function getDocNumber($type, $in = array())
+    {
         $dt = Carbon::now()->format('ymd');
-        switch ($type){
+        switch ($type) {
             case 'quotation':
                 $table = 'quotation';
                 $title = 'QU';
@@ -33,62 +34,65 @@ class UniversalService
                 $title = 'PO';
                 break;
             case 'requisitions_purchase':
-                $table = 'requisitions_purchase' ;
-                $title = 'PR' ;
+                $table = 'requisitions_purchase';
+                $title = 'PR';
                 break;
-            case  'products':
-                $stock_type = $in ;                 
+            case 'products':
+                $stock_type = $in['stock_type'];
                 $title = $stock_type;
-                $table = 'products' ;
+                $table = 'products';
                 break;
         }
-        $rs = DB::table($table)->orderBy('id','DESC')->first();
 
-        if (empty($rs)){
-            $serial = 1;
-        }else{
-            $serial = $rs->id + 1;
-        }
         //商品與其他不同
         switch ($type) {
             case 'products':
-                $doc_number = $title . str_pad($serial,6,"0",STR_PAD_LEFT);;
+                $doc_number = $title . str_pad($in['id'], 6, "0", STR_PAD_LEFT);
                 break;
             default:
-                $doc_number = $title . $dt . str_pad($serial,4,"0",STR_PAD_LEFT);;
+                $rs = DB::table($table)->orderBy('id', 'DESC')->first();
+                if (empty($rs)) {
+                    $serial = 1;
+                } else {
+                    $serial = $rs->id + 1;
+                }
+                $doc_number = $title . $dt . str_pad($serial, 4, "0", STR_PAD_LEFT);
                 break;
         }
 
         return $doc_number;
     }
 
-    public function idtokey($data){
+    public function idtokey($data)
+    {
         $rs = [];
 
-        foreach ($data as $v){
+        foreach ($data as $v) {
             $rs[$v['id']] = $v;
         }
 
         return $rs;
     }
 
-    public function getStatusCode(){
-        $data =  [
-            'DRAFTED' => '草稿' ,
-            'REVIEWING' => '簽核中' ,
-            'APPROVED' => '已核准' ,
-            'REJECTED' => '已駁回'
+    public function getStatusCode()
+    {
+        $data = [
+            'DRAFTED' => '草稿',
+            'REVIEWING' => '簽核中',
+            'APPROVED' => '已核准',
+            'REJECTED' => '已駁回',
         ];
 
         return $data;
     }
 
-    public function getTaxList(){
+    public function getTaxList()
+    {
         return [
-            0 => '未稅' ,
-            1 => '應稅' ,
-            2 => '內含' ,
-            3 => '零稅率'
+            0 => '未稅',
+            1 => '應稅',
+            2 => '內含',
+            3 => '零稅率',
         ];
     }
 
@@ -130,10 +134,10 @@ class UniversalService
      */
     public function getFooterContentTarget()
     {
-        $data =  [
-            'S' => '站內連結' ,
-            'B' => '另開視窗' ,
-            'H' => '單一圖文'
+        $data = [
+            'S' => '站內連結',
+            'B' => '另開視窗',
+            'H' => '單一圖文',
         ];
 
         return $data;

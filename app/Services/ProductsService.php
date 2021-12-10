@@ -146,12 +146,11 @@ class ProductsService
         $now = Carbon::now();
         $skuList = json_decode($in['SkuListdata'], true);
         $specListJson = json_decode($in['SpecListJson'], true);
-        $product_no = $this->universalService->getDocNumber('products', $in['stock_type']);
         DB::beginTransaction();
         try {
             $insert = [
                 'stock_type' => $in['stock_type'],
-                'product_no' => $product_no,
+                'product_no' => '',
                 'supplier_id' => $in['supplier_id'],
                 'product_name' => $in['product_name'],
                 'tax_type' => $in['tax_type'],
@@ -192,7 +191,8 @@ class ProductsService
                 'agent_id' => $agent_id,
             ];
             $products_id = Products::create($insert)->id;
-            $products = Products::findOrFail($products_id);
+            $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'] , 'id' => $products_id]);
+            Products::where('id',$products_id)->update(['product_no' => $product_no]) ;
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
@@ -200,7 +200,7 @@ class ProductsService
                     'sort' => $val['sort'] ?? 0,
                     'spec_1_value' => $val['spec_1_value'] ?? '',
                     'spec_2_value' => $val['spec_2_value'] ?? '',
-                    'item_no' => $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
+                    'item_no' => $product_no . str_pad($key, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
                     'supplier_item_no' => $val['supplier_item_no'],
                     'ean' => $val['ean'],
                     'pos_item_no' => $val['pos_item_no'],
@@ -213,7 +213,7 @@ class ProductsService
                     'updated_at' => $now,
                 ];
                 $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
-                $skuList[$key]['item_no'] = $products->product_no . str_pad($key, 4, "0", STR_PAD_LEFT);
+                $skuList[$key]['item_no'] = $product_no . str_pad($key, 4, "0", STR_PAD_LEFT);
             }
             Product_spec_info::create([
                 'product_id' => $products_id,
@@ -225,14 +225,14 @@ class ProductsService
                 'updated_at' => $now,
             ]);
             $fileList = [];
-            $uploadPath = '/products/' . $products->id;
+            $uploadPath = '/products/' . $products_id;
             if (isset($file['filedata'])) {
                 foreach ($file['filedata'] as $key => $val) {
                     $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath);
                 }
                 foreach ($fileList as $key => $val) {
                     $insertImg = [
-                        'product_id' => $products->id,
+                        'product_id' => $products_id,
                         'photo_name' => $val['image'],
                         'sort' => $key,
                         'created_by' => $user_id,
@@ -262,7 +262,6 @@ class ProductsService
         $skuList = json_decode($in['SkuListdata'], true);
         $specListJson = json_decode($in['SpecListJson'], true);
         $imgJson = json_decode($in['imgJson'], true);
-        // dd($in) ;
         DB::beginTransaction();
         try {
             $update = [
@@ -327,13 +326,10 @@ class ProductsService
                     ProductPhotos::create($insertImg);
                 }
             }
-            // dd($skuList) ;
             $add_item_no = ProductItems::where('product_id', $products_id)->count();
             foreach ($skuList as $key => $val) {
                 if ($val['id'] == '') {
                     $add_item_no += 1;
-                    dd($in['product_no'] . str_pad($add_item_no, 4, "0", STR_PAD_LEFT)) ; 
-
                     $skuInsert = [
                         'agent_id' => $agent_id,
                         'product_id' => $products_id,
