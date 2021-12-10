@@ -2,10 +2,6 @@
 @section('title', '商品主檔 - 新增基本資訊')
 @section('content')
     <style>
-        /* .no-pa {
-                                                                                                                                                            padding: 0px;
-                                                                                                                                                        } */
-
         .ondragover {
             background: #b7e0fb !important;
             transition: background-color 0.5s;
@@ -935,6 +931,12 @@
                 }
             },
             methods: {
+                change_safty_qty_all(){
+                    let change_num = this.safty_qty_all ;
+                    this.SkuList.map(function(value, key) {
+                        value.safty_qty = change_num ; 
+                    });
+                },
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
