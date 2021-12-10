@@ -1325,28 +1325,31 @@
             theme: "bootstrap",
             placeholder: "請選擇"
         });
-        $("#save_data").click(function() {
-          
-          $(".safty_qty_va").each(function(){
-              $(this).rules("add", {
-                  required: true,
-                  digits: true,
-              });
-          })
-          $(".spec_1_va").each(function(){
-              $(this).rules("add", {
-                  required: true,
-              });
-          })
-          $(".spec_2_va").each(function(){
-              $(this).rules("add", {
-                  required: true,
-              });
-          })
-          $("#new-form").submit();
-      })
+        $(document).on("click", "#save_data", function() {
+                $(".safty_qty_va").each(function(){
+                    console.log('safty_qty_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                        digits: true,
+                    });
+                })
+                $(".spec_1_va").each(function(){
+                    console.log('spec_1_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                $(".spec_2_va").each(function(){
+                    console.log('spec_2_va') ;
+                    $(this).rules("add", {
+                        required: true,
+                    });
+                })
+                $( "#new-form" )[0].submit()
+            })
+
       $("#new-form").validate({
-          debug: true,
+        //   debug: true,
           submitHandler: function(form) {
               // $('#btn-save').prop('disabled', true);
               // form.submit();
