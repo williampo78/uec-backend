@@ -633,7 +633,7 @@
                                         </div>
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                            <input type="file" @change="fileSelected" multiple>
+                                            <input type="file" @change="fileSelected" multiple accept=".jpg,.jpeg,.png">
                                             <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                                 multiple>
                                         </div>
@@ -724,11 +724,6 @@
                             sort: this.SpecList.spec_1.length,
                             only_key: Math.random().toString(36).substring(8),
                         });
-                        // .rules("add", {
-                        // required: true,
-                        // digits: true,
-                        // });
-
                     } else if (spec_type == '2') {
                         this.SpecList.spec_2.length;
                         this.SpecList.spec_2.push({
@@ -938,12 +933,24 @@
                 }
             },
             methods: {
-
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
+                    if(selectedFiles.length + this.images.length > 15){
+                        alert('不能超過15張照片')  ;
+                        e.target.value = '';
+                        return false  ;
+                    }
                     for (let i = 0; i < selectedFiles.length; i++) {
-                        this.images.push(selectedFiles[i]);
+                        let type = selectedFiles[i].type ; 
+             
+                        if(selectedFiles[i].size > 1048576){
+                            alert('照片名稱:'+selectedFiles[i].name +'已經超出大小') ;
+                        }else if(type !== 'image/jpeg' && type!== 'image/png'){
+                            alert('照片名稱:'+selectedFiles[i].name +'格式錯誤') ;
+                        }else{
+                            this.images.push(selectedFiles[i]);
+                        }
                     }
                     this.adjustTheDisplay();
                     this.images.map(function(value, key) {
@@ -1096,14 +1103,14 @@
                         required: true,
                     });
                 })
-                $( "#new-form" )[0].submit()
+                $( "#new-form" ).submit();
             })
 
             $("#new-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    // $('#btn-save').prop('disabled', true);
-                    // form.submit();
+                    $('#save_data').prop('disabled', true);
+                    form.submit();
                 },
                 rules: {
                     product_name: {

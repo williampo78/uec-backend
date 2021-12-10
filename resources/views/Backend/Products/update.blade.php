@@ -933,9 +933,9 @@
                 },
                 SpecList: [],
                 SkuList: @json($products_item),
-            products: @json($products),
-            product_spec_info: @json($product_spec_info),
-            safty_qty_all: 0,
+                products: @json($products),
+                product_spec_info: @json($product_spec_info),
+                safty_qty_all: 0,
                 }
     },
         mounted() {
@@ -1174,24 +1174,36 @@
             vm = this ;
             for(let i = 0; i< this.old_imges.length; i++) {
                 var data = this.file_cdn + this.old_imges[i].photo_name;
-    let metadata = {
-        type: 'image/jpeg',
-    };
-    var filename = this.old_imges[i].photo_name.split('/');
-    let file = new File([data], filename[2], metadata);
-    file.src = data;
-    file.id = this.old_imges[i].id;
-    file.sizeConvert = vm.formatBytes(this.old_imges[i].photo_size)
-    this.images.push(file);
+                    let metadata = {
+                        type: 'image/jpeg',
+                    };
+                    var filename = this.old_imges[i].photo_name.split('/');
+                    let file = new File([data], filename[2], metadata);
+                    file.src = data;
+                    file.id = this.old_imges[i].id;
+                    file.sizeConvert = vm.formatBytes(this.old_imges[i].photo_size)
+                    this.images.push(file);
                 }
-              
             },
     methods: {
         fileSelected(e) {
             let vm = this;
             var selectedFiles = e.target.files;
+            if(selectedFiles.length + this.images.length > 15){
+                alert('不能超過15張照片')  ;
+                e.target.value = '';
+                return false  ;
+            }
             for (let i = 0; i < selectedFiles.length; i++) {
-                this.images.push(selectedFiles[i]);
+                let type = selectedFiles[i].type ; 
+    
+                if(selectedFiles[i].size > 1048576){
+                    alert('照片名稱:'+selectedFiles[i].name +'已經超出大小') ;
+                }else if(type !== 'image/jpeg' && type!== 'image/png'){
+                    alert('照片名稱:'+selectedFiles[i].name +'格式錯誤') ;
+                }else{
+                    this.images.push(selectedFiles[i]);
+                }
             }
             this.adjustTheDisplay();
             this.images.map(function (value, key) {
@@ -1345,14 +1357,14 @@
                         required: true,
                     });
                 })
-                $( "#new-form" )[0].submit()
+                $( "#new-form" ).submit()
             })
 
       $("#new-form").validate({
         //   debug: true,
           submitHandler: function(form) {
-              // $('#btn-save').prop('disabled', true);
-              // form.submit();
+                $('#save_data').prop('disabled', true);
+                form.submit();
           },
           rules: {
               product_name: {
