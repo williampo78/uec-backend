@@ -261,8 +261,9 @@
             $('#table_list tbody').on('click', '.promotional_campaign_detail', function() {
                 let promotional_campaign_id = $(this).attr("data-promotional-campaign-id");
 
-                axios.post('/backend/promotional_campaign_cart/ajax/detail', {
-                        promotional_campaign_id: promotional_campaign_id
+                axios.post('/backend/promotional_campaign/ajax/detail', {
+                        promotional_campaign_id: promotional_campaign_id,
+                        level_code: 'PRD',
                     })
                     .then(function(response) {
                         let promotional_campaign = response.data;
@@ -292,25 +293,36 @@
 
                         // 活動類型
                         switch (promotional_campaign.campaign_type) {
-                            // ﹝滿額﹞購物車滿N元，打X折
-                            case 'CART01':
-                                $('#prd-block').hide();
+                            // ﹝單品﹞第N件(含)以上，打X折
+                            case 'PRD01':
+                                $('#prd-block').show();
                                 $('#gift-block').hide();
-                                break;
-                                // ﹝滿額﹞購物車滿N元，折X元
-                            case 'CART02':
-                                $('#prd-block').hide();
-                                $('#gift-block').hide();
-                                break;
-                                // ﹝滿額﹞購物車滿N元，送贈品
-                            case 'CART03':
-                                $('#prd-block').hide();
-                                $('#gift-block').show();
 
-                                $("#gift-product-table > tbody").empty();
+                                $("#prd-product-table > tbody").empty();
                                 break;
-                                // ﹝滿額﹞指定商品滿N件，送贈品
-                            case 'CART04':
+                                // ﹝單品﹞第N件(含)以上，折X元
+                            case 'PRD02':
+                                $('#prd-block').show();
+                                $('#gift-block').hide();
+
+                                $("#prd-product-table > tbody").empty();
+                                break;
+                                // ﹝單品﹞滿N件，每件打X折
+                            case 'PRD03':
+                                $('#prd-block').show();
+                                $('#gift-block').hide();
+
+                                $("#prd-product-table > tbody").empty();
+                                break;
+                                // ﹝單品﹞滿N件，每件折X元
+                            case 'PRD04':
+                                $('#prd-block').show();
+                                $('#gift-block').hide();
+
+                                $("#prd-product-table > tbody").empty();
+                                break;
+                                // ﹝單品﹞滿N件，送贈品
+                            case 'PRD05':
                                 $('#prd-block').show();
                                 $('#gift-block').show();
 
