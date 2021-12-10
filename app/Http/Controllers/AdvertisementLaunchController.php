@@ -205,7 +205,7 @@ class AdvertisementLaunchController extends Controller
         //
     }
 
-    public function getDetailByAjax(Request $request)
+    public function getDetail(Request $request)
     {
         $slot_content_id = $request->input('slot_content_id');
 

@@ -96,7 +96,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'advertisemsement_block',
         ],
     ]);
-    Route::post('/advertisemsement_block/ajax/detail', [AdvertisementBlockController::class, 'getDetailByAjax']);
+    Route::post('/advertisemsement_block/ajax/detail', [AdvertisementBlockController::class, 'getDetail']);
 
     // 廣告上架
     Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, [
@@ -104,7 +104,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'advertisemsement_launch',
         ],
     ]);
-    Route::post('/advertisemsement_launch/ajax/detail', [AdvertisementLaunchController::class, 'getDetailByAjax']);
+    Route::post('/advertisemsement_launch/ajax/detail', [AdvertisementLaunchController::class, 'getDetail']);
     Route::post('/advertisemsement_launch/ajax/can-pass-active-validation', [AdvertisementLaunchController::class, 'canPassActiveValidation']);
 
     // 滿額活動
@@ -113,6 +113,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'promotional_campaign_cart',
         ],
     ]);
+    Route::post('/promotional_campaign_cart/ajax/detail', [PromotionalCampaignCartController::class, 'getDetail']);
 
     // 單品活動
     Route::resource('/promotional_campaign_prd', PromotionalCampaignPrdController::class, [

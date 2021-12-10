@@ -217,4 +217,51 @@ class PromotionalCampaignCartController extends Controller
     {
         //
     }
+
+    public function getDetail(Request $request)
+    {
+        $promotional_campaign_id = $request->input('promotional_campaign_id');
+
+        $promotional_campaign = $this->promotional_campaign_service->getPromotionalCampaigns([
+            'id' => $promotional_campaign_id,
+            'level_code' => 'CART',
+        ])->first();
+
+        if (isset($promotional_campaign->products)) {
+            $this->products_service->restructureProducts($promotional_campaign->products);
+            $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
+                return [
+                    $product->product_id => $product->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                    ]),
+                ];
+            });
+        }
+
+        if (isset($promotional_campaign->giveaways)) {
+            $this->products_service->restructureProducts($promotional_campaign->giveaways);
+            $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
+                return [
+                    $giveaway->product_id => $giveaway->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                        'assigned_qty',
+                    ]),
+                ];
+            });
+        }
+
+        return response()->json($promotional_campaign);
+    }
 }
