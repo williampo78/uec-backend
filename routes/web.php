@@ -31,6 +31,7 @@ use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
 use App\Http\Controllers\PhotosController;
+use App\Http\Controllers\ProductsMallController ; 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,6 +49,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
     Route::get('/signOut', [AdminController::class, 'signOut'])->name('signOut');
     Route::resource('/products', ProductsController::class, ['names' => ['index' => 'products']]);
+    Route::resource('/product_small', ProductsMallController::class, ['names' => ['index' => 'product_small']]);
+
     Route::post('/del_photos', [PhotosController::class, 'delPhoto']); //刪除聯絡人
     Route::resource('/admin', AdminController::class);
     Route::resource('/item', ItemController::class, ['names' => ['index' => 'item']]);
