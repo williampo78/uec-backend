@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '滿額活動管理')
+@section('title', '單品活動管理')
 
 @section('style')
     <style>
@@ -18,7 +18,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 滿額活動管理</h1>
+                <h1 class="page-header"><i class="fa fa-table"></i> 單品活動管理</h1>
             </div>
         </div>
 
@@ -145,7 +145,7 @@
                         <div class="row">
                             @if ($share_role_auth['auth_create'])
                                 <div class="col-sm-2">
-                                    <a href="{{ route('promotional_campaign_cart.create') }}"
+                                    <a href="{{ route('promotional_campaign_prd.create') }}"
                                         class="btn btn-block btn-warning btn-sm" id="btn-create"><i
                                             class="fa fa-plus"></i>
                                         新增</a>
@@ -186,7 +186,7 @@
 
                                                     @if ($share_role_auth['auth_update'])
                                                         <a class="btn btn-info btn-sm"
-                                                            href="{{ route('promotional_campaign_cart.edit', $obj->id) }}">
+                                                            href="{{ route('promotional_campaign_prd.edit', $obj->id) }}">
                                                             編輯
                                                         </a>
                                                     @endif
@@ -215,7 +215,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.PromotionalCampaign.CART.detail')
+        @include('Backend.PromotionalCampaign.PRD.detail')
         <!-- /.modal -->
 
     </div>

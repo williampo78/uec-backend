@@ -16,6 +16,7 @@ class PromotionalCampaignCartController extends Controller
     private $role_service;
     private $supplier_service;
     private $products_service;
+    private const LEVEL_CODE = 'CART';
 
     public function __construct(
         PromotionalCampaignService $promotional_campaign_service,
@@ -50,15 +51,15 @@ class PromotionalCampaignCartController extends Controller
             'product_no',
         ]);
 
-        $query_data['level_code'] = 'CART';
+        $query_data['level_code'] = self::LEVEL_CODE;
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
-        // if (! $this->role_service->getOtherRoles()['auth_query'] || count($query_data) < 2) {
-        //     return view('Backend.PromotionalCampaign.CART.list');
-        // }
+        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_data) < 2) {
+            return view('Backend.PromotionalCampaign.CART.list');
+        }
 
         $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns($query_data);
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => 'CART']);
+        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => self::LEVEL_CODE]);
 
         // $promotional_campaigns = $promotional_campaigns->map(function ($obj, $key) {
         //     /*
@@ -84,7 +85,7 @@ class PromotionalCampaignCartController extends Controller
      */
     public function create()
     {
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => 'CART']);
+        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => self::LEVEL_CODE]);
         $suppliers = $this->supplier_service->getSuppliers();
 
         return view(
@@ -224,7 +225,7 @@ class PromotionalCampaignCartController extends Controller
 
         $promotional_campaign = $this->promotional_campaign_service->getPromotionalCampaigns([
             'id' => $promotional_campaign_id,
-            'level_code' => 'CART',
+            'level_code' => self::LEVEL_CODE,
         ])->first();
 
         if (isset($promotional_campaign->products)) {

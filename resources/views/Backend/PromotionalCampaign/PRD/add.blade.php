@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '滿額活動 編輯資料')
+@section('title', '單品活動 新增資料')
 
 @section('style')
     <style>
@@ -24,9 +24,8 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form role="form" id="update-form" method="post"
-                            action="{{ route('promotional_campaign_cart.update', $promotional_campaign->id) }}">
-                            @method('PUT')
+                        <form role="form" id="create-form" method="post"
+                            action="{{ route('promotional_campaign_prd.store') }}">
                             @csrf
 
                             <div class="row">
@@ -40,7 +39,7 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                @if ($share_role_auth['auth_update'])
+                                                @if ($share_role_auth['auth_create'])
                                                     <button class="btn btn-success" type="button" id="btn-save"><i
                                                             class="fa fa-save"></i> 儲存</button>
                                                 @endif
@@ -73,15 +72,15 @@
             }
 
             $('#btn-save').on('click', function() {
-                $("#update-form").submit();
+                $("#create-form").submit();
             });
 
             $('#btn-cancel').on('click', function() {
-                location.href = "{{ route('promotional_campaign_cart') }}";
+                location.href = "{{ route('promotional_campaign_prd') }}";
             });
 
             // 驗證表單
-            $("#update-form").validate({
+            $("#create-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
                     $('#btn-save').prop('disabled', true);
@@ -115,9 +114,9 @@
                     x_value: {
                         required: true,
                         min: function() {
-                            if ($('#campaign_type').val() == 'CART01') {
+                            if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
                                 return 0.01;
-                            } else if ($('#campaign_type').val() == 'CART02') {
+                            } else if (['PRD02', 'PRD04'].includes($('#campaign_type').val())) {
                                 return 1;
                             }
 
@@ -126,23 +125,39 @@
                         max: {
                             param: 0.99,
                             depends: function(element) {
-                                return $('#campaign_type').val() == 'CART01';
+                                if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
+                                    return true;
+                                }
+
+                                return false;
                             },
                         },
                         maxlength: {
                             param: 4,
                             depends: function(element) {
-                                return $('#campaign_type').val() == 'CART01';
+                                if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
+                                    return true;
+                                }
+
+                                return false;
                             },
                         },
                         digits: {
                             depends: function(element) {
-                                return $('#campaign_type').val() == 'CART02';
+                                if (['PRD02', 'PRD04'].includes($('#campaign_type').val())) {
+                                    return true;
+                                }
+
+                                return false;
                             },
                         },
                         number: {
                             depends: function(element) {
-                                return $('#campaign_type').val() == 'CART01';
+                                if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
+                                    return true;
+                                }
+
+                                return false;
                             },
                         },
                     },
@@ -181,6 +196,9 @@
                 },
             });
 
+            let campaign_types = @json($campaign_types);
+            renderCampaignType(campaign_types);
+
             let suppliers = @json($suppliers);
             renderPrdModalSupplier(suppliers);
             renderGiftModalSupplier(suppliers);
@@ -195,71 +213,10 @@
             $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
             $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
 
-            let promotional_campaign = @json($promotional_campaign);
-
-            $('#campaign_name').val(promotional_campaign.campaign_name);
-
-            if (promotional_campaign.active == 1) {
-                $('#active_enabled').prop('checked', true);
-            } else {
-                $('#active_disabled').prop('checked', true);
-            }
-
-            $('#campaign_type').empty().append(
-                `<option value="${promotional_campaign.campaign_type}">${promotional_campaign.description}</option>`
-            ).prop('disabled', true);
-            $('#n_value').val(promotional_campaign.n_value);
-            $('#x_value').val(promotional_campaign.x_value);
-            $('#start_at').val(promotional_campaign.start_at);
-            $('#end_at').val(promotional_campaign.end_at);
-
-            // 活動類型
-            switch (promotional_campaign.campaign_type) {
-                // ﹝滿額﹞購物車滿N元，打X折
-                case 'CART01':
-                    $('#prd-block').hide();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').show();
-                    break;
-                    // ﹝滿額﹞購物車滿N元，折X元
-                case 'CART02':
-                    $('#prd-block').hide();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').hide();
-                    break;
-                    // ﹝滿額﹞購物車滿N元，送贈品
-                case 'CART03':
-                    $('#prd-block').hide();
-                    $('#gift-block').show();
-                    $('#x_value').closest('.form-group').hide();
-                    break;
-                    // ﹝滿額﹞指定商品滿N件，送贈品
-                case 'CART04':
-                    $('#prd-block').show();
-                    $('#gift-block').show();
-                    $('#x_value').closest('.form-group').hide();
-                    break;
-            }
-
-            // 當下時間>=上架時間起，僅開放修改活動名稱、狀態、上架時間訖
-            if (new Date() >= new Date($('#start_at').val())) {
-                $('#n_value, #x_value, #start_at').prop('disabled', true);
-                $('#btn-new-prd, #btn-new-gift').prop('disabled', true).hide();
-                $('#prd-product-table > thead th:last, #gift-product-table > thead th:last').hide();
-            }
-
             init();
 
             var prd_modal_product_list = {}; // 單品modal清單中的商品
             var prd_product_list = {}; // 單品清單中的商品
-
-            if (promotional_campaign.products) {
-                $.each(promotional_campaign.products, function(id, product) {
-                    prd_product_list[id] = product;
-                });
-
-                renderPrdProductList(prd_product_list);
-            }
 
             // 新增單品
             $('#btn-new-prd').on('click', function() {
@@ -329,14 +286,6 @@
             var gift_modal_product_list = {}; // 贈品modal清單中的商品
             var gift_product_list = {}; // 贈品清單中的商品
 
-            if (promotional_campaign.giveaways) {
-                $.each(promotional_campaign.giveaways, function(id, product) {
-                    gift_product_list[id] = product;
-                });
-
-                renderGiftProductList(gift_product_list);
-            }
-
             // 新增贈品
             $('#btn-new-gift').on('click', function() {
                 $('#gift-modal').modal('show');
@@ -400,6 +349,71 @@
 
                     renderGiftModalProductList(gift_modal_product_list);
                 });
+            });
+
+            // 選擇活動類型
+            $('#campaign_type').on('change', function() {
+                switch ($(this).val()) {
+                    // ﹝單品﹞第N件(含)以上，打X折
+                    case 'PRD01':
+                        $('#prd-block').show();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').show();
+
+                        renderPrdModalProductType(product_types);
+                        $('#prd-modal-product-type').find('option[value="G"], option[value="A"]')
+                            .remove(); // 移除贈品、加購品
+                        $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
+                        break;
+                        // ﹝單品﹞第N件(含)以上，折X元
+                    case 'PRD02':
+                        $('#prd-block').show();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').hide();
+
+                        renderPrdModalProductType(product_types);
+                        $('#prd-modal-product-type').find('option[value="G"], option[value="A"]')
+                            .remove(); // 移除贈品、加購品
+                        $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
+                        break;
+                        // ﹝單品﹞滿N件，每件打X折
+                    case 'PRD03':
+                        $('#prd-block').show();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').show();
+
+                        renderPrdModalProductType(product_types);
+                        $('#prd-modal-product-type').find('option[value="G"], option[value="A"]')
+                            .remove(); // 移除贈品、加購品
+                        $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
+                        break;
+                        // ﹝單品﹞滿N件，每件折X元
+                    case 'PRD04':
+                        $('#prd-block').show();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').hide();
+
+                        renderPrdModalProductType(product_types);
+                        $('#prd-modal-product-type').find('option[value="G"], option[value="A"]')
+                            .remove(); // 移除贈品、加購品
+                        $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
+                        break;
+                        // ﹝單品﹞滿N件，送贈品
+                    case 'PRD05':
+                        $('#prd-block').show();
+                        $('#gift-block').show();
+                        $('#x_value').closest('.form-group').hide();
+
+                        renderPrdModalProductType(product_types);
+                        $('#prd-modal-product-type option[value="A"]').remove(); // 移除加購品
+                        $('#prd-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
+                        break;
+                    default:
+                        $('#prd-block').hide();
+                        $('#gift-block').hide();
+                        $('#x_value').closest('.form-group').show().find('div:last').show();
+                        break;
+                }
             });
         });
     </script>
