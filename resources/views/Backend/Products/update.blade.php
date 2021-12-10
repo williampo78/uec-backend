@@ -916,8 +916,8 @@
             </div>
         </div>
         {{-- 二維多規格結束 --}}
-        <button class="btn btn-large btn-primary" type="submit">儲存</button>
-        </form>
+        <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
+    </form>
     </div>
 </div>
 </div>
@@ -1325,6 +1325,98 @@
             theme: "bootstrap",
             placeholder: "請選擇"
         });
+        $("#save_data").click(function() {
+          
+          $(".safty_qty_va").each(function(){
+              $(this).rules("add", {
+                  required: true,
+                  digits: true,
+              });
+          })
+          $(".spec_1_va").each(function(){
+              $(this).rules("add", {
+                  required: true,
+              });
+          })
+          $(".spec_2_va").each(function(){
+              $(this).rules("add", {
+                  required: true,
+              });
+          })
+          $("#new-form").submit();
+      })
+      $("#new-form").validate({
+          debug: true,
+          submitHandler: function(form) {
+              // $('#btn-save').prop('disabled', true);
+              // form.submit();
+          },
+          rules: {
+              product_name: {
+                  required: true,
+              },
+              supplier_id: {
+                  required: true,
+              },
+              tax_type: {
+                  required: true,
+              },
+              category_id: {
+                  required: true,
+              },
+              brand_id: {
+                  required: true,
+              },
+              uom: {
+                  required: true,
+              },
+              //長
+              length: {
+                  required: true,
+                  digits: true,
+              },
+              width: {
+                  required: true,
+                  digits: true,
+              },
+              height: {
+                  required: true,
+                  digits: true,
+              },
+              list_price: {
+                  required: true,
+                  digits: true,
+              },
+              selling_price: {
+                  required: true,
+                  digits: true,
+              }
+          },
+          errorClass: "help-block",
+          errorElement: "span",
+          errorPlacement: function(error, element) {
+              if (element.parent('.input-group').length || element.is(':radio')) {
+                  error.insertAfter(element.parent());
+                  return;
+              }
+
+              if (element.is('select')) {
+                  element.parent().append(error);
+                  return;
+              }
+
+              error.insertAfter(element);
+          },
+          highlight: function(element, errorClass, validClass) {
+              $(element).closest(".form-group").addClass("has-error");
+          },
+          // unhighlight: function(element, errorClass, validClass) {
+          //     $(element).closest(".form-group").removeClass("has-error");
+          // },
+          success: function(label, element) {
+              $(element).closest(".form-group").removeClass("has-error");
+          },
+      });
     });
 </script>
 @endsection

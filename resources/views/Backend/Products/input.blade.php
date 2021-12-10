@@ -1094,11 +1094,6 @@
                         required: true,
                     });
                 })
-                // $(".spec_va").each(function(){
-                //     $(this).rules("add", {
-                //     required: true,
-                // });
-
                 $("#new-form").submit();
             })
             $("#new-form").validate({
