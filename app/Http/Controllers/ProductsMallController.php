@@ -13,8 +13,7 @@ class ProductsMallController extends Controller
      */
     public function index()
     {
-        //
-        echo 'TEST' ; 
+        return view('Backend.ProductsMall.list');
     }
 
     /**
@@ -24,7 +23,7 @@ class ProductsMallController extends Controller
      */
     public function create()
     {
-        //
+        return view('Backend.ProductsMall.input');
     }
 
     /**

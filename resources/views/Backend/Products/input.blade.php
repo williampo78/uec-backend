@@ -35,44 +35,6 @@
             margin: auto;
         }
 
-        .theme-color {
-            color: #138cde;
-        }
-
-        .sysinfo-title {
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .sysinfo {
-            position: fixed;
-            top: 15vh;
-            right: 20px;
-            z-index: 20;
-        }
-
-        .sysinfo ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .sysinfo-content {
-            margin: 0;
-        }
-
-        .sysinfo-li {
-            padding: 10px 15px;
-            border-left: solid 4px #aaaaaa;
-            color: #aaaaaa;
-            line-height: 1.3;
-            cursor: pointer;
-        }
-
-        .sysinfo-activie {
-            color: #138cde;
-            border-left: solid 4px #138cde;
-        }
 
     </style>
     <div class="sysinfo">
