@@ -129,10 +129,10 @@
                 <label class="control-label">安全庫存量</label>
             </div>
             <div class="col-sm-8">
-                <input class="form-control" name="keyword" id="keyword" value="">
+                <input class="form-control" name="safty_qty_all" id="keyword" v-model="safty_qty_all" >
             </div>
             <div class="cola-sm-2">
-                <button class="btn btn-primary btn-sm" type="button">套用</button>
+                <button class="btn btn-primary btn-sm" type="button" @click="change_safty_qty_all">套用</button>
             </div>
         </div>
     </div>
