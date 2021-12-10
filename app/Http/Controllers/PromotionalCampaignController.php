@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use App\Services\ProductsService;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class PromotionalCampaignController extends Controller
 {
@@ -17,9 +15,9 @@ class PromotionalCampaignController extends Controller
      */
     public function getProducts(Request $request)
     {
-        $product_service = new ProductsService;
+        $products_service = new ProductsService;
         $input_data = $request->input();
-        $products = $product_service->getProducts($input_data);
+        $products = $products_service->getProducts($input_data);
 
         if (!empty($input_data['exist_products'])) {
             // 過濾已存在的商品
@@ -28,50 +26,19 @@ class PromotionalCampaignController extends Controller
             });
         }
 
-        $products = $products->mapWithKeys(function ($obj, $key) {
-            // 上架日期
-            $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
+        $products_service->restructureProducts($products);
 
-            // 售價
-            $obj->selling_price = number_format($obj->selling_price);
-
-            // 上架狀態
-            switch ($obj->approval_status) {
-                case 'NA':
-                    $obj->launched_status = '未設定';
-                    break;
-
-                case 'REVIEWING':
-                    $obj->launched_status = '上架申請';
-                    break;
-
-                case 'REJECTED':
-                    $obj->launched_status = '上架駁回';
-                    break;
-
-                case 'CANCELLED':
-                    $obj->launched_status = '商品下架';
-                    break;
-
-                case 'APPROVED':
-                    $obj->launched_status = Carbon::now()->between($obj->start_launched_at, $obj->end_launched_at) ? '商品上架' : '商品下架';
-                    break;
-            }
-
-            // 毛利
-            $obj->gross_margin = 10;
-
+        $products = $products->mapWithKeys(function ($product) {
             return [
-                $obj->id => $obj->only([
+                $product->id => $product->only([
                     'launched_at',
-                    'id',
                     'product_name',
                     'product_no',
                     'selling_price',
                     'supplier_name',
                     'launched_status',
                     'gross_margin',
-                ])
+                ]),
             ];
         });
 

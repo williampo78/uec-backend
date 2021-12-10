@@ -111,10 +111,11 @@
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="category_hierarchy_content_input">
                 <form class="form-horizontal" role="form" id="new-form" method="POST"
-                    action="{{ route('products.store') }}" enctype="multipart/form-data" novalidaten="ovalidate">
+                    action="{{ route('products.update', $products->id) }}" enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
+                    @method('PUT')
                     <div id="page-1">
-
+                        <input name="id" value="{{$products->id}}" style="display: none">
                         <div class="row form-group">
                             <div class="col-sm-6">
                                 <div class="col-sm-2 no-pa">
@@ -305,20 +306,20 @@
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="has_expiry_date" value="0"
-                                            {{ $products->expiry_days == '0' ? 'checked' : 'disabled' }}> 無
+                                            {{ $products->has_expiry_date == '0' ? 'checked' : 'disabled' }}> 無
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="has_expiry_date" value="1"
-                                            {{ $products->expiry_days == '1' ? 'checked' : 'disabled' }}>
+                                            {{ $products->has_expiry_date == '1' ? 'checked' : 'disabled' }}>
                                         有，天數
                                     </label>
                                 </div>
                                 {{-- 效期控管的天數 --}}
                                 <div class="col-sm-3">
                                     <input class="form-control" name="expiry_days"
-                                        value=" {{ $products->expiry_days }}" disabled>
+                                        value=" {{ $products->expiry_days }}" {{ $products->has_expiry_date == '1' ? 'checked' : 'readonly' }}>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -327,7 +328,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="number" class="form-control" name="expiry_receiving_days" min="0"
-                                        value="{{ $products->expiry_receiving_days }}" disabled>
+                                        value="{{ $products->expiry_receiving_days }}" readonly>
                                 </div>
                             </div>
                         </div>
@@ -601,10 +602,10 @@
                                     <div class="col-sm-10">
                                         <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                         <input type="file" @change="fileSelected" multiple>
-                                        <input  type="file" :ref="'images_files'" name="filedata[]"
+                                        <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                             multiple>
                                     </div>
-                                    <textarea name="imgJson" id="" cols="30" rows="10">@{{images}}</textarea>
+                                    <textarea style="display: none" name="imgJson" id="" cols="30" rows="10">@{{images}}</textarea>
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -638,6 +639,7 @@
                     <hr>
                     <div id="page-2">
                         <div id="SkuComponent">
+                            <textarea style="display: none" name="SpecListJson" id="" cols="30" rows="10">@{{SpecList}}</textarea>
                             <div class="row form-group">
                                 <div class="col-sm-12">
                                     <div class="col-sm-2 ">
@@ -703,64 +705,80 @@
                                 <div class="col-sm-6" v-if="products.spec_dimension >= 1">
                                     <table class="table table-striped table-bordered table-hover">
                                         <thead>
-                                            {{-- <tr>
+                                            <tr>
                                                 <th>
                                                     <button class="btn btn-primary btn-sm" type="button" @click="AddSpecToSkuList('1')">新增項目
                                                     </button>
                                                 </th>
-                                            </tr> --}}
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($spac_list['spac_1'] as $val)
-                                                <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
-                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                    draggable="true" :data-index="spec_1_key" :data-type="'spec_1'">
-                                                    <td>
-                                                        <div class="col-sm-1">
-                                                            <label class="control-label"><i style="font-size: 20px;"
-                                                                    class="fa fa-list"></i></label>
-                                                        </div>
-                                                        <div class="col-sm-9">
-                                                            <input class="form-control"
-                                                                value="{{ $val->spec_1_value }}" disabled>
-                                                        </div>
-                                                        <div class="col-sm-2">
-                                                            {{-- <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button> --}}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-
+                                            <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag" @dragover='dragover'
+                                            @dragleave='dragleave' @drop="drop" draggable="true" :data-index="spec_1_key"
+                                            :data-type="'spec_1'">
+                                            <td>
+                                                <div class="col-sm-1">
+                                                    <label class="control-label"><i style="font-size: 20px;"
+                                                            class="fa fa-list"></i></label>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <div v-if="spec_1.old_spec">
+                                                        <input class="form-control" v-model="spec_1.name" disabled>
+                                                    </div>
+                                                    <div v-else>
+                                                        <input class="form-control" v-model="spec_1.name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <div v-if="spec_1.old_spec">
+                                                      
+                                                    </div>
+                                                    <div v-else>
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="col-sm-6" v-if="products.spec_dimension == 2">
+                                <div class="col-sm-6" v-if="products.spec_dimension == '2'">
                                     <table class="table table-striped table-bordered table-hover">
                                         <thead>
-
+                                            <tr>
+                                                <th>
+                                                    <button class="btn btn-primary btn-sm" type="button" @click="AddSpecToSkuList('2')">新增項目
+                                                    </button>
+                                                </th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($spac_list['spac_2'] as $val)
-                                                <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
-                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                    draggable="true" :data-index="spec_2_key" :data-type="'spec_2'">
-                                                    <td>
-                                                        <div class="col-sm-1">
-                                                            <label class="control-label"><i style="font-size: 20px;"
-                                                                    class="fa fa-list"></i></label>
-                                                        </div>
-                                                        <div class="col-sm-9">
-                                                            <input class="form-control"
-                                                                value="{{ $val->spec_1_value }}" disabled>
-                                                        </div>
-                                                        <div class="col-sm-2">
-                                                            {{-- <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button> --}}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
+                                            <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag" @dragover='dragover'
+                                            @dragleave='dragleave' @drop="drop" draggable="true" :data-index="spec_2_key"
+                                            :data-type="'spec_2'">
+                                            <td>
+                                                <div class="col-sm-1">
+                                                    <label class="control-label"><i style="font-size: 20px;"class="fa fa-list"></i></label>
+                                                </div>
+                                                <div class="col-sm-9">
+                                                    <div v-if="spec_2.old_spec">
+                                                        <input class="form-control" v-model="spec_2.name" disabled>
+                                                    </div>
+                                                    <div v-else>
+                                                        <input class="form-control" v-model="spec_2.name">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2" >
+                                                    <div v-if="spec_2.old_spec"></div>
+                                                    <div v-else>
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)" >刪除</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -778,7 +796,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <textarea style="display: none" name="SkuListdata" cols="30"
+                            <textarea style="display: none" style="display: none" name="SkuListdata" cols="30"
                                 rows="10">@{{ SkuList }}</textarea>
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
@@ -836,17 +854,29 @@
                         spec_1: '',
                         spec_2: '',
                     },
-                    SpecList: {
-                        spec_1: [],
-                        spec_2: [],
-                    },
+                    SpecList: [],
                     SkuList: @json($products_item),
                     products: @json($products),
+                    product_spec_info:@json($product_spec_info),
                     safty_qty_all:0 ,
                 }
             },
             mounted () {
-                   console.log(this.products) ; 
+            },
+            created () {
+                let spec_value_list = JSON.parse(this.product_spec_info.spec_value_list) ;
+                let item_list       = JSON.parse(this.product_spec_info.item_list) ;
+
+                spec_value_list.spec_1.map(function(value, key) {
+                        value.old_spec = 1 ; 
+                });
+                spec_value_list.spec_2.map(function(value, key) {
+                        value.old_spec = 1 ; 
+                });
+
+                this.SpecList = spec_value_list ;
+                this.SkuList = item_list ;
+
             },
             methods: {
                 change_safty_qty_all(){

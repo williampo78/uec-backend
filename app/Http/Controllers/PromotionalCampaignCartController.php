@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use Illuminate\Http\Request;
+use App\Services\LookupValuesVService;
+use App\Services\ProductsService;
+use App\Services\PromotionalCampaignService;
 use App\Services\RoleService;
 use App\Services\SupplierService;
-use App\Services\LookupValuesVService;
-use App\Services\PromotionalCampaignService;
+use Illuminate\Http\Request;
 
 class PromotionalCampaignCartController extends Controller
 {
@@ -15,17 +15,20 @@ class PromotionalCampaignCartController extends Controller
     private $lookup_values_v_service;
     private $role_service;
     private $supplier_service;
+    private $products_service;
 
     public function __construct(
         PromotionalCampaignService $promotional_campaign_service,
         LookupValuesVService $lookup_values_v_service,
         RoleService $role_service,
-        SupplierService $supplier_service
-    ){
+        SupplierService $supplier_service,
+        ProductsService $products_service
+    ) {
         $this->promotional_campaign_service = $promotional_campaign_service;
         $this->lookup_values_v_service = $lookup_values_v_service;
         $this->role_service = $role_service;
         $this->supplier_service = $supplier_service;
+        $this->products_service = $products_service;
     }
 
     /**
@@ -100,7 +103,7 @@ class PromotionalCampaignCartController extends Controller
     {
         $input_data = $request->except('_token');
 
-        if (! $this->promotional_campaign_service->addPromotionalCampaign($input_data)) {
+        if (!$this->promotional_campaign_service->addPromotionalCampaign($input_data)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
@@ -127,12 +130,56 @@ class PromotionalCampaignCartController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        //
+        $promotional_campaign = $this->promotional_campaign_service->getPromotionalCampaigns([
+            'id' => $id,
+            'level_code' => 'CART',
+        ])->first();
+        $suppliers = $this->supplier_service->getSuppliers();
+
+        if (isset($promotional_campaign->products)) {
+            $this->products_service->restructureProducts($promotional_campaign->products);
+            $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
+                return [
+                    $product->product_id => $product->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                    ]),
+                ];
+            });
+        }
+
+        if (isset($promotional_campaign->giveaways)) {
+            $this->products_service->restructureProducts($promotional_campaign->giveaways);
+            $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
+                return [
+                    $giveaway->product_id => $giveaway->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                        'assigned_qty',
+                    ]),
+                ];
+            });
+        }
+
+        return view(
+            'Backend.PromotionalCampaign.CART.update',
+            compact('promotional_campaign', 'suppliers')
+        );
     }
 
     /**
@@ -144,7 +191,20 @@ class PromotionalCampaignCartController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input_data = $request->except('_token', '_method');
+        $input_data['promotional_campaign_id'] = $id;
+
+        if (!$this->promotional_campaign_service->updatePromotionalCampaign($input_data)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        $route_name = 'promotional_campaign_cart';
+        $act = 'upd';
+
+        return view(
+            'Backend.success',
+            compact('route_name', 'act')
+        );
     }
 
     /**
@@ -156,5 +216,52 @@ class PromotionalCampaignCartController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getDetail(Request $request)
+    {
+        $promotional_campaign_id = $request->input('promotional_campaign_id');
+
+        $promotional_campaign = $this->promotional_campaign_service->getPromotionalCampaigns([
+            'id' => $promotional_campaign_id,
+            'level_code' => 'CART',
+        ])->first();
+
+        if (isset($promotional_campaign->products)) {
+            $this->products_service->restructureProducts($promotional_campaign->products);
+            $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
+                return [
+                    $product->product_id => $product->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                    ]),
+                ];
+            });
+        }
+
+        if (isset($promotional_campaign->giveaways)) {
+            $this->products_service->restructureProducts($promotional_campaign->giveaways);
+            $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
+                return [
+                    $giveaway->product_id => $giveaway->only([
+                        'launched_at',
+                        'product_name',
+                        'product_no',
+                        'selling_price',
+                        'supplier_name',
+                        'launched_status',
+                        'gross_margin',
+                        'assigned_qty',
+                    ]),
+                ];
+            });
+        }
+
+        return response()->json($promotional_campaign);
     }
 }

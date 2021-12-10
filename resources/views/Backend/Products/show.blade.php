@@ -301,13 +301,13 @@
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="has_expiry_date" value="0"
-                                            {{ $products->expiry_days == '0' ? 'checked' : 'disabled' }}> 無
+                                            {{ $products->has_expiry_date == '0' ? 'checked' : 'disabled' }}> 無
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="has_expiry_date" value="1"
-                                            {{ $products->expiry_days == '1' ? 'checked' : 'disabled' }}>
+                                            {{ $products->has_expiry_date == '1' ? 'checked' : 'disabled' }}>
                                         有，天數
                                     </label>
                                 </div>

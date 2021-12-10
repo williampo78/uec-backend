@@ -120,7 +120,7 @@ class AdvertisementBlockController extends Controller
         //
     }
 
-    public function getDetailByAjax(Request $request)
+    public function getDetail(Request $request)
     {
         $slot_id = $request->input('slot_id');
 
