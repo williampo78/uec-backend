@@ -31,18 +31,18 @@
                             <div class="row">
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
-                                    @include('Backend.PromotionalCampaign.CART.campaign_block')
-                                    @include('Backend.PromotionalCampaign.CART.applicable_target_block')
-                                    @include('Backend.PromotionalCampaign.CART.prd_block')
-                                    @include('Backend.PromotionalCampaign.CART.gift_block')
+                                    @include('Backend.PromotionalCampaign.campaign_block')
+                                    @include('Backend.PromotionalCampaign.applicable_target_block')
+                                    @include('Backend.PromotionalCampaign.prd_block')
+                                    @include('Backend.PromotionalCampaign.gift_block')
 
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                {{-- @if ($share_role_auth['auth_create']) --}}
-                                                <button class="btn btn-success" type="button" id="btn-save"><i
-                                                        class="fa fa-save"></i> 儲存</button>
-                                                {{-- @endif --}}
+                                                @if ($share_role_auth['auth_create'])
+                                                    <button class="btn btn-success" type="button" id="btn-save"><i
+                                                            class="fa fa-save"></i> 儲存</button>
+                                                @endif
                                                 <button class="btn btn-danger" type="button" id="btn-cancel"><i
                                                         class="fa fa-ban"></i> 取消</button>
                                             </div>
@@ -57,8 +57,8 @@
         </div>
     </div>
 
-    @include('Backend.PromotionalCampaign.CART.prd_modal')
-    @include('Backend.PromotionalCampaign.CART.gift_modal')
+    @include('Backend.PromotionalCampaign.prd_modal')
+    @include('Backend.PromotionalCampaign.gift_modal')
 @endsection
 
 @section('js')
@@ -181,14 +181,23 @@
             });
 
             let campaign_types = @json($campaign_types);
-            let suppliers = @json($suppliers);
-            let product_type_option = @json(config('uec.product_type_option'));
+            renderCampaignType(campaign_types);
 
-            init({
-                'campaign_types': campaign_types,
-                'suppliers': suppliers,
-                'product_type_option': product_type_option,
-            });
+            let suppliers = @json($suppliers);
+            renderPrdModalSupplier(suppliers);
+            renderGiftModalSupplier(suppliers);
+
+            let product_types = @json(config('uec.product_type_option'));
+            renderPrdModalProductType(product_types);
+            renderGiftModalProductType(product_types);
+
+            $('#prd-modal-product-type option[value="A"]').remove(); // 移除加購品
+            $('#prd-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
+
+            $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
+            $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
+
+            init();
 
             var prd_modal_product_list = {}; // 單品modal清單中的商品
             var prd_product_list = {}; // 單品清單中的商品

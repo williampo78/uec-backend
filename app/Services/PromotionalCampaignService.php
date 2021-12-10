@@ -197,6 +197,12 @@ class PromotionalCampaignService
      * ﹝滿額﹞購物車滿N元，送贈品 => CART03
      * ﹝滿額﹞指定商品滿N件，送贈品 => CART04
      *
+     * ﹝單品﹞第N件(含)以上，打X折 => PRD01
+     * ﹝單品﹞第N件(含)以上，折X元 => PRD02
+     * ﹝單品﹞滿N件，每件打X折 => PRD03
+     * ﹝單品﹞滿N件，每件折X元 => PRD04
+     * ﹝單品﹞滿N件，送贈品 => PRD05
+     *
      * @param array $input_data
      * @return boolean
      */
@@ -237,14 +243,14 @@ class PromotionalCampaignService
             $create_data['promotional_label'] = $campaign_type->udf_02;
 
             // 折扣
-            if ($create_data['campaign_type'] == 'CART01' || $create_data['campaign_type'] == 'CART02') {
+            if (in_array($create_data['campaign_type'], ['CART01', 'CART02', 'PRD01', 'PRD02', 'PRD03', 'PRD04'])) {
                 $create_data['x_value'] = $input_data['x_value'] ?? null;
             }
 
             $promotional_campaign_id = PromotionalCampaigns::insertGetId($create_data);
 
             // 新增單品
-            if ($create_data['campaign_type'] == 'CART04') {
+            if (in_array($create_data['campaign_type'], ['CART04', 'PRD01', 'PRD02', 'PRD03', 'PRD04', 'PRD05'])) {
                 if (isset($input_data['prd_block_id'])) {
                     foreach ($input_data['prd_block_id'] as $key => $value) {
                         $create_prd_data = [];
@@ -262,7 +268,7 @@ class PromotionalCampaignService
             }
 
             // 新增贈品
-            if ($create_data['campaign_type'] == 'CART03' || $create_data['campaign_type'] == 'CART04') {
+            if (in_array($create_data['campaign_type'], ['CART03', 'CART04', 'PRD05'])) {
                 if (isset($input_data['gift_block_id'])) {
                     foreach ($input_data['gift_block_id'] as $key => $value) {
                         $create_gift_data = [];
@@ -299,6 +305,12 @@ class PromotionalCampaignService
      * ﹝滿額﹞購物車滿N元，折X元 => CART02
      * ﹝滿額﹞購物車滿N元，送贈品 => CART03
      * ﹝滿額﹞指定商品滿N件，送贈品 => CART04
+     *
+     * ﹝單品﹞第N件(含)以上，打X折 => PRD01
+     * ﹝單品﹞第N件(含)以上，折X元 => PRD02
+     * ﹝單品﹞滿N件，每件打X折 => PRD03
+     * ﹝單品﹞滿N件，每件折X元 => PRD04
+     * ﹝單品﹞滿N件，送贈品 => PRD05
      *
      * @param array $input_data
      * @return boolean
@@ -362,7 +374,7 @@ class PromotionalCampaignService
             PromotionalCampaigns::findOrFail($promotional_campaign->id)->update($update_data);
 
             // 處理單品
-            if ($promotional_campaign->campaign_type == 'CART04') {
+            if (in_array($promotional_campaign->campaign_type, ['CART04', 'PRD01', 'PRD02', 'PRD03', 'PRD04', 'PRD05'])) {
                 if (isset($input_data['prd_block_id'])) {
                     $new_ids = array_keys($input_data['prd_block_id']);
                     $old_ids = [];
@@ -416,7 +428,7 @@ class PromotionalCampaignService
             }
 
             // 處理贈品
-            if ($promotional_campaign->campaign_type == 'CART03' || $promotional_campaign->campaign_type == 'CART04') {
+            if (in_array($promotional_campaign->campaign_type, ['CART03', 'CART04', 'PRD05'])) {
                 if (isset($input_data['gift_block_id'])) {
                     $new_ids = array_keys($input_data['gift_block_id']);
                     $old_ids = [];
