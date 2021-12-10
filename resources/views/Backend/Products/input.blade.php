@@ -2,9 +2,9 @@
 @section('title', '商品主檔 - 新增基本資訊')
 @section('content')
     <style>
-        .no-pa {
-            padding: 0px;
-        }
+        /* .no-pa {
+                                                                                                                                                            padding: 0px;
+                                                                                                                                                        } */
 
         .ondragover {
             background: #b7e0fb !important;
@@ -112,452 +112,535 @@
                     @csrf
                     <div id="page-1">
 
-                        <div class="row form-group">
+                        <div class="row ">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">庫存類型</label><span class="redtext">*</span>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="stock_type" value="A" checked> 買斷
-                                        [A]
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="stock_type" value="B"> 寄售
-                                        [B]
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="stock_type" value="T">
-                                        轉單[T]
-                                    </label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">庫存類型</label><span class="redtext">*</span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="stock_type" value="A" checked> 買斷
+                                            [A]
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="stock_type" value="B"> 寄售
+                                            [B]
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="stock_type" value="T">
+                                            轉單[T]
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label ">商品序號</label><span class="redtext">*</span>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label ">商品序號</label><span class="redtext">*</span>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="product_no" readonly>
+                                    </div>
                                 </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="product_no" readonly>
-                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class=" form-group">
 
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">供應商<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <select class="form-control supplier_id" name="supplier_id">
-                                        @foreach ($supplier as $val)
-                                            <option value="{{ $val->id }}">{{ $val->name }}</option>
-                                        @endforeach
-                                    </select>
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">供應商<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select class="form-control supplier_id" name="supplier_id">
+                                            @foreach ($supplier as $val)
+                                                <option value="{{ $val->id }}">{{ $val->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">商品名稱<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="product_name" value="">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">課稅別<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <select class="form-control tax_type" name="tax_type">
-                                        <option value="TAXABLE">應稅(5%)</option>
-                                        <option value="NON_TAXABLE">免稅</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">POS分類<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <select class="form-control category_id" name="category_id">
-                                        @foreach ($pos as $key => $val)
-                                            <option value="{{ $val->id }}"> {{ $val->name }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class=" form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">商品名稱<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="product_name" value="">
+                                        {{-- <span class="">123</span> --}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">品牌<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <select class="form-control brand_id" name="brand_id" id="brand_id">
-                                        @foreach ($brands as $val)
-                                            <option value="{{ $val->id }}">{{ $val->brand_name }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">課稅別<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select class="form-control tax_type" name="tax_type">
+                                            <option value="TAXABLE">應稅(5%)</option>
+                                            <option value="NON_TAXABLE">免稅</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">商品型號</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="model" value="">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">商品通路<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="selling_channel" value="EC" checked> 網路獨賣
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">溫層<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="lgst_temperature" value="NORMAL" checked> 常溫
-                                    </label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">POS分類<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select class="form-control category_id" name="category_id">
+                                            @foreach ($pos as $key => $val)
+                                                <option value="{{ $val->id }}"> {{ $val->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">配送方式<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="lgst_method" value="HOME" checked> 宅配
-                                    </label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">品牌<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select class="form-control brand_id" name="brand_id" id="brand_id">
+                                            @foreach ($brands as $val)
+                                                <option value="{{ $val->id }}">{{ $val->brand_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">商品交期<span class="redtext">*</span></label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">商品型號</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="model" value="">
+                                    </div>
                                 </div>
-                                <div class="col-sm-9">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="delivery_type" value="IN_STOCK" checked> 現貨
-                                    </label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">商品通路<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="selling_channel" value="EC" checked> 網路獨賣
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">溫層<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="lgst_temperature" value="NORMAL" checked> 常溫
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="row form-group">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">單位<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="uom">
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">最小採購量</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="min_purchase_qty" type="number" min="0" value="0">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">效期控管<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="has_expiry_date" value="0" checked> 無
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="has_expiry_date" value="1">
-                                        有，天數
-                                    </label>
-                                </div>
-                                {{-- 效期控管的天數 --}}
-                                <div class="col-sm-3">
-                                    <input class="form-control" name="expiry_days" value="0">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">配送方式<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="lgst_method" value="HOME" checked> 宅配
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">允收期(天)</label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <input type="number" class="form-control" name="expiry_receiving_days" min="0"
-                                        value="0">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">商品交期<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="delivery_type" value="IN_STOCK" checked> 現貨
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">商品類型<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-3 ">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="product_type" value="N" checked> 一般品
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="product_type" value="G"> 贈品
-                                    </label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="product_type" value="A"> 加購品
-                                    </label>
+                                <div class="form-group">
+                                    <div class="col-sm-2">
+                                        <label class="control-label">單位<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="uom">
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">停售<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="is_discontinued" id="inlineRadio1" value="1"> 是
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="is_discontinued" id="inlineRadio3" value="0" checked> 否
-                                    </label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">最小採購量</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="min_purchase_qty" type="number" min="0"
+                                            value="0">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">材積(公分) <span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-1">
-                                    <label class="control-label">長</label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <input class="form-control" name="length" type="number" min="0" value="0">
-                                </div>
-                                <div class="col-sm-1">
-                                    <label class="control-label">寬</label>
-                                </div>
-                                <div class="col-sm-2 ">
-                                    <input class="form-control" name="width" type="number" min="0" value="0">
-                                </div>
-                                <div class="col-sm-1">
-                                    <label class="control-label">高</label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <input class="form-control" name="height" type="number" min="0" value="0">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">效期控管<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="has_expiry_date" value="0" checked> 無
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="has_expiry_date" value="1">
+                                            有，天數
+                                        </label>
+                                    </div>
+                                    {{-- 效期控管的天數 --}}
+                                    <div class="col-sm-3">
+                                        <input class="form-control" name="expiry_days" value="0">
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">重量(公克)<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-3">
-                                    <input class="form-control" name="weight" type="number" min="0" value="0">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">市價(含稅)<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="list_price" type="number" min="0" value="0">
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">售價(含稅)<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="selling_price" type="number" min="0" value="0">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">允收期(天)</label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <input type="number" class="form-control" name="expiry_receiving_days" min="0"
+                                            value="0">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">成本(含稅)</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="" value="" readonly>
+                                <div class="form-group">
+
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">商品類型<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-3 ">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="product_type" value="N" checked> 一般品
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="product_type" value="G"> 贈品
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="product_type" value="A"> 加購品
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">毛利(%)</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="" value="" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">採購人員</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">轉單審核人員</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">建檔人員</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">建檔時間</label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">停售<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_discontinued" id="inlineRadio1" value="1"> 是
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_discontinued" id="inlineRadio3" value="0" checked>
+                                            否
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">修改人員</label>
-                                </div>
-                                <div class="col-sm-7">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
-                                </div>
-                                <div class="col-sm-3">
-                                    <label class="control-label">
-                                        <a href="#">修改紀錄</a>
-                                    </label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">材積(公分) <span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <label class="control-label">長</label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input class="form-control" name="length" type="number" min="0" value="0">
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <label class="control-label">寬</label>
+                                    </div>
+                                    <div class="col-sm-2 ">
+                                        <input class="form-control" name="width" type="number" min="0" value="0">
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <label class="control-label">高</label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input class="form-control" name="height" type="number" min="0" value="0">
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">修改時間</label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">重量(公克)<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" name="weight" type="number" min="0" value="0">
+                                    </div>
                                 </div>
-                                <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">市價(含稅)<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="list_price" type="number" min="0" value="0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">售價(含稅)<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="selling_price" type="number" min="0" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">成本(含稅)</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="" value="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">毛利(%)</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="" value="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">採購人員</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">轉單審核人員</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">建檔人員</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">建檔時間</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">修改人員</label>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="control-label">
+                                            <a href="#">修改紀錄</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">修改時間</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <hr>
                         {{-- 商品描述 START --}}
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-12 ">
-                                <div class="col-sm-1 no-pa">
-                                    <label class="control-label">商品簡述</label>
-                                </div>
-                                <div class="col-sm-10">
-                                    <input class="form-control" name="product_brief_1">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-12">
-                                <div class="col-sm-1 no-pa">
-                                </div>
-                                <div class="col-sm-10">
-                                    <input class="form-control" name="product_brief_2">
+                                <div class="form-group">
+                                    <div class="col-sm-1 ">
+                                        <label class="control-label">商品簡述</label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" name="product_brief_1">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-12">
-                                <div class="col-sm-1 no-pa">
+                                <div class="form-group">
+                                    <div class="col-sm-1 ">
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" name="product_brief_2">
+                                    </div>
                                 </div>
-                                <div class="col-sm-10">
-                                    <input class="form-control" name="product_brief_3">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1 ">
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" name="product_brief_3">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         {{-- 商品描述 END --}}
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-12">
-                                <div class="col-sm-1 no-pa">
-                                    <label class="control-label">專利字號</label>
-                                </div>
-                                <div class="col-sm-10">
-                                    <input class="form-control" name="patent_no" value="">
+                                <div class="form-group">
+                                    <div class="col-sm-1 ">
+                                        <label class="control-label">專利字號</label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" name="patent_no" value="">
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-12">
-                                <div class="col-sm-1 no-pa">
-                                    <label class="control-label">保固期限<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-1">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="is_with_warranty" value="0" checked> 無
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="is_with_warranty" value="1">
-                                        有保固，天數
-                                    </label>
-                                </div>
-                                <div class="col-sm-1 no-pa">
-                                    <input class="form-control" name="warranty_days">
+                                <div class="form-group">
+
+                                    <div class="col-sm-1 ">
+                                        <label class="control-label">保固期限<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_with_warranty" value="0" checked> 無
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_with_warranty" value="1">
+                                            有保固，天數
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-1 ">
+                                        <input class="form-control" name="warranty_days">
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row form-group">
+                        <div class="row">
                             <div class="col-sm-12">
-                                <div class="col-sm-1 no-pa">
-                                    <label class="control-label">保固範圍</label>
-                                </div>
-                                <div class="col-sm-11">
-                                    <textarea class="form-control" rows="10" cols="10" name="warranty_scope"></textarea>
+                                <div class="form-group">
+                                    <div class="col-sm-1 ">
+                                        <label class="control-label">保固範圍</label>
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <textarea class="form-control" rows="10" cols="10"
+                                            name="warranty_scope"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div id="ImageUploadBox">
-                            <div class="row form-group">
+                            <div class="row">
                                 <div class="col-sm-12">
-                                    <div class="col-sm-1 no-pa">
-                                        <label class="control-label">商品圖檔</label>
-                                    </div>
-                                    <div class="col-sm-10">
-                                        <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                        <input type="file" @change="fileSelected" multiple>
-                                        <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
-                                            multiple>
+                                    <div class="form-group">
+
+                                        <div class="col-sm-1 ">
+                                            <label class="control-label">商品圖檔</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
+                                            <input type="file" @change="fileSelected" multiple>
+                                            <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
+                                                multiple>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -637,6 +720,11 @@
                             sort: this.SpecList.spec_1.length,
                             only_key: Math.random().toString(36).substring(8),
                         });
+                        // .rules("add", {
+                        // required: true,
+                        // digits: true,
+                        // });
+
                     } else if (spec_type == '2') {
                         this.SpecList.spec_2.length;
                         this.SpecList.spec_2.push({
@@ -981,6 +1069,50 @@
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: "請選擇"
+            });
+            // 驗證表單
+            // product_name
+            $("#new-form").validate({
+                debug: true,
+                submitHandler: function(form) {
+                    // $('#btn-save').prop('disabled', true);
+                    // form.submit();
+                },
+                rules: {
+                    product_name: {
+                        required: true,
+                    },
+                    supplier_id: {
+                        required: true,
+                    },
+                    // product_name: {
+                    //     required: true,
+                    // },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
             });
         });
     </script>
