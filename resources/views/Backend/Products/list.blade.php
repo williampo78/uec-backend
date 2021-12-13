@@ -169,9 +169,15 @@
                                             <option value="APPROVED"
                                                 {{ request()->input('approval_status') == 'APPROVED' ? 'selected' : '' }}>
                                                 已核准</option>
+                                            <option value="APPROVED_STATUS_ON"
+                                                {{ request()->input('approval_status') == 'APPROVED_STATUS_ON' ? 'selected' : '' }}>
+                                                商品上架</option>
                                             <option value="REJECTED"
                                                 {{ request()->input('approval_status') == 'REJECTED' ? 'selected' : '' }}>
                                                 已駁回</option>
+                                            <option value="APPROVED_STATUS_OFF"
+                                            {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
+                                            商品下架</option>
                                         </select>
                                     </div>
                                 </div>
@@ -265,7 +271,7 @@
                                                 href="{{ route('products.edit', $val->id) }}">修改</a>
                                         </td>
                                         <td>{{ $key += 1 }}</td>
-                                        <td>{{ $val->supplier_id }}</td>
+                                        <td>{{ $val->supplier_name }}</td>
                                         <td>{{ $val->product_no }}</td>
                                         <td>{{ $val->product_name }}</td>
                                         <td>{{ $val->selling_price }}</td>
@@ -288,20 +294,7 @@
                                             {{ $val->created_at }}
                                         </td>
                                         <td>
-                                            @switch($val->approval_status)
-                                                @case('NA')
-                                                    無送審記錄
-                                                @break
-                                                @case('REVIEWING')
-                                                    簽核中
-                                                @break
-                                                @case('APPROVED')
-                                                    已核准
-                                                @break
-                                                @case('REJECTED')
-                                                    已駁回
-                                                @break
-                                            @endswitch
+                                            {{ $val->launched_status }}
                                         </td>
                                         <td>{{ $val->start_launched_at }}</td>
                                         <td>{{ $val->end_launched_at }}</td>

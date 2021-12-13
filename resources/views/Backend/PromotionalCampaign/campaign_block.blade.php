@@ -16,15 +16,17 @@
                 <div class="col-sm-2">
                     <label class="control-label">狀態 <span style="color: red;">*</span></label>
                 </div>
-                <div class="col-sm-2">
-                    <label class="radio-inline">
-                        <input type="radio" name="active" id="active_enabled" value="1" />生效
-                    </label>
-                </div>
-                <div class="col-sm-2">
-                    <label class="radio-inline">
-                        <input type="radio" name="active" id="active_disabled" checked value="0" />失效
-                    </label>
+                <div class="col-sm-10">
+                    <div class="col-sm-3">
+                        <label class="radio-inline">
+                            <input type="radio" name="active" id="active_enabled" value="1" />生效
+                        </label>
+                    </div>
+                    <div class="col-sm-9">
+                        <label class="radio-inline">
+                            <input type="radio" name="active" id="active_disabled" checked value="0" />失效
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>

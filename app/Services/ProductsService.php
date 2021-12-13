@@ -82,7 +82,25 @@ class ProductsService
 
         //上架狀態
         if (isset($input_data['approval_status'])) {
-            $products->where('products.approval_status', $input_data['approval_status']);
+            switch ($input_data['approval_status']) {
+                case 'APPROVED_STATUS_ON':
+                    $products = $products->where(function ($query) {
+                        $query->where('products.start_launched_at', '<=', Carbon::now())
+                            ->Where('products.end_launched_at', '>=', Carbon::now())
+                            ->where('products.approval_status', '=', 'APPROVED');
+                    });
+                    break;
+                case 'APPROVED_STATUS_OFF':
+                    $products = $products->where(function ($query) {
+                        $query->where('products.start_launched_at', '>=', Carbon::now())
+                            ->Where('products.end_launched_at', '<=', Carbon::now())
+                            ->where('products.approval_status', '=', 'APPROVED');
+                    });
+                    break;
+                default:
+                    $products->where('products.approval_status', '=', $input_data['approval_status']);
+                    break;
+            }
         }
 
         try {
@@ -135,6 +153,9 @@ class ProductsService
         }
 
         $result = $products->get();
+        $this->restructureProducts($result) ; 
+        // dd($result) ; 
+        // dump($result) ; 
 
         return $result;
     }
@@ -191,8 +212,8 @@ class ProductsService
                 'agent_id' => $agent_id,
             ];
             $products_id = Products::create($insert)->id;
-            $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'] , 'id' => $products_id]);
-            Products::where('id',$products_id)->update(['product_no' => $product_no]) ;
+            $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'], 'id' => $products_id]);
+            Products::where('id', $products_id)->update(['product_no' => $product_no]);
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
@@ -349,7 +370,7 @@ class ProductsService
                         'updated_at' => $now,
                     ];
                     $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
-                    $skuList[$key]['item_no'] = $in['product_no'] . str_pad($add_item_no, 4, "0", STR_PAD_LEFT) ;
+                    $skuList[$key]['item_no'] = $in['product_no'] . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
                 } else {
                     $skuUpdate = [
                         'agent_id' => $agent_id,
@@ -389,9 +410,10 @@ class ProductsService
     public function showProducts($id)
     {
         $agent_id = Auth::user()->agent_id;
-        $products = Products::select('products.*', 'updated_by_name.name AS updated_by_name', 'created_by_name.name AS created_by_name')
+        $products = Products::select('products.*', 'updated_by_name.name AS updated_by_name', 'created_by_name.name AS created_by_name' , 'supplier.name AS supplier_name')
             ->leftJoin('user as created_by_name', 'products.created_by', '=', 'created_by_name.id')
             ->leftJoin('user as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
+            ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id)->where('products.id', $id);
 
         $result = $products->first();
@@ -479,7 +501,7 @@ class ProductsService
 
             // 毛利
             $obj->gross_margin = 10;
-
+            // dd($obj) ;
             return $obj;
         });
     }

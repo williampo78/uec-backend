@@ -218,4 +218,42 @@ class PromotionalCampaignPrdController extends Controller
     {
         //
     }
+
+    /**
+     * 是否可以通過單品活動的狀態驗證
+     *
+     * @param Request $request
+     * @return boolean
+     */
+    public function canPassActiveValidation(Request $request)
+    {
+        $active = $request->input('active');
+        $campaign_type = $request->input('campaign_type');
+        $start_at = $request->input('start_at');
+        $end_at = $request->input('end_at');
+        $exist_products = $request->input('exist_products');
+        $promotional_campaign_id = $request->input('promotional_campaign_id');
+
+        if ($active == 0) {
+            return response()->json(
+                ['status' => true]
+            );
+        }
+
+        if ($this->promotional_campaign_service->canPromotionalCampaignPrdActive(
+            $campaign_type,
+            $start_at,
+            $end_at,
+            $exist_products,
+            $promotional_campaign_id
+        )) {
+            return response()->json(
+                ['status' => true]
+            );
+        }
+
+        return response()->json(
+            ['status' => false]
+        );
+    }
 }

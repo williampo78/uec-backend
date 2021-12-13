@@ -499,4 +499,103 @@ class PromotionalCampaignService
 
         return true;
     }
+
+    /**
+     * 單品活動的狀態是否可啟用
+     *
+     * @param string $campaign_type
+     * @param string $start_at
+     * @param string $end_at
+     * @param array $exist_products
+     * @param string $slot_content_id
+     * @return boolean
+     */
+    public function canPromotionalCampaignPrdActive($campaign_type, $start_at, $end_at, $exist_products, $promotional_campaign_id = null)
+    {
+        $agent_id = Auth::user()->agent_id;
+
+        if (empty($campaign_type)
+            || empty($start_at)
+            || empty($end_at)
+            || empty($exist_products)
+        ) {
+            return false;
+        }
+
+        try {
+            $start_at_format = Carbon::parse($start_at)->format('Y-m-d H:i:s');
+            $end_at_format = Carbon::parse($end_at)->format('Y-m-d H:i:s');
+        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
+            Log::warning($e->getMessage());
+
+            return false;
+        }
+
+        /*
+         * 查詢上架開始、結束時間，是否在已存在的上下架時間範圍內且狀態為啟用，並檢查是否為同一個單品。
+         * 如果要更新資料，則需排除要更新的該筆資料檢查。
+         */
+        $results = PromotionalCampaigns::select(
+            'promotional_campaigns.campaign_type',
+            'promotional_campaign_products.product_id',
+        )
+            ->rightJoin('promotional_campaign_products', 'promotional_campaigns.id', '=', 'promotional_campaign_products.promotional_campaign_id')
+            ->where('promotional_campaigns.agent_id', $agent_id)
+            ->where('promotional_campaigns.active', 1)
+            ->where('promotional_campaigns.level_code', 'PRD')
+            ->where(function ($query) use ($start_at_format, $end_at_format) {
+                $query->where(function ($query) use ($start_at_format, $end_at_format) {
+                    $query->whereBetween('promotional_campaigns.start_at', [$start_at_format, $end_at_format]);
+                })
+                    ->orWhere(function ($query) use ($start_at_format, $end_at_format) {
+                        $query->whereBetween('promotional_campaigns.end_at', [$start_at_format, $end_at_format]);
+                    })
+                    ->orWhere(function ($query) use ($start_at_format, $end_at_format) {
+                        $query->where('promotional_campaigns.start_at', '<=', $start_at_format)
+                            ->where('promotional_campaigns.end_at', '>=', $end_at_format);
+                    });
+            });
+
+        if (!empty($promotional_campaign_id)) {
+            $results = $results->where('promotional_campaigns.id', '!=', $promotional_campaign_id);
+        }
+
+        $results = $results->get();
+
+        // 同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動
+        if (in_array($campaign_type, ['PRD01', 'PRD02', 'PRD03', 'PRD04'])) {
+            $results = $results->filter(function ($result) use ($exist_products) {
+                if (!in_array($result->campaign_type, ['PRD01', 'PRD02', 'PRD03', 'PRD04'])) {
+                    return false;
+                }
+
+                if (!in_array($result->product_id, $exist_products)) {
+                    return false;
+                }
+
+                return true;
+            });
+        }
+
+        // 同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動
+        if (in_array($campaign_type, ['PRD05'])) {
+            $results = $results->filter(function ($result) use ($exist_products) {
+                if (!in_array($result->campaign_type, ['PRD05'])) {
+                    return false;
+                }
+
+                if (!in_array($result->product_id, $exist_products)) {
+                    return false;
+                }
+
+                return true;
+            });
+        }
+
+        if ($results->count() <= 0) {
+            return true;
+        }
+
+        return false;
+    }
 }

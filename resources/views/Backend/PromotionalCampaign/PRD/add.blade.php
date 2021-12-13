@@ -67,6 +67,14 @@
 
     <script>
         $(function() {
+            let campaign_types = @json($campaign_types);
+            let suppliers = @json($suppliers);
+            let product_types = @json(config('uec.product_type_option'));
+            var prd_modal_product_list = {}; // 單品modal清單中的商品
+            var prd_product_list = {}; // 單品清單中的商品
+            var gift_modal_product_list = {}; // 贈品modal清單中的商品
+            var gift_product_list = {}; // 贈品清單中的商品
+
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
@@ -92,6 +100,39 @@
                     },
                     active: {
                         required: true,
+                        remote: {
+                            param: function() {
+                                return {
+                                    url: "/backend/promotional_campaign_prd/ajax/can-pass-active-validation",
+                                    type: "post",
+                                    dataType: "json",
+                                    cache: false,
+                                    data: {
+                                        campaign_type: $("#campaign_type").val(),
+                                        start_at: $('#start_at').val(),
+                                        end_at: $('#end_at').val(),
+                                        exist_products: Object.keys(prd_product_list),
+                                    },
+                                    dataFilter: function(data, type) {
+                                        if (data) {
+                                            let json_data = $.parseJSON(data);
+
+                                            if (json_data.status) {
+                                                return true;
+                                            }
+                                        }
+
+                                        return false;
+                                    },
+                                }
+                            },
+                            depends: function(element) {
+                                return $("#campaign_type").val() &&
+                                    $('#start_at').val() &&
+                                    $('#end_at').val() &&
+                                    Object.keys(prd_product_list).length > 0;
+                            }
+                        },
                     },
                     campaign_type: {
                         required: true,
@@ -169,12 +210,27 @@
                     end_at: {
                         greaterThan: "結束時間必須大於開始時間",
                     },
+                    active: {
+                        remote: function(element) {
+                            if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes($("#campaign_type")
+                            .val())) {
+                                return "同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動";
+                            } else if (['PRD05'].includes($("#campaign_type").val())) {
+                                return '同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動';
+                            }
+                        },
+                    },
                 },
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length || element.is(':radio')) {
+                    if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is(':radio')) {
+                        element.parent().parent().parent().append(error);
                         return;
                     }
 
@@ -188,22 +244,14 @@
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
 
-            let campaign_types = @json($campaign_types);
             renderCampaignType(campaign_types);
-
-            let suppliers = @json($suppliers);
             renderPrdModalSupplier(suppliers);
             renderGiftModalSupplier(suppliers);
-
-            let product_types = @json(config('uec.product_type_option'));
             renderPrdModalProductType(product_types);
             renderGiftModalProductType(product_types);
 
@@ -214,9 +262,6 @@
             $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
 
             init();
-
-            var prd_modal_product_list = {}; // 單品modal清單中的商品
-            var prd_product_list = {}; // 單品清單中的商品
 
             // 新增單品
             $('#btn-new-prd').on('click', function() {
@@ -283,8 +328,6 @@
                 });
             });
 
-            var gift_modal_product_list = {}; // 贈品modal清單中的商品
-            var gift_product_list = {}; // 贈品清單中的商品
 
             // 新增贈品
             $('#btn-new-gift').on('click', function() {

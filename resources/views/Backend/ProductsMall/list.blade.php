@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '商品主檔 -基本資訊管理')
+@section('title', '商品主檔 -商城資訊管理')
 
 @section('content')
     <!--列表-->
@@ -17,7 +17,7 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="{{ route('products') }}"
+                        <form role="form" id="select-form" method="GET" action="{{ route('product_small') }}"
                             enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-4">
@@ -55,11 +55,11 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="supplier_id" id="supplier_id">
                                             <option value="">全部</option>
-                                            {{-- @foreach ($supplier as $val)
+                                            @foreach ($supplier as $val)
                                                 <option value="{{ $val->id }}"
                                                     {{ request()->input('supplier_id') == $val->id ? 'selected' : '' }}>
                                                     {{ $val->name }}</option>
-                                            @endforeach --}}
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -102,11 +102,11 @@
                                     <div class="col-sm-8">
                                         <select class="form-control js-select2" name="category_id" id="category_id">
                                             <option value="">全部</option>
-                                            {{-- @foreach ($pos as $val)
+                                            @foreach ($pos as $val)
                                                 <option value="{{ $val->id }}"
                                                     {{ request()->input('category_id') == $val->id ? 'selected' : '' }}>
                                                     {{ $val->name }}</option>
-                                            @endforeach --}}
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -169,9 +169,15 @@
                                             <option value="APPROVED"
                                                 {{ request()->input('approval_status') == 'APPROVED' ? 'selected' : '' }}>
                                                 已核准</option>
+                                            <option value="APPROVED_STATUS_ON"
+                                                {{ request()->input('approval_status') == 'APPROVED_STATUS_ON' ? 'selected' : '' }}>
+                                                商品上架</option>
                                             <option value="REJECTED"
                                                 {{ request()->input('approval_status') == 'REJECTED' ? 'selected' : '' }}>
                                                 已駁回</option>
+                                            <option value="APPROVED_STATUS_OFF"
+                                                {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
+                                                商品下架</option>
                                         </select>
                                     </div>
                                 </div>
@@ -231,12 +237,12 @@
                     <!-- Table list -->
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-sm-2">
+                            {{-- <div class="col-sm-2">
                                 <a class="btn btn-block btn-warning btn-sm" href="{{ route('product_small.create') }}"><i
                                         class="fa fa-plus"></i> 創建</a>
-                            </div>
+                            </div> --}}
                         </div>
-                        <hr>
+                        {{-- <hr> --}}
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
                                 <tr>
@@ -256,16 +262,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- @foreach ($products as $key => $val)
+                                @foreach ($products as $key => $val)
                                     <tr>
                                         <td>
-                                            <a class="btn btn-info btn-sm" href="{{ route('products.show', $val->id) }}">
+                                            <a class="btn btn-info btn-sm" href="{{ route('product_small.show', $val->id) }}">
                                                 <i class="fa fa-search"></i></a>
                                             <a class="btn btn-info btn-sm"
-                                                href="{{ route('products.edit', $val->id) }}">修改</a>
+                                                href="{{ route('product_small.edit', $val->id) }}">修改</a>
                                         </td>
                                         <td>{{ $key += 1 }}</td>
-                                        <td>{{ $val->supplier_id }}</td>
+                                        <td>{{ $val->supplier_name }}</td>
                                         <td>{{ $val->product_no }}</td>
                                         <td>{{ $val->product_name }}</td>
                                         <td>{{ $val->selling_price }}</td>
@@ -288,25 +294,12 @@
                                             {{ $val->created_at }}
                                         </td>
                                         <td>
-                                            @switch($val->approval_status)
-                                                @case('NA')
-                                                    無送審記錄
-                                                @break
-                                                @case('REVIEWING')
-                                                    簽核中
-                                                @break
-                                                @case('APPROVED')
-                                                    已核准
-                                                @break
-                                                @case('REJECTED')
-                                                    已駁回
-                                                @break
-                                            @endswitch
+                                            {{ $val->launched_status }}
                                         </td>
                                         <td>{{ $val->start_launched_at }}</td>
                                         <td>{{ $val->end_launched_at }}</td>
                                     </tr>
-                                @endforeach --}}
+                                @endforeach
                                 {{-- {{$category_products_list}} --}}
 
                             </tbody>
