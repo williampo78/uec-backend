@@ -137,7 +137,7 @@ class APIProductServices
     /*
      * 取得商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getProducts()
+    public function getProducts($product_id = null)
     {
         $strSQL = "SELECT p.*,
                     (SELECT photo_name
@@ -146,6 +146,9 @@ class APIProductServices
                     FROM products AS p
                     where p.approval_status = 'APPROVED'
                     and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+        if ($product_id) {
+            $strSQL .= " and p.id=" . $product_id;
+        }
         $products = DB::select($strSQL);
         $data = [];
         foreach ($products as $product) {
@@ -404,13 +407,13 @@ class APIProductServices
     public function getProduct($id)
     {
         //產品主檔基本資訊
-        $product = self::getProducts();
+        $product = self::getProducts($id);
 
         //行銷促案資訊
         $promotion_type = [];
         $promotions = self::getPromotion('product_content');
         foreach ($promotions as $category => $promotion) {
-            foreach ($promotion as $item){
+            foreach ($promotion as $item) {
                 if ($item->product_id == $id) {
                     $promotion_type[$category][] = $item;
                 }
@@ -424,8 +427,24 @@ class APIProductServices
         }
 
         //產品規格
+        $item_spec = [];
         $ProductSpec = ProductItems::where('product_id', $id)->orderBy('sort', 'asc')->get();
-        $product[$id]->spec_dimension;
-        dd($ProductSpec);
+        $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
+        $item_spec['spec_title'] = array($product[$id]->spec_1,$product[$id]->spec_2); //規格名稱
+        $spec_info = [];
+        foreach ($ProductSpec as $item) {
+            $item_spec['spec_1'][] = $item['spec_1_value'];
+            $item_spec['spec_2'][] = $item['spec_2_value'];
+            $spec_info[] = array(
+                "spec1" => $item['spec_1_value'],
+                "spec2" => $item['spec_2_value'],
+                "item_no" => $item['item_no']
+            );
+        }
+        $item_spec['spec_1'] = array_unique($item_spec['spec_1']);
+        $item_spec['spec_2'] = array_unique($item_spec['spec_2']);
+        $item_spec['spec_info'] = $spec_info;
+
+        dd(json_encode($item_spec));
     }
 }
