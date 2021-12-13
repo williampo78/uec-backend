@@ -153,6 +153,9 @@ class ProductsService
         }
 
         $result = $products->get();
+        $this->restructureProducts($result) ; 
+        // dd($result) ; 
+        // dump($result) ; 
 
         return $result;
     }
@@ -497,7 +500,7 @@ class ProductsService
 
             // 毛利
             $obj->gross_margin = 10;
-
+            // dd($obj) ;
             return $obj;
         });
     }

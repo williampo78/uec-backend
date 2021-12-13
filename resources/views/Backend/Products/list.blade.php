@@ -294,20 +294,7 @@
                                             {{ $val->created_at }}
                                         </td>
                                         <td>
-                                            @switch($val->approval_status)
-                                                @case('NA')
-                                                    無送審記錄
-                                                @break
-                                                @case('REVIEWING')
-                                                    簽核中
-                                                @break
-                                                @case('APPROVED')
-                                                    已核准
-                                                @break
-                                                @case('REJECTED')
-                                                    已駁回
-                                                @break
-                                            @endswitch
+                                            {{ $val->launched_status }}
                                         </td>
                                         <td>{{ $val->start_launched_at }}</td>
                                         <td>{{ $val->end_launched_at }}</td>
