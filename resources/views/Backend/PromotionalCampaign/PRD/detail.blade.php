@@ -5,7 +5,7 @@
 
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-gear"></i>滿額活動 檢視資料</h4>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-gear"></i>單品活動 檢視資料</h4>
             </div>
 
             <div class="modal-body">
@@ -112,7 +112,13 @@
                     <hr style="border-top: 1px solid gray;" />
                 </div>
 
-                <div id="prd-block" {{--style="display: none;"--}}>
+                <div id="prd-block" style="display: none;">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label">單品清單</label>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class='table table-striped table-bordered table-hover' style='width:100%' id="prd-product-table">
                             <thead>
@@ -133,7 +139,13 @@
                     <hr style="border-top: 1px solid gray;" />
                 </div>
 
-                <div id="gift-block" {{--style="display: none;"--}}>
+                <div id="gift-block" style="display: none;">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label class="control-label">贈品清單</label>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class='table table-striped table-bordered table-hover' style='width:100%' id="gift-product-table">
                             <thead>

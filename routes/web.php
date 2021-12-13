@@ -31,7 +31,7 @@ use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
 use App\Http\Controllers\PhotosController;
-use App\Http\Controllers\ProductsMallController ; 
+use App\Http\Controllers\ProductsMallController ;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -115,7 +115,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'promotional_campaign_cart',
         ],
     ]);
-    Route::post('/promotional_campaign_cart/ajax/detail', [PromotionalCampaignCartController::class, 'getDetail']);
 
     // 單品活動
     Route::resource('/promotional_campaign_prd', PromotionalCampaignPrdController::class, [
@@ -123,9 +122,11 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'promotional_campaign_prd',
         ],
     ]);
+    Route::post('/promotional_campaign_prd/ajax/can-pass-active-validation', [PromotionalCampaignPrdController::class, 'canPassActiveValidation']);
 
     // 行銷活動
     Route::post('/promotional_campaign/ajax/products', [PromotionalCampaignController::class, 'getProducts']);
+    Route::post('/promotional_campaign/ajax/detail', [PromotionalCampaignController::class, 'getDetail']);
 
     Route::resource('/webcontents', WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 });
