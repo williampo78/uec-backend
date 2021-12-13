@@ -91,8 +91,12 @@ class AdvertisementService
         $now = Carbon::now();
 
         $update_data = [];
-        $update_data['active'] = $input_data['active'] ?? 1;
-        $update_data['remark'] = $input_data['remark'] ?? '';
+
+        if (isset($input_data['active'])) {
+            $update_data['active'] = $input_data['active'];
+        }
+
+        $update_data['remark'] = $input_data['remark'];
         $update_data['updated_by'] = $user_id;
         $update_data['updated_at'] = $now;
 
@@ -163,9 +167,11 @@ class AdvertisementService
         // 上下架狀態查詢
         if (!empty($query_data['launch_status'])) {
             if ($query_data['launch_status'] == 'enabled') {
-                $result = $result->where('ad_slot_contents.start_at', '<=', Carbon::now());
-                $result = $result->where('ad_slot_contents.end_at', '>=', Carbon::now());
-                $result = $result->where('ad_slot_contents.active', 1);
+                $result = $result->where(function ($query) {
+                    $query->where('ad_slot_contents.start_at', '<=', Carbon::now())
+                        ->where('ad_slot_contents.end_at', '>=', Carbon::now())
+                        ->where('ad_slot_contents.active', 1);
+                });
             } else {
                 $result = $result->where(function ($query) {
                     $query->where('ad_slot_contents.start_at', '>=', Carbon::now())
@@ -281,13 +287,11 @@ class AdvertisementService
             $content_data['updated_at'] = $now;
 
             if (!empty($input_data['start_at'])) {
-                $start_at = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
-                $content_data['start_at'] = $start_at;
+                $content_data['start_at'] = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
             }
 
             if (!empty($input_data['end_at'])) {
-                $end_at = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
-                $content_data['end_at'] = $end_at;
+                $content_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
             }
 
             // 使用者自定義版位，新增主色、標題
@@ -436,18 +440,31 @@ class AdvertisementService
 
         try {
             $update_content_data = [];
-            $update_content_data['active'] = $input_data['active'] ?? 1;
-            $update_content_data['slot_color_code'] = $input_data['slot_color_code'] ?? null;
-            $update_content_data['slot_title'] = $input_data['slot_title'] ?? null;
-            $update_content_data['product_assigned_type'] = $input_data['product_assigned_type'] ?? null;
+
+            if (isset($input_data['active'])) {
+                $update_content_data['active'] = $input_data['active'];
+            }
+
+            if (isset($input_data['slot_color_code'])) {
+                $update_content_data['slot_color_code'] = $input_data['slot_color_code'];
+            }
+
+            if (isset($input_data['slot_title'])) {
+                $update_content_data['slot_title'] = $input_data['slot_title'];
+            }
+
+            if (isset($input_data['product_assigned_type'])) {
+                $update_content_data['product_assigned_type'] = $input_data['product_assigned_type'];
+            }
+
             $update_content_data['updated_by'] = $user_id;
             $update_content_data['updated_at'] = $now;
 
-            if (!empty($input_data['start_at'])) {
+            if (isset($input_data['start_at'])) {
                 $update_content_data['start_at'] = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
             }
 
-            if (!empty($input_data['end_at'])) {
+            if (isset($input_data['end_at'])) {
                 $update_content_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
             }
 
@@ -469,163 +486,145 @@ class AdvertisementService
 
             // 處理圖檔 (圖檔 or 圖檔+商品)
             if ($slot_content['content']->slot_type == 'I' || $slot_content['content']->slot_type == 'IS') {
-                $input_data['image_block_id'] = $input_data['image_block_id'] ?? [];
-                $new_ids = array_keys($input_data['image_block_id']);
+                if (isset($input_data['image_block_id'])) {
+                    $new_ids = array_keys($input_data['image_block_id']);
 
-                $old_ids = $slot_content['details']->filter(function ($obj, $key) {
-                    return $obj->data_type == 'IMG';
-                })->pluck('id')->all();
+                    $old_ids = $slot_content['details']->filter(function ($obj, $key) {
+                        return $obj->data_type == 'IMG';
+                    })->pluck('id')->all();
 
-                $delete_ids = array_diff($old_ids, $new_ids);
-                $add_ids = array_diff($new_ids, $old_ids);
+                    $delete_ids = array_diff($old_ids, $new_ids);
+                    $add_ids = array_diff($new_ids, $old_ids);
 
-                // 移除資料
-                foreach ($slot_content['details'] as $obj) {
-                    if (in_array($obj->id, $delete_ids)) {
-                        // 移除圖片
-                        if (!empty($obj->image_name)
-                            && Storage::disk('s3')->exists($obj->image_name)
-                        ) {
-                            Storage::disk('s3')->delete($obj->image_name);
+                    // 移除資料
+                    if (!empty($delete_ids)) {
+                        foreach ($slot_content['details'] as $obj) {
+                            if (in_array($obj->id, $delete_ids)) {
+                                // 移除圖片
+                                if (!empty($obj->image_name)
+                                    && Storage::disk('s3')->exists($obj->image_name)
+                                ) {
+                                    Storage::disk('s3')->delete($obj->image_name);
+                                }
+
+                                AdSlotContentDetails::destroy($obj->id);
+                            }
                         }
-
-                        $this->deleteSlotContentDetailById($obj->id);
                     }
-                }
 
-                // 新增、更新資料
-                foreach ($input_data['image_block_id'] as $key => $value) {
-                    $sort = $input_data['image_block_sort'][$key] ?? null;
-                    $image_alt = $input_data['image_block_image_alt'][$key] ?? null;
-                    $image_title = $input_data['image_block_image_title'][$key] ?? null;
-                    $image_abstract = $input_data['image_block_image_abstract'][$key] ?? null;
-                    $image_action = $input_data['image_block_image_action'][$key] ?? null;
-                    $target_url = $input_data['image_block_target_url'][$key] ?? null;
-                    $target_cate_hierarchy_id = $input_data['image_block_target_cate_hierarchy_id'][$key] ?? null;
-                    $is_target_blank = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
+                    // 新增、更新資料
+                    foreach ($input_data['image_block_id'] as $key => $value) {
+                        // 新增資料
+                        if (in_array($key, $add_ids)) {
+                            $create_detail_data = [];
+                            $create_detail_data['ad_slot_content_id'] = $slot_content['content']->slot_content_id;
+                            $create_detail_data['data_type'] = 'IMG';
+                            $create_detail_data['sort'] = $input_data['image_block_sort'][$key] ?? null;
+                            $create_detail_data['image_alt'] = $input_data['image_block_image_alt'][$key] ?? null;
+                            $create_detail_data['image_title'] = $input_data['image_block_image_title'][$key] ?? null;
+                            $create_detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key] ?? null;
+                            $create_detail_data['image_action'] = $input_data['image_block_image_action'][$key] ?? null;
+                            $create_detail_data['target_url'] = $input_data['image_block_target_url'][$key] ?? null;
+                            $create_detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key] ?? null;
+                            $create_detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
+                            $create_detail_data['created_by'] = $user_id;
+                            $create_detail_data['updated_by'] = $user_id;
+                            $create_detail_data['created_at'] = $now;
+                            $create_detail_data['updated_at'] = $now;
 
-                    // 新增資料
-                    if (in_array($key, $add_ids)) {
-                        $create_detail_data = [];
-                        $create_detail_data = [
-                            'ad_slot_content_id' => $slot_content['content']->slot_content_id,
-                            'data_type' => 'IMG',
-                            'sort' => $sort,
-                            'image_alt' => $image_alt,
-                            'image_title' => $image_title,
-                            'image_abstract' => $image_abstract,
-                            'image_action' => $image_action,
-                            'target_url' => $target_url,
-                            'target_cate_hierarchy_id' => $target_cate_hierarchy_id,
-                            'is_target_blank' => $is_target_blank,
-                            'created_by' => $user_id,
-                            'updated_by' => $user_id,
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ];
-
-                        if (isset($input_data['image_block_image_name'][$key])) {
-                            $create_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
-                        }
-
-                        AdSlotContentDetails::insert($create_detail_data);
-                    }
-                    // 更新資料
-                    else {
-                        $update_detail_data = [];
-                        $update_detail_data = [
-                            'sort' => $sort,
-                            'image_alt' => $image_alt,
-                            'image_title' => $image_title,
-                            'image_abstract' => $image_abstract,
-                            'image_action' => $image_action,
-                            'target_url' => $target_url,
-                            'target_cate_hierarchy_id' => $target_cate_hierarchy_id,
-                            'is_target_blank' => $is_target_blank,
-                            'updated_by' => $user_id,
-                            'updated_at' => $now,
-                        ];
-
-                        if (isset($input_data['image_block_image_name'][$key])) {
-                            // 移除圖片
-                            if (!empty($details_image_name[$key])
-                                && Storage::disk('s3')->exists($details_image_name[$key])
-                            ) {
-                                Storage::disk('s3')->delete($details_image_name[$key]);
+                            if (isset($input_data['image_block_image_name'][$key])) {
+                                $create_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
                             }
 
-                            // 上傳圖片
-                            $update_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
+                            AdSlotContentDetails::insert($create_detail_data);
                         }
+                        // 更新資料
+                        else {
+                            $update_detail_data = [];
+                            $update_detail_data['sort'] = $input_data['image_block_sort'][$key];
+                            $update_detail_data['image_alt'] = $input_data['image_block_image_alt'][$key];
+                            $update_detail_data['image_title'] = $input_data['image_block_image_title'][$key];
+                            $update_detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key];
+                            $update_detail_data['image_action'] = $input_data['image_block_image_action'][$key];
+                            $update_detail_data['target_url'] = $input_data['image_block_target_url'][$key];
+                            $update_detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key];
+                            $update_detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
+                            $update_detail_data['updated_by'] = $user_id;
+                            $update_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                            if (isset($input_data['image_block_image_name'][$key])) {
+                                // 移除圖片
+                                if (!empty($details_image_name[$key])
+                                    && Storage::disk('s3')->exists($details_image_name[$key])
+                                ) {
+                                    Storage::disk('s3')->delete($details_image_name[$key]);
+                                }
+
+                                // 上傳圖片
+                                $update_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
+                            }
+
+                            AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                        }
                     }
                 }
             }
 
             // 處理文字 (文字)
             if ($slot_content['content']->slot_type == 'T') {
-                $input_data['text_block_id'] = $input_data['text_block_id'] ?? [];
-                $new_ids = array_keys($input_data['text_block_id']);
+                if (isset($input_data['text_block_id'])) {
+                    $new_ids = array_keys($input_data['text_block_id']);
 
-                $old_ids = $slot_content['details']->filter(function ($obj, $key) {
-                    return $obj->data_type == 'TXT';
-                })->pluck('id')->all();
+                    $old_ids = $slot_content['details']->filter(function ($obj, $key) {
+                        return $obj->data_type == 'TXT';
+                    })->pluck('id')->all();
 
-                $delete_ids = array_diff($old_ids, $new_ids);
-                $add_ids = array_diff($new_ids, $old_ids);
+                    $delete_ids = array_diff($old_ids, $new_ids);
+                    $add_ids = array_diff($new_ids, $old_ids);
 
-                // 移除資料
-                foreach ($slot_content['details'] as $obj) {
-                    if (in_array($obj->id, $delete_ids)) {
-                        $this->deleteSlotContentDetailById($obj->id);
+                    // 移除資料
+                    if (!empty($delete_ids)) {
+                        foreach ($slot_content['details'] as $obj) {
+                            if (in_array($obj->id, $delete_ids)) {
+                                AdSlotContentDetails::destroy($obj->id);
+                            }
+                        }
                     }
-                }
 
-                // 新增、更新資料
-                foreach ($input_data['text_block_id'] as $key => $value) {
-                    $sort = $input_data['text_block_sort'][$key] ?? null;
-                    $texts = $input_data['text_block_texts'][$key] ?? null;
-                    $image_action = $input_data['text_block_image_action'][$key] ?? null;
-                    $target_url = $input_data['text_block_target_url'][$key] ?? null;
-                    $target_cate_hierarchy_id = $input_data['text_block_target_cate_hierarchy_id'][$key] ?? null;
-                    $is_target_blank = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
+                    // 新增、更新資料
+                    foreach ($input_data['text_block_id'] as $key => $value) {
+                        // 新增資料
+                        if (in_array($key, $add_ids)) {
+                            $create_detail_data = [];
+                            $create_detail_data['ad_slot_content_id'] = $slot_content['content']->slot_content_id;
+                            $create_detail_data['data_type'] = 'TXT';
+                            $create_detail_data['sort'] = $input_data['text_block_sort'][$key] ?? null;
+                            $create_detail_data['texts'] = $input_data['text_block_texts'][$key] ?? null;
+                            $create_detail_data['image_action'] = $input_data['text_block_image_action'][$key] ?? null;
+                            $create_detail_data['target_url'] = $input_data['text_block_target_url'][$key] ?? null;
+                            $create_detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key] ?? null;
+                            $create_detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
+                            $create_detail_data['created_by'] = $user_id;
+                            $create_detail_data['updated_by'] = $user_id;
+                            $create_detail_data['created_at'] = $now;
+                            $create_detail_data['updated_at'] = $now;
 
-                    // 新增資料
-                    if (in_array($key, $add_ids)) {
-                        $create_detail_data = [];
-                        $create_detail_data = [
-                            'ad_slot_content_id' => $slot_content['content']->slot_content_id,
-                            'data_type' => 'TXT',
-                            'sort' => $sort,
-                            'texts' => $texts,
-                            'image_action' => $image_action,
-                            'target_url' => $target_url,
-                            'target_cate_hierarchy_id' => $target_cate_hierarchy_id,
-                            'is_target_blank' => $is_target_blank,
-                            'created_by' => $user_id,
-                            'updated_by' => $user_id,
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ];
+                            AdSlotContentDetails::insert($create_detail_data);
+                        }
+                        // 更新資料
+                        else {
+                            $update_detail_data = [];
+                            $update_detail_data['sort'] = $input_data['text_block_sort'][$key];
+                            $update_detail_data['texts'] = $input_data['text_block_texts'][$key];
+                            $update_detail_data['image_action'] = $input_data['text_block_image_action'][$key];
+                            $update_detail_data['target_url'] = $input_data['text_block_target_url'][$key];
+                            $update_detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key];
+                            $update_detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
+                            $update_detail_data['updated_by'] = $user_id;
+                            $update_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::insert($create_detail_data);
-                    }
-                    // 更新資料
-                    else {
-                        $update_detail_data = [];
-                        $update_detail_data = [
-                            'sort' => $sort,
-                            'texts' => $texts,
-                            'image_action' => $image_action,
-                            'target_url' => $target_url,
-                            'target_cate_hierarchy_id' => $target_cate_hierarchy_id,
-                            'is_target_blank' => $is_target_blank,
-                            'updated_by' => $user_id,
-                            'updated_at' => $now,
-                        ];
-
-                        AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                            AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                        }
                     }
                 }
             }
@@ -649,42 +648,37 @@ class AdvertisementService
                 $category_add_ids = array_diff($category_new_ids, $old_ids);
 
                 // 移除資料
-                foreach ($slot_content['details'] as $obj) {
-                    if (in_array($obj->id, $delete_ids)) {
-                        $this->deleteSlotContentDetailById($obj->id);
+                if (!empty($delete_ids)) {
+                    foreach ($slot_content['details'] as $obj) {
+                        if (in_array($obj->id, $delete_ids)) {
+                            AdSlotContentDetails::destroy($obj->id);
+                        }
                     }
                 }
 
                 // 新增、更新資料 (指定商品)
                 foreach ($input_data['product_block_product_id'] as $key => $value) {
-                    $sort = $input_data['product_block_product_sort'][$key] ?? null;
-                    $product_id = $input_data['product_block_product_product_id'][$key] ?? null;
-
                     // 新增資料 (指定商品)
                     if (in_array($key, $product_add_ids)) {
                         $create_detail_data = [];
-                        $create_detail_data = [
-                            'ad_slot_content_id' => $slot_content['content']->slot_content_id,
-                            'data_type' => 'PRD',
-                            'sort' => $sort,
-                            'product_id' => $product_id,
-                            'created_by' => $user_id,
-                            'updated_by' => $user_id,
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ];
+                        $create_detail_data['ad_slot_content_id'] = $slot_content['content']->slot_content_id;
+                        $create_detail_data['data_type'] = 'PRD';
+                        $create_detail_data['sort'] = $input_data['product_block_product_sort'][$key] ?? null;
+                        $create_detail_data['product_id'] = $input_data['product_block_product_product_id'][$key] ?? null;
+                        $create_detail_data['created_by'] = $user_id;
+                        $create_detail_data['updated_by'] = $user_id;
+                        $create_detail_data['created_at'] = $now;
+                        $create_detail_data['updated_at'] = $now;
 
                         AdSlotContentDetails::insert($create_detail_data);
                     }
                     // 更新資料 (指定商品)
                     else {
                         $update_detail_data = [];
-                        $update_detail_data = [
-                            'sort' => $sort,
-                            'product_id' => $product_id,
-                            'updated_by' => $user_id,
-                            'updated_at' => $now,
-                        ];
+                        $update_detail_data['sort'] = $input_data['product_block_product_sort'][$key];
+                        $update_detail_data['product_id'] = $input_data['product_block_product_product_id'][$key];
+                        $update_detail_data['updated_by'] = $user_id;
+                        $update_detail_data['updated_at'] = $now;
 
                         AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
                     }
@@ -692,34 +686,27 @@ class AdvertisementService
 
                 // 新增、更新資料 (指定分類)
                 foreach ($input_data['product_block_category_id'] as $key => $value) {
-                    $sort = $input_data['product_block_category_sort'][$key] ?? null;
-                    $web_category_hierarchy_id = $input_data['product_block_product_web_category_hierarchy_id'][$key] ?? null;
-
                     // 新增資料 (指定分類)
                     if (in_array($key, $category_add_ids)) {
                         $create_detail_data = [];
-                        $create_detail_data = [
-                            'ad_slot_content_id' => $slot_content['content']->slot_content_id,
-                            'data_type' => 'PRD',
-                            'sort' => $sort,
-                            'web_category_hierarchy_id' => $web_category_hierarchy_id,
-                            'created_by' => $user_id,
-                            'updated_by' => $user_id,
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ];
+                        $create_detail_data['ad_slot_content_id'] = $slot_content['content']->slot_content_id;
+                        $create_detail_data['data_type'] = 'PRD';
+                        $create_detail_data['sort'] = $input_data['product_block_category_sort'][$key] ?? null;
+                        $create_detail_data['web_category_hierarchy_id'] = $input_data['product_block_product_web_category_hierarchy_id'][$key] ?? null;
+                        $create_detail_data['created_by'] = $user_id;
+                        $create_detail_data['updated_by'] = $user_id;
+                        $create_detail_data['created_at'] = $now;
+                        $create_detail_data['updated_at'] = $now;
 
                         AdSlotContentDetails::insert($create_detail_data);
                     }
                     // 更新資料 (指定分類)
                     else {
                         $update_detail_data = [];
-                        $update_detail_data = [
-                            'sort' => $sort,
-                            'web_category_hierarchy_id' => $web_category_hierarchy_id,
-                            'updated_by' => $user_id,
-                            'updated_at' => $now,
-                        ];
+                        $update_detail_data['sort'] = $input_data['product_block_category_sort'][$key];
+                        $update_detail_data['web_category_hierarchy_id'] = $input_data['product_block_product_web_category_hierarchy_id'][$key];
+                        $update_detail_data['updated_by'] = $user_id;
+                        $update_detail_data['updated_at'] = $now;
 
                         AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
                     }
@@ -729,25 +716,6 @@ class AdvertisementService
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error($e->getMessage());
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * 刪除廣告上架內容-詳細資料
-     *
-     * @param int $id
-     * @return void
-     */
-    public function deleteSlotContentDetailById($id)
-    {
-        try {
-            AdSlotContentDetails::destroy($id);
-        } catch (\Exception $e) {
             Log::error($e->getMessage());
 
             return false;
