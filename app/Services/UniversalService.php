@@ -143,4 +143,35 @@ class UniversalService
         return $data;
     }
 
+    /*
+     * 取得付款 類型
+     * Author: Rowena
+     * Return: string
+     */
+    public function getPaymentType()
+    {
+        $data = [
+            'TAPPAY_CREDITCARD' => '信用卡',
+            'TAPPAY_LINEPAY' => 'LINE Pay'
+        ];
+
+        return $data;
+    }
+
+    /*
+     * 取得配送 類型
+     * Author: Rowena
+     * Return: string
+     */
+    public function getDeliveryType()
+    {
+        $data = [
+            'HOME' => '宅配',
+            'FAMILY' => '全家取貨',
+            'STORE' => '門市取貨'
+        ];
+
+        return $data;
+    }
+
 }

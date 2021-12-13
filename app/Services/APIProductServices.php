@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Services\APICartServices;
+use App\Services\BrandsService;
+use App\Services\ShippingFeeRulesService;
+use App\Services\UniversalService;
+use App\Services\WebShippingInfoService;
 
 class APIProductServices
 {
@@ -20,11 +24,23 @@ class APIProductServices
     private $apiWebService;
     private $apiCartService;
 
-    public function __construct(WebCategoryHierarchyService $apiWebCategory, APIWebService $apiWebService, APICartServices $apiCartService)
+    public function __construct(
+        WebCategoryHierarchyService $apiWebCategory,
+        APIWebService $apiWebService,
+        APICartServices $apiCartService,
+        BrandsService $brandsService,
+        ShippingFeeRulesService $shippingFeeService,
+        UniversalService $universalService,
+        WebShippingInfoService $webShippingInfoService
+    )
     {
         $this->apiWebCategory = $apiWebCategory;
         $this->apiWebService = $apiWebService;
         $this->apiCartService = $apiCartService;
+        $this->brandsService = $brandsService;
+        $this->shippingFeeService = $shippingFeeService;
+        $this->universalService = $universalService;
+        $this->webShippingInfoService = $webShippingInfoService;
     }
 
     public function getCategory($keyword = null)
@@ -160,12 +176,18 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null)
     {
 
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
-        $strSQL = "select web_category_products.web_category_hierarchy_id, p.*,
+        $strSQL = "select web_category_products.web_category_hierarchy_id";
+        if ($config_levels == 3) {
+            $strSQL .= ",cate1.category_name L3, cate2.category_name L2, cate3.category_name L1";
+        } else {
+            $strSQL .= ",cate1.category_name L2, cate2.category_name L1";
+        }
+        $strSQL .= ",p.*,
                     (SELECT photo_name
                     FROM product_photos
                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
@@ -194,6 +216,10 @@ class APIProductServices
 
         if ($category) {//依分類搜尋
             $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+        }
+
+        if ($id) {//依產品編號找相關分類
+            $strSQL .= " and web_category_products.product_id=" . $id;
         }
 
         $products = DB::select($strSQL);
@@ -404,47 +430,157 @@ class APIProductServices
     /*
      * 取得商品資料內容頁
      */
-    public function getProduct($id)
+    public function getProduct($id, $detail = null)
     {
+        $s3 = config('filesystems.disks.s3.url');
+        $config_levels = config('uec.web_category_hierarchy_levels');
+        $payment_text = $this->universalService->getPaymentType();
+        $delivery_text = $this->universalService->getDeliveryType();
+        $now = Carbon::now();
+        $data = [];
         //產品主檔基本資訊
         $product = self::getProducts($id);
+        if (sizeof($product) > 0) {
+            $product_categorys = self::getWebCategoryProducts('', '', '', '', $id);
 
-        //行銷促案資訊
-        $promotion_type = [];
-        $promotions = self::getPromotion('product_content');
-        foreach ($promotions as $category => $promotion) {
-            foreach ($promotion as $item) {
-                if ($item->product_id == $id) {
-                    $promotion_type[$category][] = $item;
+            $rel_category = [];
+            if (sizeof($product_categorys) > 0) {
+                foreach ($product_categorys as $key => $category) {
+                    foreach ($category as $kk => $vv) {
+                        $rel_category[] = array(
+                            "category_id" => $vv->web_category_hierarchy_id,
+                            "category_name" => $vv->L1.", " .$vv->L2 .($config_levels == 3?", ".$vv->L3:"")
+                        );
+
+                    }
                 }
             }
-        }
 
-        //產品圖檔
-        $ProductPhotos = ProductPhotos::where('product_id', $id)->orderBy('sort', 'asc')->get();
-        foreach ($ProductPhotos as $photo) {
-            $photos[] = $photo->photo_name;
-        }
+            $discount = ($product[$id]->list_price == 0 ? 0 : ceil(($product[$id]->selling_price / $product[$id]->list_price) * 100));
+            $brand = $this->brandsService->getBrand($product[$id]->brand_id);
+            $shipping_fee = $this->shippingFeeService->getShippingFee($product[$id]->lgst_method);
+            $shipping_info = $this->webShippingInfoService->getShippingInfo($product[$id]->web_shipping_info_code);
 
-        //產品規格
-        $item_spec = [];
-        $ProductSpec = ProductItems::where('product_id', $id)->orderBy('sort', 'asc')->get();
-        $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
-        $item_spec['spec_title'] = array($product[$id]->spec_1,$product[$id]->spec_2); //規格名稱
-        $spec_info = [];
-        foreach ($ProductSpec as $item) {
-            $item_spec['spec_1'][] = $item['spec_1_value'];
-            $item_spec['spec_2'][] = $item['spec_2_value'];
-            $spec_info[] = array(
-                "spec1" => $item['spec_1_value'],
-                "spec2" => $item['spec_2_value'],
-                "item_no" => $item['item_no']
+            //促銷小標
+            if ($now >= $product[$id]->promotion_start_at && $now <= $product[$id]->promotion_end_at) {
+                $promotional = $product[$id]->promotion_desc;
+            } else {
+                $promotional = null;
+            }
+
+            //付款方式
+            $payment_method = [];
+            if ($product[$id]->payment_method != '') {
+                $methods = explode(',', $product[$id]->payment_method);
+                foreach ($methods as $method) {
+                    $payment_method[] = $payment_text[$method];
+                }
+            }
+
+            //配送方式
+            $delivery_method = [];
+            if ($product[$id]->payment_method != '') {
+                $methods = explode(',', $product[$id]->lgst_method);
+                foreach ($methods as $method) {
+                    $delivery_method[] = $delivery_text[$method];
+                }
+            }
+
+            //運費描述
+            $fee = [];
+            if ($shipping_fee) {
+                $fee = array(
+                    "fee" => $shipping_fee[$product[$id]->lgst_method]->shipping_fee,
+                    "fee_threshold" => $shipping_fee[$product[$id]->lgst_method]->free_threshold,
+                    "notice" => $shipping_fee[$product[$id]->lgst_method]->notice_brief,
+                    "notice_detail" => $shipping_fee[$product[$id]->lgst_method]->notice_detailed
+                );
+            }
+
+            //出貨描述
+            $shipping_info = array(
+                "info" => $shipping_info[$product[$id]->web_shipping_info_code]->info_name,
+                "notice" => $shipping_info[$product[$id]->web_shipping_info_code]->notice_brief,
+                "notice_detail" => $shipping_info[$product[$id]->web_shipping_info_code]->notice_detailed
             );
-        }
-        $item_spec['spec_1'] = array_unique($item_spec['spec_1']);
-        $item_spec['spec_2'] = array_unique($item_spec['spec_2']);
-        $item_spec['spec_info'] = $spec_info;
 
-        dd(json_encode($item_spec));
+            $product_info = array(
+                "product_id" => $id,
+                "product_name" => $product[$id]->product_name,
+                "selling_price" => intval($product[$id]->selling_price),
+                "list_price" => intval($product[$id]->list_price),
+                "product_discount" => ($discount > 100 ? 100 : intval($discount)),
+                "delivery" => $delivery_method,
+                "payment" => $payment_method,
+                "brand" => $brand[0]->brand_name,
+                "promotion_label" => $promotional
+            );
+            $data['productInfo'] = $product_info;
+
+            //運費描述
+            $data['shipping_fee'] = $fee;
+
+            //出貨描述
+            $data['shipping_info'] = $shipping_info;
+
+            //行銷促案資訊
+            $promotion_type = [];
+            $promotions = self::getPromotion('product_content');
+            foreach ($promotions as $category => $promotion) {
+                foreach ($promotion as $item) {
+                    if ($item->product_id == $id) {
+                        $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
+                            "campaign_id" => $item->id,
+                            "campaign_name" => $item->campaign_name
+                        );
+                    }
+                }
+            }
+            $data['promotion'] = $promotion_type;
+
+            //產品圖檔
+            $photos = [];
+            $ProductPhotos = ProductPhotos::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            if (isset($ProductPhotos)) {
+                foreach ($ProductPhotos as $photo) {
+                    $photos[] = $s3 . $photo->photo_name;
+                }
+            }
+            $data['photos'] = $photos;
+
+            //產品規格
+            $item_spec = [];
+            $ProductSpec = ProductItems::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
+            $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
+            $spec_info = [];
+            foreach ($ProductSpec as $item) {
+                $item_spec['spec_1'][] = $item['spec_1_value']; //規格1
+                $item_spec['spec_2'][] = $item['spec_2_value']; //規格2
+                $spec_info[] = array(
+                    "itme_id" => $item['id'],
+                    "item_no" => $item['item_no'],
+                    "item_photo" => ($item['photo_name'] ? $s3 . $item['photo_name'] : null),
+                    "item_spec1" => $item['spec_1_value'],
+                    "item_spec2" => $item['spec_2_value'],
+                );
+            }
+            $item_spec['spec_1'] = ($item_spec['spec_1'] ? array_unique($item_spec['spec_1']) : null);
+            $item_spec['spec_2'] = ($item_spec['spec_2'] ? array_unique($item_spec['spec_2']) : null);
+            $item_spec['spec_info'] = $spec_info;
+
+            $data['order_spec'] = $item_spec;
+
+            if ($detail == 'true') {
+                $data["description"] = $product[$id]->description;
+                $data["specification"] = $product[$id]->specification;
+            }
+            if ($rel_category){
+                $data['rel_category'] = $rel_category;
+            }
+            return json_encode($data);
+        } else {
+            return 201;
+        }
     }
 }
