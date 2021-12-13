@@ -254,10 +254,118 @@
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <label class="control-label">商品內容<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <textarea id="description" name="description" placeholder="請在這裡填寫內容"></textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        {{-- 二維多規格結束 --}}
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <label class="control-label">商品規格<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <label class="control-label">Google Shop圖檔<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <input type="file" name="google_shop_photo_name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <label class="control-label">Item圖示<span class="redtext">*</span></label>
+                                        {{-- product_items --}}
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-sm-2">spac_1</th>
+                                                    <th class="col-sm-2">spac_2</th>
+                                                    <th class="col-sm-2">Item圖示 *</th>
+                                                    <th class="col-sm-2">預覽</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td style="vertical-align:middle">
+                                                        spac_1_name
+                                                    </td>
+                                                    <td style="vertical-align:middle">
+                                                        spac_2_name
+                                                    </td>
+                                                    <td>
+                                                       <input type="file">
+                                                    </td>
+                                                </tr>
+    
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <label class="control-label">網頁標題</label>
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <input class="form-control" name="meta_title"
+                                            value="{{ $products->meta_title }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <label class="control-label">網頁描述</label>
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <input class="form-control" name="mata_description"
+                                            value="{{ $products->mata_description }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-2">
+                                        <label class="control-label">網頁標籤(以半形逗號分隔)</label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" name="mata_keywords"
+                                            value="{{ $products->mata_keywords }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
                 </form>
             </div>
@@ -273,7 +381,30 @@
             $('#promotion_end_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
             });
+            ClassicEditor.create(document.querySelector('#description'), {
+            ckfinder: {
+                    // Upload the images to the server using the CKFinder QuickUpload command.
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                        document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    }
 
+                },
+            })
+            ClassicEditor.create(document.querySelector('#specification'), {
+            ckfinder: {
+                    // Upload the images to the server using the CKFinder QuickUpload command.
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                        document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    }
+
+                },
+            })
 
         });
     </script>
