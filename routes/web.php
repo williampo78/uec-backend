@@ -122,6 +122,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'promotional_campaign_prd',
         ],
     ]);
+    Route::post('/promotional_campaign_prd/ajax/can-pass-active-validation', [PromotionalCampaignPrdController::class, 'canPassActiveValidation']);
 
     // 行銷活動
     Route::post('/promotional_campaign/ajax/products', [PromotionalCampaignController::class, 'getProducts']);
