@@ -119,7 +119,6 @@
                                 </div>
                             </div>
                         </div>
-                        <hr>
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
@@ -127,7 +126,7 @@
                                         <label class="control-label">前台分類<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-11">
-                                        <button class="btn btn-large btn-warning" type="button">新增分類</button>
+                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal" data-target="#model_category">新增分類</button>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
@@ -175,7 +174,8 @@
                                         <label class="control-label">關聯性商品<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <button class="btn btn-large btn-warning" type="button">新增商品</button>
+                                        {{-- related_products table --}}
+                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal" data-target="#model_related_products">新增商品</button>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
@@ -217,11 +217,13 @@
                                 </div>
                             </div>
                         </div>
+                        <hr>
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-sm-1">
-                                        <label class="control-label">促銷小標</label>
+                                        <label class="control-label">促銷小標生效時間
+                                        </label>
                                     </div>
                                     <div class="col-sm-6">
                                         <input class="form-control" name="promotion_desc"
@@ -239,7 +241,7 @@
                                     <div class="col-sm-2">
                                         <div class='input-group date'>
                                             <input type='text' class="form-control" name="promotion_start_at"
-                                                id="promotion_start_at" value="{{ $products->promotion_start_at }}"/>
+                                                id="promotion_start_at" value="{{ $products->promotion_start_at }}" />
                                         </div>
                                     </div>
                                     <div class="col-sm-1" style="padding: 0px;width: 2%;">
@@ -278,11 +280,13 @@
                                 </div>
                             </div>
                         </div>
+                        <hr>
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-sm-1">
-                                        <label class="control-label">Google Shop圖檔<span class="redtext">*</span></label>
+                                        <label class="control-label">Google Shop圖檔<span
+                                                class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-11">
                                         <input type="file" name="google_shop_photo_name">
@@ -317,16 +321,17 @@
                                                         spac_2_name
                                                     </td>
                                                     <td>
-                                                       <input type="file">
+                                                        <input type="file">
                                                     </td>
                                                 </tr>
-    
+
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <hr>
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
@@ -370,7 +375,10 @@
                 </form>
             </div>
         </div>
+        @include('Backend.ProductsMall.model_category')
+        @include('Backend.ProductsMall.model_related_products')
     </div>
+
 @endsection
 @section('js')
     <script>
@@ -382,25 +390,27 @@
                 format: 'YYYY-MM-DD HH:mm:ss',
             });
             ClassicEditor.create(document.querySelector('#description'), {
-            ckfinder: {
+                ckfinder: {
                     // Upload the images to the server using the CKFinder QuickUpload command.
                     uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
                     }
 
                 },
             })
             ClassicEditor.create(document.querySelector('#specification'), {
-            ckfinder: {
+                ckfinder: {
                     // Upload the images to the server using the CKFinder QuickUpload command.
                     uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
                     }
 
                 },
