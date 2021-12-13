@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\ProductsService;
+use App\Services\SupplierService ;
+use App\Services\BrandsService ;
+use App\Services\WebCategoryHierarchyService ;
 
 class ProductsMallController extends Controller
 {
@@ -11,9 +15,34 @@ class ProductsMallController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    private $productsService;
+    public function __construct(ProductsService $productsService,
+    SupplierService $supplierService ,
+    BrandsService $brandsService,
+    WebCategoryHierarchyService $webCategoryHierarchyService)
     {
-        return view('Backend.ProductsMall.list');
+        $this->productsService = $productsService;
+        $this->supplierService = $supplierService;
+        $this->brandsService = $brandsService ;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService ;
+    }
+
+    public function index(Request $request)
+    {
+        $in = $request->input() ;
+
+        $result = [
+            'products' => [],
+        ] ;
+
+        if(count($in) !== 0 ){
+            $result['products'] = $this->productsService->getProducts($in) ;
+        }
+    
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
+        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
+
+        return view('Backend.ProductsMall.list',$result);
     }
 
     /**
