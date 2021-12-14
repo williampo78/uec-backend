@@ -91,11 +91,11 @@ class ProductsMallController extends Controller
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
+        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id);//前台分類
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
         $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 
-        // dump($result['products']) ;
         return view('Backend.ProductsMall.input',$result) ;
     }
 
