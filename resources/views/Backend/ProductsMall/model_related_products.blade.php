@@ -33,7 +33,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input placeholder="商品序號" class="form-control" name="product_no"
-                                                id="product_no" v-model="select_req.product_no">
+                                                id="product_no">
                                         </div>
                                     </div>
                                 </div>
@@ -45,7 +45,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input placeholder="商品名稱，至少輸入四個字" class="form-control" name="product_name"
-                                                id="product_name" v-model="select_req.product_name">
+                                                id="product_name">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
@@ -72,9 +72,8 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-success"
-                                        @click="productsForCategory">儲存</button>
-                                    <button type="button" class="btn btn-success" @click="productsForCategory"
+                                    <button type="button" class="btn btn-success">儲存</button>
+                                    <button type="button" class="btn btn-success" 
                                         data-dismiss="modal">儲存並關閉</button>
                                     <button type="button" class="btn btn-danger" data-dismiss="modal"><i
                                             class="fa fa-fw fa-close"></i>關閉</button>
@@ -84,10 +83,8 @@
                                     <hr>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-primary"
-                                        @click="check_all('allon')">全勾選</button>
-                                    <button type="button" class="btn btn-primary"
-                                        @click="check_all('alloff')">全取消</button>
+                                    <button type="button" class="btn btn-primary">全勾選</button>
+                                    <button type="button" class="btn btn-primary">全取消</button>
                                 </div>
                             </div>
                             <br>
@@ -108,23 +105,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- <tr v-for="(product, result_products_key) in result_products">
-                                        <td>@{{ result_products_key + 1 }}</td>
-                                        <td>
-                                            <div class="text-center">
-                                                <input type="checkbox" class="big-checkbox"
-                                                    style="width: 20px;height: 20px;" v-model="product.check_use"
-                                                    :true-value="1" :false-value="0">
-                                            </div>
-                                        </td>
-                                        <td>@{{ product . product_no }}</td>
-                                        <td>@{{ product . product_name }}</td>
-                                        <td>@{{ product . product_name }}</td>
-                                        <td>@{{ product . start_launched_at }}</td>
-                                        <td>@{{ product . launched_status_desc }}</td>
-                                        <td>@{{ product . gross_margin }}</td>
-                                        <td>@{{ product . supplier_name }}</td>
-                                    </tr> --}}
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

@@ -33,7 +33,7 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
-            <div class="panel-body" id="category_hierarchy_content_input">
+            <div class="panel-body" id="CategoryHierarchyContentInput">
                 <form role="form" id="new-form" method="POST" action="{{ route('products.store') }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
@@ -141,7 +141,7 @@
                                             <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts">
                                                 <td style="vertical-align:middle">
                                                     <i class="fa fa-list"></i>
-                                                    @{{Category.category_name}}
+                                                    @{{ Category . category_name }}
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger"
@@ -153,7 +153,6 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                @include('Backend.ProductsMall.model_category')
                             </div>
                         </div>
                         <div class="row">
@@ -374,8 +373,9 @@
                         </div>
                         <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
                 </form>
+                @include('Backend.ProductsMall.model_category')
+                @include('Backend.ProductsMall.model_related_products')
             </div>
-            @include('Backend.ProductsMall.model_related_products')
         </div>
 
     </div>
@@ -412,37 +412,57 @@
                 },
             })
         });
-        var category_products = Vue.extend({
+        var CategoryHierarchyContentInput = Vue.extend({
             data: function() {
                 return {
                     CategoryHierarchyProducts: @json($web_category_hierarchy), //該商品原有的分類
-                    CategoryHierarchyContent:@json($category_hierarchy_content), //所有分類的List
-                    SelectCategoryName:'' , 
+                    CategoryHierarchyContent:  @json($category_hierarchy_content), //所有分類的List
+                    CategoryList: [] , //顯示的分類列表
+                    SelectCategoryName: '',
                 }
             },
             mounted() {
-              
+
             },
             created() {
                 console.log(this.CategoryHierarchyProducts) ; 
                 console.log(this.CategoryHierarchyContent) ; 
-                
+                this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
-                DelCategory(id,key){
-                    console.log(id,key);
+                DelCategory(id, key) {
+                    // this.$delete(this.images, index);
+                    this.CategoryListFilter();
                 },
-                addContentToProductsCategory(){
-                    
-                } 
+                addContentToProductsCategory(id, key) {
+                    console.log('ADD');
+                },
+                CategoryListFilter() {
+                    let vm = this;
+                    let isset = [];
+                    let list  = [];
+                    this.CategoryHierarchyContent.map(function(value, key) {
+                        isset = vm.CategoryHierarchyProducts.filter(data => data.web_category_hierarchy_id === value.id);
+                        console.log(isset) ; 
+                        if(isset.length == 0){
+                            list.push(value) ; 
+                        }
+                        if (vm.SelectCategoryName !== '') {
+                            list = list.filter(data =>
+                                data.name.toLowerCase().includes(vm.SelectCategoryName.toLowerCase())
+                            )
+                        };
+                    })
+                    this.CategoryList = list ; 
+                },
             },
-        computed: {},
-        watch: {
-            SelectCategoryName(){
-                
-            }
-        },
+            computed: {},
+            watch: {
+                SelectCategoryName() {
+                    return this.CategoryListFilter();
+                }
+            },
         })
-        new category_products().$mount('#category_products');
+        new CategoryHierarchyContentInput().$mount('#CategoryHierarchyContentInput');
     </script>
 @endsection

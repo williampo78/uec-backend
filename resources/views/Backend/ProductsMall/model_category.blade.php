@@ -18,38 +18,40 @@
                                 <div class="col-sm-4">
                                     <input placeholder="分類名稱" class="form-control" v-model="SelectCategoryName">
                                 </div>
-                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Table list -->
-                        <div class="panel-body">
-                     
-                            <table class="table table-striped table-bordered table-hover" style="width:100%"
-                                id="products_model_list" data-page-length='100'>
-                                <thead>
-                                    <tr>
-                                        {{-- <th>項次</th> --}}
-                                        <th>ID</th>
-                                        <th>分類名稱</th>
-                                        <th>功能</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(CategoryContent, category_key) in CategoryHierarchyContent">
-                                        <td>@{{CategoryContent.id}}</td>
-                                        <td>@{{CategoryContent.name}}</td>
-                                        <td>   <button type="button" class="btn btn-success"
-                                            @click="addContentToProductsCategory">加入</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <!-- Table list -->
+                    <div class="panel-body">
+                        <table class="table table-striped table-bordered table-hover" style="width:100%"
+                            id="products_model_list" data-page-length='100'>
+                            <thead>
+                                <tr>
+                                    {{-- <th>項次</th> --}}
+                                    <th>ID</th>
+                                    <th>分類名稱</th>
+                                    <th>功能</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(CategoryList, key) in CategoryList">
+                                    <td>@{{ CategoryList . id }}</td>
+                                    <td>@{{ CategoryList . name }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-success"
+                                            @click="addContentToProductsCategory(CategoryList.id  , key)">加入
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- /.modal-content -->
     </div>
-    <!-- /.modal-dialog -->
+    <!-- /.modal-content -->
+</div>
+<!-- /.modal-dialog -->
 </div>
