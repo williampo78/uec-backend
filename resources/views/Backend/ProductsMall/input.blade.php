@@ -415,8 +415,8 @@
         var category_products = Vue.extend({
             data: function() {
                 return {
-                    CategoryHierarchyProducts: @json($web_category_hierarchy),
-                    category_hierarchy_content:@json($category_hierarchy_content),
+                    CategoryHierarchyProducts: @json($web_category_hierarchy), //該商品原有的分類
+                    CategoryHierarchyContent:@json($category_hierarchy_content), //所有分類的List
                     SelectCategoryName:'' , 
                 }
             },
@@ -425,7 +425,8 @@
             },
             created() {
                 console.log(this.CategoryHierarchyProducts) ; 
-                console.log(this.category_hierarchy_content) ; 
+                console.log(this.CategoryHierarchyContent) ; 
+                
             },
             methods: {
                 DelCategory(id,key){

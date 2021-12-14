@@ -36,9 +36,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(category_content, category_key) in category_hierarchy_content">
-                                        <td>@{{category_content.id}}</td>
-                                        <td>@{{category_content.name}}</td>
+                                    <tr v-for="(CategoryContent, category_key) in CategoryHierarchyContent">
+                                        <td>@{{CategoryContent.id}}</td>
+                                        <td>@{{CategoryContent.name}}</td>
                                         <td>   <button type="button" class="btn btn-success"
                                             @click="addContentToProductsCategory">加入</button></td>
                                     </tr>
