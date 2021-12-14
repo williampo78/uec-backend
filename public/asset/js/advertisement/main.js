@@ -257,7 +257,7 @@ function addImageBlock(product_category_select_options = '', datas = {}) {
                 <div class="form-group">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" name="image_block_is_target_blank[${image_block_row_no}]" value="enabled" />
+                            <input type="checkbox" name="image_block_is_target_blank[${image_block_row_no}]" value="enabled" style="width: 20px;height: 20px;cursor: pointer;" />
                         </label>
                     </div>
                 </div>
@@ -346,7 +346,7 @@ function addTextBlock(product_category_select_options, datas = {}) {
                 <div class="form-group">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" name="text_block_is_target_blank[${text_block_row_no}]" value="enabled" />
+                            <input type="checkbox" name="text_block_is_target_blank[${text_block_row_no}]" value="enabled" style="width: 20px;height: 20px;cursor: pointer;" />
                         </label>
                     </div>
                 </div>
