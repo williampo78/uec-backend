@@ -33,7 +33,7 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
-            <div class="panel-body" id="category_hierarchy_content_input">
+            <div class="panel-body" id="CategoryHierarchyContentInput">
                 <form role="form" id="new-form" method="POST" action="{{ route('products.store') }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
@@ -102,7 +102,6 @@
                                     <div class="col-sm-9">
                                         <input class="form-control" name="product_name"
                                             value="{{ $products->product_name }}">
-                                        {{-- <span class="">123</span> --}}
                                     </div>
                                 </div>
                             </div>
@@ -120,13 +119,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-12" id="category_products">
                                 <div class="form-group">
                                     <div class="col-sm-1">
                                         <label class="control-label">前台分類<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-11">
-                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal" data-target="#model_category">新增分類</button>
+                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal"
+                                            data-target="#model_category">新增分類</button>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
@@ -138,14 +138,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts">
                                                 <td style="vertical-align:middle">
                                                     <i class="fa fa-list"></i>
-                                                    名稱
+                                                    @{{ Category . category_name }}
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger"
-                                                        @click="DelCategory(level_1_obj.id)"
+                                                        @click="DelCategory(Category.web_category_hierarchy_id,CategoryKey)"
                                                         v-show="RoleAuthJson.auth_delete">刪除</button>
                                                 </td>
                                             </tr>
@@ -175,7 +175,8 @@
                                     </div>
                                     <div class="col-sm-10">
                                         {{-- related_products table --}}
-                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal" data-target="#model_related_products">新增商品</button>
+                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal"
+                                            data-target="#model_related_products">新增商品</button>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
@@ -324,7 +325,6 @@
                                                         <input type="file">
                                                     </td>
                                                 </tr>
-
                                             </tbody>
                                         </table>
                                     </div>
@@ -373,10 +373,11 @@
                         </div>
                         <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
                 </form>
+                @include('Backend.ProductsMall.model_category')
+                @include('Backend.ProductsMall.model_related_products')
             </div>
         </div>
-        @include('Backend.ProductsMall.model_category')
-        @include('Backend.ProductsMall.model_related_products')
+
     </div>
 
 @endsection
@@ -391,10 +392,8 @@
             });
             ClassicEditor.create(document.querySelector('#description'), {
                 ckfinder: {
-                    // Upload the images to the server using the CKFinder QuickUpload command.
                     uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                             'content'),
@@ -404,18 +403,66 @@
             })
             ClassicEditor.create(document.querySelector('#specification'), {
                 ckfinder: {
-                    // Upload the images to the server using the CKFinder QuickUpload command.
                     uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                             'content'),
                     }
-
                 },
             })
-
         });
+        var CategoryHierarchyContentInput = Vue.extend({
+            data: function() {
+                return {
+                    CategoryHierarchyProducts: @json($web_category_hierarchy), //該商品原有的分類
+                    CategoryHierarchyContent:  @json($category_hierarchy_content), //所有分類的List
+                    CategoryList: [] , //顯示的分類列表
+                    SelectCategoryName: '',
+                }
+            },
+            mounted() {
+
+            },
+            created() {
+                console.log(this.CategoryHierarchyProducts) ; 
+                console.log(this.CategoryHierarchyContent) ; 
+                this.CategoryListFilter(); // 先將原先的分類拔除
+            },
+            methods: {
+                DelCategory(id, key) {
+                    // this.$delete(this.images, index);
+                    this.CategoryListFilter();
+                },
+                addContentToProductsCategory(id, key) {
+                    console.log('ADD');
+                },
+                CategoryListFilter() {
+                    let vm = this;
+                    let isset = [];
+                    let list  = [];
+                    this.CategoryHierarchyContent.map(function(value, key) {
+                        isset = vm.CategoryHierarchyProducts.filter(data => data.web_category_hierarchy_id === value.id);
+                        console.log(isset) ; 
+                        if(isset.length == 0){
+                            list.push(value) ; 
+                        }
+                        if (vm.SelectCategoryName !== '') {
+                            list = list.filter(data =>
+                                data.name.toLowerCase().includes(vm.SelectCategoryName.toLowerCase())
+                            )
+                        };
+                    })
+                    this.CategoryList = list ; 
+                },
+            },
+            computed: {},
+            watch: {
+                SelectCategoryName() {
+                    return this.CategoryListFilter();
+                }
+            },
+        })
+        new CategoryHierarchyContentInput().$mount('#CategoryHierarchyContentInput');
     </script>
 @endsection

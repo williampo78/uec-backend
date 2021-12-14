@@ -72,7 +72,7 @@ class WebCategoryProductsController extends Controller
         $in = [];
         $in['id'] = $id;
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
-        $result['category_products_list'] = $this->webCategoryHierarchyService->category_products($id);
+        $result['category_products_list'] = $this->webCategoryHierarchyService->categoryProductsHierarchyId($id);
         $result['supplier'] = $this->supplierService->getSuppliers();
 
         return view('Backend.WebCategoryProducts.input', $result);
@@ -124,7 +124,7 @@ class WebCategoryProductsController extends Controller
                 break;
             case 'show_category_products':
                 $result['data']['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
-                $result['data']['category_products_list'] = $this->webCategoryHierarchyService->category_products($in['id']);
+                $result['data']['category_products_list'] = $this->webCategoryHierarchyService->categoryProductsHierarchyId($in['id']);
                 break;
             default:
                 # code...

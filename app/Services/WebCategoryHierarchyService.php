@@ -146,12 +146,21 @@ class WebCategoryHierarchyService
 
         return DB::select($query);
     }
-    public function category_products($id)
+    public function categoryProductsHierarchyId($id)
     {
         $resut = CategoryProducts::where('web_category_hierarchy_id', $id)
             ->join('products_v', 'products_v.id', '=', 'web_category_products.product_id')
             ->select('web_category_products.id as web_category_products_id', 'web_category_products.product_id as product_id', 'products_v.*')
             ->get();
+        return $resut;
+    }
+    public function categoryProductsId($id)
+    {
+        $resut = CategoryProducts::where('web_category_products.product_id', $id)
+            ->leftJoin('web_category_hierarchy' ,'web_category_hierarchy.id','=' ,'web_category_products.web_category_hierarchy_id')
+            ->select('web_category_hierarchy_id' , 'web_category_hierarchy.category_name' , 'web_category_products.sort as sort')
+            ->orderBy('web_category_hierarchy.sort', 'ASC')
+            ->get()->toArray();
         return $resut;
     }
     public function get_products_v($in)
