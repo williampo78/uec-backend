@@ -11,13 +11,13 @@ use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Services\APICartServices;
+use App\Services\APICartService;
 use App\Services\BrandsService;
 use App\Services\ShippingFeeRulesService;
 use App\Services\UniversalService;
 use App\Services\WebShippingInfoService;
 
-class APIProductServices
+class APIProductService
 {
 
     private $apiWebCategory;
@@ -27,7 +27,7 @@ class APIProductServices
     public function __construct(
         WebCategoryHierarchyService $apiWebCategory,
         APIWebService $apiWebService,
-        APICartServices $apiCartService,
+        APICartService $apiCartService,
         BrandsService $brandsService,
         ShippingFeeRulesService $shippingFeeService,
         UniversalService $universalService,

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Services\APIProductServices;
+use App\Services\APIProductService;
 use Illuminate\Http\Request;
 use App\Services\APIService;
 use Validator;
@@ -13,7 +13,7 @@ class ProductController extends Controller
     //
     private $apiProductService;
 
-    public function __construct(APIProductServices $apiProductService, APIService $apiService)
+    public function __construct(APIProductService $apiProductService, APIService $apiService)
     {
         $this->apiProductService = $apiProductService;
         $this->apiService = $apiService;
