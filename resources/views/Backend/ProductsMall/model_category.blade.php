@@ -18,12 +18,21 @@
                                 <div class="col-sm-4">
                                     <input placeholder="分類名稱" class="form-control" v-model="SelectCategoryName">
                                 </div>
+
                             </div>
                         </div>
                     </div>
 
                     <!-- Table list -->
                     <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal"><i
+                                        class="fa fa-fw fa-close"></i>關閉</button>
+                            </div>
+                            <hr>
+                        </div>
+                        <br>
                         <table class="table table-striped table-bordered table-hover" style="width:100%"
                             id="products_model_list" data-page-length='100'>
                             <thead>
@@ -35,7 +44,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(CategoryList, key) in CategoryList" >
+                                <tr v-for="(CategoryList, key) in CategoryList">
                                     <td>@{{ CategoryList . id }}</td>
                                     <td>@{{ CategoryList . name }}</td>
                                     <td>

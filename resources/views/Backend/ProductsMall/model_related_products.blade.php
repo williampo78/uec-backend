@@ -33,7 +33,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input placeholder="商品序號" class="form-control" name="product_no"
-                                                id="product_no">
+                                                id="product_no" v-model="select_req.product_no">
                                         </div>
                                     </div>
                                 </div>
@@ -45,7 +45,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input placeholder="商品名稱，至少輸入四個字" class="form-control" name="product_name"
-                                                id="product_name">
+                                                id="product_name" v-model="select_req.product_name">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
@@ -65,6 +65,81 @@
                                         </div>
                                     </div>
                                 </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-3">
+                                            <h5>建檔日</h5>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group" id="">
+                                                <div class='input-group date' id='create_start_date'>
+                                                    <input type='text' class="form-control" name="create_start_date"
+                                                        value="" />
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <h5>~</h5>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class='input-group date' id='create_end_date'>
+                                                <input type='text' class="form-control" name="create_end_date"
+                                                    value="" />
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-3">
+                                            <h5>上架日期</h5>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group" id="">
+                                                <div class='input-group date' id='select_start_date'>
+                                                    <input type='text' class="form-control" name="select_start_date"
+                                                        value="" />
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <h5>~</h5>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class='input-group date' id='select_end_date'>
+                                                <input type='text' class="form-control" name="select_end_date"
+                                                    value="" />
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-3">
+                                            <h5>筆數限制</h5>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <input class="form-control" name="company_number" id="company_number"
+                                                type="number" value="100" max="100" min="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" class="btn btn-success text-right"
+                                            style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -72,8 +147,9 @@
                         <div class="panel-body">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-success">儲存</button>
-                                    <button type="button" class="btn btn-success" 
+                                    <button type="button" class="btn btn-success"
+                                        @click="productsForCategory">儲存</button>
+                                    <button type="button" class="btn btn-success" @click="productsForCategory"
                                         data-dismiss="modal">儲存並關閉</button>
                                     <button type="button" class="btn btn-danger" data-dismiss="modal"><i
                                             class="fa fa-fw fa-close"></i>關閉</button>
@@ -83,8 +159,10 @@
                                     <hr>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-primary">全勾選</button>
-                                    <button type="button" class="btn btn-primary">全取消</button>
+                                    <button type="button" class="btn btn-primary"
+                                        @click="check_all('allon')">全勾選</button>
+                                    <button type="button" class="btn btn-primary"
+                                        @click="check_all('alloff')">全取消</button>
                                 </div>
                             </div>
                             <br>
@@ -105,15 +183,25 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                    <tr v-for="(product, key) in result_products">
+                                        <td>@{{ key + 1 }}</td>
+                                        <td>
+                                            <div class="text-center">
+                                                <input type="checkbox" class="big-checkbox"
+                                                    style="width: 20px;height: 20px;" v-model="product.check_use"
+                                                    :true-value="1" :false-value="0">
+                                            </div>
+                                        </td>
+                                        <td>@{{ product . product_no }}</td>
+                                        <td>@{{ product . product_name }}</td>
+                                        <td>@{{ product . product_name }}</td>
+                                        <td>@{{ product . start_launched_at }}</td>
+                                        <td>@{{ product . launched_status_desc }}</td>
+                                        <td>@{{ product . gross_margin }}</td>
+                                        <td>@{{ product . supplier_name }}</td>
                                         
                                     </tr>
+                                    
                                 </tbody>
                             </table>
                         </div>
