@@ -633,7 +633,11 @@
                         @include('Backend.Products.inputSpec')
                     </div>
                     {{-- 二維多規格結束 --}}
-                    <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
+                    <button class="btn btn-large btn-success" type="button" id="save_data">
+                        <i class="fa fa-save"></i>
+                            儲存
+                        </button>
+                    <a class="btn btn-danger" href="{{ url('products') }}"><i class="fa fa-ban"></i> 取消</a>
                 </form>
             </div>
         </div>

@@ -394,8 +394,11 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-large btn-success" type="button" id="save_data">儲存</button>
-                        <a class="btn btn-danger" href="{{ url('') }}"><i class="fa fa-ban"></i> 取消</a>
+                        <button class="btn btn-large btn-success" type="button" id="save_data">
+                        <i class="fa fa-save"></i>
+                            儲存
+                        </button>
+                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i> 取消</a>
                 </form>
                 @include('Backend.ProductsMall.model_category')
                 @include('Backend.ProductsMall.model_related_products')
@@ -656,7 +659,6 @@
                             alert('格式錯誤') ;
                             e.target.value = '';
                             this.$refs.img[key].src = URL.createObjectURL(file);
-
                     }else{
                         this.$refs.img[key].src = URL.createObjectURL(file);
                     }
