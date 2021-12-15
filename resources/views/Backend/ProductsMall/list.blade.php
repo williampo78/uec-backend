@@ -268,7 +268,7 @@
                                             <a class="btn btn-info btn-sm" href="{{ route('product_small.show', $val->id) }}">
                                                 <i class="fa fa-search"></i></a>
                                             <a class="btn btn-info btn-sm"
-                                                href="{{ route('product_small.edit', $val->id) }}">修改</a>
+                                                href="{{ route('product_small.edit', $val->id) }}">編輯</a>
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_name }}</td>

@@ -50,6 +50,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/signOut', [AdminController::class, 'signOut'])->name('signOut');
     Route::resource('/products', ProductsController::class, ['names' => ['index' => 'products']]);
     Route::resource('/product_small', ProductsMallController::class, ['names' => ['index' => 'product_small']]);
+    Route::post('/product_small/ajax', [ProductsMallController::class, 'ajax']);
 
     Route::post('/del_photos', [PhotosController::class, 'delPhoto']); //刪除聯絡人
     Route::resource('/admin', AdminController::class);

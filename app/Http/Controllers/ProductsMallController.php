@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\BrandsService ;
 use App\Services\ProductsService;
 use App\Services\SupplierService ;
-use App\Services\BrandsService ;
+use Illuminate\Support\Facades\Log;
 use App\Services\WebCategoryHierarchyService ;
 
 class ProductsMallController extends Controller
@@ -91,8 +92,8 @@ class ProductsMallController extends Controller
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
-        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id);//前台分類
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
+        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id);//前台分類
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
         $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 
@@ -120,5 +121,26 @@ class ProductsMallController extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function ajax(Request $request){
+        $in = $request->input();
+        $status = true ; 
+        switch ($in['type']) {
+            case 'DelCategoryInProduct': 
+                try {
+                    $this->webCategoryHierarchyService->DelCategoryInProduct($in) ; 
+                } catch (\Throwable $th) {
+                    $status = false ; 
+                }
+                break;
+            default:
+                break;
+        }
+
+        
+        return response()->json([
+            'status' => $status,
+            'in' => $request->input(),
+        ]);
     }
 }

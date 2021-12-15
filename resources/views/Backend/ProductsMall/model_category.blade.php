@@ -30,17 +30,19 @@
                                 <tr>
                                     {{-- <th>項次</th> --}}
                                     <th>ID</th>
-                                    <th>分類名稱</th>
-                                    <th>功能</th>
+                                    <th style="width: 80%">分類名稱</th>
+                                    <th style="width: 10%">功能</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(CategoryList, key) in CategoryList">
+                                <tr v-for="(CategoryList, key) in CategoryList" @dragstart="drag"
+                                @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                :data-index="key" :data-type="'Category'">
                                     <td>@{{ CategoryList . id }}</td>
                                     <td>@{{ CategoryList . name }}</td>
                                     <td>
                                         <button type="button" class="btn btn-success"
-                                            @click="addContentToProductsCategory(CategoryList.id  , key)">加入
+                                            @click="addContentToProductsCategory(CategoryList,key)">新增
                                         </button>
                                     </td>
                                 </tr>

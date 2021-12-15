@@ -2,8 +2,15 @@
 @section('title', '商品主檔 - 新增商城資訊')
 @section('content')
     <style>
+        .ondragover {
+            background: #b7e0fb !important;
+            transition: background-color 0.5s;
+            /* background: #ce1f59 !important; */
+        }
 
-
+        .elements-box>tr>td>* {
+            pointer-events: none;
+        }
 
     </style>
     <div class="sysinfo">
@@ -145,7 +152,7 @@
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger"
-                                                        @click="DelCategory(Category.web_category_hierarchy_id,CategoryKey)"
+                                                        @click="DelCategory(Category,CategoryKey)"
                                                         v-show="RoleAuthJson.auth_delete">刪除</button>
                                                 </td>
                                             </tr>
@@ -371,7 +378,8 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-large btn-primary" type="button" id="save_data">儲存</button>
+                        <button class="btn btn-large btn-success" type="button" id="save_data">儲存</button>
+                        <a class="btn btn-danger" href="{{ url('') }}"><i class="fa fa-ban"></i> 取消</a>
                 </form>
                 @include('Backend.ProductsMall.model_category')
                 @include('Backend.ProductsMall.model_related_products')
@@ -416,36 +424,67 @@
             data: function() {
                 return {
                     CategoryHierarchyProducts: @json($web_category_hierarchy), //該商品原有的分類
-                    CategoryHierarchyContent:  @json($category_hierarchy_content), //所有分類的List
-                    CategoryList: [] , //顯示的分類列表
+                    CategoryHierarchyContent: @json($category_hierarchy_content), //所有分類的List
+                    CategoryList: [], //顯示的分類列表
                     SelectCategoryName: '',
+                    products: @json($products),
                 }
             },
             mounted() {
 
             },
             created() {
-                console.log(this.CategoryHierarchyProducts) ; 
-                console.log(this.CategoryHierarchyContent) ; 
+                let vm = this;
+                this.CategoryHierarchyProducts.map(function(value, key) {
+                    isset = vm.CategoryHierarchyContent.filter(data => data.id === value
+                        .web_category_hierarchy_id);
+                    value.category_name = isset[0].name;
+                    value.status = 'old';
+                })
                 this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
-                DelCategory(id, key) {
-                    // this.$delete(this.images, index);
+                DelCategory(obj, key) {
+                    if (confirm('確定要刪除嗎?')) {
+                        if (obj.status == 'old') {
+                            axios.post('/backend/product_small/ajax', {
+                                    product_id: this.products.id,
+                                    category_id: obj.web_category_hierarchy_id,
+                                    _token: '{{ csrf_token() }}',
+                                    type: 'DelCategoryInProduct',
+                                })
+                                .then(function(response) {
+                                    console.log(response);
+                                })
+                                .catch(function(error) {
+                                    console.log(error);
+                                });
+                        }
+                        this.$delete(this.CategoryHierarchyProducts, key);
+                    }
                     this.CategoryListFilter();
+                    // this.CategoryListFilter();
                 },
-                addContentToProductsCategory(id, key) {
-                    console.log('ADD');
+                addContentToProductsCategory(obj, key) {
+                    console.log(this.products);
+
+                    let sort = this.CategoryHierarchyProducts.length;
+                    this.CategoryHierarchyProducts.push({
+                        category_name: obj.name,
+                        status: 'new',
+                        web_category_hierarchy_id: obj.id
+                    })
+                    this.CategoryListFilter();
                 },
                 CategoryListFilter() {
                     let vm = this;
                     let isset = [];
-                    let list  = [];
+                    let list = [];
                     this.CategoryHierarchyContent.map(function(value, key) {
-                        isset = vm.CategoryHierarchyProducts.filter(data => data.web_category_hierarchy_id === value.id);
-                        console.log(isset) ; 
-                        if(isset.length == 0){
-                            list.push(value) ; 
+                        isset = vm.CategoryHierarchyProducts.filter(data => data
+                            .web_category_hierarchy_id === value.id);
+                        if (isset.length == 0) {
+                            list.push(value);
                         }
                         if (vm.SelectCategoryName !== '') {
                             list = list.filter(data =>
@@ -453,7 +492,54 @@
                             )
                         };
                     })
-                    this.CategoryList = list ; 
+                    this.CategoryList = list;
+                },
+                drag(eve) {
+                    eve.dataTransfer.setData("text/index", eve.target.dataset.index);
+                    eve.dataTransfer.setData("text/level", eve.target.dataset.level);
+                    $('tbody').addClass('elements-box')
+                },
+                dragover(eve) {
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.add('ondragover') ;
+
+                },
+                dragleave(eve) {
+                    eve.preventDefault();
+                    eve.target.parentNode.classList.remove('ondragover');
+                },
+                drop(eve) {
+                    eve.target.parentNode.classList.remove('ondragover') ;
+                    $('tbody').removeClass('elements-box')
+                    eve.target.parentNode.parentNode.classList.remove('elements-box') ;
+                    var index = eve.dataTransfer.getData("text/index");
+                    var level = eve.dataTransfer.getData("text/level");
+                    let targetIndex = eve.target.parentNode.dataset.index;
+                    let targetlevel = eve.target.parentNode.dataset.level;
+                    if (targetlevel !== level) {
+                        alert('不能跨分類喔!');
+                    } else {
+                        switch (level) {
+                            case '1':
+                                var item = this.category_level_1[index];
+                                this.category_level_1.splice(index, 1)
+                                this.category_level_1.splice(targetIndex, 0, item)
+                                break;
+                            case '2':
+                                var item = this.category_level_2[index];
+                                this.category_level_2.splice(index, 1)
+                                this.category_level_2.splice(targetIndex, 0, item)
+                                break;
+                            case '3':
+                                var item = this.category_level_3[index];
+                                this.category_level_3.splice(index, 1)
+                                this.category_level_3.splice(targetIndex, 0, item)
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
                 },
             },
             computed: {},

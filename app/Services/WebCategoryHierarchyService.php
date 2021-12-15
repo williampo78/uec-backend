@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+use function Aws\filter;
+
 class WebCategoryHierarchyService
 {
     public function __construct()
@@ -148,20 +150,20 @@ class WebCategoryHierarchyService
     }
     public function categoryProductsHierarchyId($id)
     {
-        $resut = CategoryProducts::where('web_category_hierarchy_id', $id)
+        $result = CategoryProducts::where('web_category_hierarchy_id', $id)
             ->join('products_v', 'products_v.id', '=', 'web_category_products.product_id')
             ->select('web_category_products.id as web_category_products_id', 'web_category_products.product_id as product_id', 'products_v.*')
             ->get();
-        return $resut;
+        return $result;
     }
     public function categoryProductsId($id)
-    {
-        $resut = CategoryProducts::where('web_category_products.product_id', $id)
+    {     
+        $result = CategoryProducts::where('web_category_products.product_id', $id)
             ->leftJoin('web_category_hierarchy' ,'web_category_hierarchy.id','=' ,'web_category_products.web_category_hierarchy_id')
             ->select('web_category_hierarchy_id' , 'web_category_hierarchy.category_name' , 'web_category_products.sort as sort')
             ->orderBy('web_category_hierarchy.sort', 'ASC')
-            ->get()->toArray();
-        return $resut;
+            ->get();
+        return $result;
     }
     public function get_products_v($in)
     {
@@ -245,6 +247,10 @@ class WebCategoryHierarchyService
     public function del_category_hierarchy_content($id)
     {
         return DB::table('web_category_products')->where('id', $id)->delete();
+    }
+
+    public function DelCategoryInProduct($in){
+        return DB::table('web_category_products')->where('web_category_hierarchy_id' , $in['category_id'])->where('product_id',$in['product_id'])->delete() ; 
     }
 
 }
