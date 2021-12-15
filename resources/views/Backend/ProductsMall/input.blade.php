@@ -145,7 +145,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts">
+                                            <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts" @dragstart="drag"
+                                            @dragover='dragover' @dragleave='dragleave' @drop="drop"  draggable="true"
+                                            :data-index="CategoryKey" :data-type="'Category'">
                                                 <td style="vertical-align:middle">
                                                     <i class="fa fa-list"></i>
                                                     @{{ Category . category_name }}
@@ -496,7 +498,7 @@
                 },
                 drag(eve) {
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
-                    eve.dataTransfer.setData("text/level", eve.target.dataset.level);
+                    eve.dataTransfer.setData("text/type", eve.target.dataset.type);
                     $('tbody').addClass('elements-box')
                 },
                 dragover(eve) {
@@ -513,27 +515,25 @@
                     $('tbody').removeClass('elements-box')
                     eve.target.parentNode.parentNode.classList.remove('elements-box') ;
                     var index = eve.dataTransfer.getData("text/index");
-                    var level = eve.dataTransfer.getData("text/level");
+                    var type = eve.dataTransfer.getData("text/type");
                     let targetIndex = eve.target.parentNode.dataset.index;
-                    let targetlevel = eve.target.parentNode.dataset.level;
-                    if (targetlevel !== level) {
+                    let targetType = eve.target.parentNode.dataset.type;
+                    if (targetType !== type) {
                         alert('不能跨分類喔!');
                     } else {
-                        switch (level) {
-                            case '1':
-                                var item = this.category_level_1[index];
-                                this.category_level_1.splice(index, 1)
-                                this.category_level_1.splice(targetIndex, 0, item)
+                        switch (type) {
+                            case 'Category':
+                                var item = this.CategoryHierarchyProducts[index];
+                                this.CategoryHierarchyProducts.splice(index, 1);
+                                this.CategoryHierarchyProducts.splice(targetIndex, 0, item);
                                 break;
                             case '2':
-                                var item = this.category_level_2[index];
-                                this.category_level_2.splice(index, 1)
-                                this.category_level_2.splice(targetIndex, 0, item)
+                             
                                 break;
                             case '3':
-                                var item = this.category_level_3[index];
-                                this.category_level_3.splice(index, 1)
-                                this.category_level_3.splice(targetIndex, 0, item)
+                                // var item = this.category_level_3[index];
+                                // this.category_level_3.splice(index, 1)
+                                // this.category_level_3.splice(targetIndex, 0, item)
                                 break;
                             default:
                                 break;

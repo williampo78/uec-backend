@@ -35,9 +35,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(CategoryList, key) in CategoryList" @dragstart="drag"
-                                @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                :data-index="key" :data-type="'Category'">
+                                <tr v-for="(CategoryList, key) in CategoryList" >
                                     <td>@{{ CategoryList . id }}</td>
                                     <td>@{{ CategoryList . name }}</td>
                                     <td>
