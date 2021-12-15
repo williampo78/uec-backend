@@ -44,7 +44,7 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
-            <div class="panel-body" id="CategoryHierarchyContentInput">
+            <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
                 <form role="form" id="new-form" method="POST" action="{{ route('products.store') }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
@@ -166,6 +166,8 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
+                                    rows="10">@{{ CategoryHierarchyProducts }}</textarea>
                             </div>
                         </div>
                         <div class="row">
@@ -184,7 +186,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-sm-1">
-                                        <label class="control-label">關聯性商品<span class="redtext">*</span></label>
+                                        <label class="control-label">關聯性商品</label>
                                     </div>
                                     <div class="col-sm-10">
                                         {{-- related_products table --}}
@@ -217,6 +219,9 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
+                                    rows="10">@{{ CategoryHierarchyProducts }}</textarea>
+
                             </div>
                         </div>
                         <div class="row">
@@ -290,7 +295,7 @@
                                         <label class="control-label">商品規格<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-11">
-                                        <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"></textarea>
+                                        <textarea id="specification" name="specification" placeholder="請在這裡填寫內容" accept=".jpg,.jpeg,.png"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -300,12 +305,16 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-sm-1">
-                                        <label class="control-label">Google Shop圖檔<span
-                                                class="redtext">*</span></label>
+                                        <label class="control-label">Google Shop圖檔
+                                        </label>
                                     </div>
-                                    <div class="col-sm-11">
-                                        <input type="file" name="google_shop_photo_name">
+                                    <div class="col-sm-2">
+                                        <input type="file" name="google_shop_photo_name" accept=".jpg,.jpeg,.png" @change="google_shop">
                                     </div>
+                                    <div class="col-sm-3">
+                                        <img :ref="'GoogleShopPhoto'" src="{{ asset('asset/img/default_item.png') }}" style="max-width:100%;" >
+                                    </div>
+                              
                                 </div>
                             </div>
                         </div>
@@ -320,25 +329,25 @@
                                         <table class="table table-striped table-bordered table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th class="col-sm-2">spac_1</th>
-                                                    <th class="col-sm-2">spac_2</th>
-                                                    <th class="col-sm-2">Item圖示 *</th>
-                                                    <th class="col-sm-2">預覽</th>
-
+                                                    <th class="col-sm-1">spac_1</th>
+                                                    <th class="col-sm-1">spac_2</th>
+                                                    <th class="col-sm-1">Item圖示 <span class="redtext">*</span></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td style="vertical-align:middle">
-                                                        spac_1_name
-                                                    </td>
-                                                    <td style="vertical-align:middle">
-                                                        spac_2_name
-                                                    </td>
-                                                    <td>
-                                                        <input type="file">
-                                                    </td>
-                                                </tr>
+                                                    <tr v-for="(Item , key ) in ProductsItem">
+                                                        <td style="vertical-align:middle">
+                                                            @{{ Item.spec_1_value }}
+                                                        </td>
+                                                        <td style="vertical-align:middle">
+                                                            @{{ Item.spec_2_value }}
+                                                        </td>
+                                                        <td>
+                                                            <input :name="'photo_name['+key+']'" :key="key" type="file" accept=".jpg,.jpeg,.png" @change="item_photo($event, key)">
+                                                            <img :ref="'img'" src="{{ asset('asset/img/default_item.png') }}" style="max-width:100%;">
+                                                        </td>
+                                                    </tr>
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -436,7 +445,6 @@
                     SelectCategoryName: '',
                     products: @json($products),
                     select_req: {
-                        // supplier_id :$('#supplier').val() ,
                         product_no: '',
                         product_name: '',
                         selling_price_min: '',
@@ -444,13 +452,14 @@
                     },
                     result_products: [],
                     RelatedProducts: @json($related_products),
+                    ProductsItem:@json($products_item) , 
+                    DefaultassetImg : '{{ asset('asset/img/default_item.png') }}' ,
                 }
             },
             mounted() {
 
             },
             created() {
-                console.log(this.RelatedProducts);
                 let vm = this;
                 this.CategoryHierarchyProducts.map(function(value, key) {
                     isset = vm.CategoryHierarchyContent.filter(data => data.id === value
@@ -553,7 +562,7 @@
                         });
                         this.result_products = response.data.result.data;
                     }
-                  
+
                     req();
                 },
                 productsForCategory() {
@@ -630,6 +639,28 @@
                     }
 
                 },
+                google_shop(e){
+                    let file = e.target.files[0];
+                    let type = e.target.files[0].type ; 
+                    if(type !== 'image/jpeg' && type!== 'image/png'){
+                            alert('格式錯誤') ;
+                            e.target.value = '';
+                    }else{
+                        this.$refs.GoogleShopPhoto.src = URL.createObjectURL(file);
+                    }
+                },
+                item_photo(e,key){
+                    let file = e.target.files[0];
+                    let type = e.target.files[0].type ; 
+                    if(type !== 'image/jpeg' && type!== 'image/png'){
+                            alert('格式錯誤') ;
+                            e.target.value = '';
+                            this.$refs.img[key].src = URL.createObjectURL(file);
+
+                    }else{
+                        this.$refs.img[key].src = URL.createObjectURL(file);
+                    }
+                }
             },
             computed: {},
             watch: {
