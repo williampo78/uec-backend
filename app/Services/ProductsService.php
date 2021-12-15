@@ -7,8 +7,10 @@ use App\Models\ProductPhotos;
 use App\Models\Products;
 use App\Models\Product_items;
 use App\Models\Product_spec_info;
+use App\Models\RelatedProducts ; 
 use App\Services\UniversalService;
 use Carbon\Carbon;
+use FunctionName;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -510,5 +512,13 @@ class ProductsService
     {
         $result = Product_spec_info::where('product_id', $product_id)->first();
         return $result;
+    }
+    public function getRelatedProducts($product_id){
+        $result = RelatedProducts::select('related_products.*' , 'products.product_name')
+        ->where('related_products.product_id',$product_id)
+        ->leftJoin('products', 'products.id', '=', 'related_products.product_id')
+        ->orderBy('related_products.sort' , 'ASC')
+        ->get() ; 
+        return $result ; 
     }
 }

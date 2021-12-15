@@ -97,6 +97,7 @@ class ProductsMallController extends Controller
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
         $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 
+        $result['related_products'] = $this->productsService->getRelatedProducts($id) ;
         return view('Backend.ProductsMall.input',$result) ;
     }
 
@@ -129,6 +130,13 @@ class ProductsMallController extends Controller
             case 'DelCategoryInProduct': 
                 try {
                     $this->webCategoryHierarchyService->DelCategoryInProduct($in) ; 
+                } catch (\Throwable $th) {
+                    $status = false ; 
+                }
+                break;
+            case 'DelRelatedProducts' : 
+                try {
+                    $this->webCategoryHierarchyService->DelRelatedProducts($in['id']) ; 
                 } catch (\Throwable $th) {
                     $status = false ; 
                 }

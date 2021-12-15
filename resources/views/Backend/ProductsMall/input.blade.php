@@ -11,9 +11,11 @@
         .elements-box>tr>td>* {
             pointer-events: none;
         }
+
         .modal-dialog {
             max-width: 100%;
         }
+
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -147,16 +149,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop"  draggable="true"
-                                            :data-index="CategoryKey" :data-type="'Category'">
+                                            <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
+                                                @dragstart="drag" @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                draggable="true" :data-index="CategoryKey" :data-type="'Category'">
                                                 <td style="vertical-align:middle">
                                                     <i class="fa fa-list"></i>
                                                     @{{ Category . category_name }}
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger"
-                                                        @click="DelCategory(Category,CategoryKey)"
+                                                        @click="Del(Category,CategoryKey,'Category')"
                                                         v-show="RoleAuthJson.auth_delete">刪除</button>
                                                 </td>
                                             </tr>
@@ -199,15 +201,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                            <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
+                                                @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
+                                                :data-index="key" :data-type="'Products'">
                                                 <td style="vertical-align:middle">
                                                     <i class="fa fa-list"></i>
-                                                    名稱
+                                                    @{{ Product . product_name }}
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger"
-                                                        @click="DelCategory(level_1_obj.id)"
-                                                        v-show="RoleAuthJson.auth_delete">刪除</button>
+                                                        @click="Del(Product ,key ,'Products')">刪除</button>
                                                 </td>
                                             </tr>
 
@@ -439,13 +442,15 @@
                         selling_price_min: '',
                         selling_price_max: '',
                     },
-                    result_products:[] ,
+                    result_products: [],
+                    RelatedProducts: @json($related_products),
                 }
             },
             mounted() {
 
             },
             created() {
+                console.log(this.RelatedProducts);
                 let vm = this;
                 this.CategoryHierarchyProducts.map(function(value, key) {
                     isset = vm.CategoryHierarchyContent.filter(data => data.id === value
@@ -456,26 +461,43 @@
                 this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
-                DelCategory(obj, key) {
+                Del(obj, key, type) {
                     if (confirm('確定要刪除嗎?')) {
-                        if (obj.status == 'old') {
-                            axios.post('/backend/product_small/ajax', {
-                                    product_id: this.products.id,
-                                    category_id: obj.web_category_hierarchy_id,
-                                    _token: '{{ csrf_token() }}',
-                                    type: 'DelCategoryInProduct',
-                                })
-                                .then(function(response) {
-                                    console.log(response);
-                                })
-                                .catch(function(error) {
-                                    console.log(error);
-                                });
+                        if (type == 'Category') {
+                            if (obj.status == 'old') {
+                                axios.post('/backend/product_small/ajax', {
+                                        product_id: this.products.id,
+                                        category_id: obj.web_category_hierarchy_id,
+                                        _token: '{{ csrf_token() }}',
+                                        type: 'DelCategoryInProduct',
+                                    })
+                                    .then(function(response) {
+                                        console.log(response);
+                                    })
+                                    .catch(function(error) {
+                                        console.log(error);
+                                    });
+                            }
+                            this.$delete(this.CategoryHierarchyProducts, key);
+                            this.CategoryListFilter();
+                        } else if (type == 'Products') {
+                            if (obj.id !== '') {
+                                axios.post('/backend/product_small/ajax', {
+                                        id: obj.id,
+                                        _token: '{{ csrf_token() }}',
+                                        type: 'DelRelatedProducts',
+                                    })
+                                    .then(function(response) {
+                                        console.log(response);
+                                    })
+                                    .catch(function(error) {
+                                        console.log(error);
+                                    });
+                            }
+                            this.$delete(this.RelatedProducts, key);
                         }
-                        this.$delete(this.CategoryHierarchyProducts, key);
                     }
-                    this.CategoryListFilter();
-                    // this.CategoryListFilter();
+
                 },
                 addContentToProductsCategory(obj, key) {
                     console.log(this.products);
@@ -512,10 +534,9 @@
                     var select_start_date = $('input[name="select_start_date"]').val();
                     var select_end_date = $('input[name="select_end_date"]').val();
                     var filter_product_id = [];
-                    // this.category_products_list.find((todo, index) => {
-                    //     filter_product_id.push(todo.product_id);
-                    // })
-                    // console.log(filter_product_id)  ;
+                    this.RelatedProducts.find((todo, index) => {
+                        filter_product_id.push(todo.product_id);
+                    })
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
@@ -530,45 +551,31 @@
                             select_end_date: select_end_date,
                             filter_product_id: filter_product_id, //排除掉 ID
                         });
-                        console.log(response);
                         this.result_products = response.data.result.data;
                     }
+                  
                     req();
                 },
                 productsForCategory() {
                     let list = [];
-                    let readyDel = [];
                     var findthis = this.result_products.find((todo, index) => {
                         if (todo.check_use == 1) {
-                            this.category_products_list.push({
-                                web_category_products_id: '',
-                                agent_id: todo.agent_id,
-                                created_date: todo.created_date,
-                                end_launched_at: todo.end_launched_at,
-                                gross_margin: todo.gross_margin,
+                            this.RelatedProducts.push({
+                                id: '',
                                 product_id: todo.id,
-                                item_cost: todo.item_cost,
-                                launched_status: todo.launched_status,
-                                launched_status_desc: todo.launched_status_desc,
                                 product_name: todo.product_name,
                                 product_no: todo.product_no,
-                                selling_price: todo.selling_price,
-                                start_launched_at: todo.start_launched_at,
-                                stock_type: todo.stock_type,
                                 supplier_id: todo.supplier_id,
                             });
-                            readyDel.push(index);
                             todo.del = 1;
                         } else {
                             todo.del = 0;
                         }
                     })
-
                     let new_array = this.result_products.filter(function(obj) {
                         return obj.del == 0;
                     });
                     this.result_products = new_array;
-
                 },
                 check_all(act) {
                     var status = '';
@@ -588,7 +595,7 @@
                 },
                 dragover(eve) {
                     eve.preventDefault();
-                    eve.target.parentNode.classList.add('ondragover') ;
+                    eve.target.parentNode.classList.add('ondragover');
 
                 },
                 dragleave(eve) {
@@ -596,9 +603,9 @@
                     eve.target.parentNode.classList.remove('ondragover');
                 },
                 drop(eve) {
-                    eve.target.parentNode.classList.remove('ondragover') ;
+                    eve.target.parentNode.classList.remove('ondragover');
                     $('tbody').removeClass('elements-box')
-                    eve.target.parentNode.parentNode.classList.remove('elements-box') ;
+                    eve.target.parentNode.parentNode.classList.remove('elements-box');
                     var index = eve.dataTransfer.getData("text/index");
                     var type = eve.dataTransfer.getData("text/type");
                     let targetIndex = eve.target.parentNode.dataset.index;
@@ -612,13 +619,10 @@
                                 this.CategoryHierarchyProducts.splice(index, 1);
                                 this.CategoryHierarchyProducts.splice(targetIndex, 0, item);
                                 break;
-                            case '2':
-                             
-                                break;
-                            case '3':
-                                // var item = this.category_level_3[index];
-                                // this.category_level_3.splice(index, 1)
-                                // this.category_level_3.splice(targetIndex, 0, item)
+                            case 'Products':
+                                var item = this.RelatedProducts[index];
+                                this.RelatedProducts.splice(index, 1);
+                                this.RelatedProducts.splice(targetIndex, 0, item);
                                 break;
                             default:
                                 break;

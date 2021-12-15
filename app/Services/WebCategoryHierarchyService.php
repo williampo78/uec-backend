@@ -252,5 +252,8 @@ class WebCategoryHierarchyService
     public function DelCategoryInProduct($in){
         return DB::table('web_category_products')->where('web_category_hierarchy_id' , $in['category_id'])->where('product_id',$in['product_id'])->delete() ; 
     }
+    public function DelRelatedProducts($id){
+        return DB::table('related_products')->where('id' , $id)->delete() ; 
+    }
 
 }
