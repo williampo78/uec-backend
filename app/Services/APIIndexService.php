@@ -5,14 +5,14 @@ namespace App\Services;
 
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
-use App\Services\APIProductServices;
+use App\Services\APIProductService;
 
-class APIIndexServices
+class APIIndexService
 {
 
     private $apiProductService;
 
-    public function __construct(APIProductServices $apiProductService)
+    public function __construct(APIProductService $apiProductService)
     {
         $this->apiProductService = $apiProductService;
     }

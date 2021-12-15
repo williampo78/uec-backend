@@ -11,13 +11,13 @@ use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Services\APICartServices;
+use App\Services\APICartService;
 use App\Services\BrandsService;
 use App\Services\ShippingFeeRulesService;
 use App\Services\UniversalService;
 use App\Services\WebShippingInfoService;
 
-class APIProductServices
+class APIProductService
 {
 
     private $apiWebCategory;
@@ -27,7 +27,7 @@ class APIProductServices
     public function __construct(
         WebCategoryHierarchyService $apiWebCategory,
         APIWebService $apiWebService,
-        APICartServices $apiCartService,
+        APICartService $apiCartService,
         BrandsService $brandsService,
         ShippingFeeRulesService $shippingFeeService,
         UniversalService $universalService,
@@ -449,7 +449,7 @@ class APIProductServices
                     foreach ($category as $kk => $vv) {
                         $rel_category[] = array(
                             "category_id" => $vv->web_category_hierarchy_id,
-                            "category_name" => $vv->L1.", " .$vv->L2 .($config_levels == 3?", ".$vv->L3:"")
+                            "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
                         );
 
                     }
@@ -470,16 +470,17 @@ class APIProductServices
 
             //付款方式
             $payment_method = [];
-            if ($product[$id]->payment_method != '') {
-                $methods = explode(',', $product[$id]->payment_method);
-                foreach ($methods as $method) {
-                    $payment_method[] = $payment_text[$method];
-                }
+            $payment_way = "TAPPAY_CREDITCARD,TAPPAY_LINEPAY";//本階段沒有欄位寫固定的付款方式
+            //if ($product[$id]->payment_method != '') {
+            $methods = explode(',', $payment_way);
+            foreach ($methods as $method) {
+                $payment_method[] = $payment_text[$method];
             }
+            //}
 
             //配送方式
             $delivery_method = [];
-            if ($product[$id]->payment_method != '') {
+            if ($product[$id]->lgst_method != '') {
                 $methods = explode(',', $product[$id]->lgst_method);
                 foreach ($methods as $method) {
                     $delivery_method[] = $delivery_text[$method];
@@ -517,11 +518,21 @@ class APIProductServices
             );
             $data['productInfo'] = $product_info;
 
+            //產品圖檔
+            $photos = [];
+            $ProductPhotos = ProductPhotos::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            if (isset($ProductPhotos)) {
+                foreach ($ProductPhotos as $photo) {
+                    $photos[] = $s3 . $photo->photo_name;
+                }
+            }
+            $data['productPhotos'] = $photos;
+
             //運費描述
-            $data['shipping_fee'] = $fee;
+            $data['shippingFee'] = $fee;
 
             //出貨描述
-            $data['shipping_info'] = $shipping_info;
+            $data['shippingInfo'] = $shipping_info;
 
             //行銷促案資訊
             $promotion_type = [];
@@ -536,17 +547,8 @@ class APIProductServices
                     }
                 }
             }
-            $data['promotion'] = $promotion_type;
+            $data['campaignInfo'] = $promotion_type;
 
-            //產品圖檔
-            $photos = [];
-            $ProductPhotos = ProductPhotos::where('product_id', $id)->orderBy('sort', 'asc')->get();
-            if (isset($ProductPhotos)) {
-                foreach ($ProductPhotos as $photo) {
-                    $photos[] = $s3 . $photo->photo_name;
-                }
-            }
-            $data['photos'] = $photos;
 
             //產品規格
             $item_spec = [];
@@ -569,15 +571,23 @@ class APIProductServices
             $item_spec['spec_2'] = ($item_spec['spec_2'] ? array_unique($item_spec['spec_2']) : null);
             $item_spec['spec_info'] = $spec_info;
 
-            $data['order_spec'] = $item_spec;
+            $data['orderSpec'] = $item_spec;
 
             if ($detail == 'true') {
-                $data["description"] = $product[$id]->description;
-                $data["specification"] = $product[$id]->specification;
+                $data["productDesc"] = $product[$id]->description;
+                $data["productSpec"] = $product[$id]->specification;
             }
-            if ($rel_category){
-                $data['rel_category'] = $rel_category;
+            if ($rel_category) {
+                $data['relateCategory'] = $rel_category;
             }
+            $data['googleShop'] = $s3 . $product[$id]->google_shop_photo_name;
+            $meta = [];
+            $meta['meta_title'] = ($product[$id]->meta_title ? $product[$id]->meta_title : $product[$id]->product_name);
+            $meta['mata_description'] = ($product[$id]->description ? $product[$id]->description : $product[$id]->product_name);
+            $meta['mata_keywords'] = ($product[$id]->mata_keywords ? $product[$id]->mata_keywords : $product[$id]->product_name);
+            $meta['mata_image'] = ($product[$id]->displayPhoto ? $s3 . $product[$id]->displayPhoto : null);
+            $meta['meta_type'] = 'website';
+            $data['metaData'] = $meta;
             return json_encode($data);
         } else {
             return 201;

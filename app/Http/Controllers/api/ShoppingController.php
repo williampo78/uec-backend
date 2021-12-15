@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Services\APICartServices;
+use App\Services\APICartService;
 use App\Services\APIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ class ShoppingController extends Controller
 
     private $apiCartService;
 
-    public function __construct(APICartServices $apiCartService, APIService $apiService)
+    public function __construct(APICartService $apiCartService, APIService $apiService)
     {
         $this->apiCartService = $apiCartService;
         $this->apiService = $apiService;
@@ -89,5 +89,29 @@ class ShoppingController extends Controller
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
+    }
+
+    /*
+     * 購物車清單
+     */
+    public function getShoppingCartData()
+    {
+        $error_code = $this->apiService->getErrorCode();
+        $member_id = Auth::guard('api')->user()->member_id;
+        $response = $this->apiCartService->getCartData($member_id);
+        //$response = json_encode($response, true);
+        if ($response == 'success') {
+            $status = true;
+            $data = '';
+        } elseif ($response == '203') {
+            $status = false;
+            $err = $response;
+            $data = '';
+        } else {
+            $status = false;
+            $err = '401';
+            $data = '';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $response]);
     }
 }
