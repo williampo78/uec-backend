@@ -111,14 +111,11 @@ class ProductsMallController extends Controller
     {
         $in = $request->input() ; 
         $file = $request->file() ;
-        // dd($file) ; 
         $this->productsService->updateProductSmall($in , $file , $id) ;
-        exit ;
-        // dd($in , $file) ; 
-        
-        exit ;
+        $act = 'upd';
+        $route_name = 'product_small';
+        return view('Backend.success', compact('route_name', 'act'));
     }
-
     /**
      * Remove the specified resource from storage.
      *

@@ -20,15 +20,25 @@
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
         <div class="sysinfo-content">
-            <ul>
+            <ul class="navigation">
                 <a href="#page-1">
-                    <li class="sysinfo-li sysinfo-activie" id="click-page-1">
+                    <li class="sysinfo-li" id="click-page-1">
                         前台資料
                     </li>
                 </a>
                 <a href="#page-2">
                     <li class="sysinfo-li" id="click-page-2">
-                        規格
+                        商品介紹
+                    </li>
+                </a>
+                <a href="#page-3">
+                    <li class="sysinfo-li" id="click-page-3">
+                        媒體檔
+                    </li>
+                </a>
+                <a href="#page-4">
+                    <li class="sysinfo-li" id="click-page-4">
+                        SEO
                     </li>
                 </a>
                 {{-- <li></li> --}}
@@ -49,360 +59,383 @@
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
-                    <div id="page-1" class="form-horizontal">
-                        <div class="row ">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="col-sm-2 ">
-                                        <label class="control-label">庫存類型</label><span class="redtext">*</span>
+                    <div class="form-horizontal">
+                        <section id="page-1">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 ">
+                                            <label class="control-label">庫存類型</label><span class="redtext">*</span>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="stock_type" value="A"
+                                                    {{ $products->stock_type == 'A' ? 'checked' : 'disabled' }}>
+                                                買斷
+                                                [A]
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="stock_type" value="B"
+                                                    {{ $products->stock_type == 'B' ? 'checked' : 'disabled' }}>
+                                                寄售
+                                                [B]
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="stock_type" value="T"
+                                                    {{ $products->stock_type == 'T' ? 'checked' : 'disabled' }}>
+                                                轉單[T]
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-3">
-                                        <label class="radio-inline">
-                                            <input type="radio" name="stock_type" value="A"
-                                                {{ $products->stock_type == 'A' ? 'checked' : 'disabled' }}>
-                                            買斷
-                                            [A]
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label class="radio-inline">
-                                            <input type="radio" name="stock_type" value="B"
-                                                {{ $products->stock_type == 'B' ? 'checked' : 'disabled' }}>
-                                            寄售
-                                            [B]
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label class="radio-inline">
-                                            <input type="radio" name="stock_type" value="T"
-                                                {{ $products->stock_type == 'T' ? 'checked' : 'disabled' }}>
-                                            轉單[T]
-                                        </label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 ">
+                                            <label class="control-label ">商品序號</label><span class="redtext">*</span>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" name="product_no"
+                                                value="{{ $products->product_no }}" readonly>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="col-sm-2 ">
-                                        <label class="control-label ">商品序號</label><span class="redtext">*</span>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 ">
+                                            <label class="control-label">供應商<span class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" name="supplier_name"
+                                                value="{{ $products->supplier_name }}" readonly>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="product_no"
-                                            value="{{ $products->product_no }}" readonly>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class=" form-group">
+                                        <div class="col-sm-2 ">
+                                            <label class="control-label">商品名稱<span class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" name="product_name"
+                                                value="{{ $products->product_name }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="col-sm-2 ">
-                                        <label class="control-label">供應商<span class="redtext">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="supplier_name"
-                                            value="{{ $products->supplier_name }}" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class=" form-group">
-                                    <div class="col-sm-2 ">
-                                        <label class="control-label">商品名稱<span class="redtext">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="product_name"
-                                            value="{{ $products->product_name }}">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <label class="control-label">
+                                                <a href="{{ route('products.show', $products->id) }}"
+                                                    target="_blank">查看基本資訊</a>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-12" id="category_products">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">前台分類<span class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-11">
+                                            <button class="btn btn-large btn-warning btn-sm" type="button"
+                                                data-toggle="modal" data-target="#model_category">新增分類</button>
+                                        </div>
+                                    </div>
                                     <div class="col-sm-12">
-                                        <label class="control-label">
-                                            <a href="{{ route('products.show', $products->id) }}"
-                                                target="_blank">查看基本資訊</a>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12" id="category_products">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">前台分類<span class="redtext">*</span></label>
-                                    </div>
-                                    <div class="col-sm-11">
-                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal"
-                                            data-target="#model_category">新增分類</button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <table class="table table-striped table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th class="col-sm-11">名稱</th>
-                                                <th class="col-sm-1">功能</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
-                                                @dragstart="drag" @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                draggable="true" :data-index="CategoryKey" :data-type="'Category'">
-                                                <td style="vertical-align:middle">
-                                                    <i class="fa fa-list"></i>
-                                                    @{{ Category . category_name }}
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger"
-                                                        @click="Del(Category,CategoryKey,'Category')"
-                                                        v-show="RoleAuthJson.auth_delete">刪除</button>
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
-                                    rows="10">@{{ CategoryHierarchyProducts }}</textarea>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">關聯關鍵字</label>
-                                    </div>
-                                    <div class="col-sm-11">
-                                        <input class="form-control" name="keywords" value="{{ $products->keywords }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">關聯性商品</label>
-                                    </div>
-                                    <div class="col-sm-10">
-                                        {{-- related_products table --}}
-                                        <button class="btn btn-large btn-warning btn-sm" type="button" data-toggle="modal"
-                                            data-target="#model_related_products">新增商品</button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <table class="table table-striped table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th class="col-sm-11">名稱</th>
-                                                <th class="col-sm-1">功能</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
-                                                @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                                :data-index="key" :data-type="'Products'">
-                                                <td style="vertical-align:middle">
-                                                    <i class="fa fa-list"></i>
-                                                    @{{ Product . product_name }}
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger"
-                                                        @click="Del(Product ,key ,'Products')">刪除</button>
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
-                                    rows="10">@{{ RelatedProducts }}</textarea>
-
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">每單限購數量<span class="redtext">*</span></label>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <input class="form-control" name="order_limited_qty"
-                                            value="{{ $products->order_limited_qty }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">促銷小標生效時間
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <input class="form-control" name="promotion_desc"
-                                            value="{{ $products->promotion_desc }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">促銷小標</label>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class='input-group date'>
-                                            <input type='text' class="form-control" name="promotion_start_at"
-                                                id="promotion_start_at" value="{{ $products->promotion_start_at }}" />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-1" style="padding: 0px;width: 2%;">
-                                        <label class="control-label">~</label>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class='input-group date'>
-                                            <input type='text' class="form-control" name="promotion_end_at"
-                                                id="promotion_end_at" value="{{ $products->promotion_end_at }}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">商品內容<span class="redtext">*</span></label>
-                                    </div>
-                                    <div class="col-sm-11">
-                                        <textarea id="description" name="description" placeholder="請在這裡填寫內容"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">商品規格<span class="redtext">*</span></label>
-                                    </div>
-                                    <div class="col-sm-11">
-                                        <textarea id="specification" name="specification" placeholder="請在這裡填寫內容" accept=".jpg,.jpeg,.png"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">Google Shop圖檔
-                                        </label>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <input type="file" name="google_shop_photo_name" accept=".jpg,.jpeg,.png" @change="google_shop">
-                                        <input type="hidden" name="google_shop_photo_name_old" value="{{$products->google_shop_photo_name}}">
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <img :ref="'GoogleShopPhoto'" src="{{$products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url').$products->google_shop_photo_name : asset('asset/img/default_item.png') }} " style="max-width:100%;" >
-                                    </div>
-                              
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">Item圖示<span class="redtext">*</span></label>
-                                        {{-- product_items --}}
-                                    </div>
-                                    <div class="col-sm-11">
                                         <table class="table table-striped table-bordered table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th class="col-sm-1">規格1</th>
-                                                    <th class="col-sm-1">規格2</th>
-                                                    <th class="col-sm-1">Item圖示</th>
+                                                    <th class="col-sm-11">名稱</th>
+                                                    <th class="col-sm-1">功能</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
+                                                    @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
+                                                    @drop="drop" draggable="true" :data-index="CategoryKey"
+                                                    :data-type="'Category'">
+                                                    <td style="vertical-align:middle">
+                                                        <i class="fa fa-list"></i>
+                                                        @{{ Category . category_name }}
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger"
+                                                            @click="Del(Category,CategoryKey,'Category')"
+                                                            v-show="RoleAuthJson.auth_delete">刪除</button>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
+                                        rows="10">@{{ CategoryHierarchyProducts }}</textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">關聯關鍵字</label>
+                                        </div>
+                                        <div class="col-sm-11">
+                                            <input class="form-control" name="keywords"
+                                                value="{{ $products->keywords }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">關聯性商品</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            {{-- related_products table --}}
+                                            <button class="btn btn-large btn-warning btn-sm" type="button"
+                                                data-toggle="modal" data-target="#model_related_products">新增商品</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-sm-11">名稱</th>
+                                                    <th class="col-sm-1">功能</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
+                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                    draggable="true" :data-index="key" :data-type="'Products'">
+                                                    <td style="vertical-align:middle">
+                                                        <i class="fa fa-list"></i>
+                                                        @{{ Product . product_name }}
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger"
+                                                            @click="Del(Product ,key ,'Products')">刪除</button>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
+                                        rows="10">@{{ RelatedProducts }}</textarea>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">每單限購數量<span
+                                                    class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <input class="form-control" name="order_limited_qty"
+                                                value="{{ $products->order_limited_qty }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <hr>
+                        <section id="page-2">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">促銷小標</label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class='input-group date'>
+                                                <input type='text' class="form-control" name="promotion_start_at"
+                                                    id="promotion_start_at"
+                                                    value="{{ $products->promotion_start_at }}" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1" style="padding: 0px;width: 2%;">
+                                            <label class="control-label">~</label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div class='input-group date'>
+                                                <input type='text' class="form-control" name="promotion_end_at"
+                                                    id="promotion_end_at" value="{{ $products->promotion_end_at }}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">促銷小標生效時間
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input class="form-control" name="promotion_desc"
+                                                value="{{ $products->promotion_desc }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">商品內容<span
+                                                    class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-11">
+                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">商品規格<span
+                                                    class="redtext">*</span></label>
+                                        </div>
+                                        <div class="col-sm-11">
+                                            <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
+                                                accept=".jpg,.jpeg,.png"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <hr>
+                        <section id="page-3">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">Google Shop圖檔
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <input type="file" name="google_shop_photo_name" accept=".jpg,.jpeg,.png"
+                                                @change="google_shop">
+                                            <input type="hidden" name="google_shop_photo_name_old"
+                                                value="{{ $products->google_shop_photo_name }}">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <img :ref="'GoogleShopPhoto'"
+                                                src="{{ $products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
+                                                style="max-width:100%;">
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">Item圖示<span
+                                                    class="redtext">*</span></label>
+                                            {{-- product_items --}}
+                                        </div>
+                                        <div class="col-sm-11">
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-sm-1">規格1</th>
+                                                        <th class="col-sm-1">規格2</th>
+                                                        <th class="col-sm-1">Item圖示</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
                                                     <tr v-for="(Item , key ) in ProductsItem">
                                                         <td style="vertical-align:middle">
-                                                            @{{ Item.spec_1_value }}
+                                                            @{{ Item . spec_1_value }}
                                                         </td>
                                                         <td style="vertical-align:middle">
-                                                            @{{ Item.spec_2_value }}
+                                                            @{{ Item . spec_2_value }}
                                                         </td>
                                                         <td>
-                                                            <input :name="'photo_name['+key+']'" :key="key" type="file" accept=".jpg,.jpeg,.png" @change="item_photo($event, key)">
+                                                            <input :name="'photo_name['+key+']'" :key="key" type="file"
+                                                                accept=".jpg,.jpeg,.png" @change="item_photo($event, key)">
                                                             {{-- <div v-if="Item.photo_name !==">條正成立</div>
                                                             <div v-else>條件不成立</div> --}}
                                                             <img :ref="'img'" :src="Item.imgesUrl" style="max-width:100%;">
                                                         </td>
                                                     </tr>
 
-                                            </tbody>
-                                        </table>
-                                        <textarea name="ProductsItem_Json" style="display:none" cols="30" rows="10">@{{ProductsItem}}</textarea>
+                                                </tbody>
+                                            </table>
+                                            <textarea name="ProductsItem_Json" style="display:none" cols="30"
+                                                rows="10">@{{ ProductsItem }}</textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </section>
                         <hr>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">網頁標題</label>
-                                    </div>
-                                    <div class="col-sm-11">
-                                        <input class="form-control" name="meta_title"
-                                            value="{{ $products->meta_title }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-1">
-                                        <label class="control-label">網頁描述</label>
-                                    </div>
-                                    <div class="col-sm-11">
-                                        <input class="form-control" name="mata_description"
-                                            value="{{ $products->mata_description }}">
+                        <section id="page-4">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">網頁標題</label>
+                                        </div>
+                                        <div class="col-sm-11">
+                                            <input class="form-control" name="meta_title"
+                                                value="{{ $products->meta_title }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <div class="col-sm-2">
-                                        <label class="control-label">網頁標籤(以半形逗號分隔)</label>
-                                    </div>
-                                    <div class="col-sm-10">
-                                        <input class="form-control" name="mata_keywords"
-                                            value="{{ $products->mata_keywords }}">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">網頁描述</label>
+                                        </div>
+                                        <div class="col-sm-11">
+                                            <input class="form-control" name="mata_description"
+                                                value="{{ $products->mata_description }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-2">
+                                            <label class="control-label">網頁標籤(以半形逗號分隔)</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <input class="form-control" name="mata_keywords"
+                                                value="{{ $products->mata_keywords }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                         <button class="btn btn-large btn-success" type="button" id="save_data">
-                        <i class="fa fa-save"></i>
+                            <i class="fa fa-save"></i>
                             儲存
                         </button>
-                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i> 取消</a>
+                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i>
+                            取消</a>
                 </form>
                 @include('Backend.ProductsMall.model_category')
                 @include('Backend.ProductsMall.model_related_products')
@@ -414,6 +447,9 @@
 @endsection
 @section('js')
     <script>
+        // Get all sections that have an ID defined
+
+
         $(document).ready(function() {
             $('#promotion_start_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
@@ -462,7 +498,7 @@
                 //         required: true,
                 //     });
                 // })
-                $( "#new-form" ).submit()
+                $("#new-form").submit()
             })
 
         });
@@ -482,14 +518,39 @@
                     },
                     result_products: [],
                     RelatedProducts: @json($related_products),
-                    ProductsItem:@json($products_item) , 
-                    DefaultassetImg : '{{ asset('asset/img/default_item.png') }}' ,
+                    ProductsItem: @json($products_item),
+                    DefaultassetImg: '{{ asset('asset/img/default_item.png') }}',
                     file_cdn: @json(config('filesystems.disks.s3.url')),
 
                 }
             },
             mounted() {
+                const sections = document.querySelectorAll("section[id]");
+                // Add an event listener listening for scroll
+                window.addEventListener("scroll", navHighlighter);
 
+                function navHighlighter() {
+                    // Get current scroll position
+                    let scrollY = window.pageYOffset;
+
+                    sections.forEach(current => {
+                        const sectionHeight = current.offsetHeight;
+                        const sectionTop = current.offsetTop - 50;
+                        sectionId = current.getAttribute("id");
+                        if (
+                            scrollY > sectionTop &&
+                            scrollY <= sectionTop + sectionHeight
+                        ) {
+                            // console.log('TEST');
+                            console.log(document.querySelector("a[href*=" + sectionId + "]")) ; 
+                            document.querySelector("a[href*=" + sectionId + "] li").classList.add(
+                                "sysinfo-activie");
+                        } else {
+                            document.querySelector("a[href*=" + sectionId + "] li").classList.remove(
+                                "sysinfo-activie");
+                        }
+                    });
+                }
             },
             created() {
                 let vm = this;
@@ -500,13 +561,12 @@
                     value.status = 'old';
                 })
                 this.ProductsItem.map(function(value, key) {
-                   if(value.photo_name == null){
-                    value.imgesUrl = vm.DefaultassetImg ;
-                   }else{
-                    value.imgesUrl = vm.file_cdn + value.photo_name ;
-                   }
+                    if (value.photo_name == null) {
+                        value.imgesUrl = vm.DefaultassetImg;
+                    } else {
+                        value.imgesUrl = vm.file_cdn + value.photo_name;
+                    }
                 })
-                console.log(this.ProductsItem) ;
                 this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
@@ -549,8 +609,6 @@
 
                 },
                 addContentToProductsCategory(obj, key) {
-                    console.log(this.products);
-
                     let sort = this.CategoryHierarchyProducts.length;
                     this.CategoryHierarchyProducts.push({
                         category_name: obj.name,
@@ -586,7 +644,6 @@
                     this.RelatedProducts.find((todo, index) => {
                         filter_product_id.push(todo.related_product_id);
                     })
-                    console.log(filter_product_id) ; 
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
@@ -613,7 +670,7 @@
                             this.RelatedProducts.push({
                                 id: '',
                                 product_id: todo.id,
-                                related_product_id:todo.id,
+                                related_product_id: todo.id,
                                 product_name: todo.product_name,
                                 product_no: todo.product_no,
                                 supplier_id: todo.supplier_id,
@@ -681,24 +738,24 @@
                     }
 
                 },
-                google_shop(e){
+                google_shop(e) {
                     let file = e.target.files[0];
-                    let type = e.target.files[0].type ; 
-                    if(type !== 'image/jpeg' && type!== 'image/png'){
-                            alert('格式錯誤') ;
-                            e.target.value = '';
-                    }else{
+                    let type = e.target.files[0].type;
+                    if (type !== 'image/jpeg' && type !== 'image/png') {
+                        alert('格式錯誤');
+                        e.target.value = '';
+                    } else {
                         this.$refs.GoogleShopPhoto.src = URL.createObjectURL(file);
                     }
                 },
-                item_photo(e,key){
+                item_photo(e, key) {
                     let file = e.target.files[0];
-                    let type = e.target.files[0].type ; 
-                    if(type !== 'image/jpeg' && type!== 'image/png'){
-                            alert('格式錯誤') ;
-                            e.target.value = '';
-                            this.$refs.img[key].src = URL.createObjectURL(file);
-                    }else{
+                    let type = e.target.files[0].type;
+                    if (type !== 'image/jpeg' && type !== 'image/png') {
+                        alert('格式錯誤');
+                        e.target.value = '';
+                        this.$refs.img[key].src = URL.createObjectURL(file);
+                    } else {
                         this.$refs.img[key].src = URL.createObjectURL(file);
                     }
                 }
