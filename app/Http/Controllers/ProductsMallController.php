@@ -86,7 +86,6 @@ class ProductsMallController extends Controller
      */
     public function edit($id)
     {
-        //
         $result = [] ; 
         $result['products'] = $this->productsService->showProducts($id) ; 
         $result['products_item'] = $this->productsService->getProductItems($id);
@@ -112,8 +111,8 @@ class ProductsMallController extends Controller
     {
         $in = $request->input() ; 
         $file = $request->file() ;
+        // dd($file) ; 
         $this->productsService->updateProductSmall($in , $file , $id) ;
-        
         exit ;
         // dd($in , $file) ; 
         

@@ -2,17 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\CategoryProducts;
+use App\Models\ProductAuditLog;
 use App\Models\ProductItems;
 use App\Models\ProductPhotos;
 use App\Models\Products;
-use App\Models\Product_items;
 use App\Models\Product_spec_info;
-use App\Models\RelatedProducts ; 
-use App\Models\ProductAuditLog ;
-use App\Models\CategoryProducts ;
+use App\Models\RelatedProducts;
 use App\Services\UniversalService;
 use Carbon\Carbon;
-use FunctionName;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -157,9 +155,9 @@ class ProductsService
         }
 
         $result = $products->get();
-        $this->restructureProducts($result) ; 
-        // dd($result) ; 
-        // dump($result) ; 
+        $this->restructureProducts($result);
+        // dd($result) ;
+        // dump($result) ;
 
         return $result;
     }
@@ -414,7 +412,7 @@ class ProductsService
     public function showProducts($id)
     {
         $agent_id = Auth::user()->agent_id;
-        $products = Products::select('products.*', 'updated_by_name.name AS updated_by_name', 'created_by_name.name AS created_by_name' , 'supplier.name AS supplier_name')
+        $products = Products::select('products.*', 'updated_by_name.name AS updated_by_name', 'created_by_name.name AS created_by_name', 'supplier.name AS supplier_name')
             ->leftJoin('user as created_by_name', 'products.created_by', '=', 'created_by_name.id')
             ->leftJoin('user as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
@@ -427,8 +425,8 @@ class ProductsService
     public function getProductItems($products_id)
     {
         $agent_id = Auth::user()->agent_id;
-        $product_items = Product_items::where('agent_id', $agent_id)->where('product_id', $products_id);
-        $result = $product_items->get();
+        $ProductItems = ProductItems::where('agent_id', $agent_id)->where('product_id', $products_id);
+        $result = $ProductItems->get();
         return $result;
     }
     public function getProductsPhoto($products_id)
@@ -515,102 +513,129 @@ class ProductsService
         $result = Product_spec_info::where('product_id', $product_id)->first();
         return $result;
     }
-    public function getRelatedProducts($product_id){
-        $result = RelatedProducts::select('related_products.*' , 'products.product_name')
-        ->where('related_products.product_id',$product_id)
-        ->leftJoin('products', 'products.id', '=', 'related_products.related_product_id')
-        ->orderBy('related_products.sort' , 'ASC')
-        ->get() ; 
-        // dd($result) ; 
-        return $result ; 
+    public function getRelatedProducts($product_id)
+    {
+        $result = RelatedProducts::select('related_products.*', 'products.product_name')
+            ->where('related_products.product_id', $product_id)
+            ->leftJoin('products', 'products.id', '=', 'related_products.related_product_id')
+            ->orderBy('related_products.sort', 'ASC')
+            ->get();
+        // dd($result) ;
+        return $result;
     }
-    public function updateProductSmall($in , $file = array(), $id){
+    public function updateProductSmall($in, $file = array(), $id)
+    {
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
-
         $CategoryHierarchyProducts = json_decode($in['CategoryHierarchyProducts_Json'], true);
         $RelatedProducts = json_decode($in['RelatedProducts_Json'], true);
+        $ProductsItem = json_decode($in['ProductsItem_Json'], true);
         DB::beginTransaction();
         try {
             $updateIn = [
-                'stock_type' => $in['stock_type'] ,
+                'stock_type' => $in['stock_type'],
                 'product_name' => $in['product_name'],
-                'keywords' => $in['keywords'] , 
-                'order_limited_qty' => $in['order_limited_qty'] ,
-                'promotion_desc' => $in['promotion_desc'] ,
-                'promotion_start_at' => $in['promotion_start_at'] ,
-                'promotion_end_at' => $in['promotion_end_at'] ,
+                'keywords' => $in['keywords'],
+                'order_limited_qty' => $in['order_limited_qty'],
+                'promotion_desc' => $in['promotion_desc'],
+                'promotion_start_at' => $in['promotion_start_at'],
+                'promotion_end_at' => $in['promotion_end_at'],
                 'description' => $in['description'],
-                'specification' => $in['specification'] , 
-                'meta_title' => $in['meta_title'] ,
-                'mata_description' => $in['mata_description'] , 
-                'mata_keywords' => $in['mata_keywords'] ,
+                'specification' => $in['specification'],
+                'meta_title' => $in['meta_title'],
+                'mata_description' => $in['mata_description'],
+                'mata_keywords' => $in['mata_keywords'],
                 'updated_by' => $user_id,
                 'updated_at' => $now,
-            ] ; 
-            
-            Products::where('id', $id)->update($updateIn) ; 
+            ];
+            if ($file['google_shop_photo_name']) {
+                if ($in['google_shop_photo_name_old'] !== null) {
+                    ImageUpload::DelPhoto($in['google_shop_photo_name_old']);
+                }
+                $uploadPath = '/products/' . $id;
+                $uploadImage = ImageUpload::uploadImage($file['google_shop_photo_name'], $uploadPath);
+                $updateIn['google_shop_photo_name'] = $uploadImage['image'];
+            }
+            Products::where('id', $id)->update($updateIn);
             $logCreateIn = [
-                'product_id' => $id , 
-                'created_by' => $user_id, 
-                'updated_by' => $user_id, 
-                'created_at' => $now, 
+                'product_id' => $id,
+                'created_by' => $user_id,
+                'updated_by' => $user_id,
+                'created_at' => $now,
                 'updated_at' => $now,
             ];
             ProductAuditLog::create($logCreateIn);
-    
-            foreach($CategoryHierarchyProducts as $key=>$val){
-                if($val['status'] == 'new'){
+
+            foreach ($CategoryHierarchyProducts as $key => $val) {
+                if ($val['status'] == 'new') {
                     CategoryProducts::create([
-                        'web_category_hierarchy_id' => $val['web_category_hierarchy_id'] , 
-                        'product_id' => $id ,
-                        'sort' => $key , 
-                        'created_by' => $user_id, 
-                        'updated_by' => $user_id, 
-                        'created_at' => $now, 
-                        'updated_at' => $now,
-                        ]);
-                }else{ // status old
-                    CategoryProducts::where('web_category_hierarchy_id',$val['web_category_hierarchy_id'])
-                    ->where('product_id',$id)
-                    ->update([
+                        'web_category_hierarchy_id' => $val['web_category_hierarchy_id'],
+                        'product_id' => $id,
                         'sort' => $key,
-                        'updated_by' => $user_id, 
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                        'created_at' => $now,
                         'updated_at' => $now,
-                    ]) ;
-                }
-            }
-            foreach($RelatedProducts as $key => $val ){
-                if($val['id'] == ''){
-                    $in = [
-                            'product_id' => $id,
-                            'related_product_id' => $val['related_product_id'],
+                    ]);
+                } else { // status old
+                    CategoryProducts::where('web_category_hierarchy_id', $val['web_category_hierarchy_id'])
+                        ->where('product_id', $id)
+                        ->update([
                             'sort' => $key,
-                            'created_by' => $user_id, 
-                            'updated_by' => $user_id, 
-                            'created_at' => $now, 
-                            'updated_at' => $now
-                        ];
-                    RelatedProducts::create($in);
-                }else{
-                    RelatedProducts::where('product_id',$val['product_id'])
-                    ->where('related_product_id',$val['related_product_id'])
-                    ->update([
-                        'sort' => $key,
-                        'updated_by' => $user_id, 
-                        'updated_at' => $now,
-                    ]) ;
+                            'updated_by' => $user_id,
+                            'updated_at' => $now,
+                        ]);
                 }
             }
-    
+            foreach ($RelatedProducts as $key => $val) {
+                if ($val['id'] == '') {
+                    $in = [
+                        'product_id' => $id,
+                        'related_product_id' => $val['related_product_id'],
+                        'sort' => $key,
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                    RelatedProducts::create($in);
+                } else {
+                    RelatedProducts::where('product_id', $val['product_id'])
+                        ->where('related_product_id', $val['related_product_id'])
+                        ->update([
+                            'sort' => $key,
+                            'updated_by' => $user_id,
+                            'updated_at' => $now,
+                        ]);
+                }
+            }
+            if (isset($file['photo_name'])) {
+
+                foreach ($file['photo_name'] as $key => $val) {
+                    $uploadPath = '/product_items/' . $id;
+                    if ($ProductsItem[$key]['photo_name'] !== '') {
+                        ImageUpload::DelPhoto($ProductsItem[$key]['photo_name']);
+                    }
+                    $uploadImage = ImageUpload::uploadImage($val, $uploadPath);
+
+                    ProductItems::where('id', $ProductsItem[$key]['id'])->update(
+                        [
+                            'photo_name' => $uploadImage['image'],
+                            'updated_by' => $user_id,
+                            'updated_at' => $now,
+                        ]
+                    );
+                };
+            }
+
             DB::commit();
-            return true ;
+            return true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
             return false;
         }
-       
+
     }
 }

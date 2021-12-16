@@ -310,9 +310,10 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <input type="file" name="google_shop_photo_name" accept=".jpg,.jpeg,.png" @change="google_shop">
+                                        <input type="hidden" name="google_shop_photo_name_old" value="{{$products->google_shop_photo_name}}">
                                     </div>
                                     <div class="col-sm-3">
-                                        <img :ref="'GoogleShopPhoto'" src="{{ asset('asset/img/default_item.png') }}" style="max-width:100%;" >
+                                        <img :ref="'GoogleShopPhoto'" src="{{$products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url').$products->google_shop_photo_name : asset('asset/img/default_item.png') }} " style="max-width:100%;" >
                                     </div>
                               
                                 </div>
@@ -329,9 +330,9 @@
                                         <table class="table table-striped table-bordered table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th class="col-sm-1">spac_1</th>
-                                                    <th class="col-sm-1">spac_2</th>
-                                                    <th class="col-sm-1">Item圖示 <span class="redtext">*</span></th>
+                                                    <th class="col-sm-1">規格1</th>
+                                                    <th class="col-sm-1">規格2</th>
+                                                    <th class="col-sm-1">Item圖示</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -344,12 +345,15 @@
                                                         </td>
                                                         <td>
                                                             <input :name="'photo_name['+key+']'" :key="key" type="file" accept=".jpg,.jpeg,.png" @change="item_photo($event, key)">
-                                                            <img :ref="'img'" src="{{ asset('asset/img/default_item.png') }}" style="max-width:100%;">
+                                                            {{-- <div v-if="Item.photo_name !==">條正成立</div>
+                                                            <div v-else>條件不成立</div> --}}
+                                                            <img :ref="'img'" :src="Item.imgesUrl" style="max-width:100%;">
                                                         </td>
                                                     </tr>
 
                                             </tbody>
                                         </table>
+                                        <textarea name="ProductsItem_Json" style="display:none" cols="30" rows="10">@{{ProductsItem}}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -480,13 +484,14 @@
                     RelatedProducts: @json($related_products),
                     ProductsItem:@json($products_item) , 
                     DefaultassetImg : '{{ asset('asset/img/default_item.png') }}' ,
+                    file_cdn: @json(config('filesystems.disks.s3.url')),
+
                 }
             },
             mounted() {
 
             },
             created() {
-                console.log(this.RelatedProducts) ;
                 let vm = this;
                 this.CategoryHierarchyProducts.map(function(value, key) {
                     isset = vm.CategoryHierarchyContent.filter(data => data.id === value
@@ -494,6 +499,14 @@
                     value.category_name = isset[0].name;
                     value.status = 'old';
                 })
+                this.ProductsItem.map(function(value, key) {
+                   if(value.photo_name == null){
+                    value.imgesUrl = vm.DefaultassetImg ;
+                   }else{
+                    value.imgesUrl = vm.file_cdn + value.photo_name ;
+                   }
+                })
+                console.log(this.ProductsItem) ;
                 this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
