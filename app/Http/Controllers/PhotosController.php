@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ProductPhotos;
+use ImageUpload ;
 class PhotosController extends Controller
 {
     /**
@@ -85,6 +86,8 @@ class PhotosController extends Controller
 
         switch ($in['type']) {
             case 'products':
+                $photo = ProductPhotos::where('id',$in['id'])->get() ;
+                ImageUpload::DelPhoto($photo[0]->photo_name);
                 ProductPhotos::where('id',$in['id'])->delete() ;
                 return true ; 
                 break;

@@ -52,5 +52,8 @@ class ImageUploadService
         $storage_s3 = Storage::disk('s3');
         return $storage_s3->size($file_name);
     }
-
+    public function DelPhoto($file_name){
+        $storage_s3 = Storage::disk('s3');
+        return $storage_s3->delete($file_name) ;
+    }
 }
