@@ -45,11 +45,11 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
-                <form role="form" id="new-form" method="POST" action="{{ route('products.store') }}"
+                <form role="form" id="new-form" method="POST" action="{{ route('product_small.update', $products->id) }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
+                    @method('PUT')
                     <div id="page-1" class="form-horizontal">
-
                         <div class="row ">
                             <div class="col-sm-6">
                                 <div class="form-group">
@@ -100,7 +100,7 @@
                                         <label class="control-label">供應商<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="product_no"
+                                        <input class="form-control" name="supplier_name"
                                             value="{{ $products->supplier_name }}" readonly>
                                     </div>
                                 </div>
@@ -220,7 +220,7 @@
                                     </table>
                                 </div>
                                 <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
-                                    rows="10">@{{ CategoryHierarchyProducts }}</textarea>
+                                    rows="10">@{{ RelatedProducts }}</textarea>
 
                             </div>
                         </div>
@@ -438,6 +438,29 @@
                     }
                 },
             })
+            $(document).on("click", "#save_data", function() {
+                // $(".safty_qty_va").each(function(){
+                //     console.log('safty_qty_va') ;
+                //     $(this).rules("add", {
+                //         required: true,
+                //         digits: true,
+                //     });
+                // })
+                // $(".spec_1_va").each(function(){
+                //     console.log('spec_1_va') ;
+                //     $(this).rules("add", {
+                //         required: true,
+                //     });
+                // })
+                // $(".spec_2_va").each(function(){
+                //     console.log('spec_2_va') ;
+                //     $(this).rules("add", {
+                //         required: true,
+                //     });
+                // })
+                $( "#new-form" ).submit()
+            })
+
         });
         var CategoryHierarchyContentInput = Vue.extend({
             data: function() {
@@ -463,6 +486,7 @@
 
             },
             created() {
+                console.log(this.RelatedProducts) ;
                 let vm = this;
                 this.CategoryHierarchyProducts.map(function(value, key) {
                     isset = vm.CategoryHierarchyContent.filter(data => data.id === value
@@ -547,8 +571,9 @@
                     var select_end_date = $('input[name="select_end_date"]').val();
                     var filter_product_id = [];
                     this.RelatedProducts.find((todo, index) => {
-                        filter_product_id.push(todo.product_id);
+                        filter_product_id.push(todo.related_product_id);
                     })
+                    console.log(filter_product_id) ; 
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
@@ -575,6 +600,7 @@
                             this.RelatedProducts.push({
                                 id: '',
                                 product_id: todo.id,
+                                related_product_id:todo.id,
                                 product_name: todo.product_name,
                                 product_no: todo.product_no,
                                 supplier_id: todo.supplier_id,

@@ -5,10 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryProducts extends Model
+class ProductAuditLog extends Model
 {
     use HasFactory;
-    protected $table = 'web_category_products';
-    public $timestamps = true;
+    protected $table = 'product_audit_log';
     protected $guarded = []; 
 }

@@ -10,4 +10,5 @@ class RelatedProducts extends Model
     use HasFactory;
     protected $table = 'related_products';
     public $timestamps = true;
+    protected $guarded = []; 
 }

@@ -110,7 +110,14 @@ class ProductsMallController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $in = $request->input() ; 
+        $file = $request->file() ;
+        $this->productsService->updateProductSmall($in , $file , $id) ;
+        
+        exit ;
+        // dd($in , $file) ; 
+        
+        exit ;
     }
 
     /**

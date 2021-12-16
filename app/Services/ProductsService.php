@@ -8,6 +8,8 @@ use App\Models\Products;
 use App\Models\Product_items;
 use App\Models\Product_spec_info;
 use App\Models\RelatedProducts ; 
+use App\Models\ProductAuditLog ;
+use App\Models\CategoryProducts ;
 use App\Services\UniversalService;
 use Carbon\Carbon;
 use FunctionName;
@@ -516,9 +518,99 @@ class ProductsService
     public function getRelatedProducts($product_id){
         $result = RelatedProducts::select('related_products.*' , 'products.product_name')
         ->where('related_products.product_id',$product_id)
-        ->leftJoin('products', 'products.id', '=', 'related_products.product_id')
+        ->leftJoin('products', 'products.id', '=', 'related_products.related_product_id')
         ->orderBy('related_products.sort' , 'ASC')
         ->get() ; 
+        // dd($result) ; 
         return $result ; 
+    }
+    public function updateProductSmall($in , $file = array(), $id){
+        $user_id = Auth::user()->id;
+        $agent_id = Auth::user()->agent_id;
+        $now = Carbon::now();
+
+        $CategoryHierarchyProducts = json_decode($in['CategoryHierarchyProducts_Json'], true);
+        $RelatedProducts = json_decode($in['RelatedProducts_Json'], true);
+        DB::beginTransaction();
+        try {
+            $updateIn = [
+                'stock_type' => $in['stock_type'] ,
+                'product_name' => $in['product_name'],
+                'keywords' => $in['keywords'] , 
+                'order_limited_qty' => $in['order_limited_qty'] ,
+                'promotion_desc' => $in['promotion_desc'] ,
+                'promotion_start_at' => $in['promotion_start_at'] ,
+                'promotion_end_at' => $in['promotion_end_at'] ,
+                'description' => $in['description'],
+                'specification' => $in['specification'] , 
+                'meta_title' => $in['meta_title'] ,
+                'mata_description' => $in['mata_description'] , 
+                'mata_keywords' => $in['mata_keywords'] ,
+                'updated_by' => $user_id,
+                'updated_at' => $now,
+            ] ; 
+            
+            Products::where('id', $id)->update($updateIn) ; 
+            $logCreateIn = [
+                'product_id' => $id , 
+                'created_by' => $user_id, 
+                'updated_by' => $user_id, 
+                'created_at' => $now, 
+                'updated_at' => $now,
+            ];
+            ProductAuditLog::create($logCreateIn);
+    
+            foreach($CategoryHierarchyProducts as $key=>$val){
+                if($val['status'] == 'new'){
+                    CategoryProducts::create([
+                        'web_category_hierarchy_id' => $val['web_category_hierarchy_id'] , 
+                        'product_id' => $id ,
+                        'sort' => $key , 
+                        'created_by' => $user_id, 
+                        'updated_by' => $user_id, 
+                        'created_at' => $now, 
+                        'updated_at' => $now,
+                        ]);
+                }else{ // status old
+                    CategoryProducts::where('web_category_hierarchy_id',$val['web_category_hierarchy_id'])
+                    ->where('product_id',$id)
+                    ->update([
+                        'sort' => $key,
+                        'updated_by' => $user_id, 
+                        'updated_at' => $now,
+                    ]) ;
+                }
+            }
+            foreach($RelatedProducts as $key => $val ){
+                if($val['id'] == ''){
+                    $in = [
+                            'product_id' => $id,
+                            'related_product_id' => $val['related_product_id'],
+                            'sort' => $key,
+                            'created_by' => $user_id, 
+                            'updated_by' => $user_id, 
+                            'created_at' => $now, 
+                            'updated_at' => $now
+                        ];
+                    RelatedProducts::create($in);
+                }else{
+                    RelatedProducts::where('product_id',$val['product_id'])
+                    ->where('related_product_id',$val['related_product_id'])
+                    ->update([
+                        'sort' => $key,
+                        'updated_by' => $user_id, 
+                        'updated_at' => $now,
+                    ]) ;
+                }
+            }
+    
+            DB::commit();
+            return true ;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::warning($e->getMessage());
+            return false;
+        }
+       
     }
 }
