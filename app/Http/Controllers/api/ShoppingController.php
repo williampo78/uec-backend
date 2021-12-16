@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Services\APICartService;
+use App\Services\APICartServices;
 use App\Services\APIService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ class ShoppingController extends Controller
 
     private $apiCartService;
 
-    public function __construct(APICartService $apiCartService, APIService $apiService)
+    public function __construct(APICartServices $apiCartService, APIService $apiService)
     {
         $this->apiCartService = $apiCartService;
         $this->apiService = $apiService;

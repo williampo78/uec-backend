@@ -9,20 +9,14 @@ use App\Models\ShoppingCartDetails;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\ProductItems;
-use App\Services\APIProductService;
 
-class APICartService
+class APICartServices
 {
-
-    public function __construct(APIProductService $apiProductServices)
-    {
-        $this->apiProductServices = $apiProductServices;
-    }
 
 
     /*
      * 取得購物車內容
-     * 不管是否在上架期間內全找出來
+     *
      */
     public function getCartInfo($member_id)
     {
@@ -125,9 +119,9 @@ class APICartService
         $cartInfo = self::getCartInfo($member_id);
 
         //行銷活動
-        $campaign = $this->productService->getPromotion('product_card');
+        //$campaign = $this->apiProductService->getPromotion('product_card');
 
 
-        return $campaign;
+        return $cartInfo;
     }
 }
