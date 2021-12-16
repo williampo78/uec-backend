@@ -13,10 +13,6 @@ use App\Models\ProductItems;
 class APICartServices
 {
 
-    public function __construct()
-    {
-    }
-
 
     /*
      * 取得購物車內容
@@ -24,8 +20,17 @@ class APICartServices
      */
     public function getCartInfo($member_id)
     {
-        $result = ShoppingCartDetails::where('member_id', '=', $member_id)
-            ->where('status_code', '=', 0)->get();
+        $result = ShoppingCartDetails::select("products.id as product_id", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
+            , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
+            , "product_items.item_no", "product_items.photo_name as item_photo", "product_items.status as item_status")
+            ->where('shopping_cart_details.member_id', $member_id)
+            ->where('shopping_cart_details.status_code', 0)//購物車
+            ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
+            ->join('products', 'products.id', '=', 'product_items.product_id')
+            ->where('products.approval_status', '=', 'APPROVED')//核準上架
+            ->orderBy('product_items.sort', 'asc')
+            ->get();
+
         return $result;
     }
 
@@ -102,5 +107,21 @@ class APICartServices
         }
 
         return $result;
+    }
+
+    /*
+     * 取得購物車內容
+     *
+     */
+    public function getCartData($member_id)
+    {
+        //購物車內容
+        $cartInfo = self::getCartInfo($member_id);
+
+        //行銷活動
+        //$campaign = $this->apiProductService->getPromotion('product_card');
+
+
+        return $cartInfo;
     }
 }
