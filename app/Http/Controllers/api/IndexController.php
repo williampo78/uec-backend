@@ -7,7 +7,7 @@ use App\Services\UniversalService;
 use Illuminate\Http\Request;
 use App\Services\WebContentsService;
 use App\Services\APIService;
-use App\Services\APIIndexService;
+use App\Services\APIIndexServices;
 use Mail;
 use Validator;
 
@@ -18,7 +18,7 @@ class IndexController extends Controller
     private $apiService;
     private $apiIndexService;
 
-    public function __construct(WebContentsService $webContentsService, UniversalService $universalService, APIService $apiService, APIIndexService $apiIndexService)
+    public function __construct(WebContentsService $webContentsService, UniversalService $universalService, APIService $apiService, APIIndexServices $apiIndexService)
     {
         $this->webContentsService = $webContentsService;
         $this->universalService = $universalService;
