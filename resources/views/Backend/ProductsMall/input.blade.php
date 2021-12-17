@@ -501,17 +501,22 @@
                 submitHandler: function(form) {
                     if(ck_description.getData().trim().length == 0 ){
                         $('#description_error_msg').show() ;
+                        alert('商品內容不能為空') ;
                         return false ;
                     }else{
                         $('#description_error_msg').hide() ;
                     }
+                    
                     if(ck_specification.getData().trim().length == 0 ){
                         $('#specification_error_msg').show() ;
+                        alert('商品規格不能為空') ;
                         return false ;
                     }else{
                         $('#specification_error_msg').hide() ;
                     }
+
                     if($('.CategoryHierarchyProducts').length == 0){
+                        alert('至少要新增一項分類') ;
                         $('#CategoryHierarchyProducts_error_msg').show() ;
                         return false ;
                     }else{
