@@ -496,19 +496,24 @@
                 submitHandler: function(form) {
                     if(ck_description.getData().trim().length == 0 ){
                         $('#description_error_msg').show() ;
+                        return false ;
                     }else{
                         $('#description_error_msg').hide() ;
                     }
                     if(ck_specification.getData().trim().length == 0 ){
                         $('#specification_error_msg').show() ;
+                        return false ;
                     }else{
                         $('#specification_error_msg').hide() ;
                     }
                     if($('.CategoryHierarchyProducts').length == 0){
                         $('#CategoryHierarchyProducts_error_msg').show() ;
+                        return false ;
                     }else{
                         $('#CategoryHierarchyProducts_error_msg').hide() ;
                     }
+                    $('#save_data').prop('disabled', true);
+                    form.submit();
                 },
                 rules: {
                     product_name: {
@@ -518,12 +523,6 @@
                         required: true,
                         digits: true,
                     },
-                    // CategoryError:{
-                    //     required:function(element){
-                    //         return $('.CategoryHierarchyProducts').length == 0;
-                    //     }
-                    // }
-
                 },
                 errorClass: "help-block",
                 errorElement: "span",
