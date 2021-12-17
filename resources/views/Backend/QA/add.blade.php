@@ -12,6 +12,7 @@
         <!-- /.row -->
         <form role="form" id="new-form" method="post" action="{{ route('qa.store') }}" enctype="multipart/form-data">
             @csrf
+
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-primary">

@@ -27,6 +27,8 @@ use App\Http\Controllers\WebCategoryProductsController;
 use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\WebCategoryHierarchyController;
 use App\Http\Controllers\PromotionalCampaignPrdController;
+use App\Http\Controllers\ProductReviewRegisterController; 
+use App\Http\Controllers\ProductReviewController ; 
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
@@ -50,6 +52,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('/signOut', [AdminController::class, 'signOut'])->name('signOut');
     Route::resource('/products', ProductsController::class, ['names' => ['index' => 'products']]);
     Route::resource('/product_small', ProductsMallController::class, ['names' => ['index' => 'product_small']]);
+    Route::resource('/product_review_register', ProductReviewRegisterController::class, ['names' => ['index' => 'product_review_register']]);
+    Route::resource('/product_review', ProductReviewController::class, ['names' => ['index' => 'product_review']]);
     Route::post('/product_small/ajax', [ProductsMallController::class, 'ajax']);
 
     Route::post('/del_photos', [PhotosController::class, 'delPhoto']); //刪除聯絡人

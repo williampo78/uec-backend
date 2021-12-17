@@ -55,10 +55,9 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
-                <form role="form" id="new-form" method="POST" action="{{ route('product_small.update', $products->id) }}"
+                <form role="form" id="new-form" method="GET" action="{{ route('product_small.show', $products->id) }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
-                    @method('PUT')
                     <div class="form-horizontal">
                         <section id="page-1">
                             <div class="row">
@@ -123,7 +122,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_name"
-                                                value="{{ $products->product_name }}">
+                                                value="{{ $products->product_name }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -146,10 +145,10 @@
                                         <div class="col-sm-1">
                                             <label class="control-label">前台分類<span class="redtext">*</span></label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        {{-- <div class="col-sm-11">
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
                                                 data-toggle="modal" data-target="#model_category">新增分類</button>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <div class="col-sm-12">
                                         <table class="table table-striped table-bordered table-hover">
@@ -204,8 +203,8 @@
                                         </div>
                                         <div class="col-sm-10">
                                             {{-- related_products table --}}
-                                            <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                data-toggle="modal" data-target="#model_related_products">新增商品</button>
+                                            {{-- <button class="btn btn-large btn-warning btn-sm" type="button"
+                                                data-toggle="modal" data-target="#model_related_products">新增商品</button> --}}
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
@@ -247,7 +246,7 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <input class="form-control" name="order_limited_qty"
-                                                value="{{ $products->order_limited_qty }}">
+                                                value="{{ $products->order_limited_qty }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -265,7 +264,7 @@
                                             <div class='input-group date'>
                                                 <input type='text' class="form-control" name="promotion_start_at"
                                                     id="promotion_start_at"
-                                                    value="{{ $products->promotion_start_at }}" />
+                                                    value="{{ $products->promotion_start_at }}" readonly/>
                                             </div>
                                         </div>
                                         <div class="col-sm-1" style="padding: 0px;width: 2%;">
@@ -274,7 +273,7 @@
                                         <div class="col-sm-2">
                                             <div class='input-group date'>
                                                 <input type='text' class="form-control" name="promotion_end_at"
-                                                    id="promotion_end_at" value="{{ $products->promotion_end_at }}" />
+                                                    id="promotion_end_at" value="{{ $products->promotion_end_at }}" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -289,7 +288,7 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <input class="form-control" name="promotion_desc"
-                                                value="{{ $products->promotion_desc }}">
+                                                value="{{ $products->promotion_desc }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -302,7 +301,7 @@
                                                     class="redtext">*</span></label>
                                         </div>
                                         <div class="col-sm-11">
-                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容"></textarea>
+                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容" ></textarea>
                                             <span id="description_error_msg" style="display: none" class="redtext">必須填寫</span>
                                         </div>
                                     </div>
@@ -333,12 +332,6 @@
                                             <label class="control-label">Google Shop圖檔
                                             </label>
                                         </div>
-                                        <div class="col-sm-2">
-                                            <input type="file" name="google_shop_photo_name" accept=".jpg,.jpeg,.png"
-                                                @change="google_shop">
-                                            <input type="hidden" name="google_shop_photo_name_old"
-                                                value="{{ $products->google_shop_photo_name }}">
-                                        </div>
                                         <div class="col-sm-3">
                                             <img :ref="'GoogleShopPhoto'"
                                                 src="{{ $products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
@@ -363,7 +356,7 @@
                                                         <th class="col-sm-1">規格1</th>
                                                         <th class="col-sm-1">規格2</th>
                                                         <th class="col-sm-1">Item圖示</th>
-                                                        <th class="col-sm-1">功能</th>
+                                                        {{-- <th class="col-sm-1">功能</th> --}}
 
                                                     </tr>
                                                 </thead>
@@ -380,9 +373,9 @@
                                                                 <img  :src="file_cdn + Item.photo_name" style="max-width:100%;">
                                                             </div>
                                                         </td>
-                                                        <td>
+                                                        {{-- <td>
                                                             <button type="button" data-toggle="modal" data-target="#item_photo_list" class="btn btn-large btn-warning btn-sm" @click="frombtn(Item,key)">選擇圖片</button>
-                                                        </td>
+                                                        </td> --}}
                                                     </tr>
 
                                                 </tbody>
@@ -404,7 +397,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <input class="form-control" name="meta_title"
-                                                value="{{ $products->meta_title }}">
+                                                value="{{ $products->meta_title }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -417,7 +410,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <input class="form-control" name="mata_description"
-                                                value="{{ $products->mata_description }}">
+                                                value="{{ $products->mata_description }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -430,22 +423,22 @@
                                         </div>
                                         <div class="col-sm-10">
                                             <input class="form-control" name="mata_keywords"
-                                                value="{{ $products->mata_keywords }}">
+                                                value="{{ $products->mata_keywords }}" readonly>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </section>
-                        <button class="btn btn-large btn-success" type="button" id="save_data">
+                        {{-- <button class="btn btn-large btn-success" type="button" id="save_data">
                             <i class="fa fa-save"></i>
                             儲存
-                        </button>
-                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i>
-                            取消</a>
+                        </button> --}}
+                        <a class="btn btn-success" href="{{ route('product_small') }}"><i class="fa fa-ban"></i>
+                            返回</a>
                 </form>
-                @include('Backend.ProductsMall.model_category')
+                {{-- @include('Backend.ProductsMall.model_category')
                 @include('Backend.ProductsMall.model_related_products')
-                @include('Backend.ProductsMall.model_photo_list')
+                @include('Backend.ProductsMall.model_photo_list') --}}
 
             </div>
         </div>
@@ -477,6 +470,7 @@
                     },
                 })
                 .then(editor => {
+                    editor.isReadOnly = true;
                     ck_description = editor; // Save for later use.
                 }).catch(error => {
                     console.error(error);
@@ -492,6 +486,7 @@
                     }
                 },
             }).then(editor => {
+                editor.isReadOnly = true;
                 ck_specification = editor; // Save for later use.
             }).catch(error => {
                 console.error(error);
@@ -618,14 +613,6 @@
                     value.category_name = isset[0].name;
                     value.status = 'old';
                 })
-                console.log(this.ProductsItem) ; 
-                // this.ProductsItem.map(function(value, key) {
-                //     if (value.photo_name == null) {
-                //         value.imgesUrl = vm.DefaultassetImg;
-                //     } else {
-                //         value.imgesUrl = vm.file_cdn + value.photo_name;
-                //     }
-                // })
                 this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
