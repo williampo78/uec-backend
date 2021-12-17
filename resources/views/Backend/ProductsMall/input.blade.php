@@ -363,6 +363,8 @@
                                                         <th class="col-sm-1">規格1</th>
                                                         <th class="col-sm-1">規格2</th>
                                                         <th class="col-sm-1">Item圖示</th>
+                                                        <th class="col-sm-1">功能</th>
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -374,11 +376,12 @@
                                                             @{{ Item . spec_2_value }}
                                                         </td>
                                                         <td>
-                                                            <input :name="'photo_name['+key+']'" :key="key" type="file"
-                                                                accept=".jpg,.jpeg,.png" @change="item_photo($event, key)">
-                                                            {{-- <div v-if="Item.photo_name !==">條正成立</div>
-                                                            <div v-else>條件不成立</div> --}}
-                                                            <img :ref="'img'" :src="Item.imgesUrl" style="max-width:100%;">
+                                                            <div v-if="Item.photo_name">
+                                                                <img  :src="file_cdn + Item.photo_name" style="max-width:100%;">
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" data-toggle="modal" data-target="#item_photo_list" class="btn btn-large btn-warning btn-sm" @click="frombtn(Item,key)">選擇圖片</button>
                                                         </td>
                                                     </tr>
 
@@ -442,6 +445,8 @@
                 </form>
                 @include('Backend.ProductsMall.model_category')
                 @include('Backend.ProductsMall.model_related_products')
+                @include('Backend.ProductsMall.model_photo_list')
+
             </div>
         </div>
 
@@ -570,7 +575,8 @@
                     ProductsItem: @json($products_item),
                     DefaultassetImg: '{{ asset('asset/img/default_item.png') }}',
                     file_cdn: @json(config('filesystems.disks.s3.url')),
-
+                    product_photos:@json($product_photos),
+                    ready_photo : [] ,
                 }
             },
             mounted() {
@@ -607,13 +613,14 @@
                     value.category_name = isset[0].name;
                     value.status = 'old';
                 })
-                this.ProductsItem.map(function(value, key) {
-                    if (value.photo_name == null) {
-                        value.imgesUrl = vm.DefaultassetImg;
-                    } else {
-                        value.imgesUrl = vm.file_cdn + value.photo_name;
-                    }
-                })
+                console.log(this.ProductsItem) ; 
+                // this.ProductsItem.map(function(value, key) {
+                //     if (value.photo_name == null) {
+                //         value.imgesUrl = vm.DefaultassetImg;
+                //     } else {
+                //         value.imgesUrl = vm.file_cdn + value.photo_name;
+                //     }
+                // })
                 this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
@@ -795,17 +802,26 @@
                         this.$refs.GoogleShopPhoto.src = URL.createObjectURL(file);
                     }
                 },
-                item_photo(e, key) {
-                    let file = e.target.files[0];
-                    let type = e.target.files[0].type;
-                    if (type !== 'image/jpeg' && type !== 'image/png') {
-                        alert('格式錯誤');
-                        e.target.value = '';
-                        this.$refs.img[key].src = URL.createObjectURL(file);
-                    } else {
-                        this.$refs.img[key].src = URL.createObjectURL(file);
-                    }
+                frombtn(item , key) {
+                    this.ready_photo[0] = item ;
+                    this.ready_photo[1] = key ;  
+                    console.log(this.ready_photo) ; 
+                },
+                AddPhoto(photo , key){
+                    ProductsItemKey = this.ready_photo[1] ;
+                    this.ProductsItem[ProductsItemKey].photo_name = photo.photo_name ; 
                 }
+                // item_photo(e, key) {
+                //     let file = e.target.files[0];
+                //     let type = e.target.files[0].type;
+                //     if (type !== 'image/jpeg' && type !== 'image/png') {
+                //         alert('格式錯誤');
+                //         e.target.value = '';
+                //         this.$refs.img[key].src = URL.createObjectURL(file);
+                //     } else {
+                //         this.$refs.img[key].src = URL.createObjectURL(file);
+                //     }
+                // }
             },
             computed: {},
             watch: {

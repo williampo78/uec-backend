@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Batch;
 use ImageUpload;
 
 class ProductsService
@@ -562,6 +563,15 @@ class ProductsService
                 'created_by' => $user_id,
                 'updated_by' => $user_id,
             ];
+            $ProductItemsInstance = new ProductItems();
+            foreach($ProductsItem as $key => $val ) {
+                $ProductsItemUpdate[$key] = [
+                        'id' => $val['id'] , 
+                        'photo_name' => $val['photo_name'] ,
+                ] ;             
+            }
+            $upd = Batch::update($ProductItemsInstance, $ProductsItemUpdate, 'id');
+
             ProductAuditLog::create($logCreateIn);
 
             foreach ($CategoryHierarchyProducts as $key => $val) {
