@@ -17,7 +17,7 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="{{ route('product_review_register') }}"
+                        <form role="form" id="select-form" method="GET" action="{{ route('products') }}"
                             enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-4">
@@ -246,7 +246,7 @@
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
                                 <tr>
-                                    <th style="width: 12%">功能</th>
+                                    <th style="width: 10%">功能</th>
                                     <th style="width: 1%">項次</th>
                                     <th style="width: 10%">供應商</th>
                                     <th style="width: 10%">商品序號</th>
@@ -269,8 +269,6 @@
                                                 <i class="fa fa-search"></i></a>
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('products.edit', $val->id) }}">編輯</a>
-                                                <a class="btn btn-danger btn-sm"
-                                                href="{{ route('products.edit', $val->id) }}">下架</a>
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_name }}</td>

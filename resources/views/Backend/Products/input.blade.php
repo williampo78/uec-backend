@@ -35,7 +35,6 @@
             margin: auto;
         }
 
-
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -481,7 +480,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="control-label">
-                                            <a href="#">修改紀錄</a>
+                                            {{-- <a href="#">修改紀錄</a> --}}
                                         </label>
                                     </div>
                                 </div>
@@ -902,19 +901,19 @@
                 fileSelected(e) {
                     let vm = this;
                     var selectedFiles = e.target.files;
-                    if(selectedFiles.length + this.images.length > 15){
-                        alert('不能超過15張照片')  ;
+                    if (selectedFiles.length + this.images.length > 15) {
+                        alert('不能超過15張照片');
                         e.target.value = '';
-                        return false  ;
+                        return false;
                     }
                     for (let i = 0; i < selectedFiles.length; i++) {
-                        let type = selectedFiles[i].type ; 
-             
-                        if(selectedFiles[i].size > 1048576){
-                            alert('照片名稱:'+selectedFiles[i].name +'已經超出大小') ;
-                        }else if(type !== 'image/jpeg' && type!== 'image/png'){
-                            alert('照片名稱:'+selectedFiles[i].name +'格式錯誤') ;
-                        }else{
+                        let type = selectedFiles[i].type;
+
+                        if (selectedFiles[i].size > 1048576) {
+                            alert('照片名稱:' + selectedFiles[i].name + '已經超出大小');
+                        } else if (type !== 'image/jpeg' && type !== 'image/png') {
+                            alert('照片名稱:' + selectedFiles[i].name + '格式錯誤');
+                        } else {
                             this.images.push(selectedFiles[i]);
                         }
                     }
@@ -924,8 +923,7 @@
                     });
                     e.target.value = '';
                 },
-                delImages(index) 
-                {
+                delImages(index) {
                     this.$delete(this.images, index);
                     this.adjustTheDisplay();
                 },
@@ -1051,26 +1049,26 @@
             // 驗證表單
             // product_name
             $(document).on("click", "#save_data", function() {
-                $(".safty_qty_va").each(function(){
-                    console.log('safty_qty_va') ;
+                $(".safty_qty_va").each(function() {
+                    console.log('safty_qty_va');
                     $(this).rules("add", {
                         required: true,
                         digits: true,
                     });
                 })
-                $(".spec_1_va").each(function(){
-                    console.log('spec_1_va') ;
+                $(".spec_1_va").each(function() {
+                    console.log('spec_1_va');
                     $(this).rules("add", {
                         required: true,
                     });
                 })
-                $(".spec_2_va").each(function(){
-                    console.log('spec_2_va') ;
+                $(".spec_2_va").each(function() {
+                    console.log('spec_2_va');
                     $(this).rules("add", {
                         required: true,
                     });
                 })
-                $( "#new-form" ).submit();
+                $("#new-form").submit();
             })
 
             $("#new-form").validate({

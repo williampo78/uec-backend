@@ -553,7 +553,8 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="control-label">
-                                        <a href="#">修改紀錄</a>
+                                        {{-- <a href="#">修改紀錄</a> --}}
+                                        <a href="#" data-toggle="modal" data-target="#model_category">修改紀錄</a>
                                     </label>
                                 </div>
                             </div>
@@ -922,6 +923,8 @@
             </button>
         <a class="btn btn-danger" href="{{ url('products') }}"><i class="fa fa-ban"></i> 取消</a>
     </form>
+    {{-- 修改紀錄 --}}
+    @include('Backend.Products.model_update_log')
     </div>
 </div>
 </div>

@@ -271,6 +271,8 @@
                                                 <a class="btn btn-info btn-sm"
                                                     href="{{ route('products.edit', $val->id) }}">編輯</a>
                                             @endif
+                                            <a class="btn btn-danger btn-sm"
+                                            href="{{ route('products.edit', $val->id) }}">下架</a>
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_name }}</td>
