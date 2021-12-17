@@ -17,7 +17,7 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="{{ route('products') }}"
+                        <form role="form" id="select-form" method="GET" action="{{ route('product_review_register') }}"
                             enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-4">
@@ -246,19 +246,19 @@
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
                                 <tr>
-                                    <th>功能</th>
-                                    <th>項次</th>
-                                    <th>供應商</th>
-                                    <th>商品序號</th>
-                                    <th>商品名稱</th>
-                                    <th>售價(含稅)</th>
-                                    <th>成本(含稅)</th>
-                                    <th>毛利(%)</th>
-                                    <th>商品類型</th>
-                                    <th>建檔日期</th>
-                                    <th>上架狀態</th>
-                                    <th>上架時間起</th>
-                                    <th>上架時間訖</th>
+                                    <th style="width: 12%">功能</th>
+                                    <th style="width: 1%">項次</th>
+                                    <th style="width: 10%">供應商</th>
+                                    <th style="width: 10%">商品序號</th>
+                                    <th style="width: 10%">商品名稱</th>
+                                    <th style="width: 5%">售價(含稅)</th>
+                                    <th style="width: 5%">成本(含稅)</th>
+                                    <th style="width: 5%">毛利(%)</th>
+                                    <th style="width: 5%">商品類型</th>
+                                    <th style="width: 5%">建檔日期</th>
+                                    <th style="width: 6%">上架狀態</th>
+                                    <th style="width: 10%">上架時間起</th>
+                                    <th style="width: 10%">上架時間訖</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -269,6 +269,8 @@
                                                 <i class="fa fa-search"></i></a>
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('products.edit', $val->id) }}">編輯</a>
+                                                <a class="btn btn-danger btn-sm"
+                                                href="{{ route('products.edit', $val->id) }}">下架</a>
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_name }}</td>
