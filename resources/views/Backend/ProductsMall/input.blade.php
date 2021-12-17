@@ -160,7 +160,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
+                                                <tr class="CategoryHierarchyProducts" v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
                                                     @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
                                                     @drop="drop" draggable="true" :data-index="CategoryKey"
                                                     :data-type="'Category'">
@@ -177,6 +177,7 @@
 
                                             </tbody>
                                         </table>
+                                        <span id="CategoryHierarchyProducts_error_msg" style="display: none" class="redtext">必須填寫</span>
                                     </div>
                                     <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
                                         rows="10">@{{ CategoryHierarchyProducts }}</textarea>
@@ -302,6 +303,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <textarea id="description" name="description" placeholder="請在這裡填寫內容"></textarea>
+                                            <span id="description_error_msg" style="display: none" class="redtext">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -316,6 +318,7 @@
                                         <div class="col-sm-11">
                                             <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
                                                 accept=".jpg,.jpeg,.png"></textarea>
+                                                <span id="specification_error_msg" style="display: none" class="redtext">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -448,8 +451,6 @@
 @section('js')
     <script>
         // Get all sections that have an ID defined
-
-
         $(document).ready(function() {
             $('#promotion_start_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
@@ -457,17 +458,25 @@
             $('#promotion_end_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
             });
+            var ck_description;
+            var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
-                ckfinder: {
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
-                        document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content'),
-                    }
+                    ckfinder: {
+                        uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                            document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                        }
 
-                },
-            })
+                    },
+                })
+                .then(editor => {
+                    ck_description = editor; // Save for later use.
+                }).catch(error => {
+                    console.error(error);
+                });
+
             ClassicEditor.create(document.querySelector('#specification'), {
                 ckfinder: {
                     uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
@@ -477,27 +486,68 @@
                             'content'),
                     }
                 },
-            })
+            }).then(editor => {
+                ck_specification = editor; // Save for later use.
+            }).catch(error => {
+                console.error(error);
+            });
+
+            $("#new-form").validate({
+                submitHandler: function(form) {
+                    if(ck_description.getData().trim().length == 0 ){
+                        $('#description_error_msg').show() ;
+                    }else{
+                        $('#description_error_msg').hide() ;
+                    }
+                    if(ck_specification.getData().trim().length == 0 ){
+                        $('#specification_error_msg').show() ;
+                    }else{
+                        $('#specification_error_msg').hide() ;
+                    }
+                    if($('.CategoryHierarchyProducts').length == 0){
+                        $('#CategoryHierarchyProducts_error_msg').show() ;
+                    }else{
+                        $('#CategoryHierarchyProducts_error_msg').hide() ;
+                    }
+                },
+                rules: {
+                    product_name: {
+                        required: true,
+                    },
+                    order_limited_qty: {
+                        required: true,
+                        digits: true,
+                    },
+                    // CategoryError:{
+                    //     required:function(element){
+                    //         return $('.CategoryHierarchyProducts').length == 0;
+                    //     }
+                    // }
+
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
             $(document).on("click", "#save_data", function() {
-                // $(".safty_qty_va").each(function(){
-                //     console.log('safty_qty_va') ;
-                //     $(this).rules("add", {
-                //         required: true,
-                //         digits: true,
-                //     });
-                // })
-                // $(".spec_1_va").each(function(){
-                //     console.log('spec_1_va') ;
-                //     $(this).rules("add", {
-                //         required: true,
-                //     });
-                // })
-                // $(".spec_2_va").each(function(){
-                //     console.log('spec_2_va') ;
-                //     $(this).rules("add", {
-                //         required: true,
-                //     });
-                // })
                 $("#new-form").submit()
             })
 
@@ -541,8 +591,6 @@
                             scrollY > sectionTop &&
                             scrollY <= sectionTop + sectionHeight
                         ) {
-                            // console.log('TEST');
-                            console.log(document.querySelector("a[href*=" + sectionId + "]")) ; 
                             document.querySelector("a[href*=" + sectionId + "] li").classList.add(
                                 "sysinfo-activie");
                         } else {

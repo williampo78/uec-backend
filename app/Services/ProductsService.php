@@ -547,7 +547,6 @@ class ProductsService
                 'mata_description' => $in['mata_description'],
                 'mata_keywords' => $in['mata_keywords'],
                 'updated_by' => $user_id,
-                'updated_at' => $now,
             ];
             if ($file['google_shop_photo_name']) {
                 if ($in['google_shop_photo_name_old'] !== null) {
@@ -562,8 +561,6 @@ class ProductsService
                 'product_id' => $id,
                 'created_by' => $user_id,
                 'updated_by' => $user_id,
-                'created_at' => $now,
-                'updated_at' => $now,
             ];
             ProductAuditLog::create($logCreateIn);
 
@@ -575,8 +572,6 @@ class ProductsService
                         'sort' => $key,
                         'created_by' => $user_id,
                         'updated_by' => $user_id,
-                        'created_at' => $now,
-                        'updated_at' => $now,
                     ]);
                 } else { // status old
                     CategoryProducts::where('web_category_hierarchy_id', $val['web_category_hierarchy_id'])
@@ -584,7 +579,6 @@ class ProductsService
                         ->update([
                             'sort' => $key,
                             'updated_by' => $user_id,
-                            'updated_at' => $now,
                         ]);
                 }
             }
@@ -596,8 +590,6 @@ class ProductsService
                         'sort' => $key,
                         'created_by' => $user_id,
                         'updated_by' => $user_id,
-                        'created_at' => $now,
-                        'updated_at' => $now,
                     ];
                     RelatedProducts::create($in);
                 } else {
@@ -606,7 +598,6 @@ class ProductsService
                         ->update([
                             'sort' => $key,
                             'updated_by' => $user_id,
-                            'updated_at' => $now,
                         ]);
                 }
             }
@@ -623,7 +614,6 @@ class ProductsService
                         [
                             'photo_name' => $uploadImage['image'],
                             'updated_by' => $user_id,
-                            'updated_at' => $now,
                         ]
                     );
                 };
