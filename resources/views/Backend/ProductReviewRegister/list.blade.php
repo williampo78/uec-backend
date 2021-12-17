@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '商品主檔 -基本資訊管理')
+@section('title', '商品主檔 - 上下架申請')
 
 @section('content')
     <!--列表-->
@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-cube"></i> 商品主檔 - 基本資訊管理</h1>
+                <h1 class="page-header"><i class="fa fa-cube"></i> 商品主檔 - 上下架申請</h1>
             </div>
         </div>
         <div class="row">
@@ -176,8 +176,8 @@
                                                 {{ request()->input('approval_status') == 'REJECTED' ? 'selected' : '' }}>
                                                 已駁回</option>
                                             <option value="APPROVED_STATUS_OFF"
-                                            {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
-                                            商品下架</option>
+                                                {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
+                                                商品下架</option>
                                         </select>
                                     </div>
                                 </div>
@@ -236,12 +236,12 @@
 
                     <!-- Table list -->
                     <div class="panel-body">
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-sm-2">
                                 <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}"><i
                                         class="fa fa-plus"></i> 創建</a>
                             </div>
-                        </div>
+                        </div> --}}
                         <hr>
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
@@ -267,8 +267,10 @@
                                         <td>
                                             <a class="btn btn-info btn-sm" href="{{ route('products.show', $val->id) }}">
                                                 <i class="fa fa-search"></i></a>
-                                            <a class="btn btn-info btn-sm"
-                                                href="{{ route('products.edit', $val->id) }}">編輯</a>
+                                            @if ($share_role_auth['auth_update'])
+                                                <a class="btn btn-info btn-sm"
+                                                    href="{{ route('products.edit', $val->id) }}">編輯</a>
+                                            @endif
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_name }}</td>
