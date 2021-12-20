@@ -31,7 +31,7 @@ class ProductReviewRegisterController extends Controller
         $result = [
             'products' => [],
         ] ;
-
+        
         if(count($in) !== 0 ){
             $result['products'] = $this->productsService->getProducts($in) ; 
             $this->productsService->restructureProducts($result['products']);
@@ -81,7 +81,19 @@ class ProductReviewRegisterController extends Controller
      */
     public function edit($id)
     {
-        //
+        $result['products'] = $this->productsService->showProducts($id) ; 
+        $result['products_item'] = $this->productsService->getProductItems($id);
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
+        $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
+        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id);//前台分類
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
+        $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
+        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 
+        $result['related_products'] = $this->productsService->getRelatedProducts($id) ;
+        //取商品資訊
+        //上下架歷程
+        return view('Backend.ProductReviewRegister.input',$result);
     }
 
     /**
