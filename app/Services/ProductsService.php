@@ -156,7 +156,7 @@ class ProductsService
         }
 
         $result = $products->get();
-        $this->restructureProducts($result);
+        // $this->restructureProducts($result);
         // dd($result) ;
         // dump($result) ;
 
