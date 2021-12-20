@@ -159,7 +159,6 @@ class ProductsService
         // $this->restructureProducts($result);
         // dd($result) ;
         // dump($result) ;
-
         return $result;
     }
 
