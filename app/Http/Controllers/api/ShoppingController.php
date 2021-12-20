@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Services\APICartServices;
 use App\Services\APIService;
+use App\Services\APIProductServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
@@ -14,10 +15,11 @@ class ShoppingController extends Controller
 
     private $apiCartService;
 
-    public function __construct(APICartServices $apiCartService, APIService $apiService)
+    public function __construct(APICartServices $apiCartService, APIService $apiService, APIProductServices $apiProductServices)
     {
         $this->apiCartService = $apiCartService;
         $this->apiService = $apiService;
+        $this->apiProductServices = $apiProductServices;
     }
 
     /*
@@ -98,7 +100,9 @@ class ShoppingController extends Controller
     {
         $error_code = $this->apiService->getErrorCode();
         $member_id = Auth::guard('api')->user()->member_id;
-        $response = $this->apiCartService->getCartData($member_id);
+        $campaign = $this->apiProductServices->getPromotion('product_card');
+        $campaign_gift = null;//$this->apiProductServices->getCampaignGift();
+        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift);
         //$response = json_encode($response, true);
         if ($response == 'success') {
             $status = true;

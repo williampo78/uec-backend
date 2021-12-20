@@ -593,4 +593,23 @@ class APIProductServices
             return 201;
         }
     }
+
+    /*
+     * 取得行銷促案 - 滿額贈禮
+     */
+    public function getCampaignGift()
+    {
+        $strSQL = "select pcp.product_id, pc.*
+                from promotional_campaigns pc
+                inner join  promotional_campaign_giveaways pcp on pcp.promotional_campaign_id=pc.id
+                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1 ";
+
+        $promotional = DB::select($strSQL);
+        $data = [];
+        foreach ($promotional as $promotion) {
+            $data[$promotion->product_id][] = $promotion;
+        }
+        return $data;
+
+    }
 }
