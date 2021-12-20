@@ -273,6 +273,7 @@
                                                 <a class="btn btn-info btn-sm"
                                                     href="{{ route('products.edit', $val->id) }}">編輯</a>
                                             @endif
+                                            
 
                                         </td>
                                         <td>{{ $key += 1 }}</td>

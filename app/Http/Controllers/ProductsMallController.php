@@ -37,7 +37,8 @@ class ProductsMallController extends Controller
         ] ;
 
         if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ;
+            $result['products'] = $this->productsService->getProducts($in) ; 
+            $this->productsService->restructureProducts($result['products']);
         }
     
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商

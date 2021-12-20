@@ -34,7 +34,8 @@ class ProductReviewController extends Controller
         ] ;
 
         if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ;
+            $result['products'] = $this->productsService->getProducts($in) ; 
+            $this->productsService->restructureProducts($result['products']);
         }
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商

@@ -10,11 +10,11 @@ use App\Models\Products;
 use App\Models\Product_spec_info;
 use App\Models\RelatedProducts;
 use App\Services\UniversalService;
+use Batch;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Batch;
 use ImageUpload;
 
 class ProductsService
@@ -156,10 +156,9 @@ class ProductsService
         }
 
         $result = $products->get();
-        $this->restructureProducts($result);
+        // $this->restructureProducts($result);
         // dd($result) ;
         // dump($result) ;
-
         return $result;
     }
 
@@ -327,6 +326,12 @@ class ProductsService
                 'updated_at' => $now,
             ];
             Products::where('id', $products_id)->update($update);
+            $logCreateIn = [
+                'product_id' => $products_id,
+                'created_by' => $user_id,
+                'updated_by' => $user_id,
+            ];
+            ProductAuditLog::create($logCreateIn);
             $uploadPath = '/products/' . $products_id;
             foreach ($imgJson as $key => $val) {
                 if (isset($val['id'])) {
@@ -367,6 +372,7 @@ class ProductsService
                         'safty_qty' => $val['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
+                        'edi_exported_status' => '',
                         'created_by' => $user_id,
                         'updated_by' => $user_id,
                         'created_at' => $now,
@@ -389,6 +395,7 @@ class ProductsService
                         'status' => $val['status'],
                         'updated_by' => $user_id,
                         'updated_at' => $now,
+                        'edi_exported_status' => '',
                     ];
                     ProductItems::where('id', $val['id'])->update($skuUpdate);
                 }
@@ -413,9 +420,9 @@ class ProductsService
     public function showProducts($id)
     {
         $agent_id = Auth::user()->agent_id;
-        $products = Products::select('products.*', 'updated_by_name.name AS updated_by_name', 'created_by_name.name AS created_by_name', 'supplier.name AS supplier_name')
-            ->leftJoin('user as created_by_name', 'products.created_by', '=', 'created_by_name.id')
-            ->leftJoin('user as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
+        $products = Products::select('products.*', 'updated_by_name.user_name AS updated_by_name', 'created_by_name.user_name AS created_by_name', 'supplier.name AS supplier_name')
+            ->leftJoin('users as created_by_name', 'products.created_by', '=', 'created_by_name.id')
+            ->leftJoin('users as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id)->where('products.id', $id);
 
@@ -563,16 +570,15 @@ class ProductsService
                 'created_by' => $user_id,
                 'updated_by' => $user_id,
             ];
+            ProductAuditLog::create($logCreateIn);
             $ProductItemsInstance = new ProductItems();
-            foreach($ProductsItem as $key => $val ) {
+            foreach ($ProductsItem as $key => $val) {
                 $ProductsItemUpdate[$key] = [
-                        'id' => $val['id'] , 
-                        'photo_name' => $val['photo_name'] ,
-                ] ;             
+                    'id' => $val['id'],
+                    'photo_name' => $val['photo_name'],
+                ];
             }
             $upd = Batch::update($ProductItemsInstance, $ProductsItemUpdate, 'id');
-
-            ProductAuditLog::create($logCreateIn);
 
             foreach ($CategoryHierarchyProducts as $key => $val) {
                 if ($val['status'] == 'new') {
@@ -637,5 +643,13 @@ class ProductsService
             return false;
         }
 
+    }
+    public function getProductAuditLog($product_id)
+    {
+        $ProductAuditLog = ProductAuditLog::select('product_audit_log.*', 'users.user_name AS user_name')
+            ->orderBy('product_audit_log.updated_at', 'DESC')
+            ->leftJoin('users', 'users.id', '=', 'product_audit_log.updated_by')
+            ->get();
+        return $ProductAuditLog;
     }
 }

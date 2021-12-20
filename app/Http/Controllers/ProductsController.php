@@ -35,7 +35,8 @@ class ProductsController extends Controller
         ] ;
 
         if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ;
+            $result['products'] = $this->productsService->getProducts($in) ; 
+            $this->productsService->restructureProducts($result['products']);
         }
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
@@ -102,6 +103,7 @@ class ProductsController extends Controller
     {
         $result = [] ; 
         $result['products'] = $this->productsService->showProducts($id) ; 
+        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ; 
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
@@ -121,7 +123,7 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->productsService->editProducts($request->input(), $request->file()) ;
+        $result = $this->productsService->editProducts($request->input(), $request->file()) ;
         $act = 'upd';
         $route_name = 'products';
         return view('Backend.success', compact('route_name', 'act'));
