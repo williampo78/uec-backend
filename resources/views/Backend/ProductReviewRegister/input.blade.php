@@ -10,7 +10,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput">
-                <form role="form" id="new-form" method="POST" action="{{ route('product_small.update', $products->id) }}"
+                <form role="form" id="new-form" method="POST" action="{{ route('product_review_register.update', $products->id) }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
@@ -214,15 +214,30 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @foreach ($product_review_log as $val)
                                         <tr>
-                                            <td>測試</td>
-                                            <td>測試</td>
-                                            <td>測試</td>
-                                            <td>測試</td>
-                                            <td>測試</td>
-                                            <td>測試</td>
-                                            <td>測試</td>
+                                            <td>{{$val->start_launched_at}} ~ {{$val->end_launched_at}}</td>
+                                            <td>{{$val->selling_price}}</td>
+                                            <td>{{$val->review_at}}</td>
+                                            <td>
+                                                @switch($val->review_result)
+                                                    @case('APPROVE')
+                                                        核准
+                                                        @break
+                                                    @case('REJECT')
+                                                        駁回
+                                                        @break
+                                                    @default
+                                                        尚未審核
+                                                @endswitch
+                                                {{$val->review_result}}
+                                            </td>
+                                            <td>{{$val->review_remark}}</td>
+                                            <td>{{$val->discontinued_at}}</td>
+                                            <td>{{$val->discontinued_by}}</td>
                                         </tr>
+                                        @endforeach
+                              
                                     </tbody>
                                 </table>
                             </div>
@@ -250,6 +265,9 @@
             $('#datetimepicker2').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm',
             });
+            $(document).on("click", "#save_data", function() {
+                $("#new-form").submit();
+            })
         });
     </script>
 @endsection
