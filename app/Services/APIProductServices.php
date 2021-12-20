@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Models\ProductPhotos;
 use App\Models\ProductItems;
+use App\Models\PromotionalCampaigns;
 use App\Services\APIWebService;
 use App\Services\WebCategoryHierarchyService;
 use GuzzleHttp\Psr7\Request;
@@ -599,15 +600,23 @@ class APIProductServices
      */
     public function getCampaignGift()
     {
+        $now = Carbon::now();
+        /*
         $strSQL = "select pcp.product_id, pc.*
                 from promotional_campaigns pc
                 inner join  promotional_campaign_giveaways pcp on pcp.promotional_campaign_id=pc.id
-                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1 ";
+                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1 and pc.id=12";
 
         $promotional = DB::select($strSQL);
+        */
         $data = [];
+        $promotional = PromotionalCampaigns::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaigns.*")
+            ->where("promotional_campaigns.start_at","<=", $now)
+            ->where("promotional_campaigns.end_at",">=", $now)
+            ->where("promotional_campaigns.active", "=", "1")
+            ->join('promotional_campaign_giveaways', 'promotional_campaign_giveaways.promotional_campaign_id', '=', 'promotional_campaigns.id')->get();
         foreach ($promotional as $promotion) {
-            $data[$promotion->product_id][] = $promotion;
+            $data[$promotion->promotional_campaign_id][$promotion->product_id] = $promotion;
         }
         return $data;
 

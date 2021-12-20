@@ -101,7 +101,7 @@ class ShoppingController extends Controller
         $error_code = $this->apiService->getErrorCode();
         $member_id = Auth::guard('api')->user()->member_id;
         $campaign = $this->apiProductServices->getPromotion('product_card');
-        $campaign_gift = null;//$this->apiProductServices->getCampaignGift();
+        $campaign_gift = $this->apiProductServices->getCampaignGift();
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift);
         //$response = json_encode($response, true);
         if ($response == 'success') {
