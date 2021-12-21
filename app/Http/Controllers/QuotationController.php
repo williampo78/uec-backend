@@ -4,16 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Quotation;
 use App\Models\QuotationDetails;
-use App\Models\Users;
 use App\Services\ItemService;
 use App\Services\QuotationService;
-use App\Services\RoleService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
 use App\Services\WarehouseService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class QuotationController extends Controller
 {
@@ -23,38 +19,32 @@ class QuotationController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    private $roleService;
     private $quotationService;
     private $universalService;
     private $itemService;
     private $warehouseService;
 
-    public function __construct(RoleService $roleService, QuotationService $quotationService, UniversalService $universalService, ItemService $itemService, WarehouseService $warehouseService)
+    public function __construct(QuotationService $quotationService, 
+    UniversalService $universalService, 
+    ItemService $itemService, 
+    WarehouseService $warehouseService,
+    SupplierService $supplierService)
     {
-        $this->roleService = $roleService;
         $this->quotationService = $quotationService;
         $this->universalService = $universalService;
         $this->itemService = $itemService;
         $this->warehouseService = $warehouseService;
+        $this->supplierService = $supplierService ; 
     }
     public function index(Request $request)
     {
-        $getData = $request->all();
+        $in = $request->input() ;
+        $result = [];
+        $result['supplier'] = $this->supplierService->getSuppliers();
+        $result['quotation'] = $this->quotationService->getQuotation($in);
+        $result['status_code'] = $this->quotationService->getStatusCode();
+        return view('Backend.Quotation.list', $result);
 
-        $data = [];
-        $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
-        $data['quotation'] = ($getData)? $this->quotationService->getQuotation($getData) : [];
-        $data['status_code'] = $this->quotationService->getStatusCode();
-        if (!isset($getData['select_start_date']) || !isset($getData['select_end_date'])){
-            $getData['select_start_date'] = Carbon::now()->subMonth()->toDateString();
-            $getData['select_end_date'] = Carbon::now()->toDateString();
-        }
-
-        $data['getData'] = $getData;
-        $data['user_id'] = Auth::user()->id;
-
-        return view('Backend.Quotation.list', compact('data'));
     }
 
     /**
@@ -67,8 +57,7 @@ class QuotationController extends Controller
         $supplier = new SupplierService();
         $data['supplier'] = $supplier->getSuppliers();
         $data['act'] = 'add';
-
-        return view('Backend.Quotation.add', compact('data'));
+        return view('Backend.Quotation.add', compact('supplier', 'act'));
     }
 
     /**
@@ -82,13 +71,13 @@ class QuotationController extends Controller
         $route_name = 'quotation';
         $act = 'add';
         $data = $request->except('_token');
-        if(isset($data['status_code'])){
+        if (isset($data['status_code'])) {
             $act = $data['status_code'];
         }
 
         $this->quotationService->addQuotation($data);
 
-        return view('Backend.success' , compact('route_name','act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -131,12 +120,12 @@ class QuotationController extends Controller
     {
         $route_name = 'quotation';
         $act = 'upd';
-        $data = $request->except('_token' , '_method');
+        $data = $request->except('_token', '_method');
         $data['id'] = $id;
 
         $this->quotationService->updateQuotation($data);
 
-        return view('Backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -152,17 +141,18 @@ class QuotationController extends Controller
 
         Quotation::destroy($id);
 
-        return view('Backend.success', compact('route_name' , 'act'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
-    public function ajax(Request $request){
+    public function ajax(Request $request)
+    {
         $rs = $request->all();
 
-        if ($rs['get_type'] == 'itemlist'){
+        if ($rs['get_type'] == 'itemlist') {
             $data = $this->itemService->getItemList();
-        }elseif ($rs['get_type'] == 'iteminfo'){
+        } elseif ($rs['get_type'] == 'iteminfo') {
             $data = $this->itemService->getItemInfo($rs['item_id']);
-        }elseif ($rs['get_type'] == 'quotation'){
+        } elseif ($rs['get_type'] == 'quotation') {
             $quotationStatus = $this->quotationService->getStatusCode();
             $taxList = $this->quotationService->getTaxList();
             $supplier = new SupplierService();
@@ -170,24 +160,25 @@ class QuotationController extends Controller
             $data = $this->quotationService->getQuotationById($rs['id']);
             $data['status_code'] = $quotationStatus[$data['status_code']] ?? '';
             $data['supplier_name'] = $supplierList[$data['supplier_id']]->name ?? '';
-            $data['tax'] = $taxList[$data['tax']]?? '';
+            $data['tax'] = $taxList[$data['tax']] ?? '';
 
-        }elseif ($rs['get_type'] == 'quotation_detail'){
+        } elseif ($rs['get_type'] == 'quotation_detail') {
             $data = $this->quotationService->getQuotationDetail($rs['id']);
 
-            if (isset($rs['action']) && $rs['action']=='upd'){
+            if (isset($rs['action']) && $rs['action'] == 'upd') {
                 $itemList = $this->itemService->getItemList();
-                echo "OK@@".json_encode($data)."@@".json_encode($itemList);
+                echo "OK@@" . json_encode($data) . "@@" . json_encode($itemList);
                 return false;
             }
-        }elseif ($rs['get_type'] == 'quotation_view_log'){
+        } elseif ($rs['get_type'] == 'quotation_view_log') {
             $data = $this->quotationService->getQuotationReviewLog($rs['id']);
         }
 
-        echo "OK@@".json_encode($data);
+        echo "OK@@" . json_encode($data);
     }
 
-    public function ajaxDelItem(Request $request){
+    public function ajaxDelItem(Request $request)
+    {
         $data = $request->all();
 
         QuotationDetails::destroy($data['id']);

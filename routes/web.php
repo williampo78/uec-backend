@@ -75,8 +75,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
 
     Route::resource('/requisitions_purchase_review', RequisitionsPurchaseReviewController::class, ['names' => ['index' => 'requisitions_purchase_review']]);
     Route::post('/requisitions_purchase/ajax', [RequisitionsPurchaseController::class, 'ajax']);
+    //報價單
     Route::resource('/quotation', QuotationController::class, ['names' => ['index' => 'quotation']]);
     Route::post('/quotation/ajax', [QuotationController::class, 'ajax']);
+
     Route::resource('/quotation_review', QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
     Route::post('/quotation/ajaxDelItem', [QuotationController::class, 'ajaxDelItem']);
     Route::resource('/order_supplier', OrderSupplierController::class, ['names' => ['index' => 'order_supplier']]);
