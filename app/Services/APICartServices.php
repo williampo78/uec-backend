@@ -425,15 +425,16 @@ class APICartServices
                 //$exchangeRate = $total_amount * $info->data->exchangeRate; //點數兌換現金率，若值為0.01，100點等同1元現金(100x0.01=1)
                 $pointInfo = array(
                     "point" => $info->data->point,
-                    "discountRate"=>$info->data->discountRate,
+                    "discountRate" => $info->data->discountRate,
                     "exchangeRate" => $info->data->exchangeRate,
                     "discountMax" => $discountRate,
                 );
             } else {
                 $pointInfo = array(
                     "point" => 0,
+                    "discountRate" => 0,
+                    "exchangeRate" => 0,
                     "discountMax" => 0,
-                    "exchangeRate" => 1,
                 );
             }
 
@@ -446,7 +447,7 @@ class APICartServices
             }
             $cart = [];
             $cart = array(
-                "feeInfo"=>$feeInfo,
+                "feeInfo" => $feeInfo,
                 "productRow" => count($cartInfo),
                 "list" => $product,
                 "gift" => $cartGift,
