@@ -384,7 +384,7 @@ class APICartServices
                             "discount_name" => null,
                             "discount_status" => false
                         );
-                        $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
+                        $cartTotal += 0;
                     }
                 }
             }
