@@ -9,7 +9,6 @@ use App\Services\APIProductServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
-
 class ShoppingController extends Controller
 {
 
@@ -98,24 +97,21 @@ class ShoppingController extends Controller
      */
     public function getShoppingCartData()
     {
+        $err = null;
         $error_code = $this->apiService->getErrorCode();
         $member_id = Auth::guard('api')->user()->member_id;
         $campaign = $this->apiProductServices->getPromotion('product_card');
-        $campaign_gift = null;//$this->apiProductServices->getCampaignGift();
+        $campaign_gift = $this->apiProductServices->getCampaignGift();
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift);
-        //$response = json_encode($response, true);
-        if ($response == 'success') {
+        $response = json_decode($response, true);
+        if ($response['status'] == '200') {
             $status = true;
-            $data = '';
-        } elseif ($response == '203') {
-            $status = false;
-            $err = $response;
-            $data = '';
+            $data = $response['result'];
         } else {
             $status = false;
-            $err = '401';
-            $data = '';
+            $err = '404';
+            $data = $response['result'];
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $response]);
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($response['status']=='200'?null:$error_code[$err]), 'result' => $data]);
     }
 }

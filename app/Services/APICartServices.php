@@ -9,9 +9,16 @@ use App\Models\ShoppingCartDetails;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\ProductItems;
+use App\Models\Products;
+use App\Services\APIService;
 
 class APICartServices
 {
+
+    public function __construct(APIService $apiService)
+    {
+        $this->apiService = $apiService;
+    }
 
     /*
      * 取得購物車內容
@@ -30,7 +37,11 @@ class APICartServices
             ->orderBy('product_items.sort', 'asc')
             ->get();
 
-        return $result;
+        $data = [];
+        foreach ($result as $datas) {
+            $data[$datas->product_id] = $datas;
+        }
+        return $data;
     }
 
     /*
@@ -115,241 +126,351 @@ class APICartServices
     public function getCartData($member_id, $campaigns, $campaign_gift)
     {
         $now = Carbon::now();
+        $productInfo = self::getProducts();
         //購物車內容
         $cartInfo = self::getCartInfo($member_id);
-        $cartQty = [];
-        $cartAmount = [];
-        $cartDetail = [];
-        foreach ($cartInfo as $items => $item) {
-            $cartQty[$item->product_id][$item->item_id] = $item->item_qty; //購物車數量
-            $cartAmount[$item->product_id] = intval($item->selling_price); //商品售價
-            $cartDetail[$item->product_id][$item->item_id] = $item; //購物車數量
-        }
-
-        //行銷活動
-        foreach ($campaigns as $product_id => $item) {
-            foreach ($item as $k => $v) {
-                if ($now >= $v->start_at and $now <= $v->end_at) { //活動時間內才做
-                    //先取活動類型為單品或車子(贈品或折扣) $campaign['PRD']['DISCOUNT'] 單品折扣
-                    $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+        $shippingFee = ShippingFeeRulesService::getShippingFee('HOME');
+        $feeInfo = array(
+            "notice" => $shippingFee['HOME']->notice_brief,
+            "notice_detail" => $shippingFee['HOME']->notice_detailed
+        );
+        if (count($cartInfo) == 0) {
+            return json_encode(array("status" => 404, "result" => $feeInfo));
+        } else {
+            $cartQty = [];
+            $cartAmount = [];
+            $cartDetail = [];
+            $cartTotal = 0;
+            $product = [];
+            foreach ($cartInfo as $items => $item) {
+                $cartQty[$item->product_id][$item->item_id] = $item->item_qty; //購物車數量
+                $cartAmount[$item->product_id] = intval($item->selling_price); //商品售價
+                $cartDetail[$item->product_id][$item->item_id] = $item; //購物車數量
+            }
+            //行銷活動
+            foreach ($campaigns as $product_id => $item) {
+                foreach ($item as $k => $v) {
+                    if ($now >= $v->start_at and $now <= $v->end_at) { //活動時間內才做
+                        //先取活動類型為單品或車子(贈品或折扣) $campaign['PRD']['DISCOUNT'] 單品折扣
+                        $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+                    }
                 }
             }
-        }
-        //取滿額折扣
-        $product = [];
-        foreach ($cartQty as $product_id => $item) {
-            if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
-                $qty = array_sum($item); //合併不同規格但同一商品的數量
-                if (isset($campaign['PRD']['DISCOUNT'][$product_id])) { //在活動內
-                    //ex: n=2, x=0.85, qty=4, price = 1000
-                    $unit_qty = ($qty - $campaign['PRD']['DISCOUNT'][$product_id]->n_value + 1); //有幾件可以打折(4-2+1)
-                    if ($qty >= $campaign['PRD']['DISCOUNT'][$product_id]->n_value && $unit_qty > 0) {
-                        if ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD01') { //﹝單品﹞第N件(含)以上，打X折
-                            $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000*0.85
-                            foreach ($item as $item_id => $detail_qty) { //取得item規格數量
-                                $tmp_qty = $detail_qty;
-                                if ($unit_qty >= $tmp_qty) { // 3 >= 2
-                                    //item_id折多少
-                                    $amount = $tmp_qty * $price;
-                                    $return_qty = $tmp_qty;
-                                    $unit_price = round($amount / $return_qty);
-                                    $unit_qty = $unit_qty - $tmp_qty; //3-2=1
-                                    $return_type = true;
-                                } else {
-                                    if ($unit_qty > 0) {
-                                        if ($unit_qty < $detail_qty) {
-                                            $tmp1 = $unit_qty; //要打折的數量
-                                        } else {
-                                            $tmp1 = ($detail_qty - $unit_qty); //要打折的數量
-                                        }
-                                        $tmp2 = ($detail_qty - $tmp1); //不打折的數量
-                                        $price1 = $tmp1 * $price; //1*850
-                                        $price2 = $tmp2 * $cartAmount[$product_id]; //1*1000
-                                        $amount = ($price1 + $price2);
-                                        $return_qty = $tmp_qty;
-                                        $unit_price = round($amount / ($tmp1 + $tmp2));
-                                        $unit_qty = $unit_qty - $tmp_qty; //3-2=1
-                                        $return_type = true;
-                                    } else {
-                                        $amount = $tmp_qty * $cartAmount[$product_id];
+            foreach ($cartQty as $product_id => $item) {
+                if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
+
+                    $qty = array_sum($item); //合併不同規格但同一商品的數量
+                    //商品折扣
+                    if (isset($campaign['PRD']['DISCOUNT'][$product_id])) { //在活動內 滿額折扣
+                        //ex: n=2, x=0.85, qty=4, price = 1000
+                        $unit_qty = ($qty - $campaign['PRD']['DISCOUNT'][$product_id]->n_value + 1); //有幾件可以打折(4-2+1)
+                        if ($qty >= $campaign['PRD']['DISCOUNT'][$product_id]->n_value && $unit_qty > 0) {
+                            if ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD01') { //﹝單品﹞第N件(含)以上，打X折
+                                $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000*0.85
+                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                    $tmp_qty = $detail_qty;
+                                    if ($unit_qty >= $tmp_qty) { // 3 >= 2
+                                        //item_id折多少
+                                        $amount = $tmp_qty * $price;
                                         $return_qty = $tmp_qty;
                                         $unit_price = round($amount / $return_qty);
                                         $unit_qty = $unit_qty - $tmp_qty; //3-2=1
                                         $return_type = true;
-                                    }
-                                }
-                                $product[$product_id][$item_id] = array(
-                                    "product_name" => $cartDetail[$product_id][$item_id]->product_name,
-                                    "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
-                                    "item_id" => $cartDetail[$product_id][$item_id]->item_id,
-                                    "item_no" => $cartDetail[$product_id][$item_id]->item_no,
-                                    "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
-                                    "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
-                                    "item_price" => $unit_price,
-                                    "item_qty" => $return_qty,
-                                    "amount" => $amount,
-                                    "campaign_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                    "campaign_type" => $return_type,
-                                    "product_type" => "effective"
-                                );
-                            }
-                        } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD02') { //﹝單品﹞第N件(含)以上，折X元
-                            $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000-200
-                            foreach ($item as $item_id => $detail_qty) { //取得item規格數量
-                                $tmp_qty = $detail_qty;
-                                if ($unit_qty >= $tmp_qty) { // 3 >= 2
-                                    //item_id折多少
-                                    $amount = $tmp_qty * $price;
-                                    $return_qty = $tmp_qty;
-                                    $unit_price = round($amount / $return_qty);
-                                    $unit_qty = $unit_qty - $tmp_qty; //3-2=1
-                                    $return_type = true;
-                                } else {
-                                    if ($unit_qty > 0) {
-                                        if ($unit_qty < $detail_qty) {
-                                            $tmp1 = $unit_qty; //要打折的數量
-                                        } else {
-                                            $tmp1 = ($detail_qty - $unit_qty); //要打折的數量
-                                        }
-                                        $tmp2 = ($detail_qty - $tmp1); //不打折的數量
-                                        $price1 = $tmp1 * $price; //1*850
-                                        $price2 = $tmp2 * $cartAmount[$product_id]; //1*1000
-                                        $return_qty = $tmp_qty;
-                                        $amount = ($price1 + $price2);
-                                        $unit_price = round($amount / ($tmp1 + $tmp2));
-                                        $unit_qty = $unit_qty - $tmp_qty; //3-2=1
-                                        $return_type = true;
                                     } else {
-                                        $amount = $tmp_qty * $cartAmount[$product_id];
+                                        if ($unit_qty > 0) {
+                                            if ($unit_qty < $detail_qty) {
+                                                $tmp1 = $unit_qty; //要打折的數量
+                                            } else {
+                                                $tmp1 = ($detail_qty - $unit_qty); //要打折的數量
+                                            }
+                                            $tmp2 = ($detail_qty - $tmp1); //不打折的數量
+                                            $price1 = $tmp1 * $price; //1*850
+                                            $price2 = $tmp2 * $cartAmount[$product_id]; //1*1000
+                                            $amount = ($price1 + $price2);
+                                            $return_qty = $tmp_qty;
+                                            $unit_price = round($amount / ($tmp1 + $tmp2));
+                                            $unit_qty = $unit_qty - $tmp_qty; //3-2=1
+                                            $return_type = true;
+                                        } else {
+                                            $amount = $tmp_qty * $cartAmount[$product_id];
+                                            $return_qty = $tmp_qty;
+                                            $unit_price = round($amount / $return_qty);
+                                            $unit_qty = $unit_qty - $tmp_qty; //3-2=1
+                                            $return_type = true;
+                                        }
+                                    }
+
+                                    $product[$product_id][$item_id] = array(
+                                        "product_type" => "effective",
+                                        "product_name" => $cartDetail[$product_id][$item_id]->product_name,
+                                        "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
+                                        "item_id" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
+                                        "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
+                                        "item_price" => intval($unit_price),
+                                        "item_qty" => $return_qty,
+                                        "amount" => intval($amount),
+                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "discount_status" => $return_type
+                                    );
+                                    $cartTotal += intval($amount);
+                                }
+                            } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD02') { //﹝單品﹞第N件(含)以上，折X元
+                                $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000-200
+                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                    $tmp_qty = $detail_qty;
+                                    if ($unit_qty >= $tmp_qty) { // 3 >= 2
+                                        //item_id折多少
+                                        $amount = $tmp_qty * $price;
                                         $return_qty = $tmp_qty;
                                         $unit_price = round($amount / $return_qty);
                                         $unit_qty = $unit_qty - $tmp_qty; //3-2=1
                                         $return_type = true;
+                                    } else {
+                                        if ($unit_qty > 0) {
+                                            if ($unit_qty < $detail_qty) {
+                                                $tmp1 = $unit_qty; //要打折的數量
+                                            } else {
+                                                $tmp1 = ($detail_qty - $unit_qty); //要打折的數量
+                                            }
+                                            $tmp2 = ($detail_qty - $tmp1); //不打折的數量
+                                            $price1 = $tmp1 * $price; //1*850
+                                            $price2 = $tmp2 * $cartAmount[$product_id]; //1*1000
+                                            $return_qty = $tmp_qty;
+                                            $amount = ($price1 + $price2);
+                                            $unit_price = round($amount / ($tmp1 + $tmp2));
+                                            $unit_qty = $unit_qty - $tmp_qty; //3-2=1
+                                            $return_type = true;
+                                        } else {
+                                            $amount = $tmp_qty * $cartAmount[$product_id];
+                                            $return_qty = $tmp_qty;
+                                            $unit_price = round($amount / $return_qty);
+                                            $unit_qty = $unit_qty - $tmp_qty; //3-2=1
+                                            $return_type = true;
+                                        }
                                     }
+                                    $product[$product_id][$item_id] = array(
+                                        "product_type" => "effective",
+                                        "product_name" => $cartDetail[$product_id][$item_id]->product_name,
+                                        "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
+                                        "item_id" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
+                                        "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
+                                        "item_price" => intval($unit_price),
+                                        "item_qty" => $return_qty,
+                                        "amount" => intval($amount),
+                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "discount_status" => $return_type
+                                    );
+                                    $cartTotal += intval($amount);
                                 }
-                                $product[$product_id][$item_id] = array(
-                                    "product_name" => $cartDetail[$product_id][$item_id]->product_name,
-                                    "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
-                                    "item_id" => $cartDetail[$product_id][$item_id]->item_id,
-                                    "item_no" => $cartDetail[$product_id][$item_id]->item_no,
-                                    "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
-                                    "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
-                                    "item_price" => $unit_price,
-                                    "item_qty" => $return_qty,
-                                    "amount" => $amount,
-                                    "campaign_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                    "campaign_type" => $return_type,
-                                    "product_type" => "effective"
-                                );
+                            } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD03') { //﹝單品﹞滿N件，每件打X折
+                                $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000*0.85
+                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                    $tmp_qty = $detail_qty;
+                                    $amount = $tmp_qty * $price;
+                                    $return_qty = $tmp_qty;
+                                    $unit_price = round($amount / $return_qty);
+                                    $product[$product_id][$item_id] = array(
+                                        "product_type" => "effective",
+                                        "product_name" => $cartDetail[$product_id][$item_id]->product_name,
+                                        "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
+                                        "item_id" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
+                                        "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
+                                        "item_price" => intval($unit_price),
+                                        "item_qty" => $return_qty,
+                                        "amount" => intval($amount),
+                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "discount_status" => true
+                                    );
+                                    $cartTotal += intval($amount);
+                                }
+                            } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD04') { //﹝單品﹞滿N件，每件折X元
+                                $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000-200
+                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                    $tmp_qty = $detail_qty;
+                                    $amount = $tmp_qty * $price;
+                                    $return_qty = $tmp_qty;
+                                    $unit_price = round($amount / $return_qty);
+                                    $product[$product_id][$item_id] = array(
+                                        "product_type" => "effective",
+                                        "product_name" => $cartDetail[$product_id][$item_id]->product_name,
+                                        "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
+                                        "item_id" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
+                                        "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
+                                        "item_price" => intval($unit_price),
+                                        "item_qty" => $return_qty,
+                                        "amount" => intval($amount),
+                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "discount_status" => true
+                                    );
+                                    $cartTotal += intval($amount);
+                                }
                             }
-                        } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD03') { //﹝單品﹞滿N件，每件打X折
-                            $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000*0.85
+                        } else { //沒有打折的件數
                             foreach ($item as $item_id => $detail_qty) { //取得item規格數量
-                                $tmp_qty = $detail_qty;
-                                $amount = $tmp_qty * $price;
-                                $return_qty = $tmp_qty;
-                                $unit_price = round($amount / $return_qty);
                                 $product[$product_id][$item_id] = array(
+                                    "product_type" => "effective",
                                     "product_name" => $cartDetail[$product_id][$item_id]->product_name,
                                     "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
                                     "item_id" => $cartDetail[$product_id][$item_id]->item_id,
-                                    "item_no" => $cartDetail[$product_id][$item_id]->item_no,
                                     "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
                                     "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
-                                    "item_price" => $unit_price,
-                                    "item_qty" => $return_qty,
-                                    "amount" => $amount,
-                                    "campaign_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                    "campaign_type" => true,
-                                    "product_type" => "effective"
+                                    "item_price" => intval($cartDetail[$product_id][$item_id]->selling_price),
+                                    "item_qty" => $detail_qty,
+                                    "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
+                                    "discount_name" => null,
+                                    "discount_status" => false
                                 );
-                            }
-                        } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD04') { //﹝單品﹞滿N件，每件折X元
-                            $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000-200
-                            foreach ($item as $item_id => $detail_qty) { //取得item規格數量
-                                $tmp_qty = $detail_qty;
-                                $amount = $tmp_qty * $price;
-                                $return_qty = $tmp_qty;
-                                $unit_price = round($amount / $return_qty);
-                                $product[$product_id][$item_id] = array(
-                                    "product_name" => $cartDetail[$product_id][$item_id]->product_name,
-                                    "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
-                                    "item_id" => $cartDetail[$product_id][$item_id]->item_id,
-                                    "item_no" => $cartDetail[$product_id][$item_id]->item_no,
-                                    "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
-                                    "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
-                                    "item_price" => $unit_price,
-                                    "item_qty" => $return_qty,
-                                    "amount" => $amount,
-                                    "campaign_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                    "campaign_type" => true,
-                                    "product_type" => "effective"
-                                );
-                            }
+                                $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
+                            };
                         }
-                    } else { //沒有打折的件數
+                    } else { //不在活動內
                         foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             $product[$product_id][$item_id] = array(
+                                "product_type" => "effective",
                                 "product_name" => $cartDetail[$product_id][$item_id]->product_name,
                                 "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
                                 "item_id" => $cartDetail[$product_id][$item_id]->item_id,
-                                "item_no" => $cartDetail[$product_id][$item_id]->item_no,
                                 "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
                                 "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
                                 "item_price" => intval($cartDetail[$product_id][$item_id]->selling_price),
                                 "item_qty" => $detail_qty,
                                 "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
-                                "campaign_name" => null,
-                                "campaign_type" => false,
-                                "product_type" => "effective"
+                                "discount_name" => null,
+                                "discount_status" => false
                             );
+                            $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
                         };
                     }
-                } else { //不在活動內
+                    //商品贈品
+                    if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
+                        if ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value && $campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
+                            foreach ($campaign_gift[$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                $giftList[] = array(
+                                    "product_id" => $giftInfo->product_id,
+                                    "product_name" => $productInfo[$giftInfo->product_id]->product_name
+                                );
+                            }
+                            //使用第一個item_id
+                            $i = 0;
+                            $tmp_id = 0;
+                            foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                if ($i == 0) $tmp_id = $item_id;
+                                if ($i > 0) continue;
+                                $i++;
+                            }
+
+                            $product[$product_id][$tmp_id]['gift_name'] = $campaign['PRD']['GIFT'][$product_id]->campaign_name;
+                            $product[$product_id][$tmp_id]['gift_status'] = true;
+                            $product[$product_id][$tmp_id]['gift_list'] = $giftList;
+
+                        }
+                    }
+                } else {
                     foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                         $product[$product_id][$item_id] = array(
+                            "product_type" => "expired",
                             "product_name" => $cartDetail[$product_id][$item_id]->product_name,
                             "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
                             "item_id" => $cartDetail[$product_id][$item_id]->item_id,
-                            "item_no" => $cartDetail[$product_id][$item_id]->item_no,
                             "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
                             "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
                             "item_price" => intval($cartDetail[$product_id][$item_id]->selling_price),
                             "item_qty" => $detail_qty,
                             "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
-                            "campaign_name" => null,
-                            "campaign_type" => false,
-                            "product_type" => "effective"
+                            "discount_name" => null,
+                            "discount_status" => false
                         );
-                    };
-                }
-                if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                    echo $campaign['PRD']['GIFT'][$product_id]->x_value;
-                }
-            } else {
-                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
-                    $product[$product_id][$item_id] = array(
-                        "product_name" => $cartDetail[$product_id][$item_id]->product_name,
-                        "product_photo" => $cartDetail[$product_id][$item_id]->item_photo,
-                        "item_id" => $cartDetail[$product_id][$item_id]->item_id,
-                        "item_no" => $cartDetail[$product_id][$item_id]->item_no,
-                        "item_spec1" => $cartDetail[$product_id][$item_id]->item_spec1,
-                        "item_spec2" => $cartDetail[$product_id][$item_id]->item_spec2,
-                        "item_price" => intval($cartDetail[$product_id][$item_id]->selling_price),
-                        "item_qty" => $detail_qty,
-                        "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
-                        "campaign_name" => null,
-                        "campaign_type" => false,
-                        "product_type" => "expired"
-                    );
+                        $cartTotal += 0;
+                    }
                 }
             }
+            $cartDiscount = 0;
+            $cartGift = [];
+            foreach ($cartQty as $product_id => $item) {
+                if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
+                    //全車滿額折扣
+                    if (isset($campaign['CART']['DISCOUNT'][$product_id])) {
+                        if ($cartTotal >= $campaign['CART']['DISCOUNT'][$product_id]->n_value) {
+                            if ($campaign['CART']['DISCOUNT'][$product_id]->campaign_type == 'CART01') { //﹝滿額﹞購物車滿N元，打X折
+                                $cartDiscount += $cartTotal - ($cartTotal * $campaign['CART']['DISCOUNT'][$product_id]->x_value); //打折10000-(10000*0.85)
+                            } elseif ($campaign['CART']['DISCOUNT'][$product_id]->campaign_type == 'CART02') { //﹝滿額﹞購物車滿N元，折X元
+                                $cartDiscount += $campaign['CART']['DISCOUNT'][$product_id]->x_value; //打折後10000-1000
+                            }
+                        }
+                    }
+                    //全車滿額贈品
+                    if (isset($campaign['CART']['GIFT'][$product_id])) {
+                        if ($cartTotal >= $campaign['CART']['GIFT'][$product_id]->n_value && $campaign['CART']['GIFT'][$product_id]->campaign_type == 'CART03') { //﹝滿額﹞購物車滿N元，送贈品
+                            foreach ($campaign_gift[$campaign['CART']['GIFT'][$product_id]->id] as $giftInfo) {
+                                $cartGift[] = array(
+                                    "product_id" => $giftInfo->product_id,
+                                    "product_name" => $productInfo[$giftInfo->product_id]->product_name
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            $total_amount = ($cartTotal - $cartDiscount);
+            //會員可用點數
+            $pointData = $this->apiService->getMemberPoint($member_id);
+            $info = json_decode($pointData);
+            $pointInfo = [];
+            if ($info->data->point > 0) {
+                $discountRate = $total_amount * $info->data->discountRate; //點數折抵上限率，若值為0.3，總金額1000元，折抵上限為300元(1000x0.3=300)
+                //$exchangeRate = $total_amount * $info->data->exchangeRate; //點數兌換現金率，若值為0.01，100點等同1元現金(100x0.01=1)
+                $pointInfo = array(
+                    "point" => $info->data->point,
+                    "discountRate" => $info->data->discountRate,
+                    "exchangeRate" => $info->data->exchangeRate,
+                    "discountMax" => $discountRate,
+                );
+            } else {
+                $pointInfo = array(
+                    "point" => 0,
+                    "discountRate" => 0,
+                    "exchangeRate" => 0,
+                    "discountMax" => 0,
+                );
+            }
+
+            //運費規則
+            $fee = [];
+            if ($total_amount < $shippingFee['HOME']->free_threshold) {
+                $fee = $shippingFee['HOME']->shipping_fee;
+            } else {
+                $fee = 0;
+            }
+            $cart = [];
+            $cart = array(
+                "feeInfo" => $feeInfo,
+                "productRow" => count($cartInfo),
+                "list" => $product,
+                "gift" => $cartGift,
+                "totalprice" => $cartTotal,
+                "discount" => $cartDiscount,
+                "point" => $pointInfo,
+                "shippingFee" => $fee,
+                "checkout" => $total_amount,
+            );
+            return json_encode(array("status" => 200, "result" => $cart));
         }
+    }
 
-        //取滿額贈品
-        dd();
-        //運費規則
-
-        return $campaign;
+    /*
+     * 取得商品資訊 (上架審核通過 & 上架期間內)
+     */
+    public function getProducts()
+    {
+        $data = [];
+        $products = Products::all();
+        foreach ($products as $product) {
+            $data[$product->id] = $product;
+        }
+        return $data;
     }
 }

@@ -70,7 +70,8 @@ class APIIndexServices
                     $product_info = [];
                     foreach ($categoryProducts[$ad_slot->web_category_hierarchy_id] as $product) {
                         $product_info[] = array(
-                            'prod_id' => $product->product_no,
+                            'prod_id' => $product->id,
+                            'prod_no' => $product->product_no,
                             'prod_name' => $product->product_name,
                             'prod_unit' => $product->uom,
                             'prod_price' => $product->selling_price,
@@ -90,7 +91,8 @@ class APIIndexServices
             } elseif ($ad_slot->slot_type == '4') {
                 if (isset($products[$ad_slot->product_id])) {
                     $data[$ad_slot->slot_code][] = array(
-                        'prod_id' => $products[$ad_slot->product_id]->product_no,
+                        'prod_id' => $products[$ad_slot->product_id]->id,
+                        'prod_no' => $products[$ad_slot->product_id]->product_no,
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
                         'prod_unit' => $products[$ad_slot->product_id]->uom,
                         'prod_price' => $products[$ad_slot->product_id]->selling_price,
@@ -102,7 +104,8 @@ class APIIndexServices
             } elseif ($ad_slot->slot_type == '5') {
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
                     $prd_H080A[] = array(
-                        'prod_id' => $products[$ad_slot->product_id]->product_no,
+                        'prod_id' => $products[$ad_slot->product_id]->id,
+                        'prod_no' => $products[$ad_slot->product_id]->product_no,
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
                         'prod_unit' => $products[$ad_slot->product_id]->uom,
                         'prod_price' => $products[$ad_slot->product_id]->selling_price,
@@ -129,7 +132,8 @@ class APIIndexServices
             } elseif ($ad_slot->slot_type == 'IS') {
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
                     $prd_H080B[] = array(
-                        'prod_id' => $products[$ad_slot->product_id]->product_no,
+                        'prod_id' => $products[$ad_slot->product_id]->id,
+                        'prod_no' => $products[$ad_slot->product_id]->product_no,
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
                         'prod_unit' => $products[$ad_slot->product_id]->uom,
                         'prod_price' => $products[$ad_slot->product_id]->selling_price,
