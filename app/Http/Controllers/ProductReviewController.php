@@ -32,11 +32,9 @@ class ProductReviewController extends Controller
         $result = [
             'products' => [],
         ] ;
-
-        if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ; 
-            $this->productsService->restructureProducts($result['products']);
-        }
+        $in = array_merge($in , ['approval_status' => 'REVIEWING']) ;  // 固定撈出未審核狀態
+        $result['products'] = $this->productsService->getProducts($in) ; 
+        $this->productsService->restructureProducts($result['products']);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
         return view('Backend.ProductReview.list',$result);
@@ -82,7 +80,9 @@ class ProductReviewController extends Controller
      */
     public function edit($id)
     {
-        //
+        $result['products'] = $this->productsService->showProducts($id);
+        $result['product_review_log'] = $this->productsService->getProductReviewLog($id);
+        return view('Backend.ProductReview.input', $result);
     }
 
     /**
@@ -94,7 +94,12 @@ class ProductReviewController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $result = [] ; 
+        $in = $request->input();
+        $result['status'] = $this->productsService->addProductReview($in , $id) ;
+        $act = 'review_success';
+        $route_name = 'product_review';
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
