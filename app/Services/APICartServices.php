@@ -422,11 +422,12 @@ class APICartServices
             $pointInfo = [];
             if ($info->data->point > 0) {
                 $discountRate = $total_amount * $info->data->discountRate; //點數折抵上限率，若值為0.3，總金額1000元，折抵上限為300元(1000x0.3=300)
-                $exchangeRate = $total_amount * $info->data->exchangeRate; //點數兌換現金率，若值為0.01，100點等同1元現金(100x0.01=1)
+                //$exchangeRate = $total_amount * $info->data->exchangeRate; //點數兌換現金率，若值為0.01，100點等同1元現金(100x0.01=1)
                 $pointInfo = array(
                     "point" => $info->data->point,
+                    "discountRate"=>$info->data->discountRate,
+                    "exchangeRate" => $info->data->exchangeRate,
                     "discountMax" => $discountRate,
-                    "exchangeRate" => $exchangeRate,
                 );
             } else {
                 $pointInfo = array(
