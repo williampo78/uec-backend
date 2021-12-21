@@ -265,14 +265,21 @@
                                 @foreach ($products as $key => $val)
                                     <tr>
                                         <td>
-                                            <a class="btn btn-info btn-sm" href="{{ route('products.show', $val->id) }}">
+                                            <a class="btn btn-info btn-sm" href="{{ route('product_review_register.show', $val->id) }}">
                                                 <i class="fa fa-search"></i></a>
-                                            {{-- @if ($share_role_auth['auth_update']) --}}
-                                                <a class="btn btn-info btn-sm"
-                                                    href="{{ route('product_review_register.edit', $val->id) }}">編輯</a>
-                                            {{-- @endif --}}
-                                            <a class="btn btn-danger btn-sm"
-                                            href="{{ route('products.edit', $val->id) }}">下架</a>
+                                            @if ($share_role_auth['auth_update'])
+                                                @if ($val->launched_status == '未設定' || $val->launched_status == '上架駁回' || $val->launched_status == '商品下架')
+                                                    <a class="btn btn-info btn-sm"
+                                                        href="{{ route('product_review_register.edit', $val->id) }}">編輯
+                                                    </a>
+                                                @endif
+                                            @endif
+                                            @if ($share_role_auth['auth_update'])
+                                                @if ($val->launched_status == '商品上架')
+                                                    <button class="btn btn-danger btn-sm offProduct" type="button"
+                                                        data-json="{{ $val }}"> 下架</button>
+                                                @endif
+                                            @endif
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_name }}</td>
@@ -359,7 +366,26 @@
             $('#datetimepicker2').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
-
+            $(document).on("click", ".offProduct", function() {
+                let product = $(this).data('json');
+                let msg = '你確定要將商品編號 : ' + product.product_no + ' 商品名稱 :' + product.product_name + ' 下架嗎?';
+                var check = confirm(msg);
+                if (check) {
+                    axios.post('/backend/product_review_register/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'offProduct',
+                            product_id: product.id,
+                        })
+                        .then(function(response) {
+                            alert('下架成功')  ; 
+                            history.go(0);
+                            // console.log(response);
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                }
+            })
         });
     </script>
 @endsection

@@ -11,10 +11,8 @@
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput">
                 <form role="form" id="new-form" method="POST"
-                    action="{{ route('product_review_register.update', $products->id) }}" enctype="multipart/form-data"
+                    action="" enctype="multipart/form-data"
                     novalidaten="ovalidate">
-                    @csrf
-                    @method('PUT')
                     <div class="form-horizontal">
                         <div class="row">
                             <div class="col-sm-6">
@@ -140,7 +138,7 @@
                                     <div class="col-sm-9" id="div_start_launched_at">
                                         <div class='input-group date' id='datetimepicker'>
                                             <input type='text' class="form-control" name="start_launched_at"
-                                                id="start_launched_at" value="{{ $products->start_launched_at }}" />
+                                                id="start_launched_at" value="{{ $products->start_launched_at }}" readonly/>
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -156,7 +154,7 @@
                                     <div class="col-sm-9">
                                         <div class='input-group date' id='datetimepicker2'>
                                             <input type='text' class="form-control" name="end_launched_at"
-                                                id="end_launched_at" value="{{ $products->end_launched_at }}" />
+                                                id="end_launched_at" value="{{ $products->end_launched_at }}" readonly/>
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -242,12 +240,6 @@
                                 </table>
                             </div>
                         </div>
-                        <button class="btn btn-large btn-success" type="button" id="save_data">
-                            <i class="fa fa-save"></i>
-                            送審
-                        </button>
-                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i>
-                            取消</a>
                     </div>
                 </form>
             </div>
@@ -257,64 +249,4 @@
 
 @endsection
 @section('js')
-    <script>
-        $(document).ready(function() {
-            $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
-            });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
-            });
-            $(document).on("click", "#save_data", function() {
-                $("#new-form").submit();
-            })
-            //start_launched_at
-            //end_launched_at
-            $("#new-form").validate({
-                // debug: true,
-                submitHandler: function(form) {
-                    $('#save_data').prop('disabled', true);
-                    form.submit();
-                },
-                rules: {
-                    start_launched_at: {
-                        required: true,                        
-                    },
-                    end_launched_at: {
-                        required: true,      
-                        dateGreaterThanNow: true,   
-                        greaterThan: function() {
-                            return $('#start_launched_at').val();
-                        },     
-                    }
-                },
-                messages: {
-                    end_launched_at: {
-                        greaterThan: "結束時間必須大於開始時間",
-                    },
-                },
-                errorClass: "help-block",
-                errorElement: "span",
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length || element.is(':radio')) {
-                        error.insertAfter(element.parent());
-                        return;
-                    }
-
-                    if (element.is('select')) {
-                        element.parent().append(error);
-                        return;
-                    }
-
-                    error.insertAfter(element);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").addClass("has-error");
-                },
-                success: function(label, element) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-            });
-        });
-    </script>
 @endsection

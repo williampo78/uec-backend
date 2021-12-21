@@ -70,7 +70,9 @@ class ProductReviewRegisterController extends Controller
      */
     public function show($id)
     {
-        //
+        $result['products'] = $this->productsService->showProducts($id);
+        $result['product_review_log'] = $this->productsService->getProductReviewLog($id);
+        return view('Backend.ProductReviewRegister.show', $result);
     }
 
     /**
@@ -112,5 +114,23 @@ class ProductReviewRegisterController extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function ajax(Request $request){
+        $in = $request->input();
+        $status = true ; 
+
+        switch ($in['type']) {
+            case 'offProduct': 
+                    $status = $this->productsService->offProduct($in) ; 
+                break;
+            default:
+                break;
+        }
+
+        
+        return response()->json([
+            'status' => $status,
+            'in' => $request->input(),
+        ]);
     }
 }

@@ -272,7 +272,7 @@
                                                 </td>
                                                 <td>{{ $val->review_remark }}</td>
                                                 <td>{{ $val->discontinued_at }}</td>
-                                                <td>{{ $val->discontinued_by }}</td>
+                                                <td>{{ $val->discontinued_user_name }}</td>
                                             </tr>
                                         @endforeach
 

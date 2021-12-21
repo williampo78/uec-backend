@@ -655,7 +655,10 @@ class ProductsService
     }
     public function getProductReviewLog($id)
     {
-        $getProductReviewLog = ProductReviewLog::where('product_id', $id)->get();
+        $getProductReviewLog = ProductReviewLog::select('product_review_log.*', 'discontinued_user.user_name AS discontinued_user_name')
+            ->orderBy('product_review_log.updated_at', 'DESC')
+            ->leftJoin('users as discontinued_user', 'discontinued_user.id', '=', 'product_review_log.discontinued_by')
+            ->get();
         return $getProductReviewLog;
     }
     //申請審核
@@ -726,6 +729,31 @@ class ProductsService
             $result = false;
         }
         return $result;
-        exit;
+    }
+    public function offProduct($in) {
+        $user_id = Auth::user()->id;
+        $now = Carbon::now();
+        DB::beginTransaction();
+        try {
+            $count_review = ProductReviewLog::where('product_id', $in['product_id'])->orderBy('id', 'DESC')->count() ;
+            if($count_review > 0){
+                ProductReviewLog::where('product_id', $in['product_id'])->orderBy('id', 'DESC')->first()->update([
+                    'discontinued_by'=>$user_id,
+                    'discontinued_at' => $now,
+                    'updated_by' => $user_id,
+                ]);
+            }
+            Products::where('id', $in['product_id'])->update([
+                'approval_status' => 'CANCELLED',
+                'updated_by' => $user_id,
+            ]);
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::warning($e->getMessage());
+            $result = false;
+        }
+        return $result;
     }
 }
