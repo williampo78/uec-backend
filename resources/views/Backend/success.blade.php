@@ -28,6 +28,8 @@
                                         儲存成功，報價單送審中！
                                     @elseif($act==='review')
                                         儲存成功！
+                                    @elseif($act==='product_reviewing')
+                                        儲存成功，商品送審中！
                                     @endif
                                 </div>
                                 <a class="btn btn-block btn-success" href="{{route($route_name)}}"><i class="fa fa-fw fa-book"></i> 返回列表</a>
