@@ -53,6 +53,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/products', ProductsController::class, ['names' => ['index' => 'products']]);
     Route::resource('/product_small', ProductsMallController::class, ['names' => ['index' => 'product_small']]);
     Route::resource('/product_review_register', ProductReviewRegisterController::class, ['names' => ['index' => 'product_review_register']]);
+    Route::post('/product_review_register/ajax', [ProductReviewRegisterController::class, 'ajax']);
+
     Route::resource('/product_review', ProductReviewController::class, ['names' => ['index' => 'product_review']]);
     Route::post('/product_small/ajax', [ProductsMallController::class, 'ajax']);
 
@@ -73,8 +75,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
 
     Route::resource('/requisitions_purchase_review', RequisitionsPurchaseReviewController::class, ['names' => ['index' => 'requisitions_purchase_review']]);
     Route::post('/requisitions_purchase/ajax', [RequisitionsPurchaseController::class, 'ajax']);
+    //報價單
     Route::resource('/quotation', QuotationController::class, ['names' => ['index' => 'quotation']]);
     Route::post('/quotation/ajax', [QuotationController::class, 'ajax']);
+
     Route::resource('/quotation_review', QuotationReviewController::class, ['names' => ['index' => 'quotation_review']]);
     Route::post('/quotation/ajaxDelItem', [QuotationController::class, 'ajaxDelItem']);
     Route::resource('/order_supplier', OrderSupplierController::class, ['names' => ['index' => 'order_supplier']]);

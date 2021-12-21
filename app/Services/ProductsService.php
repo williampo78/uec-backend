@@ -6,10 +6,10 @@ use App\Models\CategoryProducts;
 use App\Models\ProductAuditLog;
 use App\Models\ProductItems;
 use App\Models\ProductPhotos;
+use App\Models\ProductReviewLog;
 use App\Models\Products;
 use App\Models\Product_spec_info;
 use App\Models\RelatedProducts;
-use App\Models\ProductReviewLog;
 use App\Services\UniversalService;
 use Batch;
 use Carbon\Carbon;
@@ -653,30 +653,38 @@ class ProductsService
             ->get();
         return $ProductAuditLog;
     }
-    public function getProductReviewLog($id){
-        $getProductReviewLog = ProductReviewLog::where('product_id',$id)->get(); 
-        return $getProductReviewLog ; 
+    public function getProductReviewLog($id)
+    {
+        $getProductReviewLog = ProductReviewLog::select('product_review_log.*', 'discontinued_user.user_name AS discontinued_user_name')
+            ->orderBy('product_review_log.updated_at', 'DESC')
+            ->leftJoin('users as discontinued_user', 'discontinued_user.id', '=', 'product_review_log.discontinued_by')
+            ->get();
+        return $getProductReviewLog;
     }
-    public function addProductReviewLog($in , $product_id){
+    //申請審核
+    public function addProductReviewLog($in, $product_id)
+    {
         $user_id = Auth::user()->id;
         DB::beginTransaction();
         try {
-            ProductItems::where('product_id',$product_id)->update(['edi_exported_status'=>'']) ;
+            ProductItems::where('product_id', $product_id)->update(['edi_exported_status' => '']);
             ProductAuditLog::create([
-                'product_id' => $product_id ,
+                'product_id' => $product_id,
                 'created_by' => $user_id,
                 'updated_by' => $user_id,
-                ]) ; 
-            Products::where('id',$product_id)->update([
-                'approval_status' => 'REVIEWING' ,
-                'updated_by' => $user_id ,
+            ]);
+            Products::where('id', $product_id)->update([
+                'start_launched_at' => $in['start_launched_at'],
+                'end_launched_at' => $in['end_launched_at'],
+                'approval_status' => 'REVIEWING',
+                'updated_by' => $user_id,
             ]);
             ProductReviewLog::create([
-                'product_id' => $product_id ,
-                'selling_price'=>$in['selling_price'] ,
-                'start_launched_at'=> $in['start_launched_at'] , 
-                'end_launched_at' => $in['end_launched_at'] , 
-                'created_by' => $user_id ,
+                'product_id' => $product_id,
+                'selling_price' => $in['selling_price'],
+                'start_launched_at' => $in['start_launched_at'],
+                'end_launched_at' => $in['end_launched_at'],
+                'created_by' => $user_id,
                 'updated_by' => $user_id,
             ]);
             DB::commit();
@@ -686,6 +694,66 @@ class ProductsService
             Log::warning($e->getMessage());
             $result = false;
         }
-        return $result ; 
+        return $result;
+    }
+    //審核
+    public function addProductReview($in, $id)
+    {
+        if ($in['review_result'] == '1') { //允許
+            $review_result = 'APPROVE';
+            $approval_status = 'APPROVED';
+        } else {
+            $review_result = 'REJECT';
+            $approval_status = 'REJECTED';
+        }
+        $user_id = Auth::user()->id;
+        $now = Carbon::now();
+        DB::beginTransaction();
+        try {
+            ProductReviewLog::where('product_id', $id)->orderBy('id', 'DESC')->first()->update([
+                'review_result' => $review_result,
+                'review_remark' => $in['review_remark'],
+                'reviewer' => $user_id,
+                'review_at' => $now,
+                'updated_by' => $user_id,
+            ]);
+            Products::where('id', $id)->update([
+                'approval_status' => $approval_status,
+                'updated_by' => $user_id,
+            ]);
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::warning($e->getMessage());
+            $result = false;
+        }
+        return $result;
+    }
+    public function offProduct($in) {
+        $user_id = Auth::user()->id;
+        $now = Carbon::now();
+        DB::beginTransaction();
+        try {
+            $count_review = ProductReviewLog::where('product_id', $in['product_id'])->orderBy('id', 'DESC')->count() ;
+            if($count_review > 0){
+                ProductReviewLog::where('product_id', $in['product_id'])->orderBy('id', 'DESC')->first()->update([
+                    'discontinued_by'=>$user_id,
+                    'discontinued_at' => $now,
+                    'updated_by' => $user_id,
+                ]);
+            }
+            Products::where('id', $in['product_id'])->update([
+                'approval_status' => 'CANCELLED',
+                'updated_by' => $user_id,
+            ]);
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::warning($e->getMessage());
+            $result = false;
+        }
+        return $result;
     }
 }

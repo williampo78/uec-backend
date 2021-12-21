@@ -25,9 +25,9 @@ class QuotationService
         $agent_id = Auth::user()->agent_id;
 
         $quotation = Quotation::select('quotation.id','doc_number','supplier_id','status_code','currency_code',
-                                'exchange_rate','quotation.remark','submitted_at' , 'closed_at' , 'tax', 'quotation.created_by')
+                                'exchange_rate','quotation.remark','submitted_at' , 'closed_at' , 'tax', 'quotation.created_by' ,'supplier.name as supplier_name')
                             ->where('quotation.agent_id' , $agent_id)
-                            ->leftJoin('supplier' , 'supplier.id' , '=' , 'supplier_id');
+                            ->leftJoin('supplier' , 'supplier.id' , '=' , 'quotation.supplier_id');
 
         if (isset($data['status'])){
             $quotation->where('status_code' , $data['status']);

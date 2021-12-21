@@ -1,21 +1,58 @@
 @extends('Backend.master')
-@section('title', '商品主檔 - 商品上下架申請')
+@section('title', '商品主檔 - 商品上架審核')
 @section('content')
     <div id="page-wrapper">
-        <div class="row">
-            <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>商品主檔 - 商品上下架申請</h1>
-            </div>
-        </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">請輸入下列欄位資料</div>
+        <div class="panel panel-primary">
+            <div class="panel-heading"> 商品上架審核</div>
             <div class="panel-body" id="CategoryHierarchyContentInput">
                 <form role="form" id="new-form" method="POST"
-                    action="{{ route('product_review_register.update', $products->id) }}" enctype="multipart/form-data"
+                    action="{{ route('product_review.update', $products->id) }}" enctype="multipart/form-data"
                     novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
                     <div class="form-horizontal">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">簽核結果</label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="review_result" value="1" checked>
+                                            核准
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="review_result" value="0">
+                                            駁回
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1">
+                                        <label class="control-label ">簽核備註</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <textarea name="review_remark" id="review_remark" cols="50" rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <button class="btn btn-large btn-success" type="button" id="save_data">
+                            <i class="fa fa-save"></i>
+                            儲存
+                        </button>
+                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i>
+                            取消</a>
+                        <hr>
+
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
@@ -140,7 +177,7 @@
                                     <div class="col-sm-9" id="div_start_launched_at">
                                         <div class='input-group date' id='datetimepicker'>
                                             <input type='text' class="form-control" name="start_launched_at"
-                                                id="start_launched_at" value="{{ $products->start_launched_at }}" />
+                                                id="start_launched_at" value="{{ $products->start_launched_at }}" readonly/>
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -156,7 +193,7 @@
                                     <div class="col-sm-9">
                                         <div class='input-group date' id='datetimepicker2'>
                                             <input type='text' class="form-control" name="end_launched_at"
-                                                id="end_launched_at" value="{{ $products->end_launched_at }}" />
+                                                id="end_launched_at" value="{{ $products->end_launched_at }}" readonly/>
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -231,6 +268,7 @@
                                                         @default
                                                             尚未審核
                                                     @endswitch
+                                                    {{ $val->review_result }}
                                                 </td>
                                                 <td>{{ $val->review_remark }}</td>
                                                 <td>{{ $val->discontinued_at }}</td>
@@ -242,12 +280,7 @@
                                 </table>
                             </div>
                         </div>
-                        <button class="btn btn-large btn-success" type="button" id="save_data">
-                            <i class="fa fa-save"></i>
-                            送審
-                        </button>
-                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i>
-                            取消</a>
+
                     </div>
                 </form>
             </div>
@@ -268,53 +301,6 @@
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
-            //start_launched_at
-            //end_launched_at
-            $("#new-form").validate({
-                // debug: true,
-                submitHandler: function(form) {
-                    $('#save_data').prop('disabled', true);
-                    form.submit();
-                },
-                rules: {
-                    start_launched_at: {
-                        required: true,                        
-                    },
-                    end_launched_at: {
-                        required: true,      
-                        dateGreaterThanNow: true,   
-                        greaterThan: function() {
-                            return $('#start_launched_at').val();
-                        },     
-                    }
-                },
-                messages: {
-                    end_launched_at: {
-                        greaterThan: "結束時間必須大於開始時間",
-                    },
-                },
-                errorClass: "help-block",
-                errorElement: "span",
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length || element.is(':radio')) {
-                        error.insertAfter(element.parent());
-                        return;
-                    }
-
-                    if (element.is('select')) {
-                        element.parent().append(error);
-                        return;
-                    }
-
-                    error.insertAfter(element);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").addClass("has-error");
-                },
-                success: function(label, element) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-            });
         });
     </script>
 @endsection
