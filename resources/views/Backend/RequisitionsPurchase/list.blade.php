@@ -157,57 +157,57 @@
                                 <button style="display:none" class="btn btn-info btn-sm toggle-show-model"
                                     data-toggle="modal" data-target="#row_detail">SHOW
                                 </button>
-                                @foreach ($requisitionsPurchase as $obj)
-                                    <tr>
-                                        <td>
-                                            {{-- @if ($share_role_auth['auth_query']) --}}
-                                            <button class="btn btn-info btn-sm" @click="showBtn({{ $obj->id }})"><i
-                                                    class="fa fa-search"></i></button>
-                                            {{-- @endif --}}
-                                            {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
+                                @if (isset($requisitionsPurchase))
+                                    @foreach ($requisitionsPurchase as $obj)
+                                        <tr>
+                                            <td>
+                                                {{-- @if ($share_role_auth['auth_query']) --}}
+                                                <button class="btn btn-info btn-sm"
+                                                    @click="showBtn({{ $obj->id }})"><i
+                                                        class="fa fa-search"></i></button>
+                                                {{-- @endif --}}
+                                                {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
 
-                                            <a class="btn btn-info btn-sm"
-                                                href="{{ route('requisitions_purchase') }}/{{ $obj->id }}/edit/">修改</a>
-                                            {{-- @endif --}}
-                                            {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
+                                                <a class="btn btn-info btn-sm"
+                                                    href="{{ route('requisitions_purchase') }}/{{ $obj->id }}/edit/">修改</a>
+                                                {{-- @endif --}}
+                                                {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
 
-                                            <button class="btn btn-danger btn-sm"
-                                                @click="delBtn({{ $obj->id }})">刪除</button>
-                                            {{-- @endif --}}
-                                        </td>
-                                        </td>
-                                        <td>{{ $obj->trade_date }} </td>
-                                        <td>{{ $obj->number }}</td>
-                                        <td>{{ $obj->supplier_name }}</td>
-                                        <td>
-                                            @switch($obj->status)
-                                                @case('DRAFTED')
-                                                    草稿
-                                                @break
-                                                @case('REVIEWING')
-                                                    簽核中
-                                                @break
-                                                @case('APPROVED')
-                                                    已核准
-                                                @break
-                                                @case('REJECTED')
-                                                    已駁回
-                                                @break
-                                                @default
-                                            @endswitch
-                                        </td>
-                                        <td>{{ $obj->created_at }}</td>
-                                        <td>尚未有該欄位</td>
-                                    </tr>
-                                @endforeach
+                                                <button class="btn btn-danger btn-sm"
+                                                    @click="delBtn({{ $obj->id }})">刪除</button>
+                                                {{-- @endif --}}
+                                            </td>
+                                            </td>
+                                            <td>{{ $obj->trade_date }} </td>
+                                            <td>{{ $obj->number }}</td>
+                                            <td>{{ $obj->supplier_name }}</td>
+                                            <td>
+                                                @switch($obj->status)
+                                                    @case('DRAFTED')
+                                                        草稿
+                                                    @break
+                                                    @case('REVIEWING')
+                                                        簽核中
+                                                    @break
+                                                    @case('APPROVED')
+                                                        已核准
+                                                    @break
+                                                    @case('REJECTED')
+                                                        已駁回
+                                                    @break
+                                                    @default
+                                                @endswitch
+                                            </td>
+                                            <td>{{ $obj->created_at }}</td>
+                                            <td>尚未有該欄位</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            {{-- <textarea name="" id="" cols="30" rows="10">@{{ requisitionsPurchase }}</textarea> --}}
-            {{-- <textarea name="" id="" cols="30" rows="10">@{{ requisitionsPurchaseDetail }}</textarea> --}}
-            {{-- <textarea name="" id="" cols="30" rows="10">@{{ getRequisitionPurchaseReviewLog }}</textarea> --}}
             @include('Backend.RequisitionsPurchase.detail')
         </div>
     </div>

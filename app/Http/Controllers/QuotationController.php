@@ -114,6 +114,7 @@ class QuotationController extends Controller
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
         });
+        
         $result['act'] = 'upd';
         $result['id'] = $id;
         return view('Backend.Quotation.add', $result);

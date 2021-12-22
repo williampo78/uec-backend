@@ -163,7 +163,8 @@ class QuotationService
             DB::raw('products.product_name as product_name'),
             DB::raw('product_items.id as product_items_id'),
             DB::raw('product_items.item_no as product_items_no'),
-            DB::raw('quotation_details.original_unit_price as original_unit_price')
+            DB::raw('quotation_details.original_unit_price as original_unit_price'),
+            DB::raw('products.min_purchase_qty as min_purchase_qty'),
         )
             ->where('quotation_id', $quotation_id)
             ->leftJoin('product_items', 'product_items.id', 'quotation_details.product_item_id')

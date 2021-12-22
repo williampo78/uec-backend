@@ -441,7 +441,7 @@ class ProductsService
     public function getItemsAndProduct(){
         $agent_id = Auth::user()->agent_id;
         $ProductItems = ProductItems::
-        select('product_items.*' , 'products.product_name' , 'products.brand_id')
+        select('product_items.*' , 'products.product_name' , 'products.brand_id' , 'products.min_purchase_qty')
         ->where('product_items.agent_id', $agent_id)
         ->leftJoin('products' ,'products.id' ,'=' ,'product_items.product_id');
         $result = $ProductItems->get();

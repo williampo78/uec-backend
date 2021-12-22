@@ -210,12 +210,12 @@
                     "<div class='col-sm-6' >" +
                     "<div class='input-group'>" +
                     "<select class='form-control js-select2-item product_item_va' name='item[" + newRow +
-                    "]' id='" + position + "item-" + newRow + "'>" +
+                    "]' id='" + position + "item-" + newRow + "' data-key='" + newRow + "'>" +
                     "<option value=''></option>" +
                     "</select>" +
                     "<span class='input-group-btn'>" +
-                    "<button class='btn copy_btn' type='button' onclick=\"copy_text(" + newRow +
-                    ")\" ><i class='fa fa-copy'></i></button>" +
+                    "<button class='btn copy_btn' type='button' data-key='" + newRow +
+                    "'><i class='fa fa-copy'></i></button>" +
                     "</span>" +
                     "</div>" +
                     "</div>" +
@@ -234,7 +234,6 @@
                     "</div>" +
                     "</div>"
                 ).appendTo($('#ItemDiv'));
-
                 $(".js-select2-item").select2({
                     allowClear: true,
                     theme: "bootstrap",
@@ -255,24 +254,16 @@
                 $('#rowNo').val(newRow);
             }
 
-            function copy_text(row_id) {
-                var name = $("#inputitemname-" + row_id).val();
 
-                new Clipboard('.copy_btn', {
-                    text: function(trigger) {
-                        return name;
-                    }
-                });
-            }
 
             function getItem(quotation_id) {
                 var curRow = parseInt($('#rowNo').val());
-                var newRow = curRow + 1;
                 var position = 'input';
                 var get_type = '';
                 var obj = @json($quotation_details ?? '');
                 var item = @json($products_item ?? '');
                 $.each(obj, function(key, value) {
+                    var newRow = curRow++;
                     var itemOption = "<option value=''></option>";
                     $.each(item, function(itemKey, itemVal) {
                         var selected = '';
@@ -297,12 +288,12 @@
                         "<div class='col-sm-6' >" +
                         "<div class='input-group'>" +
                         "<select class='form-control js-select2-item product_item_va' name='item[]' id='" +
-                        position + "item-" + newRow + "' >" +
+                        position + "item-" + newRow + "' data-key='" + newRow + "'>" +
                         itemOption +
                         "</select>" +
                         "<span class='input-group-btn'>" +
-                        "<button class='btn copy_btn' type='button' onclick=\"copy_text(" + newRow +
-                        ")\" ><i class='fa fa-copy'></i></button>" +
+                        "<button class='btn copy_btn' type='button' data-key='" + newRow +
+                        "'><i class='fa fa-copy'></i></button>" +
                         "</span>" +
                         "</div>" +
                         "</div>" +
@@ -312,8 +303,9 @@
                         "'>" +
                         "</div>" +
                         "<div class='col-sm-3' >" +
-                        "<input class='form-control' name='minimum_purchase_qty[]' id='" + position +
-                        "minimum_purchase_qty-" + newRow + "' readonly >" +
+                        "<input class='form-control' name='minimum_purchase_qty[]' value='" + value
+                        .min_purchase_qty + "' id='" + position + "minimum_purchase_qty-" + newRow +
+                        "' readonly >" +
                         "</div>" +
                         "<div class='col-sm-1'>" +
                         "<button type='button' data-details='" + value.quotation_details_id +
@@ -323,7 +315,6 @@
                         "</div>" +
                         "</div>"
                     ).appendTo($('#ItemDiv'));
-
                     $('#rowNo').val(newRow);
                 });
 
@@ -333,7 +324,6 @@
                     theme: "bootstrap",
                     placeholder: "請選擇品項"
                 });
-
                 $('button[id^=btn-delete-]').click(function() {
                     var id = this.dataset.details;
 
@@ -396,6 +386,26 @@
                     default:
                         break;
                 }
+            })
+            $(document.body).on("change", ".js-select2-item", function() {
+                var item = @json($products_item ?? '');
+                let find_this_id = $(this).val();
+                let fund_this_key = $(this).data('key');
+                let inputminimum_purchase_qty = '#inputminimum_purchase_qty-' + fund_this_key;
+                let new_item = item.filter(function(obj, index) {
+                    return obj.id == find_this_id;
+                })
+                $(inputminimum_purchase_qty).val(new_item[0].min_purchase_qty);
+            });
+
+            $(document).on("click", ".copy_btn", function() {
+                let key = $(this).data('key');
+                let copytext = $('#inputitem-' + key).find('option:selected').text() ; 
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val(copytext).select();
+                document.execCommand("copy");
+                $temp.remove();
             })
         });
     </script>
