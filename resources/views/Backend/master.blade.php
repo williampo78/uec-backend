@@ -40,10 +40,6 @@
             display: none;
         }
 
-        .select2-results__options {
-            max-height: 500px !important;
-        }
-
     </style>
 
     @yield('style')

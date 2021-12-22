@@ -8,7 +8,7 @@
                 <div class="panel-heading">請輸入下列欄位資料</div>
                 <div class="panel-body">
                     <form role="form" id="new-form" method="post"
-                        action="{{ $act == 'upd' ? route('quotation.update', $data['id']) : route('quotation.store') }}"
+                        action="{{ $act == 'upd' ? route('quotation.update', $id) : route('quotation.store') }}"
                         enctype="multipart/form-data">
                         @if ($act == 'upd')
                             @method('PUT')
@@ -27,18 +27,19 @@
                                             <select class="form-control js-select2-department" name="supplier_id"
                                                 id="supplier_id">
                                                 @foreach ($supplier as $v)
-                                                    <option value='{{ $v['id'] }}'>{{ $v['name'] }}</option>
+                                                    <option value='{{ $v['id'] }}'
+                                                        {{ isset($quotation['trade_date']) && $quotation['trade_date'] == $v['id'] ? 'selected' : '' }}>
+                                                        {{ $v['name'] }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-3">
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">報價日期<span class="redtext">*</span></label>
                                             <div class='input-group date' id='datetimepickera'>
-                                                <input type='text' class="form-control" name="trade_date"
-                                                    id="trade_date" value="" />
+                                                <input type='text' class="form-control" name="trade_date" id="trade_date"
+                                                    value="{{ $quotation['trade_date'] ?? '' }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -49,7 +50,7 @@
                                         <div class="form-group" id="div_doc_number">
                                             <label for="doc_number">報價單號</label>
                                             <input class="form-control" name="doc_number" id="doc_number"
-                                                value="{{ $data['quotation']['doc_number'] ?? '' }}" readonly>
+                                                value="{{ $quotation['doc_number'] ?? '' }}" readonly>
                                         </div>
                                     </div>
 
@@ -75,17 +76,17 @@
                                         <div class="form-group" id="tax_div">
                                             <label for="tax_div">稅別<span class="redtext">*</span></label>
                                             <select class="form-control js-select2-department" name="tax" id="tax">
-                                                <option value=1
-                                                    {{ isset($data['quotation']['tax']) && $data['quotation']['tax'] == 1 ? 'selected' : '' }}>
+                                                <option value="1"
+                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '1' ? 'selected' : '' }}>
                                                     應稅</option>
-                                                <option value=0
-                                                    {{ isset($data['quotation']['tax']) && $data['quotation']['tax'] == 0 ? 'selected' : '' }}>
+                                                <option value="0"
+                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '0' ? 'selected' : '' }}>
                                                     未稅</option>
-                                                <option value=2
-                                                    {{ isset($data['quotation']['tax']) && $data['quotation']['tax'] == 2 ? 'selected' : '' }}>
+                                                <option value="2"
+                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '2' ? 'selected' : '' }}>
                                                     內含</option>
-                                                <option value=3
-                                                    {{ isset($data['quotation']['tax']) && $data['quotation']['tax'] == 3 ? 'selected' : '' }}>
+                                                <option value="3"
+                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '3' ? 'selected' : '' }}>
                                                     零稅率</option>
                                             </select>
                                         </div>
@@ -97,7 +98,7 @@
                                         <div class="form-group" id="div_remark">
                                             <label for="remark">備註</label>
                                             <textarea class="form-control" rows="3" name="remark"
-                                                id="remark">{{ $data['quotation']['remark'] ?? '' }}</textarea>
+                                                id="remark">{{ $quotation['remark'] ?? '' }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -106,6 +107,14 @@
                                 <h4><i class="fa fa-th-large"></i> 品項</h4>
                                 <div id="ItemDiv">
                                     <input type="hidden" name="rowNo" id="rowNo" value="0">
+                                    <div class='add_row'>
+                                        <div class='row'>
+                                            <div class='col-sm-6 text-left'>品項<span class='redtext'>*</span></div>
+                                            <div class='col-sm-2 text-left'>單價<span class='redtext'>*</span></div>
+                                            <div class='col-sm-3 text-left'>最小採購量</div>
+                                            <div class='col-sm-1 text-left'>功能</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row form-group">
                                     <div class="col-sm-12">
@@ -118,9 +127,7 @@
                                         <hr>
                                     </div>
                                 </div>
-
                                 <input type="hidden" name="status_code" id="status_code" value="">
-
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
@@ -144,74 +151,20 @@
 @section('js')
     <script>
         $(document).ready(function() {
-            // 新增品項
             $('#btn-addNewRow').click(function() {
                 AddItemRow("process", "input");
             });
 
             $('#supplier_id').select2();
             $('#tax').select2();
-        });
 
-        $(function() {
+            var quotation_id = '{{ $id ?? '' }}';
+            if (quotation_id != '') {
+                getItem(quotation_id);
+            }
             $('#datetimepickera').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
-
-            var quotation_id = '{{ $data['quotation']['id'] ?? '' }}';
-            if (quotation_id != '') {
-                ajaxGetItem(quotation_id);
-            }
-        });
-    </script>
-
-    <script>
-        $(document).on("click", ".save_data", function() {
-            let type = $(this).data('type');
-            if (type !== 'cancel') {
-                $(".product_item_va").each(function() {
-                    $(this).rules("add", {
-                        required: true,
-                    });
-                })
-                $(".price_va").each(function() {
-                    $(this).rules("add", {
-                        required: true,
-                    });
-                })
-                var curRow = $('.product_item_count').length ;
-                console.log(curRow) ; 
-                if(curRow == 0){
-                    alert('至少要填入一個品項才能送出') ;
-                    return false ;
-                }
-            }
-            switch (type) {
-
-                case 'cancel':
-                    if (confirm("確認放棄存檔?")) {
-                        window.location.href = "{{ route('quotation') }}";
-                    }
-                    break;
-                case 'saveDraft':
-                    if (confirm("確定要儲存為草稿？")) {
-                        $('#status_code').val('DRAFTED');
-                        $('#new-form').submit();
-                    }
-                    return false;
-                    break;
-                case 'saveReview':
-                    if (confirm("單據送審後無法再修改，確定要送審？")) {
-                        $('#status_code').val('REVIEWING');
-                        $('#new-form').submit();
-                    }
-                    return false;
-                    break;
-                default:
-                    break;
-            }
-        })
-        $(document).ready(function() {
             $('#new-form').validate({
                 // debug: true,
                 submitHandler: function(form) {
@@ -246,9 +199,206 @@
                     $(element).removeClass('is-invalid');
                 }
             });
+
+            function AddItemRow(get_type, position) {
+                var curRow = parseInt($('#rowNo').val());
+                var newRow = curRow + 1;
+                $(" <div class='add_row product_item_count' id='div-addrow-" + position + newRow + "'>" +
+                    "<div class='row'>" +
+                    "<input class='form-control' name='itemname[]' id='" + position + "itemname-" + newRow +
+                    "' type='hidden'>" +
+                    "<div class='col-sm-6' >" +
+                    "<div class='input-group'>" +
+                    "<select class='form-control js-select2-item product_item_va' name='item[" + newRow +
+                    "]' id='" + position + "item-" + newRow + "'>" +
+                    "<option value=''></option>" +
+                    "</select>" +
+                    "<span class='input-group-btn'>" +
+                    "<button class='btn copy_btn' type='button' onclick=\"copy_text(" + newRow +
+                    ")\" ><i class='fa fa-copy'></i></button>" +
+                    "</span>" +
+                    "</div>" +
+                    "</div>" +
+                    "<div class='col-sm-2' >" +
+                    "<input class='form-control qty price_va' name='price[" + newRow + "]' id='" + position +
+                    "price-" + newRow + "'  type='number' min='0'>" +
+                    "</div>" +
+                    "<div class='col-sm-3' >" +
+                    "<input class='form-control' name='minimum_purchase_qty[" + newRow + "]' id='" + position +
+                    "minimum_purchase_qty-" + newRow + "' readonly >" +
+                    "</div>" +
+                    "<div class='col-sm-1'>" +
+                    "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
+                    "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>"
+                ).appendTo($('#ItemDiv'));
+
+                $(".js-select2-item").select2({
+                    allowClear: true,
+                    theme: "bootstrap",
+                    placeholder: "請選擇品項"
+                });
+
+                $('button[id^=btn-delete-]').click(function() {
+                    $("#div-addrow-" + position + $(this).val()).remove();
+                    return false;
+                });
+                let product = @json($products_item);
+                $.each(product, function(key, value) {
+                    let text_value = value.item_no + "-" + value.brands_name + "-" + value.product_name +
+                        "-" + value.spec_1_value + "-" + value.spec_2_value;
+                    $("#" + position + "item-" + newRow).append($("<option></option>").attr("value", value
+                        .id).text(text_value));
+                });
+                $('#rowNo').val(newRow);
+            }
+
+            function copy_text(row_id) {
+                var name = $("#inputitemname-" + row_id).val();
+
+                new Clipboard('.copy_btn', {
+                    text: function(trigger) {
+                        return name;
+                    }
+                });
+            }
+
+            function getItem(quotation_id) {
+                var curRow = parseInt($('#rowNo').val());
+                var newRow = curRow + 1;
+                var position = 'input';
+                var get_type = '';
+                var obj = @json($quotation_details ?? '');
+                var item = @json($products_item ?? '');
+                $.each(obj, function(key, value) {
+                    var itemOption = "<option value=''></option>";
+                    $.each(item, function(itemKey, itemVal) {
+                        var selected = '';
+                        if (itemVal.id == value.product_items_id) {
+                            selected = 'selected';
+                        }
+                        itemOption += "<option value=" + itemVal.id + " " + selected + ">" + value
+                            .product_items_no + "-" + itemVal.brands_name + "-" + itemVal
+                            .product_name + "-" + itemVal.spec_1_value + "-" + itemVal
+                            .spec_2_value + "</option>";
+                        let text_value = value.item_no + "-" + value.brands_name + "-" + value
+                            .product_name + "-" + value.spec_1_value + "-" + value.spec_2_value;
+                    });
+
+                    $(" <div class='add_row product_item_count' id='div-addrow-" + position + newRow +
+                        "'>" +
+                        "<input name='quotation_details_id[]' type='hidden' value='" + value
+                        .quotation_details_id + "'>" +
+                        "<input class='form-control' id='" + position + "itemname-" + newRow +
+                        "' type='hidden'>" +
+                        "<div class='row'>" +
+                        "<div class='col-sm-6' >" +
+                        "<div class='input-group'>" +
+                        "<select class='form-control js-select2-item product_item_va' name='item[]' id='" +
+                        position + "item-" + newRow + "' >" +
+                        itemOption +
+                        "</select>" +
+                        "<span class='input-group-btn'>" +
+                        "<button class='btn copy_btn' type='button' onclick=\"copy_text(" + newRow +
+                        ")\" ><i class='fa fa-copy'></i></button>" +
+                        "</span>" +
+                        "</div>" +
+                        "</div>" +
+                        "<div class='col-sm-2' >" +
+                        "<input class='form-control qty price_va' name='price[]' id='" + position +
+                        "price-" + newRow + "'  type='number' value='" + value.original_unit_price +
+                        "'>" +
+                        "</div>" +
+                        "<div class='col-sm-3' >" +
+                        "<input class='form-control' name='minimum_purchase_qty[]' id='" + position +
+                        "minimum_purchase_qty-" + newRow + "' readonly >" +
+                        "</div>" +
+                        "<div class='col-sm-1'>" +
+                        "<button type='button' data-details='" + value.quotation_details_id +
+                        "' class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
+                        "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
+                        "</div>" +
+                        "</div>" +
+                        "</div>"
+                    ).appendTo($('#ItemDiv'));
+
+                    $('#rowNo').val(newRow);
+                });
+
+
+                $(".js-select2-item").select2({
+                    allowClear: true,
+                    theme: "bootstrap",
+                    placeholder: "請選擇品項"
+                });
+
+                $('button[id^=btn-delete-]').click(function() {
+                    var id = this.dataset.details;
+
+                    if (confirm("確定要刪除?")) {
+                        $.ajax({
+                            url: "/backend/quotation/ajaxDelItem",
+                            type: "POST",
+                            data: {
+                                'id': id,
+                                _token: '{{ csrf_token() }}'
+                            },
+                            enctype: 'multipart/form-data',
+                        })
+
+                        $("#div-addrow-" + position + $(this).val()).remove();
+                    }
+                    return false;
+                });
+            }
+            $(document).on("click", ".save_data", function() {
+                let type = $(this).data('type');
+                if (type !== 'cancel') {
+                    $(".product_item_va").each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    })
+                    $(".price_va").each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    })
+                    var curRow = $('.product_item_count').length;
+                    if (curRow == 0) {
+                        alert('至少要填入一個品項才能送出');
+                        return false;
+                    }
+                }
+                switch (type) {
+
+                    case 'cancel':
+                        if (confirm("確認放棄存檔?")) {
+                            window.location.href = "{{ route('quotation') }}";
+                        }
+                        break;
+                    case 'saveDraft':
+                        if (confirm("確定要儲存為草稿？")) {
+                            $('#status_code').val('DRAFTED');
+                            $('#new-form').submit();
+                        }
+                        return false;
+                        break;
+                    case 'saveReview':
+                        if (confirm("單據送審後無法再修改，確定要送審？")) {
+                            $('#status_code').val('REVIEWING');
+                            $('#new-form').submit();
+                        }
+                        return false;
+                        break;
+                    default:
+                        break;
+                }
+            })
         });
     </script>
 @endsection
 
-@include('Backend.Quotation.addItem')
 @endsection

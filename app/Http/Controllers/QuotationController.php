@@ -83,8 +83,6 @@ class QuotationController extends Controller
             $act = $data['status_code'];
         }
         $this->quotationService->addQuotation($data);
-        dd($data) ;
-
         return view('Backend.success', compact('route_name', 'act'));
     }
 
@@ -108,13 +106,17 @@ class QuotationController extends Controller
     public function edit($id)
     {
         $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSuppliers();
-        $data['quotation'] = $this->quotationService->getQuotationById($id);
-        $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
-        $data['act'] = 'upd';
-        $data['id'] = $id;
-
-        return view('Backend.Quotation.add', compact('data'));
+        $result['supplier'] = $supplier->getSuppliers();
+        $result['quotation'] = $this->quotationService->getQuotationById($id);
+        $result['quotation_details'] = $this->quotationService->getQuotationDetail($id);
+        $brands =  $this->brandsService->getBrands()->keyBy('id')->toArray() ;
+        $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
+            $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
+            return $obj;
+        });;
+        $result['act'] = 'upd';
+        $result['id'] = $id;
+        return view('Backend.Quotation.add', $result);
     }
 
     /**
@@ -132,7 +134,7 @@ class QuotationController extends Controller
         $data['id'] = $id;
 
         $this->quotationService->updateQuotation($data);
-
+        
         return view('Backend.success', compact('route_name', 'act'));
     }
 
@@ -174,12 +176,7 @@ class QuotationController extends Controller
                 break;
             case 'quotation_detail':
                 $data = $this->quotationService->getQuotationDetail($rs['id']);
-                // if (isset($rs['action']) && $rs['action'] == 'upd') {
-                //     $itemList = $this->itemService->getItemList();
-                //     echo "OK@@" . json_encode($data) . "@@" . json_encode($itemList);
-                //     return false;
-                // }
-                // break;
+                break;
             case 'quotation_view_log':
                 $data = $this->quotationService->getQuotationReviewLog($rs['id']);
                 break;

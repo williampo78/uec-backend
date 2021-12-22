@@ -156,10 +156,19 @@ class QuotationService
 
     public function getQuotationDetail($quotation_id)
     {
-        return QuotationDetails::select(DB::raw('quotation_details.id as quotation_details_id'), DB::raw('item.id as item_id'), DB::raw('item.name as item_name'), DB::raw('item.number as item_number'), 'original_unit_price')
+        $result = QuotationDetails::select(
+            DB::raw('quotation_details.id as quotation_details_id'),
+            DB::raw('product_items.product_id as product_id'),
+            DB::raw('products.product_name as product_name'),
+            DB::raw('product_items.id as product_items_id'),
+            DB::raw('product_items.item_no as product_items_no'),
+            DB::raw('quotation_details.original_unit_price as original_unit_price')
+        )
             ->where('quotation_id', $quotation_id)
-            ->leftJoin('item', 'item.id', 'quotation_details.item_id')
-            ->orderBy('item.id')->get();
+            ->leftJoin('product_items', 'product_items.id', 'quotation_details.product_item_id')
+            ->leftJoin('products', 'products.id', 'product_items.product_id')
+            ->get();
+        return $result;
     }
 
     public function getQuotationReview()
@@ -184,7 +193,7 @@ class QuotationService
 
         $quotationData = [
             'supplier_id' => $data['supplier_id'],
-            'submitted_at' => $data['submitted_at'],
+            'trade_date' => $data['trade_date'],
             'tax' => $data['tax'],
             'remark' => $data['remark'],
             'status_code' => $data['status_code'],
@@ -192,10 +201,9 @@ class QuotationService
         ];
 
         Quotation::where('id', $quotation_id)->update($quotationData);
-
         foreach ($data['item'] as $k => $item_id) {
             $quotationDetailData = [
-                'item_id' => $item_id,
+                'product_item_id' => $item_id,
                 'unit_price' => $data['price'][$k],
                 'original_unit_price' => $data['price'][$k],
                 'updated_at' => $now,
