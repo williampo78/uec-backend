@@ -172,7 +172,7 @@
                                                     onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
                                             @endif
                                         </td>
-                                        <td>{{ $v['created_at'] }}</td>
+                                        <td>{{ $v['trade_date'] }}</td>
                                         <td>{{ $v['doc_number'] }}</td>
                                         <td>{{ $v['supplier_name'] }}</td>
                                         <td>
