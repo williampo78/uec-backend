@@ -118,7 +118,7 @@ class AdvertisementLaunchController extends Controller
     {
         $ad_slot_content = $this->advertisement_service->getSlotContentById($id);
 
-        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? ImageUpload::getImage($ad_slot_content['content']->slot_icon_name) : null;
+        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $ad_slot_content['content']->slot_icon_name : null;
 
         // 整理給前端的資料
         $ad_slot_content['content'] = $ad_slot_content['content']->only([
@@ -139,7 +139,7 @@ class AdvertisementLaunchController extends Controller
         ]);
 
         foreach ($ad_slot_content['details'] as $key => $obj) {
-            $obj->image_name_url = !empty($obj->image_name) ? ImageUpload::getImage($obj->image_name) : null;
+            $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
 
             // 整理給前端的資料
             $ad_slot_content['details'][$key] = $obj->only([
@@ -222,7 +222,7 @@ class AdvertisementLaunchController extends Controller
 
         $ad_slot_content = $this->advertisement_service->getSlotContentById($slot_content_id);
 
-        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? ImageUpload::getImage($ad_slot_content['content']->slot_icon_name) : null;
+        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $ad_slot_content['content']->slot_icon_name : null;
 
         // 整理給前端的資料
         $ad_slot_content['content'] = $ad_slot_content['content']->only([
@@ -239,7 +239,7 @@ class AdvertisementLaunchController extends Controller
         ]);
 
         foreach ($ad_slot_content['details'] as $key => $obj) {
-            $obj->image_name_url = !empty($obj->image_name) ? ImageUpload::getImage($obj->image_name) : null;
+            $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
             $obj->product = !empty($obj->product_id) ? $products_format[$obj->product_id] ?? null : null;
             $obj->product_category = !empty($obj->web_category_hierarchy_id) ? $product_category_format[$obj->web_category_hierarchy_id] ?? null : null;
 

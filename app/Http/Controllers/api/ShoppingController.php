@@ -102,7 +102,8 @@ class ShoppingController extends Controller
         $member_id = Auth::guard('api')->user()->member_id;
         $campaign = $this->apiProductServices->getPromotion('product_card');
         $campaign_gift = $this->apiProductServices->getCampaignGift();
-        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift);
+        $campaign_discount = $this->apiProductServices->getCampaignDiscount();
+        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
         $response = json_decode($response, true);
         if ($response['status'] == '200') {
             $status = true;

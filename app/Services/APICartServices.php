@@ -123,7 +123,7 @@ class APICartServices
      * 取得購物車內容
      *
      */
-    public function getCartData($member_id, $campaigns, $campaign_gift)
+    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount)
     {
         $now = Carbon::now();
         $productInfo = self::getProducts();
@@ -142,10 +142,14 @@ class APICartServices
             $cartDetail = [];
             $cartTotal = 0;
             $product = [];
+            $CART04 = [];
+            $CART04_n = [];
+            $cartGift = [];
+            $assigned = [];
             foreach ($cartInfo as $items => $item) {
                 $cartQty[$item->product_id][$item->item_id] = $item->item_qty; //購物車數量
                 $cartAmount[$item->product_id] = intval($item->selling_price); //商品售價
-                $cartDetail[$item->product_id][$item->item_id] = $item; //購物車數量
+                $cartDetail[$item->product_id][$item->item_id] = $item; //購物車內容
             }
             //行銷活動
             foreach ($campaigns as $product_id => $item) {
@@ -153,6 +157,10 @@ class APICartServices
                     if ($now >= $v->start_at and $now <= $v->end_at) { //活動時間內才做
                         //先取活動類型為單品或車子(贈品或折扣) $campaign['PRD']['DISCOUNT'] 單品折扣
                         $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+                        if ($v->campaign_type == 'CART04') {
+                            $CART04[$v->id][$product_id] = 1;
+                            $CART04_n[$v->id] = $v->n_value;//CART04 同系列商品滿額條件
+                        }
                     }
                 }
             }
@@ -210,8 +218,8 @@ class APICartServices
                                         "item_price" => intval($unit_price),
                                         "item_qty" => $return_qty,
                                         "amount" => intval($amount),
-                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                        "discount_status" => $return_type
+                                        "campaign_discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaign_discount_status" => $return_type
                                     );
                                     $cartTotal += intval($amount);
                                 }
@@ -259,8 +267,8 @@ class APICartServices
                                         "item_price" => intval($unit_price),
                                         "item_qty" => $return_qty,
                                         "amount" => intval($amount),
-                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                        "discount_status" => $return_type
+                                        "campaign_discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaign_discount_status" => $return_type
                                     );
                                     $cartTotal += intval($amount);
                                 }
@@ -281,8 +289,8 @@ class APICartServices
                                         "item_price" => intval($unit_price),
                                         "item_qty" => $return_qty,
                                         "amount" => intval($amount),
-                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                        "discount_status" => true
+                                        "campaign_discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaign_discount_status" => true
                                     );
                                     $cartTotal += intval($amount);
                                 }
@@ -303,8 +311,8 @@ class APICartServices
                                         "item_price" => intval($unit_price),
                                         "item_qty" => $return_qty,
                                         "amount" => intval($amount),
-                                        "discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
-                                        "discount_status" => true
+                                        "campaign_discount_name" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaign_discount_status" => true
                                     );
                                     $cartTotal += intval($amount);
                                 }
@@ -321,8 +329,8 @@ class APICartServices
                                     "item_price" => intval($cartDetail[$product_id][$item_id]->selling_price),
                                     "item_qty" => $detail_qty,
                                     "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
-                                    "discount_name" => null,
-                                    "discount_status" => false
+                                    "campaign_discount_name" => null,
+                                    "campaign_discount_status" => false
                                 );
                                 $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
                             };
@@ -339,16 +347,18 @@ class APICartServices
                                 "item_price" => intval($cartDetail[$product_id][$item_id]->selling_price),
                                 "item_qty" => $detail_qty,
                                 "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
-                                "discount_name" => null,
-                                "discount_status" => false
+                                "campaign_discount_name" => null,
+                                "campaign_discount_status" => false
                             );
                             $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
                         };
                     }
                     //商品贈品
+                    $giftList = [];
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
-                        if ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value && $campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
-                            foreach ($campaign_gift[$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                        //$qty >= $campaign['PRD']['GIFT'][$product_id]->n_value &&
+                        if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
+                            foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftList[] = array(
                                     "product_id" => $giftInfo->product_id,
                                     "product_name" => $productInfo[$giftInfo->product_id]->product_name
@@ -363,10 +373,23 @@ class APICartServices
                                 $i++;
                             }
 
-                            $product[$product_id][$tmp_id]['gift_name'] = $campaign['PRD']['GIFT'][$product_id]->campaign_name;
-                            $product[$product_id][$tmp_id]['gift_status'] = true;
-                            $product[$product_id][$tmp_id]['gift_list'] = $giftList;
+                            $product[$product_id][$tmp_id]['campaign_gift_name'] = $campaign['PRD']['GIFT'][$product_id]->campaign_name;
+                            if ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value) {
+                                $product[$product_id][$tmp_id]['campaign_gift_status'] = true;
+                            } else {
+                                $product[$product_id][$tmp_id]['campaign_gift_status'] = false;
+                            }
+                            $product[$product_id][$tmp_id]['campaign_gift_list'] = $giftList;
 
+                        }
+                    }
+
+                    //指定商品贈品
+                    foreach ($CART04 as $campaign_id => $prod) { //同系列只送一次
+                        if (key_exists($product_id, $prod)) {
+                            foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                $assigned[$campaign_id][$item_id] = intval($detail_qty);
+                            }
                         }
                     }
                 } else {
@@ -381,37 +404,46 @@ class APICartServices
                             "item_price" => intval($cartDetail[$product_id][$item_id]->selling_price),
                             "item_qty" => $detail_qty,
                             "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
-                            "discount_name" => null,
-                            "discount_status" => false
+                            "campaign_discount_name" => null,
+                            "campaign_discount_status" => false
                         );
                         $cartTotal += 0;
                     }
                 }
             }
+            //全車滿額贈
             $cartDiscount = 0;
-            $cartGift = [];
-            foreach ($cartQty as $product_id => $item) {
-                if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
-                    //全車滿額折扣
-                    if (isset($campaign['CART']['DISCOUNT'][$product_id])) {
-                        if ($cartTotal >= $campaign['CART']['DISCOUNT'][$product_id]->n_value) {
-                            if ($campaign['CART']['DISCOUNT'][$product_id]->campaign_type == 'CART01') { //﹝滿額﹞購物車滿N元，打X折
-                                $cartDiscount += $cartTotal - ($cartTotal * $campaign['CART']['DISCOUNT'][$product_id]->x_value); //打折10000-(10000*0.85)
-                            } elseif ($campaign['CART']['DISCOUNT'][$product_id]->campaign_type == 'CART02') { //﹝滿額﹞購物車滿N元，折X元
-                                $cartDiscount += $campaign['CART']['DISCOUNT'][$product_id]->x_value; //打折後10000-1000
-                            }
+            foreach ($campaign_discount as $items => $item) {
+                if ($cartTotal >= $item->n_value) {
+                    if ($item->campaign_type == 'CART01') { //﹝滿額﹞購物車滿N元，打X折
+                        $cartDiscount += $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
+                    } elseif ($item->campaign_type == 'CART02') { //﹝滿額﹞購物車滿N元，折X元
+                        $cartDiscount += $item->x_value; //打折後10000-1000
+                    }
+                }
+            }
+            foreach ($campaign_gift['CART'] as $items => $item) {
+                if ($cartTotal >= $item->n_value) {
+                    if ($now >= $item->start_launched_at && $now <= $item->end_launched_at) { //在上架期間內
+                        if ($item->campaign_type == 'CART03') { //﹝滿額﹞購物車滿N元，送贈品
+                            $cartGift[] = array(
+                                "campaign_name" => $item->campaign_name,
+                                "product_id" => $item->product_id,
+                                "product_name" => $item->product_name
+                            );
                         }
                     }
-                    //全車滿額贈品
-                    if (isset($campaign['CART']['GIFT'][$product_id])) {
-                        if ($cartTotal >= $campaign['CART']['GIFT'][$product_id]->n_value && $campaign['CART']['GIFT'][$product_id]->campaign_type == 'CART03') { //﹝滿額﹞購物車滿N元，送贈品
-                            foreach ($campaign_gift[$campaign['CART']['GIFT'][$product_id]->id] as $giftInfo) {
-                                $cartGift[] = array(
-                                    "product_id" => $giftInfo->product_id,
-                                    "product_name" => $productInfo[$giftInfo->product_id]->product_name
-                                );
-                            }
-                        }
+                }
+            }
+            foreach ($assigned as $campaign_id=>$item) {
+                $assigned_qty = array_sum($assigned[$campaign_id]);
+                if ($assigned_qty >= $CART04_n[$campaign_id]) {
+                    foreach ($campaign_gift['PROD'][$campaign_id] as $prod_id =>$value) {
+                        $cartGift[] = array(
+                            "campaign_name" => $value->campaign_name,
+                            "product_id" => $prod_id,
+                            "product_name" => $value->product_name
+                        );
                     }
                 }
             }
@@ -450,7 +482,7 @@ class APICartServices
                 "feeInfo" => $feeInfo,
                 "productRow" => count($cartInfo),
                 "list" => $product,
-                "gift" => $cartGift,
+                "giftAway" => $cartGift,
                 "totalprice" => $cartTotal,
                 "discount" => $cartDiscount,
                 "point" => $pointInfo,
