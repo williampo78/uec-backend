@@ -6,7 +6,7 @@
                     <div class="col-sm-1"><label> 報價單號</label></div>
                     <div class="col-sm-3">{{ $quotation->doc_number }}</div>
                     <div class="col-sm-1"><label> 供應商</label></div>
-                    <div class="col-sm-3">{{ $quotation->supplier_id }}</div>
+                    <div class="col-sm-3">{{ $quotation->supplier_name }}</div>
                     <div class="col-sm-1"><label> 狀態</label></div>
                     <div class="col-sm-3">{{ $quotation->status_code }}</div>
                 </div>
@@ -43,7 +43,7 @@
                                 <td>{{ $val->product_items_no }}</td>
                                 <td>{{ $val->product_name }}</td>
                                 <td>{{ $val->ean }}</td>
-                                <td>{{ $val->unit_price }}</td>
+                                <td>{{ $val->original_unit_price }}</td>
                                 <td></td>
                             </tr>
                         @endforeach
