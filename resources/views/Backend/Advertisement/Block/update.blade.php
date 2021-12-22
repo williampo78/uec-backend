@@ -114,13 +114,13 @@
                                                     <div class="col-sm-4">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="active" id="active_enabled"
-                                                                {{ $ad_slot->active ? 'checked' : '' }} value="1">是
+                                                                {{ $ad_slot->active ? 'checked' : '' }} value="1">啟用
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="active" id="active_disabled"
-                                                                {{ $ad_slot->active ? '' : 'checked' }} value="0">否
+                                                                {{ $ad_slot->active ? '' : 'checked' }} value="0">關閉
                                                         </label>
                                                     </div>
                                                 </div>
