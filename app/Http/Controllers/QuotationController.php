@@ -6,11 +6,11 @@ use App\Models\Quotation;
 use App\Models\QuotationDetails;
 // use App\Services\ItemService;
 use App\Services\BrandsService;
+use App\Services\ProductsService;
 use App\Services\QuotationService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
 use App\Services\WarehouseService;
-use App\Services\ProductsService ; 
 use Illuminate\Http\Request;
 
 class QuotationController extends Controller
@@ -36,8 +36,8 @@ class QuotationController extends Controller
         $this->universalService = $universalService;
         $this->warehouseService = $warehouseService;
         $this->supplierService = $supplierService;
-        $this->productsService = $productsService ; 
-        $this->brandsService = $brandsService ;
+        $this->productsService = $productsService;
+        $this->brandsService = $brandsService;
     }
     public function index(Request $request)
     {
@@ -58,12 +58,12 @@ class QuotationController extends Controller
     public function create()
     {
         $result['supplier'] = $this->supplierService->getSuppliers();
-        $brands =  $this->brandsService->getBrands()->keyBy('id')->toArray() ;
+        $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
         $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
-        });;
-       
+        });
+
         $result['act'] = 'add';
         return view('Backend.Quotation.add', $result);
     }
@@ -109,11 +109,11 @@ class QuotationController extends Controller
         $result['supplier'] = $supplier->getSuppliers();
         $result['quotation'] = $this->quotationService->getQuotationById($id);
         $result['quotation_details'] = $this->quotationService->getQuotationDetail($id);
-        $brands =  $this->brandsService->getBrands()->keyBy('id')->toArray() ;
+        $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
         $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
-        });;
+        });
         $result['act'] = 'upd';
         $result['id'] = $id;
         return view('Backend.Quotation.add', $result);
@@ -134,7 +134,7 @@ class QuotationController extends Controller
         $data['id'] = $id;
 
         $this->quotationService->updateQuotation($data);
-        
+
         return view('Backend.success', compact('route_name', 'act'));
     }
 
@@ -158,33 +158,18 @@ class QuotationController extends Controller
     {
         $rs = $request->all();
         switch ($rs['get_type']) {
-            case 'itemlist':
-                // $data = $this->itemService->getItemList();
-                break;
-            case 'iteminfo':
-                // $data = $this->itemService->getItemInfo($rs['item_id']);
-                break;
-            case 'quotation':
-                $quotationStatus = $this->quotationService->getStatusCode();
-                $taxList = $this->quotationService->getTaxList();
-                $supplier = new SupplierService();
-                $supplierList = $this->universalService->idtokey($supplier->getSuppliers());
-                $data = $this->quotationService->getQuotationById($rs['id']);
-                $data['status_code'] = $quotationStatus[$data['status_code']] ?? '';
-                $data['supplier_name'] = $supplierList[$data['supplier_id']]->name ?? '';
-                $data['tax'] = $taxList[$data['tax']] ?? '';
-                break;
-            case 'quotation_detail':
-                $data = $this->quotationService->getQuotationDetail($rs['id']);
-                break;
-            case 'quotation_view_log':
-                $data = $this->quotationService->getQuotationReviewLog($rs['id']);
+            case 'showQuotation':
+                $data = [];
+                $data['quotation'] = $this->quotationService->getQuotationById($rs['id']);
+                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($rs['id']);
+                $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($rs['id']);
+                $data['taxlist'] = $this->quotationService->getTaxList() ;
+                return view('Backend.Quotation.show', $data);
                 break;
             default:
                 # code...
                 break;
         }
-        echo "OK@@" . json_encode($data);
     }
 
     public function ajaxDelItem(Request $request)

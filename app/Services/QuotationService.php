@@ -58,7 +58,7 @@ class QuotationService
     {
         $agent_id = Auth::user()->agent_id;
 
-        return Quotation::select()->where('quotation.agent_id', $agent_id)->where('id', $id)->first();
+        return Quotation::select('quotation.*' , 'supplier.name as supplier_name')->where('quotation.agent_id', $agent_id)->where('quotation.id', $id)->leftJoin('supplier', 'supplier.id', '=', 'quotation.supplier_id')->first();
     }
 
     public function getStatusCode()
@@ -159,6 +159,7 @@ class QuotationService
         $result = QuotationDetails::select(
             DB::raw('quotation_details.id as quotation_details_id'),
             DB::raw('product_items.product_id as product_id'),
+            DB::raw('product_items.ean as ean'),
             DB::raw('products.product_name as product_name'),
             DB::raw('product_items.id as product_items_id'),
             DB::raw('product_items.item_no as product_items_no'),
