@@ -438,6 +438,15 @@ class ProductsService
         $result = $ProductItems->get();
         return $result;
     }
+    public function getItemsAndProduct(){
+        $agent_id = Auth::user()->agent_id;
+        $ProductItems = ProductItems::
+        select('product_items.*' , 'products.product_name' , 'products.brand_id')
+        ->where('product_items.agent_id', $agent_id)
+        ->leftJoin('products' ,'products.id' ,'=' ,'product_items.product_id');
+        $result = $ProductItems->get();
+        return $result;
+    }
     public function getProductsPhoto($products_id)
     {
         $ProductPhotos = ProductPhotos::where('product_id', $products_id);

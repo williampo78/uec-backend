@@ -7,22 +7,20 @@
         {
             $(" <div class='add_row'>" +
                 "<div class='row'>" +
-                "<div class='col-sm-6 text-left'>品項</div>" +
-                "<div class='col-sm-2 text-left'>單價</div>" +
+                "<div class='col-sm-6 text-left'>品項<span class='redtext'>*</span></div>" +
+                "<div class='col-sm-2 text-left'>單價<span class='redtext'>*</span></div>" +
                 "<div class='col-sm-3 text-left'>最小採購量</div>" +
                 "<div class='col-sm-1 text-left'>功能</div>" +
                 "</div>" +
                 " </div>").appendTo($('#ItemDiv'));
         }
 
-        $(" <div class='add_row' id='div-addrow-" + position + newRow + "'>" +
+        $(" <div class='add_row product_item_count' id='div-addrow-" + position + newRow + "'>" +
             "<div class='row'>" +
-            // "<input class='form-control' name='itemid[]' id='" + position + "itemid-" + newRow + "' type='hidden'>" +
             "<input class='form-control' name='itemname[]' id='" + position + "itemname-" + newRow + "' type='hidden'>" +
-            // "<input class='form-control' name='itemprice[]' id='" + position + "itemprice-" + newRow + "' type='hidden'>" +
             "<div class='col-sm-6' >" +
             "<div class='input-group'>" +
-            "<select class='form-control js-select2-item' name='item[]' id='" + position + "item-" + newRow + "' onchange=\"getItemInfo(" + newRow + " , '" + get_type + "', '" + position + "')\" >" +
+            "<select class='form-control js-select2-item product_item_va' name='item[" + newRow + "]' id='" + position + "item-" + newRow + "' onchange=\"getItemInfo(" + newRow + " , '" + get_type + "', '" + position + "')\" >" +
             "<option value=''></option>" +
             "</select>" +
             "<span class='input-group-btn'>"+
@@ -31,10 +29,10 @@
             "</div>" +
             "</div>" +
             "<div class='col-sm-2' >" +
-            "<input class='form-control qty' name='price[]' id='" + position + "price-" + newRow + "'  type='number'>" +
+            "<input class='form-control qty price_va' name='price["+newRow+"]' id='" + position + "price-" + newRow + "'  type='number' min='0'>" +
             "</div>" +
             "<div class='col-sm-3' >" +
-            "<input class='form-control' name='minimum_purchase_qty[]' id='" + position + "minimum_purchase_qty-" + newRow + "' readonly >" +
+            "<input class='form-control' name='minimum_purchase_qty["+newRow+"]' id='" + position + "minimum_purchase_qty-" + newRow + "' readonly >" +
             "</div>" +
             "<div class='col-sm-1'>" +
             "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow + "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
@@ -55,29 +53,11 @@
             $("#div-addrow-" + position + $(this).val()).remove();
             return false;
         });
-
-        // 即時取出物品資訊，放到 select 中
-        $.ajax(
-            {
-                url: "/backend/quotation/ajax",
-                type: "POST",
-                data: {'get_type': "itemlist", _token: '{{csrf_token()}}'},
-                enctype: 'multipart/form-data',
-            })
-            .done(function( data )
-            {
-                var data_array = data.split('@@');
-                if(data_array[0] == "OK")
-                {
-                    var obj = jQuery.parseJSON(data_array[1]);
-                    $.each( obj, function( key, value )
-                    {
-                        var text_value = value.number + "-" + value.brand + "-" + value.name + "-" + value.spec;
-                        $("#" + position + "item-" + newRow).append($("<option></option>").attr("value", value.id).text(text_value));
-                    });
-                }
-            });
-
+        let product = @json($products_item) ;
+        $.each( product, function( key, value ){
+            let text_value = value.item_no + "-" + value.brands_name + "-" + value.product_name + "-" + value.spec_1_value + "-" + value.spec_2_value;
+            $("#" + position + "item-" + newRow).append($("<option></option>").attr("value", value.id).text(text_value));
+        });
         $('#rowNo').val(newRow);
     }
 

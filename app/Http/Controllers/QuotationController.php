@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Quotation;
 use App\Models\QuotationDetails;
-use App\Services\ItemService;
+// use App\Services\ItemService;
+use App\Services\BrandsService;
 use App\Services\QuotationService;
 use App\Services\SupplierService;
 use App\Services\UniversalService;
 use App\Services\WarehouseService;
+use App\Services\ProductsService ; 
 use Illuminate\Http\Request;
 
 class QuotationController extends Controller
@@ -21,24 +23,25 @@ class QuotationController extends Controller
 
     private $quotationService;
     private $universalService;
-    private $itemService;
+    // private $itemService;
     private $warehouseService;
 
-    public function __construct(QuotationService $quotationService, 
-    UniversalService $universalService, 
-    ItemService $itemService, 
-    WarehouseService $warehouseService,
-    SupplierService $supplierService)
-    {
+    public function __construct(QuotationService $quotationService,
+        UniversalService $universalService,
+        WarehouseService $warehouseService,
+        SupplierService $supplierService,
+        ProductsService $productsService,
+        BrandsService $brandsService) {
         $this->quotationService = $quotationService;
         $this->universalService = $universalService;
-        $this->itemService = $itemService;
         $this->warehouseService = $warehouseService;
-        $this->supplierService = $supplierService ; 
+        $this->supplierService = $supplierService;
+        $this->productsService = $productsService ; 
+        $this->brandsService = $brandsService ;
     }
     public function index(Request $request)
     {
-        $in = $request->input() ;
+        $in = $request->input();
         $result = [];
         $result['supplier'] = $this->supplierService->getSuppliers();
         $result['quotation'] = $this->quotationService->getQuotation($in);
@@ -54,10 +57,15 @@ class QuotationController extends Controller
      */
     public function create()
     {
-        $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSuppliers();
-        $data['act'] = 'add';
-        return view('Backend.Quotation.add', compact('supplier', 'act'));
+        $result['supplier'] = $this->supplierService->getSuppliers();
+        $brands =  $this->brandsService->getBrands()->keyBy('id')->toArray() ;
+        $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
+            $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
+            return $obj;
+        });;
+       
+        $result['act'] = 'add';
+        return view('Backend.Quotation.add', $result);
     }
 
     /**
@@ -74,8 +82,8 @@ class QuotationController extends Controller
         if (isset($data['status_code'])) {
             $act = $data['status_code'];
         }
-
         $this->quotationService->addQuotation($data);
+        dd($data) ;
 
         return view('Backend.success', compact('route_name', 'act'));
     }
@@ -147,33 +155,38 @@ class QuotationController extends Controller
     public function ajax(Request $request)
     {
         $rs = $request->all();
-
-        if ($rs['get_type'] == 'itemlist') {
-            $data = $this->itemService->getItemList();
-        } elseif ($rs['get_type'] == 'iteminfo') {
-            $data = $this->itemService->getItemInfo($rs['item_id']);
-        } elseif ($rs['get_type'] == 'quotation') {
-            $quotationStatus = $this->quotationService->getStatusCode();
-            $taxList = $this->quotationService->getTaxList();
-            $supplier = new SupplierService();
-            $supplierList = $this->universalService->idtokey($supplier->getSuppliers());
-            $data = $this->quotationService->getQuotationById($rs['id']);
-            $data['status_code'] = $quotationStatus[$data['status_code']] ?? '';
-            $data['supplier_name'] = $supplierList[$data['supplier_id']]->name ?? '';
-            $data['tax'] = $taxList[$data['tax']] ?? '';
-
-        } elseif ($rs['get_type'] == 'quotation_detail') {
-            $data = $this->quotationService->getQuotationDetail($rs['id']);
-
-            if (isset($rs['action']) && $rs['action'] == 'upd') {
-                $itemList = $this->itemService->getItemList();
-                echo "OK@@" . json_encode($data) . "@@" . json_encode($itemList);
-                return false;
-            }
-        } elseif ($rs['get_type'] == 'quotation_view_log') {
-            $data = $this->quotationService->getQuotationReviewLog($rs['id']);
+        switch ($rs['get_type']) {
+            case 'itemlist':
+                // $data = $this->itemService->getItemList();
+                break;
+            case 'iteminfo':
+                // $data = $this->itemService->getItemInfo($rs['item_id']);
+                break;
+            case 'quotation':
+                $quotationStatus = $this->quotationService->getStatusCode();
+                $taxList = $this->quotationService->getTaxList();
+                $supplier = new SupplierService();
+                $supplierList = $this->universalService->idtokey($supplier->getSuppliers());
+                $data = $this->quotationService->getQuotationById($rs['id']);
+                $data['status_code'] = $quotationStatus[$data['status_code']] ?? '';
+                $data['supplier_name'] = $supplierList[$data['supplier_id']]->name ?? '';
+                $data['tax'] = $taxList[$data['tax']] ?? '';
+                break;
+            case 'quotation_detail':
+                $data = $this->quotationService->getQuotationDetail($rs['id']);
+                // if (isset($rs['action']) && $rs['action'] == 'upd') {
+                //     $itemList = $this->itemService->getItemList();
+                //     echo "OK@@" . json_encode($data) . "@@" . json_encode($itemList);
+                //     return false;
+                // }
+                // break;
+            case 'quotation_view_log':
+                $data = $this->quotationService->getQuotationReviewLog($rs['id']);
+                break;
+            default:
+                # code...
+                break;
         }
-
         echo "OK@@" . json_encode($data);
     }
 

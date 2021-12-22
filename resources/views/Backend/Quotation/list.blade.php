@@ -175,7 +175,23 @@
                                         <td>{{ $v['created_at'] }}</td>
                                         <td>{{ $v['doc_number'] }}</td>
                                         <td>{{ $v['supplier_name'] }}</td>
-                                        <td>{{ $v['status_code'] }}</td>
+                                        <td>
+                                            @switch($v['status_code'])
+                                                @case('DRAFTED')
+                                                    草稿
+                                                @break
+                                                @case('REVIEWING')
+                                                    簽核中
+                                                @break
+                                                @case('APPROVED')
+                                                    已核准
+                                                @break
+                                                @case('REJECTED')
+                                                    已駁回
+                                                @break
+                                                @default
+                                            @endswitch
+                                        </td>
                                         <td>{{ $v['submitted_at'] }}</td>
                                         <td>{{ $v['closed_at'] }}</td>
                                     </tr>
@@ -188,23 +204,23 @@
         </div>
     </div>
     @include('Backend.Quotation.detail')
-@section('js')
-    <script>
-        $(function() {
-            $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD',
+    @section('js')
+        <script>
+            $(function() {
+                $('#datetimepicker').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
+                $('#datetimepicker2').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                });
             });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-        });
 
-        function del(id, doc_number) {
-            if (confirm("確定要刪除報價單" + doc_number + "?")) {
-                document.getElementById('del-' + id).submit();
-            }
-            return false;
-        };
-    </script>
-@endsection
+            function del(id, doc_number) {
+                if (confirm("確定要刪除報價單" + doc_number + "?")) {
+                    document.getElementById('del-' + id).submit();
+                }
+                return false;
+            };
+        </script>
+    @endsection
 @endsection

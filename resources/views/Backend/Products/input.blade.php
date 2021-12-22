@@ -1050,20 +1050,17 @@
             // product_name
             $(document).on("click", "#save_data", function() {
                 $(".safty_qty_va").each(function() {
-                    console.log('safty_qty_va');
                     $(this).rules("add", {
                         required: true,
                         digits: true,
                     });
                 })
                 $(".spec_1_va").each(function() {
-                    console.log('spec_1_va');
                     $(this).rules("add", {
                         required: true,
                     });
                 })
                 $(".spec_2_va").each(function() {
-                    console.log('spec_2_va');
                     $(this).rules("add", {
                         required: true,
                     });
