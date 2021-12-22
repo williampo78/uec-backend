@@ -38,7 +38,6 @@ class QuotationReviewController extends Controller
         $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
         $data['status_code'] = $this->quotationService->getStatusCode();
         $data['quotation'] = $this->quotationService->getQuotationReview();
-
         return view('Backend.QuotationReview.list' , compact('data'));
     }
 

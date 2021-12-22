@@ -175,8 +175,6 @@ class QuotationService
     public function getQuotationReview()
     {
         $user_id = Auth::user()->id;
-//        $user_id = 3;
-
         return Quotation::where('status_code', 'REVIEWING')->where('next_approver', $user_id)->get();
     }
 

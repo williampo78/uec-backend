@@ -566,7 +566,7 @@ class ProductsService
                 'mata_keywords' => $in['mata_keywords'],
                 'updated_by' => $user_id,
             ];
-            if ($file['google_shop_photo_name']) {
+            if (isset($file['google_shop_photo_name'])) {
                 if ($in['google_shop_photo_name_old'] !== null) {
                     ImageUpload::DelPhoto($in['google_shop_photo_name_old']);
                 }
@@ -652,7 +652,6 @@ class ProductsService
             Log::warning($e->getMessage());
             return false;
         }
-
     }
     public function getProductAuditLog($product_id)
     {

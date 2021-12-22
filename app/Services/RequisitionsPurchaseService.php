@@ -27,15 +27,31 @@ class RequisitionsPurchaseService
 
         $select_start_date = !isset($requset['select_start_date']) ? date('Y-m-d') : $requset['select_start_date']; //開始時間
         $select_end_date = !isset($requset['select_end_date']) ? date('Y-m-d') : $requset['select_end_date']; //結束時間
-        $active = 1;
-        $rs = RequisitionsPurchase::select('requisitions_purchase.*', DB::RAW('user.name as user_name'), DB::RAW('supplier.name as supplier_name'), DB::RAW('warehouse.name as warehouse_name'))
-            ->leftJoin('user', 'requisitions_purchase.user_id', '=', 'user.id')
+        // $active = 1;
+        $rs = RequisitionsPurchase::select(
+            'requisitions_purchase.*',
+            DB::RAW('user.name as user_name'),
+            DB::RAW('supplier.name as supplier_name'),
+            DB::RAW('warehouse.name as warehouse_name')
+        )
+            ->leftJoin('user', 'requisitions_purchase.created_by', '=', 'user.id')
             ->leftJoin('supplier', 'requisitions_purchase.supplier_id', '=', 'supplier.id')
             ->leftJoin('warehouse', 'requisitions_purchase.warehouse_id', '=', 'warehouse.id')
             ->where('requisitions_purchase.agent_id', $agent_id)
+        // if (!empty($requset['select_start_date'])) {
+        //     $start_launched_at = Carbon::parse($input_data['start_launched_at'])->format('Y-m-d H:i:s');
+        //     $products->whereDate('products.start_launched_at', '>=', $start_launched_at);
+        // }
+
+        // // 上架結束日
+        // if (!empty($input_data['end_launched_at'])) {
+        //     $input_data['end_launched_at'] = $input_data['end_launched_at'] . ' 23:59:59';
+        //     $end_launched_at = Carbon::parse($input_data['end_launched_at'])->format('Y-m-d H:i:s');
+        //     $products->whereDate('products.end_launched_at', '<=', $end_launched_at);
+        // }
             ->where('trade_date', '>=', $select_start_date)
             ->where('trade_date', '<=', $select_end_date)
-            ->where('requisitions_purchase.active', $active)
+            // ->where('requisitions_purchase.active', $active)
             ->orderBy('requisitions_purchase.trade_date', 'desc')
             ->orderBy('requisitions_purchase.created_at', 'desc');
 
@@ -135,16 +151,16 @@ class RequisitionsPurchaseService
             //創建主表
             $requisitions_purchase['agent_id'] = $user_id;
             $requisitions_purchase['number'] = $this->universalService->getDocNumber('requisitions_purchase');
-            $requisitions_purchase['user_id'] = $user_id;
+            //20211221刪除欄位 $requisitions_purchase['user_id'] = $user_id;
             $requisitions_purchase['use_date'] = $now; //需用日先填假值
             $requisitions_purchase['created_at'] = $now; //創建時間
-            $requisitions_purchase['next_approver'] = $hierarchy[0] ;
+            $requisitions_purchase['next_approver'] = $hierarchy[0];
             $requisitions_purchase_id = RequisitionsPurchase::insertGetId($requisitions_purchase);
             if (isset($requisitions_purchase_detail)) {
                 foreach ($requisitions_purchase_detail as $key => $val) {
                     unset($requisitions_purchase_detail[$key]['id']);
                     $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
-                    $requisitions_purchase_detail[$key]['item_number'] = $requisitions_purchase['number'];
+                    $requisitions_purchase_detail[$key]['item_number'] = $requisitions_purchase['number']; //20211221欄位改名為item_no
                     $requisitions_purchase_detail[$key]['total_price'] = $requisitions_purchase['total_price'];
                 }
                 RequisitionsPurchaseDetail::insert($requisitions_purchase_detail);
@@ -185,11 +201,11 @@ class RequisitionsPurchaseService
             'currency_code' => $input['currency_code'],
             'currency_price' => $input['currency_price'],
             'original_total_tax_price' => $input['original_total_tax_price'],
-            'original_total_price' => $input['original_total_price'],
             'tax' => $input['tax'],
             'total_tax_price' => $input['total_tax_price'],
             'total_price' => $input['total_price'],
             'remark' => $input['remark'],
+            //20211221欄位漏塞？ original_total_tax_price與original_total_price
         ];
         RequisitionsPurchase::where('id', $input['id'])->update($requisitions_purchase_in);
 
@@ -198,21 +214,14 @@ class RequisitionsPurchaseService
             $indata = [];
             unset($requisitions_purchase_detail_in[$key]['created_at']);
             unset($requisitions_purchase_detail_in[$key]['updated_at']);
-            $indata['item_id'] = $item['item_id'];
-            $indata['item_number'] = $item['item_number'];
-            $indata['item_brand'] = $item['item_brand'];
-            $indata['item_name'] = $item['item_name'];
-            $indata['item_spec'] = $item['item_spec'];
-            $indata['item_lot_number'] = $item['item_lot_number'];
+            $indata['item_id'] = $item['item_id']; //20211221欄位改名為product_item_id
+            $indata['item_number'] = $item['item_number']; //20211221欄位改名為item_no
             $indata['item_qty'] = $item['item_qty'];
-            $indata['item_unit'] = $item['item_unit'];
             $indata['item_price'] = $item['item_price'];
             $indata['subtotal_price'] = $item['subtotal_price'];
             $indata['subtotal_tax_price'] = $item['subtotal_tax_price'];
-            $indata['total_price'] = $item['total_price'];
             $indata['original_subtotal_price'] = $item['original_subtotal_price'];
             $indata['original_subtotal_tax_price'] = $item['original_subtotal_tax_price'];
-            $indata['original_total_price'] = $item['original_total_price'];
             $indata['currency_id'] = $item['currency_id'];
             $indata['currency_code'] = $item['currency_code'];
             $indata['currency_price'] = $item['currency_price'];
@@ -221,20 +230,22 @@ class RequisitionsPurchaseService
             if ($item['id'] == '') {
                 RequisitionsPurchaseDetail::insert($indata);
             } else {
-                RequisitionsPurchaseDetail::where('id' , $item['id'])->update($indata);
+                RequisitionsPurchaseDetail::where('id', $item['id'])->update($indata);
             }
         }
-        return true ; 
+        return true;
     }
-    public function delrequisitionsPurchase($id){
+    public function delrequisitionsPurchase($id)
+    {
         RequisitionsPurchase::where('id', $id)->delete();
         RequisitionsPurchaseDetail::where('requisitions_purchase_id', $id)->delete();
         RequisitionsPurchaseReviewLog::where('requisitions_purchase_id', $id)->delete();
-        return true ;
+        return true;
     }
-    public function delRequisitionsPurchaseDetail($id){
+    public function delRequisitionsPurchaseDetail($id)
+    {
         RequisitionsPurchaseDetail::where('id', $id)->delete();
-        return true ;
+        return true;
     }
-    
+
 }

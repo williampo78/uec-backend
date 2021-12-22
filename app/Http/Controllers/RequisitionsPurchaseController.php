@@ -47,6 +47,7 @@ class RequisitionsPurchaseController extends Controller
         $input = $request->input();
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($input);
+        dd($result) ; 
         return view('Backend.RequisitionsPurchase.list', $result);
     }
 
