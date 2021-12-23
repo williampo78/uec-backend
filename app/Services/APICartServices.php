@@ -11,13 +11,15 @@ use Illuminate\Support\Facades\Log;
 use App\Models\ProductItems;
 use App\Models\Products;
 use App\Services\APIService;
+use App\Services\StockService;
 
 class APICartServices
 {
 
-    public function __construct(APIService $apiService)
+    public function __construct(APIService $apiService, StockService $stockService)
     {
         $this->apiService = $apiService;
+        $this->stockService = $stockService;
     }
 
     /*
@@ -235,7 +237,7 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-
+                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 'qty');
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -244,6 +246,8 @@ class APICartServices
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
+                                        "itemStock" => $stock,
+                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -295,6 +299,7 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
+                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -303,6 +308,8 @@ class APICartServices
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
+                                        "itemStock" => $stock,
+                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -329,6 +336,7 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
+                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -337,6 +345,8 @@ class APICartServices
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
+                                        "itemStock" => $stock,
+                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -362,6 +372,7 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
+                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -370,6 +381,8 @@ class APICartServices
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
+                                        "itemStock" => $stock,
+                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -389,6 +402,7 @@ class APICartServices
                             foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                                 $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                 $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
+                                $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
                                 $product[] = array(
                                     "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                     "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -397,6 +411,8 @@ class APICartServices
                                     "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
                                     "itemQty" => $detail_qty,
                                     "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
+                                    "itemStock" => $stock,
+                                    "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                     "campaignDiscountName" => null,
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
@@ -408,6 +424,7 @@ class APICartServices
                         foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                             $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
+                            $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
                             $product[] = array(
                                 "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                 "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -416,6 +433,8 @@ class APICartServices
                                 "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
                                 "itemQty" => $detail_qty,
                                 "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
+                                "itemStock" => $stock,
+                                "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
                                 "campaignGiftAway" => []
@@ -437,6 +456,7 @@ class APICartServices
                         $product_type = 'expired';
                         $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                         $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
+                        $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
                         $product[] = array(
                             "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                             "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -445,6 +465,8 @@ class APICartServices
                             "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
                             "itemQty" => $detail_qty,
                             "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
+                            "itemStock" => $stock,
+                            "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                             "campaignDiscountName" => null,
                             "campaignDiscountStatus" => false,
                             "campaignGiftAway" => []

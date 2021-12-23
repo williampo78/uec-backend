@@ -60,7 +60,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::post('/membership/collections', [MemberInfoController::class, 'setCollections']);
     Route::post('/membership/collections/batchDelete', [MemberInfoController::class, 'batchDeleteCollections']);
 
-    Route::group(['prefix'=>'shopping'], function (){
+    Route::group(['prefix' => 'shopping'], function () {
         Route::post('/setMemberCart', [ShoppingController::class, 'setCart']);
         Route::post('/shoppingCartData', [ShoppingController::class, 'getShoppingCartData']);
     });
@@ -78,6 +78,6 @@ Route::group(['prefix' => 'members'], function () {
     Route::post('/memberBasic', [AuthController::class, 'memberBasic']);
 });
 
-Route::group(['prefix'=>'shopping'], function (){
+Route::group(['prefix' => 'shopping'], function () {
     Route::get('/getCartCount', [ShoppingController::class, 'getCartCount']);
 });
