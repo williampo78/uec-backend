@@ -203,6 +203,7 @@ class APIProductServices
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.product_no like '%" . $keyword . "%'";
             $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
             $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
             if ($config_levels == 3) {
@@ -245,6 +246,7 @@ class APIProductServices
         $page = $input['page'];
         $selling_price_min = $input['price_min'];
         $selling_price_max = $input['price_max'];
+        $sort_flag = $input['sort'] == 'asc' ? SORT_ASC : SORT_DESC ;
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword);
         if ($products) {
             $promotion = self::getPromotion('product_card');
@@ -318,7 +320,7 @@ class APIProductServices
 
                 }
             }
-            array_multisort(array_column($data, 'selling_price'), SORT_DESC, $data);
+            array_multisort(array_column($data, 'selling_price'), $sort_flag, $data);
             $searchResult = self::getPages($data, $size, $page);
         } else {
             $searchResult = '404';
