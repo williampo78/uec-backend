@@ -385,8 +385,8 @@
                     var details = this.details;
                     var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
+                    console.log(details) ; 
                     $.each(details, function(key, obj) {
-                        // details[key].item_price = 0  ;
                         //原幣小計 = 單價 * 數量
                         if (obj.is_gift == 1) { //如果是贈品則不計算單價
                             obj.subtotal_price = 0;
@@ -400,7 +400,7 @@
                     switch (requisitions_purchase.tax) {
                         case '0':
                             // console.log('未稅');
-                            requisitions_purchase.original_total_tax_price = 0; //原幣稅額
+                            requisitions_purchase.original_total_txa_price = 0; //原幣稅額
                             requisitions_purchase.total_tax_price = 0; //稅額
                             break;
                         case '1':

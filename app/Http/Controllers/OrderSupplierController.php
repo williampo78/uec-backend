@@ -64,7 +64,7 @@ class OrderSupplierController extends Controller
             $data['requisitions_purchase'][$key]->text = $val->number;
         }
 //      $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
-        $data['tax'] = $this->universalService->getTaxList();
+        $data['tax'] = config('uec.tax_option')  ;
         $data['act'] = 'add';
         return view('Backend.OrderSupplier.input', compact('data'));
     }

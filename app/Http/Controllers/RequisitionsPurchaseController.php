@@ -84,7 +84,7 @@ class RequisitionsPurchaseController extends Controller
             return $obj;
         });
         
-        $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
+        $result['taxList'] = config('uec.tax_option') ; //取德稅別列表
  
         return view('Backend.RequisitionsPurchase.input', $result);
     }
@@ -148,7 +148,7 @@ class RequisitionsPurchaseController extends Controller
             return $obj;
         });
         
-        $result['taxList'] = $this->universalService->getTaxList(); //取德稅別列表
+        $result['taxList'] = config('uec.tax_option'); //取德稅別列表
         return view('Backend.RequisitionsPurchase.input', $result);
     }
 

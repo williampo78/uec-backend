@@ -76,18 +76,11 @@
                                         <div class="form-group" id="tax_div">
                                             <label for="tax_div">稅別<span class="redtext">*</span></label>
                                             <select class="form-control js-select2-department" name="tax" id="tax">
-                                                <option value="1"
-                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '1' ? 'selected' : '' }}>
-                                                    應稅</option>
-                                                <option value="0"
-                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '0' ? 'selected' : '' }}>
-                                                    未稅</option>
-                                                <option value="2"
-                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '2' ? 'selected' : '' }}>
-                                                    內含</option>
-                                                <option value="3"
-                                                    {{ isset($quotation['tax']) && $quotation['tax'] == '3' ? 'selected' : '' }}>
-                                                    零稅率</option>
+                                                @foreach ($taxList as $key => $tax)
+                                                    <option value="{{ $key }}"
+                                                        {{ isset($quotation['tax']) && $quotation['tax'] == $key ? 'selected' : '' }}>
+                                                        {{ $tax }}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -400,7 +393,7 @@
 
             $(document).on("click", ".copy_btn", function() {
                 let key = $(this).data('key');
-                let copytext = $('#inputitem-' + key).find('option:selected').text() ; 
+                let copytext = $('#inputitem-' + key).find('option:selected').text();
                 var $temp = $("<input>");
                 $("body").append($temp);
                 $temp.val(copytext).select();

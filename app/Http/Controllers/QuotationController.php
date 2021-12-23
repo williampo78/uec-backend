@@ -63,7 +63,7 @@ class QuotationController extends Controller
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
         });
-
+        $result['taxList'] =  config('uec.tax_option');
         $result['act'] = 'add';
         return view('Backend.Quotation.add', $result);
     }
@@ -114,7 +114,7 @@ class QuotationController extends Controller
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
         });
-        
+        $result['taxList'] = config('uec.tax_option') ;
         $result['act'] = 'upd';
         $result['id'] = $id;
         return view('Backend.Quotation.add', $result);
@@ -164,7 +164,7 @@ class QuotationController extends Controller
                 $data['quotation'] = $this->quotationService->getQuotationById($rs['id']);
                 $data['quotationDetails'] = $this->quotationService->getQuotationDetail($rs['id']);
                 $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($rs['id']);
-                $data['taxlist'] = $this->quotationService->getTaxList() ;
+                $data['taxlist'] = config('uec.tax_option') ;
                 return view('Backend.Quotation.show', $data);
                 break;
             default:
