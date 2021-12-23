@@ -24,7 +24,7 @@ class QuotationService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $quotation = Quotation::select('quotation.id', 'trade_date','doc_number', 'supplier_id', 'status_code', 'currency_code',
+        $quotation = Quotation::select('quotation.id', 'trade_date', 'doc_number', 'supplier_id', 'status_code', 'currency_code',
             'exchange_rate', 'quotation.remark', 'submitted_at', 'closed_at', 'tax', 'quotation.created_by', 'supplier.name as supplier_name')
             ->where('quotation.agent_id', $agent_id)
             ->leftJoin('supplier', 'supplier.id', '=', 'quotation.supplier_id');
@@ -58,7 +58,7 @@ class QuotationService
     {
         $agent_id = Auth::user()->agent_id;
 
-        return Quotation::select('quotation.*' , 'supplier.name as supplier_name')->where('quotation.agent_id', $agent_id)->where('quotation.id', $id)->leftJoin('supplier', 'supplier.id', '=', 'quotation.supplier_id')->first();
+        return Quotation::select('quotation.*', 'supplier.name as supplier_name')->where('quotation.agent_id', $agent_id)->where('quotation.id', $id)->leftJoin('supplier', 'supplier.id', '=', 'quotation.supplier_id')->first();
     }
 
     public function getStatusCode()
@@ -163,6 +163,7 @@ class QuotationService
             DB::raw('products.product_name as product_name'),
             DB::raw('product_items.id as product_items_id'),
             DB::raw('product_items.item_no as product_items_no'),
+            DB::raw('product_items.pos_item_no as pos_item_no'),
             DB::raw('quotation_details.original_unit_price as original_unit_price'),
             DB::raw('products.min_purchase_qty as min_purchase_qty'),
         )
@@ -223,17 +224,17 @@ class QuotationService
         return true;
     }
     public function getItemLastPrice($in)
-    { //取得報價核准的最後一個金額
-        $get = Quotation::select(DB::raw('quotation_details.original_unit_price'))
+    {
+        $result = Quotation::select(DB::raw('quotation_details.original_unit_price'))
             ->join('quotation_details', 'quotation.id', 'quotation_details.quotation_id')
             ->where('quotation.supplier_id', $in['supplier_id'])
             ->where('quotation.currency_code', $in['currency_code'])
             ->where('quotation.tax', $in['tax'])
             ->where('quotation.status_code', 'APPROVED')
-            ->where('quotation_details.item_id', $in['item_id'])
+            ->where('quotation_details.product_item_id', $in['product_item_id'])
             ->orderBy('quotation.closed_at')
             ->limit(1)
             ->get();
-        return $get;
+        return $result;
     }
 }

@@ -1,5 +1,5 @@
 @extends('Backend.master')
-@section('title', isset($requisitionsPurchase) ? '新建請購單' : '編輯請購單' )
+@section('title', isset($requisitionsPurchase) ? '新建請購單' : '編輯請購單')
 @section('content')
 
     <div class="row">
@@ -57,7 +57,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_doc_number">
-                                            <label for="doc_number">報價單號 <span class="redtext">*</span></label>
+                                            <label for="doc_number">請購單號 <span class="redtext">*</span></label>
                                             <input class="form-control" name="number" id="number"
                                                 value="{{ $requisitionsPurchase->number ?? '' }}" readonly>
                                         </div>
@@ -175,7 +175,7 @@
                                             <div class="col-sm-3">
                                                 <select2 :selectkey="detailKey" :options="options" :details="details"
                                                     :requisitions_purchase="requisitions_purchase"
-                                                    v-model="details[detailKey].item_id"> </select2>
+                                                    v-model="details[detailKey].product_item_id"> </select2>
                                             </div>
                                             <div class="col-sm-1">
 
@@ -193,11 +193,11 @@
                                             </div>
                                             {{-- 單位 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="details[detailKey].item_price">
+                                                    v-model="details[detailKey].item_uom">
                                             </div>
                                             {{-- 最小採購量 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="details[detailKey].item_price">
+                                                    v-model="details[detailKey].min_purchase_qty">
                                             </div>
                                             {{-- 原幣小計 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
@@ -257,21 +257,41 @@
                 return {
                     requisitions_purchase: @json(isset($requisitionsPurchase) ? $requisitionsPurchase : $requisitionsPurchaseDefault),
                     status: '',
-                    details: @json(isset($requisitionsPurchaseDetail) ? $requisitionsPurchaseDetail : []),
-                    options: @json(isset($item) ? $item : '{}')
+                    details: [],
+                    detailsUpdate: @json(isset($requisitionsPurchaseDetail) ? $requisitionsPurchaseDetail : []),
+                    options: @json(isset($products_item) ? $products_item : '{}'),
                 }
+            },
+            created() {
+                var addArray = [];
+                var vm = this;
+                $.each(this.detailsUpdate, function(key, obj) {
+                    vm.details.push({
+                        id: obj.id,
+                        subtotal_price: obj.original_subtotal_price, // 原幣小計
+                        product_item_id: String(obj.product_item_id), // 品項ID
+                        item_number: obj.product_items_no, //品項編號
+                        item_name: obj.product_name, //品項名稱
+                        item_brand: '', //品項品牌(商品join)
+                        min_purchase_qty: obj.min_purchase_qty, //最小採購量
+                        item_uom: obj.uom, //品項單位(商品join)
+                        item_price: obj.item_price, //單價
+                        item_qty: obj.item_qty, //數量
+                        is_gift: obj.is_gift, // 是否為贈品
+                    });
+                });
             },
             methods: {
                 ItemListAdd() {
                     this.details.push({
                         id: '',
                         subtotal_price: '', // 原幣小計
-                        item_id: '', // 品項ID
+                        product_item_id: '', // 品項ID
                         item_number: '', //品項編號
                         item_name: '', //品項名稱
-                        item_brand: '', //品項品牌
-                        item_spec: '', //品項規格
-                        item_unit: '', //品項單位
+                        item_brand: '', //品項品牌(商品join)
+                        min_purchase_qty: '', //最小採購量
+                        item_uom: '', //品項單位(商品join)
                         item_price: '', //單價
                         item_qty: 0, //數量
                         is_gift: false, // 是否為贈品
@@ -291,7 +311,6 @@
                                 })
                                 .catch(function(error) {
                                     console.log(error);
-                                    console.log('ERROR');
                                 })
                         }
                         this.$delete(this.details, key)
@@ -302,13 +321,11 @@
                     var details = this.details;
                     this.status = status; //訂單狀態
                     var check_item_status = true; //檢查表單內容 給予狀態
-
-                    console.log(details);
                     $.each(details, function(key, obj) {
                         if (obj.item_price == null) {
                             check_item_status = false;
                         }
-                        if (obj.item_id == "") {
+                        if (obj.product_item_id == "") {
                             check_item_status = false;
                         }
                     });
@@ -341,12 +358,11 @@
                         var whereGet = '?supplier_id=' + $('#supplier_id').val() +
                             '&currency_code=' + $('#currency_code').val() +
                             '&tax=' + requisitions_purchase.tax +
-                            '&item_id=' + obj.item_id;
+                            '&product_item_id=' + obj.product_item_id;
                         var req = async () => {
                             const response = await axios.get('/backend/getItemLastPrice/' +
                                 whereGet);
                             details[key].item_price = response.data.original_unit_price;
-                            console.log(response.data);
                         }
                         req();
                     });
@@ -394,8 +410,8 @@
                             break;
                         case '2':
                             // console.log('內含');
-                            requisitions_purchase.original_total_tax_price = (sum_price * 0.0476).toFixed(2); //原幣稅額
-                            requisitions_purchase.total_tax_price = (sum_price * 0.0476).toFixed(2); //稅額
+                            requisitions_purchase.original_total_tax_price = (sum_price * 0.05).toFixed(2); //原幣稅額
+                            requisitions_purchase.total_tax_price = (sum_price * 0.05).toFixed(2); //稅額
                             break;
                         case '3':
                             // console.log('零稅率');
@@ -443,17 +459,16 @@
                     $.each(this.options, function(key, obj) {
                         if (obj.id == value) {
                             details[getSelectKey].item_name = obj.name; //品項名稱
-                            details[getSelectKey].item_number = obj.item_number; //品項編號
+                            details[getSelectKey].item_number = obj.item_no; //品項編號
                             details[getSelectKey].item_brand = obj.brand; //品牌
-                            details[getSelectKey].item_spec = obj.spec; //規格
-                            details[getSelectKey].item_unit = obj.small_unit; // 單位
-                            // details[getSelectKey].item_price = obj.sell_price1; //目前先以販售價格**要用審核過後的價格帶出
+                            details[getSelectKey].item_uom = obj.uom; // 單位
+                            details[getSelectKey].min_purchase_qty = obj.min_purchase_qty; //最小採購量
                             var find_this_item_id = obj.id;
                             //帶出價格
                             var whereGet = '?supplier_id=' + $('#supplier_id').val() +
                                 '&currency_code=' + $('#currency_code').val() +
                                 '&tax=' + requisitions_purchase.tax +
-                                '&item_id=' + find_this_item_id;
+                                '&product_item_id=' + find_this_item_id;
                             const req = async () => {
                                 const response = await axios.get('/backend/getItemLastPrice/' +
                                     whereGet);
