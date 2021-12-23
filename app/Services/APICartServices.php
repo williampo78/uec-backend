@@ -412,7 +412,7 @@ class APICartServices
                                     "itemQty" => $detail_qty,
                                     "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                     "itemStock" => $stock,
-                                    "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                    "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                     "campaignDiscountName" => null,
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
