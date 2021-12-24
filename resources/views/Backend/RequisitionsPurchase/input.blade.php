@@ -201,7 +201,7 @@
                                             </div>
                                             {{-- 原幣小計 --}}
                                             <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="details[detailKey].subtotal_price">
+                                                    v-model="details[detailKey].original_subtotal_price">
                                             </div>
                                             {{-- 功能 --}}
                                             <div class="col-sm-1">
@@ -268,7 +268,7 @@
                 $.each(this.detailsUpdate, function(key, obj) {
                     vm.details.push({
                         id: obj.id,
-                        subtotal_price: obj.original_subtotal_price, // 原幣小計
+                        original_subtotal_price: obj.original_subtotal_price, // 原幣小計
                         product_item_id: String(obj.product_item_id), // 品項ID
                         item_number: obj.product_items_no, //品項編號
                         item_name: obj.product_name, //品項名稱
@@ -278,6 +278,8 @@
                         item_price: obj.item_price, //單價
                         item_qty: obj.item_qty, //數量
                         is_gift: obj.is_gift, // 是否為贈品
+                        subtotal_tax_price: obj.subtotal_tax_price, ////(本幣)稅額
+                        original_subtotal_tax_price: obj.original_subtotal_tax_price, //原幣稅額
                     });
                 });
             },
@@ -285,7 +287,7 @@
                 ItemListAdd() {
                     this.details.push({
                         id: '',
-                        subtotal_price: '', // 原幣小計
+                        original_subtotal_price: '', // 原幣小計
                         product_item_id: '', // 品項ID
                         item_number: '', //品項編號
                         item_name: '', //品項名稱
@@ -295,6 +297,8 @@
                         item_price: '', //單價
                         item_qty: 0, //數量
                         is_gift: false, // 是否為贈品
+                        subtotal_tax_price: 0, ////(本幣)稅額
+                        original_subtotal_tax_price: 0, //原幣稅額
                     });
                 },
                 ItemListDel(id, key) {
@@ -385,38 +389,58 @@
                     var details = this.details;
                     var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
-                    console.log(details) ; 
                     $.each(details, function(key, obj) {
                         //原幣小計 = 單價 * 數量
                         if (obj.is_gift == 1) { //如果是贈品則不計算單價
                             obj.subtotal_price = 0;
                         } else if (obj.item_qty > 0) {
-                            obj.subtotal_price = obj.item_price * obj.item_qty;
+                            obj.original_subtotal_price = obj.item_price * obj.item_qty; // (本幣)小計
+                            obj.subtotal_price = obj.original_subtotal_price; //原幣小計
+                            //各品項計算稅率
+                            switch (requisitions_purchase.tax) {
+                                case '0': //免稅
+                                    obj.subtotal_tax_price = 0; //(本幣)稅額
+                                    obj.original_subtotal_tax_price = 0 //原幣稅額
+                                    break;
+                                case '1': // 應稅
+                                    obj.subtotal_tax_price = (obj.subtotal_price * 0.05).toFixed(
+                                        2);; //(本幣)稅額
+                                    obj.original_subtotal_tax_price = (obj.original_subtotal_price * 0.05).toFixed(
+                                        2); //原幣稅額
+                                    break;
+                                case '2': //應稅內含
+                                    obj.subtotal_tax_price = 0; //(本幣)稅額
+                                    obj.original_subtotal_tax_price = 0 //原幣稅額
+                                    break;
+                                case '3': //零稅率
+                                    obj.subtotal_tax_price = 0; //(本幣)稅額
+                                    obj.original_subtotal_tax_price = 0 //原幣稅額
+                                    break;
+                            }
+                            //將稅金寫近來
                         } else {
                             obj.subtotal_price = 0;
                         }
                         sum_price += obj.subtotal_price;
                     });
+                    // console.log(requisitions_purchase.tax);
+                    //表頭計算稅
                     switch (requisitions_purchase.tax) {
-                        case '0':
-                            // console.log('未稅');
+                        case '0': //免稅
                             requisitions_purchase.original_total_txa_price = 0; //原幣稅額
-                            requisitions_purchase.total_tax_price = 0; //稅額
+                            requisitions_purchase.total_tax_price = 0; //稅額(本幣)
                             break;
-                        case '1':
-                            // console.log('應稅');
+                        case '1': // 應稅
                             requisitions_purchase.original_total_tax_price = sum_price * 0.05; //原幣稅額
-                            requisitions_purchase.total_tax_price = sum_price * 0.05; //稅額
+                            requisitions_purchase.total_tax_price = sum_price * 0.05; //稅額(本幣)
                             break;
-                        case '2':
-                            // console.log('內含');
+                        case '2': //應稅內含
                             requisitions_purchase.original_total_tax_price = (sum_price * 0.05).toFixed(2); //原幣稅額
-                            requisitions_purchase.total_tax_price = (sum_price * 0.05).toFixed(2); //稅額
+                            requisitions_purchase.total_tax_price = (sum_price * 0.05).toFixed(2); //稅額(本幣)
                             break;
-                        case '3':
-                            // console.log('零稅率');
+                        case '3': //零稅率
                             requisitions_purchase.original_total_tax_price = 0; //原幣稅額
-                            requisitions_purchase.total_tax_price = 0; //稅額
+                            requisitions_purchase.total_tax_price = 0; //稅額(本幣)
                             break;
                     }
                     requisitions_purchase.original_total_price = sum_price; //原幣總金額

@@ -152,7 +152,8 @@ class RequisitionsPurchaseService
             return false;
         }
         DB::beginTransaction();
-        try {
+        dd($requisitions_purchase_detail) ; 
+        // try {
             //創建主表
             $requisitions_purchase['agent_id'] = $user_id;
             $requisitions_purchase['number'] = $this->universalService->getDocNumber('requisitions_purchase');
@@ -181,14 +182,15 @@ class RequisitionsPurchaseService
                 $reviewLogData['reviewer'] = $reviewer;
                 RequisitionsPurchaseReviewLog::insert($reviewLogData);
             }
-            DB::commit();
+            // DB::commit();
             $result = true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::info($e);
 
-            $result = false;
-        }
+        // } catch (\Exception $e) {
+            DB::rollBack();
+        //     Log::info($e);
+
+        //     $result = false;
+        // }
 
         return $result;
     }
@@ -231,17 +233,16 @@ class RequisitionsPurchaseService
                     RequisitionsPurchaseDetail::where('id', $item['id'])->update($indata);
                 }
             }
-            DB::commit();
-            $result = true;
+        //     DB::commit();
+        //     $result = true;
         // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     dd($requisitions_purchase_detail_in);
-
+            DB::rollBack();
+            dd($requisitions_purchase_detail_in);
         //     Log::info($e);
 
-        //     $result = false;
+            $result = false;
         // }
-
+        
         return $result;
     }
     public function delrequisitionsPurchase($id)

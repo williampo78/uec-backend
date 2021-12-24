@@ -84,6 +84,27 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-sm-3">
+                                        <label for="tax_div">報價含稅否<span class="redtext">*</span></label>
+                                        <div class="radio">
+                                            <div class="col-sm-6">
+                                                <label>
+                                                    <input type="radio" name="is_tax_included" value="1"
+                                                        {{ isset($quotation['is_tax_included']) && $quotation['tax'] == '1' ? 'checked' : '' }}>
+                                                    未稅
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-6">
+
+                                                <label>
+                                                    <input type="radio" name="is_tax_included" value="0"
+                                                        {{ isset($quotation['is_tax_included']) && $quotation['tax'] == '0' ? 'checked' : '' }}>
+                                                    含稅
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -96,7 +117,6 @@
                                     </div>
                                 </div>
 
-                                <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項</h4>
                                 <div id="ItemDiv">
                                     <input type="hidden" name="rowNo" id="rowNo" value="0">
@@ -144,6 +164,9 @@
 @section('js')
     <script>
         $(document).ready(function() {
+
+            is_tax_included_status();
+
             $('#btn-addNewRow').click(function() {
                 AddItemRow("process", "input");
             });
@@ -159,7 +182,7 @@
                 format: 'YYYY-MM-DD',
             });
             $('#new-form').validate({
-                // debug: true,
+                debug: true,
                 submitHandler: function(form) {
                     form.submit();
                 },
@@ -167,6 +190,9 @@
                     submitted_at: {
                         required: true
                     },
+                    is_tax_included: {
+                        required: $('#tax').val() !== 0
+                    }
                 },
                 messages: {
                     submitted_at: "請輸入報價日期",
@@ -390,7 +416,26 @@
                 })
                 $(inputminimum_purchase_qty).val(new_item[0].min_purchase_qty);
             });
-
+            $(document.body).on("change", "#tax", function() {
+                is_tax_included_status();
+            });
+            //報價含稅否
+            function is_tax_included_status() {
+                let taxtype = $('#tax').val();
+                switch (taxtype) {
+                    case '0': // 免稅
+                        $('input[name=is_tax_included]').attr("disabled", true);
+                        break;
+                    case '2': //應稅內含
+                        $('input[name=is_tax_included]').attr("disabled", false);
+                        break;
+                    case '3': //零稅率
+                        $('input[name=is_tax_included]').attr("disabled", false);
+                        break;
+                    default:
+                        break;
+                }
+            }
             $(document).on("click", ".copy_btn", function() {
                 let key = $(this).data('key');
                 let copytext = $('#inputitem-' + key).find('option:selected').text();
