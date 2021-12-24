@@ -20,7 +20,7 @@
 
                                 <div class="row form-group">
                                     <div class="col-sm-1"><label> 幣別</label></div>
-                                    <div class="col-sm-5" >{{ $data['requisitions_purchase']['currency_code'] }}</div>
+                                    <div class="col-sm-5" >新台幣 (匯率：1)</div>
                                     <div class="col-sm-1"><label> 狀態</label></div>
                                     <div class="col-sm-5">{{ $data['status_code'][$data['requisitions_purchase']['status']]?? '' }}</div>
                                 </div>
@@ -62,13 +62,13 @@
                                     <tbody>
                                     <tr>
                                         <td>{{ $v['item_number'] }}</td>
-                                        <td>{{ $v['item_name'] }}</td>
+                                        <td>{{ $v['combination_name'] }}</td>
                                         <td>{{ $v['item_price'] }}</td>
-                                        <td>{{ $v['item_qyt'] }}</td>
-                                        <td>{{ $v['item_unit'] }}</td>
+                                        <td>{{ $v['item_qty'] }}</td>
+                                        <td>{{ $v['uom'] }}</td>
                                         <td>{{ $v['subtotal_price'] }}</td>
-                                        <td>{{ $v['is_gift']== 1 ? 'V':'X' }}</td>
-                                        <td>最小採購量</td>
+                                        <td>{{ $v['is_gift']== 1 ? '是':'否' }}</td>
+                                        <td>{{$v['min_purchase_qty']}}</td>
                                     </tr>
                                     </tbody>
                                 @endforeach
@@ -108,6 +108,9 @@
                                     <label class="btn btn-default form-check-label">
                                         <input class="form-check-input" name="review_result" type="radio" value="0">取消
                                     </label>
+                                    <label for="">
+                                        <div class="review_result_error"></div>
+                                    </label>
                                 </div>
                             </div>
                             <div class="col-sm-12">
@@ -131,5 +134,46 @@
         </div>
     </div>
 @endsection
+@section('js')
 
+    <script>
+        $(document).ready(function() {
+            $('#new-form').validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    form.submit();
+                },
+                rules: {
+                    review_result: {
+                        required: true
+                    }
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    // console.log(error, element);
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.appendTo($('.review_result_error'));
+                        return;
+                    }
 
+                    if (element.is('select')) {
+                        console.log('B');
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    // error.insertAfter(element);
+                },
+                messages: {
+                    review_result: "請選取簽核結果",
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
+@endsection

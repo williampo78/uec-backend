@@ -77,7 +77,7 @@ class RequisitionsPurchaseService
             ->first();
     }
 
-    public function getAjaxRequisitionsPurchaseDetail($requisitions_purchase_id)
+    public function getRequisitionPurchaseDetail($requisitions_purchase_id)
     {
         $result = RequisitionsPurchaseDetail::select(
             DB::raw('requisitions_purchase_detail.*'),
@@ -111,11 +111,6 @@ class RequisitionsPurchaseService
         return RequisitionsPurchaseReviewLog::where('requisitions_purchase_id', $requisition_purchase_id)
             ->leftJoin('users', 'users.id', '=', 'reviewer')
             ->get();
-    }
-
-    public function getRequisitionPurchaseDetail($requisition_purchase_id)
-    {
-        return RequisitionsPurchaseDetail::where('requisitions_purchase_id', $requisition_purchase_id)->get();
     }
 
     public function getRequisitionPurchaseDetailForOrderSupplier($requisition_purchase_id)

@@ -61,7 +61,7 @@ class ReviewService
             }
 
         //簽核未通過
-        }elseif($data['review_result']==0){
+        }elseif($data['review_result']== 0 ){
             // 簽核未通過 狀態改為駁回 'REJECTED' ， 並不再進入下一關簽核，next_approver 改為 null
             $updateData[$status] = 'REJECTED';
             $updateData['closed_at'] = $now;

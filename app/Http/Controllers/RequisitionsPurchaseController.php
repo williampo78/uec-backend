@@ -114,7 +114,7 @@ class RequisitionsPurchaseController extends Controller
 
         $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($id); //請購單
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id)->transform(function ($obj, $key) use ($brands) {
+        $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($id)->transform(function ($obj, $key) use ($brands) {
 
             $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
    
@@ -154,7 +154,7 @@ class RequisitionsPurchaseController extends Controller
     public function edit($id)
     {
         $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id);
-        $result['requisitionsPurchaseDetail'] = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id);
+        $result['requisitionsPurchaseDetail'] = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($id);
 
         // dd($result) ;
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
@@ -216,7 +216,7 @@ class RequisitionsPurchaseController extends Controller
             $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($rs['id']);
             echo "OK@@" . json_encode($data);
         } elseif ($rs['get_type'] === 'requisitions_purchase_detail') {
-            $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($rs['id']);
+            $data = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($rs['id']);
             echo "OK@@" . json_encode($data);
         }
     }

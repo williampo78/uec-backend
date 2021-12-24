@@ -14,7 +14,7 @@ class HierarchyService
 
     public function getHierarchyCode($hierarchy_code)
     {
-        $user_id = Auth::user()->id;
+        // $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
         //目前只有這筆範例 id 先用4
         $user_id = 4;
@@ -36,7 +36,7 @@ class HierarchyService
                            b.parent_id as prev_id,
                            r.dp + 1 as dp
                     from rloop r
-                    inner join approval_hierarchy b on b.id=r.prev_id and b.hierarchy_code = 'QUOTATION'
+                    inner join approval_hierarchy b on b.id=r.prev_id and b.hierarchy_code = '".$hierarchy_code."'
                     and b.agent_id = ".$agent_id."
 
                 ), rResult as
