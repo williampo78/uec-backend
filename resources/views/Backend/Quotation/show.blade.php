@@ -41,7 +41,13 @@
                         @foreach ($quotationDetails as $val)
                             <tr>
                                 <td>{{ $val->product_items_no }}</td>
-                                <td>{{ $val->product_name }}</td>
+                                <td>
+                                    @if (!$val->combination_name)
+                                        <span class="redtext">該商品異常</span>
+                                    @else
+                                        {{ $val->combination_name }}
+                                    @endif
+                                </td>
                                 <td>{{ $val->ean }}</td>
                                 <td>{{ $val->original_unit_price }}</td>
                                 <td></td>

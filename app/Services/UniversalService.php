@@ -88,12 +88,7 @@ class UniversalService
 
     public function getTaxList()
     {
-        return [
-            0 => '未稅',
-            1 => '應稅',
-            2 => '內含',
-            3 => '零稅率',
-        ];
+        return config('uec.tax_option') ;
     }
 
     /*

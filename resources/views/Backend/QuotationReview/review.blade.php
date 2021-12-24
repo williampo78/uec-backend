@@ -47,11 +47,11 @@
                                 @foreach($data['quotation_detail'] as $v)
                                      <tbody>
                                         <tr>
-                                            <td>{{ $v['item_number'] }}</td>
-                                            <td>{{ $v['item_name'] }}</td>
-                                            <td>國際條碼</td>
+                                            <td>{{ $v['product_items_no'] }}</td>
+                                            <td>{{ $v['product_name'] }}</td>
+                                            <td>{{$v['pos_item_no']}}</td>
                                             <td>{{ $v['original_unit_price'] }}</td>
-                                            <td>最小採購量</td>
+                                            <td>{{$v['min_purchase_qty']}}</td>
                                         </tr>
                                     </tbody>
                                 @endforeach

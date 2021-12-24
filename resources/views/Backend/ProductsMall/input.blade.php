@@ -618,7 +618,7 @@
                     value.category_name = isset[0].name;
                     value.status = 'old';
                 })
-                console.log(this.ProductsItem) ; 
+                // console.log(this.ProductsItem) ; 
                 // this.ProductsItem.map(function(value, key) {
                 //     if (value.photo_name == null) {
                 //         value.imgesUrl = vm.DefaultassetImg;
