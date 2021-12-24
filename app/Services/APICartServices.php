@@ -185,7 +185,7 @@ class APICartServices
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftAway[] = array(
-                                    "productPhoto" => $cartInfo[$product_id]['photo'],
+                                    "productPhoto" => $giftInfo['photo'],
                                     "productId" => $giftInfo->product_id,
                                     "productName" => $productInfo[$giftInfo->product_id]->product_name,
                                     "assignedQty" => $giftInfo->assignedQty
