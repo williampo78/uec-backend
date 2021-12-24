@@ -120,7 +120,7 @@
                                 <div class="col-sm-4">
                                     <div class="row">
                                         <div class="col-sm-3 text-right">
-                                            <h5>贈品序號</h5>
+                                            <h5>商品序號</h5>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no" id="product_no"

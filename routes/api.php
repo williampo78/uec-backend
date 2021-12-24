@@ -10,7 +10,7 @@ use App\Http\Controllers\api\MemberInfoController;
 use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\ShoppingController;
-
+use App\Http\Controllers\api\StockController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -39,6 +39,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/advanceSearch', [ProductController::class, 'getProductSearchResult']);
     Route::post('/advanceSearchCategory', [ProductController::class, 'getProductSearchResultCategory']);
 
+    Route::get('/stock', [StockController::class, 'getItemStock']);
 });
 
 Route::group(['middleware' => 'jwt.member'], function () {
@@ -60,7 +61,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::post('/membership/collections', [MemberInfoController::class, 'setCollections']);
     Route::post('/membership/collections/batchDelete', [MemberInfoController::class, 'batchDeleteCollections']);
 
-    Route::group(['prefix'=>'shopping'], function (){
+    Route::group(['prefix' => 'shopping'], function () {
         Route::post('/setMemberCart', [ShoppingController::class, 'setCart']);
         Route::post('/shoppingCartData', [ShoppingController::class, 'getShoppingCartData']);
     });
@@ -78,6 +79,6 @@ Route::group(['prefix' => 'members'], function () {
     Route::post('/memberBasic', [AuthController::class, 'memberBasic']);
 });
 
-Route::group(['prefix'=>'shopping'], function (){
+Route::group(['prefix' => 'shopping'], function () {
     Route::get('/getCartCount', [ShoppingController::class, 'getCartCount']);
 });
