@@ -83,9 +83,9 @@ class RequisitionsPurchaseController extends Controller
             $obj->text = $obj->item_no . '-' . $brands[$obj->brand_id]['brand_name'] . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
             return $obj;
         });
-        
-        $result['taxList'] = config('uec.tax_option') ; //取德稅別列表
- 
+
+        $result['taxList'] = config('uec.tax_option'); //取德稅別列表
+
         return view('Backend.RequisitionsPurchase.input', $result);
     }
 
@@ -111,19 +111,37 @@ class RequisitionsPurchaseController extends Controller
      */
     public function show($id, Request $request)
     {
-        $responseType = $request->input('responseType');
 
         $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($id); //請購單
-        $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id); //請購單內的品項
-        $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id); //簽核紀錄
+        $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
+        $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($id)->transform(function ($obj, $key) use ($brands) {
 
-        if ($responseType = 'json') {
-            return response()->json([
-                'requisitionsPurchase' => json_encode($requisitionsPurchase),
-                'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail),
-                'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
-            ]);
-        }
+            $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
+   
+            $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
+
+            if ($obj->spec_1_value !== '') {
+                $obj->combination_name .= '-' . $obj->spec_1_value;
+            }
+
+            if ($obj->spec_2_value !== '') {
+                $obj->combination_name .= '-' . $obj->spec_2_value;
+            }
+            if($obj->product_name == ''){
+                $obj->combination_name = false ;
+            }
+            $obj->brands_name = $brandsName; //不做join key find val
+
+            return $obj;
+        });
+
+        $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id); //簽核紀錄
+        // dd($requisitionsPurchaseDetail) ; 
+        return response()->json([
+            'requisitionsPurchase' => json_encode($requisitionsPurchase),
+            'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail),
+            'getRequisitionPurchaseReviewLog' => json_encode($getRequisitionPurchaseReviewLog),
+        ]);
 
     }
 
@@ -147,7 +165,7 @@ class RequisitionsPurchaseController extends Controller
             $obj->text = $obj->item_no . '-' . $brands[$obj->brand_id]['brand_name'] . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
             return $obj;
         });
-        
+
         $result['taxList'] = config('uec.tax_option'); //取德稅別列表
         return view('Backend.RequisitionsPurchase.input', $result);
     }

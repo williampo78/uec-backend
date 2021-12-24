@@ -82,9 +82,12 @@ class RequisitionsPurchaseService
         $result = RequisitionsPurchaseDetail::select(
             DB::raw('requisitions_purchase_detail.*'),
             DB::raw('product_items.product_id as product_id'),
+            DB::raw('product_items.spec_1_value as spec_1_value'),
+            DB::raw('product_items.spec_2_value as spec_2_value'),
             DB::raw('product_items.ean as ean'),
             DB::raw('products.product_name as product_name'),
             DB::raw('products.uom as uom'),
+            DB::raw('products.brand_id as brand_id'),
             DB::raw('product_items.item_no as product_items_no'),
             DB::raw('products.min_purchase_qty as min_purchase_qty'),
         )
@@ -145,20 +148,20 @@ class RequisitionsPurchaseService
         $requisitions_purchase = $input;
 
         $user_id = Auth::user()->id;
+        $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
-
         $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION'); // 取得簽核者
         if (!$hierarchy) {
             return false;
         }
         DB::beginTransaction();
-        dd($requisitions_purchase_detail) ; 
-        // try {
+        try {
             //創建主表
-            $requisitions_purchase['agent_id'] = $user_id;
+            $requisitions_purchase['agent_id'] = $agent_id;
             $requisitions_purchase['number'] = $this->universalService->getDocNumber('requisitions_purchase');
             $requisitions_purchase['created_at'] = $now; //創建時間
             $requisitions_purchase['next_approver'] = $hierarchy[0];
+            $requisitions_purchase['created_by'] = $user_id;
             $requisitions_purchase_id = RequisitionsPurchase::insertGetId($requisitions_purchase);
             if (isset($requisitions_purchase_detail)) {
                 foreach ($requisitions_purchase_detail as $key => $val) {
@@ -170,27 +173,29 @@ class RequisitionsPurchaseService
                 }
                 RequisitionsPurchaseDetail::insert($requisitions_purchase_detail);
             }
-
-            //簽核log
-            foreach ($hierarchy as $seq_no => $reviewer) {
-                $reviewLogData['requisitions_purchase_id'] = $requisitions_purchase_id;
-                $reviewLogData['created_by'] = $user_id;
-                $reviewLogData['created_at'] = $now;
-                $reviewLogData['updated_by'] = $user_id;
-                $reviewLogData['updated_at'] = $now;
-                $reviewLogData['seq_no'] = $seq_no + 1;
-                $reviewLogData['reviewer'] = $reviewer;
-                RequisitionsPurchaseReviewLog::insert($reviewLogData);
+            if ($requisitions_purchase['status'] == 'REVIEWING') {
+                //簽核log
+                foreach ($hierarchy as $seq_no => $reviewer) {
+                    $reviewLogData['requisitions_purchase_id'] = $requisitions_purchase_id;
+                    $reviewLogData['created_by'] = $user_id;
+                    $reviewLogData['created_at'] = $now;
+                    $reviewLogData['updated_by'] = $user_id;
+                    $reviewLogData['updated_at'] = $now;
+                    $reviewLogData['seq_no'] = $seq_no + 1;
+                    $reviewLogData['reviewer'] = $reviewer;
+                    RequisitionsPurchaseReviewLog::insert($reviewLogData);
+                }
             }
-            // DB::commit();
+
+            DB::commit();
             $result = true;
 
-        // } catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
-        //     Log::info($e);
+            Log::info($e);
 
-        //     $result = false;
-        // }
+            $result = false;
+        }
 
         return $result;
     }
@@ -200,7 +205,7 @@ class RequisitionsPurchaseService
         $now = Carbon::now();
         $requisitions_purchase_detail_in = json_decode($input['requisitions_purchase_detail'], true);
         DB::beginTransaction();
-        // try {
+        try {
             $requisitions_purchase_in = [
                 'supplier_id' => $input['supplier_id'],
                 'trade_date' => $input['trade_date'],
@@ -213,6 +218,7 @@ class RequisitionsPurchaseService
                 'total_tax_price' => $input['total_tax_price'],
                 'total_price' => $input['total_price'],
                 'remark' => $input['remark'],
+                'status' => $input['status'],
             ];
             RequisitionsPurchase::where('id', $input['id'])->update($requisitions_purchase_in);
             foreach ($requisitions_purchase_detail_in as $key => $item) {
@@ -224,7 +230,9 @@ class RequisitionsPurchaseService
                 $indata['item_price'] = $item['item_price'];
                 $indata['item_number'] = $item['item_number'];
                 $indata['subtotal_price'] = $item['subtotal_price'];
-                $indata['currency_code'] = 'TWD';
+                $indata['original_subtotal_tax_price'] = $item['original_subtotal_tax_price'];
+                $indata['subtotal_tax_price'] = $item['subtotal_tax_price'];
+                $indata['currency_code'] = $input['currency_code'];
                 $indata['updated_at'] = $now;
                 $indata['is_gift'] = $item['is_gift'];
                 if ($item['id'] == '') {
@@ -233,16 +241,32 @@ class RequisitionsPurchaseService
                     RequisitionsPurchaseDetail::where('id', $item['id'])->update($indata);
                 }
             }
-        //     DB::commit();
-        //     $result = true;
-        // } catch (\Exception $e) {
+            if ($input['status'] == 'REVIEWING') {
+                $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION'); // 取得簽核者
+                if (!$hierarchy) {
+                    return false;
+                }
+                //簽核log
+                foreach ($hierarchy as $seq_no => $reviewer) {
+                    $reviewLogData['requisitions_purchase_id'] = $input['id'];
+                    $reviewLogData['created_by'] = $user_id;
+                    $reviewLogData['created_at'] = $now;
+                    $reviewLogData['updated_by'] = $user_id;
+                    $reviewLogData['updated_at'] = $now;
+                    $reviewLogData['seq_no'] = $seq_no + 1;
+                    $reviewLogData['reviewer'] = $reviewer;
+                    RequisitionsPurchaseReviewLog::insert($reviewLogData);
+                }
+            }
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
             DB::rollBack();
-            dd($requisitions_purchase_detail_in);
-        //     Log::info($e);
+            Log::info($e);
 
             $result = false;
-        // }
-        
+        }
+
         return $result;
     }
     public function delrequisitionsPurchase($id)
