@@ -8,7 +8,6 @@ use App\Models\QuotationReviewLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class QuotationService
 {
@@ -93,6 +92,7 @@ class QuotationService
         if (!$hierarchy) {
             return false;
         }
+        // dd($data) ;
         DB::beginTransaction();
         try {
             $quotationData = [];
@@ -108,6 +108,8 @@ class QuotationService
             $quotationData['updated_at'] = $now;
             $quotationData['next_approver'] = $hierarchy[0];
             $quotationData['trade_date'] = $data['trade_date'];
+            $quotationData['is_tax_included'] = isset($data['is_tax_included']) ? $data['is_tax_included'] : null;
+
             if ($data['status_code'] == 'REVIEWING') {
                 $quotationData['submitted_at'] = $now;
             }
@@ -125,6 +127,28 @@ class QuotationService
                     $detailData[$k]['created_at'] = $now;
                     $detailData[$k]['updated_by'] = $user_id;
                     $detailData[$k]['updated_at'] = $now;
+                    if ($data['tax'] == 2) { //應稅內含
+                        if ($data['is_tax_included'] == '1') { // 報價含稅
+                            $tax_num = round($data['price'][$k] / 1.05, 2);
+                            $detailData[$k]['unit_nontax_price'] = $tax_num; //本幣單價未稅金額
+                            $detailData[$k]['unit_tax_price'] = $data['price'][$k] - $tax_num; //本幣單價稅額
+                            $detailData[$k]['original_unit_price'] = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
+                            $detailData[$k]['original_unit_nontax_price'] = $tax_num; //未稅金額
+                            $detailData[$k]['original_unit_tax_price'] = $data['price'][$k] - $tax_num; //稅額
+                        } else { //報價不含稅
+                            $detailData[$k]['unit_nontax_price'] = $data['price'][$k]; //本幣單價未稅金額
+                            $detailData[$k]['unit_tax_price'] = (($data['price'][$k] * 1.05) - $data['price'][$k]); //本幣單價稅額
+                            $detailData[$k]['original_unit_price'] = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
+                            $detailData[$k]['original_unit_nontax_price'] = $data['price'][$k]; //未稅金額
+                            $detailData[$k]['original_unit_tax_price'] = (($data['price'][$k] * 1.05) - $data['price'][$k]); //稅額
+                        }
+                    } else { //免稅 零稅率 稅額固定為 0
+                        $detailData[$k]['unit_nontax_price'] = $data['price'][$k]; //本幣單價未稅金額
+                        $detailData[$k]['unit_tax_price'] = 0; //本幣單價稅額
+                        $detailData[$k]['original_unit_price'] = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
+                        $detailData[$k]['original_unit_nontax_price'] = $data['price'][$k]; //未稅金額
+                        $detailData[$k]['original_unit_tax_price'] = 0; //稅額
+                    }
                 }
                 QuotationDetails::insert($detailData);
             }
@@ -151,7 +175,7 @@ class QuotationService
             $result = false;
         }
 
-        return $result;
+        // return $result;
     }
 
     public function getQuotationDetail($quotation_id)
@@ -191,7 +215,6 @@ class QuotationService
         $now = Carbon::now();
         $user_id = Auth::user()->id;
         $quotation_id = $data['id'];
-
         $quotationData = [
             'supplier_id' => $data['supplier_id'],
             'trade_date' => $data['trade_date'],
@@ -199,17 +222,47 @@ class QuotationService
             'remark' => $data['remark'],
             'status_code' => $data['status_code'],
             'updated_at' => $now,
+            'is_tax_included' => isset($data['is_tax_included']) ? $data['is_tax_included'] : null,
         ];
 
         Quotation::where('id', $quotation_id)->update($quotationData);
         foreach ($data['item'] as $k => $item_id) {
+            if ($data['tax'] == 2) { //應稅內含
+                if ($data['is_tax_included'] == '1') { // 報價含稅
+                    $tax_num = round($data['price'][$k] / 1.05, 2);
+                    $unit_nontax_price = $tax_num; //本幣單價未稅金額
+                    $unit_tax_price = $data['price'][$k] - $tax_num; //本幣單價稅額
+                    $original_unit_price = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
+                    $original_unit_nontax_price = $tax_num; //未稅金額
+                    $original_unit_tax_price = $data['price'][$k] - $tax_num; //稅額
+                } else { //報價不含稅
+                    $unit_nontax_price = $data['price'][$k]; //本幣單價未稅金額
+                    $unit_tax_price = (($data['price'][$k] * 1.05) - $data['price'][$k]); //本幣單價稅額
+                    $original_unit_price = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
+                    $original_unit_nontax_price = $data['price'][$k]; //未稅金額
+                    $original_unit_tax_price = (($data['price'][$k] * 1.05) - $data['price'][$k]); //稅額
+                }
+            } else { //免稅 零稅率 稅額固定為 0
+                $unit_nontax_price = $data['price'][$k]; //本幣單價未稅金額
+                $unit_tax_price = 0; //本幣單價稅額
+                $original_unit_price = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
+                $original_unit_nontax_price = $data['price'][$k]; //未稅金額
+                $original_unit_tax_price = 0; //稅額
+            }
+
             $quotationDetailData = [
                 'product_item_id' => $item_id,
                 'unit_price' => $data['price'][$k],
                 'original_unit_price' => $data['price'][$k],
                 'updated_at' => $now,
                 'updated_by' => $user_id,
+                'unit_nontax_price' => $unit_nontax_price ,
+                'unit_tax_price' => $unit_tax_price ,
+                'original_unit_price' => $original_unit_price , 
+                'original_unit_nontax_price' => $original_unit_nontax_price , 
+                'original_unit_tax_price' => $original_unit_tax_price ,
             ];
+
             if (isset($data['quotation_details_id'][$k])) {
                 $quotation_details_id = $data['quotation_details_id'][$k];
                 QuotationDetails::where('id', $quotation_details_id)->update($quotationDetailData);

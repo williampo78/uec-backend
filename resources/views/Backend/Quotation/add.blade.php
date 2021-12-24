@@ -182,7 +182,7 @@
                 format: 'YYYY-MM-DD',
             });
             $('#new-form').validate({
-                debug: true,
+                // debug: true,
                 submitHandler: function(form) {
                     form.submit();
                 },
