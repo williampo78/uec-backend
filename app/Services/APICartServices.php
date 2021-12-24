@@ -237,7 +237,8 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 'qty');
+                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = $stock_info->specifiedQty;
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -299,7 +300,8 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = $stock_info->specifiedQty;
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -336,7 +338,8 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = $stock_info->specifiedQty;
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -372,7 +375,8 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = $stock_info->specifiedQty;
                                     $product[] = array(
                                         "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -402,7 +406,8 @@ class APICartServices
                             foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                                 $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                 $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                $stock = $stock_info->specifiedQty;
                                 $product[] = array(
                                     "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                     "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -424,7 +429,8 @@ class APICartServices
                         foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                             $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                            $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                            $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                            $stock = $stock_info->specifiedQty;
                             $product[] = array(
                                 "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                 "itemId" => $cartDetail[$product_id][$item_id]->item_id,
@@ -456,7 +462,8 @@ class APICartServices
                         $product_type = 'expired';
                         $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                         $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                        $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                        $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                        $stock = $stock_info->specifiedQty;
                         $product[] = array(
                             "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                             "itemId" => $cartDetail[$product_id][$item_id]->item_id,
