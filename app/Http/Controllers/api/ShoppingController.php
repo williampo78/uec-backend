@@ -115,4 +115,53 @@ class ShoppingController extends Controller
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($response['status']=='200'?null:$error_code[$err]), 'result' => $data]);
     }
+
+
+    /*
+     * 批次設定購物車資料 (商品編號)
+     * @param  int  $id
+     */
+    public function setBatchCart(Request $request)
+    {
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        /*
+        */
+        $messages = [
+            'item_id.required' => '商品編號不能為空',
+            'item_no.required' => '商品代碼不能為空',
+            'item_qty.required' => '商品數量不能為空',
+            'status_code.required' => '商品數量不能為空',
+        ];
+
+        $v = Validator::make($request->all(), [
+            'item_id' => 'required',
+            'item_no' => 'required',
+            'item_qty' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+
+        if (count($request->item_id) != count($request->item_no) && count($request->item_id) != count($request->item_qty)) {
+            $data = "商品編號與商品代碼數量或商品數量不符合";
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $data]);
+        }
+        $response = $this->apiCartService->setBatchCart($request);
+        if ($response == 'success') {
+            $status = true;
+            $data = ($request['status'] == 0 ? '加入' : '移除') . '購物車成功';
+        } elseif ($response == '203') {
+            $status = false;
+            $err = $response;
+            $data = '';
+        } else {
+            $status = false;
+            $err = '401';
+            $data = '';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
+
+    }
 }

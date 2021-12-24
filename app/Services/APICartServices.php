@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Models\ProductPhotos;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\ShoppingCartDetails;
@@ -12,6 +13,7 @@ use App\Models\ProductItems;
 use App\Models\Products;
 use App\Services\APIService;
 use App\Services\StockService;
+use Batch;
 
 class APICartServices
 {
@@ -28,9 +30,10 @@ class APICartServices
      */
     public function getCartInfo($member_id)
     {
+        $s3 = config('filesystems.disks.s3.url');
         $result = ShoppingCartDetails::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
-            , "product_items.item_no", "product_items.photo_name as item_photo", "product_items.status as item_status")
+            , "product_items.item_no")
             ->where('shopping_cart_details.member_id', $member_id)
             ->where('shopping_cart_details.status_code', 0)//購物車
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
@@ -41,7 +44,9 @@ class APICartServices
 
         $data = [];
         foreach ($result as $datas) {
+            $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
+            $data[$datas->product_id]['item_photo'] = $s3.$ProductPhotos->photo_name;
         }
         return $data;
     }
@@ -180,13 +185,14 @@ class APICartServices
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftAway[] = array(
+                                    "productPhoto" => $cartInfo[$product_id]['photo'],
                                     "productId" => $giftInfo->product_id,
-                                    "productName" => $productInfo[$giftInfo->product_id]->product_name
+                                    "productName" => $productInfo[$giftInfo->product_id]->product_name,
+                                    "assignedQty" => $giftInfo->assignedQty
                                 );
                             }
                         }
                     }
-
                     //商品折扣
                     if (isset($campaign['PRD']['DISCOUNT'][$product_id])) { //在活動內 滿額折扣
                         //ex: n=2, x=0.85, qty=4, price = 1000
@@ -243,7 +249,6 @@ class APICartServices
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -309,7 +314,6 @@ class APICartServices
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -350,7 +354,6 @@ class APICartServices
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -390,7 +393,6 @@ class APICartServices
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -424,7 +426,6 @@ class APICartServices
                                     $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                 }
                                 $product[] = array(
-                                    "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                     "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                     "itemSpec1" => $spec1,
                                     "itemSpec2" => $spec2,
@@ -450,7 +451,6 @@ class APICartServices
                                 $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                             }
                             $product[] = array(
-                                "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                 "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                 "itemSpec1" => $spec1,
                                 "itemSpec2" => $spec2,
@@ -486,7 +486,6 @@ class APICartServices
                             $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                         }
                         $product[] = array(
-                            "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                             "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                             "itemSpec1" => $spec1,
                             "itemSpec2" => $spec2,
@@ -507,6 +506,7 @@ class APICartServices
                     "productID" => $product_id,
                     "productNo" => $cartInfo[$product_id]['product_no'],
                     "productName" => $cartInfo[$product_id]['product_name'],
+                    "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product
                 );
             }
@@ -526,11 +526,15 @@ class APICartServices
                 if ($total_amount >= $item->n_value) {
                     if ($now >= $item->start_launched_at && $now <= $item->end_launched_at) { //在上架期間內
                         if ($item->campaign_type == 'CART03') { //﹝滿額﹞購物車滿N元，送贈品
-                            $cartGift[] = array(
-                                "campaignName" => $item->campaign_name,
-                                "productId" => $item->product_id,
-                                "productName" => $item->product_name
-                            );
+                            if ($item->assignedQty >0) {
+                                $cartGift[] = array(
+                                    "campaignName" => $item->campaign_name,
+                                    "productId" => $item->product_id,
+                                    "productName" => $item->product_name,
+                                    "productPhoto" => $campaign_gift['PROD'][$item->promotional_campaign_id][$item->product_id]['photo'],
+                                    "assignedQty" => $item->assignedQty
+                                );
+                            }
                         }
                     }
                 }
@@ -539,11 +543,15 @@ class APICartServices
                 $assigned_qty = array_sum($assigned[$campaign_id]);
                 if ($assigned_qty >= $CART04_n[$campaign_id]) {
                     foreach ($campaign_gift['PROD'][$campaign_id] as $prod_id => $value) {
-                        $cartGift[] = array(
-                            "campaignName" => $value->campaign_name,
-                            "productId" => $prod_id,
-                            "productName" => $value->product_name
-                        );
+                        if ($value->assignedQty >0) {
+                            $cartGift[] = array(
+                                "campaignName" => $value->campaign_name,
+                                "productId" => $prod_id,
+                                "productName" => $value->product_name,
+                                "productPhoto" => $value->photo,
+                                "assignedQty" => $value->assignedQty
+                            );
+                        }
                     }
                 }
             }
@@ -581,7 +589,7 @@ class APICartServices
                 "feeInfo" => $feeInfo,
                 "productRow" => count($cartInfo),
                 "list" => $productDetail,
-                "totalprice" => $cartTotal,
+                "totalPrice" => $cartTotal,
                 "discount" => $cartDiscount,
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
@@ -603,5 +611,88 @@ class APICartServices
             $data[$product->id] = $product;
         }
         return $data;
+    }
+
+
+    /**
+     * 會員購物車(批次新增)
+     * @param
+     * @return string
+     */
+    public function setBatchCart($input)
+    {
+        /*
+        $member_id = Auth::guard('api')->user()->member_id;
+        $now = Carbon::now();
+        //確認是否有該品項
+        $item = ProductItems::where('id', $input['item_id'])->where('item_no', $input['item_no'])->get()->toArray();
+        if (count($item) > 0) {
+            $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
+            if (count($data) > 0) {
+                $act = 'upd';
+            } else {
+                $act = 'add';
+            }
+        } else {
+            return '401';
+        }
+        DB::beginTransaction();
+        try {
+            $webData = [];
+            foreach ($input['item_id'] as $key => $value) {
+                $data = ShoppingCartDetails::where('product_item_id', $value)->where('member_id', $member_id)->get()->toArray();
+                $webData[$key] = [
+                    'id' => $data[0]['id'],
+                    'member_id' => $member_id,
+                    'product_id' => $value,
+                    'status' => -1,
+                    'created_by' => $member_id,
+                    'updated_by' => -1,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+            $collectionInstance = new MemberCollections();
+            $upd = Batch::update($collectionInstance, $webData, 'id');
+            $webData = [];
+            if ($act == 'add') {
+                $webData['member_id'] = $member_id;
+                $webData['product_item_id'] = $input['item_id'];
+                $webData['status_code'] = $input['status_code'];
+                $webData['qty'] = $input['item_qty'];
+                $webData['utm_source'] = $input['utm_source'];
+                $webData['utm_medium'] = $input['utm_medium'];
+                $webData['utm_campaign'] = $input['utm_campaign'];
+                $webData['utm_sales'] = $input['utm_sales'];
+                $webData['utm_time'] = $input['utm_time'];
+                $webData['created_by'] = $member_id;
+                $webData['updated_by'] = -1;
+                $webData['created_at'] = $now;
+                $webData['updated_at'] = $now;
+                if ($input['status_code'] != 0) {
+                    return '203';
+                }
+                $new_id = ShoppingCartDetails::insertGetId($webData);
+            } else if ($act == 'upd') {
+                $webData['qty'] = $input['item_qty'];
+                $webData['status_code'] = $input['status_code'];
+                $webData['updated_by'] = $member_id;
+                $webData['updated_at'] = $now;
+                $new_id = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
+            }
+            DB::commit();
+            if ($new_id > 0) {
+                $result = 'success';
+            } else {
+                $result = 'fail';
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = 'fail';
+        }
+
+        return $result;
+        */
     }
 }
