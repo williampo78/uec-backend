@@ -185,9 +185,12 @@ class QuotationService
             DB::raw('product_items.product_id as product_id'),
             DB::raw('product_items.ean as ean'),
             DB::raw('products.product_name as product_name'),
+            DB::raw('products.brand_id as brand_id'),
             DB::raw('product_items.id as product_items_id'),
             DB::raw('product_items.item_no as product_items_no'),
             DB::raw('product_items.pos_item_no as pos_item_no'),
+            DB::raw('product_items.spec_1_value') ,
+            DB::raw('product_items.spec_2_value') , 
             DB::raw('quotation_details.original_unit_price as original_unit_price'),
             DB::raw('products.min_purchase_qty as min_purchase_qty'),
         )

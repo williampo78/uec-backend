@@ -63,7 +63,7 @@ class QuotationController extends Controller
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
         });
-        $result['taxList'] =  config('uec.tax_option');
+        $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'add';
         return view('Backend.Quotation.add', $result);
     }
@@ -114,7 +114,7 @@ class QuotationController extends Controller
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
         });
-        $result['taxList'] = config('uec.tax_option') ;
+        $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'upd';
         $result['id'] = $id;
         return view('Backend.Quotation.add', $result);
@@ -162,9 +162,29 @@ class QuotationController extends Controller
             case 'showQuotation':
                 $data = [];
                 $data['quotation'] = $this->quotationService->getQuotationById($rs['id']);
-                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($rs['id']);
+                $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
+                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($rs['id'])->transform(function ($obj, $key) use ($brands) {
+
+                    $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
+           
+                    $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
+
+                    if ($obj->spec_1_value !== '') {
+                        $obj->combination_name .= '-' . $obj->spec_1_value;
+                    }
+
+                    if ($obj->spec_2_value !== '') {
+                        $obj->combination_name .= '-' . $obj->spec_2_value;
+                    }
+                    if($obj->product_name == ''){
+                        $obj->combination_name = false ;
+                    }
+                    $obj->brands_name = $brandsName; //不做join key find val
+                    return $obj;
+                });
                 $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($rs['id']);
-                $data['taxlist'] = config('uec.tax_option') ;
+
+                $data['taxlist'] = config('uec.tax_option');
                 return view('Backend.Quotation.show', $data);
                 break;
             default:
