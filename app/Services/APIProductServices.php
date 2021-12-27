@@ -605,7 +605,8 @@ class APIProductServices
         //已審核上架與活動期間內
         $now = Carbon::now();
         $data = [];
-        $promotional = PromotionalCampaigns::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name")
+        $s3 = config('filesystems.disks.s3.url');
+        $promotional = PromotionalCampaigns::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name")
             ->where("promotional_campaigns.start_at", "<=", $now)
             ->where("promotional_campaigns.end_at", ">=", $now)
             ->where("promotional_campaigns.active", "=", "1")
@@ -613,7 +614,9 @@ class APIProductServices
             ->join('products', 'products.id', '=', 'promotional_campaign_giveaways.product_id')
             ->where('products.approval_status', '=', 'APPROVED')->get();
         foreach ($promotional as $promotion) {
+            $ProductPhotos = ProductPhotos::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
             $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id] = $promotion; //取單品的贈品
+            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = $s3.$ProductPhotos->photo_name;
             if ($promotion->level_code == 'CART') {
                 $data['CART'][] = $promotion; //取全站贈品
             }
