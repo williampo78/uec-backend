@@ -12,12 +12,10 @@ class HierarchyService
     {
     }
 
-    public function getHierarchyCode($hierarchy_code)
+    public function getHierarchyCode($hierarchy_code , $created_by = null)
     {
-        // $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
-        //目前只有這筆範例 id 先用4
-        $user_id = 4;
+        $user_id = $created_by == null ? Auth::user()->id : $created_by ;
 
         $result = DB::select("with recursive rloop as
                 (
@@ -63,10 +61,9 @@ class HierarchyService
         return $hierarchy;
     }
 
-    public function getNextApproval($hierarchy_code){
+    public function getNextApproval($hierarchy_code , $created_by = null){
         $reviewer = Auth::user()->id;
-//        $reviewer = 1;
-        $hierarchy = $this->getHierarchyCode($hierarchy_code);
+        $hierarchy = $this->getHierarchyCode($hierarchy_code ,$created_by);
 
         $next_approver = false;
         //帶出下一個簽核者

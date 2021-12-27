@@ -105,7 +105,9 @@ class QuotationReviewController extends Controller
 
         $data = $request->except('_token' , '_method');
         $data['id'] = $id;
+        $data['created_by'] = $this->quotationService->getQuotationById($id)->created_by;
         $this->reviewService->updateReview($data , 'QUOTATION');
+        
 
         return view('Backend.success', compact('route_name' , 'act'));
     }
