@@ -29,7 +29,7 @@ class WebContentsController extends Controller
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['footer'] = ($getData ? $this->webContentsService->getFooter($getData, 'FOOTER') : []);
         $data['user'] = $this->universalService->getUser();
-        $data['code'] = $this->universalService->getFooterCategory('FOOTER_CATEGORY');
+        $data['code'] = $this->universalService->getLookupValues('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
         $data['getData'] = $getData;
         return view('Backend.WebContents.list', compact('data'));

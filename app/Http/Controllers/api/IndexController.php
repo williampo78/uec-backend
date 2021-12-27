@@ -28,7 +28,7 @@ class IndexController extends Controller
 
     public function index()
     {
-        $level1 = $this->universalService->getFooterCategory('FOOTER_CATEGORY');
+        $level1 = $this->universalService->getLookupValues('FOOTER_CATEGORY');
         $data = [];
         $items = [];
         foreach ($level1 as $code => $name) {
@@ -114,7 +114,7 @@ class IndexController extends Controller
 
     public function getQA()
     {
-        $level1 = $this->universalService->getFooterCategory('QA_CATEGORY');
+        $level1 = $this->universalService->getLookupValues('QA_CATEGORY');
         $data = [];
         $items = [];
         foreach ($level1 as $code => $name) {
