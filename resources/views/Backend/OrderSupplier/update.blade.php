@@ -122,19 +122,19 @@
                                                 <label for="tax">稅別</label>
                                                 @switch($order_supplier['tax'])
                                                     @case(1)
-                                                        <input class="form-control" id="tax_name" value="未稅" readonly>
+                                                        <input class="form-control" id="tax_name" value="免稅" readonly>
                                                     @break
                                                     @case(2)
                                                         <input class="form-control" id="tax_name" value="應稅" readonly>
                                                     @break
                                                     @case(3)
-                                                        <input class="form-control" id="tax_name" value="內含" readonly>
-
-                                                        @default
-                                                            <input class="form-control" id="tax_name" value="零稅率" readonly>
-                                                    @endswitch
-                                                    <input type="hidden" name="tax" id="tax"
-                                                        value="{{ $order_supplier['tax'] ?? '' }}">
+                                                        <input class="form-control" id="tax_name" value="應稅內含" readonly>
+                                                    @break
+                                                    @default
+                                                        <input class="form-control" id="tax_name" value="零稅率" readonly>
+                                                @endswitch
+                                                <input type="hidden" name="tax" id="tax"
+                                                    value="{{ $order_supplier['tax'] ?? '' }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -274,12 +274,13 @@
                                                 {{-- 請購量 --}}
                                                 <div class="col-sm-1">
                                                     <input class="form-control" type="number" readonly
-                                                        v-model="detail.show_item_qty">
+                                                        v-model="detail.item_qty">
                                                 </div>
                                                 {{-- 採購量 --}}
                                                 <div class="col-sm-1">
-                                                    <input class="form-control" type="number" v-model="detail.item_qty"
-                                                        :min="0" :max="detail.show_item_qty" @change="detailsCount">
+                                                    <input class="form-control" type="number"
+                                                        v-model="detail.purchase_qty" :min="0" :max="detail.item_qty"
+                                                        @change="detailsCount">
                                                 </div>
                                                 {{-- 單位 --}}
                                                 <div class="col-sm-1">
@@ -313,7 +314,6 @@
                                                     儲存並轉單</button>
                                                 <button class="btn btn-danger" type="button" @click="cancel()"><i
                                                         class="fa fa-ban"></i> 取消</button>
-                                                {{-- <button type="button" @click="test">測試</button> --}}
                                             </div>
                                         </div>
                                     </div>
@@ -331,11 +331,16 @@
             var requisitions = Vue.extend({
                 data: function() {
                     return {
+                        order_supplier: @json($order_supplier),
                         order_supplier_detail: @json($order_supplier_detail),
                         requisitions_purchase_options: @json(isset($data['requisitions_purchase']) ? $data['requisitions_purchase'] : '{}'),
                         requisitions_purchase_id: '',
                         status_code: '',
                     }
+                },
+                created() {
+                    console.log(this.order_supplier );
+                    console.log(this.order_supplier_detail) ; 
                 },
                 methods: {
                     submitBtn(status) {
@@ -348,6 +353,7 @@
                         console.log('取消');
                     },
                     detailsCount() {
+
                         var taxtype = String(this.order_supplier.tax);
 
                         var original_total_tax_price = 0; // 原幣稅額
@@ -357,7 +363,6 @@
                         var sum_price = 0;
                         $.each(this.order_supplier_detail, function(key, obj) {
                             if (obj.is_giveaway) { //如果是贈品則不計算單價
-                                console.log('is_gift true');
                                 obj.subtotal_price = 0;
                                 obj.original_subtotal_price = 0;
                             } else {
@@ -365,7 +370,7 @@
                                     case '0': //免稅
                                         price = obj.item_qty * obj.item_price;
                                         obj.original_subtotal_price = obj.item_qty * obj.item_price; // 數量 * 金錢
-                                        sum_price += obj.original_subtotal_price;
+                                        sum_price += price;
                                         break;
                                     case '1': //應稅
                                         alert('error');
@@ -373,8 +378,9 @@
                                         break;
                                     case '2': //應稅內含
                                         price = obj.item_qty * obj.item_price;
+                                        console.log(price);
                                         obj.original_subtotal_price = price; // 數量 * 金錢
-                                        sum_price += obj.original_subtotal_price;
+                                        sum_price += price;
                                         total_tax_price += ((price * 1.05).toFixed(2)) - price; //(本幣)稅額
                                         original_total_tax_price += ((price * 1.05).toFixed(2)) - price; //原幣稅額
                                         break;
@@ -395,6 +401,7 @@
                         this.order_supplier.sum_price = sum_price;
                     },
                 },
+
                 mounted: function() {
                     $(".js-select2-requisitions_purchase_id").select2({
                         allowClear: false,
@@ -411,12 +418,6 @@
                         format: 'YYYY-MM-DD',
                     });
                 },
-                computed: {
-                    changeRequisitionsPurchase() {
-                        console.log('抓到囉' + changeRequisitionsPurchase.inputVal);
-                    }
-                },
-
             })
 
             new requisitions().$mount('#requisitions_vue_app');
