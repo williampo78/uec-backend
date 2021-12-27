@@ -28,7 +28,7 @@
                                             </select2>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="requisitions_purchase_id" v-model="requisitions_purchase_id">
+                                    {{-- <input type="hidden" name="requisitions_purchase_id" v-model="requisitions_purchase_id"> --}}
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">採購日期<span class="redtext">*</span></label>
@@ -49,6 +49,9 @@
                                                 v-model="order_supplier.number" readonly>
                                         </div>
                                     </div>
+
+                                </div>
+                                <div class="row">
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
@@ -213,7 +216,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group" id="div_remark">
@@ -223,7 +225,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <textarea type="hidden"
+                                <textarea type="hidden" style="display: none"
                                     name="order_supplier_detail_json">@{{ order_supplier_detail }}</textarea>
                                 <hr>
                                 <h4><i class="fa fa-th-large"></i> 品項</h4>
@@ -249,8 +251,14 @@
                                             </div>
                                             {{-- 贈品 --}}
                                             <div class="col-sm-1">
-                                                <div v-if="detail.is_giveaway">是</div>
-                                                <div v-else>否</div>
+                                                <div v-if="detail.is_giveaway">
+                                                    <input type="checkbox" class="big-checkbox" onclick="return false"
+                                                        checked>
+                                                </div>
+
+                                                <div v-else>
+                                                    <input type="checkbox" class="big-checkbox" onclick="return false">
+                                                </div>
                                             </div>
                                             {{-- 單價 --}}
                                             <div class="col-sm-2">
@@ -302,7 +310,6 @@
                                                     class="fa fa-save"></i> 儲存並轉單</button>
                                             <button class="btn btn-danger" type="button" @click="cancel()"><i
                                                     class="fa fa-ban"></i> 取消</button>
-                                            <button type="button" @click="test">測試</button>
                                         </div>
                                     </div>
                                 </div>
@@ -365,7 +372,7 @@
                         } else {
                             switch (taxtype) {
                                 case '0': //免稅
-                                    price = obj.item_qty * obj.item_price ;
+                                    price = obj.item_qty * obj.item_price;
                                     obj.original_subtotal_price = obj.item_qty * obj.item_price; // 數量 * 金錢
                                     sum_price += obj.original_subtotal_price;
                                     break;
@@ -374,14 +381,14 @@
                                     return false;
                                     break;
                                 case '2': //應稅內含
-                                    price = obj.item_qty * obj.item_price ;
+                                    price = obj.item_qty * obj.item_price;
                                     obj.original_subtotal_price = price; // 數量 * 金錢
                                     sum_price += obj.original_subtotal_price;
                                     total_tax_price += ((price * 1.05).toFixed(2)) - price; //(本幣)稅額
                                     original_total_tax_price += ((price * 1.05).toFixed(2)) - price; //原幣稅額
                                     break;
                                 case '3': //零稅率
-                                    price = obj.item_qty * obj.item_price ; 
+                                    price = obj.item_qty * obj.item_price;
                                     obj.original_subtotal_price = price; // 數量 * 金錢
                                     sum_price += price;
                                     break;
@@ -396,9 +403,6 @@
                     this.order_supplier.total_price = sum_price;
                     this.order_supplier.sum_price = sum_price;
                 },
-                test() {
-                    console.log(this.order_supplier.supplier_name);
-                }
             },
             mounted: function() {
                 $(".js-select2-requisitions_purchase_id").select2({
@@ -415,6 +419,47 @@
                 $('#datetimepicker3').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
+                $("#new-form").validate({
+                    debug: true,
+                    submitHandler: function(form) {
+                        $('#save_data').prop('disabled', true);
+                        form.submit();
+                    },
+                    rules: {
+                        trade_date: {
+                            required: true,
+                        },
+                        requisitions_purchase_id: {
+                            required: true,
+                        }
+                    },
+                    messages: {
+                        // end_launched_at: {
+                        //     greaterThan: "結束時間必須大於開始時間",
+                        // },
+                    },
+                    errorClass: "help-block",
+                    errorElement: "span",
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length || element.is(':radio')) {
+                            error.insertAfter(element.parent());
+                            return;
+                        }
+                        if (element.is('select')) {
+                            element.parent().append(error);
+                            return;
+                        }
+                        console.log(element);
+
+                        // error.insertAfter(element);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").addClass("has-error");
+                    },
+                    success: function(label, element) {
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                });
             },
 
         })
@@ -430,6 +475,7 @@
                         allowClear: false,
                     })
                     .val(this.value)
+                    .attr('name', 'requisitions_purchase_id')
                     .trigger("change")
                     .on("change", function() {
                         vm.$emit("input", this.value);
