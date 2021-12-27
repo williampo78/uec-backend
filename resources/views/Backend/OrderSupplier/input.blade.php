@@ -111,7 +111,6 @@
                                                     class="redtext">*</span></label>
                                             <input class="form-control" id="original_total_tax_price"
                                                 name="original_total_tax_price"
-                                                value="{{ $data['order_supplier']['original_total_tax_price'] ?? '' }}"
                                                 v-model="order_supplier.original_total_tax_price" readonly>
                                         </div>
                                     </div>
@@ -121,12 +120,10 @@
                                             <label for="original_total_price">原幣總金額<span
                                                     class="redtext">*</span></label>
                                             <input class="form-control" id="original_total_price"
-                                                name="original_total_price"
-                                                value="{{ $data['order_supplier']['original_total_price'] ?? '' }}"
-                                                v-model="order_supplier.original_total_price" readonly>
+                                                name="original_total_price" v-model="order_supplier.original_total_price"
+                                                readonly>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="tax">稅別<span class="redtext">*</span></label>
@@ -139,8 +136,7 @@
                                         <div class="form-group">
                                             <label for="total_tax_price">稅額<span class="redtext">*</span></label>
                                             <input class="form-control" id="total_tax_price" name="total_tax_price"
-                                                v-model="order_supplier.total_tax_price"
-                                                value="{{ $data['order_supplier']['total_tax_price'] ?? '' }}" readonly>
+                                                v-model="order_supplier.total_tax_price" readonly>
                                         </div>
                                     </div>
 
@@ -148,8 +144,7 @@
                                         <div class="form-group">
                                             <label for="total_price">總金額<span class="redtext">*</span></label>
                                             <input class="form-control" id="total_price" name="total_price"
-                                                v-model="order_supplier.total_price"
-                                                value="{{ $data['order_supplier']['total_price'] ?? '' }}" readonly>
+                                                v-model="order_supplier.total_price" readonly>
                                         </div>
                                     </div>
 
@@ -270,7 +265,7 @@
                                             {{-- 採購量 --}}
                                             <div class="col-sm-1">
                                                 <input class="form-control" type="number" v-model="detail.item_qty"
-                                                    :min="0" :max="detail.show_item_qty">
+                                                    :min="0" :max="detail.show_item_qty" @change="detailsCount">
                                             </div>
                                             {{-- 單位 --}}
                                             <div class="col-sm-1">
@@ -355,6 +350,52 @@
                 cancel() {
                     console.log('取消');
                 },
+                detailsCount() {
+                    var taxtype = String(this.order_supplier.tax);
+
+                    var original_total_tax_price = 0; // 原幣稅額
+                    var original_total_price = 0; // 原幣總金額
+                    var total_tax_price = 0; //(本幣)稅額
+                    var total_price = 0; //(本幣)總金額
+                    var sum_price = 0;
+                    $.each(this.order_supplier_detail, function(key, obj) {
+                        if (obj.is_gift) { //如果是贈品則不計算單價
+                            obj.subtotal_price = 0;
+                            obj.original_subtotal_price = 0;
+                        } else {
+                            switch (taxtype) {
+                                case '0': //免稅
+                                    price = obj.item_qty * obj.item_price ;
+                                    obj.original_subtotal_price = obj.item_qty * obj.item_price; // 數量 * 金錢
+                                    sum_price += obj.original_subtotal_price;
+                                    break;
+                                case '1': //應稅
+                                    alert('error');
+                                    return false;
+                                    break;
+                                case '2': //應稅內含
+                                    price = obj.item_qty * obj.item_price ;
+                                    obj.original_subtotal_price = price; // 數量 * 金錢
+                                    sum_price += obj.original_subtotal_price;
+                                    total_tax_price += ((price * 1.05).toFixed(2)) - price; //(本幣)稅額
+                                    original_total_tax_price += ((price * 1.05).toFixed(2)) - price; //原幣稅額
+                                    break;
+                                case '3': //零稅率
+                                    price = obj.item_qty * obj.item_price ; 
+                                    obj.original_subtotal_price = price; // 數量 * 金錢
+                                    sum_price += price;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    });
+                    this.order_supplier.original_total_price = sum_price;
+                    this.order_supplier.original_total_tax_price = original_total_tax_price;
+                    this.order_supplier.total_tax_price = total_tax_price;
+                    this.order_supplier.total_price = sum_price;
+                    this.order_supplier.sum_price = sum_price;
+                },
                 test() {
                     console.log(this.order_supplier.supplier_name);
                 }
@@ -374,11 +415,6 @@
                 $('#datetimepicker3').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-            },
-            computed: {
-                changeRequisitionsPurchase() {
-                    console.log('抓到囉' + changeRequisitionsPurchase.inputVal);
-                }
             },
 
         })
@@ -422,10 +458,12 @@
                         order_supplier.supplier_name = requisitionsPurchase.supplier_name;
                         order_supplier.supplier_id = requisitionsPurchase.supplier_id;
                         order_supplier.original_total_tax_price = requisitionsPurchase
-                            .original_total_tax_price;
-                        order_supplier.original_total_price = requisitionsPurchase.original_total_price;
-                        order_supplier.total_tax_price = requisitionsPurchase.total_tax_price;
-                        order_supplier.total_price = requisitionsPurchase.total_price;
+                            .original_total_tax_price; // 原幣稅額
+                        order_supplier.original_total_price = requisitionsPurchase
+                            .original_total_price; // 原幣總金額
+                        order_supplier.total_tax_price = requisitionsPurchase.total_tax_price; //(本幣)稅額
+                        order_supplier.total_price = requisitionsPurchase.total_price; //(本幣)總金額
+                        order_supplier.tax = requisitionsPurchase.tax;
                         switch (requisitionsPurchase.tax) {
                             case 0:
                                 order_supplier.tax_name = '免稅';
@@ -450,7 +488,7 @@
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
                                 requisitions_purchase_dtl_id: obj
-                                .id, // requisitions_purchase_detail
+                                    .id, // requisitions_purchase_detail
                                 product_item_id: obj.product_item_id, //  品項ID
                                 combination_name: obj.combination_name, //顯示的品項名稱
                                 item_no: obj.item_number, //編號
