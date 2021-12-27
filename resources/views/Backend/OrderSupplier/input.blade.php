@@ -10,10 +10,6 @@
                         action="{{ $data['act'] == 'add' ? route('order_supplier.store') : route('order_supplier.update', $data['id']) }}"
                         enctype="multipart/form-data">
                         @csrf
-                        @if ($data['act'] == 'upd')
-                            @method('PUT')
-                        @endif
-
                         <div class="row">
 
                             <!-- 欄位 -->
@@ -33,8 +29,7 @@
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">採購日期<span class="redtext">*</span></label>
                                             <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="trade_date" id="trade_date"
-                                                    value="{{ $data['order_supplier']['trade_date'] ?? '' }}" />
+                                                <input type='text' class="form-control" name="trade_date" id="trade_date"/>
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -44,9 +39,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="number">採購單號<span class="redtext">*</span></label>
-                                            <input class="form-control" id="number"
-                                                value="{{ $data['order_supplier']['number'] ?? '' }}"
-                                                v-model="order_supplier.number" readonly>
+                                            <input class="form-control" id="number" v-model="order_supplier.number" readonly>
                                         </div>
                                     </div>
 
@@ -57,9 +50,7 @@
                                         <div class="form-group">
                                             <label for="supplier">供應商<span class="redtext">*</span></label>
                                             <input class="form-control" id="supplier"
-                                                v-model="order_supplier.supplier_name"
-                                                value="{{ isset($data['order_supplier']) && $data['supplier'][$data['order_supplier']['supplier_id']]['name'] ?? '' }}"
-                                                readonly>
+                                                v-model="order_supplier.supplier_name" readonly>
                                             <input type="hidden" id="supplier_id" name="supplier_id"
                                                 v-model="order_supplier.supplier_id">
                                         </div>
@@ -69,8 +60,7 @@
                                         <div class="form-group">
                                             <label for="receiver_name">收件人名稱</label>
                                             <input class="form-control" name="receiver_name" id="receiver_name"
-                                                v-model="order_supplier.receiver_name"
-                                                value="{{ $data['order_supplier']['receiver_name'] ?? '' }}">
+                                                v-model="order_supplier.receiver_name">
                                         </div>
                                     </div>
 
@@ -78,8 +68,7 @@
                                         <div class="form-group">
                                             <label for="receiver_address">收件人地址</label>
                                             <input class="form-control" name="receiver_address" id="receiver_address"
-                                                v-model="order_supplier.receiver_address"
-                                                value="{{ $data['order_supplier']['receiver_address'] ?? '' }}">
+                                                v-model="order_supplier.receiver_address">
                                         </div>
                                     </div>
 
@@ -88,11 +77,6 @@
                                             <label for="currency_code">幣別<span class="redtext">*</span></label>
                                             <input class="form-control" type="text" value="新台幣" readonly>
                                             <input class="form-control" type="hidden" name="currency_code" value='TWD'>
-
-                                            {{-- <select class="form-control js-select2-default" id="currency_code" 
-                                                name="currency_code" readonly>
-                                                <option value='TWD'>新台幣</option>
-                                            </select> --}}
                                         </div>
 
                                         <input type="hidden" name="currency_id" value="1">
@@ -155,8 +139,7 @@
                                         <div class="form-group">
                                             <label for="invoice_company_number">發票統編</label>
                                             <input class="form-control" name="invoice_company_number"
-                                                v-model="order_supplier.invoice_company_number" id="invoice_company_number"
-                                                value="{{ $data['order_supplier']['invoice_company_number'] ?? '' }}">
+                                                v-model="order_supplier.invoice_company_number" id="invoice_company_number">
                                         </div>
                                     </div>
 
@@ -164,8 +147,7 @@
                                         <div class="form-group">
                                             <label for="invoice_name">發票抬頭</label>
                                             <input class="form-control" name="invoice_name" id="invoice_name"
-                                                v-model="order_supplier.invoice_name"
-                                                value="{{ $data['order_supplier']['invoice_name'] ?? '' }}">
+                                                v-model="order_supplier.invoice_name">
                                         </div>
                                     </div>
 
@@ -173,8 +155,7 @@
                                         <div class="form-group">
                                             <label for="invoice_address">發票地址</label>
                                             <input class="form-control" name="invoice_address" id="invoice_address"
-                                                v-model="order_supplier.invoice_address"
-                                                value="{{ $data['order_supplier']['invoice_address'] ?? '' }}">
+                                                v-model="order_supplier.invoice_address">
                                         </div>
                                     </div>
 
@@ -193,8 +174,7 @@
                                             <label for="supplier_deliver_date">廠商交貨日</label>
                                             <div class='input-group date' id='datetimepicker2'>
                                                 <input type='text' class="form-control" name="supplier_deliver_date"
-                                                    id="supplier_deliver_date"
-                                                    value="{{ $data['order_supplier']['supplier_deliver_date'] ?? '' }}" />
+                                                    id="supplier_deliver_date"/>
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -207,8 +187,7 @@
                                             <label for="expect_deliver_date">預計進貨日</label>
                                             <div class='input-group date' id='datetimepicker3'>
                                                 <input type='text' class="form-control" name="expect_deliver_date"
-                                                    id="expect_deliver_date"
-                                                    value="{{ $data['order_supplier']['expect_deliver_date'] ?? '' }}" />
+                                                    id="expect_deliver_date"/>
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -221,7 +200,7 @@
                                         <div class="form-group" id="div_remark">
                                             <label for="remark">備註</label>
                                             <textarea class="form-control" rows="3" name="remark"
-                                                id="remark">{{ $data['order_supplier']['remark'] ?? '' }}</textarea>
+                                                id="remark"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -232,7 +211,7 @@
                                 <div id="ItemDiv">
                                     <div class="add_row">
                                         <div class="row">
-                                            <div class="col-sm-2 text-left">品項<span class="redtext">*</span></div>
+                                            <div class="col-sm-3 text-left">品項<span class="redtext">*</span></div>
                                             <div class="col-sm-1 text-left">贈品</div>
                                             <div class="col-sm-2 text-left">單價<span class="redtext">*</span></div>
                                             <div class="col-sm-1 text-left">請購量<span class="redtext">*</span></div>
@@ -246,8 +225,8 @@
                                     <div class="add_row" v-for="(detail, detailKey) in order_supplier_detail">
                                         <div class="row">
                                             {{-- 品項 --}}
-                                            <div class="col-sm-2">
-                                                <input class="form-control" v-model="detail.item_no" readonly>
+                                            <div class="col-sm-3">
+                                                <input class="form-control" v-model="detail.combination_name" readonly>
                                             </div>
                                             {{-- 贈品 --}}
                                             <div class="col-sm-1">
@@ -284,7 +263,7 @@
                                                 <input class="form-control " readonly v-model="detail.min_purchase_qty">
                                             </div>
                                             {{-- 原幣小計 --}}
-                                            <div class="col-sm-1">
+                                            <div class="col-sm-2">
                                                 <input class="form-control " readonly
                                                     v-model="detail.original_subtotal_price">
                                             </div>
@@ -366,7 +345,8 @@
                     var total_price = 0; //(本幣)總金額
                     var sum_price = 0;
                     $.each(this.order_supplier_detail, function(key, obj) {
-                        if (obj.is_gift) { //如果是贈品則不計算單價
+                        if (obj.is_giveaway) { //如果是贈品則不計算單價
+                            console.log('is_gift true') ;
                             obj.subtotal_price = 0;
                             obj.original_subtotal_price = 0;
                         } else {
@@ -420,7 +400,7 @@
                     format: 'YYYY-MM-DD',
                 });
                 $("#new-form").validate({
-                    debug: true,
+                    // debug: true,
                     submitHandler: function(form) {
                         $('#save_data').prop('disabled', true);
                         form.submit();
@@ -546,6 +526,7 @@
                                 uom: obj.uom, //單位
                                 original_subtotal_price: obj.original_subtotal_price, //原幣小計
                                 subtotal_price: obj.subtotal_price,
+                                pos_item_no:obj.pos_item_no,
 
                             });
                         });

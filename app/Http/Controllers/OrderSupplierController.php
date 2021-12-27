@@ -85,7 +85,6 @@ class OrderSupplierController extends Controller
         if (isset($data['status_code'])) {
             $act = $data['status_code'];
         }
-        // dd($data) ;
         $this->orderSupplierService->updateOrderSupplier($data, 'add');
         return view('Backend.success', compact('route_name', 'act'));
     }
@@ -110,12 +109,34 @@ class OrderSupplierController extends Controller
     public function edit($id)
     {
         $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSuppliers();
-        $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id)->toArray();
-        $data['order_supplier_detail'] = $this->orderSupplierService->getOrderSupplierDetail($id)->toArray();
-        $data['act'] = 'upd';
-        $data['id'] = $id;
-        return view('Backend.OrderSupplier.update', compact('data'));
+        $result['supplier'] = $supplier->getSuppliers();
+        $result['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
+        $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
+        $result['order_supplier_detail'] = $this->orderSupplierService->getOrderSupplierDetail($id)->transform(function ($obj, $key) use ($brands) {
+
+            $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
+
+            $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
+
+            if ($obj->spec_1_value !== '') {
+                $obj->combination_name .= '-' . $obj->spec_1_value;
+            }
+
+            if ($obj->spec_2_value !== '') {
+                $obj->combination_name .= '-' . $obj->spec_2_value;
+            }
+            if ($obj->product_name == '') {
+                $obj->combination_name = false;
+            }
+            $obj->brands_name = $brandsName; //不做join key find val
+
+            return $obj;
+        });;
+
+        $result['act'] = 'upd';
+        $result['id'] = $id;
+        return view('Backend.OrderSupplier.update', $result);
+
     }
 
     /**
