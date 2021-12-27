@@ -46,7 +46,7 @@ class APICartServices
         foreach ($result as $datas) {
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = $s3.$ProductPhotos->photo_name;
+            $data[$datas->product_id]['item_photo'] = $s3 . $ProductPhotos->photo_name;
         }
         return $data;
     }
@@ -256,7 +256,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -321,7 +321,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -361,7 +361,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -400,7 +400,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -433,7 +433,7 @@ class APICartServices
                                     "itemQty" => $detail_qty,
                                     "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                     "itemStock" => $stock,
-                                    "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                    "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                     "campaignDiscountName" => null,
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
@@ -458,7 +458,7 @@ class APICartServices
                                 "itemQty" => $detail_qty,
                                 "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                 "itemStock" => $stock,
-                                "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
                                 "campaignGiftAway" => []
@@ -493,7 +493,7 @@ class APICartServices
                             "itemQty" => $detail_qty,
                             "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                             "itemStock" => $stock,
-                            "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                            "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                             "campaignDiscountName" => null,
                             "campaignDiscountStatus" => false,
                             "campaignGiftAway" => []
@@ -526,7 +526,7 @@ class APICartServices
                 if ($total_amount >= $item->n_value) {
                     if ($now >= $item->start_launched_at && $now <= $item->end_launched_at) { //在上架期間內
                         if ($item->campaign_type == 'CART03') { //﹝滿額﹞購物車滿N元，送贈品
-                            if ($item->assignedQty >0) {
+                            if ($item->assignedQty > 0) {
                                 $cartGift[] = array(
                                     "campaignName" => $item->campaign_name,
                                     "productId" => $item->product_id,
@@ -543,7 +543,7 @@ class APICartServices
                 $assigned_qty = array_sum($assigned[$campaign_id]);
                 if ($assigned_qty >= $CART04_n[$campaign_id]) {
                     foreach ($campaign_gift['PROD'][$campaign_id] as $prod_id => $value) {
-                        if ($value->assignedQty >0) {
+                        if ($value->assignedQty > 0) {
                             $cartGift[] = array(
                                 "campaignName" => $value->campaign_name,
                                 "productId" => $prod_id,
@@ -621,71 +621,62 @@ class APICartServices
      */
     public function setBatchCart($input)
     {
-        /*
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
-        //確認是否有該品項
-        $item = ProductItems::where('id', $input['item_id'])->where('item_no', $input['item_no'])->get()->toArray();
-        if (count($item) > 0) {
-            $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
-            if (count($data) > 0) {
-                $act = 'upd';
+        $webDataAdd = [];
+        $webDataUpd = [];
+        foreach ($input['item_id'] as $key => $value) {
+            //確認是否有該品項
+            $item = ShoppingCartDetails::where('member_id', '=', $member_id)->where('product_item_id', '=', $value)->first();
+            if ($item) {
+                $webDataUpd[$key] = [
+                    "id" => $item->id,
+                    "product_item_id" => $input['item_id'][$key],
+                    "qty" => $input['item_qty'][$key],
+                    "status_code" => $input['status_code'],
+                    "updated_by" => $member_id,
+                    "updated_at" => $now
+                ];
             } else {
-                $act = 'add';
-            }
-        } else {
-            return '401';
-        }
-        DB::beginTransaction();
-        try {
-            $webData = [];
-            foreach ($input['item_id'] as $key => $value) {
-                $data = ShoppingCartDetails::where('product_item_id', $value)->where('member_id', $member_id)->get()->toArray();
-                $webData[$key] = [
-                    'id' => $data[0]['id'],
-                    'member_id' => $member_id,
-                    'product_id' => $value,
-                    'status' => -1,
-                    'created_by' => $member_id,
-                    'updated_by' => -1,
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                $webDataAdd[$key] = [
+                    $member_id,
+                    $value,
+                    $input['item_qty'][$key],
+                    $input['status_code'],
+                    $input['utm_source'],
+                    $input['utm_medium'],
+                    $input['utm_campaign'],
+                    $input['utm_sales'],
+                    $input['utm_time'],
+                    $member_id,
+                    $member_id,
+                    $now,
+                    $now
                 ];
             }
-            $collectionInstance = new MemberCollections();
-            $upd = Batch::update($collectionInstance, $webData, 'id');
-            $webData = [];
-            if ($act == 'add') {
-                $webData['member_id'] = $member_id;
-                $webData['product_item_id'] = $input['item_id'];
-                $webData['status_code'] = $input['status_code'];
-                $webData['qty'] = $input['item_qty'];
-                $webData['utm_source'] = $input['utm_source'];
-                $webData['utm_medium'] = $input['utm_medium'];
-                $webData['utm_campaign'] = $input['utm_campaign'];
-                $webData['utm_sales'] = $input['utm_sales'];
-                $webData['utm_time'] = $input['utm_time'];
-                $webData['created_by'] = $member_id;
-                $webData['updated_by'] = -1;
-                $webData['created_at'] = $now;
-                $webData['updated_at'] = $now;
-                if ($input['status_code'] != 0) {
-                    return '203';
-                }
-                $new_id = ShoppingCartDetails::insertGetId($webData);
-            } else if ($act == 'upd') {
-                $webData['qty'] = $input['item_qty'];
-                $webData['status_code'] = $input['status_code'];
-                $webData['updated_by'] = $member_id;
-                $webData['updated_at'] = $now;
-                $new_id = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
+
+        }
+        $addColumn = [
+            "member_id", "product_item_id", "qty", "status_code",
+            "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_time",
+            "created_by", "updated_by", "created_at", "updated_at"
+        ];
+        DB::beginTransaction();
+        try {
+
+            if ($webDataUpd) {
+                $cartInstance = new ShoppingCartDetails();
+                $upd = Batch::update($cartInstance, $webDataUpd, 'id');
             }
+
+            if ($webDataAdd) {
+                $cartInstance = new ShoppingCartDetails();
+                $batchSize = 50;
+                $add = Batch::insert($cartInstance, $addColumn, $webDataAdd, $batchSize);
+            }
+
             DB::commit();
-            if ($new_id > 0) {
-                $result = 'success';
-            } else {
-                $result = 'fail';
-            }
+            $result = 'success';
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
@@ -693,6 +684,5 @@ class APICartServices
         }
 
         return $result;
-        */
     }
 }
