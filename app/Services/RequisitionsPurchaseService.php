@@ -133,7 +133,7 @@ class RequisitionsPurchaseService
     {
         $agent_id = Auth::user()->agent_id;
 
-        return RequisitionsPurchase::where('agent_id', $agent_id)->get();
+        return RequisitionsPurchase::where('agent_id', $agent_id)->where('is_transfer' , '0')->get();
     }
     public function createRequisitionsPurchase($input)
     { //建立請購單

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderSupplier;
+use App\Services\BrandsService;
 use App\Services\OrderSupplierService;
 use App\Services\RequisitionsPurchaseService;
 use App\Services\SupplierService;
@@ -23,11 +24,14 @@ class OrderSupplierController extends Controller
     private $orderSupplierService;
     private $requisitionsPurchaseService;
 
-    public function __construct(UniversalService $universalService, OrderSupplierService $orderSupplierService, RequisitionsPurchaseService $requisitionsPurchaseService)
-    {
+    public function __construct(UniversalService $universalService,
+        OrderSupplierService $orderSupplierService,
+        RequisitionsPurchaseService $requisitionsPurchaseService,
+        BrandsService $brandsService) {
         $this->universalService = $universalService;
         $this->orderSupplierService = $orderSupplierService;
         $this->requisitionsPurchaseService = $requisitionsPurchaseService;
+        $this->brandsService = $brandsService;
     }
     public function index(Request $request)
     {
@@ -42,7 +46,6 @@ class OrderSupplierController extends Controller
             $getData['select_start_date'] = Carbon::now()->subMonth()->toDateString();
             $getData['select_end_date'] = Carbon::now()->toDateString();
         }
-
 
         $data['getData'] = $getData;
         $data['user_id'] = Auth::user()->id;
@@ -63,8 +66,7 @@ class OrderSupplierController extends Controller
         foreach ($data['requisitions_purchase'] as $key => $val) {
             $data['requisitions_purchase'][$key]->text = $val->number;
         }
-//      $data['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
-        $data['tax'] = config('uec.tax_option')  ;
+        $data['tax'] = config('uec.tax_option');
         $data['act'] = 'add';
         return view('Backend.OrderSupplier.input', compact('data'));
     }
@@ -157,30 +159,50 @@ class OrderSupplierController extends Controller
         switch ($in['type']) {
             case 'getRequisitionsPurchase':
                 $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($in['id']); //請購單
-                $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchaseDetail($in['id']); //請購單內的品項
+                $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
+                $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($in['id'])->transform(function ($obj, $key) use ($brands) {
+
+                    $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
+
+                    $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
+
+                    if ($obj->spec_1_value !== '') {
+                        $obj->combination_name .= '-' . $obj->spec_1_value;
+                    }
+
+                    if ($obj->spec_2_value !== '') {
+                        $obj->combination_name .= '-' . $obj->spec_2_value;
+                    }
+                    if ($obj->product_name == '') {
+                        $obj->combination_name = false;
+                    }
+                    $obj->brands_name = $brandsName; //不做join key find val
+
+                    return $obj;
+                }); //請購單內的品項
                 return response()->json([
                     'status' => true,
                     'reqData' => $in,
-                    'requisitionsPurchase' => $requisitionsPurchase ,
+                    'requisitionsPurchase' => $requisitionsPurchase,
                     'requisitionsPurchaseDetail' => $requisitionsPurchaseDetail,
                 ]);
                 break;
-            case 'order_supplier' :
+            case 'order_supplier':
                 $data = $this->orderSupplierService->getOrderSupplierById($in['id']);
                 return response()->json([
                     'status' => true,
                     'reqData' => $in,
-                    'orderSupplier' => $data ,
+                    'orderSupplier' => $data,
                 ]);
-                break ;
-            case 'del_order_supplier' :
-                $result = $this->orderSupplierService->delOrderSupplierById($in['id']) ;
+                break;
+            case 'del_order_supplier':
+                $result = $this->orderSupplierService->delOrderSupplierById($in['id']);
                 return response()->json([
                     'status' => true,
                     'reqData' => $in,
-                    'result' =>$result ,
+                    'result' => $result,
                 ]);
-                break ;
+                break;
             default:
                 # code...
                 break;

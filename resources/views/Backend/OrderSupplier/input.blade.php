@@ -21,7 +21,7 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="supplier">請購單</label>
+                                            <label for="supplier">請購單<span class="redtext">*</span></label>
                                             <select2 :options="requisitions_purchase_options"
                                                 :order_supplier_detail="order_supplier_detail"
                                                 :order_supplier="order_supplier" v-model="requisitions_purchase_id">
@@ -31,7 +31,7 @@
                                     <input type="hidden" name="requisitions_purchase_id" v-model="requisitions_purchase_id">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_trade_date">
-                                            <label for="trade_date">採購日期</label>
+                                            <label for="trade_date">採購日期<span class="redtext">*</span></label>
                                             <div class='input-group date' id='datetimepicker'>
                                                 <input type='text' class="form-control" name="trade_date" id="trade_date"
                                                     value="{{ $data['order_supplier']['trade_date'] ?? '' }}" />
@@ -43,7 +43,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="number">採購單號</label>
+                                            <label for="number">採購單號<span class="redtext">*</span></label>
                                             <input class="form-control" id="number"
                                                 value="{{ $data['order_supplier']['number'] ?? '' }}"
                                                 v-model="order_supplier.number" readonly>
@@ -52,7 +52,7 @@
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="supplier">供應商</label>
+                                            <label for="supplier">供應商<span class="redtext">*</span></label>
                                             <input class="form-control" id="supplier"
                                                 v-model="order_supplier.supplier_name"
                                                 value="{{ isset($data['order_supplier']) && $data['supplier'][$data['order_supplier']['supplier_id']]['name'] ?? '' }}"
@@ -82,7 +82,7 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label for="currency_code">幣別</label>
+                                            <label for="currency_code">幣別<span class="redtext">*</span></label>
                                             <input class="form-control" type="text" value="新台幣" readonly>
                                             <input class="form-control" type="hidden" name="currency_code" value='TWD'>
 
@@ -97,7 +97,7 @@
 
                                     <div class="col-sm-2">
                                         <div class="form-group">
-                                            <label for="currency_price">匯率</label>
+                                            <label for="currency_price">匯率<span class="redtext">*</span></label>
                                             <input class="form-control" id="currency_price" name="currency_price"
                                                 value="1" readonly>
                                             <input type="hidden" name="exchange_rate" id="exchange_rate" value="1"
@@ -107,7 +107,8 @@
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="original_total_tax_price">原幣稅額</label>
+                                            <label for="original_total_tax_price">原幣稅額<span
+                                                    class="redtext">*</span></label>
                                             <input class="form-control" id="original_total_tax_price"
                                                 name="original_total_tax_price"
                                                 value="{{ $data['order_supplier']['original_total_tax_price'] ?? '' }}"
@@ -117,7 +118,8 @@
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="original_total_price">原幣總金額</label>
+                                            <label for="original_total_price">原幣總金額<span
+                                                    class="redtext">*</span></label>
                                             <input class="form-control" id="original_total_price"
                                                 name="original_total_price"
                                                 value="{{ $data['order_supplier']['original_total_price'] ?? '' }}"
@@ -127,7 +129,7 @@
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="tax">稅別</label>
+                                            <label for="tax">稅別<span class="redtext">*</span></label>
                                             <input class="form-control" id="tax_name" v-model="order_supplier.tax_name"
                                                 readonly>
                                             <input type="hidden" name="tax" id="tax" v-model="order_supplier.tex">
@@ -135,7 +137,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="total_tax_price">稅額</label>
+                                            <label for="total_tax_price">稅額<span class="redtext">*</span></label>
                                             <input class="form-control" id="total_tax_price" name="total_tax_price"
                                                 v-model="order_supplier.total_tax_price"
                                                 value="{{ $data['order_supplier']['total_tax_price'] ?? '' }}" readonly>
@@ -144,7 +146,7 @@
 
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="total_price">總金額</label>
+                                            <label for="total_price">總金額<span class="redtext">*</span></label>
                                             <input class="form-control" id="total_price" name="total_price"
                                                 v-model="order_supplier.total_price"
                                                 value="{{ $data['order_supplier']['total_price'] ?? '' }}" readonly>
@@ -233,58 +235,55 @@
                                 <div id="ItemDiv">
                                     <div class="add_row">
                                         <div class="row">
-                                            <div class="col-sm-2 text-left">商品編號<span class="redtext">*</span></div>
-                                            <div class="col-sm-2 text-left">商品名稱</div>
+                                            <div class="col-sm-2 text-left">品項<span class="redtext">*</span></div>
+                                            <div class="col-sm-1 text-left">贈品</div>
                                             <div class="col-sm-2 text-left">單價<span class="redtext">*</span></div>
+                                            <div class="col-sm-1 text-left">請購量<span class="redtext">*</span></div>
                                             <div class="col-sm-1 text-left">採購量<span class="redtext">*</span></div>
                                             <div class="col-sm-1 text-left">單位</div>
-                                            <div class="col-sm-1 text-left">小計</div>
-                                            <div class="col-sm-1 text-left">贈品</div>
                                             <div class="col-sm-1 text-left">最小採購量</div>
-                                            <div class="col-sm-1 text-left">進貨量</div>
-                                            {{-- <div class="col-sm-2 text-left">原幣小計<span class="redtext">*</span></div> --}}
-                                            {{-- <div class="col-sm-1 text-left">功能</div> --}}
+                                            <div class="col-sm-2 text-left">原幣小計<span class="redtext">*</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="add_row" v-for="(detail, detailKey) in order_supplier_detail">
                                         <div class="row">
-                                            {{-- 商品編號 --}}
+                                            {{-- 品項 --}}
                                             <div class="col-sm-2">
-                                                <input class="form-control" v-model="detail.item_number" readonly>
-                                            </div>
-                                            {{-- 商品名稱 --}}
-                                            <div class="col-sm-2">
-                                                <input class="form-control" v-model="detail.item_name" readonly>
-                                            </div>
-                                            {{-- 單價 --}}
-                                            <div class="col-sm-2">
-                                                <input class="form-control qty" type="number" readonly
-                                                    v-model="detail.item_price">
-                                            </div>
-                                            {{-- 採購量 --}}
-                                            <div class="col-sm-1"><input class="form-control"
-                                                    v-model="detail.item_qty" type="number" min="0">
-                                            </div>
-                                            {{-- 單位 --}}
-                                            <div class="col-sm-1">
-                                                <input class="form-control" v-model="detail.item_unit" readonly>
-                                            </div>
-                                            {{-- 小計 --}}
-                                            <div class="col-sm-1"><input class="form-control"
-                                                    v-model="detail.subtotal_price" readonly>
+                                                <input class="form-control" v-model="detail.item_no" readonly>
                                             </div>
                                             {{-- 贈品 --}}
                                             <div class="col-sm-1">
-                                                <input type="checkbox" class="big-checkbox" v-model="detail.is_giveaway"
-                                                    :true-value="1" :false-value="0" readonl="readonly">
+                                                <div v-if="detail.is_giveaway">是</div>
+                                                <div v-else>否</div>
+                                            </div>
+                                            {{-- 單價 --}}
+                                            <div class="col-sm-2">
+                                                <input class="form-control" type="number" readonly
+                                                    v-model="detail.item_price">
+                                            </div>
+                                            {{-- 請購量 --}}
+                                            <div class="col-sm-1">
+                                                <input class="form-control" type="number" readonly
+                                                    v-model="detail.show_item_qty">
+                                            </div>
+                                            {{-- 採購量 --}}
+                                            <div class="col-sm-1">
+                                                <input class="form-control" type="number" v-model="detail.item_qty"
+                                                    :min="0" :max="detail.show_item_qty">
+                                            </div>
+                                            {{-- 單位 --}}
+                                            <div class="col-sm-1">
+                                                <input class="form-control " readonly v-model="detail.uom">
                                             </div>
                                             {{-- 最小採購量 --}}
-                                            <div class="col-sm-1"><input class="form-control" readonly
-                                                    value="最小採購量">
+                                            <div class="col-sm-1">
+                                                <input class="form-control " readonly v-model="detail.min_purchase_qty">
                                             </div>
-                                            {{-- 進貨量 --}}
-                                            <div class="col-sm-1"><input class="form-control" readonly
-                                                    v-model="detail.purchase_qty">
+                                            {{-- 原幣小計 --}}
+                                            <div class="col-sm-1">
+                                                <input class="form-control " readonly
+                                                    v-model="detail.original_subtotal_price">
                                             </div>
                                         </div>
                                     </div>
@@ -343,12 +342,12 @@
                     order_supplier_detail: order_supplier_detail,
                     requisitions_purchase_options: @json(isset($data['requisitions_purchase']) ? $data['requisitions_purchase'] : '{}'),
                     requisitions_purchase_id: '',
-                    status_code: '' , 
+                    status_code: '',
                 }
             },
             methods: {
                 submitBtn(status) {
-                    this.status_code = status ; 
+                    this.status_code = status;
                     this.$nextTick(() => {
                         $('#new-form').submit();
                     });
@@ -429,13 +428,13 @@
                         order_supplier.total_price = requisitionsPurchase.total_price;
                         switch (requisitionsPurchase.tax) {
                             case 0:
-                                order_supplier.tax_name = '未稅';
+                                order_supplier.tax_name = '免稅';
                                 break;
                             case 1:
                                 order_supplier.tax_name = '應稅';
                                 break;
                             case 2:
-                                order_supplier.tax_name = '內含';
+                                order_supplier.tax_name = '應稅內含';
                                 break;
                             case 3:
                                 order_supplier.tax_name = '零稅率';
@@ -450,19 +449,20 @@
                         requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
-                                id: '',
-                                item_id:obj.item_id ,
-                                requisitions_purchase_dtl_id: obj.id,
-                                item_number: obj.item_number,
-                                item_name: obj.item_name,
-                                item_price: obj.item_price,
-                                item_qty: obj.item_qty,
-                                item_unit: obj.item_unit,
-                                subtotal_price: '',
-                                is_giveaway: obj.is_gift,
-                                item_brand:obj.item_brand ,
-                                item_spec:obj.item_spec ,
-                                purchase_qty: '',
+                                requisitions_purchase_dtl_id: obj
+                                .id, // requisitions_purchase_detail
+                                product_item_id: obj.product_item_id, //  品項ID
+                                combination_name: obj.combination_name, //顯示的品項名稱
+                                item_no: obj.item_number, //編號
+                                item_price: obj.item_price, //單價
+                                show_item_qty: obj.item_qty, //顯示請購數量
+                                item_qty: obj.item_qty, //數量
+                                is_giveaway: obj.is_gift, //贈品
+                                min_purchase_qty: obj.min_purchase_qty, //最小採購量
+                                uom: obj.uom, //單位
+                                original_subtotal_price: obj.original_subtotal_price, //原幣小計
+                                subtotal_price: obj.subtotal_price,
+
                             });
                         });
                     }
