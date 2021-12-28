@@ -133,9 +133,9 @@ class WebCategoryHierarchyService
 
         if ($confi_levels == 2) {
             $query = "SELECT level_two.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,
-            level_two.content_type ,level_two.level_three ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
-            FROM (SELECT * WHERE category_level = 1 ) level_one
-            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_ level = 2 " . $whereID . ") level_two ON level_two.parent_id = level_one.id
+            level_two.content_type ,'' as level_three ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
+            FROM (SELECT * FROM web_category_hierarchy WHERE category_level = 1 ) level_one
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $whereID . ") level_two ON level_two.parent_id = level_one.id
             " . $where . " ORDER BY level_one.category_name, level_two.category_name";
         } else {
             $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active,
@@ -157,7 +157,7 @@ class WebCategoryHierarchyService
         return $result;
     }
     public function categoryProductsId($id)
-    {     
+    {
         $result = CategoryProducts::where('web_category_products.product_id', $id)
             ->leftJoin('web_category_hierarchy' ,'web_category_hierarchy.id','=' ,'web_category_products.web_category_hierarchy_id')
             ->select('web_category_hierarchy_id' , 'web_category_hierarchy.category_name' , 'web_category_products.sort as sort')
@@ -250,10 +250,10 @@ class WebCategoryHierarchyService
     }
 
     public function DelCategoryInProduct($in){
-        return DB::table('web_category_products')->where('web_category_hierarchy_id' , $in['category_id'])->where('product_id',$in['product_id'])->delete() ; 
+        return DB::table('web_category_products')->where('web_category_hierarchy_id' , $in['category_id'])->where('product_id',$in['product_id'])->delete() ;
     }
     public function DelRelatedProducts($id){
-        return DB::table('related_products')->where('id' , $id)->delete() ; 
+        return DB::table('related_products')->where('id' , $id)->delete() ;
     }
 
 }

@@ -47,7 +47,7 @@ class CheckoutController extends Controller
     }
 
     /*
-     * 產生暫存訂單
+     * step1 立即結帳時，先檢查金額
      */
     public function setTmpOrder(Request $request)
     {
@@ -78,16 +78,12 @@ class CheckoutController extends Controller
         $response = json_decode($response, true);
         //Step1, 檢核金額
         if ($response['result']['totalPrice'] == $request->total_price && $response['result']['discount'] == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
-            if ($response['status'] == '200') {
-                $status = true;
-                $data = true;
-            } else {
-                $status = false;
-                $err = '404';
-                $data = [];
-            }
-            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($response['status'] == '200' ? null : $error_code[$err]), 'result' => $data]);
+            $status = true;
+            $data = true;
+            $err = '200';
         } else {
+            $status = false;
+            $err = '401';
             if ($response['result']['totalPrice'] != $request->total_price) {
                 $data['total_price'] = "商品總價有誤";
             }
@@ -97,7 +93,7 @@ class CheckoutController extends Controller
             if ($response['result']['shippingFee'] != $request->shipping_fee) {
                 $data['shipping_fee'] = "運費有誤";
             }
-            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $data]);
         }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
     }
 }
