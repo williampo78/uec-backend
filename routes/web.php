@@ -5,8 +5,10 @@ use App\Http\Controllers\QAController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\PhotosController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductsController;
@@ -18,6 +20,8 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\WebContentsController;
 use App\Http\Controllers\SupplierTypeController;
 use App\Http\Controllers\OrderSupplierController;
+use App\Http\Controllers\ProductsMallController ;
+use App\Http\Controllers\ProductReviewController ;
 use App\Http\Controllers\PrimaryCategoryController;
 use App\Http\Controllers\QuotationReviewController;
 use App\Http\Controllers\AdvertisementBlockController;
@@ -26,14 +30,11 @@ use App\Http\Controllers\PromotionalCampaignController;
 use App\Http\Controllers\WebCategoryProductsController;
 use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\WebCategoryHierarchyController;
+use App\Http\Controllers\ProductReviewRegisterController;
 use App\Http\Controllers\PromotionalCampaignPrdController;
-use App\Http\Controllers\ProductReviewRegisterController; 
-use App\Http\Controllers\ProductReviewController ; 
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
-use App\Http\Controllers\PhotosController;
-use App\Http\Controllers\ProductsMallController ;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -136,6 +137,14 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     // 行銷活動
     Route::post('/promotional_campaign/ajax/products', [PromotionalCampaignController::class, 'getProducts']);
     Route::post('/promotional_campaign/ajax/detail', [PromotionalCampaignController::class, 'getDetail']);
+
+    // 訂單管理
+    Route::resource('/order', OrderController::class, [
+        'names' => [
+            'index' => 'order',
+        ],
+    ]);
+    Route::post('/order/ajax/detail', [OrderController::class, 'getDetail']);
 
     Route::resource('/webcontents', WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 });

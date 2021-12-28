@@ -43,4 +43,53 @@ return [
         'G' => '贈品',
         'A' => '加購品',
     ],
+
+    // 訂單狀態
+    'order_status_code_options' => [
+        'CREATED' => '新建立',
+        'PROCESSING' => '處理中',
+        'SHIPPED' => '已出貨',
+        'CLOSED' => '已結案',
+        'REFUSED' => '客拒收 / 客未取',
+        'CANCELLED' => '已取消',
+        'VOIDED' => '已作廢',
+    ],
+
+    // 訂單付款金流狀態
+    'order_pay_status_options' => [
+        'PENDING' => '待請款',
+        'COMPLETED' => '請款成功',
+        'FAILED' => '請款失敗',
+        'VOIDED' => '已作廢',
+    ],
+
+    // 付款方式
+    'order_payment_method_options' => [
+        'TAPPAY_CREDITCARD' => '信用卡一次付清',
+        'TAPPAY_LINEPAY' => 'LINE Pay',
+    ],
+
+    // 物流方式
+    'order_lgst_method_options' => [
+        'HOME' => '宅配',
+        'FAMILY' => '全家',
+    ],
+
+    // 訂單明細身分
+    'order_record_identity_options' => [
+        'M' => '主商品',
+        'G' => '贈品',
+        'A' => '加購品',
+    ],
+
+    // 出貨單狀態
+    'shipment_status_code_options' => [
+        'CREATED' => '新建立',
+        'SHIPPING' => '備貨中',
+        'STORE_ARRIVED' => '已到店',
+        'SHIPPED' => '已出貨',
+        'DELIVERED' => '已配達',
+        'REFUSED' => '客拒收 / 客未取',
+        'VOIDED' => '已作廢',
+    ],
 ];

@@ -21,7 +21,9 @@
         }
 
         .tab-content {
-            border: 1px solid #ddd;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
             padding: 30px;
         }
     </style>
