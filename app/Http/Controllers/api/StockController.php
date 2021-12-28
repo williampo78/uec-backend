@@ -35,7 +35,8 @@ class StockController extends Controller
                 return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
             }
         }
-        $result = $this->stockService->getStockByItem('WHS01', $request['item_id']);
+        $warehouseCode = $this->stockService->getWarehouseConfig();
+        $result = $this->stockService->getStockByItem($warehouseCode, $request['item_id']);
         if ($result) {
             $status = true;
             $err = '';
