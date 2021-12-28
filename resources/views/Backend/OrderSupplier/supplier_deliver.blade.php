@@ -7,44 +7,61 @@
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-gear"></i> 補登預進日</h4>
-                <input type='hidden' name="get_modal_id" id="get_modal_id" value="" />
+                <input type='hidden' id="get_order_supplier_id" value="" />
             </div>
-            <form id="productModal">
+            <form id="supplier_deliver_form" class="form-horizontal">
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-sm-12">
-                            <div class="col-sm-2 text-right"><label> 採購單號</label></div>
-                            <div class="col-sm-10 show_number"></div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-3"><label> 採購單號</label></div>
+                                <div class="col-sm-9 show_number"></div>
+                            </div>
                         </div>
                     </div>
                     <br>
                     <div class="row">
-                        <div class="col-sm-12">
-                            <div class="col-sm-2 text-right"><label> 廠商交貨日</label></div>
-                            <div class="col-sm-4">
-                                <div class='input-group date' id='supplier_deliver_date_dp'>
-                                    <input type='text' class="form-control" name="supplier_deliver_date"
-                                        id="supplier_deliver_date" value="" />
-                                    <span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+
+                                <div class="col-sm-3"><label> 廠商交貨日</label></div>
+                                <div class="col-sm-9">
+                                    <div class='input-group date' id='supplier_deliver_date_dp'>
+                                        <label></label>
+                                        <input type='text' class="form-control" name="supplier_deliver_date"
+                                            id="supplier_deliver_date" value="" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
                                 </div>
+
                             </div>
-                            <div class="col-sm-2 text-right"><label> 預計進貨日</label></div>
-                            <div class="col-sm-4">
-                                <div class='input-group date' id='expect_deliver_date_dp'>
-                                    <input type='text' class="form-control" name="expect_deliver_date"
-                                        id="expect_deliver_date" value="" />
-                                    <span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                        </div>
+
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+
+                                <div class="col-sm-3">
+                                    <label class="control-label"> 預計進貨日</label>
                                 </div>
+                                <div class="col-sm-9">
+                                    <div class='input-group date' id='expect_deliver_date_dp'>
+                                        <input type='text' class="form-control" name="expect_deliver_date"
+                                            id="expect_deliver_date" value="" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" onclick="saveDate();" data-dismiss="modal"><i
+                    <button type="submit" class="btn btn-success"><i
                             class="fa fa-fw fa-save"></i> 儲存並關閉</button>
                     <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
                         關閉視窗</button>

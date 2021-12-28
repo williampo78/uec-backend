@@ -131,7 +131,7 @@ class OrderSupplierController extends Controller
             $obj->brands_name = $brandsName; //不做join key find val
 
             return $obj;
-        });;
+        });
 
         $result['act'] = 'upd';
         $result['id'] = $id;
@@ -179,6 +179,7 @@ class OrderSupplierController extends Controller
         $in = $request->all();
         switch ($in['type']) {
             case 'getRequisitionsPurchase':
+
                 $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($in['id']); //請購單
                 $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
                 $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($in['id'])->transform(function ($obj, $key) use ($brands) {
@@ -200,6 +201,7 @@ class OrderSupplierController extends Controller
                     $obj->brands_name = $brandsName; //不做join key find val
 
                     return $obj;
+
                 }); //請購單內的品項
                 return response()->json([
                     'status' => true,
@@ -222,6 +224,46 @@ class OrderSupplierController extends Controller
                     'status' => true,
                     'reqData' => $in,
                     'result' => $result,
+                ]);
+                break;
+            case 'supplier_deliver_time':
+                $result = $this->orderSupplierService->updateSupplierDeliverTime($in);
+                $result = true;
+                return response()->json([
+                    'status' => true,
+                    'reqData' => $in,
+                    'result' => $result,
+                ]);
+                break;
+            case 'show_supplier':
+                $orderSupplier = $this->orderSupplierService->getOrderSupplierById($in['id']);
+                $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
+                $orderSupplierDetail = $this->orderSupplierService->getOrderSupplierDetail($in['id'])->transform(function ($obj, $key) use ($brands) {
+
+                    $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
+
+                    $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
+
+                    if ($obj->spec_1_value !== '') {
+                        $obj->combination_name .= '-' . $obj->spec_1_value;
+                    }
+
+                    if ($obj->spec_2_value !== '') {
+                        $obj->combination_name .= '-' . $obj->spec_2_value;
+                    }
+                    if ($obj->product_name == '') {
+                        $obj->combination_name = false;
+                    }
+                    $obj->brands_name = $brandsName; //不做join key find val
+
+                    return $obj;
+                });
+
+                return response()->json([
+                    'status' => true,
+                    'reqData' => $in,
+                    'orderSupplier' => $orderSupplier,
+                    'orderSupplierDetail' => $orderSupplierDetail,
                 ]);
                 break;
             default:

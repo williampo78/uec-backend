@@ -231,12 +231,12 @@
                                             {{-- 贈品 --}}
                                             <div class="col-sm-1">
                                                 <div v-if="detail.is_giveaway">
-                                                    <input type="checkbox" class="big-checkbox" onclick="return false"
-                                                        checked>
+                                                    <input type="checkbox" class="big-checkbox" 
+                                                        checked disabled>
                                                 </div>
 
                                                 <div v-else>
-                                                    <input type="checkbox" class="big-checkbox" onclick="return false">
+                                                    <input type="checkbox" class="big-checkbox" disabled>
                                                 </div>
                                             </div>
                                             {{-- 單價 --}}
@@ -247,12 +247,12 @@
                                             {{-- 請購量 --}}
                                             <div class="col-sm-1">
                                                 <input class="form-control" type="number" readonly
-                                                    v-model="detail.show_item_qty">
+                                                    v-model="detail.item_qty">
                                             </div>
                                             {{-- 採購量 --}}
                                             <div class="col-sm-1">
-                                                <input class="form-control" type="number" v-model="detail.item_qty"
-                                                    :min="0" :max="detail.show_item_qty" @change="detailsCount">
+                                                <input class="form-control" type="number" v-model="detail.purchase_qty"
+                                                    :min="0" :max="detail.item_qty" @change="detailsCount">
                                             </div>
                                             {{-- 單位 --}}
                                             <div class="col-sm-1">
@@ -334,7 +334,7 @@
                     });
                 },
                 cancel() {
-                    console.log('取消');
+                    return history.go(-1) ;
                 },
                 detailsCount() {
                     var taxtype = String(this.order_supplier.tax);
@@ -352,8 +352,8 @@
                         } else {
                             switch (taxtype) {
                                 case '0': //免稅
-                                    price = obj.item_qty * obj.item_price;
-                                    obj.original_subtotal_price = obj.item_qty * obj.item_price; // 數量 * 金錢
+                                    price = obj.purchase_qty * obj.item_price;
+                                    obj.original_subtotal_price = obj.purchase_qty * obj.item_price; // 數量 * 金錢
                                     sum_price += obj.original_subtotal_price;
                                     break;
                                 case '1': //應稅
@@ -361,14 +361,14 @@
                                     return false;
                                     break;
                                 case '2': //應稅內含
-                                    price = obj.item_qty * obj.item_price;
+                                    price = obj.purchase_qty * obj.item_price;
                                     obj.original_subtotal_price = price; // 數量 * 金錢
                                     sum_price += obj.original_subtotal_price;
                                     total_tax_price += ((price * 1.05).toFixed(2)) - price; //(本幣)稅額
                                     original_total_tax_price += ((price * 1.05).toFixed(2)) - price; //原幣稅額
                                     break;
                                 case '3': //零稅率
-                                    price = obj.item_qty * obj.item_price;
+                                    price = obj.purchase_qty * obj.item_price;
                                     obj.original_subtotal_price = price; // 數量 * 金錢
                                     sum_price += price;
                                     break;
@@ -519,15 +519,14 @@
                                 combination_name: obj.combination_name, //顯示的品項名稱
                                 item_no: obj.item_number, //編號
                                 item_price: obj.item_price, //單價
-                                show_item_qty: obj.item_qty, //顯示請購數量
-                                item_qty: obj.item_qty, //數量
+                                item_qty: obj.item_qty, //顯示請購數量
+                                purchase_qty: obj.item_qty, //數量
                                 is_giveaway: obj.is_gift, //贈品
                                 min_purchase_qty: obj.min_purchase_qty, //最小採購量
                                 uom: obj.uom, //單位
                                 original_subtotal_price: obj.original_subtotal_price, //原幣小計
                                 subtotal_price: obj.subtotal_price,
                                 pos_item_no:obj.pos_item_no,
-
                             });
                         });
                     }
