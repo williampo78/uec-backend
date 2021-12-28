@@ -246,7 +246,7 @@ class APIProductServices
         $page = $input['page'];
         $selling_price_min = $input['price_min'];
         $selling_price_max = $input['price_max'];
-        $sort_flag = $input['sort'] == 'asc' ? SORT_ASC : SORT_DESC ;
+        $sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC ;
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword);
         if ($products) {
             $promotion = self::getPromotion('product_card');
