@@ -16,9 +16,9 @@
                             <div class="row">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right"><label> 採購單號</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . number }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . number }}</div>
                                     <div class="col-sm-2 text-right"><label> 供應商</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . supplier_name }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . supplier_name }}</div>
                                 </div>
                             </div>
                             <div class="row">
@@ -28,10 +28,10 @@
                                     <div class="col-sm-4">新台幣</div>
                                     <div class="col-sm-2 text-right"><label> 狀態</label></div>
                                     <div class="col-sm-4">
-                                        <div v-if="order_supplier.status == 'DRAFTED'">草稿</div>
-                                        <div v-else-if="order_supplier.status == 'REVIEWING'">簽核中</div>
-                                        <div v-else-if="order_supplier.status == 'APPROVED'">已核准</div>
-                                        <div v-else-if="order_supplier.status == 'REJECTED'">已駁回</div>
+                                        <div v-if="show_supplier.status == 'DRAFTED'">草稿</div>
+                                        <div v-else-if="show_supplier.status == 'REVIEWING'">簽核中</div>
+                                        <div v-else-if="show_supplier.status == 'APPROVED'">已核准</div>
+                                        <div v-else-if="show_supplier.status == 'REJECTED'">已駁回</div>
                                         {{-- status --}}
                                     </div>
                                 </div>
@@ -40,50 +40,50 @@
 
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right"><label> 原幣稅額</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . original_total_tax_price }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . original_total_tax_price }}</div>
                                     <div class="col-sm-2 text-right"><label> 原幣總金額</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . original_total_price }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . original_total_price }}</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right"><label> 稅額</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . total_tax_price }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . total_tax_price }}</div>
                                     <div class="col-sm-2 text-right"><label> 總金額</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . total_price }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . total_price }}</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right"><label> 採購單號</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . requisitions_purchase_number }}
+                                    <div class="col-sm-4">@{{ show_supplier . requisitions_purchase_number }}
                                     </div>
                                     <div class="col-sm-2 text-right"><label> 發票抬頭</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . invoice_name }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . invoice_name }}</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right"><label> 發票統編</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . invoice_company_number }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . invoice_company_number }}</div>
                                     <div class="col-sm-2 text-right"><label> 發票地址</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . invoice_address }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . invoice_address }}</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right"><label> 備註</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . remark }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . remark }}</div>
                                     <div class="col-sm-2 text-right"><label> 倉庫</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . warehouse_name }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . warehouse_name }}</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <div class="col-sm-2 text-right"><label> 廠商交貨日</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . supplier_deliver_date }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . supplier_deliver_date }}</div>
                                     <div class="col-sm-2 text-right"><label> 預計進貨日</label></div>
-                                    <div class="col-sm-4">@{{ order_supplier . expect_deliver_date }}</div>
+                                    <div class="col-sm-4">@{{ show_supplier . expect_deliver_date }}</div>
                                 </div>
                             </div>
                         </div>
@@ -106,15 +106,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(item, index) in show_detail">
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                    <tr v-for="(detail, index) in show_detail">
+                                        <td>@{{detail.item_no}}</td>
+                                        <td>@{{detail.combination_name}}</td>
+                                        <td>@{{detail.item_price}}</td>
+                                        <td>@{{detail.uom}}</td>
+                                        <td>@{{detail.subtotal_price}}</td>
+                                        <td>@{{detail.is_giveaway}}</td>
+                                        <td>@{{detail.min_purchase_qty}}</td>
+                                        <td>@{{detail.purchase_qty}}</td>
                                     </tr>
                                 </tbody>
                             </table>

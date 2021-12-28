@@ -220,23 +220,22 @@
             data: function() {
                 return {
                     order_supplier: {},
+                    show_supplier:{} ,
                     show_detail:{} ,
                 }
             },
             methods: {
                 showBtn(id) {
                     console.log(id) ;
-                    var req = this;
+                    var vm = this;
                     axios.post('/backend/order_supplier/ajax', {
-                            "type": "getRequisitionsPurchase",
+                            "type": "show_supplier",
                             _token: '{{ csrf_token() }}',
                             'id': id
                         })
                         .then(function(response) {
-                            console.log(response.data) ; 
-                            req.order_supplier = response.data.orderSupplier;
-                            req.show_detail  = response.data.orderSupplier ; 
-                            console.log(response) ;
+                            vm.show_supplier = response.data.orderSupplier ; 
+                            vm.show_detail = response.data.orderSupplierDetail ;
                             $('.toggle-show-model').click();
                         })
                         .catch(function(error) {
@@ -303,15 +302,15 @@
                     var expect_deliver_date = $('#expect_deliver_date').val();
                     var get_order_supplier_id = $('#get_order_supplier_id').val();
                     axios.post('/backend/order_supplier/ajax', {
-                            "type": "supplier_deliver_time",
+                            "type": "show_supplier",
                             _token: '{{ csrf_token() }}',
                             'id': get_order_supplier_id,
                             'supplier_deliver_date': supplier_deliver_date,
                             'expect_deliver_date': expect_deliver_date,
                         })
                         .then(function(response) {
-                            console.log(response) ; 
                             if (response.data.result) {
+                                console.log(response.data) ; 
                                 alert('修改成功');
                                 history.go(0);
                             } else {
