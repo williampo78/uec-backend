@@ -103,8 +103,7 @@
                                                 <label for="original_total_tax_price">原幣稅額</label>
                                                 <input class="form-control" id="original_total_tax_price"
                                                     name="original_total_tax_price"
-                                                    v-model="order_supplier.original_total_tax_price"
-                                                    readonly>
+                                                    v-model="order_supplier.original_total_tax_price" readonly>
                                             </div>
                                         </div>
 
@@ -257,10 +256,9 @@
                                                 {{-- 贈品 --}}
                                                 <div class="col-sm-1">
                                                     <div v-if="detail.is_giveaway">
-                                                        <input type="checkbox" class="big-checkbox" 
-                                                            checked disabled>
+                                                        <input type="checkbox" class="big-checkbox" checked disabled>
                                                     </div>
-    
+
                                                     <div v-else>
                                                         <input type="checkbox" class="big-checkbox" disabled>
                                                     </div>
@@ -338,8 +336,8 @@
                     }
                 },
                 created() {
-                    console.log(this.order_supplier );
-                    console.log(this.order_supplier_detail) ; 
+                    console.log(this.order_supplier);
+                    console.log(this.order_supplier_detail);
                 },
                 methods: {
                     submitBtn(status) {
@@ -349,7 +347,7 @@
                         });
                     },
                     cancel() {
-                        return history.go(-1) ; 
+                        return history.go(-1);
                         // console.log('取消');
                     },
                     detailsCount() {
@@ -367,7 +365,8 @@
                                 switch (taxtype) {
                                     case '0': //免稅
                                         price = obj.purchase_qty * obj.item_price;
-                                        obj.original_subtotal_price = obj.purchase_qty * obj.item_price; // 數量 * 金錢
+                                        obj.original_subtotal_price = obj.purchase_qty * obj
+                                        .item_price; // 數量 * 金錢
                                         sum_price += price;
                                         break;
                                     case '1': //應稅
@@ -413,6 +412,47 @@
                     });
                     $('#datetimepicker3').datetimepicker({
                         format: 'YYYY-MM-DD',
+                    });
+                    $("#new-form").validate({
+                        // debug: true,
+                        submitHandler: function(form) {
+                            $('#save_data').prop('disabled', true);
+                            form.submit();
+                        },
+                        rules: {
+                            trade_date: {
+                                required: true,
+                            },
+                            requisitions_purchase_id: {
+                                required: true,
+                            }
+                        },
+                        messages: {
+                            // end_launched_at: {
+                            //     greaterThan: "結束時間必須大於開始時間",
+                            // },
+                        },
+                        errorClass: "help-block",
+                        errorElement: "span",
+                        errorPlacement: function(error, element) {
+                            if (element.parent('.input-group').length || element.is(':radio')) {
+                                error.insertAfter(element.parent());
+                                return;
+                            }
+                            if (element.is('select')) {
+                                element.parent().append(error);
+                                return;
+                            }
+                            console.log(element);
+
+                            // error.insertAfter(element);
+                        },
+                        highlight: function(element, errorClass, validClass) {
+                            $(element).closest(".form-group").addClass("has-error");
+                        },
+                        success: function(label, element) {
+                            $(element).closest(".form-group").removeClass("has-error");
+                        },
                     });
                 },
             })

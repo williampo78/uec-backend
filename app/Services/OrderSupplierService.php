@@ -109,6 +109,17 @@ class OrderSupplierService
             ->get();
         return $result;
     }
+    public function updateSupplierDeliverTime($in)
+    {
+        $user_id = Auth::user()->id;
+
+        $result = OrderSupplier::where('id', $in['id'])->update([
+            'supplier_deliver_date' => $in['supplier_deliver_date'],
+            'expect_deliver_date' => $in['expect_deliver_date'],
+            'updated_by' => $user_id,
+        ]);
+        return $result;
+    }
 
     public function updateOrderSupplier($data, $act)
     {

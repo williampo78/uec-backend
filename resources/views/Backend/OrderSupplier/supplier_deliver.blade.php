@@ -7,7 +7,7 @@
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-gear"></i> 補登預進日</h4>
-                <input type='hidden' name="get_modal_id" id="get_modal_id" value="" />
+                <input type='hidden' id="get_order_supplier_id" value="" />
             </div>
             <form id="supplier_deliver_form" class="form-horizontal">
                 <div class="modal-body">
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success" @click="update_supplier_deliver();"><i
+                    <button type="submit" class="btn btn-success"><i
                             class="fa fa-fw fa-save"></i> 儲存並關閉</button>
                     <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
                         關閉視窗</button>

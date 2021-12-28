@@ -220,7 +220,6 @@
             data: function() {
                 return {
                     order_supplier: {},
-                    now_supplier_deliver: {},
                 }
             },
             methods: {
@@ -266,8 +265,9 @@
                 supplier_deliver(obj) {
                     $('#supplier_deliver_date').val(obj.supplier_deliver_date);
                     $('#expect_deliver_date').val(obj.expect_deliver_date);
+                    $('#get_order_supplier_id').val(obj.id)
                     $('.show_number').html(obj.number);
-                    this.now_supplier_deliver = obj;
+
                 },
 
             },
@@ -293,10 +293,31 @@
                 format: 'YYYY-MM-DD',
             });
             $("#supplier_deliver_form").validate({
-                debug: true,
+                // debug: true,
                 submitHandler: function(form) {
-                    $('#save_data').prop('disabled', true);
-                    
+                    console.log(form);
+                    var supplier_deliver_date = $('#supplier_deliver_date').val();
+                    var expect_deliver_date = $('#expect_deliver_date').val();
+                    var get_order_supplier_id = $('#get_order_supplier_id').val();
+                    axios.post('/backend/order_supplier/ajax', {
+                            "type": "supplier_deliver_time",
+                            _token: '{{ csrf_token() }}',
+                            'id': get_order_supplier_id,
+                            'supplier_deliver_date': supplier_deliver_date,
+                            'expect_deliver_date': expect_deliver_date,
+                        })
+                        .then(function(response) {
+                            console.log(response) ; 
+                            if (response.data.result) {
+                                alert('修改成功');
+                                history.go(0);
+                            } else {
+                                alert('修改失敗');
+                            }
+                        })
+                        .catch(function(error) {
+                            console.log('ERROR');
+                        })
                 },
                 rules: {
                     supplier_deliver_date: {
@@ -304,10 +325,6 @@
                     },
                     expect_deliver_date: {
                         required: true,
-                        dateGreaterThanNow: true,
-                        greaterThan: function() {
-                            return $('#start_launched_at').val();
-                        },
                     }
                 },
                 messages: {

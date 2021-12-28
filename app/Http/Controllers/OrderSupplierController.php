@@ -131,7 +131,7 @@ class OrderSupplierController extends Controller
             $obj->brands_name = $brandsName; //不做join key find val
 
             return $obj;
-        });;
+        });
 
         $result['act'] = 'upd';
         $result['id'] = $id;
@@ -218,6 +218,15 @@ class OrderSupplierController extends Controller
                 break;
             case 'del_order_supplier':
                 $result = $this->orderSupplierService->delOrderSupplierById($in['id']);
+                return response()->json([
+                    'status' => true,
+                    'reqData' => $in,
+                    'result' => $result,
+                ]);
+                break;
+            case 'supplier_deliver_time':
+                $result = $this->orderSupplierService->updateSupplierDeliverTime($in);
+                $result = true ; 
                 return response()->json([
                     'status' => true,
                     'reqData' => $in,
