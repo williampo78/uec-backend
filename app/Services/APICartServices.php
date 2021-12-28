@@ -174,9 +174,9 @@ class APICartServices
                     }
                 }
             }
-            $prod_gift = [];
             foreach ($cartQty as $product_id => $item) {
                 $product = [];
+                $prod_gift = [];
                 if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
                     $product_type = "effective";
                     $qty = array_sum($item); //合併不同規格但同一商品的數量
