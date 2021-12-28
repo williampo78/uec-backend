@@ -25,8 +25,8 @@ class OrderSupplierService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = OrderSupplier::select(DB::raw('order_supplier.id as id'), DB::raw('order_supplier.supplier_id as supplier_id'), DB::raw('order_supplier.number as number'),
-            DB::raw('requisitions_purchase.number as requisitions_purchase_number'), DB::raw('order_supplier.trade_date as trade_date'), DB::raw('order_supplier.total_price as total_price'), DB::raw('order_supplier.status as status'),
+        $result = OrderSupplier::select(DB::raw('order_supplier.*'),
+            DB::raw('requisitions_purchase.number as requisitions_purchase_number'),
             'supplier_deliver_date', 'expect_deliver_date')
             ->where('order_supplier.agent_id', $agent_id)
             ->leftJoin('supplier', 'order_supplier.supplier_id', '=', 'supplier.id')
@@ -165,7 +165,7 @@ class OrderSupplierService
                     'requisitions_purchase_dtl_id' => $val['requisitions_purchase_dtl_id'],
                     'product_item_id' => $val['product_item_id'],
                     'item_no' => $val['item_no'],
-                    'item_qty' => $val['show_item_qty'],
+                    'item_qty' => $val['item_qty'],
                     'item_price' => $val['item_price'],
                     'subtotal_price' => $val['subtotal_price'],
                     'original_subtotal_price' => $val['original_subtotal_price'],
@@ -173,7 +173,7 @@ class OrderSupplierService
                     'currency_code' => 'TWD', //目前暫未開放
                     'currency_price' => '1', //目前暫未開放
                     'is_giveaway' => $val['is_giveaway'],
-                    'purchase_qty' => $val['item_qty'],
+                    'purchase_qty' => $val['purchase_qty'],
                     'created_at' => $now,
                     'updated_at' => $now,
                     'created_by' => $user_id,
@@ -201,7 +201,6 @@ class OrderSupplierService
             Log::warning($e->getMessage());
             $result = false;
         }
-
-        return true;
+        return $result;
     }
 }

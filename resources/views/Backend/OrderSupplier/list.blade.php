@@ -173,24 +173,24 @@
                                             @csrf
                                         </form>
                                         <td>
-                                            {{-- @if ($share_role_auth['auth_query']) --}}
-                                            <button class="btn btn-info btn-sm" @click="showBtn({{ $v['id'] }})"><i
-                                                    class="fa fa-search"></i></button>
-                                            {{-- @endif --}}
-
-                                            {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
-                                            <a class="btn btn-info btn-sm"
-                                                href="{{ route('order_supplier.edit', $v['id']) }}">修改</a>
-                                            {{-- @endif --}}
+                                            @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-info btn-sm"
+                                                    @click="showBtn({{ $v['id'] }})"><i
+                                                        class="fa fa-search"></i></button>
+                                            @endif
+                                            @if ($share_role_auth['auth_update'] && $v['status'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
+                                                <a class="btn btn-info btn-sm"
+                                                    href="{{ route('order_supplier.edit', $v['id']) }}">修改</a>
+                                            @endif
 
                                             <button class="btn btn-warning btn-sm" data-toggle="modal"
                                                 data-target="#row_supplier_deliver"
-                                                @click="supplier_deliver({{ $v['id'] }} , '{{ $v['expect_deliver_date'] }}','{{ $v['supplier_deliver_date'] }}','{{ $v['number'] }}')">預進日</button>
+                                                @click="supplier_deliver({{ $v }})">預進日</button>
 
-                                            {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
-                                            <button class="btn btn-danger btn-sm" type="button"
-                                                @click="delBtn({{ $v['id'] }})">刪除</button>
-                                            {{-- @endif --}}
+                                            @if ($share_role_auth['auth_delete'] && $v['status'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
+                                                <button class="btn btn-danger btn-sm" type="button"
+                                                    @click="delBtn({{ $v['id'] }})">刪除</button>
+                                            @endif
                                         </td>
                                         <td>{{ $v['trade_date'] }}</td>
                                         <td>{{ $v['number'] }}</td>
@@ -208,7 +208,9 @@
                 </div>
             </div>
         </div>
+        {{-- 報價單明細 --}}
         @include('Backend.OrderSupplier.detail')
+        {{-- 補登預進日 --}}
         @include('Backend.OrderSupplier.supplier_deliver')
     </div>
 
@@ -218,6 +220,7 @@
             data: function() {
                 return {
                     order_supplier: {},
+                    now_supplier_deliver: {},
                 }
             },
             methods: {
@@ -258,17 +261,14 @@
                             .catch(function(error) {
                                 console.log('ERROR');
                             })
-                    } else {
-                        console.log('不刪除');
                     }
                 },
-                supplier_deliver(id, expect_deliver_date, supplier_deliver_date,number) {
-                    $('#supplier_deliver_date').val(supplier_deliver_date);
-                    $('#expect_deliver_date').val(expect_deliver_date);
-                    $('.show_number').html(number) ; 
-                    alert('尚未串接完成')  ;
-                    // console.log(number) ; 
-                }
+                supplier_deliver(obj) {
+                    $('#supplier_deliver_date').val(obj.supplier_deliver_date);
+                    $('#expect_deliver_date').val(obj.expect_deliver_date);
+                    $('.show_number').html(obj.number);
+                    this.now_supplier_deliver = obj;
+                },
 
             },
 
@@ -276,8 +276,7 @@
         })
 
         new showRequisitions().$mount('#page-wrapper');
-
-        $(function() {
+        $(document).ready(function() {
             $('#supplier').select2();
             $('#status').select2();
 
@@ -292,6 +291,51 @@
             });
             $('#expect_deliver_date_dp').datetimepicker({
                 format: 'YYYY-MM-DD',
+            });
+            $("#supplier_deliver_form").validate({
+                debug: true,
+                submitHandler: function(form) {
+                    $('#save_data').prop('disabled', true);
+                    
+                },
+                rules: {
+                    supplier_deliver_date: {
+                        required: true,
+                    },
+                    expect_deliver_date: {
+                        required: true,
+                        dateGreaterThanNow: true,
+                        greaterThan: function() {
+                            return $('#start_launched_at').val();
+                        },
+                    }
+                },
+                messages: {
+                    end_launched_at: {
+                        greaterThan: "結束時間必須大於開始時間",
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
             });
         });
 

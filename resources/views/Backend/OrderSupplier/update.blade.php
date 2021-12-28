@@ -103,7 +103,7 @@
                                                 <label for="original_total_tax_price">原幣稅額</label>
                                                 <input class="form-control" id="original_total_tax_price"
                                                     name="original_total_tax_price"
-                                                    value="{{ $order_supplier['original_total_tax_price'] ?? '' }}"
+                                                    v-model="order_supplier.original_total_tax_price"
                                                     readonly>
                                             </div>
                                         </div>
@@ -113,7 +113,7 @@
                                                 <label for="original_total_price">原幣總金額</label>
                                                 <input class="form-control" id="original_total_price"
                                                     name="original_total_price"
-                                                    value="{{ $order_supplier['original_total_price'] ?? '' }}" readonly>
+                                                    v-model="order_supplier.original_total_price" readonly>
                                             </div>
                                         </div>
 
@@ -141,7 +141,7 @@
                                             <div class="form-group">
                                                 <label for="total_tax_price">稅額</label>
                                                 <input class="form-control" id="total_tax_price" name="total_tax_price"
-                                                    value="{{ $order_supplier['total_tax_price'] ?? '' }}" readonly>
+                                                    v-model="order_supplier.total_tax_price" readonly>
                                             </div>
                                         </div>
 
@@ -149,7 +149,7 @@
                                             <div class="form-group">
                                                 <label for="total_price">總金額</label>
                                                 <input class="form-control" id="total_price" name="total_price"
-                                                    value="{{ $order_supplier['total_price'] ?? '' }}" readonly>
+                                                    v-model="order_supplier.total_price" readonly>
                                             </div>
                                         </div>
 
@@ -257,13 +257,12 @@
                                                 {{-- 贈品 --}}
                                                 <div class="col-sm-1">
                                                     <div v-if="detail.is_giveaway">
-                                                        <input type="checkbox" class="big-checkbox"
-                                                            onclick="return false" checked>
+                                                        <input type="checkbox" class="big-checkbox" 
+                                                            checked disabled>
                                                     </div>
-
+    
                                                     <div v-else>
-                                                        <input type="checkbox" class="big-checkbox"
-                                                            onclick="return false">
+                                                        <input type="checkbox" class="big-checkbox" disabled>
                                                     </div>
                                                 </div>
                                                 {{-- 單價 --}}
@@ -350,12 +349,11 @@
                         });
                     },
                     cancel() {
-                        console.log('取消');
+                        return history.go(-1) ; 
+                        // console.log('取消');
                     },
                     detailsCount() {
-
                         var taxtype = String(this.order_supplier.tax);
-
                         var original_total_tax_price = 0; // 原幣稅額
                         var original_total_price = 0; // 原幣總金額
                         var total_tax_price = 0; //(本幣)稅額
@@ -368,8 +366,8 @@
                             } else {
                                 switch (taxtype) {
                                     case '0': //免稅
-                                        price = obj.item_qty * obj.item_price;
-                                        obj.original_subtotal_price = obj.item_qty * obj.item_price; // 數量 * 金錢
+                                        price = obj.purchase_qty * obj.item_price;
+                                        obj.original_subtotal_price = obj.purchase_qty * obj.item_price; // 數量 * 金錢
                                         sum_price += price;
                                         break;
                                     case '1': //應稅
@@ -377,15 +375,14 @@
                                         return false;
                                         break;
                                     case '2': //應稅內含
-                                        price = obj.item_qty * obj.item_price;
-                                        console.log(price);
+                                        price = obj.purchase_qty * obj.item_price;
                                         obj.original_subtotal_price = price; // 數量 * 金錢
                                         sum_price += price;
                                         total_tax_price += ((price * 1.05).toFixed(2)) - price; //(本幣)稅額
                                         original_total_tax_price += ((price * 1.05).toFixed(2)) - price; //原幣稅額
                                         break;
                                     case '3': //零稅率
-                                        price = obj.item_qty * obj.item_price;
+                                        price = obj.purchase_qty * obj.item_price;
                                         obj.original_subtotal_price = price; // 數量 * 金錢
                                         sum_price += price;
                                         break;
