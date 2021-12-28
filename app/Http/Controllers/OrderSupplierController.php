@@ -179,6 +179,7 @@ class OrderSupplierController extends Controller
         $in = $request->all();
         switch ($in['type']) {
             case 'getRequisitionsPurchase':
+                
                 $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($in['id']); //請購單
                 $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
                 $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($in['id'])->transform(function ($obj, $key) use ($brands) {
@@ -200,6 +201,7 @@ class OrderSupplierController extends Controller
                     $obj->brands_name = $brandsName; //不做join key find val
 
                     return $obj;
+
                 }); //請購單內的品項
                 return response()->json([
                     'status' => true,
@@ -231,6 +233,16 @@ class OrderSupplierController extends Controller
                     'status' => true,
                     'reqData' => $in,
                     'result' => $result,
+                ]);
+                break;
+            case 'show_supplier':
+                $orderSupplier = $this->orderSupplierService->getOrderSupplierById($in['id']);
+                $orderSupplier = $this->orderSupplierService->getOrderSupplierById($in['id']);
+
+                return response()->json([
+                    'status' => true,
+                    'reqData' => $in,
+                    'orderSupplier' => $orderSupplier,
                 ]);
                 break;
             default:

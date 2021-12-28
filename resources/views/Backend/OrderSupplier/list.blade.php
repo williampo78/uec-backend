@@ -220,21 +220,24 @@
             data: function() {
                 return {
                     order_supplier: {},
+                    show_detail:{} ,
                 }
             },
             methods: {
                 showBtn(id) {
+                    console.log(id) ;
                     var req = this;
                     axios.post('/backend/order_supplier/ajax', {
-                            "type": "order_supplier",
+                            "type": "getRequisitionsPurchase",
                             _token: '{{ csrf_token() }}',
                             'id': id
                         })
                         .then(function(response) {
+                            console.log(response.data) ; 
                             req.order_supplier = response.data.orderSupplier;
-                            console.log(response.data.orderSupplier);
+                            req.show_detail  = response.data.orderSupplier ; 
+                            console.log(response) ;
                             $('.toggle-show-model').click();
-                            return req;
                         })
                         .catch(function(error) {
                             console.log('ERROR');
