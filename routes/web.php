@@ -32,6 +32,7 @@ use App\Http\Controllers\ProductReviewController ;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PhotosController;
 use App\Http\Controllers\ProductsMallController ;
 /*
@@ -83,7 +84,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/quotation/ajaxDelItem', [QuotationController::class, 'ajaxDelItem']);
     Route::resource('/order_supplier', OrderSupplierController::class, ['names' => ['index' => 'order_supplier']]);
     Route::post('/order_supplier/ajax', [OrderSupplierController::class, 'ajax']);
-
+    Route::resource('/purchase', PurchaseController::class, ['names' => ['index' => 'purchase']]); // 進貨單
     Route::resource('/test', TestController::class, ['names' => ['index' => 'test']]);
     Route::resource('/roles', RolesController::class, ['names' => ['index' => 'roles']]);
 
