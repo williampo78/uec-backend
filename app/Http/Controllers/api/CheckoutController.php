@@ -54,28 +54,17 @@ class CheckoutController extends Controller
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $messages = [
-            'delivery.required' => '物流方式不能為空',
             'shipping_fee.required' => '運費不能為空',
             'total_price.required' => '商品總價不能為空',
             'total_price.numeric' => '商品總價必須為數值',
             'discount.required' => '滿額折抵不能為空',
             'discount.numeric' => '滿額折抵必須為數值',
-            'point_discount.required' => '點數折抵不能為空',
-            'point_discount.numeric' => '點數折抵必須為數值',
-            'checkout.required' => '結帳金額不能為空',
-            'checkout.numeric' => '結帳金額必須為數值',
-            'points.required' => '會員點數不能為空',
-            'points.numeric' => '會員點數必須為數值',
         ];
 
         $v = Validator::make($request->all(), [
-            'delivery' => 'required',
             'shipping_fee' => 'required',
             'total_price' => 'required|numeric',
             'discount' => 'required|numeric',
-            'point_discount' => 'required|numeric',
-            'checkout' => 'required|numeric',
-            'points' => 'required|numeric',
         ], $messages);
 
         if ($v->fails()) {
@@ -87,11 +76,11 @@ class CheckoutController extends Controller
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
         $response = json_decode($response, true);
-        //Step1, 前端送出的商品總價與滿額折抵與購物車計算的一樣時才做
-        if ($response['result']['totalPrice'] == $request->total_price && $response['result']['discount'] == $request->discount) {
+        //Step1, 檢核金額
+        if ($response['result']['totalPrice'] == $request->total_price && $response['result']['discount'] == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
             if ($response['status'] == '200') {
                 $status = true;
-                $data = 'api還沒處理完成，訂單尚未成立';
+                $data = true;
             } else {
                 $status = false;
                 $err = '404';
@@ -99,8 +88,15 @@ class CheckoutController extends Controller
             }
             return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($response['status'] == '200' ? null : $error_code[$err]), 'result' => $data]);
         } else {
-            $data['total_price'] = "商品總價有誤";
-            $data['discount'] = "滿額折抵有誤";
+            if ($response['result']['totalPrice'] != $request->total_price) {
+                $data['total_price'] = "商品總價有誤";
+            }
+            if ($response['result']['discount'] != $request->discount) {
+                $data['discount'] = "滿額折抵有誤";
+            }
+            if ($response['result']['shippingFee'] != $request->shipping_fee) {
+                $data['shipping_fee'] = "運費有誤";
+            }
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $data]);
         }
     }
