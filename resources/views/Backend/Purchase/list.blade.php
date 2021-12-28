@@ -150,7 +150,7 @@
                                     <tr>
                                         <td>
                                             {{-- @if ($share_role_auth['auth_query']) --}}
-                                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                            <button type="button" class="btn btn-info btn-sm show-btn" data-toggle="modal"
                                                 data-target="#show_data"><i class="fa fa-search"></i></button>
                                             {{-- @endif --}}
 
@@ -193,6 +193,9 @@
             });
             $('#trade_date_end_box').datetimepicker({
                 format: 'YYYY-MM-DD',
+            });
+            $('.show-btn').click(function() {
+                
             });
 
             // $("#select-form").validate({

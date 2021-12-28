@@ -136,6 +136,7 @@ class RequisitionsPurchaseReviewController extends Controller
         $data = $request->except('_token', '_method');
         $data['id'] = $id;
         $data['created_by'] = $this->requisition_purchase_service->getRequisitionPurchaseById($id)->created_by;
+        
         $this->review_service->updateReview($data, 'REQUISITION_PUR');
 
         return view('Backend.success', compact('route_name', 'act'));

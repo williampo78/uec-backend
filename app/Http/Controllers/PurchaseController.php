@@ -97,4 +97,8 @@ class PurchaseController extends Controller
     {
         //
     }
+    public function ajax(Request $request){
+    
+
+    }
 }
