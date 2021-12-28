@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PurchaseService;
 use App\Services\SupplierService;
 use Illuminate\Http\Request;
 
@@ -14,14 +15,20 @@ class PurchaseController extends Controller
      */
 
     public function __construct(
-        SupplierService $supplierService
+        SupplierService $supplierService,
+        PurchaseService $purchaseService
     ) {
         $this->supplierService = $supplierService;
+        $this->purchaseService = $purchaseService;
     }
-    public function index()
+    public function index(Request $request)
     {
         $result = [];
-        $result['supplier'] = $this->supplierService->getSuppliers() ; 
+        $in = $request->input();
+        $result['supplier'] = $this->supplierService->getSuppliers();
+        if (!empty($in)) {
+            $result['purchase'] = $this->purchaseService->getPurchase($in);
+        }
         return view('Backend.Purchase.list', $result);
     }
 

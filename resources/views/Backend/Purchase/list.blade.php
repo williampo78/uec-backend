@@ -24,14 +24,15 @@
                                 {{-- row 1 start --}}
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3"><label class="control-label"> 供應商</label></div>
+                                        <div class="col-sm-3"><label class="control-label"> 供應商 </label></div>
                                         <div class="col-sm-9">
                                             <div class='input-group' id='supplier_deliver_date_dp'>
                                                 <select class="form-control js-select2-department" name="supplier"
-                                                    id="supplier">
+                                                    id="supplier" value="{{ request()->input('company_number') }}">
+                                                    <option value=""></option>
                                                     @foreach ($supplier as $v)
                                                         <option value='{{ $v['id'] }}'
-                                                            {{ isset($data['getData']['supplier']) && $v['id'] == $data['getData']['supplier'] ? 'selected' : '' }}>
+                                                            {{ request()->input('supplier') && $v['id'] == request()->input('supplier') ? 'selected' : '' }}>
                                                             {{ $v['name'] }}</option>
                                                     @endforeach
                                                 </select>
@@ -45,7 +46,8 @@
                                         <div class="col-sm-4"><label class="control-label">供應商統編</label></div>
                                         <div class="col-sm-8">
                                             <div class='input-group'>
-                                                <input class="form-control" name="company_number" id="company_number">
+                                                <input class="form-control" name="company_number" id="company_number"
+                                                    value="{{ request()->input('company_number') }}">
                                             </div>
                                         </div>
                                     </div>
@@ -55,7 +57,9 @@
                                         <div class="col-sm-4"><label class="control-label">採購單號</label></div>
                                         <div class="col-sm-8">
                                             <div class='input-group'>
-                                                <input class="form-control" name="company_number" id="company_number">
+                                                <input class="form-control" name="order_supplier_number"
+                                                    id="order_supplier_number"
+                                                    value="{{ request()->input('company_number') }}">
                                             </div>
                                         </div>
                                     </div>
@@ -68,26 +72,36 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3"><label class="control-label">採購單號</label></div>
+                                        <div class="col-sm-3"><label class="control-label">進貨日期</label></div>
                                         <div class="col-sm-4">
-                                            <div class="input-group date" id="datetimepicker">
-                                                <input type="text" class="form-control" name="select_start_date"
-                                                    id="select_start_date" value="">
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                            <div class="form-group">
+
+                                                <div class="input-group date" id="trade_date_start_box">
+                                                    <input type="text" class="form-control" name="trade_date_start"
+                                                        id="trade_date_start"
+                                                        value="{{ request()->input('trade_date_start') }}">
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-sm-1">
-                                            <h5>～</h5>
+                                            <div class="form-group">
+                                                <label class="control-label">　～</label>
+                                            </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="input-group date" id="datetimepicker2">
-                                                <input type="text" class="form-control" name="select_end_date"
-                                                    id="select_end_date" value="">
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                            <div class="form-group">
+                                                <div class="input-group date" id="trade_date_end_box">
+                                                    <input type="text" class="form-control" name="trade_date_end"
+                                                        id="trade_date_end"
+                                                        value="{{ request()->input('trade_date_end') }}">
+                                                    <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -98,14 +112,15 @@
                                         <div class="col-sm-4"><label class="control-label">進貨單號</label></div>
                                         <div class="col-sm-8">
                                             <div class='input-group'>
-                                                <input class="form-control" name="company_number" id="company_number">
+                                                <input class="form-control" name="number" id="number"
+                                                    value="{{ request()->input('number') }}">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-4 text-right">
                                     <div class="col-sm-12">
-                                        <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
                                     </div>
                                 </div>
                                 {{-- row 2 end --}}
@@ -122,25 +137,45 @@
                         <thead>
                             <tr>
                                 <th>功能</th>
-                                <th>請購日期</th>
-                                <th>請購單號</th>
-                                <th>供應商名稱</th>
-                                <th>狀態</th>
+                                <th>進貨日期</th>
+                                <th>進貨單號</th>
+                                <th>採購單號</th>
                                 <th>總金額</th>
+                                <th>發票號碼</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <td></td>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                            <td>5</td>
+                            @if (isset($purchase))
+                                @foreach ($purchase as $obj)
+                                    <tr>
+                                        <td>
+                                            {{-- @if ($share_role_auth['auth_query']) --}}
+                                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                                data-target="#show_data"><i class="fa fa-search"></i></button>
+                                            {{-- @endif --}}
+
+                                            {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == Auth::user()->id) --}}
+                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                                data-target="#update_invoice">補登發票</button>
+                                            {{-- @endif --}}
+                                        </td>
+                                        <td>{{ $obj->trade_date }}</td>
+                                        <td>{{ $obj->number }}</td>
+                                        <td>{{ $obj->order_supplier_number }}</td>
+                                        <td>{{ $obj->total_price }}</td>
+                                        <td>{{ $obj->invoice_number }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+        @include('Backend.Purchase.show')
+        @include('Backend.Purchase.update_invoice')
+
     </div>
     </div>
 
@@ -153,12 +188,76 @@
                 theme: "bootstrap",
                 placeholder: "請選擇"
             });
-            $('#datetimepicker').datetimepicker({
+            $('#trade_date_start_box').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
-            $('#datetimepicker2').datetimepicker({
+            $('#trade_date_end_box').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
+
+            // $("#select-form").validate({
+            //     debug: true,
+            //     submitHandler: function(form) {
+            //         $('#save_data').prop('disabled', true);
+            //         // form.submit();
+            //     },
+            //     rules: {
+            //         trade_date_start: {
+            //             required: {
+            //                 depends: function(element) {
+            //                     return $('#order_supplier_number').val() == '' && $('#number').val() ==
+            //                         '';
+            //                 }
+            //             },
+            //             monthIntervalVerify: function() {
+            //                 let obj = {
+            //                     startTime: $('#trade_date_start').val(),
+            //                     endTime: $('#trade_date_end').val(),
+            //                     monthNum: 6,
+            //                 }
+            //                 return obj;
+            //             },
+            //         },
+            //         trade_date_end: {
+            //             required: {
+            //                 depends: function(element) {
+            //                     return $('#order_supplier_number').val() == '' && $('#number').val() ==
+            //                         '' || $('#trade_date_start').val() !== '';
+            //                 }
+            //             },
+            //         },
+
+            //     },
+            //     messages: {
+            //         end_launched_at: {
+            //             greaterThan: "結束時間必須大於開始時間",
+            //         },
+            //     },
+            //     errorClass: "help-block",
+            //     errorElement: "span",
+            //     errorPlacement: function(error, element) {
+            //         if (element.parent('.input-group').length || element.is(':radio')) {
+            //             error.insertAfter(element.parent());
+            //             return;
+            //         }
+            //         if (element.is('select')) {
+            //             element.parent().append(error);
+            //             return;
+            //         }
+
+            //         error.insertAfter(element);
+            //     },
+            //     highlight: function(element, errorClass, validClass) {
+            //         $(element).closest(".form-group").addClass("has-error");
+            //     },
+            //     unhighlight: function(element, errorClass, validClass) {
+            //         $(element).closest(".form-group").removeClass("has-error");
+            //     },
+            //     success: function(label, element) {
+            //         $(element).closest(".form-group").removeClass("has-error");
+            //     },
+            // });
+
         });
     </script>
 @endsection
