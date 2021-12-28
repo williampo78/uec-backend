@@ -72,7 +72,7 @@ class APICartServices
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         //確認是否有該品項
-        $item = ProductItems::where('id', $input['item_id'])->where('item_no', $input['item_no'])->get()->toArray();
+        $item = ProductItems::where('id', $input['item_id'])->get()->toArray();
         if (count($item) > 0) {
             $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
