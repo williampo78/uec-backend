@@ -6,6 +6,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\WarehouseStock;
+use App\Models\SysConfig;
 
 class StockService
 {
@@ -36,6 +37,19 @@ class StockService
             ->where("warehouse_stock.product_item_id", "=", $item_id)
             ->first();
         return $stock;
+    }
+
+    /*
+     * 找出商城的倉庫代碼
+     */
+    public function getWarehouseConfig()
+    {
+        $value = SysConfig::select("sys_config.config_value")
+            ->join("warehouse", "warehouse.number", "=", "sys_config.config_value")
+            ->where("warehouse.delete", "=", "0")
+            ->where("sys_config.config_key", "=", "EC_WAREHOUSE_GOODS")
+            ->where("sys_config.active", "=", "1")->first();
+        return $value->config_value;
     }
 
 }

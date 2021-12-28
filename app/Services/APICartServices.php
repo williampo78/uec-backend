@@ -72,7 +72,7 @@ class APICartServices
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         //確認是否有該品項
-        $item = ProductItems::where('id', $input['item_id'])->where('item_no', $input['item_no'])->get()->toArray();
+        $item = ProductItems::where('id', $input['item_id'])->get()->toArray();
         if (count($item) > 0) {
             $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
@@ -136,6 +136,8 @@ class APICartServices
         $productInfo = self::getProducts();
         //購物車內容
         $cartInfo = self::getCartInfo($member_id);
+        //商城倉庫代碼
+        $warehouseCode = $this->stockService->getWarehouseConfig();
         $shippingFee = ShippingFeeRulesService::getShippingFee('HOME');
         $feeInfo = array(
             "notice" => $shippingFee['HOME']->notice_brief,
@@ -243,7 +245,7 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
@@ -308,7 +310,7 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
@@ -348,7 +350,7 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
@@ -387,7 +389,7 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
@@ -420,7 +422,7 @@ class APICartServices
                             foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                                 $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                 $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                                $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
                                 $stock = 0;
                                 if ($stock_info) {
                                     $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
@@ -445,7 +447,7 @@ class APICartServices
                         foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                             $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                            $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                            $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
                             $stock = 0;
                             if ($stock_info) {
                                 $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
@@ -480,7 +482,7 @@ class APICartServices
                         $product_type = 'expired';
                         $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                         $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                        $stock_info = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id);
+                        $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
                         $stock = 0;
                         if ($stock_info) {
                             $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);

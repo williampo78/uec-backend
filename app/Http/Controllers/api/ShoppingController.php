@@ -60,14 +60,12 @@ class ShoppingController extends Controller
         $error_code = $this->apiService->getErrorCode();
         $messages = [
             'item_id.required' => '商品編號不能為空',
-            'item_no.required' => '商品代碼不能為空',
             'item_qty.required' => '商品數量不能為空',
             'status_code.required' => '商品數量不能為空',
         ];
 
         $v = Validator::make($request->all(), [
             'item_id' => 'required',
-            'item_no' => 'required',
             'item_qty' => 'required',
         ], $messages);
 
@@ -128,14 +126,12 @@ class ShoppingController extends Controller
 
         $messages = [
             'item_id.required' => '商品編號不能為空',
-            'item_no.required' => '商品代碼不能為空',
             'item_qty.required' => '商品數量不能為空',
             'status_code.required' => '商品數量不能為空',
         ];
 
         $v = Validator::make($request->all(), [
             'item_id' => 'required',
-            'item_no' => 'required',
             'item_qty' => 'required',
         ], $messages);
 
