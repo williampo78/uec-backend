@@ -35,17 +35,19 @@ class StockController extends Controller
                 return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
             }
         }
-        $result = $this->stockService->getStockByItem('WHS01', $request['item_id'], 'qty');
-        if ($result > 0) {
+        $warehouseCode = $this->stockService->getWarehouseConfig();
+        $result = $this->stockService->getStockByItem($warehouseCode, $request['item_id']);
+        if ($result) {
             $status = true;
             $err = '';
             $data = $result;
+            $data['specifiedQty'] = ($result->stockQty <= $result->limitedQty ? $result->stockQty : $result->limitedQty);
         } else {
             $status = false;
             $err = '404';
             $data = 0;
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => array("stock" => $data)]);
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
     }
 }

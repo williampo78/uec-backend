@@ -11,7 +11,7 @@ return [
     /*
      * 預設為測試環境
      *
-    */
+     */
     'isTesting' => env('UEC_TEST', 'true'),
     'mailPrefix' => "[ 電商測試 ]",
 
@@ -91,5 +91,12 @@ return [
         'DELIVERED' => '已配達',
         'REFUSED' => '客拒收 / 客未取',
         'VOIDED' => '已作廢',
+    ],
+
+    'tax_option' => [
+        '0' => '免稅',
+        // 1 => '應稅',
+        '2' => '應稅內含',
+        '3' => '零稅率',
     ],
 ];

@@ -19,7 +19,7 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 幣別</label></div>
-                                <div class="col-sm-4">台幣</div>
+                                <div class="col-sm-4">新台幣 (匯率：1)</div>
                                 <div class="col-sm-2"><label> 狀態</label></div>
                                 <div class="col-sm-4">
                                     <div v-if="requisitionsPurchase.status == 'DRAFTED'">草稿</div>
@@ -68,14 +68,17 @@
                                 <tbody v-for="(item, itemKey) in requisitionsPurchaseDetail">
                                     <tr>
                                         <td>@{{item.item_number}}</td>
-                                        <td>@{{item.item_name}}</td>
+                                        <td>@{{item.combination_name}}</td>
                                         <td>@{{item.item_price}}</td>
                                         <td>@{{item.item_qty}}</td>
-                                        <td>@{{item.item_unit}}</td>
+                                        <td>@{{item.uom}}</td>
                                         <td>@{{item.subtotal_price}}</td>
-                                        <td>@{{item.is_gift}}</td>
+                                        <td>
+                                            <div v-if="item.is_gift">是</div>
+                                            <div v-else>否</div>
+                                        </td>
                                         {{-- 最小出貨量 --}}
-                                        <td>@{{item.item_minimum_sales_qty}}</td>
+                                        <td>@{{item.min_purchase_qty}}</td>
                                     </tr>
                                 </tbody>
                             </table>

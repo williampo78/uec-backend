@@ -173,24 +173,24 @@
                                             @csrf
                                         </form>
                                         <td>
-                                            {{-- @if ($share_role_auth['auth_query']) --}}
-                                            <button class="btn btn-info btn-sm" @click="showBtn({{ $v['id'] }})"><i
-                                                    class="fa fa-search"></i></button>
-                                            {{-- @endif --}}
-
-                                            {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
-                                            <a class="btn btn-info btn-sm"
-                                                href="{{ route('order_supplier.edit', $v['id']) }}">修改</a>
-                                            {{-- @endif --}}
+                                            @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-info btn-sm"
+                                                    @click="showBtn({{ $v['id'] }})"><i
+                                                        class="fa fa-search"></i></button>
+                                            @endif
+                                            @if ($share_role_auth['auth_update'] && $v['status'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
+                                                <a class="btn btn-info btn-sm"
+                                                    href="{{ route('order_supplier.edit', $v['id']) }}">修改</a>
+                                            @endif
 
                                             <button class="btn btn-warning btn-sm" data-toggle="modal"
                                                 data-target="#row_supplier_deliver"
-                                                @click="supplier_deliver({{ $v['id'] }} , '{{ $v['expect_deliver_date'] }}','{{ $v['supplier_deliver_date'] }}','{{ $v['number'] }}')">預進日</button>
+                                                @click="supplier_deliver({{ $v }})">預進日</button>
 
-                                            {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
-                                            <button class="btn btn-danger btn-sm" type="button"
-                                                @click="delBtn({{ $v['id'] }})">刪除</button>
-                                            {{-- @endif --}}
+                                            @if ($share_role_auth['auth_delete'] && $v['status'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
+                                                <button class="btn btn-danger btn-sm" type="button"
+                                                    @click="delBtn({{ $v['id'] }})">刪除</button>
+                                            @endif
                                         </td>
                                         <td>{{ $v['trade_date'] }}</td>
                                         <td>{{ $v['number'] }}</td>
@@ -208,7 +208,9 @@
                 </div>
             </div>
         </div>
+        {{-- 報價單明細 --}}
         @include('Backend.OrderSupplier.detail')
+        {{-- 補登預進日 --}}
         @include('Backend.OrderSupplier.supplier_deliver')
     </div>
 
@@ -218,21 +220,23 @@
             data: function() {
                 return {
                     order_supplier: {},
+                    show_supplier:{} ,
+                    show_detail:{} ,
                 }
             },
             methods: {
                 showBtn(id) {
-                    var req = this;
+                    console.log(id) ;
+                    var vm = this;
                     axios.post('/backend/order_supplier/ajax', {
-                            "type": "order_supplier",
+                            "type": "show_supplier",
                             _token: '{{ csrf_token() }}',
                             'id': id
                         })
                         .then(function(response) {
-                            req.order_supplier = response.data.orderSupplier;
-                            console.log(response.data.orderSupplier);
+                            vm.show_supplier = response.data.orderSupplier ; 
+                            vm.show_detail = response.data.orderSupplierDetail ;
                             $('.toggle-show-model').click();
-                            return req;
                         })
                         .catch(function(error) {
                             console.log('ERROR');
@@ -258,17 +262,15 @@
                             .catch(function(error) {
                                 console.log('ERROR');
                             })
-                    } else {
-                        console.log('不刪除');
                     }
                 },
-                supplier_deliver(id, expect_deliver_date, supplier_deliver_date,number) {
-                    $('#supplier_deliver_date').val(supplier_deliver_date);
-                    $('#expect_deliver_date').val(expect_deliver_date);
-                    $('.show_number').html(number) ; 
-                    alert('尚未串接完成')  ;
-                    // console.log(number) ; 
-                }
+                supplier_deliver(obj) {
+                    $('#supplier_deliver_date').val(obj.supplier_deliver_date);
+                    $('#expect_deliver_date').val(obj.expect_deliver_date);
+                    $('#get_order_supplier_id').val(obj.id)
+                    $('.show_number').html(obj.number);
+
+                },
 
             },
 
@@ -276,8 +278,7 @@
         })
 
         new showRequisitions().$mount('#page-wrapper');
-
-        $(function() {
+        $(document).ready(function() {
             $('#supplier').select2();
             $('#status').select2();
 
@@ -292,6 +293,68 @@
             });
             $('#expect_deliver_date_dp').datetimepicker({
                 format: 'YYYY-MM-DD',
+            });
+            $("#supplier_deliver_form").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    console.log(form);
+                    var supplier_deliver_date = $('#supplier_deliver_date').val();
+                    var expect_deliver_date = $('#expect_deliver_date').val();
+                    var get_order_supplier_id = $('#get_order_supplier_id').val();
+                    axios.post('/backend/order_supplier/ajax', {
+                            "type": "show_supplier",
+                            _token: '{{ csrf_token() }}',
+                            'id': get_order_supplier_id,
+                            'supplier_deliver_date': supplier_deliver_date,
+                            'expect_deliver_date': expect_deliver_date,
+                        })
+                        .then(function(response) {
+                            if (response.data.result) {
+                                console.log(response.data) ; 
+                                alert('修改成功');
+                                history.go(0);
+                            } else {
+                                alert('修改失敗');
+                            }
+                        })
+                        .catch(function(error) {
+                            console.log('ERROR');
+                        })
+                },
+                rules: {
+                    supplier_deliver_date: {
+                        required: true,
+                    },
+                    expect_deliver_date: {
+                        required: true,
+                    }
+                },
+                messages: {
+                    end_launched_at: {
+                        greaterThan: "結束時間必須大於開始時間",
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
             });
         });
 

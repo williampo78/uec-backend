@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Models\ProductPhotos;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\ShoppingCartDetails;
@@ -12,6 +13,7 @@ use App\Models\ProductItems;
 use App\Models\Products;
 use App\Services\APIService;
 use App\Services\StockService;
+use Batch;
 
 class APICartServices
 {
@@ -28,9 +30,10 @@ class APICartServices
      */
     public function getCartInfo($member_id)
     {
+        $s3 = config('filesystems.disks.s3.url');
         $result = ShoppingCartDetails::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
-            , "product_items.item_no", "product_items.photo_name as item_photo", "product_items.status as item_status")
+            , "product_items.item_no")
             ->where('shopping_cart_details.member_id', $member_id)
             ->where('shopping_cart_details.status_code', 0)//購物車
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
@@ -41,7 +44,9 @@ class APICartServices
 
         $data = [];
         foreach ($result as $datas) {
+            $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
+            $data[$datas->product_id]['item_photo'] = $s3 . $ProductPhotos->photo_name;
         }
         return $data;
     }
@@ -67,7 +72,7 @@ class APICartServices
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         //確認是否有該品項
-        $item = ProductItems::where('id', $input['item_id'])->where('item_no', $input['item_no'])->get()->toArray();
+        $item = ProductItems::where('id', $input['item_id'])->get()->toArray();
         if (count($item) > 0) {
             $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
@@ -131,6 +136,8 @@ class APICartServices
         $productInfo = self::getProducts();
         //購物車內容
         $cartInfo = self::getCartInfo($member_id);
+        //商城倉庫代碼
+        $warehouseCode = $this->stockService->getWarehouseConfig();
         $shippingFee = ShippingFeeRulesService::getShippingFee('HOME');
         $feeInfo = array(
             "notice" => $shippingFee['HOME']->notice_brief,
@@ -167,9 +174,9 @@ class APICartServices
                     }
                 }
             }
-            $prod_gift = [];
             foreach ($cartQty as $product_id => $item) {
                 $product = [];
+                $prod_gift = [];
                 if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
                     $product_type = "effective";
                     $qty = array_sum($item); //合併不同規格但同一商品的數量
@@ -180,13 +187,14 @@ class APICartServices
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftAway[] = array(
+                                    "productPhoto" => $giftInfo['photo'],
                                     "productId" => $giftInfo->product_id,
-                                    "productName" => $productInfo[$giftInfo->product_id]->product_name
+                                    "productName" => $productInfo[$giftInfo->product_id]->product_name,
+                                    "assignedQty" => $giftInfo->assignedQty
                                 );
                             }
                         }
                     }
-
                     //商品折扣
                     if (isset($campaign['PRD']['DISCOUNT'][$product_id])) { //在活動內 滿額折扣
                         //ex: n=2, x=0.85, qty=4, price = 1000
@@ -237,9 +245,12 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 'qty');
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = 0;
+                                    if ($stock_info) {
+                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                    }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -247,7 +258,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -299,9 +310,12 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = 0;
+                                    if ($stock_info) {
+                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                    }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -309,7 +323,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -336,9 +350,12 @@ class APICartServices
 
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = 0;
+                                    if ($stock_info) {
+                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                    }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -346,7 +363,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -372,9 +389,12 @@ class APICartServices
                                     }
                                     $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                     $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock = 0;
+                                    if ($stock_info) {
+                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                    }
                                     $product[] = array(
-                                        "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
@@ -382,7 +402,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "shortageOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -402,9 +422,12 @@ class APICartServices
                             foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                                 $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                                 $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                                $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                $stock = 0;
+                                if ($stock_info) {
+                                    $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                }
                                 $product[] = array(
-                                    "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                     "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                     "itemSpec1" => $spec1,
                                     "itemSpec2" => $spec2,
@@ -412,7 +435,7 @@ class APICartServices
                                     "itemQty" => $detail_qty,
                                     "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                     "itemStock" => $stock,
-                                    "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                    "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                     "campaignDiscountName" => null,
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
@@ -424,9 +447,12 @@ class APICartServices
                         foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                             $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                            $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                            $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                            $stock = 0;
+                            if ($stock_info) {
+                                $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                            }
                             $product[] = array(
-                                "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                                 "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                                 "itemSpec1" => $spec1,
                                 "itemSpec2" => $spec2,
@@ -434,7 +460,7 @@ class APICartServices
                                 "itemQty" => $detail_qty,
                                 "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                 "itemStock" => $stock,
-                                "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
                                 "campaignGiftAway" => []
@@ -456,9 +482,12 @@ class APICartServices
                         $product_type = 'expired';
                         $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                         $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                        $stock = $this->stockService->getStockByItem('WHS01', $cartDetail[$product_id][$item_id]->item_id, 1);
+                        $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                        $stock = 0;
+                        if ($stock_info) {
+                            $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                        }
                         $product[] = array(
-                            "itemPhoto" => $cartDetail[$product_id][$item_id]->item_photo,
                             "itemId" => $cartDetail[$product_id][$item_id]->item_id,
                             "itemSpec1" => $spec1,
                             "itemSpec2" => $spec2,
@@ -466,7 +495,7 @@ class APICartServices
                             "itemQty" => $detail_qty,
                             "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                             "itemStock" => $stock,
-                            "shortageOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                            "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                             "campaignDiscountName" => null,
                             "campaignDiscountStatus" => false,
                             "campaignGiftAway" => []
@@ -479,6 +508,7 @@ class APICartServices
                     "productID" => $product_id,
                     "productNo" => $cartInfo[$product_id]['product_no'],
                     "productName" => $cartInfo[$product_id]['product_name'],
+                    "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product
                 );
             }
@@ -498,11 +528,15 @@ class APICartServices
                 if ($total_amount >= $item->n_value) {
                     if ($now >= $item->start_launched_at && $now <= $item->end_launched_at) { //在上架期間內
                         if ($item->campaign_type == 'CART03') { //﹝滿額﹞購物車滿N元，送贈品
-                            $cartGift[] = array(
-                                "campaignName" => $item->campaign_name,
-                                "productId" => $item->product_id,
-                                "productName" => $item->product_name
-                            );
+                            if ($item->assignedQty > 0) {
+                                $cartGift[] = array(
+                                    "campaignName" => $item->campaign_name,
+                                    "productId" => $item->product_id,
+                                    "productName" => $item->product_name,
+                                    "productPhoto" => $campaign_gift['PROD'][$item->promotional_campaign_id][$item->product_id]['photo'],
+                                    "assignedQty" => $item->assignedQty
+                                );
+                            }
                         }
                     }
                 }
@@ -511,11 +545,15 @@ class APICartServices
                 $assigned_qty = array_sum($assigned[$campaign_id]);
                 if ($assigned_qty >= $CART04_n[$campaign_id]) {
                     foreach ($campaign_gift['PROD'][$campaign_id] as $prod_id => $value) {
-                        $cartGift[] = array(
-                            "campaignName" => $value->campaign_name,
-                            "productId" => $prod_id,
-                            "productName" => $value->product_name
-                        );
+                        if ($value->assignedQty > 0) {
+                            $cartGift[] = array(
+                                "campaignName" => $value->campaign_name,
+                                "productId" => $prod_id,
+                                "productName" => $value->product_name,
+                                "productPhoto" => $value->photo,
+                                "assignedQty" => $value->assignedQty
+                            );
+                        }
                     }
                 }
             }
@@ -553,7 +591,7 @@ class APICartServices
                 "feeInfo" => $feeInfo,
                 "productRow" => count($cartInfo),
                 "list" => $productDetail,
-                "totalprice" => $cartTotal,
+                "totalPrice" => $cartTotal,
                 "discount" => $cartDiscount,
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
@@ -575,5 +613,78 @@ class APICartServices
             $data[$product->id] = $product;
         }
         return $data;
+    }
+
+
+    /**
+     * 會員購物車(批次新增)
+     * @param
+     * @return string
+     */
+    public function setBatchCart($input)
+    {
+        $member_id = Auth::guard('api')->user()->member_id;
+        $now = Carbon::now();
+        $webDataAdd = [];
+        $webDataUpd = [];
+        foreach ($input['item_id'] as $key => $value) {
+            //確認是否有該品項
+            $item = ShoppingCartDetails::where('member_id', '=', $member_id)->where('product_item_id', '=', $value)->first();
+            if ($item) {
+                $webDataUpd[$key] = [
+                    "id" => $item->id,
+                    "product_item_id" => $input['item_id'][$key],
+                    "qty" => $input['item_qty'][$key],
+                    "status_code" => $input['status_code'],
+                    "updated_by" => $member_id,
+                    "updated_at" => $now
+                ];
+            } else {
+                $webDataAdd[$key] = [
+                    $member_id,
+                    $value,
+                    $input['item_qty'][$key],
+                    $input['status_code'],
+                    $input['utm_source'],
+                    $input['utm_medium'],
+                    $input['utm_campaign'],
+                    $input['utm_sales'],
+                    $input['utm_time'],
+                    $member_id,
+                    $member_id,
+                    $now,
+                    $now
+                ];
+            }
+
+        }
+        $addColumn = [
+            "member_id", "product_item_id", "qty", "status_code",
+            "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_time",
+            "created_by", "updated_by", "created_at", "updated_at"
+        ];
+        DB::beginTransaction();
+        try {
+
+            if ($webDataUpd) {
+                $cartInstance = new ShoppingCartDetails();
+                $upd = Batch::update($cartInstance, $webDataUpd, 'id');
+            }
+
+            if ($webDataAdd) {
+                $cartInstance = new ShoppingCartDetails();
+                $batchSize = 50;
+                $add = Batch::insert($cartInstance, $addColumn, $webDataAdd, $batchSize);
+            }
+
+            DB::commit();
+            $result = 'success';
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = 'fail';
+        }
+
+        return $result;
     }
 }

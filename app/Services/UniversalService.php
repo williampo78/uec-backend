@@ -88,12 +88,7 @@ class UniversalService
 
     public function getTaxList()
     {
-        return [
-            0 => '未稅',
-            1 => '應稅',
-            2 => '內含',
-            3 => '零稅率',
-        ];
+        return config('uec.tax_option') ;
     }
 
     /*
@@ -114,10 +109,10 @@ class UniversalService
 
     /*
      * 傳入分類代碼 顯示類別名稱
-     * Sample: QA_CATEGORY or FOOTER_CATEGORY
+     * Sample: QA_CATEGORY or FOOTER_CATEGORY or DONATED_INSTITUTION
      * Author: Rowena
      */
-    public function getFooterCategory($category)
+    public function getLookupValues($category)
     {
         $lookup = Lookup_values_v::where('type_code', '=', $category)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
         $data = [];

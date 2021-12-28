@@ -84,11 +84,10 @@ class QuotationReviewController extends Controller
         $supplier = new SupplierService();
         $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
         $data['status_code'] = $this->quotationService->getStatusCode();
-        $data['taxList'] = $this->quotationService->getTaxList();
+        $data['taxList'] = config('uec.tax_option');
         $data['quotation'] = $this->quotationService->getQuotationById($id);
         $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
         $data['quotation_detail_log'] = $this->quotationService->getQuotationReviewLog($id);
-
         return view('Backend.QuotationReview.review' , compact('data'));
     }
 
@@ -106,7 +105,9 @@ class QuotationReviewController extends Controller
 
         $data = $request->except('_token' , '_method');
         $data['id'] = $id;
+        $data['created_by'] = $this->quotationService->getQuotationById($id)->created_by;
         $this->reviewService->updateReview($data , 'QUOTATION');
+        
 
         return view('Backend.success', compact('route_name' , 'act'));
     }

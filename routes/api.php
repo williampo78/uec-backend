@@ -11,6 +11,8 @@ use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\ShoppingController;
 use App\Http\Controllers\api\StockController;
+use App\Http\Controllers\api\CheckoutController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -64,7 +66,13 @@ Route::group(['middleware' => 'jwt.member'], function () {
     Route::group(['prefix' => 'shopping'], function () {
         Route::post('/setMemberCart', [ShoppingController::class, 'setCart']);
         Route::post('/shoppingCartData', [ShoppingController::class, 'getShoppingCartData']);
+        Route::post('/batchSetCart', [ShoppingController::class, 'setBatchCart']);
     });
+
+    Route::group(['prefix' => 'checkout'], function () {
+        Route::post('/tmpOrder', [CheckoutController::class, 'setTmpOrder']);
+    });
+
 });
 
 Route::get('area', [DradviceController::class, 'area']);
@@ -81,4 +89,8 @@ Route::group(['prefix' => 'members'], function () {
 
 Route::group(['prefix' => 'shopping'], function () {
     Route::get('/getCartCount', [ShoppingController::class, 'getCartCount']);
+});
+
+Route::group(['prefix' => 'checkout'], function () {
+    Route::get('/donatedInstitution', [CheckoutController::class, 'getDonatedInstitution']);
 });
