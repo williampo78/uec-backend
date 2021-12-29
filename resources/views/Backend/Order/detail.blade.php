@@ -389,7 +389,24 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-payment-info">
-
+                        <div class="table-responsive">
+                            <table class='table table-striped table-bordered table-hover' style='width:100%'>
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">時間</th>
+                                        <th class="text-nowrap">類型</th>
+                                        <th class="text-nowrap">對象</th>
+                                        <th class="text-nowrap">金額</th>
+                                        <th class="text-nowrap">狀態</th>
+                                        <th class="text-nowrap">狀態變更時間</th>
+                                        <th class="text-nowrap">備註</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="tab-pane fade" id="tab-campaign-discount">
 

@@ -307,6 +307,39 @@ class OrderController extends Controller
             });
         }
 
+        // 金流資訊
+        if (isset($order->order_payments)) {
+            $order->order_payments = $order->order_payments->map(function ($order_payment) {
+                // 時間
+                $order_payment->created_at_format = Carbon::parse($order_payment->created_at)->format('Y-m-d H:i');
+
+                // 類型
+                if (isset(config('uec.payment_type_options')[$order_payment->payment_type])) {
+                    $order_payment->payment_type = config('uec.payment_type_options')[$order_payment->payment_type];
+                }
+
+                // 金額
+                $order_payment->amount = number_format($order_payment->amount);
+
+                // 金流狀態
+                if (isset(config('uec.payment_status_options')[$order_payment->payment_status])) {
+                    $order_payment->payment_status = config('uec.payment_status_options')[$order_payment->payment_status];
+                }
+
+                // 請款/退款API最近一次呼叫時間
+                $order_payment->latest_api_date = Carbon::parse($order_payment->latest_api_date)->format('Y-m-d H:i');
+
+                return $order_payment->only([
+                    'created_at_format',
+                    'payment_type',
+                    'amount',
+                    'payment_status',
+                    'latest_api_date',
+                    'remark',
+                ]);
+            });
+        }
+
         $order = $order->only([
             'id',
             'order_no',
@@ -336,6 +369,7 @@ class OrderController extends Controller
             'buyer_title',
             'donated_institution_name',
             'invoices',
+            'order_payments',
         ]);
 
         return response()->json($order);

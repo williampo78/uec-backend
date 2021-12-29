@@ -484,9 +484,9 @@
                         $('#modal-paid-amount').empty().text(order.paid_amount);
 
                         // 訂單明細
-                        if (order.order_details) {
-                            $("#tab-order-detail tbody").empty();
+                        $("#tab-order-detail tbody").empty();
 
+                        if (order.order_details) {
                             $.each(order.order_details, function (key, order_detail) {
                                 let package_no = order_detail.package_no ?
                                     `<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">${order_detail.package_no}</a>` :
@@ -544,6 +544,28 @@
                                 invoices[count] = invoice;
 
                                 count++;
+                            });
+                        }
+
+                        // 金流資訊
+                        $("#tab-payment-info tbody").empty();
+
+                        if (order.order_payments) {
+                            $.each(order.order_payments, function (key, order_payment) {
+                                let count = 1;
+
+                                $("#tab-payment-info tbody").append(`
+                                    <tr>
+                                        <td>${count++}</td>
+                                        <td>${order_payment.created_at_format}</td>
+                                        <td>${order_payment.payment_type}</td>
+                                        <td>Tappay</td>
+                                        <td>${order_payment.amount}</td>
+                                        <td>${order_payment.payment_status}</td>
+                                        <td>${order_payment.latest_api_date}</td>
+                                        <td>${order_payment.remark}</td>
+                                    </tr>
+                                `);
                             });
                         }
 

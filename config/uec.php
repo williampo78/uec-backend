@@ -114,6 +114,21 @@ return [
         'NON_TAXABLE' => '免稅',
     ],
 
+    // 金流類型
+    'payment_type_options' => [
+        'PAY' => '請款',
+        'REFUND' => '退款',
+    ],
+
+    // 金流狀態
+    'payment_status_options' => [
+        'NA' => '不須處理',
+        'PENDING' => '待請款 / 待退款',
+        'COMPLETED' => '請款成功 / 退款成功',
+        'FAILED' => '請款失敗 / 退款失敗',
+        'VOIDED' => '已作廢',
+    ],
+
     'tax_option' => [
         '0' => '免稅',
         // 1 => '應稅',

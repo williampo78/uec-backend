@@ -9,6 +9,7 @@ use App\Models\InvoiceDetail;
 use App\Models\Order;
 use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
+use App\Models\OrderPayment;
 use App\Models\Shipment;
 use App\Models\ShipmentDetail;
 
@@ -201,9 +202,9 @@ class OrderService
         $all_invoices = $invoices->concat($invoice_allowances);
         $all_invoices = $all_invoices->sortBy('transaction_date');
 
-        // dump($invoices);
-        // dump($invoice_allowances);
-        // dump($all_invoices);
+        // 訂單金流單
+        $order_payments = OrderPayment::orderBy('created_at', 'asc')
+            ->get();
 
         foreach ($order_details as $order_detail) {
             // 將託運單號加入訂單明細中
@@ -276,6 +277,20 @@ class OrderService
                 }
 
                 $order->invoices->push($invoice);
+            }
+        }
+
+        // 將訂單金流單加入訂單中
+        foreach ($order_payments as $order_payment) {
+            if ($orders->contains('order_no', $order_payment->order_no)) {
+                $order = $orders->firstWhere('order_no', $order_payment->order_no);
+
+                // 檢查訂單金流單是否有定義
+                if (!isset($order->order_payments)) {
+                    $order->order_payments = collect();
+                }
+
+                $order->order_payments->push($order_payment);
             }
         }
 
