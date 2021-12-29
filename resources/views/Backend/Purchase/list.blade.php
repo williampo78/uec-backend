@@ -151,7 +151,8 @@
                                         <td>
                                             {{-- @if ($share_role_auth['auth_query']) --}}
                                             <button type="button" class="btn btn-info btn-sm show-btn" data-toggle="modal"
-                                                data-target="#show_data"><i class="fa fa-search"></i></button>
+                                                data-target="#show_data" data-id="{{ $obj->id }}"><i
+                                                    class="fa fa-search"></i></button>
                                             {{-- @endif --}}
 
                                             {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == Auth::user()->id) --}}
@@ -173,7 +174,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Purchase.show')
+        @include('Backend.Purchase.detail')
         @include('Backend.Purchase.update_invoice')
 
     </div>
@@ -195,7 +196,19 @@
                 format: 'YYYY-MM-DD',
             });
             $('.show-btn').click(function() {
-                
+                var id = $(this).data('id');
+                axios.post('/backend/purchase/ajax', {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        type: 'showPurchase',
+                        id: id,
+                    })
+                    .then(function(response) {
+                        $('#show_blade_init').html('');
+                        $('#show_blade_init').html(response.data);
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
             });
 
             // $("#select-form").validate({

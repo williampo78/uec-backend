@@ -46,7 +46,8 @@
                                             <div class="form-group" id="div_doc_number">
                                                 <div class="row">
                                                     <div class="col-sm-12">
-                                                        <label for="doc_number">狀態 <span class="redtext">*</span></label>
+                                                        <label for="doc_number">狀態 <span
+                                                                class="redtext">*</span></label>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <label class="radio-inline">
@@ -69,7 +70,7 @@
                                             <div class="form-group" id="div_doc_number">
                                                 <label for="doc_number">網頁標題</label>
                                                 <input class="form-control" name="meta_title" id="meta_title"
-                                                    value="{{ isset($category_hierarchy_content->meta_title) }}">
+                                                    value="{{ isset($a->meta_title) }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
@@ -98,8 +99,8 @@
                                                 <div class="form-group" id="div_doc_number">
                                                     <div class="col-sm-4">
                                                         <label class="radio-inline">
-                                                            <input type="radio" name="content_type"
-                                                                id="content_type1" value="P" checked="checked">指定商品
+                                                            <input type="radio" name="content_type" id="content_type1"
+                                                                value="P" checked="checked">指定商品
                                                         </label>
                                                     </div>
                                                     {{-- <div class="col-sm-4">
