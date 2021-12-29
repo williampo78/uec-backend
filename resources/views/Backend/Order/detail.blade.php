@@ -298,13 +298,95 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-invoice-info">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">發票用途</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <p id="modal-invoice-usage"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">載具類型</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <p id="modal-carrier-type"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">載具號碼</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <p id="modal-carrier-no"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">統一編號</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <p id="modal-buyer-gui-number"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">抬頭</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <p id="modal-buyer-title"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <div class="col-sm-4">
+                                        <label class="control-label">捐贈機構</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <p id="modal-donated-institution-name"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
 
+                        <div class="table-responsive">
+                            <table class='table table-striped table-bordered table-hover' style='width:100%'>
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">日期</th>
+                                        <th class="text-nowrap">類型</th>
+                                        <th class="text-nowrap">發票號碼</th>
+                                        <th class="text-nowrap">課稅別</th>
+                                        <th class="text-nowrap">金額</th>
+                                        <th class="text-nowrap"></th>
+                                        <th class="text-nowrap">備註</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="tab-pane fade" id="tab-payment-info">
 
