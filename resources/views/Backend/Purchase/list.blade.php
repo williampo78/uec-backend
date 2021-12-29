@@ -156,8 +156,9 @@
                                             {{-- @endif --}}
 
                                             {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == Auth::user()->id) --}}
-                                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
-                                                data-target="#update_invoice">補登發票</button>
+                                            <button type="button" class="btn btn-warning btn-sm update_invoice"
+                                                data-toggle="modal" data-target="#update_invoice"
+                                                data-obj="{{ $obj }}">補登發票</button>
                                             {{-- @endif --}}
                                         </td>
                                         <td>{{ $obj->trade_date }}</td>
@@ -195,6 +196,9 @@
             $('#trade_date_end_box').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
+            $('#invoice_date_box').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
             $('.show-btn').click(function() {
                 var id = $(this).data('id');
                 axios.post('/backend/purchase/ajax', {
@@ -210,69 +214,143 @@
                         console.log(error);
                     });
             });
+            $('.update_invoice').click(function() {
+                var obj = $(this).data('obj');
+                $('#show_number').html(obj.number)
+                $('#show_order_supplier_number').html(obj.order_supplier_number);
+                $('#invoice_date').val(obj.invoice_date);
+                $('#invoice_number').val(obj.invoice_number);
+                $('#purchase_id').val(obj.id);
 
-            // $("#select-form").validate({
-            //     debug: true,
-            //     submitHandler: function(form) {
-            //         $('#save_data').prop('disabled', true);
-            //         // form.submit();
-            //     },
-            //     rules: {
-            //         trade_date_start: {
-            //             required: {
-            //                 depends: function(element) {
-            //                     return $('#order_supplier_number').val() == '' && $('#number').val() ==
-            //                         '';
-            //                 }
-            //             },
-            //             monthIntervalVerify: function() {
-            //                 let obj = {
-            //                     startTime: $('#trade_date_start').val(),
-            //                     endTime: $('#trade_date_end').val(),
-            //                     monthNum: 6,
-            //                 }
-            //                 return obj;
-            //             },
-            //         },
-            //         trade_date_end: {
-            //             required: {
-            //                 depends: function(element) {
-            //                     return $('#order_supplier_number').val() == '' && $('#number').val() ==
-            //                         '' || $('#trade_date_start').val() !== '';
-            //                 }
-            //             },
-            //         },
+            });
 
-            //     },
-            //     messages: {
-            //         end_launched_at: {
-            //             greaterThan: "結束時間必須大於開始時間",
-            //         },
-            //     },
-            //     errorClass: "help-block",
-            //     errorElement: "span",
-            //     errorPlacement: function(error, element) {
-            //         if (element.parent('.input-group').length || element.is(':radio')) {
-            //             error.insertAfter(element.parent());
-            //             return;
-            //         }
-            //         if (element.is('select')) {
-            //             element.parent().append(error);
-            //             return;
-            //         }
+            $("#select-form").validate({
+                debug: true,
+                submitHandler: function(form) {
+                    $('#save_data').prop('disabled', true);
+                    // form.submit();
+                },
+                rules: {
+                    trade_date_start: {
+                        required: {
+                            depends: function(element) {
+                                return $('#order_supplier_number').val() == '' && $('#number').val() ==
+                                    '';
+                            }
+                        },
+                        monthIntervalVerify: function() {
+                            let obj = {
+                                startTime: $('#trade_date_start').val(),
+                                endTime: $('#trade_date_end').val(),
+                                monthNum: 6,
+                            }
+                            return obj;
+                        },
+                    },
+                    trade_date_end: {
+                        required: {
+                            depends: function(element) {
+                                return $('#order_supplier_number').val() == '' && $('#number').val() ==
+                                    '' || $('#trade_date_start').val() !== '';
+                            }
+                        },
+                    },
 
-            //         error.insertAfter(element);
-            //     },
-            //     highlight: function(element, errorClass, validClass) {
-            //         $(element).closest(".form-group").addClass("has-error");
-            //     },
-            //     unhighlight: function(element, errorClass, validClass) {
-            //         $(element).closest(".form-group").removeClass("has-error");
-            //     },
-            //     success: function(label, element) {
-            //         $(element).closest(".form-group").removeClass("has-error");
-            //     },
-            // });
+                },
+                messages: {
+                    end_launched_at: {
+                        greaterThan: "結束時間必須大於開始時間",
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
+
+            $("#update_invoice_form").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    var check = confirm('確定要修改嗎?');
+
+                    if (check) {
+                        var invoice_date = $('#invoice_date').val();
+                        var invoice_number = $('#invoice_number').val();
+                        var id = $('#purchase_id').val();
+                        axios.post('/backend/purchase/ajax', {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                type: 'update_invoice',
+                                id: id,
+                                invoice_number: invoice_number,
+                                invoice_date: invoice_date
+                            })
+                            .then(function(response) {
+                                alert('更新成功')
+                                history.go(0)
+
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                            });
+                    }
+
+                },
+                rules: {
+                    invoice_number: {
+                        required: true
+                    },
+                    invoice_date: {
+                        required: true
+                    },
+
+                },
+                messages: {
+
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
+
 
         });
     </script>

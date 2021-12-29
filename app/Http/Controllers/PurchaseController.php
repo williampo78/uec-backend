@@ -130,6 +130,13 @@ class PurchaseController extends Controller
                 // dd($data) ; 
                 return view('Backend.Purchase.show', $data);
                 break;
+            case 'update_invoice':
+                $result = $this->purchaseService->updateInvoice($req) ;
+                return response()->json([
+                    'in' => $req,
+                    'status' => $result ,
+                ]);
+                break;
             default:
                 # code...
                 break;

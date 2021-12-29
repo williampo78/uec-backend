@@ -24,7 +24,7 @@
                         <div class="col-sm-6">
                             <div class="form-group">
 
-                                <div class="col-sm-3"><label> 廠商交貨日</label></div>
+                                <div class="col-sm-3"><label class="control-label"> 廠商交貨日</label></div>
                                 <div class="col-sm-9">
                                     <div class='input-group date' id='supplier_deliver_date_dp'>
                                         <label></label>

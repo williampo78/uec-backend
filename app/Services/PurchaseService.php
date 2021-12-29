@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Purchase;
 use App\Models\PurchaseDetail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseService
@@ -69,5 +70,14 @@ class PurchaseService
         $purchase->where('purchase_id', $in['purchase_id']);
 
         return $purchase->get();
+    }
+    public function updateInvoice($in)
+    {
+        $user_id = Auth::user()->id;
+        return Purchase::where('id', $in['id'])->update([
+            'updated_by' => $user_id,
+            'invoice_number' => $in['invoice_number'],
+            'invoice_date' => $in['invoice_date'],
+        ]);
     }
 }
