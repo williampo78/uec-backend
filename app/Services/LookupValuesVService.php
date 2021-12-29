@@ -53,4 +53,22 @@ class LookupValuesVService
 
         return $result;
     }
+
+    /**
+     * 取得發票捐贈機構
+     *
+     * @return object
+     */
+    public function getDonatedInstitutions()
+    {
+        $agent_id = Auth::user()->agent_id;
+
+        $result = Lookup_values_v::where('agent_id', $agent_id)
+            ->where('type_code', 'DONATED_INSTITUTION')
+            ->orderBy("sort", "asc")
+            ->orderBy("code", "asc")
+            ->get();
+
+        return $result;
+    }
 }

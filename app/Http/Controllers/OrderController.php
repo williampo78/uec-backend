@@ -180,8 +180,61 @@ class OrderController extends Controller
         // 結帳金額
         $order->paid_amount = number_format($order->paid_amount);
 
+        // 發票用途
+        if (isset(config('uec.invoice_usage_options')[$order->invoice_usage])) {
+            $order->invoice_usage = config('uec.invoice_usage_options')[$order->invoice_usage];
+        }
+
+        // 載具類型
+        if (isset(config('uec.carrier_type_options')[$order->carrier_type])) {
+            $order->carrier_type = config('uec.carrier_type_options')[$order->carrier_type];
+        }
+
+        if (isset($order->shipments)) {
+            $order->shipments = $order->shipments->take(1)->map(function ($shipment) {
+                // 出貨單狀態
+                if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
+                    $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
+                }
+
+                return $shipment->only([
+                    'status_code',
+                ]);
+            });
+        }
+
+        // 訂單明細
         if (isset($order->order_details)) {
             $order->order_details = $order->order_details->map(function ($order_detail) {
+                // 單位售價 (商品主檔維護的售價)
+                $order_detail->selling_price = number_format($order_detail->selling_price);
+
+                // 單價 (單品折扣後的單價，即前台購物車呈現的單價)
+                $order_detail->unit_price = number_format($order_detail->unit_price);
+
+                // 活動折扣金額
+                $order_detail->campaign_discount = number_format($order_detail->campaign_discount);
+
+                // 小計
+                $order_detail->subtotal = number_format($order_detail->subtotal);
+
+                // 會員點數扣抵金額
+                $order_detail->point_discount = number_format($order_detail->point_discount);
+
+                // 訂單明細身分
+                if (isset(config('uec.order_record_identity_options')[$order_detail->record_identity])) {
+                    $order_detail->record_identity = config('uec.order_record_identity_options')[$order_detail->record_identity];
+                }
+
+                // 累計已銷退的活動折扣金額
+                $order_detail->returned_campaign_discount = number_format($order_detail->returned_campaign_discount);
+
+                // 累計已銷退的的小計
+                $order_detail->returned_subtotal = number_format($order_detail->returned_subtotal);
+
+                // 累計已銷退的會員點數扣抵金額
+                $order_detail->returned_point_discount = number_format($order_detail->returned_point_discount);
+
                 return $order_detail->only([
                     'seq',
                     'item_no',
@@ -201,19 +254,55 @@ class OrderController extends Controller
                     'returned_subtotal',
                     'returned_point_discount',
                 ]);
-            })
-                ->toArray();
+            });
         }
 
-        if (isset($order->shipments)) {
-            $order->shipments = $order->shipments->take(1)->map(function ($shipment) {
-                // 出貨單狀態
-                if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
-                    $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
+        // 發票資訊
+        if (isset($order->invoices)) {
+            $order->invoices = $order->invoices->map(function ($invoice) {
+                // 時間
+                $invoice->transaction_date = Carbon::parse($invoice->transaction_date)->format('Y-m-d');
+
+                // 類型
+                $invoice->type = isset($invoice->invoice_allowance_id) ? '發票折讓' : '發票開立' ;
+
+                // 課稅別
+                if (isset(config('uec.tax_type_options')[$invoice->tax_type])) {
+                    $invoice->tax_type = config('uec.tax_type_options')[$invoice->tax_type];
                 }
 
-                return $shipment->only([
-                    'status_code',
+                // 金額
+                $invoice->amount = number_format($invoice->amount);
+
+                // 發票明細
+                if (isset($invoice->invoice_details)) {
+                    $invoice->invoice_details = $invoice->invoice_details->map(function ($invoice_detail) {
+                        // 單價
+                        $invoice_detail->unit_price = number_format($invoice_detail->unit_price);
+
+                        // 小計
+                        $invoice_detail->amount = number_format($invoice_detail->amount);
+
+                        return $invoice_detail->only([
+                            'seq',
+                            'item_name',
+                            'unit_price',
+                            'qty',
+                            'amount',
+                        ]);
+                    });
+                }
+
+                return $invoice->only([
+                    'transaction_date',
+                    'type',
+                    'invoice_no',
+                    'tax_type',
+                    'amount',
+                    'remark',
+                    'random_no',
+                    'order_no',
+                    'invoice_details',
                 ]);
             });
         }
@@ -238,8 +327,15 @@ class OrderController extends Controller
             'point_discount',
             'shipping_fee',
             'paid_amount',
-            'order_details',
             'shipments',
+            'order_details',
+            'invoice_usage',
+            'carrier_type',
+            'carrier_no',
+            'buyer_gui_number',
+            'buyer_title',
+            'donated_institution_name',
+            'invoices',
         ]);
 
         return response()->json($order);
