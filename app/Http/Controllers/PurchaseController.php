@@ -127,7 +127,6 @@ class PurchaseController extends Controller
 
                     return $obj;
                 });
-                // dd($data) ; 
                 return view('Backend.Purchase.show', $data);
                 break;
             case 'update_invoice':

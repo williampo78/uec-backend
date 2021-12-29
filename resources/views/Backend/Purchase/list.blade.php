@@ -227,8 +227,8 @@
             $("#select-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    $('#save_data').prop('disabled', true);
-                    // form.submit();
+                    // $('#save_data').prop('disabled', true);
+                    form.submit();
                 },
                 rules: {
                     trade_date_start: {
