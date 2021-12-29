@@ -51,7 +51,7 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-            $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.* from `web_category_products` cate_prod
+            $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
                     inner join `products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
@@ -70,7 +70,7 @@ class APIProductServices
             $strSQL .= " group by cate.`id`
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
         } elseif ($config_levels == '2') {
-            $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.* from `web_category_products` cate_prod
+            $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
                     inner join `products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
@@ -104,6 +104,7 @@ class APIProductServices
                 $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_title'] = $category->meta_title;
                 $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_description'] = $category->meta_description;
                 $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['count'] = $category->pCount;
 
             } else if ($config_levels == '2') {
 
@@ -113,6 +114,7 @@ class APIProductServices
                 $L2_data[$category->L1ID][$category->id]['meta_title'] = $category->meta_title;
                 $L2_data[$category->L1ID][$category->id]['meta_description'] = $category->meta_description;
                 $L2_data[$category->L1ID][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L2_data[$category->L1ID][$category->id]['count'] = $category->pCount;
             }
 
         }
@@ -133,12 +135,14 @@ class APIProductServices
                             $data3[$key3]["id"] = $value3["id"];
                             $data3[$key3]["name"] = $value3["name"];
                             $data3[$key3]["type"] = $value3["type"];
+                            $data3[$key3]["count"] = $value3["count"];
                             $data3[$key3]["meta_title"] = $value3["meta_title"];
                             $data3[$key3]["meta_description"] = $value3["meta_description"];
                             $data3[$key3]["meta_keywords"] = $value3["meta_keywords"];
                         }
                         $data2[$key2]["cateInfo"] = $data3;
                     } elseif ($config_levels == 2) {
+                        $data2[$key2]["count"] = $value2["count"];
                         $data2[$key2]["type"] = $value2["type"];
                         $data2[$key2]["meta_title"] = $value2["meta_title"];
                         $data2[$key2]["meta_description"] = $value2["meta_description"];
