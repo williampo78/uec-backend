@@ -93,10 +93,47 @@ return [
         'VOIDED' => '已作廢',
     ],
 
+    // 發票用途
+    'invoice_usage_options' => [
+        'P' => '個人電子發票',
+        'D' => '發票捐贈',
+        'C' => '公司戶電子發票',
+    ],
+
+    // 載具類型
+    'carrier_type_options' => [
+        '1' => '商城線上載具',
+        '2' => '自然人憑證載具',
+        '3' => '手機條碼載具',
+    ],
+
+    // 課稅類別
+    'tax_type_options' => [
+        'TAXABLE' => '應稅',
+        'ZERO_RATED' => '零稅率',
+        'NON_TAXABLE' => '免稅',
+    ],
+
+    // 金流類型
+    'payment_type_options' => [
+        'PAY' => '請款',
+        'REFUND' => '退款',
+    ],
+
+    // 金流狀態
+    'payment_status_options' => [
+        'NA' => '不須處理',
+        'PENDING' => '待請款 / 待退款',
+        'COMPLETED' => '請款成功 / 退款成功',
+        'FAILED' => '請款失敗 / 退款失敗',
+        'VOIDED' => '已作廢',
+    ],
+
     'tax_option' => [
         '0' => '免稅',
         // 1 => '應稅',
         '2' => '應稅內含',
         '3' => '零稅率',
     ],
+
 ];

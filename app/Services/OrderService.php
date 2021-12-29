@@ -2,9 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\Invoice;
+use App\Models\InvoiceAllowance;
+use App\Models\InvoiceAllowanceDetail;
+use App\Models\InvoiceDetail;
 use App\Models\Order;
 use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
+use App\Models\OrderPayment;
 use App\Models\Shipment;
 use App\Models\ShipmentDetail;
 
@@ -96,6 +101,20 @@ class OrderService
         // 出貨單明細
         $shipment_details = ShipmentDetail::get();
 
+        // 將出貨單明細加入出貨單中
+        foreach ($shipment_details as $shipment_detail) {
+            if ($shipments->contains('id', $shipment_detail->shipment_id)) {
+                $shipment = $shipments->firstWhere('id', $shipment_detail->shipment_id);
+
+                // 檢查出貨單明細是否有定義
+                if (!isset($shipment->shipment_details)) {
+                    $shipment->shipment_details = collect();
+                }
+
+                $shipment->shipment_details->push($shipment_detail);
+            }
+        }
+
         // 訂單折扣
         $order_campaign_discounts = OrderCampaignDiscount::select(
             'order_campaign_discounts.*',
@@ -111,19 +130,81 @@ class OrderService
 
         $order_campaign_discounts = $order_campaign_discounts->get();
 
-        // 將出貨單明細加入出貨單中
-        foreach ($shipment_details as $shipment_detail) {
-            if ($shipments->contains('id', $shipment_detail->shipment_id)) {
-                $shipment = $shipments->firstWhere('id', $shipment_detail->shipment_id);
+        $lookup_values_v_service = new LookupValuesVService;
+        // 發票捐贈機構
+        $donated_institutions = $lookup_values_v_service->getDonatedInstitutions();
 
-                // 檢查出貨單明細是否有定義
-                if (!isset($shipment->shipment_details)) {
-                    $shipment->shipment_details = collect();
+        // 發票開立
+        $invoices = Invoice::select(
+            'id AS invoice_id',
+            'order_no',
+            'invoice_date AS transaction_date',
+            'invoice_no',
+            'tax_type',
+            'total_amount AS amount',
+            'remark',
+            'random_no',
+        )
+            ->get();
+
+        // 發票開立明細
+        $invoice_details = InvoiceDetail::orderBy('invoice_id', 'asc')
+            ->orderBy('seq', 'asc')
+            ->get();
+
+        // 將發票開立明細加入發票開立中
+        foreach ($invoice_details as $invoice_detail) {
+            if ($invoices->contains('invoice_id', $invoice_detail->invoice_id)) {
+                $invoice = $invoices->firstWhere('invoice_id', $invoice_detail->invoice_id);
+
+                // 檢查發票開立明細是否有定義
+                if (!isset($invoice->invoice_details)) {
+                    $invoice->invoice_details = collect();
                 }
 
-                $shipment->shipment_details->push($shipment_detail);
+                $invoice->invoice_details->push($invoice_detail);
             }
         }
+
+        // 發票折讓
+        $invoice_allowances = InvoiceAllowance::select(
+            'invoice_allowance.id AS invoice_allowance_id',
+            'invoice_allowance.order_no',
+            'invoice_allowance.allowance_date AS transaction_date',
+            'invoice_allowance.invoice_no',
+            'invoices.tax_type',
+            'invoice_allowance.allowance_amount AS amount',
+            'invoices.remark',
+            'invoices.random_no',
+        )
+            ->join('invoices', 'invoice_allowance.invoice_id', 'invoices.id')
+            ->get();
+
+        // 發票折讓明細
+        $invoice_allowance_details = InvoiceAllowanceDetail::orderBy('invoice_allowance_id', 'asc')
+            ->orderBy('seq', 'asc')
+            ->get();
+
+        // 將發票折讓明細加入發票折讓中
+        foreach ($invoice_allowance_details as $invoice_allowance_detail) {
+            if ($invoice_allowances->contains('invoice_allowance_id', $invoice_allowance_detail->invoice_allowance_id)) {
+                $invoice_allowance = $invoice_allowances->firstWhere('invoice_allowance_id', $invoice_allowance_detail->invoice_allowance_id);
+
+                // 檢查發票折讓明細是否有定義
+                if (!isset($invoice_allowance->invoice_details)) {
+                    $invoice_allowance->invoice_details = collect();
+                }
+
+                $invoice_allowance->invoice_details->push($invoice_allowance_detail);
+            }
+        }
+
+        $all_invoices = $invoices->concat($invoice_allowances);
+        $all_invoices = $all_invoices->sortBy('transaction_date');
+
+        // 訂單金流單
+        $order_payments = OrderPayment::orderBy('created_at', 'asc')
+            ->get();
 
         foreach ($order_details as $order_detail) {
             // 將託運單號加入訂單明細中
@@ -174,6 +255,42 @@ class OrderService
                 }
 
                 $order->order_campaign_discounts->push($order_campaign_discount);
+            }
+        }
+
+        // 將發票捐贈機構名稱加入訂單中
+        foreach ($donated_institutions as $donated_institution) {
+            if ($orders->contains('donated_institution', $donated_institution->code)) {
+                $order = $orders->firstWhere('donated_institution', $donated_institution->code);
+                $order->donated_institution_name = $donated_institution->description;
+            }
+        }
+
+        // 將發票資訊加入訂單中
+        foreach ($all_invoices as $invoice) {
+            if ($orders->contains('order_no', $invoice->order_no)) {
+                $order = $orders->firstWhere('order_no', $invoice->order_no);
+
+                // 檢查發票資訊是否有定義
+                if (!isset($order->invoices)) {
+                    $order->invoices = collect();
+                }
+
+                $order->invoices->push($invoice);
+            }
+        }
+
+        // 將訂單金流單加入訂單中
+        foreach ($order_payments as $order_payment) {
+            if ($orders->contains('order_no', $order_payment->order_no)) {
+                $order = $orders->firstWhere('order_no', $order_payment->order_no);
+
+                // 檢查訂單金流單是否有定義
+                if (!isset($order->order_payments)) {
+                    $order->order_payments = collect();
+                }
+
+                $order->order_payments->push($order_payment);
             }
         }
 

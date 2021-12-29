@@ -326,6 +326,7 @@
             </div>
         </div>
         @include('Backend.Order.detail')
+        @include('Backend.Order.invoice_detail')
         <!-- /.modal -->
 
     </div>
@@ -435,10 +436,11 @@
                 },
             });
 
-            // let slot_type_option_json = @json(config('uec.ad_slot_type_option'));
+            let invoices = {};
 
             $('#table_list tbody').on('click', '.order_detail', function() {
                 let order_id = $(this).attr("data-order");
+                invoices = {};
 
                 axios.post('/backend/order/ajax/detail', {
                         order_id: order_id
@@ -446,18 +448,25 @@
                     .then(function(response) {
                         let order = response.data;
                     console.log(order);
+                        // 訂單資訊
                         $('#modal-order-no').empty().text(order.order_no);
                         $('#modal-ordered-date').empty().text(order.ordered_date);
                         $('#modal-order-status-code').empty().text(order.status_code);
                         $('#modal-payment-method').empty().text(order.payment_method);
                         $('#modal-pay-status').empty().text(order.pay_status);
                         $('#modal-shipping-free-threshold').empty().text(order.shipping_free_threshold);
+
+                        // 訂購人
                         $('#modal-member-account').empty().text(order.member_account);
                         $('#modal-buyer-name').empty().text(order.buyer_name);
                         $('#modal-buyer-email').empty().text(order.buyer_email);
+
+                        // 收件人
                         $('#modal-receiver-name').empty().text(order.receiver_name);
                         $('#modal-receiver-mobile').empty().text(order.receiver_mobile);
                         $('#modal-receiver-address').empty().text(order.receiver_address);
+
+                        // 物流
                         $('#modal-lgst-method').empty().text(order.lgst_method);
 
                         if (order.shipments) {
@@ -467,16 +476,22 @@
                             }
                         }
 
+                        // 金額區塊
                         $('#modal-total-amount').empty().text(order.total_amount);
                         $('#modal-cart-campaign-discount').empty().text(order.cart_campaign_discount);
                         $('#modal-point-discount').empty().text(order.point_discount);
                         $('#modal-shipping-fee').empty().text(order.shipping_fee);
                         $('#modal-paid-amount').empty().text(order.paid_amount);
 
-                        if (order.order_details) {
-                            $("#tab-order-detail tbody").empty();
+                        // 訂單明細
+                        $("#tab-order-detail tbody").empty();
 
+                        if (order.order_details) {
                             $.each(order.order_details, function (key, order_detail) {
+                                let package_no = order_detail.package_no ?
+                                    `<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">${order_detail.package_no}</a>` :
+                                    '';
+
                                 $("#tab-order-detail tbody").append(`
                                     <tr>
                                         <td>${order_detail.seq}</td>
@@ -491,11 +506,64 @@
                                         <td>${order_detail.subtotal}</td>
                                         <td>${order_detail.point_discount}</td>
                                         <td>${order_detail.record_identity}</td>
-                                        <td>${order_detail.package_no}</td>
+                                        <td>${package_no}</td>
                                         <td>${order_detail.returned_qty}</td>
                                         <td>${order_detail.returned_campaign_discount}</td>
                                         <td>${order_detail.returned_subtotal}</td>
                                         <td>${order_detail.returned_point_discount}</td>
+                                    </tr>
+                                `);
+                            });
+                        }
+
+                        // 發票資訊
+                        $('#modal-invoice-usage').empty().text(order.invoice_usage);
+                        $('#modal-carrier-type').empty().text(order.carrier_type);
+                        $('#modal-carrier-no').empty().text(order.carrier_no);
+                        $('#modal-buyer-gui-number').empty().text(order.buyer_gui_number);
+                        $('#modal-buyer-title').empty().text(order.buyer_title);
+                        $('#modal-donated-institution-name').empty().text(order.donated_institution_name);
+                        $("#tab-invoice-info tbody").empty();
+
+                        if (order.invoices) {
+                            let count = 1;
+                            $.each(order.invoices, function (key, invoice) {
+                                $("#tab-invoice-info tbody").append(`
+                                    <tr data-count="${count}">
+                                        <td>${count}</td>
+                                        <td>${invoice.transaction_date}</td>
+                                        <td>${invoice.type}</td>
+                                        <td>${invoice.invoice_no}</td>
+                                        <td>${invoice.tax_type}</td>
+                                        <td>${invoice.amount}</td>
+                                        <td><button type="button" class="btn btn-primary btn-invoice-detail">詳細資訊</button></td>
+                                        <td>${invoice.remark}</td>
+                                    </tr>
+                                `);
+
+                                invoices[count] = invoice;
+
+                                count++;
+                            });
+                        }
+
+                        // 金流資訊
+                        $("#tab-payment-info tbody").empty();
+
+                        if (order.order_payments) {
+                            $.each(order.order_payments, function (key, order_payment) {
+                                let count = 1;
+
+                                $("#tab-payment-info tbody").append(`
+                                    <tr>
+                                        <td>${count++}</td>
+                                        <td>${order_payment.created_at_format}</td>
+                                        <td>${order_payment.payment_type}</td>
+                                        <td>Tappay</td>
+                                        <td>${order_payment.amount}</td>
+                                        <td>${order_payment.payment_status}</td>
+                                        <td>${order_payment.latest_api_date}</td>
+                                        <td>${order_payment.remark}</td>
                                     </tr>
                                 `);
                             });
@@ -506,6 +574,39 @@
                     .catch(function(error) {
                         console.log(error);
                     });
+            });
+
+            // 點擊發票資訊中的詳細資訊
+            $(document).on('click', '.btn-invoice-detail', function() {
+                let count = $(this).closest('tr').attr('data-count');
+
+                if (invoices[count]) {
+                    $('#invoice-modal-invoice-no').empty().text(invoices[count].invoice_no);
+                    $('#invoice-modal-transaction-date').empty().text(invoices[count].transaction_date);
+                    $('#invoice-modal-random-no').empty().text(invoices[count].random_no);
+                    $('#invoice-modal-order-no').empty().text(invoices[count].order_no);
+                    $('#invoice-modal-selling-price').empty().text(invoices[count].amount);
+                    $('#invoice-modal-tax-type').empty().text(invoices[count].tax_type);
+                    $('#invoice-modal-total-tax').empty().text(0);
+                    $('#invoice-modal-amount').empty().text(invoices[count].amount);
+                    $("#invoice-modal-invoice-info-table tbody").empty();
+
+                    if (invoices[count].invoice_details) {
+                        $.each(invoices[count].invoice_details, function (key, invoice_detail) {
+                            $("#invoice-modal-invoice-info-table tbody").append(`
+                                <tr>
+                                    <td>${invoice_detail.seq}</td>
+                                    <td>${invoice_detail.item_name}</td>
+                                    <td>${invoice_detail.unit_price}</td>
+                                    <td>${invoice_detail.qty}</td>
+                                    <td>${invoice_detail.amount}</td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    $('#invoice_detail').modal('show');
+                }
             });
         });
     </script>
