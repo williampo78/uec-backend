@@ -548,7 +548,7 @@ class APICartServices
                 if ($assigned_qty >= $CART04_n[$campaign_id]) {
                     foreach ($campaign_gift['PROD'][$campaign_id] as $prod_id => $value) {
                         if ($value->assignedQty > 0) {
-                            if ($this->stockService->getStockByProd($warehouseCode, $item->product_id)->stock_qty > 0) { //有足夠庫存
+                            if ($this->stockService->getStockByProd($warehouseCode, $prod_id)->stock_qty > 0) { //有足夠庫存
                                 $cartGift[] = array(
                                     "campaignName" => $value->campaign_name,
                                     "productId" => $prod_id,
