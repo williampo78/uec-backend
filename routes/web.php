@@ -36,6 +36,7 @@ use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\BuyoutProductsReportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -150,6 +151,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/order/ajax/detail', [OrderController::class, 'getDetail']);
 
     Route::resource('/webcontents', WebContentsController::class, ['names' => ['index' => 'webcontents']]);
+
+    Route::resource('/buyout_products_report', BuyoutProductsReportController::class, ['names' => ['index' => 'buyout_products_report']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
