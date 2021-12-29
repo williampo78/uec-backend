@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Models\ProductItems;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\WarehouseStock;
@@ -50,6 +51,22 @@ class StockService
             ->where("sys_config.config_key", "=", "EC_WAREHOUSE_GOODS")
             ->where("sys_config.active", "=", "1")->first();
         return $value->config_value;
+    }
+
+    /*
+     * 找出產品的庫存數
+     * @params : $number = 倉別，$prod_id = 商品id)
+     */
+    public function getStockByProd($number = null, $prod_id = null)
+    {
+        $stock = ProductItems::selectRaw("sum(warehouse_stock.stock_qty) as stock_qty")
+            ->join("warehouse_stock", "warehouse_stock.product_item_id","=","product_items.id")
+            ->join("warehouse","warehouse.id","=","warehouse_stock.warehouse_id")
+            ->where("warehouse.number", "=", $number)
+            ->where("product_items.product_id", "=", $prod_id)
+            ->groupBy('product_items.product_id')->first();
+
+        return $stock;
     }
 
 }
