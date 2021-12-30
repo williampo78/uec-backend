@@ -129,6 +129,12 @@ return [
         'VOIDED' => '已作廢',
     ],
 
+    // 活動階層
+    'campaign_level_code_options' => [
+        'PRD' => '單品',
+        'CART' => '滿額',
+    ],
+
     'tax_option' => [
         '0' => '免稅',
         // 1 => '應稅',

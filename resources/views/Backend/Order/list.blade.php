@@ -32,6 +32,10 @@
             padding: 30px;
         }
 
+        #tab-lgst-info tbody th {
+            text-align: right;
+        }
+
     </style>
 @endsection
 
@@ -41,7 +45,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>訂單管理</h1>
+                <h1 class="page-header"><i class="fa fa-list"></i> 銷售訂單管理</h1>
             </div>
         </div>
 
@@ -54,7 +58,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="row">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">訂單時間</label>
                                         </div>
                                         <div class="col-sm-4">
@@ -99,7 +103,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">訂單編號</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -111,7 +115,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">會員帳號</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -126,7 +130,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">訂單狀態</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -147,7 +151,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">付款狀態</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -168,7 +172,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">出貨單狀態</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -192,7 +196,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">商品序號</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -204,7 +208,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">商品名稱</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -216,7 +220,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3 text-right">
+                                        <div class="col-sm-3">
                                             <label class="control-label">活動名稱</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -240,14 +244,15 @@
                                 <div class="col-sm-4">
                                     <div class="col-sm-3"></div>
                                     <div class="col-sm-9 text-right">
-                                        {{-- @if ($share_role_auth['auth_export']) --}}
-                                        <button class="btn btn-primary"><i class="fa fa-file-excel-o"></i> 匯出EXCEL</button>
-                                        {{-- @endif --}}
+                                        @if ($share_role_auth['auth_export'])
+                                            <button class="btn btn-primary"><i class="fa fa-file-excel-o"></i>
+                                                匯出EXCEL</button>
+                                        @endif
 
-                                        {{-- @if ($share_role_auth['auth_query']) --}}
-                                        <button class="btn btn-warning" id="btn-search"><i class="fa fa-search"></i>
-                                            查詢</button>
-                                        {{-- @endif --}}
+                                        @if ($share_role_auth['auth_query'])
+                                            <button class="btn btn-warning" id="btn-search"><i class="fa fa-search"></i>
+                                                查詢</button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -256,7 +261,7 @@
 
                     <!-- Table list -->
                     <div class="panel-body">
-                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
                                 id="table_list">
                                 <thead>
@@ -282,12 +287,12 @@
                                         @foreach ($orders as $order)
                                             <tr>
                                                 <td>
-                                                    {{-- @if ($share_role_auth['auth_query']) --}}
-                                                    <button type="button" class="btn btn-info btn-sm order_detail"
-                                                        data-order="{{ $order['id'] }}" title="檢視">
-                                                        <i class="fa fa-search"></i>
-                                                    </button>
-                                                    {{-- @endif --}}
+                                                    @if ($share_role_auth['auth_query'])
+                                                        <button type="button" class="btn btn-info btn-sm order_detail"
+                                                            data-order="{{ $order['id'] }}" title="檢視">
+                                                            <i class="fa fa-search"></i>
+                                                        </button>
+                                                    @endif
                                                 </td>
                                                 <td>{{ $count++ }}</td>
                                                 <td>{{ $order['ordered_date'] ?? '' }}</td>
@@ -447,7 +452,7 @@
                     })
                     .then(function(response) {
                         let order = response.data;
-                    console.log(order);
+                        console.log(order);
                         // 訂單資訊
                         $('#modal-order-no').empty().text(order.order_no);
                         $('#modal-ordered-date').empty().text(order.ordered_date);
@@ -487,7 +492,13 @@
                         $("#tab-order-detail tbody").empty();
 
                         if (order.order_details) {
-                            $.each(order.order_details, function (key, order_detail) {
+                            $.each(order.order_details, function(key, order_detail) {
+                                let spec_1_value = order_detail.spec_1_value ? order_detail
+                                    .spec_1_value : '';
+                                let spec_2_value = order_detail.spec_2_value ? order_detail
+                                    .spec_2_value : '';
+                                let record_identity = order_detail.record_identity ?
+                                    order_detail.record_identity : '';
                                 let package_no = order_detail.package_no ?
                                     `<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">${order_detail.package_no}</a>` :
                                     '';
@@ -497,15 +508,15 @@
                                         <td>${order_detail.seq}</td>
                                         <td>${order_detail.item_no}</td>
                                         <td>${order_detail.product_name}</td>
-                                        <td>${order_detail.spec_1_value}</td>
-                                        <td>${order_detail.spec_2_value}</td>
+                                        <td>${spec_1_value}</td>
+                                        <td>${spec_2_value}</td>
                                         <td>${order_detail.selling_price}</td>
                                         <td>${order_detail.unit_price}</td>
                                         <td>${order_detail.qty}</td>
                                         <td>${order_detail.campaign_discount}</td>
                                         <td>${order_detail.subtotal}</td>
                                         <td>${order_detail.point_discount}</td>
-                                        <td>${order_detail.record_identity}</td>
+                                        <td>${record_identity}</td>
                                         <td>${package_no}</td>
                                         <td>${order_detail.returned_qty}</td>
                                         <td>${order_detail.returned_campaign_discount}</td>
@@ -522,12 +533,13 @@
                         $('#modal-carrier-no').empty().text(order.carrier_no);
                         $('#modal-buyer-gui-number').empty().text(order.buyer_gui_number);
                         $('#modal-buyer-title').empty().text(order.buyer_title);
-                        $('#modal-donated-institution-name').empty().text(order.donated_institution_name);
+                        $('#modal-donated-institution-name').empty().text(order
+                            .donated_institution_name);
                         $("#tab-invoice-info tbody").empty();
 
                         if (order.invoices) {
                             let count = 1;
-                            $.each(order.invoices, function (key, invoice) {
+                            $.each(order.invoices, function(key, invoice) {
                                 $("#tab-invoice-info tbody").append(`
                                     <tr data-count="${count}">
                                         <td>${count}</td>
@@ -551,8 +563,11 @@
                         $("#tab-payment-info tbody").empty();
 
                         if (order.order_payments) {
-                            $.each(order.order_payments, function (key, order_payment) {
+                            $.each(order.order_payments, function(key, order_payment) {
                                 let count = 1;
+                                let latest_api_date = order_payment.latest_api_date ?
+                                    order_payment.latest_api_date : '';
+                                let remark = order_payment.remark ? order_payment.remark : '';
 
                                 $("#tab-payment-info tbody").append(`
                                     <tr>
@@ -562,12 +577,51 @@
                                         <td>Tappay</td>
                                         <td>${order_payment.amount}</td>
                                         <td>${order_payment.payment_status}</td>
-                                        <td>${order_payment.latest_api_date}</td>
-                                        <td>${order_payment.remark}</td>
+                                        <td>${latest_api_date}</td>
+                                        <td>${remark}</td>
                                     </tr>
                                 `);
                             });
                         }
+
+                        // 活動折抵
+                        $("#tab-campaign-discount tbody").empty();
+
+                        if (order.order_campaign_discounts) {
+                            $.each(order.order_campaign_discounts, function(key,
+                                order_campaign_discount) {
+                                let item_no = order_campaign_discount.item_no ?
+                                    order_campaign_discount.item_no : '';
+                                let spec_1_value = order_campaign_discount.spec_1_value ?
+                                    order_campaign_discount.spec_1_value : '';
+                                let spec_2_value = order_campaign_discount.spec_2_value ?
+                                    order_campaign_discount.spec_2_value : '';
+                                let record_identity = order_campaign_discount.record_identity ?
+                                    order_campaign_discount.record_identity : '';
+
+                                $("#tab-campaign-discount tbody").append(`
+                                    <tr>
+                                        <td>${order_campaign_discount.group_seq}</td>
+                                        <td>${order_campaign_discount.level_code}</td>
+                                        <td>${order_campaign_discount.campaign_name}</td>
+                                        <td>${item_no}</td>
+                                        <td>${order_campaign_discount.product_name}</td>
+                                        <td>${spec_1_value}</td>
+                                        <td>${spec_2_value}</td>
+                                        <td>${record_identity}</td>
+                                        <td>${order_campaign_discount.discount}</td>
+                                        <td>${order_campaign_discount.is_voided}</td>
+                                    </tr>
+                                `);
+                            });
+                        }
+
+                        // 物流資訊
+                        $('#modal-cancelled-voided-at').empty().text(order.cancelled_voided_at);
+                        $('#modal-shipped-at').empty().text(order.shipped_at);
+                        $('#modal-arrived-store-at').empty().text(order.arrived_store_at);
+                        $('#modal-home-dilivered-at').empty().text(order.home_dilivered_at);
+                        $('#modal-cvs-completed-at').empty().text(order.cvs_completed_at);
 
                         $('#order_detail').modal('show');
                     })
@@ -592,7 +646,7 @@
                     $("#invoice-modal-invoice-info-table tbody").empty();
 
                     if (invoices[count].invoice_details) {
-                        $.each(invoices[count].invoice_details, function (key, invoice_detail) {
+                        $.each(invoices[count].invoice_details, function(key, invoice_detail) {
                             $("#invoice-modal-invoice-info-table tbody").append(`
                                 <tr>
                                     <td>${invoice_detail.seq}</td>

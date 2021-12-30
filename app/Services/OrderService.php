@@ -68,6 +68,7 @@ class OrderService
 
             'products.product_no',
             'products.product_name',
+
             'product_items.spec_1_value',
             'product_items.spec_2_value',
         )
@@ -120,15 +121,25 @@ class OrderService
             'order_campaign_discounts.*',
 
             'promotional_campaigns.campaign_name',
+            'promotional_campaigns.level_code',
+
+            'products.product_name',
+
+            'product_items.spec_1_value',
+            'product_items.spec_2_value',
         )
-            ->leftJoin('promotional_campaigns', 'order_campaign_discounts.promotion_campaign_id', 'promotional_campaigns.id');
+            ->leftJoin('promotional_campaigns', 'order_campaign_discounts.promotion_campaign_id', 'promotional_campaigns.id')
+            ->leftJoin('product_items', 'order_campaign_discounts.product_item_id', 'product_items.id')
+            ->leftJoin('products', 'product_items.product_id', 'products.id');
 
         // 活動名稱
         if (isset($query_datas['campaign_name'])) {
             $order_campaign_discounts = $order_campaign_discounts->where('promotional_campaigns.campaign_name', 'LIKE', "%{$query_datas['campaign_name']}%");
         }
 
-        $order_campaign_discounts = $order_campaign_discounts->get();
+        $order_campaign_discounts = $order_campaign_discounts->orderBy('order_campaign_discounts.group_seq', 'asc')
+            ->orderBy('order_campaign_discounts.order_detail_id', 'asc')
+            ->get();
 
         $lookup_values_v_service = new LookupValuesVService;
         // 發票捐贈機構
