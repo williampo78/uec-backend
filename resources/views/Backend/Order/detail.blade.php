@@ -409,10 +409,54 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-campaign-discount">
-
+                        <div class="table-responsive">
+                            <table class='table table-striped table-bordered table-hover' style='width:100%'>
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">活動群組</th>
+                                        <th class="text-nowrap">活動層級</th>
+                                        <th class="text-nowrap">活動名稱</th>
+                                        <th class="text-nowrap">Item編號</th>
+                                        <th class="text-nowrap">商品名稱</th>
+                                        <th class="text-nowrap">規格一</th>
+                                        <th class="text-nowrap">規格二</th>
+                                        <th class="text-nowrap">身份</th>
+                                        <th class="text-nowrap">折抵金額</th>
+                                        <th class="text-nowrap">作廢</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="tab-pane fade" id="tab-lgst-info">
-
+                        <div class="table-responsive">
+                            <table class='table table-striped table-bordered table-hover' style='width:40%'>
+                                <tbody>
+                                    <tr>
+                                        <th>取消 / 作廢時間</th>
+                                        <td id="modal-cancelled-voided-at"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>出貨時間</th>
+                                        <td id="modal-shipped-at"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>到店時間</th>
+                                        <td id="modal-arrived-store-at"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>(宅配)配達時間</th>
+                                        <td id="modal-home-dilivered-at"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>(超取)取件時間</th>
+                                        <td id="modal-cvs-completed-at"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

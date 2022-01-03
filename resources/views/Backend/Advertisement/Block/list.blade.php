@@ -26,7 +26,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>廣告版位管理</h1>
+                <h1 class="page-header"><i class="fa fa-list"></i> 廣告版位管理</h1>
             </div>
         </div>
 
@@ -101,7 +101,7 @@
 
                     <!-- Table list -->
                     <div class="panel-body">
-                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
                                 id="table_list">
                                 <thead>

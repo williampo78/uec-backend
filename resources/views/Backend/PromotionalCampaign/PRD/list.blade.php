@@ -153,7 +153,7 @@
                             @endif
                         </div>
                         <hr />
-                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
                                 id="table_list">
                                 <thead>
