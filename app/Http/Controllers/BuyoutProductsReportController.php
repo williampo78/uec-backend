@@ -123,7 +123,6 @@ class BuyoutProductsReportController extends Controller
         ];
         $data = $data->toArray();
         $export = new ReportExport($title, $data);
-        // Excel::download($export, 'invoices.xlsx');
-        return Excel::download($export, 'invoices.xlsx');
+        return Excel::download($export, '買斷商品對帳單'.date('Y-m-d').'.xlsx');
     }
 }
