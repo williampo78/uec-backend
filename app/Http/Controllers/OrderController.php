@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OrdersExport;
 use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -450,5 +452,15 @@ class OrderController extends Controller
         ]);
 
         return response()->json($order);
+    }
+
+    public function exportOrderExcel(Request $request)
+    {
+        $input_datas = $request->input();
+        $input_datas['is_latest'] = 1;
+
+        $orders = $this->order_service->getOrders($input_datas);
+
+        return Excel::download(new OrdersExport($orders), 'orders.xlsx');
     }
 }

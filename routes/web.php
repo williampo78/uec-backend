@@ -149,6 +149,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
         ],
     ]);
     Route::post('/order/ajax/detail', [OrderController::class, 'getDetail']);
+    Route::get('/order/ajax/excel', [OrderController::class, 'exportOrderExcel']);
 
     Route::resource('/webcontents', WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 
