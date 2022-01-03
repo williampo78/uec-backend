@@ -144,7 +144,6 @@ class ShoppingController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $data]);
         }
         $response = $this->apiCartService->setBatchCart($request);
-        dd($response);
         if ($response == 'success') {
             $status = true;
             $data = ($request['status'] == 0 ? '加入' : '移除') . '購物車成功';
