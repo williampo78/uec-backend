@@ -12,6 +12,7 @@ use Batch;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderCampaignDiscount;
+use App\Models\ShoppingCartDetails;
 
 class APIOrdersServices
 {
@@ -24,7 +25,7 @@ class APIOrdersServices
 
     /**
      * 訂單
-     * @param
+     * @param 購物車清單, 前端的訂單資料
      * @return string
      */
     public function setOrders($cart, $order)
@@ -32,6 +33,11 @@ class APIOrdersServices
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         $random = Str::random(6);
+        $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
+        $utm_info = [];
+        foreach ($utms as $utm) {
+            $utm_info[$utm->product_item_id] = $utm;
+        }
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -89,22 +95,71 @@ class APIOrdersServices
                 "created_by", "updated_by", "created_at", "updated_at",
                 "returned_qty", "returned_campaign_discount", "returned_subtotal", "returned_point_discount", "returned_points"
             ];
-            $i = 0;
+            $seq = 0;
             $details = [];
+            $detail_gift = [];
+            $point_rate = 0;
             foreach ($cart['list'] as $products) {
-                print_r($products['itemList']);
                 foreach ($products['itemList'] as $item) {
-                    $i++;
-                    $details[$i] = [
+                    $seq++;
+                    if ($item['campaignDiscountStatus']) { //有活動折扣
+                        $discount = -($products['sellingPrice'] * $item['itemQty'] - $item['amount']);
+                    } else {
+                        $discount = 0;
+                    }
+                    if ($order['point_discount'] < 0) { //有用點數折現金
+                        $discount_rate[$seq] = round(($item['amount'] / $order['total_price']) * 100);
+                        $point_rate += $discount_rate[$seq];
+                    } else {
+                        $discount_rate[$seq] = 0;
+                        $point_rate = 100;
+                    }
+                    $details[$seq] = [
                         $order_id,
-                        $i,
+                        $seq,
                         $products['productID'],
                         $item['itemId'],
-
+                        $item['itemNo'],
+                        $products['sellingPrice'],
+                        $item['itemQty'],
+                        $item['itemPrice'],
+                        $discount,
+                        $item['amount'],
+                        'M',
+                        -$discount_rate[$seq],
+                        $utm_info[$item['itemId']]->utm_source,
+                        $utm_info[$item['itemId']]->utm_medium,
+                        $utm_info[$item['itemId']]->utm_campaign,
+                        $utm_info[$item['itemId']]->utm_sales,
+                        $utm_info[$item['itemId']]->utm_time,
+                        $member_id,
+                        $member_id,
+                        $now,
+                        $now,
+                        0, 0, 0, 0, 0
                     ];
+                    if (isset($item['campaignGiftAway']['campaignProdList'])){
+                        //if ($item['campaignGiftAway']['campaignGiftStatus']) { //符合條件
+                            foreach ($item['campaignGiftAway']['campaignProdList'] as $gifts=>$gift) {
+                                echo $gift['productId'];
+                            }
+                       // }
+                    } else {
+                        foreach ($item['campaignGiftAway'] as $gifts=>$gift) {
+                            echo $gift['productId'];
+                        }
+                    }
                 }
             }
+            if ($point_rate != 100) { //點數比例加總不等於100時，把最後一筆資料的比例做修正
+                $details[$seq][11] = $details[$seq][11] - 100 + $point_rate;
+            }
 
+            /*
+            $orderInstance = new OrderDetail();
+            $batchSize = 50;
+            Batch::insert($orderInstance, $addColumn, $webData, $batchSize);
+            */
             DB::commit();
 
             if ($order_id > 0) {

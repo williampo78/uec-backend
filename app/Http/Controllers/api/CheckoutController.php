@@ -190,7 +190,7 @@ class CheckoutController extends Controller
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
         $response = json_decode($response, true);
         //Step1, 檢核金額
-        if ($response['result']['totalPrice'] == $request->total_price && $response['result']['discount'] == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
+        if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
             //Stet2, 產生訂單
             $data = $this->apiOrdersService->setOrders($response['result'], $request);
             $status = true;

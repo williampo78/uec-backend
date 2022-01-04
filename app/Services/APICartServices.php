@@ -517,6 +517,7 @@ class APICartServices
                     "productID" => $product_id,
                     "productNo" => $cartInfo[$product_id]['product_no'],
                     "productName" => $cartInfo[$product_id]['product_name'],
+                    "sellingPrice" => $cartInfo[$product_id]['selling_price'],
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product
                 );
