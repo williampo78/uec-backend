@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\APIService;
 use App\Services\APIProductServices;
 use App\Services\APICartServices;
-
+use App\Services\APIOrdersServices;
 use Validator;
 
 class CheckoutController extends Controller
@@ -19,13 +19,15 @@ class CheckoutController extends Controller
     private $apiService;
     private $apiProductServices;
     private $apiCartService;
+    private $apiOrdersService;
 
-    public function __construct(UniversalService $universalService, APIService $apiService, APIProductServices $apiProductServices, APICartServices $apiCartService)
+    public function __construct(UniversalService $universalService, APIService $apiService, APIProductServices $apiProductServices, APICartServices $apiCartService, APIOrdersServices $apiOrdersService)
     {
         $this->universalService = $universalService;
         $this->apiService = $apiService;
         $this->apiProductServices = $apiProductServices;
         $this->apiCartService = $apiCartService;
+        $this->apiOrdersService = $apiOrdersService;
     }
 
     /*
@@ -106,10 +108,12 @@ class CheckoutController extends Controller
         $error_code = $this->apiService->getErrorCode();
         $messages = [
             'payment_method.required' => '付款方式不能為空',
+            'taypay_prime.required' => '未取得TapPay Prime',
             'invoice.usage.required' => '請選擇發票開立方式',
-            'invoice.carrier_type.required' => '請選擇載具類型',
-            'buyer.required' => '請選擇訂購人資訊',
-            'receiver.required' => '請選擇收件人資訊',
+            'buyer.*.required' => '訂購人資訊未填寫完整',
+            'buyer.email.email' => 'Email格式錯誤',
+            'receiver.*.required' => '收件人資訊未填寫完整',
+            'receiver.email.email' => 'Email格式錯誤',
             'total_price.required' => '商品總價不能為空',
             'total_price.numeric' => '商品總價必須為數值',
             'discount.required' => '滿額折抵不能為空',
@@ -126,9 +130,12 @@ class CheckoutController extends Controller
 
         $v = Validator::make($request->all(), [
             'payment_method' => 'required',
-            'invoice.*' => 'required',
-            'buyer' => 'required',
-            'receiver' => 'required',
+            'taypay_prime' => 'required',
+            'invoice.usage' => 'required',
+            'buyer.*' => 'required',
+            'buyer.email' => 'email',
+            'receiver.*' => 'required',
+            'receiver.email' => 'email',
             'total_price' => 'required|numeric',
             'discount' => 'required|numeric',
             'point_discount' => 'required|numeric',
@@ -136,24 +143,45 @@ class CheckoutController extends Controller
             'payment' => 'required|numeric',
             'points' => 'required|numeric',
         ], $messages);
+
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
-        dd();
-        $errInvoice = [
-            'usage.required' => '請選擇發票開立方式',
-            'carrier_type.required' => '請選擇載具類型',
-        ];
 
-        $v_invocie = Validator::make($request->invoice, [
-            'usage' => 'required',
-            'carrier_type' => 'required',
-        ], $errInvoice);
+        if ($request->invoice['usage'] == 'P') { //二聯式，個人電子發票
+            if($request->invoice['carrier_type'] == 3) {
+                $errInvoice = [
+                    'carrier_no.required' => '手機條碼載具必填',
+                    'carrier_no.min' => '手機條碼載具最少8碼',
+                    'carrier_no.max' => '手機條碼載具最多8碼',
+                ];
+                $v_invocie = Validator::make($request->invoice, [
+                    'carrier_no' => 'required|min:8|max:8',
+                ], $errInvoice);
+            }
+        } elseif ($request->invoice['invoice_usage'] == 'C') { //三聯式，公司戶電子發票
+            $errInvoice = [
+                'buyer_gui_number.required' => '統一編號必填',
+                'buyer_title.required' => '發票抬頭必填',
+            ];
+            $v_invocie = Validator::make($request->invoice, [
+                'buyer_gui_number' => 'required',
+                'buyer_title' => 'required',
+            ], $errInvoice);
+
+        } elseif ($request->invoice['invoice_usage'] == 'D') { //發票捐贈
+            $errInvoice = [
+                'donated_code.required' => '機構捐贈碼必填',
+            ];
+            $v_invocie = Validator::make($request->invoice, [
+                'donated_code' => 'required',
+            ], $errInvoice);
+
+        }
 
         if ($v_invocie->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v_invocie->errors()]);
         }
-dd();
 
         $member_id = Auth::guard('api')->user()->member_id;
         $campaign = $this->apiProductServices->getPromotion('product_card');
@@ -163,8 +191,9 @@ dd();
         $response = json_decode($response, true);
         //Step1, 檢核金額
         if ($response['result']['totalPrice'] == $request->total_price && $response['result']['discount'] == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
+            //Stet2, 產生訂單
+            $data = $this->apiOrdersService->setOrders($response['result'], $request);
             $status = true;
-            $data = true;
             $err = '200';
         } else {
             $status = false;

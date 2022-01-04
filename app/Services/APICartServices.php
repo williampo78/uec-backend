@@ -46,7 +46,7 @@ class APICartServices
         foreach ($result as $datas) {
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = $s3 . $ProductPhotos->photo_name;
+            $data[$datas->product_id]['item_photo'] = (isset($ProductPhotos->photo_name)?$s3 . $ProductPhotos->photo_name:null);
         }
         return $data;
     }
@@ -177,6 +177,7 @@ class APICartServices
                 }
             }
             foreach ($cartQty as $product_id => $item) {
+                if ($product_id !='101') continue;
                 $product = [];
                 $prod_gift = [];
                 if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
