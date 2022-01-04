@@ -245,7 +245,8 @@
                                     <div class="col-sm-3"></div>
                                     <div class="col-sm-9 text-right">
                                         @if ($share_role_auth['auth_export'])
-                                            <button class="btn btn-primary"><i class="fa fa-file-excel-o"></i>
+                                            <button class="btn btn-primary" id="btn-export-excel" type="button"><i
+                                                    class="fa fa-file-excel-o"></i>
                                                 匯出EXCEL</button>
                                         @endif
 
@@ -338,6 +339,7 @@
 @endsection
 
 @section('js')
+    <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
     <script>
         $(function() {
             $('#datetimepicker_ordered_date_start').datetimepicker({
@@ -661,6 +663,31 @@
 
                     $('#invoice_detail').modal('show');
                 }
+            });
+
+            // 匯出訂單
+            $('#btn-export-excel').on('click', function() {
+                axios.get('/backend/order/ajax/excel', {
+                        params: {
+                            ordered_date_start: $('#ordered_date_start').val(),
+                            ordered_date_end: $('#ordered_date_end').val(),
+                            order_no: $('#order_no').val(),
+                            member_account: $('#member_account').val(),
+                            order_status_code: $('#order_status_code').val(),
+                            pay_status: $('#pay_status').val(),
+                            shipment_status_code: $('#shipment_status_code').val(),
+                            product_no: $('#product_no').val(),
+                            product_name: $('#product_name').val(),
+                            campaign_name: $('#campaign_name').val(),
+                        },
+                        responseType: 'blob',
+                    })
+                    .then(function(response) {
+                        saveAs(response.data, "orders.xlsx");
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
             });
         });
     </script>
