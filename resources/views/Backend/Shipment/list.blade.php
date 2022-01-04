@@ -8,34 +8,6 @@
             max-width: 100%;
         }
 
-        .modal-dialog .modal-body .panel {
-            margin: 0;
-            border-radius: 0;
-        }
-
-        .modal-dialog .modal-body .panel .panel-heading {
-            height: 4rem;
-        }
-
-        .no-border-bottom {
-            border-bottom: 0;
-        }
-
-        .amount-panel .row {
-            padding: 1.5rem;
-        }
-
-        .tab-content {
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            padding: 30px;
-        }
-
-        #tab-lgst-info tbody th {
-            text-align: right;
-        }
-
     </style>
 @endsection
 
@@ -146,8 +118,8 @@
                                             <label class="control-label">出貨單狀態</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control select2-shipment-status-code"
-                                                id="status_code" name="status_code">
+                                            <select class="form-control select2-shipment-status-code" id="status_code"
+                                                name="status_code">
                                                 <option></option>
                                                 @if (config()->has('uec.shipment_status_code_options'))
                                                     @foreach (config('uec.shipment_status_code_options') as $key => $value)
@@ -167,8 +139,8 @@
                                             <label class="control-label">付款方式</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control select2-shipment-payment-method"
-                                                id="payment_method" name="payment_method">
+                                            <select class="form-control select2-shipment-payment-method" id="payment_method"
+                                                name="payment_method">
                                                 <option></option>
                                                 @if (config()->has('uec.payment_method_options'))
                                                     @foreach (config('uec.payment_method_options') as $key => $value)
@@ -258,7 +230,7 @@
                                                 <td>
                                                     @if ($share_role_auth['auth_query'])
                                                         <button type="button" class="btn btn-info btn-sm shipment_detail"
-                                                            data-order="{{ $shipment['shipments_id'] }}" title="檢視">
+                                                            data-shipment="{{ $shipment['shipments_id'] }}" title="檢視">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     @endif
@@ -397,187 +369,63 @@
                 },
             });
 
-            let invoices = {};
+            $('#table_list tbody').on('click', '.shipment_detail', function() {
+                let shipment_id = $(this).attr("data-shipment");
 
-            $('#table_list tbody').on('click', '.order_detail', function() {
-                let order_id = $(this).attr("data-order");
-                invoices = {};
-
-                axios.post('/backend/order/ajax/detail', {
-                        order_id: order_id
+                axios.post('/backend/shipment/ajax/detail', {
+                        shipment_id: shipment_id
                     })
                     .then(function(response) {
-                        let order = response.data;
+                        let shipment = response.data;
+                        let package_no = shipment.package_no ?
+                            `<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">${shipment.package_no}</a>` :
+                            '';
 
-                        // 訂單資訊
-                        $('#modal-order-no').empty().text(order.order_no);
-                        $('#modal-ordered-date').empty().text(order.ordered_date);
-                        $('#modal-order-status-code').empty().text(order.status_code);
-                        $('#modal-payment-method').empty().text(order.payment_method);
-                        $('#modal-pay-status').empty().text(order.pay_status);
-                        $('#modal-shipping-free-threshold').empty().text(order.shipping_free_threshold);
+                        $('#modal-shipment-no').empty().text(shipment.shipment_no);
+                        $('#modal-created-at').empty().text(shipment.created_at_format);
+                        $('#modal-status-code').empty().text(shipment.status_code);
+                        $('#modal-lgst-method').empty().text(shipment.lgst_method);
+                        $('#modal-lgst-company-code').empty().text(shipment.lgst_company_code);
+                        $('#modal-order-no').empty().text(shipment.order_no);
+                        $('#modal-ship-to-name').empty().text(shipment.ship_to_name);
+                        $('#modal-ship-to-mobile').empty().text(shipment.ship_to_mobile);
+                        $('#modal-ship-to-address').empty().text(shipment.ship_to_address);
+                        $('#modal-member-account').empty().text(shipment.member_account);
+                        $('#modal-edi-exported-at').empty().text(shipment.edi_exported_at);
+                        $('#modal-package-no').empty().html(package_no);
+                        $('#modal-shipped-at').empty().text(shipment.shipped_at);
+                        $('#modal-arrived-store-at').empty().text(shipment.arrived_store_at);
+                        $('#modal-cvs-completed-at').empty().text(shipment.cvs_completed_at);
+                        $('#modal-home-dilivered-at').empty().text(shipment.home_dilivered_at);
+                        $('#modal-overdue-confirmed-at').empty().text(shipment.overdue_confirmed_at);
+                        $('#modal-cancelled-voided-at').empty().text(shipment.cancelled_voided_at);
 
-                        // 訂購人
-                        $('#modal-member-account').empty().text(order.member_account);
-                        $('#modal-buyer-name').empty().text(order.buyer_name);
-                        $('#modal-buyer-email').empty().text(order.buyer_email);
+                        // 出貨單明細
+                        $("#modal-product-table tbody").empty();
 
-                        // 收件人
-                        $('#modal-receiver-name').empty().text(order.receiver_name);
-                        $('#modal-receiver-mobile').empty().text(order.receiver_mobile);
-                        $('#modal-receiver-address').empty().text(order.receiver_address);
+                        if (shipment.shipment_details) {
+                            $.each(shipment.shipment_details, function(key, shipment_detail) {
+                                let item_no = shipment_detail.item_no ? shipment_detail
+                                    .item_no : '';
+                                let spec_1_value = shipment_detail.spec_1_value ?
+                                    shipment_detail.spec_1_value : '';
+                                let spec_2_value = shipment_detail.spec_2_value ?
+                                    shipment_detail.spec_2_value : '';
 
-                        // 物流
-                        $('#modal-lgst-method').empty().text(order.lgst_method);
-                        $('#modal-shipment-status-code').empty();
-                        if (order.shipments && order.shipments[0]) {
-                            $('#modal-shipment-status-code').text(order.shipments[0]
-                                .status_code);
-                        }
-
-                        // 金額區塊
-                        $('#modal-total-amount').empty().text(order.total_amount);
-                        $('#modal-cart-campaign-discount').empty().text(order.cart_campaign_discount);
-                        $('#modal-point-discount').empty().text(order.point_discount);
-                        $('#modal-shipping-fee').empty().text(order.shipping_fee);
-                        $('#modal-paid-amount').empty().text(order.paid_amount);
-
-                        // 訂單明細
-                        $("#tab-order-detail tbody").empty();
-
-                        if (order.order_details) {
-                            $.each(order.order_details, function(key, order_detail) {
-                                let spec_1_value = order_detail.spec_1_value ? order_detail
-                                    .spec_1_value : '';
-                                let spec_2_value = order_detail.spec_2_value ? order_detail
-                                    .spec_2_value : '';
-                                let record_identity = order_detail.record_identity ?
-                                    order_detail.record_identity : '';
-                                let package_no = order_detail.package_no ?
-                                    `<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">${order_detail.package_no}</a>` :
-                                    '';
-
-                                $("#tab-order-detail tbody").append(`
+                                $("#modal-product-table tbody").append(`
                                     <tr>
-                                        <td>${order_detail.seq}</td>
-                                        <td>${order_detail.item_no}</td>
-                                        <td>${order_detail.product_name}</td>
-                                        <td>${spec_1_value}</td>
-                                        <td>${spec_2_value}</td>
-                                        <td>${order_detail.selling_price}</td>
-                                        <td>${order_detail.unit_price}</td>
-                                        <td>${order_detail.qty}</td>
-                                        <td>${order_detail.campaign_discount}</td>
-                                        <td>${order_detail.subtotal}</td>
-                                        <td>${order_detail.point_discount}</td>
-                                        <td>${record_identity}</td>
-                                        <td>${package_no}</td>
-                                        <td>${order_detail.returned_qty}</td>
-                                        <td>${order_detail.returned_campaign_discount}</td>
-                                        <td>${order_detail.returned_subtotal}</td>
-                                        <td>${order_detail.returned_point_discount}</td>
-                                    </tr>
-                                `);
-                            });
-                        }
-
-                        // 發票資訊
-                        $('#modal-invoice-usage').empty().text(order.invoice_usage);
-                        $('#modal-carrier-type').empty().text(order.carrier_type);
-                        $('#modal-carrier-no').empty().text(order.carrier_no);
-                        $('#modal-buyer-gui-number').empty().text(order.buyer_gui_number);
-                        $('#modal-buyer-title').empty().text(order.buyer_title);
-                        $('#modal-donated-institution-name').empty().text(order
-                            .donated_institution_name);
-                        $("#tab-invoice-info tbody").empty();
-
-                        if (order.invoices) {
-                            let count = 1;
-                            $.each(order.invoices, function(key, invoice) {
-                                $("#tab-invoice-info tbody").append(`
-                                    <tr data-count="${count}">
-                                        <td>${count}</td>
-                                        <td>${invoice.transaction_date}</td>
-                                        <td>${invoice.type}</td>
-                                        <td>${invoice.invoice_no}</td>
-                                        <td>${invoice.tax_type}</td>
-                                        <td>${invoice.amount}</td>
-                                        <td><button type="button" class="btn btn-primary btn-invoice-detail">詳細資訊</button></td>
-                                        <td>${invoice.remark}</td>
-                                    </tr>
-                                `);
-
-                                invoices[count] = invoice;
-
-                                count++;
-                            });
-                        }
-
-                        // 金流資訊
-                        $("#tab-payment-info tbody").empty();
-
-                        if (order.order_payments) {
-                            $.each(order.order_payments, function(key, order_payment) {
-                                let count = 1;
-                                let latest_api_date = order_payment.latest_api_date ?
-                                    order_payment.latest_api_date : '';
-                                let remark = order_payment.remark ? order_payment.remark : '';
-
-                                $("#tab-payment-info tbody").append(`
-                                    <tr>
-                                        <td>${count++}</td>
-                                        <td>${order_payment.created_at_format}</td>
-                                        <td>${order_payment.payment_type}</td>
-                                        <td>Tappay</td>
-                                        <td>${order_payment.amount}</td>
-                                        <td>${order_payment.payment_status}</td>
-                                        <td>${latest_api_date}</td>
-                                        <td>${remark}</td>
-                                    </tr>
-                                `);
-                            });
-                        }
-
-                        // 活動折抵
-                        $("#tab-campaign-discount tbody").empty();
-
-                        if (order.order_campaign_discounts) {
-                            $.each(order.order_campaign_discounts, function(key,
-                                order_campaign_discount) {
-                                let item_no = order_campaign_discount.item_no ?
-                                    order_campaign_discount.item_no : '';
-                                let spec_1_value = order_campaign_discount.spec_1_value ?
-                                    order_campaign_discount.spec_1_value : '';
-                                let spec_2_value = order_campaign_discount.spec_2_value ?
-                                    order_campaign_discount.spec_2_value : '';
-                                let record_identity = order_campaign_discount.record_identity ?
-                                    order_campaign_discount.record_identity : '';
-
-                                $("#tab-campaign-discount tbody").append(`
-                                    <tr>
-                                        <td>${order_campaign_discount.group_seq}</td>
-                                        <td>${order_campaign_discount.level_code}</td>
-                                        <td>${order_campaign_discount.campaign_name}</td>
+                                        <td>${shipment_detail.seq}</td>
                                         <td>${item_no}</td>
-                                        <td>${order_campaign_discount.product_name}</td>
+                                        <td>${shipment_detail.product_name}</td>
                                         <td>${spec_1_value}</td>
                                         <td>${spec_2_value}</td>
-                                        <td>${record_identity}</td>
-                                        <td>${order_campaign_discount.discount}</td>
-                                        <td>${order_campaign_discount.is_voided}</td>
+                                        <td>${shipment_detail.qty}</td>
                                     </tr>
                                 `);
                             });
                         }
 
-                        // 物流資訊
-                        $('#modal-cancelled-voided-at').empty().text(order.cancelled_voided_at);
-                        $('#modal-shipped-at').empty().text(order.shipped_at);
-                        $('#modal-arrived-store-at').empty().text(order.arrived_store_at);
-                        $('#modal-home-dilivered-at').empty().text(order.home_dilivered_at);
-                        $('#modal-cvs-completed-at').empty().text(order.cvs_completed_at);
-
-                        $('#order_detail').modal('show');
+                        $('#shipment_detail').modal('show');
                     })
                     .catch(function(error) {
                         console.log(error);

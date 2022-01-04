@@ -9,7 +9,7 @@
             </div>
 
             <div class="modal-body">
-                <div id="campaign-block">
+                <div id="campaign-block" class="form-horizontal">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
@@ -17,7 +17,7 @@
                                     <label class="control-label">活動名稱</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p id="modal-campaign-name"></p>
+                                    <p class="form-control-static" id="modal-campaign-name"></p>
                                 </div>
                             </div>
                         </div>
@@ -28,12 +28,11 @@
                                     <label class="control-label">狀態</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p id="modal-active"></p>
+                                    <p class="form-control-static" id="modal-active"></p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
 
                     <div class="row">
                         <div class="col-sm-6">
@@ -42,7 +41,7 @@
                                     <label class="control-label">活動類型</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p id="modal-campaign-type"></p>
+                                    <p class="form-control-static" id="modal-campaign-type"></p>
                                 </div>
                             </div>
                         </div>
@@ -54,7 +53,7 @@
                                             <label class="control-label">N (滿額) = </label>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p id="modal-n-value"></p>
+                                            <p class="form-control-static" id="modal-n-value"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -64,7 +63,7 @@
                                             <label class="control-label">X (折扣) = </label>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p id="modal-x-value"></p>
+                                            <p class="form-control-static" id="modal-x-value"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -79,7 +78,7 @@
                                     <label class="control-label">上架時間起</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p id="modal-start-at"></p>
+                                    <p class="form-control-static" id="modal-start-at"></p>
                                 </div>
                             </div>
                         </div>
@@ -89,7 +88,7 @@
                                     <label class="control-label">上架時間訖</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p id="modal-end-at"></p>
+                                    <p class="form-control-static" id="modal-end-at"></p>
                                 </div>
                             </div>
                         </div>

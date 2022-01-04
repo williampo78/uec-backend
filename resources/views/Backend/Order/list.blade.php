@@ -22,7 +22,7 @@
         }
 
         .amount-panel .row {
-            padding: 1.5rem;
+            padding: 1rem;
         }
 
         .tab-content {

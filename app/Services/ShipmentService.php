@@ -23,6 +23,7 @@ class ShipmentService
             'shipments.ship_to_name',
             'shipments.ship_to_mobile',
             'shipments.package_no',
+            'shipments.cancelled_at',
             'shipments.voided_at',
             'shipments.shipped_at',
             'shipments.arrived_store_at',
@@ -37,6 +38,11 @@ class ShipmentService
             'orders.buyer_name',
         )
             ->leftJoin('orders', 'shipments.order_id', '=', 'orders.id');
+
+        // 出貨單id
+        if (isset($query_datas['shipment_id'])) {
+            $shipments = $shipments->where('shipments.id', $query_datas['shipment_id']);
+        }
 
         // 建單開始時間
         if (isset($query_datas['created_at_start'])) {

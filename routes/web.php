@@ -158,7 +158,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'shipment',
         ],
     ]);
-    // Route::post('/shipment/ajax/detail', [ShipmentController::class, 'getDetail']);
+    Route::post('/shipment/ajax/detail', [ShipmentController::class, 'getDetail']);
 
     Route::resource('/webcontents', WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 

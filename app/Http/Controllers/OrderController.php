@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\OrdersExport;
-use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\OrdersExport;
+use App\Services\RoleService;
+use App\Services\OrderService;
 use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
     private $order_service;
+    private $role_service;
 
     public function __construct(
-        OrderService $order_service
+        OrderService $order_service,
+        RoleService $role_service
     ) {
         $this->order_service = $order_service;
+        $this->role_service = $role_service;
     }
 
     /**
@@ -26,8 +30,13 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query_datas = [];
-
         $query_datas = $request->query();
+
+        // 沒有查詢權限、網址列參數不足，直接返回列表頁
+        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
+            return view('Backend.Order.list');
+        }
+
         $query_datas['is_latest'] = 1;
 
         $orders = $this->order_service->getOrders($query_datas);
