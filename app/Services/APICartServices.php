@@ -177,7 +177,7 @@ class APICartServices
                 }
             }
             foreach ($cartQty as $product_id => $item) {
-                if ($product_id !='101') continue;
+                //if ($product_id !='101') continue;
                 $product = [];
                 $prod_gift = [];
                 if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
