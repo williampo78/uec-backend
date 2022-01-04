@@ -105,7 +105,7 @@ class APICartServices
                 }
                 $new_id = ShoppingCartDetails::insertGetId($webData);
             } else if ($act == 'upd') {
-                $webData['qty'] = ($input['status_code'] == 0 ? $input['item_qty'] : 0);
+                $webData['qty'] = $input['item_qty'];
                 $webData['status_code'] = $input['status_code'];
                 $webData['updated_by'] = $member_id;
                 $webData['updated_at'] = $now;
@@ -140,8 +140,6 @@ class APICartServices
         $warehouseCode = $this->stockService->getWarehouseConfig();
         $shippingFee = ShippingFeeRulesService::getShippingFee('HOME');
         $feeInfo = array(
-            "shipping_fee" => $shippingFee['HOME']->shipping_fee,
-            "free_threshold" => $shippingFee['HOME']->free_threshold,
             "notice" => $shippingFee['HOME']->notice_brief,
             "noticeDetail" => $shippingFee['HOME']->notice_detailed
         );
@@ -711,7 +709,7 @@ class APICartServices
             $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
                 $act = 'upd';
-                $qty = ($input['item_qty'] + (isset($data[0]['qty']) ? $data[0]['qty'] : 0));
+                $qty = ($input['item_qty'] + (isset($data[0]['qty'])?$data[0]['qty']:0));
             } else {
                 $act = 'add';
             }
