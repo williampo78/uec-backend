@@ -9,97 +9,99 @@
             </div>
 
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">發票號碼</label>
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">發票號碼</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-invoice-no"></p>
+                                </div>
                             </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-invoice-no"></p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">發票日期</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-transaction-date"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">發票日期</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-transaction-date"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">隨機碼</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-random-no"></p>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">隨機碼</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-random-no"></p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">訂單編號</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-order-no"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">銷售額</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-selling-price"></p>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">訂單編號</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-order-no"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">課稅別</label>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">銷售額</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-selling-price"></p>
+                                </div>
                             </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-tax-type"></p>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">課稅別</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-tax-type"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">總稅額</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-total-tax"></p>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">總稅額</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-total-tax"></p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <div class="col-sm-4">
-                                <label class="control-label">總金額</label>
-                            </div>
-                            <div class="col-sm-8">
-                                <p id="invoice-modal-amount"></p>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <label class="control-label">總金額</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <p class="form-control-static" id="invoice-modal-amount"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -114,7 +116,8 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class='table table-striped table-bordered table-hover' style='width:100%' id="invoice-modal-invoice-info-table">
+                    <table class='table table-striped table-bordered table-hover' style='width:100%'
+                        id="invoice-modal-invoice-info-table">
                         <thead>
                             <tr>
                                 <th class="text-nowrap">項次</th>

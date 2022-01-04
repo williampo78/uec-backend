@@ -64,13 +64,13 @@ return [
     ],
 
     // 付款方式
-    'order_payment_method_options' => [
+    'payment_method_options' => [
         'TAPPAY_CREDITCARD' => '信用卡一次付清',
         'TAPPAY_LINEPAY' => 'LINE Pay',
     ],
 
     // 物流方式
-    'order_lgst_method_options' => [
+    'lgst_method_options' => [
         'HOME' => '宅配',
         'FAMILY' => '全家',
     ],
@@ -133,6 +133,11 @@ return [
     'campaign_level_code_options' => [
         'PRD' => '單品',
         'CART' => '滿額',
+    ],
+
+    // 物流公司
+    'lgst_company_code_options' => [
+        'CHOICE' => '秋雨',
     ],
 
     'tax_option' => [

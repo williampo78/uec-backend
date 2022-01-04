@@ -22,7 +22,7 @@
         }
 
         .amount-panel .row {
-            padding: 1.5rem;
+            padding: 1rem;
         }
 
         .tab-content {
@@ -242,18 +242,21 @@
                                     <div class="col-sm-9"></div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9 text-right">
-                                        @if ($share_role_auth['auth_export'])
-                                            <button class="btn btn-primary" id="btn-export-excel" type="button"><i
-                                                    class="fa fa-file-excel-o"></i>
-                                                匯出EXCEL</button>
-                                        @endif
+                                    <div class="form-group">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-9 text-right">
+                                            @if ($share_role_auth['auth_export'])
+                                                <button class="btn btn-primary" id="btn-export-excel" type="button"><i
+                                                        class="fa fa-file-excel-o"></i>
+                                                    匯出EXCEL</button>
+                                            @endif
 
-                                        @if ($share_role_auth['auth_query'])
-                                            <button class="btn btn-warning" id="btn-search"><i class="fa fa-search"></i>
-                                                查詢</button>
-                                        @endif
+                                            @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-warning" id="btn-search"><i
+                                                        class="fa fa-search"></i>
+                                                    查詢</button>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -266,18 +269,18 @@
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
                                 id="table_list">
                                 <thead>
-                                    <tr role="row">
-                                        <th class="col-sm-1 ">功能</th>
-                                        <th class="col-sm-1 ">項次</th>
-                                        <th class="col-sm-1 ">訂單時間</th>
-                                        <th class="col-sm-1 ">訂單編號</th>
-                                        <th class="col-sm-1 ">訂單狀態</th>
-                                        <th class="col-sm-1 ">付款方式</th>
-                                        <th class="col-sm-1 ">物流方式</th>
-                                        <th class="col-sm-1 ">出貨單狀態</th>
-                                        <th class="col-sm-1 ">結帳金額</th>
-                                        <th class="col-sm-1 ">會員帳號</th>
-                                        <th class="col-sm-1 ">訂購人</th>
+                                    <tr>
+                                        <th class="text-nowrap">功能</th>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">訂單時間</th>
+                                        <th class="text-nowrap">訂單編號</th>
+                                        <th class="text-nowrap">訂單狀態</th>
+                                        <th class="text-nowrap">付款方式</th>
+                                        <th class="text-nowrap">物流方式</th>
+                                        <th class="text-nowrap">出貨單狀態</th>
+                                        <th class="text-nowrap">結帳金額</th>
+                                        <th class="text-nowrap">會員帳號</th>
+                                        <th class="text-nowrap">訂購人</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -298,26 +301,12 @@
                                                 <td>{{ $count++ }}</td>
                                                 <td>{{ $order['ordered_date'] ?? '' }}</td>
                                                 <td>{{ $order['order_no'] ?? '' }}</td>
-                                                <td>
-                                                    @isset(config('uec.order_status_code_options')[$order['status_code']])
-                                                        {{ config('uec.order_status_code_options')[$order['status_code']] }}
-                                                    @endisset
-                                                </td>
-                                                <td>
-                                                    @isset(config('uec.order_payment_method_options')[$order['payment_method']])
-                                                        {{ config('uec.order_payment_method_options')[$order['payment_method']] }}
-                                                    @endisset
-                                                </td>
-                                                <td>
-                                                    @isset(config('uec.order_lgst_method_options')[$order['lgst_method']])
-                                                        {{ config('uec.order_lgst_method_options')[$order['lgst_method']] }}
-                                                    @endisset
-                                                </td>
+                                                <td>{{ $order['status_code'] ?? '' }}</td>
+                                                <td>{{ $order['payment_method'] ?? '' }}</td>
+                                                <td>{{ $order['lgst_method'] ?? '' }}</td>
                                                 <td>
                                                     @isset($order['shipments'][0])
-                                                        @isset(config('uec.shipment_status_code_options')[$order['shipments'][0]['status_code']])
-                                                            {{ config('uec.shipment_status_code_options')[$order['shipments'][0]['status_code']] }}
-                                                        @endisset
+                                                        {{ $order['shipments'][0]['status_code'] ?? '' }}
                                                     @endisset
                                                 </td>
                                                 <td>{{ $order['paid_amount'] ?? '' }}</td>

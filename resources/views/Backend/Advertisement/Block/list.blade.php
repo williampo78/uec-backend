@@ -106,15 +106,15 @@
                                 id="table_list">
                                 <thead>
                                     <tr role="row">
-                                        <th class="col-sm-1 ">功能</th>
-                                        <th class="col-sm-1 ">適用頁面</th>
-                                        <th class="col-sm-1 ">代碼</th>
-                                        <th class="col-sm-1 ">描述</th>
-                                        <th class="col-sm-1 ">Mobile適用</th>
-                                        <th class="col-sm-1 ">Desktop適用</th>
-                                        <th class="col-sm-1 ">上架類型</th>
-                                        <th class="col-sm-1 ">狀態</th>
-                                        <th class="col-sm-1 ">備註</th>
+                                        <th class="text-nowrap">功能</th>
+                                        <th class="text-nowrap">適用頁面</th>
+                                        <th class="text-nowrap">代碼</th>
+                                        <th class="text-nowrap">描述</th>
+                                        <th class="text-nowrap">Mobile適用</th>
+                                        <th class="text-nowrap">Desktop適用</th>
+                                        <th class="text-nowrap">上架類型</th>
+                                        <th class="text-nowrap">狀態</th>
+                                        <th class="text-nowrap">備註</th>
                                     </tr>
                                 </thead>
                                 <tbody>
