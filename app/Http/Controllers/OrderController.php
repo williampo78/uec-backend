@@ -34,8 +34,32 @@ class OrderController extends Controller
 
         // 整理給前端的資料
         $orders = $orders->map(function ($order) {
+            // 訂單時間
+            $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i');
+
+            // 訂單狀態
+            if (isset(config('uec.order_status_code_options')[$order->status_code])) {
+                $order->status_code = config('uec.order_status_code_options')[$order->status_code];
+            }
+
+            // 付款方式
+            if (isset(config('uec.payment_method_options')[$order->payment_method])) {
+                $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
+            }
+
+            // 物流方式
+            if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
+                $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
+            }
+
+            // 出貨單明細
             if (isset($order->shipments)) {
                 $order->shipments = $order->shipments->take(1)->map(function ($shipment) {
+                    // 出貨單狀態
+                    if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
+                        $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
+                    }
+
                     return $shipment->only([
                         'status_code',
                     ]);
@@ -147,8 +171,8 @@ class OrderController extends Controller
         }
 
         // 付款方式
-        if (isset(config('uec.order_payment_method_options')[$order->payment_method])) {
-            $order->payment_method = config('uec.order_payment_method_options')[$order->payment_method];
+        if (isset(config('uec.payment_method_options')[$order->payment_method])) {
+            $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
         }
 
         // 付款狀態
@@ -221,8 +245,8 @@ class OrderController extends Controller
         }
 
         // 物流方式
-        if (isset(config('uec.order_lgst_method_options')[$order->lgst_method])) {
-            $order->lgst_method = config('uec.order_lgst_method_options')[$order->lgst_method];
+        if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
+            $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
         }
 
         if (isset($order->shipments)) {

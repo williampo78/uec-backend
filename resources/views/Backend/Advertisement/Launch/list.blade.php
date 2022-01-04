@@ -136,14 +136,14 @@
                                 id="table_list">
                                 <thead>
                                     <tr role="row">
-                                        <th class="col-sm-1 ">功能</th>
-                                        <th class="col-sm-1 ">適用頁面</th>
-                                        <th class="col-sm-1 ">版位代碼</th>
-                                        <th class="col-sm-1 ">版位名稱</th>
-                                        <th class="col-sm-1 ">Mobile適用</th>
-                                        <th class="col-sm-1 ">Desktop適用</th>
-                                        <th class="col-sm-1 ">上下架狀態</th>
-                                        <th class="col-sm-1 ">上架時間</th>
+                                        <th class="text-nowrap">功能</th>
+                                        <th class="text-nowrap">適用頁面</th>
+                                        <th class="text-nowrap">版位代碼</th>
+                                        <th class="text-nowrap">版位名稱</th>
+                                        <th class="text-nowrap">Mobile適用</th>
+                                        <th class="text-nowrap">Desktop適用</th>
+                                        <th class="text-nowrap">上下架狀態</th>
+                                        <th class="text-nowrap">上架時間</th>
                                     </tr>
                                 </thead>
                                 <tbody>

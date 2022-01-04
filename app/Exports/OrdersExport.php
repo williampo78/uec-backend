@@ -75,13 +75,13 @@ class OrdersExport implements FromArray, WithHeadings, WithEvents
             }
 
             // 物流方式
-            if (isset(config('uec.order_lgst_method_options')[$order->lgst_method])) {
-                $order->lgst_method = config('uec.order_lgst_method_options')[$order->lgst_method];
+            if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
+                $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
             }
 
             // 付款方式
-            if (isset(config('uec.order_payment_method_options')[$order->payment_method])) {
-                $order->payment_method = config('uec.order_payment_method_options')[$order->payment_method];
+            if (isset(config('uec.payment_method_options')[$order->payment_method])) {
+                $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
             }
 
             // 發票開立時間

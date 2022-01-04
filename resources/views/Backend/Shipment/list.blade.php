@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '銷售訂單管理')
+@section('title', '出貨單管理')
 
 @section('style')
     <style>
@@ -45,7 +45,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 銷售訂單管理</h1>
+                <h1 class="page-header"><i class="fa fa-list"></i> 出貨單管理</h1>
             </div>
         </div>
 
@@ -59,19 +59,19 @@
                                 <div class="col-sm-4">
                                     <div class="row">
                                         <div class="col-sm-3">
-                                            <label class="control-label">訂單時間</label>
+                                            <label class="control-label">建單時間</label>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_ordered_date_start'>
+                                                <div class='input-group date' id='datetimepicker_created_at_start'>
                                                     <input type='text'
                                                         class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_ordered_date_start"
-                                                        name="ordered_date_start" id="ordered_date_start"
-                                                        value="{{ request()->input('ordered_date_start') }}"
+                                                        data-target="#datetimepicker_created_at_start"
+                                                        name="created_at_start" id="created_at_start"
+                                                        value="{{ request()->input('created_at_start') }}"
                                                         autocomplete="off" />
                                                     <span class="input-group-addon"
-                                                        data-target="#datetimepicker_ordered_date_start"
+                                                        data-target="#datetimepicker_created_at_start"
                                                         data-toggle="datetimepicker">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -83,15 +83,15 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_ordered_date_end'>
+                                                <div class='input-group date' id='datetimepicker_created_at_end'>
                                                     <input type='text'
                                                         class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_ordered_date_end"
-                                                        name="ordered_date_end" id="ordered_date_end"
-                                                        value="{{ request()->input('ordered_date_end') }}"
+                                                        data-target="#datetimepicker_created_at_end" name="created_at_end"
+                                                        id="created_at_end"
+                                                        value="{{ request()->input('created_at_end') }}"
                                                         autocomplete="off" />
                                                     <span class="input-group-addon"
-                                                        data-target="#datetimepicker_ordered_date_end"
+                                                        data-target="#datetimepicker_created_at_end"
                                                         data-toggle="datetimepicker">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -104,11 +104,11 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3">
-                                            <label class="control-label">訂單編號</label>
+                                            <label class="control-label">出貨單號</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="order_no" id="order_no"
-                                                value="{{ request()->input('order_no') }}" />
+                                            <input class="form-control search-limit-group" name="shipment_no"
+                                                id="shipment_no" value="{{ request()->input('shipment_no') }}" />
                                         </div>
                                     </div>
                                 </div>
@@ -131,41 +131,11 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3">
-                                            <label class="control-label">訂單狀態</label>
+                                            <label class="control-label">訂單編號</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control select2-order-status-code" id="order_status_code"
-                                                name="order_status_code">
-                                                <option></option>
-                                                @if (config()->has('uec.order_status_code_options'))
-                                                    @foreach (config('uec.order_status_code_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('order_status_code') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">付款狀態</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-pay-status" id="pay_status"
-                                                name="pay_status">
-                                                <option></option>
-                                                @if (config()->has('uec.order_pay_status_options'))
-                                                    @foreach (config('uec.order_pay_status_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('pay_status') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
+                                            <input class="form-control search-limit-group" name="order_no" id="order_no"
+                                                value="{{ request()->input('order_no') }}" />
                                         </div>
                                     </div>
                                 </div>
@@ -177,12 +147,33 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control select2-shipment-status-code"
-                                                id="shipment_status_code" name="shipment_status_code">
+                                                id="status_code" name="status_code">
                                                 <option></option>
                                                 @if (config()->has('uec.shipment_status_code_options'))
                                                     @foreach (config('uec.shipment_status_code_options') as $key => $value)
                                                         <option value='{{ $key }}'
-                                                            {{ $key == request()->input('shipment_status_code') ? 'selected' : '' }}>
+                                                            {{ $key == request()->input('status_code') ? 'selected' : '' }}>
+                                                            {{ $value }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">付款方式</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2-shipment-payment-method"
+                                                id="payment_method" name="payment_method">
+                                                <option></option>
+                                                @if (config()->has('uec.payment_method_options'))
+                                                    @foreach (config('uec.payment_method_options') as $key => $value)
+                                                        <option value='{{ $key }}'
+                                                            {{ $key == request()->input('payment_method') ? 'selected' : '' }}>
                                                             {{ $value }}</option>
                                                     @endforeach
                                                 @endif
@@ -220,37 +211,8 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">活動名稱</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control" name="campaign_name" id="campaign_name"
-                                                value="{{ request()->input('campaign_name') }}" placeholder="模糊查詢" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <br />
-
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
-                                            @if ($share_role_auth['auth_export'])
-                                                <button class="btn btn-primary" id="btn-export-excel" type="button"><i
-                                                        class="fa fa-file-excel-o"></i>
-                                                    匯出EXCEL</button>
-                                            @endif
-
                                             @if ($share_role_auth['auth_query'])
                                                 <button class="btn btn-warning" id="btn-search"><i
                                                         class="fa fa-search"></i>
@@ -272,46 +234,48 @@
                                     <tr>
                                         <th class="text-nowrap">功能</th>
                                         <th class="text-nowrap">項次</th>
-                                        <th class="text-nowrap">訂單時間</th>
+                                        <th class="text-nowrap">建單時間</th>
+                                        <th class="text-nowrap">出貨單號</th>
                                         <th class="text-nowrap">訂單編號</th>
-                                        <th class="text-nowrap">訂單狀態</th>
-                                        <th class="text-nowrap">付款方式</th>
                                         <th class="text-nowrap">物流方式</th>
                                         <th class="text-nowrap">出貨單狀態</th>
-                                        <th class="text-nowrap">結帳金額</th>
+                                        <th class="text-nowrap">出貨時間</th>
+                                        <th class="text-nowrap">物流廠商</th>
                                         <th class="text-nowrap">會員帳號</th>
                                         <th class="text-nowrap">訂購人</th>
+                                        <th class="text-nowrap">收件者</th>
+                                        <th class="text-nowrap">收件手機</th>
+                                        <th class="text-nowrap">收件地址</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @isset($orders)
+                                    @isset($shipments)
                                         @php
                                             $count = 1;
                                         @endphp
-                                        @foreach ($orders as $order)
+                                        @foreach ($shipments as $shipment)
                                             <tr>
                                                 <td>
                                                     @if ($share_role_auth['auth_query'])
-                                                        <button type="button" class="btn btn-info btn-sm order_detail"
-                                                            data-order="{{ $order['id'] }}" title="檢視">
+                                                        <button type="button" class="btn btn-info btn-sm shipment_detail"
+                                                            data-order="{{ $shipment['shipments_id'] }}" title="檢視">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     @endif
                                                 </td>
                                                 <td>{{ $count++ }}</td>
-                                                <td>{{ $order['ordered_date'] ?? '' }}</td>
-                                                <td>{{ $order['order_no'] ?? '' }}</td>
-                                                <td>{{ $order['status_code'] ?? '' }}</td>
-                                                <td>{{ $order['payment_method'] ?? '' }}</td>
-                                                <td>{{ $order['lgst_method'] ?? '' }}</td>
-                                                <td>
-                                                    @isset($order['shipments'][0])
-                                                        {{ $order['shipments'][0]['status_code'] ?? '' }}
-                                                    @endisset
-                                                </td>
-                                                <td>{{ $order['paid_amount'] ?? '' }}</td>
-                                                <td>{{ $order['member_account'] ?? '' }}</td>
-                                                <td>{{ $order['buyer_name'] ?? '' }}</td>
+                                                <td>{{ $shipment['created_at_format'] ?? '' }}</td>
+                                                <td>{{ $shipment['shipment_no'] ?? '' }}</td>
+                                                <td>{{ $shipment['order_no'] ?? '' }}</td>
+                                                <td>{{ $shipment['lgst_method'] ?? '' }}</td>
+                                                <td>{{ $shipment['status_code'] ?? '' }}</td>
+                                                <td>{{ $shipment['shipped_at'] ?? '' }}</td>
+                                                <td>{{ $shipment['lgst_company_code'] ?? '' }}</td>
+                                                <td>{{ $shipment['member_account'] ?? '' }}</td>
+                                                <td>{{ $shipment['buyer_name'] ?? '' }}</td>
+                                                <td>{{ $shipment['ship_to_name'] ?? '' }}</td>
+                                                <td>{{ $shipment['ship_to_mobile'] ?? '' }}</td>
+                                                <td>{{ $shipment['ship_to_address'] ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     @endisset
@@ -322,8 +286,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Order.detail')
-        @include('Backend.Order.invoice_detail')
+        @include('Backend.Shipment.detail')
         <!-- /.modal -->
 
     </div>
@@ -333,41 +296,35 @@
     <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
     <script>
         $(function() {
-            $('#datetimepicker_ordered_date_start').datetimepicker({
+            $('#datetimepicker_created_at_start').datetimepicker({
                 format: 'YYYY-MM-DD',
                 showClear: true,
             });
 
-            $('#datetimepicker_ordered_date_end').datetimepicker({
+            $('#datetimepicker_created_at_end').datetimepicker({
                 format: 'YYYY-MM-DD',
                 showClear: true,
             });
 
-            $("#datetimepicker_ordered_date_start").on("dp.change", function(e) {
-                if ($('#ordered_date_end').val()) {
-                    $('#datetimepicker_ordered_date_end').datetimepicker('minDate', e.date);
+            $("#datetimepicker_created_at_start").on("dp.change", function(e) {
+                if ($('#created_at_end').val()) {
+                    $('#datetimepicker_created_at_end').datetimepicker('minDate', e.date);
                 }
             });
 
-            $("#datetimepicker_ordered_date_end").on("dp.change", function(e) {
-                if ($('#ordered_date_start').val()) {
-                    $('#datetimepicker_ordered_date_start').datetimepicker('maxDate', e.date);
+            $("#datetimepicker_created_at_end").on("dp.change", function(e) {
+                if ($('#created_at_start').val()) {
+                    $('#datetimepicker_created_at_start').datetimepicker('maxDate', e.date);
                 }
-            });
-
-            $('.select2-order-status-code').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
-
-            $('.select2-pay-status').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
             });
 
             $('.select2-shipment-status-code').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: '',
+            });
+
+            $('.select2-shipment-payment-method').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: '',
@@ -381,10 +338,13 @@
                     form.submit();
                 },
                 rules: {
-                    ordered_date_start: {
+                    created_at_start: {
                         require_from_group: [1, ".search-limit-group"],
                     },
-                    ordered_date_end: {
+                    created_at_end: {
+                        require_from_group: [1, ".search-limit-group"],
+                    },
+                    shipment_no: {
                         require_from_group: [1, ".search-limit-group"],
                     },
                     order_no: {
@@ -395,17 +355,20 @@
                     },
                 },
                 messages: {
-                    ordered_date_start: {
-                        require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
+                    created_at_start: {
+                        require_from_group: '須指定﹝建單時間﹞起訖、或﹝出貨單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！',
                     },
-                    ordered_date_end: {
-                        require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
+                    created_at_end: {
+                        require_from_group: '須指定﹝建單時間﹞起訖、或﹝出貨單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！',
+                    },
+                    shipment_no: {
+                        require_from_group: '須指定﹝建單時間﹞起訖、或﹝出貨單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！',
                     },
                     order_no: {
-                        require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
+                        require_from_group: '須指定﹝建單時間﹞起訖、或﹝出貨單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！',
                     },
                     member_account: {
-                        require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
+                        require_from_group: '須指定﹝建單時間﹞起訖、或﹝出貨單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！',
                     },
                 },
                 errorClass: "help-block",
@@ -615,64 +578,6 @@
                         $('#modal-cvs-completed-at').empty().text(order.cvs_completed_at);
 
                         $('#order_detail').modal('show');
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                    });
-            });
-
-            // 點擊發票資訊中的詳細資訊
-            $(document).on('click', '.btn-invoice-detail', function() {
-                let count = $(this).closest('tr').attr('data-count');
-
-                if (invoices[count]) {
-                    $('#invoice-modal-invoice-no').empty().text(invoices[count].invoice_no);
-                    $('#invoice-modal-transaction-date').empty().text(invoices[count].transaction_date);
-                    $('#invoice-modal-random-no').empty().text(invoices[count].random_no);
-                    $('#invoice-modal-order-no').empty().text(invoices[count].order_no);
-                    $('#invoice-modal-selling-price').empty().text(invoices[count].amount);
-                    $('#invoice-modal-tax-type').empty().text(invoices[count].tax_type);
-                    $('#invoice-modal-total-tax').empty().text(0);
-                    $('#invoice-modal-amount').empty().text(invoices[count].amount);
-                    $("#invoice-modal-invoice-info-table tbody").empty();
-
-                    if (invoices[count].invoice_details) {
-                        $.each(invoices[count].invoice_details, function(key, invoice_detail) {
-                            $("#invoice-modal-invoice-info-table tbody").append(`
-                                <tr>
-                                    <td>${invoice_detail.seq}</td>
-                                    <td>${invoice_detail.item_name}</td>
-                                    <td>${invoice_detail.unit_price}</td>
-                                    <td>${invoice_detail.qty}</td>
-                                    <td>${invoice_detail.amount}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-                    $('#invoice_detail').modal('show');
-                }
-            });
-
-            // 匯出訂單
-            $('#btn-export-excel').on('click', function() {
-                axios.get('/backend/order/ajax/excel', {
-                        params: {
-                            ordered_date_start: $('#ordered_date_start').val(),
-                            ordered_date_end: $('#ordered_date_end').val(),
-                            order_no: $('#order_no').val(),
-                            member_account: $('#member_account').val(),
-                            order_status_code: $('#order_status_code').val(),
-                            pay_status: $('#pay_status').val(),
-                            shipment_status_code: $('#shipment_status_code').val(),
-                            product_no: $('#product_no').val(),
-                            product_name: $('#product_name').val(),
-                            campaign_name: $('#campaign_name').val(),
-                        },
-                        responseType: 'blob',
-                    })
-                    .then(function(response) {
-                        saveAs(response.data, "orders.xlsx");
                     })
                     .catch(function(error) {
                         console.log(error);
