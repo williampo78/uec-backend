@@ -46,7 +46,7 @@ class APICartServices
         foreach ($result as $datas) {
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = $s3 . $ProductPhotos->photo_name;
+            $data[$datas->product_id]['item_photo'] = (isset($ProductPhotos->photo_name)?$s3 . $ProductPhotos->photo_name:null);
         }
         return $data;
     }
@@ -254,6 +254,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -319,6 +320,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -359,6 +361,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -398,6 +401,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -431,6 +435,7 @@ class APICartServices
                                 }
                                 $product[] = array(
                                     "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                    "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                     "itemSpec1" => $spec1,
                                     "itemSpec2" => $spec2,
                                     "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -456,6 +461,7 @@ class APICartServices
                             }
                             $product[] = array(
                                 "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                 "itemSpec1" => $spec1,
                                 "itemSpec2" => $spec2,
                                 "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -465,7 +471,7 @@ class APICartServices
                                 "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
-                                "campaignGiftAway" => []
+                                "campaignGiftAway" => $giftAway
                             );
                             $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
                         };
@@ -491,6 +497,7 @@ class APICartServices
                         }
                         $product[] = array(
                             "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                            "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                             "itemSpec1" => $spec1,
                             "itemSpec2" => $spec2,
                             "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -642,7 +649,7 @@ class APICartServices
                 $webDataUpd[$key] = [
                     "id" => $item->id,
                     "product_item_id" => $input['item_id'][$key],
-                    "qty" => $input['item_qty'][$key],
+                    "qty" => ($input['item_qty'][$key] + $item->qty),
                     "status_code" => $input['status_code'],
                     "updated_by" => $member_id,
                     "updated_at" => $now
