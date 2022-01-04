@@ -649,7 +649,7 @@ class APICartServices
                 $webDataUpd[$key] = [
                     "id" => $item->id,
                     "product_item_id" => $input['item_id'][$key],
-                    "qty" => $input['item_qty'][$key],
+                    "qty" => ($input['item_qty'][$key] + $item->qty),
                     "status_code" => $input['status_code'],
                     "updated_by" => $member_id,
                     "updated_at" => $now
