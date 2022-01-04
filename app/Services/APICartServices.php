@@ -177,7 +177,6 @@ class APICartServices
                 }
             }
             foreach ($cartQty as $product_id => $item) {
-                //if ($product_id !='101') continue;
                 $product = [];
                 $prod_gift = [];
                 if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
@@ -472,7 +471,7 @@ class APICartServices
                                 "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
-                                "campaignGiftAway" => []
+                                "campaignGiftAway" => $giftAway
                             );
                             $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
                         };
