@@ -254,6 +254,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -319,6 +320,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -359,6 +361,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -398,6 +401,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -431,6 +435,7 @@ class APICartServices
                                 }
                                 $product[] = array(
                                     "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                    "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                     "itemSpec1" => $spec1,
                                     "itemSpec2" => $spec2,
                                     "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -456,6 +461,7 @@ class APICartServices
                             }
                             $product[] = array(
                                 "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                 "itemSpec1" => $spec1,
                                 "itemSpec2" => $spec2,
                                 "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -491,6 +497,7 @@ class APICartServices
                         }
                         $product[] = array(
                             "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                            "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                             "itemSpec1" => $spec1,
                             "itemSpec2" => $spec2,
                             "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
