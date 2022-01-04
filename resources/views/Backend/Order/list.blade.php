@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '訂單管理')
+@section('title', '銷售訂單管理')
 
 @section('style')
     <style>
@@ -314,8 +314,10 @@
                                                     @endisset
                                                 </td>
                                                 <td>
-                                                    @isset(config('uec.shipment_status_code_options')[$order['shipments'][0]['status_code']])
-                                                        {{ config('uec.shipment_status_code_options')[$order['shipments'][0]['status_code']] }}
+                                                    @isset($order['shipments'][0])
+                                                        @isset(config('uec.shipment_status_code_options')[$order['shipments'][0]['status_code']])
+                                                            {{ config('uec.shipment_status_code_options')[$order['shipments'][0]['status_code']] }}
+                                                        @endisset
                                                     @endisset
                                                 </td>
                                                 <td>{{ $order['paid_amount'] ?? '' }}</td>
@@ -454,7 +456,7 @@
                     })
                     .then(function(response) {
                         let order = response.data;
-                        console.log(order);
+
                         // 訂單資訊
                         $('#modal-order-no').empty().text(order.order_no);
                         $('#modal-ordered-date').empty().text(order.ordered_date);
@@ -475,12 +477,10 @@
 
                         // 物流
                         $('#modal-lgst-method').empty().text(order.lgst_method);
-
-                        if (order.shipments) {
-                            if (order.shipments[0]) {
-                                $('#modal-shipment-status-code').empty().text(order.shipments[0]
-                                    .status_code);
-                            }
+                        $('#modal-shipment-status-code').empty();
+                        if (order.shipments && order.shipments[0]) {
+                            $('#modal-shipment-status-code').text(order.shipments[0]
+                                .status_code);
                         }
 
                         // 金額區塊
