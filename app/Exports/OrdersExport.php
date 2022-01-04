@@ -22,7 +22,7 @@ class OrdersExport implements FromArray, WithHeadings, WithEvents
     /**
      * @return array
      */
-    public function array(): array
+    function array(): array
     {
         $body = [];
 
