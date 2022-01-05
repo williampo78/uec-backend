@@ -373,7 +373,7 @@ class ProductsService
                         'safty_qty' => $val['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
-                        'edi_exported_status' => '',
+                        'edi_exported_status' => null,
                         'created_by' => $user_id,
                         'updated_by' => $user_id,
                         'created_at' => $now,
@@ -396,7 +396,7 @@ class ProductsService
                         'status' => $val['status'],
                         'updated_by' => $user_id,
                         'updated_at' => $now,
-                        'edi_exported_status' => '',
+                        'edi_exported_status' => null,
                     ];
                     ProductItems::where('id', $val['id'])->update($skuUpdate);
                 }
@@ -675,7 +675,7 @@ class ProductsService
         $user_id = Auth::user()->id;
         DB::beginTransaction();
         try {
-            ProductItems::where('product_id', $product_id)->update(['edi_exported_status' => '']);
+            ProductItems::where('product_id', $product_id)->update(['edi_exported_status' => null]);
             ProductAuditLog::create([
                 'product_id' => $product_id,
                 'created_by' => $user_id,
