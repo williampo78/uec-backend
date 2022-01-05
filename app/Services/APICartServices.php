@@ -547,14 +547,17 @@ class APICartServices
                         if ($now >= $item->start_launched_at && $now <= $item->end_launched_at) { //在上架期間內
                             if ($item->campaign_type == 'CART03') { //﹝滿額﹞購物車滿N元，送贈品
                                 if ($item->assignedQty > 0) {
-                                    if ($this->stockService->getStockByProd($warehouseCode, $item->product_id)->stock_qty > 0) { //有足夠庫存
-                                        $cartGift[] = array(
-                                            "campaignName" => $item->campaign_name,
-                                            "productId" => $item->product_id,
-                                            "productName" => $item->product_name,
-                                            "productPhoto" => $campaign_gift['PROD'][$item->promotional_campaign_id][$item->product_id]['photo'],
-                                            "assignedQty" => $item->assignedQty
-                                        );
+                                    $stock_check = $this->stockService->getStockByProd($warehouseCode, $item->product_id);
+                                    if (isset($stock_check)) {
+                                        if ($this->stockService->getStockByProd($warehouseCode, $item->product_id)->stock_qty > 0) { //有足夠庫存
+                                            $cartGift[] = array(
+                                                "campaignName" => $item->campaign_name,
+                                                "productId" => $item->product_id,
+                                                "productName" => $item->product_name,
+                                                "productPhoto" => $campaign_gift['PROD'][$item->promotional_campaign_id][$item->product_id]['photo'],
+                                                "assignedQty" => $item->assignedQty
+                                            );
+                                        }
                                     }
                                 }
                             }
