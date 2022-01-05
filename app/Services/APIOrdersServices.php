@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderCampaignDiscount;
 use App\Models\ShoppingCartDetails;
+use App\Models\ProductItems;
 
 class APIOrdersServices
 {
@@ -28,8 +29,9 @@ class APIOrdersServices
      * @param 購物車清單, 前端的訂單資料
      * @return string
      */
-    public function setOrders($cart, $order)
+    public function setOrders($cart, $order, $campaign_gift, $campaign_discount)
     {
+        dd($campaign_discount);
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         $random = Str::random(6);
@@ -38,6 +40,16 @@ class APIOrdersServices
         foreach ($utms as $utm) {
             $utm_info[$utm->product_item_id] = $utm;
         }
+
+        $product_items = ProductItems::all();
+        $prod_info = [];
+        foreach ($product_items as $product_item) {
+            $prod_info[$product_item->product_id] = $product_item;
+        }
+
+
+
+
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -90,10 +102,17 @@ class APIOrdersServices
             $addColumn = [
                 "order_id", "seq", "product_id", "product_item_id", "item_no",
                 "selling_price", "qty", "unit_price", "campaign_discount", "subtotal",
-                "record_identity", "point_discount",
+                "record_identity", "point_discount", "points",
                 "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_time",
                 "created_by", "updated_by", "created_at", "updated_at",
                 "returned_qty", "returned_campaign_discount", "returned_subtotal", "returned_point_discount", "returned_points"
+            ];
+            //活動折抵紀錄
+            $addCampaign = [
+                "order_id", "level_code", "group_seq", "order_detail_id", "promotion_campaign_id",
+                "product_id", "product_item_id", "item_no", "discount", "record_identity",
+                "is_voided",
+                "created_by", "updated_by", "created_at", "updated_at"
             ];
             $seq = 0;
             $details = [];
@@ -115,60 +134,144 @@ class APIOrdersServices
                         $point_rate = 100;
                     }
                     $details[$seq] = [
-                        $order_id,
-                        $seq,
-                        $products['productID'],
-                        $item['itemId'],
-                        $item['itemNo'],
-                        $products['sellingPrice'],
-                        $item['itemQty'],
-                        $item['itemPrice'],
-                        $discount,
-                        $item['amount'],
-                        'M',
-                        -$discount_rate[$seq],
-                        $utm_info[$item['itemId']]->utm_source,
-                        $utm_info[$item['itemId']]->utm_medium,
-                        $utm_info[$item['itemId']]->utm_campaign,
-                        $utm_info[$item['itemId']]->utm_sales,
-                        $utm_info[$item['itemId']]->utm_time,
-                        $member_id,
-                        $member_id,
-                        $now,
-                        $now,
-                        0, 0, 0, 0, 0
+                        "order_id" => $order_id,
+                        "seq" => $seq,
+                        "product_id" => $products['productID'],
+                        "product_item_id" => $item['itemId'],
+                        "item_no" => $item['itemNo'],
+                        "selling_price" => $products['sellingPrice'],
+                        "qty" => $item['itemQty'],
+                        "unit_price" => $item['itemPrice'],
+                        "campaign_discount" => $discount,
+                        "subtotal" => $item['amount'],
+                        "record_identity" => "M",
+                        "point_discount" => -$discount_rate[$seq],
+                        "points" => (-$discount_rate[$seq] / $cart['point']['exchangeRate']),
+                        "utm_source" => $utm_info[$item['itemId']]->utm_source,
+                        "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
+                        "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
+                        "utm_sales" => $utm_info[$item['itemId']]->utm_sales,
+                        "utm_time" => $utm_info[$item['itemId']]->utm_time,
+                        "created_by" => $member_id,
+                        "created_at" => $member_id,
+                        "updated_by" => $now,
+                        "updated_at" => $now,
+                        "returned_qty" => 0,
+                        "returned_campaign_discount" => 0,
+                        "returned_subtotal" => 0,
+                        "returned_point_discount" => 0,
+                        "returned_points" => 0
                     ];
-                    if (isset($item['campaignGiftAway']['campaignProdList'])){
-                        //if ($item['campaignGiftAway']['campaignGiftStatus']) { //符合條件
-                            foreach ($item['campaignGiftAway']['campaignProdList'] as $gifts=>$gift) {
-                                echo $gift['productId'];
+                    $order_detail_id = OrderDetail::insertGetId($details[$seq]);
+                    if ($cart['campaignDiscountId']) {
+                        $campaign_details[$seq] = [
+                            "order_id" => $order_id,
+                            "level_code" => $products['campaignDiscountLevel'],
+                            "product_id" => $products['productID'],
+                            "product_item_id" => $item['itemId'],
+                            "item_no" => $item['itemNo'],
+                            "selling_price" => $products['sellingPrice'],
+                            "qty" => $item['itemQty'],
+                            "unit_price" => $item['itemPrice'],
+                            "campaign_discount" => $discount,
+                            "subtotal" => $item['amount'],
+                            "record_identity" => "M",
+                            "point_discount" => -$discount_rate[$seq],
+                            "points" => (-$discount_rate[$seq] / $cart['point']['exchangeRate']),
+                            "utm_source" => $utm_info[$item['itemId']]->utm_source,
+                            "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
+                            "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
+                            "utm_sales" => $utm_info[$item['itemId']]->utm_sales,
+                            "utm_time" => $utm_info[$item['itemId']]->utm_time,
+                            "created_by" => $member_id,
+                            "created_at" => $member_id,
+                            "updated_by" => $now,
+                            "updated_at" => $now,
+                            "returned_qty" => 0,
+                            "returned_campaign_discount" => 0,
+                            "returned_subtotal" => 0,
+                            "returned_point_discount" => 0,
+                            "returned_points" => 0
+                        ];
+                    }
+                    if (isset($item['campaignGiftAway']['campaignProdList'])) {
+                        if ($item['campaignGiftAway']['campaignGiftStatus']) { //符合條件
+                            foreach ($item['campaignGiftAway']['campaignProdList'] as $gifts => $gift) {
+                                $detail_gift[$seq] = [
+                                    $order_id,
+                                    ($seq + 1),
+                                    $gift['productId'],
+                                    $prod_info[$gift['productId']]['id'],
+                                    $prod_info[$gift['productId']]['item_no'],
+                                    0,
+                                    $item['itemQty'],
+                                    0,
+                                    $discount,
+                                    0,
+                                    'G',
+                                    0,
+                                    0,
+                                    $utm_info[$item['itemId']]->utm_source,
+                                    $utm_info[$item['itemId']]->utm_medium,
+                                    $utm_info[$item['itemId']]->utm_campaign,
+                                    $utm_info[$item['itemId']]->utm_sales,
+                                    $utm_info[$item['itemId']]->utm_time,
+                                    $member_id,
+                                    $member_id,
+                                    $now,
+                                    $now,
+                                    0, 0, 0, 0, 0
+                                ];
                             }
-                       // }
+                        }
                     } else {
-                        foreach ($item['campaignGiftAway'] as $gifts=>$gift) {
-                            echo $gift['productId'];
+                        foreach ($item['campaignGiftAway'] as $gifts => $gift) {
+                            $detail_gift[$seq] = [
+                                $order_id,
+                                ($seq + 1),
+                                $gift['productId'],
+                                $prod_info[$gift['productId']]['id'],
+                                $prod_info[$gift['productId']]['item_no'],
+                                0,
+                                $gift['assignedQty'],
+                                0,
+                                $discount,
+                                0,
+                                'G',
+                                0,
+                                0,
+                                $utm_info[$item['itemId']]->utm_source,
+                                $utm_info[$item['itemId']]->utm_medium,
+                                $utm_info[$item['itemId']]->utm_campaign,
+                                $utm_info[$item['itemId']]->utm_sales,
+                                $utm_info[$item['itemId']]->utm_time,
+                                $member_id,
+                                $member_id,
+                                $now,
+                                $now,
+                                0, 0, 0, 0, 0
+                            ];
                         }
                     }
                 }
             }
             if ($point_rate != 100) { //點數比例加總不等於100時，把最後一筆資料的比例做修正
-                $details[$seq][11] = $details[$seq][11] - 100 + $point_rate;
+                $details[($seq - 1)][11] = $details[($seq - 1)][11] - 100 + $point_rate;
+                $details[($seq - 1)][12] = ($details[($seq - 1)][11] / $cart['point']['exchangeRate']);
             }
 
-            /*
-            $orderInstance = new OrderDetail();
-            $batchSize = 50;
-            Batch::insert($orderInstance, $addColumn, $webData, $batchSize);
-            */
-            DB::commit();
-
-            if ($order_id > 0) {
+            if ($details) {
+                $arr_detail = array_merge($details, $detail_gift);
+                $orderInstance = new OrderDetail();
+                $batchSize = 500;
+                $insert = Batch::insert($orderInstance, $addColumn, $arr_detail, $batchSize);
+            }
+            if ($insert['totalRows'] > 0) {
+                DB::commit();
                 $result = 'success';
             } else {
                 $result = 'fail';
             }
-
-            $result = $result;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);

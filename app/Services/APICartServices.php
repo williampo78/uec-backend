@@ -46,7 +46,7 @@ class APICartServices
         foreach ($result as $datas) {
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = (isset($ProductPhotos->photo_name)?$s3 . $ProductPhotos->photo_name:null);
+            $data[$datas->product_id]['item_photo'] = (isset($ProductPhotos->photo_name) ? $s3 . $ProductPhotos->photo_name : null);
         }
         return $data;
     }
@@ -262,6 +262,7 @@ class APICartServices
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -328,6 +329,7 @@ class APICartServices
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
@@ -369,6 +371,7 @@ class APICartServices
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -409,6 +412,7 @@ class APICartServices
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
@@ -443,6 +447,7 @@ class APICartServices
                                     "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                     "itemStock" => $stock,
                                     "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                    "campaignDiscountId" => null,
                                     "campaignDiscountName" => null,
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
@@ -469,6 +474,7 @@ class APICartServices
                                 "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                 "itemStock" => $stock,
                                 "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                "campaignDiscountId" => null,
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
                                 "campaignGiftAway" => $giftAway
@@ -505,6 +511,7 @@ class APICartServices
                             "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                            "campaignDiscountId" => null,
                             "campaignDiscountName" => null,
                             "campaignDiscountStatus" => false,
                             "campaignGiftAway" => []
@@ -577,23 +584,13 @@ class APICartServices
             $pointData = $this->apiService->getMemberPoint($member_id);
             $info = json_decode($pointData);
             $pointInfo = [];
-            if ($info->data->point > 0) {
-                $discountRate = $total_amount * $info->data->discountRate; //點數折抵上限率，若值為0.3，總金額1000元，折抵上限為300元(1000x0.3=300)
-                //$exchangeRate = $total_amount * $info->data->exchangeRate; //點數兌換現金率，若值為0.01，100點等同1元現金(100x0.01=1)
-                $pointInfo = array(
-                    "point" => $info->data->point,
-                    "discountRate" => $info->data->discountRate,
-                    "exchangeRate" => $info->data->exchangeRate,
-                    "discountMax" => $discountRate,
-                );
-            } else {
-                $pointInfo = array(
-                    "point" => 0,
-                    "discountRate" => 0,
-                    "exchangeRate" => 0,
-                    "discountMax" => 0,
-                );
-            }
+
+            $pointInfo = array(
+                "point" => $info->data->point,
+                "discountRate" => $info->data->discountRate,
+                "exchangeRate" => $info->data->exchangeRate,
+                "discountMax" => ($info->data->point > 0 ? $total_amount * $info->data->discountRate : 0),
+            );
 
             //運費規則
             $fee = [];

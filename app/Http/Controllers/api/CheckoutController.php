@@ -192,7 +192,7 @@ class CheckoutController extends Controller
         //Step1, 檢核金額
         if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
             //Stet2, 產生訂單
-            $data = $this->apiOrdersService->setOrders($response['result'], $request);
+            $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign_gift, $campaign_discount);
             $status = true;
             $err = '200';
         } else {
