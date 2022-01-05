@@ -189,6 +189,7 @@ class APICartServices
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftAway[] = array(
+                                    "campaignId" => $giftInfo->promotional_campaign_id,
                                     "productPhoto" => $giftInfo['photo'],
                                     "productId" => $giftInfo->product_id,
                                     "productName" => $productInfo[$giftInfo->product_id]->product_name,
@@ -240,6 +241,7 @@ class APICartServices
                                     //找符合的item放
                                     if (isset($campaign['PRD']['GIFT'][$product_id]) && $return_type) {
                                         $prod_gift = array(
+                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
                                             "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
                                             "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
                                             "campaignProdList" => $giftAway
@@ -306,6 +308,7 @@ class APICartServices
                                     //找符合的item放
                                     if (isset($campaign['PRD']['GIFT'][$product_id]) && $return_type) {
                                         $prod_gift = array(
+                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
                                             "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
                                             "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
                                             "campaignProdList" => $giftAway
@@ -348,6 +351,7 @@ class APICartServices
                                     //找符合的item放
                                     if (isset($campaign['PRD']['GIFT'][$product_id])) {
                                         $prod_gift = array(
+                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
                                             "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
                                             "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
                                             "campaignProdList" => $giftAway
@@ -390,6 +394,7 @@ class APICartServices
                                     //找符合的item放
                                     if (isset($campaign['PRD']['GIFT'][$product_id])) {
                                         $prod_gift = array(
+                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
                                             "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
                                             "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
                                             "campaignProdList" => $giftAway
@@ -424,6 +429,7 @@ class APICartServices
                             //找符合的item放
                             if (isset($campaign['PRD']['GIFT'][$product_id])) {
                                 $prod_gift = array(
+                                    "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
                                     "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
                                     "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
                                     "campaignProdList" => $giftAway
@@ -457,6 +463,17 @@ class APICartServices
                         }
                     } else { //不在活動內
                         foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+
+                            //找符合的item放
+                            if (isset($campaign['PRD']['GIFT'][$product_id])) {
+                                $prod_gift = array(
+                                    "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                    "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                    "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                    "campaignProdList" => $giftAway
+                                );
+                            }
+
                             $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
                             $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
                             $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
@@ -477,7 +494,7 @@ class APICartServices
                                 "campaignDiscountId" => null,
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
-                                "campaignGiftAway" => $giftAway
+                                "campaignGiftAway" => $prod_gift
                             );
                             $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
                         };
@@ -514,7 +531,7 @@ class APICartServices
                             "campaignDiscountId" => null,
                             "campaignDiscountName" => null,
                             "campaignDiscountStatus" => false,
-                            "campaignGiftAway" => []
+                            "campaignGiftAway7" => []
                         );
                         $cartTotal += 0;
                     }
@@ -551,6 +568,7 @@ class APICartServices
                                     if (isset($stock_check)) {
                                         if ($this->stockService->getStockByProd($warehouseCode, $item->product_id)->stock_qty > 0) { //有足夠庫存
                                             $cartGift[] = array(
+                                                "campaignId" => $item->promotional_campaign_id,
                                                 "campaignName" => $item->campaign_name,
                                                 "productId" => $item->product_id,
                                                 "productName" => $item->product_name,
@@ -572,6 +590,7 @@ class APICartServices
                         if ($value->assignedQty > 0) {
                             if ($this->stockService->getStockByProd($warehouseCode, $prod_id)->stock_qty > 0) { //有足夠庫存
                                 $cartGift[] = array(
+                                    "campaignId" => $value->promotional_campaign_id,
                                     "campaignName" => $value->campaign_name,
                                     "productId" => $prod_id,
                                     "productName" => $value->product_name,
