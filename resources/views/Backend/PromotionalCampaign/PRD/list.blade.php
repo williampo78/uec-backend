@@ -158,13 +158,13 @@
                                 id="table_list">
                                 <thead>
                                     <tr role="row">
-                                        <th class="col-sm-1">功能</th>
-                                        <th class="col-sm-1">項次</th>
-                                        <th class="col-sm-1">活動名稱</th>
-                                        <th class="col-sm-1">活動類型</th>
-                                        <th class="col-sm-1">狀態</th>
-                                        <th class="col-sm-1">上架時間起</th>
-                                        <th class="col-sm-1">上架時間訖</th>
+                                        <th class="text-nowrap">功能</th>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">活動名稱</th>
+                                        <th class="text-nowrap">活動類型</th>
+                                        <th class="text-nowrap">狀態</th>
+                                        <th class="text-nowrap">上架時間起</th>
+                                        <th class="text-nowrap">上架時間訖</th>
                                     </tr>
                                 </thead>
                                 <tbody>

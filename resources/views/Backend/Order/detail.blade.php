@@ -9,7 +9,7 @@
             </div>
 
             <div class="modal-body">
-                <div class="row">
+                <div class="row form-horizontal">
                     <div class="col-sm-8">
                         <div class="panel panel-default no-border-bottom">
                             <div class="panel-heading text-center">訂單資訊</div>
@@ -21,7 +21,7 @@
                                                 <label class="control-label">訂單編號</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-order-no"></p>
+                                                <p class="form-control-static" id="modal-order-no"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -31,7 +31,7 @@
                                                 <label class="control-label">訂單時間</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-ordered-date"></p>
+                                                <p class="form-control-static" id="modal-ordered-date"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -41,7 +41,7 @@
                                                 <label class="control-label">訂單狀態</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-order-status-code"></p>
+                                                <p class="form-control-static" id="modal-order-status-code"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -53,7 +53,7 @@
                                                 <label class="control-label">付款方式</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-payment-method"></p>
+                                                <p class="form-control-static" id="modal-payment-method"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -63,7 +63,7 @@
                                                 <label class="control-label">付款狀態</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-pay-status"></p>
+                                                <p class="form-control-static" id="modal-pay-status"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -73,7 +73,7 @@
                                                 <label class="control-label">免運門檻</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-shipping-free-threshold"></p>
+                                                <p class="form-control-static" id="modal-shipping-free-threshold"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -90,7 +90,7 @@
                                                 <label class="control-label">會員帳號</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-member-account"></p>
+                                                <p class="form-control-static" id="modal-member-account"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +100,7 @@
                                                 <label class="control-label">訂購人姓名</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-buyer-name"></p>
+                                                <p class="form-control-static" id="modal-buyer-name"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -110,7 +110,7 @@
                                                 <label class="control-label">訂購人eMail</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-buyer-email"></p>
+                                                <p class="form-control-static" id="modal-buyer-email"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -127,7 +127,7 @@
                                                 <label class="control-label">收件者</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-receiver-name"></p>
+                                                <p class="form-control-static" id="modal-receiver-name"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -137,7 +137,7 @@
                                                 <label class="control-label">收件手機</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-receiver-mobile"></p>
+                                                <p class="form-control-static" id="modal-receiver-mobile"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -147,7 +147,7 @@
                                                 <label class="control-label">收件地址</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-receiver-address"></p>
+                                                <p class="form-control-static" id="modal-receiver-address"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -164,7 +164,7 @@
                                                 <label class="control-label">物流方式</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-lgst-method"></p>
+                                                <p class="form-control-static" id="modal-lgst-method"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -174,7 +174,7 @@
                                                 <label class="control-label">出貨單狀態</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p id="modal-shipment-status-code"></p>
+                                                <p class="form-control-static" id="modal-shipment-status-code"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -195,7 +195,7 @@
                                             <label class="control-label">商品總價 (A)：</label>
                                         </div>
                                         <div class="col-sm-3 text-right">
-                                            <p id="modal-total-amount"></p>
+                                            <p class="form-control-static" id="modal-total-amount"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -206,7 +206,7 @@
                                             <label class="control-label">滿額折抵 (B)：</label>
                                         </div>
                                         <div class="col-sm-3 text-right">
-                                            <p id="modal-cart-campaign-discount"></p>
+                                            <p class="form-control-static" id="modal-cart-campaign-discount"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -217,7 +217,7 @@
                                             <label class="control-label">點數折抵 (C)：</label>
                                         </div>
                                         <div class="col-sm-3 text-right">
-                                            <p id="modal-point-discount"></p>
+                                            <p class="form-control-static" id="modal-point-discount"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -228,7 +228,7 @@
                                             <label class="control-label">運費 (D)：</label>
                                         </div>
                                         <div class="col-sm-3 text-right">
-                                            <p id="modal-shipping-fee"></p>
+                                            <p class="form-control-static" id="modal-shipping-fee"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -241,7 +241,7 @@
                                             <label class="control-label">結帳金額 (=A+B+C+D)：</label>
                                         </div>
                                         <div class="col-sm-3 text-right">
-                                            <p id="modal-paid-amount"></p>
+                                            <p class="form-control-static" id="modal-paid-amount"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -303,71 +303,73 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-invoice-info">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <label class="control-label">發票用途</label>
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label">發票用途</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <p class="form-control-static" id="modal-invoice-usage"></p>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-8">
-                                        <p id="modal-invoice-usage"></p>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label">載具類型</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <p class="form-control-static" id="modal-carrier-type"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label">載具號碼</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <p class="form-control-static" id="modal-carrier-no"></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <label class="control-label">載具類型</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <p id="modal-carrier-type"></p>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label">統一編號</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <p class="form-control-static" id="modal-buyer-gui-number"></p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <label class="control-label">載具號碼</label>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label">抬頭</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <p class="form-control-static" id="modal-buyer-title"></p>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-8">
-                                        <p id="modal-carrier-no"></p>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <label class="control-label">捐贈機構</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <p class="form-control-static" id="modal-donated-institution-name"></p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <label class="control-label">統一編號</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <p id="modal-buyer-gui-number"></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <label class="control-label">抬頭</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <p id="modal-buyer-title"></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <label class="control-label">捐贈機構</label>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <p id="modal-donated-institution-name"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <br/>
+                        <br />
 
                         <div class="table-responsive">
                             <table class='table table-striped table-bordered table-hover' style='width:100%'>

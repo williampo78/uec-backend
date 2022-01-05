@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Exports\OrdersExport;
+use App\Services\RoleService;
+use App\Services\OrderService;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
     private $order_service;
+    private $role_service;
 
     public function __construct(
-        OrderService $order_service
+        OrderService $order_service,
+        RoleService $role_service
     ) {
         $this->order_service = $order_service;
+        $this->role_service = $role_service;
     }
 
     /**
@@ -24,16 +30,45 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $query_datas = [];
-
         $query_datas = $request->query();
+
+        // 沒有查詢權限、網址列參數不足，直接返回列表頁
+        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
+            return view('Backend.Order.list');
+        }
+
         $query_datas['is_latest'] = 1;
 
         $orders = $this->order_service->getOrders($query_datas);
 
         // 整理給前端的資料
         $orders = $orders->map(function ($order) {
+            // 訂單時間
+            $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i');
+
+            // 訂單狀態
+            if (isset(config('uec.order_status_code_options')[$order->status_code])) {
+                $order->status_code = config('uec.order_status_code_options')[$order->status_code];
+            }
+
+            // 付款方式
+            if (isset(config('uec.payment_method_options')[$order->payment_method])) {
+                $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
+            }
+
+            // 物流方式
+            if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
+                $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
+            }
+
+            // 出貨單明細
             if (isset($order->shipments)) {
                 $order->shipments = $order->shipments->take(1)->map(function ($shipment) {
+                    // 出貨單狀態
+                    if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
+                        $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
+                    }
+
                     return $shipment->only([
                         'status_code',
                     ]);
@@ -145,8 +180,8 @@ class OrderController extends Controller
         }
 
         // 付款方式
-        if (isset(config('uec.order_payment_method_options')[$order->payment_method])) {
-            $order->payment_method = config('uec.order_payment_method_options')[$order->payment_method];
+        if (isset(config('uec.payment_method_options')[$order->payment_method])) {
+            $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
         }
 
         // 付款狀態
@@ -219,8 +254,8 @@ class OrderController extends Controller
         }
 
         // 物流方式
-        if (isset(config('uec.order_lgst_method_options')[$order->lgst_method])) {
-            $order->lgst_method = config('uec.order_lgst_method_options')[$order->lgst_method];
+        if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
+            $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
         }
 
         if (isset($order->shipments)) {
@@ -450,5 +485,15 @@ class OrderController extends Controller
         ]);
 
         return response()->json($order);
+    }
+
+    public function exportOrderExcel(Request $request)
+    {
+        $input_datas = $request->input();
+        $input_datas['is_latest'] = 1;
+
+        $orders = $this->order_service->getOrders($input_datas);
+
+        return Excel::download(new OrdersExport($orders), 'orders.xlsx');
     }
 }

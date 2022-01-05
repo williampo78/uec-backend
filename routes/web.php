@@ -12,6 +12,8 @@ use App\Http\Controllers\PhotosController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\LoginAuthController;
 use App\Http\Controllers\QuotationController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\AdvertisementBlockController;
 use App\Http\Controllers\AdvertisementLaunchController;
 use App\Http\Controllers\PromotionalCampaignController;
 use App\Http\Controllers\WebCategoryProductsController;
+use App\Http\Controllers\BuyoutProductsReportController;
 use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\WebCategoryHierarchyController;
 use App\Http\Controllers\ProductReviewRegisterController;
@@ -35,8 +38,6 @@ use App\Http\Controllers\PromotionalCampaignPrdController;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
-use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\BuyoutProductsReportController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -149,6 +150,15 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
         ],
     ]);
     Route::post('/order/ajax/detail', [OrderController::class, 'getDetail']);
+    Route::get('/order/ajax/excel', [OrderController::class, 'exportOrderExcel']);
+
+    // 出貨單管理
+    Route::resource('/shipment', ShipmentController::class, [
+        'names' => [
+            'index' => 'shipment',
+        ],
+    ]);
+    Route::post('/shipment/ajax/detail', [ShipmentController::class, 'getDetail']);
 
     Route::resource('/webcontents', WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 

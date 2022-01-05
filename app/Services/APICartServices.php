@@ -46,7 +46,7 @@ class APICartServices
         foreach ($result as $datas) {
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = $s3 . $ProductPhotos->photo_name;
+            $data[$datas->product_id]['item_photo'] = (isset($ProductPhotos->photo_name)?$s3 . $ProductPhotos->photo_name:null);
         }
         return $data;
     }
@@ -105,7 +105,7 @@ class APICartServices
                 }
                 $new_id = ShoppingCartDetails::insertGetId($webData);
             } else if ($act == 'upd') {
-                $webData['qty'] = $input['item_qty'];
+                $webData['qty'] = ($input['status_code'] == 0 ? $input['item_qty'] : 0);
                 $webData['status_code'] = $input['status_code'];
                 $webData['updated_by'] = $member_id;
                 $webData['updated_at'] = $now;
@@ -140,6 +140,8 @@ class APICartServices
         $warehouseCode = $this->stockService->getWarehouseConfig();
         $shippingFee = ShippingFeeRulesService::getShippingFee('HOME');
         $feeInfo = array(
+            "shipping_fee" => $shippingFee['HOME']->shipping_fee,
+            "free_threshold" => $shippingFee['HOME']->free_threshold,
             "notice" => $shippingFee['HOME']->notice_brief,
             "noticeDetail" => $shippingFee['HOME']->notice_detailed
         );
@@ -252,6 +254,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -317,6 +320,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -357,6 +361,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -396,6 +401,7 @@ class APICartServices
                                     }
                                     $product[] = array(
                                         "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -429,6 +435,7 @@ class APICartServices
                                 }
                                 $product[] = array(
                                     "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                    "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                     "itemSpec1" => $spec1,
                                     "itemSpec2" => $spec2,
                                     "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -454,6 +461,7 @@ class APICartServices
                             }
                             $product[] = array(
                                 "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                                "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                                 "itemSpec1" => $spec1,
                                 "itemSpec2" => $spec2,
                                 "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -463,7 +471,7 @@ class APICartServices
                                 "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                                 "campaignDiscountName" => null,
                                 "campaignDiscountStatus" => false,
-                                "campaignGiftAway" => []
+                                "campaignGiftAway" => $giftAway
                             );
                             $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
                         };
@@ -489,6 +497,7 @@ class APICartServices
                         }
                         $product[] = array(
                             "itemId" => $cartDetail[$product_id][$item_id]->item_id,
+                            "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
                             "itemSpec1" => $spec1,
                             "itemSpec2" => $spec2,
                             "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
@@ -508,6 +517,7 @@ class APICartServices
                     "productID" => $product_id,
                     "productNo" => $cartInfo[$product_id]['product_no'],
                     "productName" => $cartInfo[$product_id]['product_name'],
+                    "sellingPrice" => $cartInfo[$product_id]['selling_price'],
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product
                 );
@@ -640,7 +650,7 @@ class APICartServices
                 $webDataUpd[$key] = [
                     "id" => $item->id,
                     "product_item_id" => $input['item_id'][$key],
-                    "qty" => $input['item_qty'][$key],
+                    "qty" => ($input['item_qty'][$key] + $item->qty),
                     "status_code" => $input['status_code'],
                     "updated_by" => $member_id,
                     "updated_at" => $now
@@ -693,4 +703,71 @@ class APICartServices
 
         return $result;
     }
+
+    /**
+     * 更新購物車商品數量(增加)
+     * @param
+     * @return string
+     */
+    public function setGoodsQty($input)
+    {
+        $member_id = Auth::guard('api')->user()->member_id;
+        $now = Carbon::now();
+        //確認是否有該品項
+        $item = ProductItems::where('id', $input['item_id'])->get()->toArray();
+        if (count($item) > 0) {
+            $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
+            if (count($data) > 0) {
+                $act = 'upd';
+                $qty = ($input['item_qty'] + (isset($data[0]['qty']) ? $data[0]['qty'] : 0));
+            } else {
+                $act = 'add';
+            }
+        } else {
+            return '401';
+        }
+        DB::beginTransaction();
+        try {
+            $webData = [];
+            if ($act == 'add') {
+                $webData['member_id'] = $member_id;
+                $webData['product_item_id'] = $input['item_id'];
+                $webData['status_code'] = $input['status_code'];
+                $webData['qty'] = $input['item_qty'];
+                $webData['utm_source'] = $input['utm_source'];
+                $webData['utm_medium'] = $input['utm_medium'];
+                $webData['utm_campaign'] = $input['utm_campaign'];
+                $webData['utm_sales'] = $input['utm_sales'];
+                $webData['utm_time'] = $input['utm_time'];
+                $webData['created_by'] = $member_id;
+                $webData['updated_by'] = -1;
+                $webData['created_at'] = $now;
+                $webData['updated_at'] = $now;
+                if ($input['status_code'] != 0) {
+                    return '203';
+                }
+                $new_id = ShoppingCartDetails::insertGetId($webData);
+            } else if ($act == 'upd') {
+                $webData['qty'] = $qty;
+                $webData['status_code'] = $input['status_code'];
+                $webData['updated_by'] = $member_id;
+                $webData['updated_at'] = $now;
+                $new_id = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
+            }
+            DB::commit();
+            if ($new_id > 0) {
+                $result = 'success';
+            } else {
+                $result = 'fail';
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = 'fail';
+        }
+
+        return $result;
+    }
+
+
 }

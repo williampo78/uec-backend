@@ -71,6 +71,7 @@ class OrderService
 
             'product_items.spec_1_value',
             'product_items.spec_2_value',
+            'product_items.pos_item_no',
         )
             ->leftJoin('product_items', 'order_details.product_item_id', 'product_items.id')
             ->leftJoin('products', 'product_items.product_id', 'products.id');
@@ -328,32 +329,6 @@ class OrderService
 
             return true;
         });
-
-        // dump
-        foreach ($orders as $order) {
-            // dump($order->id);
-
-            if (isset($order->order_details)) {
-                // dump('order_details', $order->order_details->toArray());
-            }
-
-            if (isset($order->shipments)) {
-                // dump('shipments', $order->shipments->toArray());
-
-                foreach ($order->shipments as $shipment) {
-                    if (isset($shipment->shipment_details)) {
-                        // dump('shipment_details', $shipment->shipment_details->toArray());
-                    }
-                }
-            }
-
-            if (isset($order->order_campaign_discounts)) {
-                // dump('order_campaign_discounts', $order->order_campaign_discounts->toArray());
-            }
-        }
-
-        // dd($orders->toArray());
-        // dd('end');
 
         return $orders;
     }
