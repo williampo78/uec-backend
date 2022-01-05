@@ -53,6 +53,9 @@ class APIIndexServices
                 );
             } elseif ($ad_slot->slot_type == 'I') {
                 $data[$ad_slot->slot_code][] = array(
+                    'slot_color_code' => $ad_slot->slot_color_code,
+                    'slot_icon_name' => ($ad_slot->slot_icon_name?$s3.$ad_slot->slot_icon_name:null),
+                    'slot_title' => $ad_slot->slot_title,
                     'img_path' => ($ad_slot->image_name?$s3.$ad_slot->image_name:null),
                     'img_alt' => $ad_slot->image_alt,
                     'img_title' => $ad_slot->image_title,
