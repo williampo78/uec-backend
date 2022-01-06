@@ -189,23 +189,32 @@ class CheckoutController extends Controller
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
         $response = json_decode($response, true);
-        //Step1, 檢核金額
-        if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
-            //Stet2, 產生訂單
-            $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
-            $status = true;
-            $err = '200';
-        } else {
+        $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
+        dd($data);
+        return response()->json(['status' => 1, 'error_code' => $err, 'error_msg' => 1, 'result' => json_decode($data, true)]);
+        if ($response['status'] == '404') {
             $status = false;
-            $err = '401';
-            if ($response['result']['totalPrice'] != $request->total_price) {
-                $data['total_price'] = "商品總價有誤";
-            }
-            if ($response['result']['discount'] != $request->discount) {
-                $data['discount'] = "滿額折抵有誤";
-            }
-            if ($response['result']['shippingFee'] != $request->shipping_fee) {
-                $data['shipping_fee'] = "運費有誤";
+            $err = $response['status'];
+            $data = [];
+        } else {
+            //Step1, 檢核金額
+            if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
+                //Stet2, 產生訂單
+                $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
+                $status = true;
+                $err = '200';
+            } else {
+                $status = false;
+                $err = '401';
+                if ($response['result']['totalPrice'] != $request->total_price) {
+                    $data['total_price'] = "商品總價有誤";
+                }
+                if ($response['result']['discount'] != $request->discount) {
+                    $data['discount'] = "滿額折抵有誤";
+                }
+                if ($response['result']['shippingFee'] != $request->shipping_fee) {
+                    $data['shipping_fee'] = "運費有誤";
+                }
             }
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);

@@ -15,13 +15,14 @@ use App\Models\OrderCampaignDiscount;
 use App\Models\ShoppingCartDetails;
 use App\Models\ProductItems;
 use App\Models\OrderPayment;
+use App\Services\APITapPayService;
 
 class APIOrdersServices
 {
 
-    public function __construct()
+    public function __construct(APITapPayService $apiTapPayService)
     {
-
+        $this->apiTapPayService = $apiTapPayService;
     }
 
 
@@ -36,6 +37,66 @@ class APIOrdersServices
         $now = Carbon::now();
         $random = Str::random(6);
 
+        $webData = [];
+        $webData['agent_id'] = 1;
+        $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
+        $webData['member_id'] = $member_id;
+        $webData['member_account'] = $order['buyer']['mobile'];
+        $webData['ordered_date'] = $now;
+        $webData['is_latest'] = 1;
+        $webData['is_cash_on_delivery'] = 0;
+        $webData['status_code'] = $order['status_code'];
+        $webData['payment_method'] = $order['payment_method'];
+        $webData['lgst_method'] = $order['lgst_method'];
+        $webData['is_shipping_free'] = ($order['shipping_fee'] == 0 ? 1 : 0);
+        $webData['shipping_fee'] = $order['shipping_fee'];
+        $webData['shipping_free_threshold'] = 0;
+        $webData['total_amount'] = $order['total_price'];
+        $webData['cart_campaign_discount'] = $order['discount'];
+        $webData['point_discount'] = $order['point_discount'];
+        $webData['paid_amount'] = ($order['total_price'] + $order['discount'] + $order['point_discount'] + $order['shipping_fee']);
+        $webData['points'] = $order['points'];
+        $webData['pay_status'] = 'PENDING';
+        $webData['buyer_name'] = $order['buyer']['name'];
+        $webData['buyer_mobile'] = $order['buyer']['mobile'];
+        $webData['buyer_email'] = $order['buyer']['email'];
+        $webData['buyer_zip_code'] = $order['buyer']['zip'];
+        $webData['buyer_city'] = $order['buyer']['city'];
+        $webData['buyer_district'] = $order['buyer']['district'];
+        $webData['buyer_address'] = $order['buyer']['address'];
+        $webData['receiver_name'] = $order['receiver']['name'];
+        $webData['receiver_mobile'] = $order['receiver']['mobile'];
+        $webData['receiver_zip_code'] = $order['receiver']['zip'];
+        $webData['receiver_city'] = $order['receiver']['city'];
+        $webData['receiver_district'] = $order['receiver']['district'];
+        $webData['receiver_address'] = $order['receiver']['address'];
+        $webData['invoice_usage'] = $order['invoice']['usage'];
+        $webData['carrier_type'] = $order['invoice']['carrier_type'];
+        $webData['carrier_no'] = $order['invoice']['carrier_no'];
+        $webData['donated_institution'] = $order['invoice']['donated_code'];
+        $webData['buyer_gui_number'] = $order['invoice']['buyer_gui_number'];
+        $webData['buyer_title'] = $order['invoice']['buyer_title'];
+        $webData['created_by'] = $member_id;
+        $webData['created_at'] = $now;
+        $webData['updated_by'] = -1;
+        $webData['updated_at'] = $now;
+
+        $payment_id = 26;
+        $webData['prime'] = $order['taypay_prime'];
+        $tapPay = $this->apiTapPayService->payByPrime($webData);
+        $tapPayResult = json_decode($tapPay, true);
+        if ($tapPayResult['status'] == 0) {
+            $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id']]);
+            if ($payment) {
+                $result['status'] = 200;
+                $result['payment_url'] = $tapPayResult['payment_url'];
+            } else {
+                $result['status'] = 401;
+            }
+        } else {
+            $result['status'] = 401;
+        }
+
         $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
         foreach ($utms as $utm) {
@@ -47,7 +108,6 @@ class APIOrdersServices
         foreach ($product_items as $product_item) {
             $prod_info[$product_item->product_id] = $product_item;
         }
-
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -94,6 +154,7 @@ class APIOrdersServices
             $webData['created_at'] = $now;
             $webData['updated_by'] = -1;
             $webData['updated_at'] = $now;
+
             $order_id = Order::insertGetId($webData);
 
             //建立一筆金流單
@@ -375,12 +436,28 @@ class APIOrdersServices
                 OrderDetail::where('id', $detail->id)->update($pointData);
             }
 
+            //TapPay
+            $webData['prime'] = $order['taypay_prime'];
+            $tapPay = $this->apiTapPayService->payByPrime($webData);
+            $tapPayResult = json_decode($tapPay, true);
+            if ($tapPayResult['status'] == 0) {
+                $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id']]);
+                if ($payment) {
+                    $result['status'] = 200;
+                    $result['payment_url'] = $tapPayResult['payment_url'];
+                } else {
+                    $result['status'] = 401;
+                }
+            } else {
+                $result['status'] = 401;
+            }
+
             DB::commit();
-            $result = 'success';
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
-            $result = 'fail';
+            $result['status'] = 401;
         }
 
         return $result;
