@@ -37,10 +37,6 @@ class APIIndexServices
         $strSQL .= " order by ad1.`slot_code`, ad3.`sort`";
         $ads = DB::select($strSQL);
         $data = [];
-        $img_H080A = [];
-        $img_H080B = [];
-        $prd_H080A = [];
-        $prd_H080B = [];
         foreach ($ads as $ad_slot) {
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
@@ -111,8 +107,10 @@ class APIIndexServices
                     );
                 }
             } elseif ($ad_slot->slot_type == 'IS') {
+                $image_info = [];
+                $product_info = [];
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
-                    $prd_H080B[] = array(
+                    $product_info[$ad_slot->slot_code][] = array(
                         'prod_id' => $products[$ad_slot->product_id]->id,
                         'prod_no' => $products[$ad_slot->product_id]->product_no,
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
@@ -124,7 +122,8 @@ class APIIndexServices
                     );
                 }
                 if ($ad_slot->data_type == 'IMG') {
-                    $img_H080B[] = array(
+
+                    $image_info[$ad_slot->slot_code][] = array(
                         'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
                         'img_alt' => $ad_slot->image_alt,
                         'img_title' => $ad_slot->image_title,
@@ -138,24 +137,12 @@ class APIIndexServices
                         'desktop_applicable' => $ad_slot->is_desktop_applicable
                     );
                 }
-            }
-        }
 
-        if (!$img_H080A && !$prd_H080A) {
-            unset($data['H080A']);
-        } else {
-            $data['H080A'][] = array(
-                'images' => $img_H080A,
-                'products' => $prd_H080A
-            );
-        }
-        if (!$img_H080B && !$prd_H080B) {
-            unset($data['H080B']);
-        } else {
-            $data['H080B'][] = array(
-                'images' => $img_H080B,
-                'products' => $prd_H080B
-            );
+                $data[$ad_slot->slot_code] = array(
+                    'images' => (isset($product_info[$ad_slot->slot_code]) ? $product_info[$ad_slot->slot_code] : []),
+                    'products' => (isset($product_info[$ad_slot->slot_code]) ? $product_info[$ad_slot->slot_code] : [])
+                );
+            }
         }
         return $data;
     }
