@@ -14,6 +14,7 @@ use App\Models\OrderDetail;
 use App\Models\OrderCampaignDiscount;
 use App\Models\ShoppingCartDetails;
 use App\Models\ProductItems;
+use App\Models\OrderPayment;
 
 class APIOrdersServices
 {
@@ -91,9 +92,29 @@ class APIOrdersServices
             $webData['buyer_title'] = $order['invoice']['buyer_title'];
             $webData['created_by'] = $member_id;
             $webData['created_at'] = $now;
-            $webData['updated_by'] = $member_id;
+            $webData['updated_by'] = -1;
             $webData['updated_at'] = $now;
             $order_id = Order::insertGetId($webData);
+
+            //建立一筆金流單
+            $paymantData = [];
+            $paymantData['source_table_name'] = 'orders';
+            $paymantData['source_table_id'] = $order_id;
+            $paymantData['order_no'] = $webData['order_no'];
+            $paymantData['payment_type'] = 'PAY';
+            $paymantData['payment_method'] = $order['payment_method'];
+            $paymantData['payment_status'] = 'PENDING';
+            $paymantData['amount'] = $webData['paid_amount'];
+            $paymantData['point_discount'] = $webData['point_discount'];
+            $paymantData['points'] = $webData['points'];
+            $paymantData['record_created_reason'] = 'ORDER_CREATED';
+            $paymantData['created_by'] = $member_id;
+            $paymantData['created_at'] = $now;
+            $paymantData['updated_by'] = -1;
+            $paymantData['updated_at'] = $now;
+            $paymantData['rec_trade_id'] = '';
+            $payment_id = OrderPayment::insertGetId($paymantData);
+
             //訂單單身
             $seq = 0;
             $details = [];
@@ -148,6 +169,11 @@ class APIOrdersServices
                     if ($order_detail_id > 0) {
                         $detail_count++;
                     }
+
+                    //訂單明細建立後，更新購物車中的商品狀態為 - 已轉為訂單
+                    $updData['status_code'] = 1;
+                    ShoppingCartDetails::where('member_id', '=', $member_id)->where('product_item_id', '=', $item['itemId'])->update($updData);
+
                     //有折扣則寫入折扣資訊
                     if ($item['campaignDiscountId']) {
                         if ($campaigns[$products['productID']][0]->id == $item['campaignDiscountId'] && $campaigns[$products['productID']][0]->category_code == 'DISCOUNT') {
@@ -282,7 +308,6 @@ class APIOrdersServices
                             OrderCampaignDiscount::insert($campaign_details[$seq]);
                         }
                     }
-
                 }
             }
 
@@ -342,13 +367,14 @@ class APIOrdersServices
                 }
             }
 
-            $webData = [];
+            $pointData = [];
             if ($point_rate != 100) { //點數比例加總不等於100時，把最後一筆資料的比例做修正
-                $detail = OrderDetail::where('order_id','=', $order_id)->where('record_identity','=', 'M')->orderBy('seq', 'DESC')->first();
-                $webData['point_discount'] = $detail->point_discount - 100 + $point_rate;
-                $webData['points'] = ($webData['point_discount'] / $cart['point']['exchangeRate']);
-                $upd = OrderDetail::where('id' , $detail->id)->update($webData);
+                $detail = OrderDetail::where('order_id', '=', $order_id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
+                $pointData['point_discount'] = $detail->point_discount - 100 + $point_rate;
+                $pointData['points'] = ($pointData['point_discount'] / $cart['point']['exchangeRate']);
+                OrderDetail::where('id', $detail->id)->update($pointData);
             }
+
             DB::commit();
             $result = 'success';
         } catch (\Exception $e) {
