@@ -94,8 +94,10 @@ class APIOrdersServices
                 $result['status'] = 401;
             }
         } else {
-            $result['status'] = 401;
+            $result['status'] = $tapPayResult['status'];
+            $result['msg'] = $tapPayResult['msg'];
         }
+return $result;
 
         $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
@@ -449,7 +451,7 @@ class APIOrdersServices
                     $result['status'] = 401;
                 }
             } else {
-                $result['status'] = 401;
+                $result['status'] = $tapPayResult['status'];
             }
 
             DB::commit();

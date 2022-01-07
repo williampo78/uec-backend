@@ -34,7 +34,14 @@ class ProductsService
         $products = Products::select('products.*', 'supplier.name AS supplier_name')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
-
+        
+        if (isset($input_data['web_category_hierarchy_id'])) {
+            $web_category_hierarchy_id = $input_data['web_category_hierarchy_id'] ;
+            $products->join('web_category_products', function ($join) use ($web_category_hierarchy_id) {
+                $join->where('web_category_products.web_category_hierarchy_id', '=', $web_category_hierarchy_id)
+                    ->on('web_category_products.product_id', '=', 'products.id');
+            });
+        }
         //庫存類型
         if (isset($input_data['stock_type'])) {
             $products->where('products.stock_type', '=', $input_data['stock_type']);
@@ -217,6 +224,7 @@ class ProductsService
             $products_id = Products::create($insert)->id;
             $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'], 'id' => $products_id]);
             Products::where('id', $products_id)->update(['product_no' => $product_no]);
+            $add_item_no = 1 ; 
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
@@ -224,7 +232,7 @@ class ProductsService
                     'sort' => $val['sort'] ?? 0,
                     'spec_1_value' => $val['spec_1_value'] ?? '',
                     'spec_2_value' => $val['spec_2_value'] ?? '',
-                    'item_no' => $product_no . str_pad($key, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
+                    'item_no' => $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
                     'supplier_item_no' => $val['supplier_item_no'],
                     'ean' => $val['ean'],
                     'pos_item_no' => $val['pos_item_no'],
@@ -237,7 +245,8 @@ class ProductsService
                     'updated_at' => $now,
                 ];
                 $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
-                $skuList[$key]['item_no'] = $product_no . str_pad($key, 4, "0", STR_PAD_LEFT);
+                $skuList[$key]['item_no'] = $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
+                $add_item_no += 1 ;
             }
             Product_spec_info::create([
                 'product_id' => $products_id,

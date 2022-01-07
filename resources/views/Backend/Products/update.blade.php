@@ -921,7 +921,7 @@
             <i class="fa fa-save"></i>
                 儲存
             </button>
-        <a class="btn btn-danger" href="{{ url('products') }}"><i class="fa fa-ban"></i> 取消</a>
+        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i> 取消</a>
     </form>
     {{-- 修改紀錄 --}}
     @include('Backend.Products.model_update_log')

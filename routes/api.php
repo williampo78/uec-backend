@@ -77,6 +77,7 @@ Route::group(['middleware' => 'jwt.verify'], function () {
         Route::post('/checkOrder', [CheckoutController::class, 'setOrder']);
     });
     Route::resource('/members/message', MessagesController::class, ['names' => ['index' => 'members.message']]);
+    Route::get('/members/message-top/', [MessagesController::class,'messageTop']);
 
 });
 
@@ -107,4 +108,5 @@ Route::group(['prefix' => 'shopping'], function () {
 
 Route::group(['prefix' => 'checkout'], function () {
     Route::get('/donatedInstitution', [CheckoutController::class, 'getDonatedInstitution']);
+    Route::post('/tapPayNotify', [CheckoutController::class, 'tapPayNotify']);
 });

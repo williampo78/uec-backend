@@ -100,11 +100,12 @@
                                         <h5>前台分類</h5>
                                     </div>
                                     <div class="col-sm-8">
-                                        <select class="form-control js-select2" name="category_id" id="category_id">
+                                        <select class="form-control js-select2" name="web_category_hierarchy_id"
+                                            id="web_category_hierarchy_id">
                                             <option value="">全部</option>
                                             @foreach ($pos as $val)
                                                 <option value="{{ $val->id }}"
-                                                    {{ request()->input('category_id') == $val->id ? 'selected' : '' }}>
+                                                    {{ request()->input('web_category_hierarchy_id') == $val->id ? 'selected' : '' }}>
                                                     {{ $val->name }}</option>
                                             @endforeach
                                         </select>
@@ -162,22 +163,19 @@
                                             <option value="">全部</option>
                                             <option value="NA"
                                                 {{ request()->input('approval_status') == 'NA' ? 'selected' : '' }}>
-                                                無送審記錄</option>
+                                                未設定</option>
                                             <option value="REVIEWING"
                                                 {{ request()->input('approval_status') == 'REVIEWING' ? 'selected' : '' }}>
-                                                簽核中</option>
-                                            <option value="APPROVED"
-                                                {{ request()->input('approval_status') == 'APPROVED' ? 'selected' : '' }}>
-                                                已核准</option>
+                                                上架申請</option>
                                             <option value="APPROVED_STATUS_ON"
                                                 {{ request()->input('approval_status') == 'APPROVED_STATUS_ON' ? 'selected' : '' }}>
                                                 商品上架</option>
                                             <option value="REJECTED"
                                                 {{ request()->input('approval_status') == 'REJECTED' ? 'selected' : '' }}>
-                                                已駁回</option>
+                                                上架駁回</option>
                                             <option value="APPROVED_STATUS_OFF"
-                                            {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
-                                            商品下架</option>
+                                                {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
+                                                商品下架</option>
                                         </select>
                                     </div>
                                 </div>
@@ -345,6 +343,11 @@
                 placeholder: "請選擇"
             });
             $('#approval_status').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $('#web_category_hierarchy_id').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: "請選擇"

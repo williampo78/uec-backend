@@ -7,19 +7,21 @@ use App\Services\ProductsService;
 use App\Services\SupplierService ;
 use App\Services\BrandsService ;
 use App\Services\WebCategoryHierarchyService ;
-
+use App\Services\CategoriesSerivce ;
 class ProductsController extends Controller
 {
     private $productsService;
     public function __construct(ProductsService $productsService,
     SupplierService $supplierService ,
     BrandsService $brandsService,
-    WebCategoryHierarchyService $webCategoryHierarchyService)
+    WebCategoryHierarchyService $webCategoryHierarchyService,
+    CategoriesSerivce $categoriesSerivce)
     {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
         $this->brandsService = $brandsService ;
         $this->webCategoryHierarchyService = $webCategoryHierarchyService ;
+        $this->categoriesSerivce = $categoriesSerivce ; 
     }
     /**
      * Display a listing of the resource.
@@ -54,7 +56,7 @@ class ProductsController extends Controller
         $result = [] ;
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ;
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();
+        $result['pos'] =  $this->categoriesSerivce->getPosCategories();
         return view('Backend.Products.input',$result);
     }
 
@@ -86,7 +88,7 @@ class ProductsController extends Controller
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
+        $result['pos'] =  $this->categoriesSerivce->getPosCategories();
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
         $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
         // dump($result['spac_list']) ; exit ;
@@ -107,7 +109,7 @@ class ProductsController extends Controller
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//前台分類
+        $result['pos'] =  $this->categoriesSerivce->getPosCategories();
         $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
         $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 

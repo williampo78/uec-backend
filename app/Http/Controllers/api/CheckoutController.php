@@ -11,6 +11,8 @@ use App\Services\APIProductServices;
 use App\Services\APICartServices;
 use App\Services\APIOrdersServices;
 use Validator;
+use App\Models\TmpTapPay;
+use App\Services\APITapPayService;
 
 class CheckoutController extends Controller
 {
@@ -20,14 +22,16 @@ class CheckoutController extends Controller
     private $apiProductServices;
     private $apiCartService;
     private $apiOrdersService;
+    private $apiTapPay;
 
-    public function __construct(UniversalService $universalService, APIService $apiService, APIProductServices $apiProductServices, APICartServices $apiCartService, APIOrdersServices $apiOrdersService)
+    public function __construct(UniversalService $universalService, APIService $apiService, APIProductServices $apiProductServices, APICartServices $apiCartService, APIOrdersServices $apiOrdersService, APITapPayService $apiTapPay)
     {
         $this->universalService = $universalService;
         $this->apiService = $apiService;
         $this->apiProductServices = $apiProductServices;
         $this->apiCartService = $apiCartService;
         $this->apiOrdersService = $apiOrdersService;
+        $this->apiTapPay = $apiTapPay;
     }
 
     /*
@@ -149,7 +153,7 @@ class CheckoutController extends Controller
         }
 
         if ($request->invoice['usage'] == 'P') { //二聯式，個人電子發票
-            if($request->invoice['carrier_type'] == 3) {
+            if ($request->invoice['carrier_type'] == 3) {
                 $errInvoice = [
                     'carrier_no.required' => '手機條碼載具必填',
                     'carrier_no.min' => '手機條碼載具最少8碼',
@@ -189,9 +193,11 @@ class CheckoutController extends Controller
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
         $response = json_decode($response, true);
-        $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
-        dd($data);
-        return response()->json(['status' => 1, 'error_code' => $err, 'error_msg' => 1, 'result' => json_decode($data, true)]);
+
+                $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
+                //dd($data);
+                return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
+
         if ($response['status'] == '404') {
             $status = false;
             $err = $response['status'];
@@ -200,9 +206,16 @@ class CheckoutController extends Controller
             //Step1, 檢核金額
             if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
                 //Stet2, 產生訂單
-                $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
-                $status = true;
-                $err = '200';
+                $dataOrder = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
+                if ($dataOrder['status'] == 200) {
+                    $status = true;
+                    $err = '200';
+                    $data = $dataOrder['payment_url'];
+                } else {
+                    $status = false;
+                    $err = $dataOrder['status'];
+                    $data = $dataOrder['msg'];
+                }
             } else {
                 $status = false;
                 $err = '401';
@@ -218,5 +231,17 @@ class CheckoutController extends Controller
             }
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
+    }
+
+    /*
+     * step3 訂單完成後，TapPay 確認交易狀態
+     */
+    public function tapPayNotify(Request $request)
+    {
+        $data['info'] = $request->getContent();
+        $result = $this->apiTapPay->tapPayNotifyLog($data);
+        if ($result) {
+            return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => []]);
+        }
     }
 }

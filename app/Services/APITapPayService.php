@@ -3,7 +3,8 @@
 
 namespace App\Services;
 
-
+use App\Models\TmpTapPay;
+use App\Models\OrderPayment;
 class APITapPayService
 {
 
@@ -43,7 +44,7 @@ class APITapPayService
         $data['remember'] = false;
         $data['three_domain_secure'] = true;
         $url['frontend_redirect_url'] = env('TAP_PAY_RESULT_URL');
-        $url['backend_notify_url'] = env('TAP_PAY_NOTIFY_URL').'/api/shopping/tapPayNotify';
+        $url['backend_notify_url'] = env('TAP_PAY_NOTIFY_URL');
         $data['result_url'] = ($url);
         $curl = curl_init();
 
@@ -67,6 +68,21 @@ class APITapPayService
 
         curl_close($curl);
         return $response;
+    }
+
+
+    /*
+     * TapPay backend_notify 3D驗證交易完成後進行通知
+     * method: POST
+     * @return json
+     */
+    public function tapPayNotifyLog($input)
+    {
+        //先把TapPay回傳的資料都寫入
+        $tap_log_id = TmpTapPay::insertGetId($input);
+        $tap = TmpTapPay::where('id', '=', $tap_log_id)->first();
+        //檢查回傳交易資料跟訂單是否符合，如果都沒有問題再更新付款狀態
+        dd($tap->info);
     }
 
 }
