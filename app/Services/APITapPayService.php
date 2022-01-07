@@ -79,7 +79,8 @@ class APITapPayService
     {
         $log_id = TmpTapPay::insertGetId($input);
         $tap = TmpTapPay::where('id', '=', $log_id)->first();
-
+        $test = explode('\r\n',$tap->info);
+        dd($test);
     }
 
 }
