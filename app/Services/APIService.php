@@ -469,6 +469,22 @@ class APIService
         ])->getBody()->getContents();
         return $response;
     }
+        /**
+     * 取得置頂訊息
+     */
+    public function getTopMessages($input, $url)
+    {
+        $client = new Client();
+        $result = $client->request('GET', $this->getURL() . $url, [
+            'query' => $input,
+            'http_errors' => false,
+            'headers' => [
+                // 'Authorization'     => $token ,
+                'Content-Type: application/json',
+            ],
+        ])->getBody()->getContents();
+        return $result;
+    }
 
     /**
      * 重設會員密碼

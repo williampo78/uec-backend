@@ -76,6 +76,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
         Route::post('/checkOrder', [CheckoutController::class, 'setOrder']);
     });
     Route::resource('/members/message', MessagesController::class, ['names' => ['index' => 'members.message']]);
+    Route::get('/members/message-top/', [MessagesController::class,'messageTop']);
 
 });
 
