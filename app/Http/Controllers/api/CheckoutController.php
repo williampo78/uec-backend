@@ -238,7 +238,7 @@ class CheckoutController extends Controller
         $data['info'] = $request;
         $result = TmpTapPay::insert($data);
         if ($result) {
-            return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => []]);
+            return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $request]);
         }
     }
 }
