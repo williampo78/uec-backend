@@ -7,6 +7,14 @@ use Illuminate\Support\Facades\Auth;
 
 class APIService
 {
+    private $http_client;
+
+    public function __construct()
+    {
+        $this->http_client = new Client([
+            'base_uri' => config('crm.api.base_uri'),
+        ]);
+    }
 
     /**
      * 取得錯誤代碼
@@ -33,12 +41,7 @@ class APIService
      */
     public function getURL()
     {
-        if (config('uec.isTesting')) {
-            return 'https://ssapi.dradvice.com.tw';
-        } else {
-            return 'https://ssapi.dradvice.com.tw';
-        }
-
+        return config('crm.api.base_uri');
     }
 
     /*
@@ -465,5 +468,42 @@ class APIService
             ],
         ])->getBody()->getContents();
         return $response;
+    }
+
+    /**
+     * 重設會員密碼
+     *
+     * @param string $token
+     * @param array $payloads
+     * @return array
+     */
+    public function resetPassword($token, $payloads)
+    {
+        $password = $payloads['password'];
+        $endpoint = '/crm/v2/members/reset-password';
+
+        $response = $this->http_client->request('POST', $endpoint, [
+            'timeout' => 180,
+            'connect_timeout' => 10,
+            // 'verify' => false,
+            'http_errors' => false,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'password' => $password,
+            ],
+        ]);
+
+        $status_code = $response->getStatusCode();
+        $body = $response->getBody();
+        $response_payloads = json_decode($body, true);
+
+        return [
+            'status_code' => $status_code,
+            'payloads' => $response_payloads,
+        ];
     }
 }

@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 
 class MemberService
 {
+    /* 2022/1/7 先停用，之後重構再處理
     private $http_client;
 
     public function __construct()
@@ -14,6 +15,7 @@ class MemberService
             'base_uri' => config('crm.api.base_uri'),
         ]);
     }
+    */
 
     /**
      * 重設會員密碼
@@ -22,6 +24,7 @@ class MemberService
      * @param array $payloads
      * @return array
      */
+    /*
     public function resetPassword($token, $payloads)
     {
         $password = $payloads['password'];
@@ -51,4 +54,5 @@ class MemberService
             'payloads' => $response_payloads,
         ];
     }
+    */
 }

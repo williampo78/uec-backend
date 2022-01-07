@@ -4,15 +4,15 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\api\MemberResetPasswordRequest;
-use App\Services\CRM\MemberService;
+use App\Services\APIService;
 
 class MemberController extends Controller
 {
-    private $crm_member_service;
+    private $api_service;
 
-    public function __construct(MemberService $crm_member_service)
+    public function __construct(APIService $api_service)
     {
-        $this->crm_member_service = $crm_member_service;
+        $this->api_service = $api_service;
     }
 
     public function resetPassword(MemberResetPasswordRequest $request)
@@ -26,7 +26,7 @@ class MemberController extends Controller
             ], 401);
         }
 
-        $results = $this->crm_member_service->resetPassword($token, $request_payloads);
+        $results = $this->api_service->resetPassword($token, $request_payloads);
 
         // 發生錯誤
         if ($results['status_code'] != 200) {
