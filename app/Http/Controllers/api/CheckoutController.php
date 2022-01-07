@@ -238,7 +238,7 @@ class CheckoutController extends Controller
      */
     public function tapPayNotify(Request $request)
     {
-        $data['info'] = $request->input();
+        $data['info'] = $request->getContent();
         $result = $this->apiTapPay->tapPayNotifyLog($data);
         if ($result) {
             return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => []]);
