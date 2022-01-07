@@ -246,7 +246,7 @@
                             <i class="fa fa-save"></i>
                             送審
                         </button>
-                        <a class="btn btn-danger" href="{{ url('product_small') }}"><i class="fa fa-ban"></i>
+                        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i>
                             取消</a>
                     </div>
                 </form>
