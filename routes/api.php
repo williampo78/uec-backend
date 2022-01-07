@@ -12,7 +12,7 @@ use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\ShoppingController;
 use App\Http\Controllers\api\StockController;
 use App\Http\Controllers\api\CheckoutController;
-
+use App\Http\Controllers\api\MessagesController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -74,6 +74,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
         Route::post('/tmpOrder', [CheckoutController::class, 'setTmpOrder']);
         Route::post('/checkOrder', [CheckoutController::class, 'setOrder']);
     });
+    Route::resource('/members/message', MessagesController::class, ['names' => ['index' => 'members.message']]);
 
 });
 
