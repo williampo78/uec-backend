@@ -11,6 +11,7 @@ use App\Services\APIProductServices;
 use App\Services\APICartServices;
 use App\Services\APIOrdersServices;
 use Validator;
+use App\Models\TmpTapPay;
 
 class CheckoutController extends Controller
 {
@@ -234,6 +235,10 @@ class CheckoutController extends Controller
      */
     public function tapPayNotify(Request $request)
     {
-
+        $data['info'] = $request;
+        $result = TmpTapPay::insert($data);
+        if ($result) {
+            return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => []]);
+        }
     }
 }
