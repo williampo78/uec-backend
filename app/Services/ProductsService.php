@@ -34,7 +34,14 @@ class ProductsService
         $products = Products::select('products.*', 'supplier.name AS supplier_name')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
-
+        
+        if (isset($input_data['web_category_hierarchy_id'])) {
+            $web_category_hierarchy_id = $input_data['web_category_hierarchy_id'] ;
+            $products->join('web_category_products', function ($join) use ($web_category_hierarchy_id) {
+                $join->where('web_category_products.web_category_hierarchy_id', '=', $web_category_hierarchy_id)
+                    ->on('web_category_products.product_id', '=', 'products.id');
+            });
+        }
         //庫存類型
         if (isset($input_data['stock_type'])) {
             $products->where('products.stock_type', '=', $input_data['stock_type']);

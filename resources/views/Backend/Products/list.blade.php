@@ -100,11 +100,12 @@
                                         <h5>前台分類</h5>
                                     </div>
                                     <div class="col-sm-8">
-                                        <select class="form-control js-select2" name="category_id" id="category_id">
+                                        <select class="form-control js-select2" name="web_category_hierarchy_id"
+                                            id="web_category_hierarchy_id">
                                             <option value="">全部</option>
                                             @foreach ($pos as $val)
                                                 <option value="{{ $val->id }}"
-                                                    {{ request()->input('category_id') == $val->id ? 'selected' : '' }}>
+                                                    {{ request()->input('web_category_hierarchy_id') == $val->id ? 'selected' : '' }}>
                                                     {{ $val->name }}</option>
                                             @endforeach
                                         </select>
@@ -176,8 +177,8 @@
                                                 {{ request()->input('approval_status') == 'REJECTED' ? 'selected' : '' }}>
                                                 已駁回</option>
                                             <option value="APPROVED_STATUS_OFF"
-                                            {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
-                                            商品下架</option>
+                                                {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
+                                                商品下架</option>
                                         </select>
                                     </div>
                                 </div>
@@ -345,6 +346,11 @@
                 placeholder: "請選擇"
             });
             $('#approval_status').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $('#web_category_hierarchy_id').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: "請選擇"
