@@ -452,19 +452,18 @@ class APIService
         return $response;
     }
     /**
-     * 
+     * 秀出訊息
      */
-    public function showMessages($input, $url, $token)
+    public function showMessages($url)
     {
         $client = new Client();
-        $response = $client->request('PATCH', $this->getURL() . $url, [
-            'json' => $input,
+        $response = $client->request('get', $this->getURL() . $url, [
+            // 'json' => $input,
             'http_errors' => false,
             'headers' => [
                 'Content-Type: application/json',
             ],
         ])->getBody()->getContents();
-
         return $response;
     }
 }

@@ -92,9 +92,28 @@ class MessagesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request,$messageId)
     {
-        //
+        $err = null ;
+        $member_id = Auth::guard('api')->user()->member_id;
+        $url = '/drm/v1/members/' . $member_id . '/messages/'.$messageId;
+        $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiService->showMessages($url);
+        $result = json_decode($response, true);
+
+        try {
+            if ($result['status'] == '200') {
+                return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => null, 'result' => $result['data']]);
+            } else {
+                $err = $result['status'];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error'])?$result['error']:[])]);
+            }
+        } catch (JWTException $e) {
+            Log::info($e);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+        }
+
     }
 
     /**
