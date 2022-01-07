@@ -43,7 +43,7 @@ class APITapPayService
         $data['remember'] = false;
         $data['three_domain_secure'] = true;
         $url['frontend_redirect_url'] = env('TAP_PAY_RESULT_URL');
-        $url['backend_notify_url'] = env('TAP_PAY_NOTIFY_URL').'/api/shopping/tapPayNotify';
+        $url['backend_notify_url'] = env('TAP_PAY_NOTIFY_URL').'/api/checkout/tapPayNotify';
         $data['result_url'] = ($url);
         $curl = curl_init();
 

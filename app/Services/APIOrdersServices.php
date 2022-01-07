@@ -36,7 +36,7 @@ class APIOrdersServices
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         $random = Str::random(6);
-
+        /*
         $webData = [];
         $webData['agent_id'] = 1;
         $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
@@ -94,9 +94,11 @@ class APIOrdersServices
                 $result['status'] = 401;
             }
         } else {
-            $result['status'] = 401;
+            $result['status'] = $tapPayResult['status'];
+            $result['msg'] = $tapPayResult['msg'];
         }
-
+return $result;
+        */
         $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
         foreach ($utms as $utm) {
@@ -449,7 +451,7 @@ class APIOrdersServices
                     $result['status'] = 401;
                 }
             } else {
-                $result['status'] = 401;
+                $result['status'] = $tapPayResult['status'];
             }
 
             DB::commit();
