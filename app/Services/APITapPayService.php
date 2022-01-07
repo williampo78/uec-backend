@@ -3,7 +3,7 @@
 
 namespace App\Services;
 
-
+use App\Models\TmpTapPay;
 class APITapPayService
 {
 
@@ -67,6 +67,19 @@ class APITapPayService
 
         curl_close($curl);
         return $response;
+    }
+
+
+    /*
+     * TapPay backend_notify 3D驗證交易完成後進行通知
+     * method: POST
+     * @return json
+     */
+    public function tapPayNotifyLog($input)
+    {
+        $log_id = TmpTapPay::insertGetId($input);
+        $tap = TmpTapPay::where('id', '=', $log_id)->first();
+
     }
 
 }
