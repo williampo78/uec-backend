@@ -1,13 +1,20 @@
 <?php
 
-
 namespace App\Services;
 
-
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 
 class APIService
 {
+    private $http_client;
+
+    public function __construct()
+    {
+        $this->http_client = new Client([
+            'base_uri' => config('crm.api.base_uri'),
+        ]);
+    }
 
     /**
      * 取得錯誤代碼
@@ -23,7 +30,7 @@ class APIService
             '203' => '無效的請求方式',
             '401' => '資料錯誤',
             '404' => '目前無資料',
-            '405' => '資料已存在'
+            '405' => '資料已存在',
         ];
         return $code;
     }
@@ -34,12 +41,7 @@ class APIService
      */
     public function getURL()
     {
-        if (config('uec.isTesting')) {
-            return 'https://ssapi.dradvice.com.tw';
-        } else {
-            return 'https://ssapi.dradvice.com.tw';
-        }
-
+        return config('crm.api.base_uri');
     }
 
     /*
@@ -92,7 +94,7 @@ class APIService
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => $input,
             CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
+                'Content-Type: application/json',
             ),
         ));
 
@@ -148,7 +150,7 @@ class APIService
             CURLOPT_CUSTOMREQUEST => 'PATCH',
             CURLOPT_POSTFIELDS => json_encode($input),
             CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
+                'Content-Type: application/json',
             ),
         ));
 
@@ -178,7 +180,7 @@ class APIService
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode($input),
             CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
+                'Content-Type: application/json',
             ),
         ));
 
@@ -251,7 +253,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members',
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -259,10 +261,10 @@ class APIService
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_POSTFIELDS => json_encode($input),
             CURLOPT_HTTPHEADER => array(
-                'Authorization: '.$token,
-                'Content-Type: application/json'
+                'Authorization: ' . $token,
+                'Content-Type: application/json',
             ),
         ));
 
@@ -283,7 +285,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/get-status?mobile='.$input,
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/get-status?mobile=' . $input,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -300,7 +302,6 @@ class APIService
 
     }
 
-
     /*
      * 會員註冊 (發送驗證簡訊)
      * method: POST
@@ -311,7 +312,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/auth/sms/send',
+            CURLOPT_URL => $this->getURL() . '/crm/v1/auth/sms/send',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -319,9 +320,9 @@ class APIService
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_POSTFIELDS => json_encode($input),
             CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
+                'Content-Type: application/json',
             ),
         ));
 
@@ -342,7 +343,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/auth/sms/verify',
+            CURLOPT_URL => $this->getURL() . '/crm/v1/auth/sms/verify',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -350,9 +351,9 @@ class APIService
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS =>json_encode($input),
+            CURLOPT_POSTFIELDS => json_encode($input),
             CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
+                'Content-Type: application/json',
             ),
         ));
 
@@ -374,7 +375,7 @@ class APIService
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->getURL().'/crm/v1/members/basic?mobile='.$input,
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/basic?mobile=' . $input,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -383,8 +384,8 @@ class APIService
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
-                'Authorization: '.$token,
-                'Content-Type: application/json'
+                'Authorization: ' . $token,
+                'Content-Type: application/json',
             ),
         ));
 
@@ -419,5 +420,90 @@ class APIService
 
         curl_close($curl);
         return $response;
+    }
+    /*
+     * 訊息中心
+     */
+    public function getMessages($input, $url)
+    {
+        $client = new Client();
+        $result = $client->request('GET', $this->getURL() . $url, [
+            'query' => $input,
+            'http_errors' => false,
+            'headers' => [
+                // 'Authorization'     => $token ,
+                'Content-Type: application/json',
+            ],
+        ])->getBody()->getContents();
+        return $result;
+    }
+    /**
+     * 更改訊息讀取狀態
+     *
+     */
+    public function changeReadStatusMessages($input, $url, $token)
+    {
+        $client = new Client();
+        $response = $client->request('PATCH', $this->getURL() . $url, [
+            'json' => $input,
+            'http_errors' => false,
+            'headers' => [
+                'Content-Type: application/json',
+            ],
+        ])->getBody()->getContents();
+
+        return $response;
+    }
+    /**
+     * 秀出訊息
+     */
+    public function showMessages($url)
+    {
+        $client = new Client();
+        $response = $client->request('get', $this->getURL() . $url, [
+            // 'json' => $input,
+            'http_errors' => false,
+            'headers' => [
+                'Content-Type: application/json',
+            ],
+        ])->getBody()->getContents();
+        return $response;
+    }
+
+    /**
+     * 重設會員密碼
+     *
+     * @param string $token
+     * @param array $payloads
+     * @return array
+     */
+    public function resetPassword($token, $payloads)
+    {
+        $password = $payloads['password'];
+        $endpoint = '/crm/v2/members/reset-password';
+
+        $response = $this->http_client->request('POST', $endpoint, [
+            'timeout' => 180,
+            'connect_timeout' => 10,
+            // 'verify' => false,
+            'http_errors' => false,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'password' => $password,
+            ],
+        ]);
+
+        $status_code = $response->getStatusCode();
+        $body = $response->getBody();
+        $response_payloads = json_decode($body, true);
+
+        return [
+            'status_code' => $status_code,
+            'payloads' => $response_payloads,
+        ];
     }
 }

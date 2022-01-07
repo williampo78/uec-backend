@@ -1,17 +1,18 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\IndexController;
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\CheckoutController;
 use App\Http\Controllers\api\DradviceController;
-use App\Http\Controllers\api\TestInfoController;
+use App\Http\Controllers\api\IndexController;
+use App\Http\Controllers\api\MemberController;
 use App\Http\Controllers\api\MemberInfoController;
 use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\ShoppingController;
 use App\Http\Controllers\api\StockController;
-use App\Http\Controllers\api\CheckoutController;
+use App\Http\Controllers\api\MessagesController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +23,7 @@ use App\Http\Controllers\api\CheckoutController;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -74,6 +75,7 @@ Route::group(['middleware' => 'jwt.member'], function () {
         Route::post('/tmpOrder', [CheckoutController::class, 'setTmpOrder']);
         Route::post('/checkOrder', [CheckoutController::class, 'setOrder']);
     });
+    Route::resource('/members/message', MessagesController::class, ['names' => ['index' => 'members.message']]);
 
 });
 
@@ -87,6 +89,12 @@ Route::group(['prefix' => 'members'], function () {
     Route::post('/sendSms', [AuthController::class, 'sendSMS']);
     Route::post('/verifySms', [AuthController::class, 'verifySMS']);
     Route::post('/memberBasic', [AuthController::class, 'memberBasic']);
+});
+
+// 指定單一會員
+Route::group(['prefix' => 'member'], function () {
+    // 重設會員密碼
+    Route::post('/password', [MemberController::class, 'resetPassword']);
 });
 
 Route::group(['prefix' => 'shopping'], function () {

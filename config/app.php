@@ -24,6 +24,10 @@ return [
     | running in. This may determine how you prefer to configure various
     | services the application utilizes. Set this in your ".env" file.
     |
+    | local 本地環境
+    | testing 測試環境
+    | production 正式環境
+    |
     */
 
     'env' => env('APP_ENV', 'production'),
