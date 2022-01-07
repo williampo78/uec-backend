@@ -142,10 +142,9 @@ class MessagesController extends Controller
         $input = ["isRead" => true];
         $response = $this->apiService->changeReadStatusMessages($input, $url, $token);
         $result = json_decode($response, true);
-
         try {
             if ($result['status'] == '200') {
-                return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => null, 'result' => $result['data']]);
+                return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => null, 'result' => $result]);
             } else {
                 $err = $result['status'];
                 return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
