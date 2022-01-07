@@ -6,11 +6,11 @@ use App\Http\Controllers\api\DradviceController;
 use App\Http\Controllers\api\IndexController;
 use App\Http\Controllers\api\MemberController;
 use App\Http\Controllers\api\MemberInfoController;
+use App\Http\Controllers\api\MessagesController;
 use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\ProductController;
 use App\Http\Controllers\api\ShoppingController;
 use App\Http\Controllers\api\StockController;
-use App\Http\Controllers\api\MessagesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,7 +45,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/stock', [StockController::class, 'getItemStock']);
 });
 
-Route::group(['middleware' => 'jwt.member'], function () {
+// jwt驗證
+Route::group(['middleware' => 'jwt.verify'], function () {
     Route::post('/members/logout', [AuthController::class, 'logout']);
 
     Route::post('/membership', [MemberInfoController::class, 'profile']);
@@ -95,6 +96,9 @@ Route::group(['prefix' => 'members'], function () {
 Route::group(['prefix' => 'member'], function () {
     // 重設會員密碼
     Route::post('/password', [MemberController::class, 'resetPassword']);
+
+    // 取得會員訂單列表
+    Route::get('/orders', [MemberController::class, 'getOrders']);
 });
 
 Route::group(['prefix' => 'shopping'], function () {

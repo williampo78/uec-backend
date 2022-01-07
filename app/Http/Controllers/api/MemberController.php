@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\api\MemberResetPasswordRequest;
 use App\Services\APIService;
+use App\Services\OrderService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\api\MemberGetOrdersRequest;
+use App\Http\Requests\api\MemberResetPasswordRequest;
+use Carbon\Carbon;
 
 class MemberController extends Controller
 {
@@ -54,5 +57,22 @@ class MemberController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    public function getOrders(MemberGetOrdersRequest $request)
+    {
+        $order_service = new OrderService;
+        $date = $request->query('date');
+        $ordered_start_date = Carbon::parse($date)->subDays(90);
+        $ordered_end_date = Carbon::parse($date);
+
+        $orders = $order_service->getOrders([
+            'revision_no' => 0,
+            'ordered_start_date' => $ordered_start_date,
+            'ordered_end_date' => $ordered_end_date,
+        ]);
+        // dump($date);
+
+        return 'end';
     }
 }

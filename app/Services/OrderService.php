@@ -29,6 +29,11 @@ class OrderService
             $orders = $orders->where('is_latest', $query_datas['is_latest']);
         }
 
+        // 修訂版號
+        if (isset($query_datas['revision_no'])) {
+            $orders = $orders->where('revision_no', $query_datas['revision_no']);
+        }
+
         // 訂單開始時間
         if (isset($query_datas['ordered_date_start'])) {
             $orders = $orders->whereDate('ordered_date', '>=', $query_datas['ordered_date_start']);
