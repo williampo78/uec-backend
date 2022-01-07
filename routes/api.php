@@ -104,4 +104,5 @@ Route::group(['prefix' => 'shopping'], function () {
 
 Route::group(['prefix' => 'checkout'], function () {
     Route::get('/donatedInstitution', [CheckoutController::class, 'getDonatedInstitution']);
+    Route::post('/tapPayNotify', [CheckoutController::class, 'tapPayNotify']);
 });
