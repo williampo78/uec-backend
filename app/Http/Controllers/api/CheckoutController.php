@@ -12,6 +12,7 @@ use App\Services\APICartServices;
 use App\Services\APIOrdersServices;
 use Validator;
 use App\Models\TmpTapPay;
+use App\Services\APITapPayService;
 
 class CheckoutController extends Controller
 {
@@ -21,14 +22,16 @@ class CheckoutController extends Controller
     private $apiProductServices;
     private $apiCartService;
     private $apiOrdersService;
+    private $apiTapPay;
 
-    public function __construct(UniversalService $universalService, APIService $apiService, APIProductServices $apiProductServices, APICartServices $apiCartService, APIOrdersServices $apiOrdersService)
+    public function __construct(UniversalService $universalService, APIService $apiService, APIProductServices $apiProductServices, APICartServices $apiCartService, APIOrdersServices $apiOrdersService, APITapPayService $apiTapPay)
     {
         $this->universalService = $universalService;
         $this->apiService = $apiService;
         $this->apiProductServices = $apiProductServices;
         $this->apiCartService = $apiCartService;
         $this->apiOrdersService = $apiOrdersService;
+        $this->apiTapPay = $apiTapPay;
     }
 
     /*
@@ -235,8 +238,8 @@ class CheckoutController extends Controller
      */
     public function tapPayNotify(Request $request)
     {
-        $data['info'] = $request;
-        $result = TmpTapPay::insert($data);
+        $data['info'] = $request->getContent();
+        $result = $this->apiTapPay->tapPayNotifyLog($data);
         if ($result) {
             return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => []]);
         }
