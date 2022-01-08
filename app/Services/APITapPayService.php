@@ -96,9 +96,8 @@ class APITapPayService
                     //檢查該筆資料的交易紀錄的狀態
                     foreach ($record['trade_records'] as $trade) {
                         $data = [];
-                        if ($trade['record_status'] == 1) { //交易完成..更新金流狀態...準備出貨單
+                        if ($trade['record_status'] == 1 || trade['record_status'] == 0) { //交易完成..更新金流狀態...準備出貨單
                             $orderStatus = $this->setShipment($orderPayment);
-                            dd($orderStatus);
                         }
                     }
                 }
