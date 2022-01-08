@@ -95,8 +95,7 @@ class APITapPayService
                 if ($record['status'] == 2) { //tappay打回來的最後資料
                     //檢查該筆資料的交易紀錄的狀態
                     foreach ($record['trade_records'] as $trade) {
-                        $data = [];
-                        if ($trade['record_status'] == 1 || trade['record_status'] == 0) { //交易完成..更新金流狀態...準備出貨單
+                        if ($trade['record_status'] == 1 || $trade['record_status'] == 0) { //交易完成..更新金流狀態...準備出貨單
                             $orderStatus = $this->setShipment($orderPayment);
                         }
                     }
@@ -167,11 +166,12 @@ class APITapPayService
      */
     public function setShipment($data)
     {
+        $status = Order::getOrder($data->source_table_id);
+        if ($status['status_code'] != 'CREATED') exit;
         $now = Carbon::now();
         $random = Str::random(6);
         //商城倉庫代碼
         $warehouseCode = $this->stockService->getWarehouseConfig();
-
         DB::beginTransaction();
         try {
             $order = Order::where('id', '=', $data->source_table_id)->update(['pay_status' => 'COMPLETED', 'status_code' => 'PROCESSING']);
