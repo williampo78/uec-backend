@@ -82,8 +82,8 @@ class APITapPayService
     public function tapPayNotifyLog($input)
     {
         //先把TapPay回傳的資料都寫入
-        //$pay_log_id = TapPayPayLog::insertGetId($input);
-        $info = TapPayPayLog::where('id', '=', 2)->first();
+        $pay_log_id = TapPayPayLog::insertGetId($input);
+        $info = TapPayPayLog::where('id', '=', $pay_log_id)->first();
         //交易代碼status成功時才檢查回傳交易資料跟訂單是否符合
         $input['status'] = 0;
         if ($input['status'] == 0) {
