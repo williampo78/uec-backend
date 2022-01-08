@@ -244,9 +244,5 @@ class CheckoutController extends Controller
         $data['payment_type'] = 'PAY';
         $data['response_info'] = $request->getContent();
         $result = $this->apiTapPay->tapPayNotifyLog($data);
-        dd($result);
-        if ($result) {
-            return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => []]);
-        }
     }
 }

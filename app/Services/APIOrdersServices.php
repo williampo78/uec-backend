@@ -97,7 +97,7 @@ class APIOrdersServices
             $result['status'] = $tapPayResult['status'];
             $result['msg'] = $tapPayResult['msg'];
         }
-return $result;
+        return $result;
 
         $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
@@ -464,6 +464,5 @@ return $result;
 
         return $result;
     }
-
 
 }
