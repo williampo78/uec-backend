@@ -147,10 +147,4 @@ return [
         '3' => '零稅率',
     ],
 
-    // TapPay 收款商家
-    'merchant_id' => [
-        'TAPPAY_CREDITCARD' => 'uarktech_CTBC',
-        'TAPPAY_LINEPAY' => 'uarktech_LINEPAY'
-    ]
-
 ];

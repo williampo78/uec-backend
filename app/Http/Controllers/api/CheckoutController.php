@@ -11,7 +11,6 @@ use App\Services\APIProductServices;
 use App\Services\APICartServices;
 use App\Services\APIOrdersServices;
 use Validator;
-use App\Models\TmpTapPay;
 use App\Services\APITapPayService;
 
 class CheckoutController extends Controller
@@ -194,9 +193,9 @@ class CheckoutController extends Controller
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
         $response = json_decode($response, true);
 
-                $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
-                //dd($data);
-                return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
+        $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
+        //dd($data);
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
 
         if ($response['status'] == '404') {
             $status = false;
@@ -238,8 +237,14 @@ class CheckoutController extends Controller
      */
     public function tapPayNotify(Request $request)
     {
-        $data['info'] = $request->getContent();
+        $data['order_no'] = $request['order_number'];
+        $data['rec_trade_id'] = $request['rec_trade_id'];
+        $data['amount'] = $request['amount'];
+        $data['status'] = $request['status'];
+        $data['payment_type'] = 'PAY';
+        $data['response_info'] = $request->getContent();
         $result = $this->apiTapPay->tapPayNotifyLog($data);
+        dd($result);
         if ($result) {
             return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => []]);
         }
