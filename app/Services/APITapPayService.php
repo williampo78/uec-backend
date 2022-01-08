@@ -45,7 +45,9 @@ class APITapPayService
         $data['cardholder'] = ($buyer);
         $data['order_number'] = $input['order_no'];
         $data['remember'] = false;
-        $data['three_domain_secure'] = true;
+        if ($input['payment_method'] == 'TAPPAY_CREDITCARD') {
+            $data['three_domain_secure'] = true;
+        }
         $url['frontend_redirect_url'] = config('tappay.frontend_redirect_url');
         $url['backend_notify_url'] = config('tappay.backend_notify_url');
         $data['result_url'] = ($url);
