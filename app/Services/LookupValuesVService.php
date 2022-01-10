@@ -16,14 +16,14 @@ class LookupValuesVService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = Lookup_values_v::select('code', 'description')
+        $results = Lookup_values_v::select('code', 'description')
             ->where('agent_id', $agent_id)
             ->where('type_code', 'APPLICABLE_PAGE')
             ->orderBy("sort", "asc")
             ->orderBy("code", "asc")
             ->get();
 
-        return $result;
+        return $results;
     }
 
     /**
@@ -36,39 +36,45 @@ class LookupValuesVService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = Lookup_values_v::where('agent_id', $agent_id)
+        $results = Lookup_values_v::where('agent_id', $agent_id)
             ->where('type_code', 'CAMPAIGN_TYPE');
 
         if (!empty($query_datas['udf_01'])) {
-            $result = $result->where('udf_01', $query_datas['udf_01']);
+            $results = $results->where('udf_01', $query_datas['udf_01']);
         }
 
         if (!empty($query_datas['code'])) {
-            $result = $result->where('code', $query_datas['code']);
+            $results = $results->where('code', $query_datas['code']);
         }
 
-        $result = $result->orderBy("sort", "asc")
+        $results = $results->orderBy("sort", "asc")
             ->orderBy("code", "asc")
             ->get();
 
-        return $result;
+        return $results;
     }
 
     /**
      * 取得發票捐贈機構
      *
+     * @param array $query_datas
      * @return object
      */
-    public function getDonatedInstitutions()
+    public function getDonatedInstitutions($query_datas = [])
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = Lookup_values_v::where('agent_id', $agent_id)
-            ->where('type_code', 'DONATED_INSTITUTION')
-            ->orderBy("sort", "asc")
+        $results = Lookup_values_v::where('agent_id', $agent_id)
+            ->where('type_code', 'DONATED_INSTITUTION');
+
+        if (isset($query_datas['code'])) {
+            $results = $results->where('code', $query_datas['code']);
+        }
+
+        $results = $results->orderBy("sort", "asc")
             ->orderBy("code", "asc")
             ->get();
 
-        return $result;
+        return $results;
     }
 }

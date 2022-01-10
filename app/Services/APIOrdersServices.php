@@ -39,7 +39,7 @@ class APIOrdersServices
 
         $webData = [];
         $webData['agent_id'] = 1;
-        $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
+        $webData['order_no'] = "OD220107GFAZYW";
         $webData['member_id'] = $member_id;
         $webData['member_account'] = $order['buyer']['mobile'];
         $webData['ordered_date'] = $now;
@@ -90,6 +90,7 @@ class APIOrdersServices
             if ($payment) {
                 $result['status'] = 200;
                 $result['payment_url'] = $tapPayResult['payment_url'];
+                $result['rec_trade_id'] = $tapPayResult['rec_trade_id'];
             } else {
                 $result['status'] = 401;
             }
@@ -97,7 +98,7 @@ class APIOrdersServices
             $result['status'] = $tapPayResult['status'];
             $result['msg'] = $tapPayResult['msg'];
         }
-return $result;
+        return $result;
 
         $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
@@ -464,6 +465,5 @@ return $result;
 
         return $result;
     }
-
 
 }

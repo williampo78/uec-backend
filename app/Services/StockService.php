@@ -29,7 +29,7 @@ class StockService
      */
     public function getStockByItem($number = null, $item_id = null)
     {
-        $stock = WarehouseStock::select("warehouse_stock.stock_qty as stockQty", "products.order_limited_qty as limitedQty")
+        $stock = WarehouseStock::select("warehouse_stock.stock_qty as stockQty", "products.order_limited_qty as limitedQty", "warehouse_stock.warehouse_id", "warehouse_stock.id")
             ->join("warehouse", "warehouse.id", "=", "warehouse_stock.warehouse_id")
             ->join("product_items", "product_items.id", "=", "warehouse_stock.product_item_id")
             ->join("products", "products.id", "=", "product_items.product_id")

@@ -29,6 +29,11 @@ class OrderService
             $orders = $orders->where('is_latest', $query_datas['is_latest']);
         }
 
+        // 修訂版號
+        if (isset($query_datas['revision_no'])) {
+            $orders = $orders->where('revision_no', $query_datas['revision_no']);
+        }
+
         // 訂單開始時間
         if (isset($query_datas['ordered_date_start'])) {
             $orders = $orders->whereDate('ordered_date', '>=', $query_datas['ordered_date_start']);
@@ -141,10 +146,6 @@ class OrderService
         $order_campaign_discounts = $order_campaign_discounts->orderBy('order_campaign_discounts.group_seq', 'asc')
             ->orderBy('order_campaign_discounts.order_detail_id', 'asc')
             ->get();
-
-        $lookup_values_v_service = new LookupValuesVService;
-        // 發票捐贈機構
-        $donated_institutions = $lookup_values_v_service->getDonatedInstitutions();
 
         // 發票開立
         $invoices = Invoice::select(
@@ -267,14 +268,6 @@ class OrderService
                 }
 
                 $order->order_campaign_discounts->push($order_campaign_discount);
-            }
-        }
-
-        // 將發票捐贈機構名稱加入訂單中
-        foreach ($donated_institutions as $donated_institution) {
-            if ($orders->contains('donated_institution', $donated_institution->code)) {
-                $order = $orders->firstWhere('donated_institution', $donated_institution->code);
-                $order->donated_institution_name = $donated_institution->description;
             }
         }
 

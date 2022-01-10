@@ -11,4 +11,13 @@ class Order extends Model
 
     protected $table = 'orders';
     protected $guarded = [];
+
+    /**
+     * 取得 訂單
+     *
+     */
+    static public function getOrder($order_id)
+    {
+        return self::where('id', '=', $order_id)->first();
+    }
 }
