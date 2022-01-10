@@ -29,14 +29,15 @@ class ProductsService
 
     public function getProducts($input_data = [])
     {
+        DB::enableQueryLog();
         $agent_id = Auth::user()->agent_id;
 
         $products = Products::select('products.*', 'supplier.name AS supplier_name')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
-        
+
         if (isset($input_data['web_category_hierarchy_id'])) {
-            $web_category_hierarchy_id = $input_data['web_category_hierarchy_id'] ;
+            $web_category_hierarchy_id = $input_data['web_category_hierarchy_id'];
             $products->join('web_category_products', function ($join) use ($web_category_hierarchy_id) {
                 $join->where('web_category_products.web_category_hierarchy_id', '=', $web_category_hierarchy_id)
                     ->on('web_category_products.product_id', '=', 'products.id');
@@ -94,18 +95,17 @@ class ProductsService
         //上架狀態
         if (isset($input_data['approval_status'])) {
             switch ($input_data['approval_status']) {
+                //商品上架
                 case 'APPROVED_STATUS_ON':
                     $products = $products->where(function ($query) {
-                        $query->where('products.start_launched_at', '<=', Carbon::now())
-                            ->Where('products.end_launched_at', '>=', Carbon::now())
-                            ->where('products.approval_status', '=', 'APPROVED');
+                        $query->where('products.approval_status', '=', 'APPROVED');
                     });
                     break;
+                //商品下架
                 case 'APPROVED_STATUS_OFF':
                     $products = $products->where(function ($query) {
-                        $query->where('products.start_launched_at', '>=', Carbon::now())
-                            ->Where('products.end_launched_at', '<=', Carbon::now())
-                            ->where('products.approval_status', '=', 'APPROVED');
+                        $query->where('products.approval_status', '=', 'APPROVED')
+                            ->orWhere('products.approval_status', 'CANCELLED');
                     });
                     break;
                 default:
@@ -114,23 +114,14 @@ class ProductsService
             }
         }
 
-        try {
-            // 上架起始日
-            if (!empty($input_data['start_launched_at'])) {
-                $start_launched_at = Carbon::parse($input_data['start_launched_at'])->format('Y-m-d H:i:s');
-                $products->whereDate('products.start_launched_at', '>=', $start_launched_at);
-            }
-
-            // 上架結束日
-            if (!empty($input_data['end_launched_at'])) {
-                $input_data['end_launched_at'] = $input_data['end_launched_at'] . ' 23:59:59';
-                $end_launched_at = Carbon::parse($input_data['end_launched_at'])->format('Y-m-d H:i:s');
-                $products->whereDate('products.end_launched_at', '<=', $end_launched_at);
-            }
-        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-            Log::warning($e->getMessage());
+        // 上架起始日 & 上架結束日
+        if (!empty($input_data['start_launched_at']) && !empty($input_data['end_launched_at'])) {
+            $start_launched_at = Carbon::parse($input_data['start_launched_at'])->format('Y-m-d H:i:s');
+            $input_data['end_launched_at'] = $input_data['end_launched_at'] . ' 23:59:59';
+            $end_launched_at = Carbon::parse($input_data['end_launched_at'])->format('Y-m-d H:i:s');
+            $products->where('products.end_launched_at', '>=', $end_launched_at)
+                     ->where('products.start_launched_at', '<=', $start_launched_at);
         }
-
         // 最低售價
         if (isset($input_data['selling_price_min'])) {
             $products->where('products.selling_price', '>=', $input_data['selling_price_min']);
@@ -164,9 +155,6 @@ class ProductsService
         }
 
         $result = $products->get();
-        // $this->restructureProducts($result);
-        // dd($result) ;
-        // dump($result) ;
         return $result;
     }
 
@@ -224,7 +212,7 @@ class ProductsService
             $products_id = Products::create($insert)->id;
             $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'], 'id' => $products_id]);
             Products::where('id', $products_id)->update(['product_no' => $product_no]);
-            $add_item_no = 1 ; 
+            $add_item_no = 1;
             foreach ($skuList as $key => $val) {
                 $skuInsert = [
                     'agent_id' => $agent_id,
@@ -246,7 +234,7 @@ class ProductsService
                 ];
                 $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
                 $skuList[$key]['item_no'] = $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
-                $add_item_no += 1 ;
+                $add_item_no += 1;
             }
             Product_spec_info::create([
                 'product_id' => $products_id,
@@ -447,12 +435,13 @@ class ProductsService
         $result = $ProductItems->get();
         return $result;
     }
-    public function getItemsAndProduct(){
+    public function getItemsAndProduct()
+    {
         $agent_id = Auth::user()->agent_id;
         $ProductItems = ProductItems::
-        select('product_items.*' , 'products.product_name' , 'products.brand_id' , 'products.min_purchase_qty' , 'products.uom')
-        ->where('product_items.agent_id', $agent_id)
-        ->leftJoin('products' ,'products.id' ,'=' ,'product_items.product_id');
+            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom')
+            ->where('product_items.agent_id', $agent_id)
+            ->leftJoin('products', 'products.id', '=', 'product_items.product_id');
         $result = $ProductItems->get();
         return $result;
     }
@@ -747,15 +736,16 @@ class ProductsService
         }
         return $result;
     }
-    public function offProduct($in) {
+    public function offProduct($in)
+    {
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         DB::beginTransaction();
         try {
-            $count_review = ProductReviewLog::where('product_id', $in['product_id'])->orderBy('id', 'DESC')->count() ;
-            if($count_review > 0){
+            $count_review = ProductReviewLog::where('product_id', $in['product_id'])->orderBy('id', 'DESC')->count();
+            if ($count_review > 0) {
                 ProductReviewLog::where('product_id', $in['product_id'])->orderBy('id', 'DESC')->first()->update([
-                    'discontinued_by'=>$user_id,
+                    'discontinued_by' => $user_id,
                     'discontinued_at' => $now,
                     'updated_by' => $user_id,
                 ]);

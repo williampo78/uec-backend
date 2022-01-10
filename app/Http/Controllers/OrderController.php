@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OrdersExport;
+use App\Services\LookupValuesVService;
+use App\Services\OrderService;
+use App\Services\RoleService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Exports\OrdersExport;
-use App\Services\RoleService;
-use App\Services\OrderService;
 use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
@@ -218,6 +219,14 @@ class OrderController extends Controller
         // 載具類型
         if (isset(config('uec.carrier_type_options')[$order->carrier_type])) {
             $order->carrier_type = config('uec.carrier_type_options')[$order->carrier_type];
+        }
+
+        $lookup_values_v_service = new LookupValuesVService;
+        // 發票捐贈機構
+        if (isset($order->donated_institution)) {
+            $order->donated_institution_name = $lookup_values_v_service->getDonatedInstitutions([
+                'code' => $order->donated_institution,
+            ])->first()['description'];
         }
 
         // 取消 / 作廢時間
