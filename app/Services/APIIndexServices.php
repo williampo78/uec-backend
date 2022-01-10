@@ -214,7 +214,7 @@ class APIIndexServices
         if (!$img_H080A && !$prd_H080A) {
             unset($data['H080A']);
         } else {
-            $data['H080A'][] = array(
+            $data['H080A'] = array(
                 'images' => $img_H080A,
                 'products' => $prd_H080A
             );
@@ -222,7 +222,7 @@ class APIIndexServices
         if (!$img_H080B && !$prd_H080B) {
             unset($data['H080B']);
         } else {
-            $data['H080B'][] = array(
+            $data['H080B'] = array(
                 'images' => $img_H080B,
                 'products' => $prd_H080B
             );
