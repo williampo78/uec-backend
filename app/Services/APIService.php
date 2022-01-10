@@ -421,6 +421,7 @@ class APIService
         curl_close($curl);
         return $response;
     }
+
     /*
      * 訊息中心
      */
@@ -437,6 +438,7 @@ class APIService
         ])->getBody()->getContents();
         return $result;
     }
+
     /**
      * 更改訊息讀取狀態
      *
@@ -454,6 +456,7 @@ class APIService
 
         return $response;
     }
+
     /**
      * 秀出訊息
      */
@@ -469,7 +472,8 @@ class APIService
         ])->getBody()->getContents();
         return $response;
     }
-        /**
+
+    /**
      * 取得置頂訊息
      */
     public function getTopMessages($input, $url)
@@ -521,5 +525,35 @@ class APIService
             'status_code' => $status_code,
             'payloads' => $response_payloads,
         ];
+    }
+
+    /*
+     * 更新會員可用點數
+     * method: POST
+     * @return json
+     */
+    public function changeMemberPoint($data, $member_id)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $this->getURL() . '/crm/v1/members/' . $member_id . '/change-point',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($data),
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return $response;
     }
 }

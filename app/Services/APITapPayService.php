@@ -12,6 +12,7 @@ use App\Models\ShipmentDetail;
 use App\Models\WarehouseStock;
 use App\Models\StockTransactionLog;
 use App\Services\StockService;
+use App\Services\APIService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,9 +20,10 @@ use Illuminate\Support\Str;
 
 class APITapPayService
 {
-    public function __construct(StockService $stockService)
+    public function __construct(StockService $stockService, APIService $APIService)
     {
         $this->stockService = $stockService;
+        $this->apiService = $APIService;
     }
 
     /*
@@ -177,7 +179,23 @@ class APITapPayService
         DB::beginTransaction();
         try {
             $order = Order::where('id', '=', $data->source_table_id)->update(['pay_status' => 'COMPLETED', 'status_code' => 'PROCESSING']);
+
+            //更新付款狀態
             $order_payment = OrderPayment::where('id', '=', $data->id)->update(['payment_status' => 'COMPLETED']);
+
+            //更新會員點數
+            if ($status['points'] != 0) {
+                $pointData['point'] = $status['points'];
+                $pointData['orderId'] = $status['order_no'];
+                $pointData['type'] = 'USED';
+                $pointData['callFrom'] = 'EC';
+                $used_member = $status['member_id'];
+                $pointStatus = $this->apiService->changeMemberPoint($pointData, $used_member);
+                $pointStatus = json_decode($pointStatus, true);
+                $thisStatus = ($pointStatus['status'] == '200' ? 'S' : 'E');
+                $order_payment = OrderPayment::where('id', '=', $data->id)->update(['point_api_status' => $thisStatus, 'point_api_date' => $pointStatus['timestamp'], 'point_api_log' => json_encode($pointStatus)]);
+            }
+
             //建立出貨單頭
             $shipData = [];
             $shipData['agent_id'] = 1;
