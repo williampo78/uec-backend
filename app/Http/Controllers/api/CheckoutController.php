@@ -185,8 +185,7 @@ class CheckoutController extends Controller
         if ($v_invocie->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v_invocie->errors()]);
         }
-echo "ABC";
-        dd();
+
         $member_id = Auth::guard('api')->user()->member_id;
         $campaign = $this->apiProductServices->getPromotion('product_card');
         $campaign_gift = $this->apiProductServices->getCampaignGift();
