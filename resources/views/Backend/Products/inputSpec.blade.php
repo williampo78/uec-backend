@@ -82,8 +82,9 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="form-group">
-                                        <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'"  v-model="spec_1.name" >
-                                    </div> 
+                                        <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'"
+                                            v-model="spec_1.name">
+                                    </div>
                                 </div>
                                 <div class="col-sm-2">
                                     <button class="btn btn-danger btn-sm" type="button"
@@ -116,7 +117,8 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="form-group">
-                                        <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name">
+                                        <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'"
+                                            v-model="spec_2.name">
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
@@ -152,7 +154,7 @@
                 <th style="width: 15%">Item編號</th>
                 <th style="width: 10%">廠商貨號</th>
                 <th style="width: 10%">國際條碼</th>
-                <th style="width: 10%">POS品號</th>
+                <th style="width: 10%">POS品號<span class="stock_type_list redtext">*</span></th>
                 <th style="width: 10%">安全庫存量<span class="redtext">*</span></th>
                 <th style="width: 10%">是否追加<span class="redtext">*</span></th>
                 <th style="width: 10%">狀態<span class="redtext">*</span></th>
@@ -165,14 +167,20 @@
                 <td><input class="form-control" v-model="Sku.item_no" readonly></td>
                 <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
                 <td><input class="form-control" v-model="Sku.ean"></td>
-                <td><input class="form-control" v-model="Sku.pos_item_no"></td>
                 <td>
-                    <div class="form-group">
-                        <input class="form-control safty_qty_va" v-model="Sku.safty_qty" :name="'safty_qty_va['+SkuKey+']'">
+                    <div class="form-group" >
+                        <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
+                            :name="'pos_item_no['+SkuKey+']'">
                     </div>
                 </td>
                 <td>
-                    <select class="form-control js-select2" v-model="Sku.is_additional_purchase" >
+                    <div class="form-group">
+                        <input class="form-control safty_qty_va" type="number" min="0" v-model="Sku.safty_qty"
+                            :name="'safty_qty_va['+SkuKey+']'">
+                    </div>
+                </td>
+                <td>
+                    <select class="form-control js-select2" v-model="Sku.is_additional_purchase">
                         <option value="1">是</option>
                         <option value="0">否</option>
                     </select>

@@ -797,10 +797,14 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <div v-if="spec_1.old_spec">
-                                                <input class="form-control" v-model="spec_1.name" disabled>
+                                                <div class="form-group">
+                                                    <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name" disabled>
+                                                </div>
                                             </div>
                                             <div v-else>
-                                                <input class="form-control" v-model="spec_1.name">
+                                                <div class="form-group">
+                                                    <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name">
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
@@ -840,10 +844,15 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <div v-if="spec_2.old_spec">
-                                                <input class="form-control" v-model="spec_2.name" disabled>
+                                                <div class="form-group">
+                                                    <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name" disabled>
+                                                </div>
                                             </div>
                                             <div v-else>
-                                                <input class="form-control" v-model="spec_2.name">
+                                                <div class="form-group">
+                                                    <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name">
+                                                </div>
+
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
@@ -875,6 +884,7 @@
                 </div>
                 <textarea style="display: none" style="display: none" name="SkuListdata" cols="30"
                     rows="10">@{{ SkuList }}</textarea>
+                    
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
@@ -883,10 +893,10 @@
                             <th style="width: 15%">Item編號</th>
                             <th style="width: 10%">廠商貨號</th>
                             <th style="width: 10%">國際條碼</th>
-                            <th style="width: 10%">POS品號</th>
-                            <th style="width: 10%">安全庫存量*</th>
-                            <th style="width: 10%">是否追加*</th>
-                            <th style="width: 10%">狀態*</th>
+                            <th style="width: 10%">POS品號<span class="stock_type_list redtext">*</span></th>
+                            <th style="width: 10%">安全庫存量<span class="redtext">*</span></th>
+                            <th style="width: 10%">是否追加<span class="redtext">*</span></th>
+                            <th style="width: 10%">狀態<span class="redtext">*</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -896,11 +906,20 @@
                             <td><input class="form-control" v-model="Sku.item_no" readonly></td>
                             <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
                             <td><input class="form-control" v-model="Sku.ean"></td>
-                            <td><input class="form-control" v-model="Sku.pos_item_no"></td>
-                            <td><input class="form-control" v-model="Sku.safty_qty"></td>
                             <td>
-                                <select class="form-control js-select2" v-model="Sku.is_additional_purchase"
-                                    id="active">
+                                <div class="form-group" style="margin-right:0px;margin-left:0px;">
+                                    <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
+                                        :name="'pos_item_no['+SkuKey+']'" >
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group" style="margin-right:0px;margin-left:0px;">
+                                    <input class="form-control safty_qty_va" type="number" min="0" v-model="Sku.safty_qty"
+                                        :name="'safty_qty_va['+SkuKey+']'">
+                                </div>
+                            </td>
+                            <td>
+                                <select class="form-control js-select2" v-model="Sku.is_additional_purchase">
                                     <option value="1">是</option>
                                     <option value="0">否</option>
                                 </select>
@@ -1349,6 +1368,13 @@
         }
     }
     $(document).ready(function () {
+        $('input[type=radio][name=stock_type]').change(function() {
+                if($(this).val() == 'T'){
+                    $('.stock_type_list').hide();
+                }else{
+                    $('.stock_type_list').show();
+                }
+            });
         $(".supplier_id").select2({
             allowClear: true,
             theme: "bootstrap",
@@ -1384,6 +1410,15 @@
                 $(".spec_2_va").each(function(){
                     $(this).rules("add", {
                         required: true,
+                    });
+                })
+                $(".pos_item_no_va").each(function() {
+                    $(this).rules("add", {
+                        required :{
+                            depends: function(element) {
+                                return $("input[name='stock_type']:checked").val() !== 'T'  ; 
+                            }
+                        }
                     });
                 })
                 $( "#new-form" ).submit()
@@ -1434,6 +1469,10 @@
               selling_price: {
                   required: true,
                   digits: true,
+              }, //重量
+                    weight:{
+                    required: true,
+                    digits: true,
               }
           },
           errorClass: "help-block",
