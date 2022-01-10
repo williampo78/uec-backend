@@ -564,9 +564,15 @@ class APIProductServices
             $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
             $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
             $spec_info = [];
+            $spec1 = '';
+            $spec2 = '';
             foreach ($ProductSpec as $item) {
-                $item_spec['spec_1'][] = $item['spec_1_value']; //規格1
-                $item_spec['spec_2'][] = $item['spec_2_value']; //規格2
+                if ($spec1 != $item['spec_1_value']) {
+                    $item_spec['spec_1'][] = $item['spec_1_value'];//規格1
+                }
+                if ($spec2 != $item['spec_2_value']) {
+                    $item_spec['spec_2'][] = $item['spec_2_value'];//規格2
+                }
                 $spec_info[] = array(
                     "itme_id" => $item['id'],
                     "item_no" => $item['item_no'],
@@ -574,6 +580,8 @@ class APIProductServices
                     "item_spec1" => $item['spec_1_value'],
                     "item_spec2" => $item['spec_2_value'],
                 );
+                $spec1 = $item['spec_1_value'];
+                $spec2 = $item['spec_2_value'];
             }
             $item_spec['spec_1'] = ($item_spec['spec_1'] ? array_unique($item_spec['spec_1']) : null);
             $item_spec['spec_2'] = ($item_spec['spec_2'] ? array_unique($item_spec['spec_2']) : null);
@@ -602,7 +610,7 @@ class APIProductServices
             $certificate = $this->getCertificateIcon();
             foreach ($certificate as $item) {
                 if ($item->product_id == $id) {
-                    $icon[] = array("icon"=>$s3 . $item->photo_name);
+                    $icon[] = array("icon" => $s3 . $item->photo_name);
                 }
             }
             $data['certificate'] = $icon;
