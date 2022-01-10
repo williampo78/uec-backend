@@ -36,7 +36,7 @@ class APIOrdersServices
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         $random = Str::random(6);
-
+        /* test
         $webData = [];
         $webData['agent_id'] = 1;
         $webData['order_no'] = "OD220107GFAZYW";
@@ -99,6 +99,7 @@ class APIOrdersServices
             $result['msg'] = $tapPayResult['msg'];
         }
         return $result;
+        */
 
         $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
