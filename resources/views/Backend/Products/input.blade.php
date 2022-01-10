@@ -634,8 +634,8 @@
                     {{-- 二維多規格結束 --}}
                     <button class="btn btn-large btn-success" type="button" id="save_data">
                         <i class="fa fa-save"></i>
-                            儲存
-                        </button>
+                        儲存
+                    </button>
                     <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i> 取消</a>
                 </form>
             </div>
@@ -662,9 +662,9 @@
                         spec_1_value: 0,
                         spec_1_only_key: 0,
                         item_no: '',
-                        supplier_item_no: 0,
-                        ean: 0,
-                        pos_item_no: 0,
+                        supplier_item_no: '',
+                        ean: '',
+                        pos_item_no: '',
                         safty_qty: 0,
                         is_additional_purchase: 0,
                         status: 0,
@@ -864,12 +864,12 @@
                                     id: '',
                                     sort_key: 0,
                                     sort: 0,
-                                    spec_1_value: 0,
-                                    spec_1_only_key: 0,
-                                    item_no: 0,
-                                    supplier_item_no: 0,
-                                    ean: 0,
-                                    pos_item_no: 0,
+                                    spec_1_value: '',
+                                    spec_1_only_key: '',
+                                    item_no: '',
+                                    supplier_item_no: '',
+                                    ean: '',
+                                    pos_item_no: '',
                                     safty_qty: 0,
                                     is_additional_purchase: 0,
                                     status: 0,
@@ -1026,6 +1026,21 @@
             }
         }
         $(document).ready(function() {
+
+            $('input[type=radio][name=stock_type]').change(function() {
+                if ($(this).val() == 'T') {
+                    $('.stock_type_list').hide();
+                } else {
+                    $('.stock_type_list').show();
+                }
+            });
+            $('#checkbox1').change(function() {
+                if ($(this).is(":checked")) {
+                    var returnVal = confirm("Are you sure?");
+                    $(this).attr("checked", returnVal);
+                }
+                $('#textbox1').val($(this).is(':checked'));
+            });
             $(".supplier_id").select2({
                 allowClear: true,
                 theme: "bootstrap",
@@ -1065,6 +1080,41 @@
                         required: true,
                     });
                 })
+                $(".pos_item_no_va").each(function() {
+                    console.log($(this).val());
+                    $(this).rules("add", {
+                        required: {
+                            depends: function(element) {
+                                return $("input[name='stock_type']:checked").val() !== 'T';
+                            }
+                        },
+                        remote: {
+                            url: "/backend/products/ajax",
+                            type: "post",
+                            dataType: "json",
+                            cache: false,
+                            data: {
+                                pos_item_no: function() {
+                                    return $(this).val();
+                                },
+                                type:function(){
+                                    return 'checkPosItemNo' ;
+                                }
+                            },
+                            dataFilter: function(data, type) {
+                                if (data) {
+                                    console.log(data) ; 
+                                    // if (json_data.status) {
+                                    //     return true;
+                                    // }
+                                }
+
+                                return false;
+                            },
+                        },
+
+                    });
+                });
                 $("#new-form").submit();
             })
 
@@ -1113,6 +1163,10 @@
                     selling_price: {
                         required: true,
                         digits: true,
+                    }, //重量
+                    weight: {
+                        required: true,
+                        digits: true,
                     }
                 },
                 errorClass: "help-block",
@@ -1133,9 +1187,9 @@
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                // unhighlight: function(element, errorClass, validClass) {
-                //     $(element).closest(".form-group").removeClass("has-error");
-                // },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },

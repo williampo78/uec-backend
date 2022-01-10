@@ -141,5 +141,20 @@ class ProductsController extends Controller
     {
         //
     }
+    public function ajax(Request $request){
+        $in = $request->input();
+        switch ($in['type']) {
+            case 'checkPosItemNo': 
+                // echo 'TEST' ; 
+                break;
+            default:
+                break;
+        }
+
+        
+        return response()->json([
+            'in' => $request->input(),
+        ]);
+    }
 
 }

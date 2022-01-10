@@ -55,6 +55,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
     Route::get('/signOut', [AdminController::class, 'signOut'])->name('signOut');
     Route::resource('/products', ProductsController::class, ['names' => ['index' => 'products']]);
+    Route::post('/products/ajax', [ProductsController::class, 'ajax']);
+
     Route::resource('/product_small', ProductsMallController::class, ['names' => ['index' => 'product_small']]);
     Route::resource('/product_review_register', ProductReviewRegisterController::class, ['names' => ['index' => 'product_review_register']]);
     Route::post('/product_review_register/ajax', [ProductReviewRegisterController::class, 'ajax']);
