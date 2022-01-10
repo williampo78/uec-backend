@@ -634,8 +634,8 @@
                     {{-- 二維多規格結束 --}}
                     <button class="btn btn-large btn-success" type="button" id="save_data">
                         <i class="fa fa-save"></i>
-                            儲存
-                        </button>
+                        儲存
+                    </button>
                     <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i> 取消</a>
                 </form>
             </div>
@@ -1026,20 +1026,20 @@
             }
         }
         $(document).ready(function() {
-            
+
             $('input[type=radio][name=stock_type]').change(function() {
-                if($(this).val() == 'T'){
+                if ($(this).val() == 'T') {
                     $('.stock_type_list').hide();
-                }else{
+                } else {
                     $('.stock_type_list').show();
                 }
             });
             $('#checkbox1').change(function() {
-                if($(this).is(":checked")) {
+                if ($(this).is(":checked")) {
                     var returnVal = confirm("Are you sure?");
                     $(this).attr("checked", returnVal);
                 }
-                $('#textbox1').val($(this).is(':checked'));        
+                $('#textbox1').val($(this).is(':checked'));
             });
             $(".supplier_id").select2({
                 allowClear: true,
@@ -1083,28 +1083,30 @@
                 $(".pos_item_no_va").each(function() {
                     console.log($(this).val());
                     $(this).rules("add", {
-                        required :{
+                        required: {
                             depends: function(element) {
-                                return $("input[name='stock_type']:checked").val() !== 'T'  ; 
+                                return $("input[name='stock_type']:checked").val() !== 'T';
                             }
-                        },                  
-                         remote: {
-                            url: "/backend/users/ajax/is-user-account-repeat",
+                        },
+                        remote: {
+                            url: "/backend/products/ajax",
                             type: "post",
                             dataType: "json",
                             cache: false,
                             data: {
-                                user_account: function() {
-                                    return ($(this).val();
+                                pos_item_no: function() {
+                                    return $(this).val();
                                 },
+                                type:function(){
+                                    return 'checkPosItemNo' ;
+                                }
                             },
                             dataFilter: function(data, type) {
                                 if (data) {
-                                    let json_data = $.parseJSON(data);
-
-                                    if (json_data.status) {
-                                        return true;
-                                    }
+                                    console.log(data) ; 
+                                    // if (json_data.status) {
+                                    //     return true;
+                                    // }
                                 }
 
                                 return false;
@@ -1112,7 +1114,7 @@
                         },
 
                     });
-                })
+                });
                 $("#new-form").submit();
             })
 
@@ -1162,7 +1164,7 @@
                         required: true,
                         digits: true,
                     }, //重量
-                    weight:{
+                    weight: {
                         required: true,
                         digits: true,
                     }

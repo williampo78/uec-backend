@@ -22,7 +22,6 @@ class CategoriesSerivce
      * 
      */
     public function getPosCategories(){
-        
         $result = TertiaryCategories::select(
             DB::raw('tertiary_categories.id as id'),
             DB::raw('primary_category.name as primary_category'),
@@ -32,7 +31,11 @@ class CategoriesSerivce
             DB::raw("CONCAT(primary_category.name,' > ' ,category.name , ' > ' ,tertiary_categories.name) AS name")
 
         )->join('category','category.id' ,'=' , 'tertiary_categories.category_id') 
-         ->join('primary_category' , 'primary_category.id' , '=' , 'category.id')
+         ->join('primary_category' , 'primary_category.id' , '=' , 'category.primary_category_id')
+         ->where('tertiary_categories.active','=','1')
+         ->orderBy('primary_category.number')
+         ->orderBy('category.number')
+         ->orderBy('tertiary_categories.number')
          ->get()
         ;
         return $result ;

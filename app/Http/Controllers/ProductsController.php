@@ -144,7 +144,8 @@ class ProductsController extends Controller
     public function ajax(Request $request){
         $in = $request->input();
         switch ($in['type']) {
-            case 'DelCategoryInProduct': 
+            case 'checkPosItemNo': 
+                // echo 'TEST' ; 
                 break;
             default:
                 break;
