@@ -590,7 +590,7 @@ class APIProductServices
             $data['googleShop'] = $s3 . $product[$id]->google_shop_photo_name;
             $meta = [];
             $meta['meta_title'] = ($product[$id]->meta_title ? $product[$id]->meta_title : $product[$id]->product_name);
-            $meta['mata_description'] = ($product[$id]->description ? $product[$id]->description : $product[$id]->product_name);
+            $meta['mata_description'] = ($product[$id]->mata_description ? $product[$id]->mata_description : $product[$id]->product_name);
             $meta['mata_keywords'] = ($product[$id]->mata_keywords ? $product[$id]->mata_keywords : $product[$id]->product_name);
             $meta['mata_image'] = ($product[$id]->displayPhoto ? $s3 . $product[$id]->displayPhoto : null);
             $meta['meta_type'] = 'website';
