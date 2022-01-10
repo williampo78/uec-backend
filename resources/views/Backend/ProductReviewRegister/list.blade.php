@@ -162,19 +162,16 @@
                                             <option value="">全部</option>
                                             <option value="NA"
                                                 {{ request()->input('approval_status') == 'NA' ? 'selected' : '' }}>
-                                                無送審記錄</option>
+                                                未設定</option>
                                             <option value="REVIEWING"
                                                 {{ request()->input('approval_status') == 'REVIEWING' ? 'selected' : '' }}>
-                                                簽核中</option>
-                                            <option value="APPROVED"
-                                                {{ request()->input('approval_status') == 'APPROVED' ? 'selected' : '' }}>
-                                                已核准</option>
+                                                上架申請</option>
                                             <option value="APPROVED_STATUS_ON"
                                                 {{ request()->input('approval_status') == 'APPROVED_STATUS_ON' ? 'selected' : '' }}>
                                                 商品上架</option>
                                             <option value="REJECTED"
                                                 {{ request()->input('approval_status') == 'REJECTED' ? 'selected' : '' }}>
-                                                已駁回</option>
+                                                上架駁回</option>
                                             <option value="APPROVED_STATUS_OFF"
                                                 {{ request()->input('approval_status') == 'APPROVED_STATUS_OFF' ? 'selected' : '' }}>
                                                 商品下架</option>
