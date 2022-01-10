@@ -91,22 +91,35 @@ class ProductsService
         if (isset($input_data['product_type'])) {
             $products->where('products.product_type', $input_data['product_type']);
         }
-
+        // dd(Carbon::now()) ; 
         //上架狀態
         if (isset($input_data['approval_status'])) {
             switch ($input_data['approval_status']) {
                 //商品上架
                 case 'APPROVED_STATUS_ON':
                     $products = $products->where(function ($query) {
-                        $query->where('products.approval_status', '=', 'APPROVED');
+                        $query->where('products.approval_status', '=', 'APPROVED')
+                               ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
+                               
+                        // ->where('products.start_launched_at', '>=', Carbon::now())
+                        // ->where('products.end_launched_at', '<=', Carbon::now());
                     });
+                    // products.approval_status = 'APPROVED' and current_timestamp between products.start_launched_at  and products.end_launched_at
                     break;
                 //商品下架
                 case 'APPROVED_STATUS_OFF':
+                  
                     $products = $products->where(function ($query) {
                         $query->where('products.approval_status', '=', 'APPROVED')
-                            ->orWhere('products.approval_status', 'CANCELLED');
+                            
+                              ->where('products.start_launched_at' , '>' ,Carbon::now())
+                              ->orWhere('products.end_launched_at' , '<' ,Carbon::now());
                     });
+                    $products = $products->Where(function ($query) {
+                        $query->orWhere('products.approval_status', '=', 'CANCELLED');
+                    });
+                    // 狀況1 (  products.approval_status = 'CANCELLED'  )
+                    // 狀況2 (  products.approval_status = 'APPROVED' and (current_timestamp < start_launched_at or current_timestamp > end_launched_at)  )
                     break;
                 default:
                     $products->where('products.approval_status', '=', $input_data['approval_status']);
@@ -114,14 +127,17 @@ class ProductsService
             }
         }
 
-        // 上架起始日 & 上架結束日
-        if (!empty($input_data['start_launched_at']) && !empty($input_data['end_launched_at'])) {
+        //上架起始日
+        if (!empty($input_data['start_launched_at'])) {
             $start_launched_at = Carbon::parse($input_data['start_launched_at'])->format('Y-m-d H:i:s');
+            $products->where('products.start_launched_at', '>=', $start_launched_at);
+        }
+        //上架結束日
+        if( !empty($input_data['end_launched_at'] )){
             $input_data['end_launched_at'] = $input_data['end_launched_at'] . ' 23:59:59';
             $end_launched_at = Carbon::parse($input_data['end_launched_at'])->format('Y-m-d H:i:s');
-            $products->where('products.end_launched_at', '>=', $end_launched_at)
-                     ->where('products.start_launched_at', '<=', $start_launched_at);
-        }
+            $products->where('products.start_launched_at', '<=', $end_launched_at) ;
+        };
         // 最低售價
         if (isset($input_data['selling_price_min'])) {
             $products->where('products.selling_price', '>=', $input_data['selling_price_min']);
