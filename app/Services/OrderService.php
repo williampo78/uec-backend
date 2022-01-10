@@ -2,26 +2,36 @@
 
 namespace App\Services;
 
-use App\Models\Invoice;
-use App\Models\InvoiceAllowance;
-use App\Models\InvoiceAllowanceDetail;
-use App\Models\InvoiceDetail;
 use App\Models\Order;
-use App\Models\OrderCampaignDiscount;
+use App\Models\Invoice;
+use App\Models\Shipment;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
-use App\Models\Shipment;
+use App\Models\InvoiceDetail;
+use App\Models\ProductPhotos;
 use App\Models\ShipmentDetail;
+use App\Models\InvoiceAllowance;
+use Illuminate\Support\Facades\DB;
+use App\Models\OrderCampaignDiscount;
+use App\Models\InvoiceAllowanceDetail;
 
 class OrderService
 {
     public function getOrders($query_datas = [])
     {
         // 訂單
-        $orders = new Order;
+        $orders = Order::select(
+            '*',
+            DB::raw('get_order_status_desc(order_no) AS order_status_desc'),
+        );
 
         if (isset($query_datas['id'])) {
             $orders = $orders->where('id', $query_datas['id']);
+        }
+
+        // CRM會員ID
+        if (isset($query_datas['member_id'])) {
+            $orders = $orders->where('member_id', $query_datas['member_id']);
         }
 
         // 退貨會導致一個order_no存在多筆orders，以此欄位標記是否為最新版本
@@ -94,6 +104,25 @@ class OrderService
         $order_details = $order_details->orderBy('order_details.order_id', 'asc')
             ->orderBy('order_details.seq', 'asc')
             ->get();
+
+        // 商品圖片
+        $product_photos = ProductPhotos::orderBy('product_id', 'asc')
+            ->orderBy('sort', 'asc')
+            ->get();
+
+        // 將商品圖片加入訂單明細中
+        foreach ($product_photos as $product_photo) {
+            if ($order_details->contains('product_id', $product_photo->product_id)) {
+                $order_detail = $order_details->firstWhere('product_id', $product_photo->product_id);
+
+                // 檢查出貨單明細是否有定義
+                if (!isset($order_detail->product_photos)) {
+                    $order_detail->product_photos = collect();
+                }
+
+                $order_detail->product_photos->push($product_photo);
+            }
+        }
 
         // 出貨單
         $shipments = new Shipment;
