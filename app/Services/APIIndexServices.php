@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\APIProductServices;
@@ -19,6 +20,7 @@ class APIIndexServices
 
     public function getIndex($params = null)
     {
+        $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->apiProductService->getProducts();
         $categoryProducts = $this->apiProductService->getWebCategoryProducts();
@@ -41,6 +43,7 @@ class APIIndexServices
         $img_H080B = [];
         $prd_H080A = [];
         $prd_H080B = [];
+        $promotion = $this->apiProductService->getPromotion('product_card');
         foreach ($ads as $ad_slot) {
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
@@ -68,17 +71,43 @@ class APIIndexServices
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
             } elseif ($ad_slot->slot_type == 'S') {
+                $promotional = [];
+                if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
+                    $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
+                } else {
+                    $promotion_desc = null;
+                }
+
+                if (isset($promotion[$ad_slot->product_id])) {
+                    foreach ($promotion[$ad_slot->product_id] as $k => $Label) { //取活動標籤
+                        $promotional[] = $Label->promotional_label;
+                    }
+                }
                 if ($ad_slot->product_assigned_type == 'C') {
                     if (isset($categoryProducts[$ad_slot->web_category_hierarchy_id])) {
                         $product_info = [];
                         foreach ($categoryProducts[$ad_slot->web_category_hierarchy_id] as $product) {
+                            $promotional = [];
+                            if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
+                                $promotion_desc = $product->promotion_desc;
+                            } else {
+                                $promotion_desc = null;
+                            }
+                            if (isset($promotion[$product->id])) {
+                                foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
+                                    $promotional[] = $Label->promotional_label;
+                                }
+                            }
                             $product_info[] = array(
                                 'prod_id' => $product->id,
                                 'prod_no' => $product->product_no,
                                 'prod_name' => $product->product_name,
                                 'prod_unit' => $product->uom,
+                                'prod_list_price' => $product->list_price,
                                 'prod_price' => $product->selling_price,
                                 'prod_photo_path' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                                'promotion_desc' => $promotion_desc."##",
+                                'promotion_label' => (count($promotional) > 0 ? $promotional : null),
                             );
                         }
 
@@ -97,8 +126,11 @@ class APIIndexServices
                         'prod_no' => $products[$ad_slot->product_id]->product_no,
                         'prod_name' => $products[$ad_slot->product_id]->product_name,
                         'prod_unit' => $products[$ad_slot->product_id]->uom,
+                        'prod_list_price' => $products[$ad_slot->product_id]->list_price,
                         'prod_price' => $products[$ad_slot->product_id]->selling_price,
                         'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                        'promotion_desc' => $promotion_desc,
+                        'promotion_label' => (count($promotional) > 0 ? $promotional : null),
                     );
 
                     $data[$ad_slot->slot_code] = array(
@@ -150,16 +182,31 @@ class APIIndexServices
                 */
 
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
+                    $promotional = [];
+                    if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
+                        $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
+                    } else {
+                        $promotion_desc = null;
+                    }
+
+                    if (isset($promotion[$ad_slot->product_id])) {
+                        foreach ($promotion[$ad_slot->product_id] as $k => $Label) { //取活動標籤
+                            $promotional[] = $Label->promotional_label;
+                        }
+                    }
                     if ($ad_slot->slot_code == 'H080A') {
                         $prd_H080A[] = array(
                             'prod_id' => $products[$ad_slot->product_id]->id,
                             'prod_no' => $products[$ad_slot->product_id]->product_no,
                             'prod_name' => $products[$ad_slot->product_id]->product_name,
                             'prod_unit' => $products[$ad_slot->product_id]->uom,
+                            'prod_list_price' => $products[$ad_slot->product_id]->list_price,
                             'prod_price' => $products[$ad_slot->product_id]->selling_price,
                             'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                            'desktop_applicable' => $ad_slot->is_desktop_applicable
+                            'desktop_applicable' => $ad_slot->is_desktop_applicable,
+                            'promotion_desc' => $promotion_desc,
+                            'promotion_label' => (count($promotional) > 0 ? $promotional : null),
                         );
                     }
                     if ($ad_slot->slot_code == 'H080B') {
@@ -168,10 +215,13 @@ class APIIndexServices
                             'prod_no' => $products[$ad_slot->product_id]->product_no,
                             'prod_name' => $products[$ad_slot->product_id]->product_name,
                             'prod_unit' => $products[$ad_slot->product_id]->uom,
+                            'prod_list_price' => $products[$ad_slot->product_id]->list_price,
                             'prod_price' => $products[$ad_slot->product_id]->selling_price,
                             'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                            'desktop_applicable' => $ad_slot->is_desktop_applicable
+                            'desktop_applicable' => $ad_slot->is_desktop_applicable,
+                            'promotion_desc' => $promotion_desc,
+                            'promotion_label' => (count($promotional) > 0 ? $promotional : null),
                         );
                     }
                 }
@@ -214,7 +264,7 @@ class APIIndexServices
         if (!$img_H080A && !$prd_H080A) {
             unset($data['H080A']);
         } else {
-            $data['H080A'][] = array(
+            $data['H080A'] = array(
                 'images' => $img_H080A,
                 'products' => $prd_H080A
             );
@@ -222,7 +272,7 @@ class APIIndexServices
         if (!$img_H080B && !$prd_H080B) {
             unset($data['H080B']);
         } else {
-            $data['H080B'][] = array(
+            $data['H080B'] = array(
                 'images' => $img_H080B,
                 'products' => $prd_H080B
             );

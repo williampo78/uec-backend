@@ -162,7 +162,7 @@ class CheckoutController extends Controller
                     'carrier_no' => 'required|min:8|max:8',
                 ], $errInvoice);
             }
-        } elseif ($request->invoice['invoice_usage'] == 'C') { //三聯式，公司戶電子發票
+        } elseif ($request->invoice['usage'] == 'C') { //三聯式，公司戶電子發票
             $errInvoice = [
                 'buyer_gui_number.required' => '統一編號必填',
                 'buyer_title.required' => '發票抬頭必填',
@@ -172,7 +172,7 @@ class CheckoutController extends Controller
                 'buyer_title' => 'required',
             ], $errInvoice);
 
-        } elseif ($request->invoice['invoice_usage'] == 'D') { //發票捐贈
+        } elseif ($request->invoice['usage'] == 'D') { //發票捐贈
             $errInvoice = [
                 'donated_code.required' => '機構捐贈碼必填',
             ];
