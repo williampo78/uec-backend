@@ -250,7 +250,7 @@ class APIProductServices
         $page = $input['page'];
         $selling_price_min = $input['price_min'];
         $selling_price_max = $input['price_max'];
-        $sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC ;
+        $sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC;
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword);
         if ($products) {
             $promotion = self::getPromotion('product_card');
@@ -447,6 +447,7 @@ class APIProductServices
         $data = [];
         //產品主檔基本資訊
         $product = self::getProducts($id);
+
         if (sizeof($product) > 0) {
             $product_categorys = self::getWebCategoryProducts('', '', '', '', $id);
 
@@ -595,6 +596,17 @@ class APIProductServices
             $meta['mata_image'] = ($product[$id]->displayPhoto ? $s3 . $product[$id]->displayPhoto : null);
             $meta['meta_type'] = 'website';
             $data['metaData'] = $meta;
+
+            //認證標章
+            $icon = [];
+            $certificate = $this->getCertificateIcon();
+            foreach ($certificate as $item) {
+                if ($item->product_id == $id) {
+                    $icon[] = array("icon"=>$s3 . $item->photo_name);
+                }
+            }
+            $data['certificate'] = $icon;
+
             return json_encode($data);
         } else {
             return 201;
@@ -620,7 +632,7 @@ class APIProductServices
         foreach ($promotional as $promotion) {
             $ProductPhotos = ProductPhotos::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
             $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id] = $promotion; //取單品的贈品
-            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($ProductPhotos->photo_name)?$s3.$ProductPhotos->photo_name:null);
+            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($ProductPhotos->photo_name) ? $s3 . $ProductPhotos->photo_name : null);
             if ($promotion->level_code == 'CART') {
                 $data['CART'][] = $promotion; //取全站贈品
             }
@@ -641,6 +653,21 @@ class APIProductServices
             ->where("end_at", ">=", $now)
             ->where("level_code", '=', 'CART')->get();
         return $promotional;
+    }
+
+    /*
+     * 取得產品認證標章
+     * @param $id
+     */
+    public function getCertificateIcon()
+    {
+        $strSQL = "select lov.photo_name, pa.product_id
+                from product_attributes pa
+                join product_attribute_lov lov on pa.attribute_type = 'CERTIFICATE' and lov.id = pa.product_attribute_lov_id
+                where lov.active =1
+                order by lov.sort;";
+        $certificate = DB::select($strSQL);
+        return $certificate;
     }
 
 }
