@@ -147,10 +147,6 @@ class OrderService
             ->orderBy('order_campaign_discounts.order_detail_id', 'asc')
             ->get();
 
-        $lookup_values_v_service = new LookupValuesVService;
-        // 發票捐贈機構
-        $donated_institutions = $lookup_values_v_service->getDonatedInstitutions();
-
         // 發票開立
         $invoices = Invoice::select(
             'id AS invoice_id',
@@ -272,14 +268,6 @@ class OrderService
                 }
 
                 $order->order_campaign_discounts->push($order_campaign_discount);
-            }
-        }
-
-        // 將發票捐贈機構名稱加入訂單中
-        foreach ($donated_institutions as $donated_institution) {
-            if ($orders->contains('donated_institution', $donated_institution->code)) {
-                $order = $orders->firstWhere('donated_institution', $donated_institution->code);
-                $order->donated_institution_name = $donated_institution->description;
             }
         }
 
