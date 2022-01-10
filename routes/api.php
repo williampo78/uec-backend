@@ -79,6 +79,8 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::resource('/members/message', MessagesController::class, ['names' => ['index' => 'members.message']]);
     Route::get('/members/message-top/', [MessagesController::class, 'messageTop']);
 
+    Route::get('/tapPayApp', [CheckoutController::class, 'tapPayApp']);
+
 });
 
 Route::get('area', [DradviceController::class, 'area']);

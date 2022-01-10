@@ -2,6 +2,10 @@
 return [
     'url'=>env('TAP_PAY_API_URI'),
 
+    'app_id'=>env('TAP_PAY_APP_ID'),
+
+    'app_key'=>env('TAP_PAY_APP_KEY'),
+
     'partner_key' => env('TAP_PAY_PARTNER_KEY'),
 
     // TapPay 收款商家
