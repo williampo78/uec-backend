@@ -31,7 +31,7 @@ class ProductsService
     {
         DB::enableQueryLog();
         $agent_id = Auth::user()->agent_id;
-
+        $now = Carbon::now() ; 
         $products = Products::select('products.*', 'supplier.name AS supplier_name')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
@@ -91,27 +91,27 @@ class ProductsService
         if (isset($input_data['product_type'])) {
             $products->where('products.product_type', $input_data['product_type']);
         }
-        // dd(Carbon::now()) ;
+        // dd($now) ;
         //上架狀態
         if (isset($input_data['approval_status'])) {
             switch ($input_data['approval_status']) {
                 //商品上架
                 case 'APPROVED_STATUS_ON':
-                    $products = $products->where(function ($query) {
+                    $products = $products->where(function ($query) use ($now){
                         $query->where('products.approval_status', '=', 'APPROVED')
-                            ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
-                        // ->where('products.start_launched_at', '>=', Carbon::now())
-                        // ->where('products.end_launched_at', '<=', Carbon::now());
+                            // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
+                            ->where('products.start_launched_at' ,'<=',$now)
+                            ->where('products.end_launched_at' ,'>=',$now);
                     });
                     // products.approval_status = 'APPROVED' and current_timestamp between products.start_launched_at  and products.end_launched_at
                     break;
                 //商品下架
                 case 'APPROVED_STATUS_OFF':
 
-                    $products = $products->where(function ($query) {
+                    $products = $products->where(function ($query) use ($now){
                         $query->where('products.approval_status', '=', 'APPROVED')
-                            ->where('products.start_launched_at', '>', Carbon::now())
-                            ->orWhere('products.end_launched_at', '<', Carbon::now());
+                            ->where('products.start_launched_at', '>', $now)
+                            ->orWhere('products.end_launched_at', '<', $now);
                     });
                     $products = $products->Where(function ($query) {
                         $query->orWhere('products.approval_status', '=', 'CANCELLED');
