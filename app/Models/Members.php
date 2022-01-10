@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Members extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+
     protected $table = 'members';
 
     protected $guarded = [];
