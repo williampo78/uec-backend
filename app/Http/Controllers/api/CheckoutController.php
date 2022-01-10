@@ -245,4 +245,14 @@ class CheckoutController extends Controller
         $data['response_info'] = $request->getContent();
         $result = $this->apiTapPay->tapPayNotifyLog($data);
     }
+
+    /*
+     * 取得TapPay的APP ID & KEY
+     */
+    public function tapPayApp()
+    {
+        $data['APP_ID'] = config('tappay.app_id');
+        $data['APP_KEY'] = config('tappay.app_key');
+        return $data;
+    }
 }
