@@ -676,10 +676,10 @@ class APIProductServices
                         }
                     }
                 }
-
                 $rel_data[] = array(
                     "product_id" => $rel->related_product_id,
                     "product_name" => $products[$rel->related_product_id]->product_name,
+                    "product_photo"=>($products[$rel->related_product_id]->displayPhoto?$s3.$products[$rel->related_product_id]->displayPhoto:null),
                     "selling_price" => intval($products[$rel->related_product_id]->selling_price),
                     "list_price" => intval($products[$rel->related_product_id]->list_price),
                     'promotion_desc' => $promotion_desc,
