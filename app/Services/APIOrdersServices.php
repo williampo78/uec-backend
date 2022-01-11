@@ -3,6 +3,8 @@
 
 namespace App\Services;
 
+use App\Models\StockTransactionLog;
+use App\Models\WarehouseStock;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +38,8 @@ class APIOrdersServices
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         $random = Str::random(6);
+        //商城倉庫代碼
+        $warehouseCode = $this->stockService->getWarehouseConfig();
         /* test
         $webData = [];
         $webData['agent_id'] = 1;
@@ -439,6 +443,36 @@ class APIOrdersServices
                 $pointData['points'] = ($pointData['point_discount'] / $cart['point']['exchangeRate']);
                 OrderDetail::where('id', $detail->id)->update($pointData);
             }
+
+
+            //庫存與LOG相關
+            $order_details = OrderDetail::getOrderDetails($order_id);
+            foreach ($order_details as $detail) {
+                $stock = $this->stockService->getStockByItem($warehouseCode, $detail->product_item_id);
+                if (isset($stock['id'])) {
+                    $updStock = WarehouseStock::where('id', '=', $stock['id'])->update(['stock_qty' => ($stock['stockQty'] - $detail->qty)]);
+                    if ($updStock) {
+                        $logData['transaction_type'] = 'ORDER_SHIP';
+                        $logData['transaction_date'] = $now;
+                        $logData['warehouse_id'] = $stock['warehouse_id'];
+                        $logData['product_item_id'] = $detail->product_item_id;
+                        $logData['item_no'] = $detail->item_no;
+                        $logData['transaction_qty'] = -$detail->qty;
+                        $logData['transaction_nontax_amount'] = $detail->unit_price;
+                        $logData['transaction_amount'] = $detail->unit_price;
+                        $logData['source_doc_no'] = $webData['order_no'];
+                        $logData['source_table_name'] = 'order_details';
+                        $logData['source_table_id'] = $detail->id;
+                        $logData['remark'] = '';
+                        $logData['created_by'] = -1;
+                        $logData['created_at'] = $now;
+                        $logData['updated_by'] = -1;
+                        $logData['updated_at'] = $now;
+                        StockTransactionLog::insert($logData);
+                    }
+                }
+            }
+
 
             //TapPay
             $webData['prime'] = $order['taypay_prime'];
