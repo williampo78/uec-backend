@@ -17,6 +17,7 @@ use App\Services\BrandsService;
 use App\Services\ShippingFeeRulesService;
 use App\Services\UniversalService;
 use App\Services\WebShippingInfoService;
+use App\Models\RelatedProducts;
 
 class APIProductServices
 {
@@ -557,6 +558,26 @@ class APIProductServices
             }
             $data['campaignInfo'] = $promotion_type;
 
+            $login = Auth::guard('api')->check();
+            $collection = false;
+            $is_collection = [];
+            if ($login) {
+                $member_id = Auth::guard('api')->user()->member_id;
+                if ($member_id > 0) {
+                    $response = $this->apiWebService->getMemberCollections();
+                    $is_collection = json_decode($response, true);
+                }
+            }
+            if (isset($is_collection)) {
+                foreach ($is_collection as $k => $v) {
+                    if ($v['product_id'] == $id) {
+                        $collection = true;
+                    } else {
+                        $collection = false;
+                    }
+                }
+            }
+            $data['collection'] = $collection;
 
             //產品規格
             $item_spec = [];
@@ -583,12 +604,10 @@ class APIProductServices
                 $spec1 = $item['spec_1_value'];
                 $spec2 = $item['spec_2_value'];
             }
-            $item_spec['spec_1'] = ($item_spec['spec_1'] ? array_unique($item_spec['spec_1']) : null);
-            $item_spec['spec_2'] = ($item_spec['spec_2'] ? array_unique($item_spec['spec_2']) : null);
+            $item_spec['spec_1'] = (isset($item_spec['spec_1']) ? array_unique($item_spec['spec_1']) : []);
+            $item_spec['spec_2'] = (isset($item_spec['spec_2']) ? array_unique($item_spec['spec_2']) : []);
             $item_spec['spec_info'] = $spec_info;
-
             $data['orderSpec'] = $item_spec;
-
             if ($detail == 'true') {
                 $data["productDesc"] = $product[$id]->description;
                 $data["productSpec"] = $product[$id]->specification;
@@ -614,6 +633,63 @@ class APIProductServices
                 }
             }
             $data['certificate'] = $icon;
+
+            //相關推薦
+            $rel_prod = RelatedProducts::getRelated($id);
+            $promotion = self::getPromotion('product_card');
+            $rel_data = [];
+            $products = $this->getProducts();
+
+            $login = Auth::guard('api')->check();
+            $collection = false;
+            $is_collection = [];
+            if ($login) {
+                $member_id = Auth::guard('api')->user()->member_id;
+                if ($member_id > 0) {
+                    $response = $this->apiWebService->getMemberCollections();
+                    $is_collection = json_decode($response, true);
+                }
+            }
+
+            foreach ($rel_prod as $rel) {
+                //echo $products[$rel->related_product_id]->promotion_start_at;
+                $promotional = [];
+                if ($now >= $products[$rel->related_product_id]->promotion_start_at && $now <= $products[$rel->related_product_id]->promotion_end_at) {
+                    $promotion_desc = $products[$rel->related_product_id]->promotion_desc;
+                } else {
+                    $promotion_desc = null;
+                }
+
+
+                if (isset($promotion[$rel->related_product_id])) {
+                    foreach ($promotion[$rel->related_product_id] as $k => $Label) { //取活動標籤
+                        $promotional[] = $Label->promotional_label;
+                    }
+                }
+
+                if (isset($is_collection)) {
+                    foreach ($is_collection as $k => $v) {
+                        if ($v['product_id'] == $rel->related_product_id) {
+                            $collection = true;
+                        } else {
+                            $collection = false;
+                        }
+                    }
+                }
+
+                $rel_data[] = array(
+                    "product_id" => $rel->related_product_id,
+                    "product_name" => $products[$rel->related_product_id]->product_name,
+                    "selling_price" => intval($products[$rel->related_product_id]->selling_price),
+                    "list_price" => intval($products[$rel->related_product_id]->list_price),
+                    'promotion_desc' => $promotion_desc,
+                    "promotion_label" => $promotional,
+                    "collections" => $collection,
+                );
+
+
+            }
+            $data['rel_product'] = $rel_data;
 
             return json_encode($data);
         } else {
@@ -665,7 +741,7 @@ class APIProductServices
 
     /*
      * 取得產品認證標章
-     * @param $id
+     * @param
      */
     public function getCertificateIcon()
     {
@@ -676,6 +752,19 @@ class APIProductServices
                 order by lov.sort;";
         $certificate = DB::select($strSQL);
         return $certificate;
+    }
+
+
+    /*
+     * 取得相推薦產品
+     * @param
+     */
+    public function getRelated($product_id)
+    {
+        $rel_prod = RelatedProducts::select('related_products.*')
+            ->join('porducts', 'products.id', '=', 'related_products.product_id')
+            ->where('related_products.product_id', '=', $product_id)->get();
+        return $rel_prod;
     }
 
 }

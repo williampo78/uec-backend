@@ -10,5 +10,10 @@ class RelatedProducts extends Model
     use HasFactory;
     protected $table = 'related_products';
     public $timestamps = true;
-    protected $guarded = []; 
+    protected $guarded = [];
+
+    static public function getRelated($product_id)
+    {
+        return self::where('product_id', '=', $product_id)->get();
+    }
 }

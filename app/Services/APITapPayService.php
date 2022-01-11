@@ -178,7 +178,7 @@ class APITapPayService
         $warehouseCode = $this->stockService->getWarehouseConfig();
         DB::beginTransaction();
         try {
-            $order = Order::where('id', '=', $data->source_table_id)->update(['pay_status' => 'COMPLETED', 'status_code' => 'PROCESSING']);
+            $order = Order::where('id', '=', $data->source_table_id)->update(['pay_status' => 'COMPLETED', 'is_paid' => 1, 'paid_at' => $now]);
 
             //更新付款狀態
             $order_payment = OrderPayment::where('id', '=', $data->id)->update(['payment_status' => 'COMPLETED']);
@@ -240,6 +240,7 @@ class APITapPayService
                 $shipDetail_id = ShipmentDetail::insertGetId($shipDetail);
 
                 //庫存與LOG相關
+                /* 暫留，確認庫存什麼時間點扣
                 $stock = $this->stockService->getStockByItem($warehouseCode, $detail->product_item_id);
                 if (isset($stock['id'])) {
                     $updStock = WarehouseStock::where('id', '=', $stock['id'])->update(['stock_qty' => ($stock['stockQty'] - $detail->qty)]);
@@ -263,6 +264,7 @@ class APITapPayService
                         StockTransactionLog::insert($logData);
                     }
                 }
+                */
             }
             if ($order && $order_payment) {
                 DB::commit();
