@@ -26,8 +26,8 @@ class MemberController extends Controller
 
         if (empty($token)) {
             return response()->json([
-                'message' => '無效的Token',
-            ], 401);
+                'message' => 'token不存在',
+            ], 404);
         }
 
         $results = $this->api_service->resetPassword($token, $request_payloads);
@@ -115,7 +115,7 @@ class MemberController extends Controller
 
         // 訂單總數
         $order_totals = count($orders);
-        // 沒有訂單
+        // 沒有任何訂單
         if ($order_totals < 1) {
             return response()->json([
                 'message' => '查詢成功',

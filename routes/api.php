@@ -83,6 +83,15 @@ Route::group(['middleware' => 'jwt.verify'], function () {
 
 });
 
+// jwt v2驗證
+Route::group(['middleware' => 'jwt.v2.verify'], function () {
+    // 單一會員
+    Route::group(['prefix' => 'member'], function () {
+        // 取得會員訂單列表
+        Route::get('/orders', [MemberController::class, 'getOrders']);
+    });
+});
+
 Route::get('area', [DradviceController::class, 'area']);
 Route::get('area/{all}', [DradviceController::class, 'area']);
 
@@ -95,13 +104,10 @@ Route::group(['prefix' => 'members'], function () {
     Route::post('/memberBasic', [AuthController::class, 'memberBasic']);
 });
 
-// 指定單一會員
+// 單一會員
 Route::group(['prefix' => 'member'], function () {
     // 重設會員密碼
     Route::post('/password', [MemberController::class, 'resetPassword']);
-
-    // 取得會員訂單列表
-    Route::get('/orders', [MemberController::class, 'getOrders']);
 });
 
 Route::group(['prefix' => 'shopping'], function () {
