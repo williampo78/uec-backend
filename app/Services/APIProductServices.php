@@ -790,8 +790,8 @@ class APIProductServices
             foreach ($gifts['PROD'][$campaign_id] as $gift) {
                 if ($now >= $gift->start_at && $now <= $gift->end_at) {
                     $giftAway[] = array(
-                        "product_name" => $gift->product_name,
-                        "product_photo" => ($gift->photo ? $s3 . $gift->photo : null),
+                        "productName" => $gift->product_name,
+                        "productPhoto" => ($gift->photo ? $s3 . $gift->photo : null),
                         "assignedQty" => $gift->assignedQty,
                     );
                 }
