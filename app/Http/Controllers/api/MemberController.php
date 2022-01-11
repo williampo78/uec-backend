@@ -150,7 +150,7 @@ class MemberController extends Controller
 
             // 出貨時間
             if (isset($order->shipped_at)) {
-                $order->shipped_at = Carbon::parse($order->shipped_at)->format('Y/m/d H:i');
+                $order->shipped_at = Carbon::parse($order->shipped_at)->format('Y/m/d');
             }
 
             // 訂單明細
