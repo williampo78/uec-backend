@@ -694,7 +694,7 @@ class APIProductServices
                     "list_price" => intval($products[$rel->related_product_id]->list_price),
                     'promotion_desc' => $promotion_desc,
                     "promotion_label" => $promotional,
-                    "collections" => $collection,
+                    "collection" => $collection,
                 );
 
 

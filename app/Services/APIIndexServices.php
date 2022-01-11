@@ -131,7 +131,7 @@ class APIIndexServices
                                 'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
                                 'promotion_desc' => $promotion_desc,
                                 'promotion_label' => (count($promotional) > 0 ? $promotional : null),
-                                "collections" => $collection,
+                                "collection" => $collection,
                             );
                         }
 
@@ -155,7 +155,7 @@ class APIIndexServices
                         'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                         'promotion_desc' => $promotion_desc,
                         'promotion_label' => (count($promotional) > 0 ? $promotional : null),
-                        "collections" => $collection,
+                        "collection" => $collection,
                     );
 
                     $data[$ad_slot->slot_code] = array(
@@ -232,7 +232,7 @@ class APIIndexServices
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
                             'promotion_label' => (count($promotional) > 0 ? $promotional : null),
-                            "collections" => $collection,
+                            "collection" => $collection,
                         );
                     }
                     if ($ad_slot->slot_code == 'H080B') {
@@ -248,7 +248,7 @@ class APIIndexServices
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
                             'promotion_label' => (count($promotional) > 0 ? $promotional : null),
-                            "collections" => $collection,
+                            "collection" => $collection,
                         );
                     }
                 }
