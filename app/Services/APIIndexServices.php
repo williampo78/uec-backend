@@ -5,17 +5,21 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Services\APIProductServices;
+use App\Services\APIWebService;
 
 class APIIndexServices
 {
 
     private $apiProductService;
+    private $apiWebService;
 
-    public function __construct(APIProductServices $apiProductService)
+    public function __construct(APIProductServices $apiProductService, APIWebService $apiWebService)
     {
         $this->apiProductService = $apiProductService;
+        $this->apiWebService = $apiWebService;
     }
 
     public function getIndex($params = null)
@@ -44,7 +48,26 @@ class APIIndexServices
         $prd_H080A = [];
         $prd_H080B = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
+        $login = Auth::guard('api')->check();
+        $collection = false;
+        $is_collection = [];
+        if ($login) {
+            $member_id = Auth::guard('api')->user()->member_id;
+            if ($member_id > 0) {
+                $response = $this->apiWebService->getMemberCollections();
+                $is_collection = json_decode($response, true);
+            }
+        }
         foreach ($ads as $ad_slot) {
+            if (isset($is_collection)) {
+                foreach ($is_collection as $k => $v) {
+                    if ($v['product_id'] == $ad_slot->product_id) {
+                        $collection = true;
+                    } else {
+                        $collection = false;
+                    }
+                }
+            }
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
                     'name' => $ad_slot->texts,
@@ -106,8 +129,9 @@ class APIIndexServices
                                 'prod_list_price' => $product->list_price,
                                 'prod_price' => $product->selling_price,
                                 'prod_photo_path' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
-                                'promotion_desc' => $promotion_desc."##",
+                                'promotion_desc' => $promotion_desc,
                                 'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                                "collections" => $collection,
                             );
                         }
 
@@ -131,6 +155,7 @@ class APIIndexServices
                         'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                         'promotion_desc' => $promotion_desc,
                         'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                        "collections" => $collection,
                     );
 
                     $data[$ad_slot->slot_code] = array(
@@ -207,6 +232,7 @@ class APIIndexServices
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
                             'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            "collections" => $collection,
                         );
                     }
                     if ($ad_slot->slot_code == 'H080B') {
@@ -222,6 +248,7 @@ class APIIndexServices
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
                             'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            "collections" => $collection,
                         );
                     }
                 }
