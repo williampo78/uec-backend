@@ -280,7 +280,7 @@ class APIOrdersServices
                                     "product_id" => $gift['productId'],
                                     "product_item_id" => $prod_info[$gift['productId']]['id'],
                                     "item_no" => $prod_info[$gift['productId']]['item_no'],
-                                    "selling_price" => 0,
+                                    "selling_price" => $products['sellingPrice'],
                                     "qty" => $gift['assignedQty'],
                                     "unit_price" => 0,
                                     "campaign_discount" => 0,
@@ -334,7 +334,7 @@ class APIOrdersServices
                                 "product_id" => $gift['productId'],
                                 "product_item_id" => $prod_info[$gift['productId']]['id'],
                                 "item_no" => $prod_info[$gift['productId']]['item_no'],
-                                "selling_price" => 0,
+                                "selling_price" => $products['sellingPrice'],
                                 "qty" => $gift['assignedQty'],
                                 "unit_price" => 0,
                                 "campaign_discount" => 0,
@@ -392,7 +392,7 @@ class APIOrdersServices
                         "product_id" => $gift['productId'],
                         "product_item_id" => $prod_info[$gift['productId']]['id'],
                         "item_no" => $prod_info[$gift['productId']]['item_no'],
-                        "selling_price" => 0,
+                        "selling_price" => $gift['sellingPrice'],
                         "qty" => $gift['assignedQty'],
                         "unit_price" => 0,
                         "campaign_discount" => 0,
@@ -481,7 +481,7 @@ class APIOrdersServices
             $tapPay = $this->apiTapPayService->payByPrime($webData);
             $tapPayResult = json_decode($tapPay, true);
             if ($tapPayResult['status'] == 0) {
-                $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id']]);
+                $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => $now]);
                 if ($payment) {
                     $result['status'] = 200;
                     $result['payment_url'] = $tapPayResult['payment_url'];

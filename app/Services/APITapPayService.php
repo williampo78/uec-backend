@@ -181,7 +181,7 @@ class APITapPayService
             $order = Order::where('id', '=', $data->source_table_id)->update(['pay_status' => 'COMPLETED', 'is_paid' => 1, 'paid_at' => $now]);
 
             //更新付款狀態
-            $order_payment = OrderPayment::where('id', '=', $data->id)->update(['payment_status' => 'COMPLETED']);
+            $order_payment = OrderPayment::where('id', '=', $data->id)->update(['payment_status' => 'COMPLETED', 'latest_api_status' => 'S']);
 
             //更新會員點數
             if ($status['points'] != 0) {
