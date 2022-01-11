@@ -18,13 +18,15 @@ use App\Models\ShoppingCartDetails;
 use App\Models\ProductItems;
 use App\Models\OrderPayment;
 use App\Services\APITapPayService;
+use App\Services\StockService;
 
 class APIOrdersServices
 {
 
-    public function __construct(APITapPayService $apiTapPayService)
+    public function __construct(APITapPayService $apiTapPayService, StockService $stockService)
     {
         $this->apiTapPayService = $apiTapPayService;
+        $this->stockService = $stockService;
     }
 
 
