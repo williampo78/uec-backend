@@ -551,11 +551,12 @@ class APIProductServices
                     if ($item->product_id == $id) {
                         $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
                             "campaign_id" => $item->id,
-                            "campaign_name" => $item->campaign_name
+                            "campaign_name" => $item->campaign_name,
                         );
                     }
                 }
             }
+
             $data['campaignInfo'] = $promotion_type;
 
             $login = Auth::guard('api')->check();
@@ -626,9 +627,9 @@ class APIProductServices
 
             //商品簡述
             $data['product_brief'] = array(
-                'brief_1'=>$product[$id]->product_brief_1,
-                'brief_2'=>$product[$id]->product_brief_2,
-                'brief_3'=>$product[$id]->product_brief_3,
+                'brief_1' => $product[$id]->product_brief_1,
+                'brief_2' => $product[$id]->product_brief_2,
+                'brief_3' => $product[$id]->product_brief_3,
             );
 
             //認證標章
@@ -687,7 +688,7 @@ class APIProductServices
                 $rel_data[] = array(
                     "product_id" => $rel->related_product_id,
                     "product_name" => $products[$rel->related_product_id]->product_name,
-                    "product_photo"=>($products[$rel->related_product_id]->displayPhoto?$s3.$products[$rel->related_product_id]->displayPhoto:null),
+                    "product_photo" => ($products[$rel->related_product_id]->displayPhoto ? $s3 . $products[$rel->related_product_id]->displayPhoto : null),
                     "selling_price" => intval($products[$rel->related_product_id]->selling_price),
                     "list_price" => intval($products[$rel->related_product_id]->list_price),
                     'promotion_desc' => $promotion_desc,
@@ -773,6 +774,40 @@ class APIProductServices
             ->join('porducts', 'products.id', '=', 'related_products.product_id')
             ->where('related_products.product_id', '=', $product_id)->get();
         return $rel_prod;
+    }
+
+    /*
+     * 取得活動贈品內容
+     * @param
+     */
+    public function getCampaignGiftByID($campaign_id)
+    {
+        $s3 = config('filesystems.disks.s3.url');
+        $gifts = $this->getCampaignGift();
+        $now = Carbon::now();
+        $giftAway = [];
+        if (isset($gifts['PROD'][$campaign_id])) {
+            foreach ($gifts['PROD'][$campaign_id] as $gift) {
+                if ($now >= $gift->start_at && $now <= $gift->end_at) {
+                    $giftAway[] = array(
+                        "product_name" => $gift->product_name,
+                        "product_photo" => ($gift->photo ? $s3 . $gift->photo : null),
+                        "assignedQty" => $gift->assignedQty,
+                    );
+                }
+            }
+            if (count($giftAway) > 0) {
+                $result['status'] = 200;
+                $result['result'] = $giftAway;
+            } else {
+                $result['status'] = 401;
+                $result['result'] = null;
+            }
+        } else {
+            $result['status'] = 401;
+            $result['result'] = null;
+        }
+        return $result;
     }
 
 }

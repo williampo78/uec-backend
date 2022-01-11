@@ -157,24 +157,22 @@ class ProductController extends Controller
     }
 
     /*
-     * 取得產品認證標章
+     * 取得活動贈品內容
      * @param int $id
      */
-    public function getCertificateIcon($id)
+    public function getCampaignGift($id)
     {
         $error_code = $this->apiService->getErrorCode();
-        $result = $this->apiProductService->getProduct($id, $params);
-
-        if ($result == '201') {
-            $status = false;
-            $err = '201';
-            $list = [];
-        } else {
+        $result = $this->apiProductService->getCampaignGiftByID($id);
+        if ($result['status'] == '200') {
             $status = true;
-            $err = '';
-            $list = json_decode($result,true);
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+
+        return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
 
     }
 
