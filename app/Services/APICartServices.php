@@ -192,6 +192,7 @@ class APICartServices
                                     "productPhoto" => $giftInfo['photo'],
                                     "productId" => $giftInfo->product_id,
                                     "productName" => $productInfo[$giftInfo->product_id]->product_name,
+                                    "sellingPrice" => $giftInfo->selling_price,
                                     "assignedQty" => $giftInfo->assignedQty
                                 );
                             }
@@ -593,6 +594,7 @@ class APICartServices
                                     "campaignId" => $value->promotional_campaign_id,
                                     "campaignName" => $value->campaign_name,
                                     "productId" => $prod_id,
+                                    "sellingPrice" => $value->selling_price,
                                     "productName" => $value->product_name,
                                     "productPhoto" => $value->photo,
                                     "assignedQty" => $value->assignedQty
