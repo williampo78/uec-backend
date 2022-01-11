@@ -513,9 +513,8 @@ class APIOrdersServices
                 } else {
                     $result['status'] = $tapPayResult['status'];
                 }
-                DB::commit();
             }
-
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
