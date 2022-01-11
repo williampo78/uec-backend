@@ -1110,6 +1110,7 @@
                                 }
                             },
                         },
+                        notRepeating: true,
                         messages : { remote : 'POS品號重複' },
 
                     });

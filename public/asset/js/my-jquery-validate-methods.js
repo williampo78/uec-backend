@@ -32,3 +32,17 @@ jQuery.validator.addMethod("monthIntervalVerify", function (value, element, obj)
 }, function (params, element) {
     return `起訖最多不可超過 ${params.month_num} 個月`;
 });
+jQuery.validator.addMethod("notRepeating", function (value, element, params) {
+    var prefix = params;
+    var selector = jQuery.validator.format("[name!='{0}']", element.name, prefix);
+    var matches = new Array();
+    $(selector).each(function(index, item) {
+        if (value == $(item).val()) {
+            matches.push(item);
+        }
+    });
+    return matches.length == 0;
+}, function (params, element) {
+    return `已跟其他輸入的欄位重複`;
+});
+
