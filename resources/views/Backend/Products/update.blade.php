@@ -909,7 +909,7 @@
                             <td>
                                 <div class="form-group" style="margin-right:0px;margin-left:0px;">
                                     <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
-                                        :name="'pos_item_no['+SkuKey+']'" >
+                                        :name="'pos_item_no['+SkuKey+']'" :data-item_no="Sku.item_no" >
                                 </div>
                             </td>
                             <td>
@@ -963,9 +963,8 @@
                 product_spec_info: @json($product_spec_info),
                 safty_qty_all: 0,
                 }
-    },
-        mounted() {
-    },
+        },
+        mounted() {},
         created() {
         let spec_value_list = JSON.parse(this.product_spec_info.spec_value_list) ;
         let item_list       = JSON.parse(this.product_spec_info.item_list) ;
@@ -982,208 +981,205 @@
 
     },
         methods: {
-        change_safty_qty_all() {
-            let change_num = this.safty_qty_all;
-            this.SkuList.map(function (value, key) {
-                value.safty_qty = change_num;
-            });
-        },
-        AddSpecToSkuList(spec_type) {
-            if (spec_type == '1') {
-                this.SpecList.spec_1.push({
-                    name: '',
-                    sort: this.SpecList.spec_1.length,
-                    only_key: Math.random().toString(36).substring(8),
+            change_safty_qty_all() {
+                let change_num = this.safty_qty_all;
+                this.SkuList.map(function (value, key) {
+                    value.safty_qty = change_num;
                 });
-            } else if (spec_type == '2') {
-                this.SpecList.spec_2.length;
-                this.SpecList.spec_2.push({
-                    name: '',
-                    sort: this.SpecList.spec_2.length,
-                    only_key: Math.random().toString(36).substring(8),
-                });
-            }
-        },
-        DelSpecList(obj, type, index) { //刪除規格
-            if (type == 'spec_1') {
-                this.SpecList.spec_1.splice(index, 1);
-                let new_SkuList = this.SkuList.filter(data => data.spec_1_only_key !== obj.only_key);
-                this.SkuList = new_SkuList;
-            } else if (type == 'spec_2') {
-                this.SpecList.spec_2.splice(index, 1);
-                let new_SkuList = this.SkuList.filter(data => data.spec_2_only_key !== obj.only_key);
-                this.SkuList = new_SkuList;
-            }
-        },
-        AddSkuList() { //新增規格
-            var skuList = this.SkuList;
-            var specList = this.SpecList;
-            if (this.products.spec_dimension == 1) {
-                specList.spec_1.map(function (value, key) {
-                    let only_key_isset = skuList.filter(data => data.spec_1_only_key === value
-                        .only_key);
-                    if (only_key_isset.length == 0) {
-                        skuList.push({
-                            id: '',
-                            sort_key: key,
-                            sort: skuList.length,
-                            spec_1_value: value.name,
-                            spec_1_only_key: value.only_key,
-                            item_no: '',
-                            supplier_item_no: '',
-                            ean: '',
-                            pos_item_no: '',
-                            safty_qty: 0,
-                            is_additional_purchase: 1,
-                            status: 1,
-                        })
-                    } else {
-                        only_key_isset[0].spec_1_value = value.name;
-                        only_key_isset[0].spec_1_only_key = value.only_key;
-                        only_key_isset[0].sort_key = key;
-                    }
-                })
-
-
-            } else if (this.products.spec_dimension == 2) {
-                let spac_1 = [];
-                let spac_2 = [];
-
-
-                specList.spec_1.map(function (value, key) {
-                    spac_1.push(key);
-                });
-                specList.spec_2.map(function (value, key) {
-                    spac_2.push(key);
-                });
-
-                let cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
-                let output = cartesian(spac_1, spac_2);
-                output.map(function (value, key) {
-                    spac_1_key = value[0];
-                    spac_2_key = value[1];
-                    let find_spac_obj_1 = specList.spec_1[spac_1_key];
-                    let find_spac_obj_2 = specList.spec_2[spac_2_key];
-                    //檢查原先是否有存在該筆規格
-                    let only_key_isset = skuList.filter(data => data.spec_1_only_key ===
-                        find_spac_obj_1
-                            .only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
-                    if (only_key_isset.length == 0) {
-                        skuList.push({
-                            id: '',
-                            sort_key: spac_1_key + '' + spac_2_key,
-                            sort: skuList.length,
-                            spec_1_value: find_spac_obj_1.name,
-                            spec_2_value: find_spac_obj_2.name,
-                            spec_1_only_key: find_spac_obj_1.only_key,
-                            spec_2_only_key: find_spac_obj_2.only_key,
-                            item_no: '',
-                            supplier_item_no: '',
-                            ean: '',
-                            pos_item_no: '',
-                            safty_qty: 0,
-                            is_additional_purchase: 1,
-                            status: 1,
-                        })
-                    } else {
-                        only_key_isset[0].spec_1_value = find_spac_obj_1.name;
-                        only_key_isset[0].spec_2_value = find_spac_obj_2.name;
-                        only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
-                        only_key_isset[0].spec_2_only_key = find_spac_obj_2.only_key;
-                        only_key_isset[0].sort_key = spac_1_key + '' + spac_2_key;
-                    }
-
-                });
-                skuList.sort((a, b) => a.sort_key - b.sort_key); //重新排序
-                return this.SkuList;
-            }
-
-        },
-        drag(eve) {
-            $('tbody').addClass('elements-box')
-            eve.dataTransfer.setData("text/index", eve.target.dataset.index);
-            eve.dataTransfer.setData("text/type", eve.target.dataset.type);
-            $('tbody').addClass('elements-box')
-        },
-        dragover(eve) {
-            eve.preventDefault();
-            eve.target.parentNode.classList.add('ondragover');
-            $('tbody').addClass('elements-box');
-
-        },
-        dragleave(eve) {
-            eve.preventDefault();
-            eve.target.parentNode.classList.remove('ondragover');
-            $('tbody').removeClass('elements-box');
-        },
-        drop(eve) {
-            eve.target.parentNode.classList.remove('ondragover');
-            $('tbody').removeClass('elements-box');
-            var index = eve.dataTransfer.getData("text/index");
-            var type = eve.dataTransfer.getData("text/type");
-            let targetIndex = eve.target.parentNode.dataset.index;
-            let targetType = eve.target.parentNode.dataset.type;
-            if (targetType !== type) {
-                console.log('不能跨類別');
-            } else {
-                switch (targetType) {
-                    case 'spec_1':
-                        var item = this.SpecList.spec_1[index];
-                        this.SpecList.spec_1.splice(index, 1);
-                        this.SpecList.spec_1.splice(targetIndex, 0, item);
-                        break;
-                    case 'spec_2':
-                        var item = this.SpecList.spec_2[index];
-                        this.SpecList.spec_2.splice(index, 1)
-                        this.SpecList.spec_2.splice(targetIndex, 0, item)
-                        break;
-                    default:
-                        break;
+            },
+            AddSpecToSkuList(spec_type) {
+                if (spec_type == '1') {
+                    this.SpecList.spec_1.push({
+                        name: '',
+                        sort: this.SpecList.spec_1.length,
+                        only_key: Math.random().toString(36).substring(8),
+                    });
+                } else if (spec_type == '2') {
+                    this.SpecList.spec_2.length;
+                    this.SpecList.spec_2.push({
+                        name: '',
+                        sort: this.SpecList.spec_2.length,
+                        only_key: Math.random().toString(36).substring(8),
+                    });
                 }
-            }
-        },
+            },
+            DelSpecList(obj, type, index) { //刪除規格
+                if (type == 'spec_1') {
+                    this.SpecList.spec_1.splice(index, 1);
+                    let new_SkuList = this.SkuList.filter(data => data.spec_1_only_key !== obj.only_key);
+                    this.SkuList = new_SkuList;
+                } else if (type == 'spec_2') {
+                    this.SpecList.spec_2.splice(index, 1);
+                    let new_SkuList = this.SkuList.filter(data => data.spec_2_only_key !== obj.only_key);
+                    this.SkuList = new_SkuList;
+                }
+            },
+            AddSkuList() { //新增規格
+                var skuList = this.SkuList;
+                var specList = this.SpecList;
+                if (this.products.spec_dimension == 1) {
+                    specList.spec_1.map(function (value, key) {
+                        let only_key_isset = skuList.filter(data => data.spec_1_only_key === value
+                            .only_key);
+                        if (only_key_isset.length == 0) {
+                            skuList.push({
+                                id: '',
+                                sort_key: key,
+                                sort: skuList.length,
+                                spec_1_value: value.name,
+                                spec_1_only_key: value.only_key,
+                                item_no: '',
+                                supplier_item_no: '',
+                                ean: '',
+                                pos_item_no: '',
+                                safty_qty: 0,
+                                is_additional_purchase: 1,
+                                status: 1,
+                            })
+                        } else {
+                            only_key_isset[0].spec_1_value = value.name;
+                            only_key_isset[0].spec_1_only_key = value.only_key;
+                            only_key_isset[0].sort_key = key;
+                        }
+                    })
 
-    },
-        computed: {
 
-    },
+                } else if (this.products.spec_dimension == 2) {
+                    let spac_1 = [];
+                    let spac_2 = [];
+
+
+                    specList.spec_1.map(function (value, key) {
+                        spac_1.push(key);
+                    });
+                    specList.spec_2.map(function (value, key) {
+                        spac_2.push(key);
+                    });
+
+                    let cartesian = (...a) => a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+                    let output = cartesian(spac_1, spac_2);
+                    output.map(function (value, key) {
+                        spac_1_key = value[0];
+                        spac_2_key = value[1];
+                        let find_spac_obj_1 = specList.spec_1[spac_1_key];
+                        let find_spac_obj_2 = specList.spec_2[spac_2_key];
+                        //檢查原先是否有存在該筆規格
+                        let only_key_isset = skuList.filter(data => data.spec_1_only_key ===
+                            find_spac_obj_1
+                                .only_key && data.spec_2_only_key === find_spac_obj_2.only_key);
+                        if (only_key_isset.length == 0) {
+                            skuList.push({
+                                id: '',
+                                sort_key: spac_1_key + '' + spac_2_key,
+                                sort: skuList.length,
+                                spec_1_value: find_spac_obj_1.name,
+                                spec_2_value: find_spac_obj_2.name,
+                                spec_1_only_key: find_spac_obj_1.only_key,
+                                spec_2_only_key: find_spac_obj_2.only_key,
+                                item_no: '',
+                                supplier_item_no: '',
+                                ean: '',
+                                pos_item_no: '',
+                                safty_qty: 0,
+                                is_additional_purchase: 1,
+                                status: 1,
+                            })
+                        } else {
+                            only_key_isset[0].spec_1_value = find_spac_obj_1.name;
+                            only_key_isset[0].spec_2_value = find_spac_obj_2.name;
+                            only_key_isset[0].spec_1_only_key = find_spac_obj_1.only_key;
+                            only_key_isset[0].spec_2_only_key = find_spac_obj_2.only_key;
+                            only_key_isset[0].sort_key = spac_1_key + '' + spac_2_key;
+                        }
+
+                    });
+                    skuList.sort((a, b) => a.sort_key - b.sort_key); //重新排序
+                    return this.SkuList;
+                }
+
+            },
+            drag(eve) {
+                $('tbody').addClass('elements-box')
+                eve.dataTransfer.setData("text/index", eve.target.dataset.index);
+                eve.dataTransfer.setData("text/type", eve.target.dataset.type);
+                $('tbody').addClass('elements-box')
+            },
+            dragover(eve) {
+                eve.preventDefault();
+                eve.target.parentNode.classList.add('ondragover');
+                $('tbody').addClass('elements-box');
+
+            },
+            dragleave(eve) {
+                eve.preventDefault();
+                eve.target.parentNode.classList.remove('ondragover');
+                $('tbody').removeClass('elements-box');
+            },
+            drop(eve) {
+                eve.target.parentNode.classList.remove('ondragover');
+                $('tbody').removeClass('elements-box');
+                var index = eve.dataTransfer.getData("text/index");
+                var type = eve.dataTransfer.getData("text/type");
+                let targetIndex = eve.target.parentNode.dataset.index;
+                let targetType = eve.target.parentNode.dataset.type;
+                if (targetType !== type) {
+                    console.log('不能跨類別');
+                } else {
+                    switch (targetType) {
+                        case 'spec_1':
+                            var item = this.SpecList.spec_1[index];
+                            this.SpecList.spec_1.splice(index, 1);
+                            this.SpecList.spec_1.splice(targetIndex, 0, item);
+                            break;
+                        case 'spec_2':
+                            var item = this.SpecList.spec_2[index];
+                            this.SpecList.spec_2.splice(index, 1)
+                            this.SpecList.spec_2.splice(targetIndex, 0, item)
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            },
+
+     },
         watch: {
-        SpecList: {
-            handler(val) {
-                this.AddSkuList();
-                return this.SkuList;
+            SpecList: {
+                handler(val) {
+                    this.AddSkuList();
+                    return this.SkuList;
+                },
+                deep: true
             },
-            deep: true
-        },
-        "products.spec_dimension": {
-            handler(val) {
-                this.Spec = { // 選擇的規格
-                    spec_1: '',
-                    spec_2: '',
-                };
-                this.SpecList = {
-                    spec_1: [],
-                    spec_2: [],
-                }
-                switch (val) {
-                    case '0': //單規格
-                        this.SkuList = [{}];
-                        break;
-                    case '1': //一維多規格
-                        this.SkuList = [];
-                        break;
-                    case '2': //二維多規格
-                        this.SkuList = [];
-                        break;
-                    default:
-                        break;
-                }
+            "products.spec_dimension": {
+                handler(val) {
+                    this.Spec = { // 選擇的規格
+                        spec_1: '',
+                        spec_2: '',
+                    };
+                    this.SpecList = {
+                        spec_1: [],
+                        spec_2: [],
+                    }
+                    switch (val) {
+                        case '0': //單規格
+                            this.SkuList = [{}];
+                            break;
+                        case '1': //一維多規格
+                            this.SkuList = [];
+                            break;
+                        case '2': //二維多規格
+                            this.SkuList = [];
+                            break;
+                        default:
+                            break;
+                    }
 
-            },
-            deep: true
-        }
-    },
-        })
+                },
+                deep: true
+            }
+        },
+    });
     new SkuComponent().$mount('#SkuComponent');
     var ImageUpload = Vue.extend({
         data: function () {
@@ -1414,13 +1410,38 @@
                 })
                 $(".pos_item_no_va").each(function() {
                     $(this).rules("add", {
-                        required :{
+                        required: {
                             depends: function(element) {
-                                return $("input[name='stock_type']:checked").val() !== 'T'  ; 
+                                return $("input[name='stock_type']:checked").val() !== 'T';
                             }
-                        }
+                        },
+                        remote: {
+                            param: function(element) {
+                                return {
+                                    url: "/backend/products/ajax",
+                                    type: "post",
+                                    dataType: "json",
+                                    cache: false,
+                                    data: {
+                                        pos_item_no: $(element).val(),
+                                        item_no:$(element).data('item_no'),
+                                        type: 'checkPosItemNo',
+                                    },
+                                    dataFilter: function(data) {
+                                        data = JSON.parse(data)
+                                        if(data.result){
+                                            return true ; 
+                                        }else{
+                                            return false ; 
+                                        }
+                                    },
+                                }
+                            },
+                        },
+                        messages : { remote : 'POS品號重複' },
+
                     });
-                })
+                });
                 $( "#new-form" ).submit()
         })
 

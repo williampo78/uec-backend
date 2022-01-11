@@ -145,15 +145,19 @@ class ProductsController extends Controller
         $in = $request->input();
         switch ($in['type']) {
             case 'checkPosItemNo': 
-                // echo 'TEST' ; 
+                if($in['pos_item_no'] !== ''){
+                    $result = $this->productsService->checkPosItemNo($in['pos_item_no'],$in['item_no']);
+                }else{
+                    $result = false ; 
+                }
                 break;
             default:
                 break;
         }
 
-        
         return response()->json([
-            'in' => $request->input(),
+            'requestData'=> $in,
+            'result' => $result,
         ]);
     }
 
