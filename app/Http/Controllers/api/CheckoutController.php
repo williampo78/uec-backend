@@ -215,7 +215,7 @@ class CheckoutController extends Controller
                 } else {
                     $status = false;
                     $err = $dataOrder['status'];
-                    $data = $dataOrder['msg'];
+                    $data = null;
                 }
             } else {
                 $status = false;
