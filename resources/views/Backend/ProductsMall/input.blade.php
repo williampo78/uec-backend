@@ -302,7 +302,7 @@
                                                     class="redtext">*</span></label>
                                         </div>
                                         <div class="col-sm-11">
-                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容"></textarea>
+                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
                                             <span id="description_error_msg" style="display: none" class="redtext">必須填寫</span>
                                         </div>
                                     </div>
@@ -317,7 +317,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
-                                                accept=".jpg,.jpeg,.png"></textarea>
+                                                accept=".jpg,.jpeg,.png">{{ $products->specification }}</textarea>
                                                 <span id="specification_error_msg" style="display: none" class="redtext">必須填寫</span>
                                         </div>
                                     </div>
