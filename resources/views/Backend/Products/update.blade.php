@@ -798,12 +798,12 @@
                                         <div class="col-sm-9">
                                             <div v-if="spec_1.old_spec">
                                                 <div class="form-group">
-                                                    <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name" disabled>
+                                                    <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name" data-va="spec_1_va" readonly>
                                                 </div>
                                             </div>
                                             <div v-else>
                                                 <div class="form-group">
-                                                    <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name">
+                                                    <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name" data-va="spec_1_va">
                                                 </div>
                                             </div>
                                         </div>
@@ -845,12 +845,12 @@
                                         <div class="col-sm-9">
                                             <div v-if="spec_2.old_spec">
                                                 <div class="form-group">
-                                                    <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name" disabled>
+                                                    <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name" data-va="spec_2_va" disabled>
                                                 </div>
                                             </div>
                                             <div v-else>
                                                 <div class="form-group">
-                                                    <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name">
+                                                    <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name" data-va="spec_2_va">
                                                 </div>
 
                                             </div>
@@ -909,7 +909,7 @@
                             <td>
                                 <div class="form-group" style="margin-right:0px;margin-left:0px;">
                                     <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
-                                        :name="'pos_item_no['+SkuKey+']'" :data-item_no="Sku.item_no" >
+                                        :name="'pos_item_no['+SkuKey+']'" :data-item_no="Sku.item_no" data-va="pos_item_no" >
                                 </div>
                             </td>
                             <td>
@@ -1401,11 +1401,13 @@
                 $(".spec_1_va").each(function(){
                     $(this).rules("add", {
                         required: true,
+                        notRepeating: true,
                     });
                 })
                 $(".spec_2_va").each(function(){
                     $(this).rules("add", {
                         required: true,
+                        notRepeating: true,
                     });
                 })
                 $(".pos_item_no_va").each(function() {
@@ -1449,6 +1451,11 @@
       $("#new-form").validate({
         //   debug: true,
           submitHandler: function(form) {
+                var item_num = Object.keys(JSON.parse($('#SkuListdata').val())).length;
+                        if(item_num <= 0) {
+                            alert('至少輸入一個品項')
+                        return false ;
+                    }
                 $('#save_data').prop('disabled', true);
                 form.submit();
           },

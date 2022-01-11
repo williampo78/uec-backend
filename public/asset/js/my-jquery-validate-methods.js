@@ -34,7 +34,8 @@ jQuery.validator.addMethod("monthIntervalVerify", function (value, element, obj)
 });
 jQuery.validator.addMethod("notRepeating", function (value, element, params) {
     var prefix = params;
-    var selector = jQuery.validator.format("[name!='{0}']", element.name, prefix);
+    var fund =  $(element).data('va') ;
+    var selector = jQuery.validator.format("[name!='{0}'][data-va='"+fund+"']", element.name, prefix);
     var matches = new Array();
     $(selector).each(function(index, item) {
         if (value == $(item).val()) {
