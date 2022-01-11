@@ -1081,7 +1081,6 @@
                     });
                 })
                 $(".pos_item_no_va").each(function() {
-                    console.log($(this).val());
                     $(this).rules("add", {
                         required: {
                             depends: function(element) {
@@ -1089,32 +1088,33 @@
                             }
                         },
                         remote: {
-                            url: "/backend/products/ajax",
-                            type: "post",
-                            dataType: "json",
-                            cache: false,
-                            data: {
-                                pos_item_no: function() {
-                                    return $(this).val();
-                                },
-                                type:function(){
-                                    return 'checkPosItemNo' ;
+                            param: function(element) {
+                                return {
+                                    url: "/backend/products/ajax",
+                                    type: "post",
+                                    dataType: "json",
+                                    cache: false,
+                                    data: {
+                                        pos_item_no: $(element).val(),
+                                        item_no:'',
+                                        type: 'checkPosItemNo',
+                                    },
+                                    dataFilter: function(data) {
+                                        data = JSON.parse(data)
+                                        if(data.result){
+                                            return true ; 
+                                        }else{
+                                            return false ; 
+                                        }
+                                    },
                                 }
-                            },
-                            dataFilter: function(data, type) {
-                                if (data) {
-                                    console.log(data) ; 
-                                    // if (json_data.status) {
-                                    //     return true;
-                                    // }
-                                }
-
-                                return false;
                             },
                         },
+                        messages : { remote : 'POS品號重複' },
 
                     });
                 });
+                
                 $("#new-form").submit();
             })
 

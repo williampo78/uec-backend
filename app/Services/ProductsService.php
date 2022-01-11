@@ -31,7 +31,7 @@ class ProductsService
     {
         DB::enableQueryLog();
         $agent_id = Auth::user()->agent_id;
-        $now = Carbon::now() ; 
+        $now = Carbon::now();
         $products = Products::select('products.*', 'supplier.name AS supplier_name')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
@@ -97,17 +97,17 @@ class ProductsService
             switch ($input_data['approval_status']) {
                 //商品上架
                 case 'APPROVED_STATUS_ON':
-                    $products = $products->where(function ($query) use ($now){
+                    $products = $products->where(function ($query) use ($now) {
                         $query->where('products.approval_status', '=', 'APPROVED')
-                            // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
-                            ->where('products.start_launched_at' ,'<=',$now)
-                            ->where('products.end_launched_at' ,'>=',$now);
+                        // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
+                            ->where('products.start_launched_at', '<=', $now)
+                            ->where('products.end_launched_at', '>=', $now);
                     });
                     // products.approval_status = 'APPROVED' and current_timestamp between products.start_launched_at  and products.end_launched_at
                     break;
                 //商品下架
                 case 'APPROVED_STATUS_OFF':
-                    $products = $products->where(function ($query) use ($now){
+                    $products = $products->where(function ($query) use ($now) {
                         $query->where('products.approval_status', '=', 'APPROVED')
                             ->where('products.start_launched_at', '>', $now)
                             ->orWhere('products.end_launched_at', '<', $now);
@@ -775,5 +775,26 @@ class ProductsService
             $result = false;
         }
         return $result;
+    }
+    /**
+     * 確認 PosItemNo 是否有重複
+     *
+     */
+    public function checkPosItemNo($PosItemNo, $ItemNo)
+    {
+        if ($ItemNo !== '') { //編輯才會進來這裡檢查是否是自己的 pos_item_no
+            $updateCheck = ProductItems::where('pos_item_no', $PosItemNo)->where('item_no', $ItemNo); 
+            if($updateCheck->count() > 0 ){
+                return true ;
+            }
+        }
+        
+        $ProductItems = ProductItems::where('pos_item_no', $PosItemNo);
+        if ($ProductItems->count() > 0) { //已存在
+            return false;
+        } else {
+            return true;
+        }
+
     }
 }
