@@ -624,6 +624,13 @@ class APIProductServices
             $meta['meta_type'] = 'website';
             $data['metaData'] = $meta;
 
+            //商品簡述
+            $data['product_brief'] = array(
+                'brief_1'=>$product[$id]->product_brief_1,
+                'brief_2'=>$product[$id]->product_brief_2,
+                'brief_3'=>$product[$id]->product_brief_3,
+            );
+
             //認證標章
             $icon = [];
             $certificate = $this->getCertificateIcon();
@@ -633,6 +640,7 @@ class APIProductServices
                 }
             }
             $data['certificate'] = $icon;
+
 
             //相關推薦
             $rel_prod = RelatedProducts::getRelated($id);
