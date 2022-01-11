@@ -715,7 +715,7 @@ class APIProductServices
         $now = Carbon::now();
         $data = [];
         $s3 = config('filesystems.disks.s3.url');
-        $promotional = PromotionalCampaigns::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name")
+        $promotional = PromotionalCampaigns::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
             ->where("promotional_campaigns.start_at", "<=", $now)
             ->where("promotional_campaigns.end_at", ">=", $now)
             ->where("promotional_campaigns.active", "=", "1")

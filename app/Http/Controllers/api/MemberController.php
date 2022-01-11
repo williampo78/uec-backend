@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\api;
 
+use Carbon\Carbon;
+use App\Services\APIService;
+use Illuminate\Http\Request;
+use App\Services\OrderService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\api\MemberGetOrdersRequest;
 use App\Http\Requests\api\MemberResetPasswordRequest;
-use App\Services\APIService;
-use App\Services\OrderService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 
 class MemberController extends Controller
 {
@@ -130,7 +131,7 @@ class MemberController extends Controller
             $order->product_totals = 0;
 
             // 訂單時間
-            $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y/m/d H:i');
+            $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s');
 
             // 訂單狀態
             $order->order_status = $order->order_status_desc;
@@ -150,7 +151,7 @@ class MemberController extends Controller
 
             // 出貨時間
             if (isset($order->shipped_at)) {
-                $order->shipped_at = Carbon::parse($order->shipped_at)->format('Y/m/d H:i');
+                $order->shipped_at = Carbon::parse($order->shipped_at)->format('Y-m-d H:i:s');
             }
 
             // 訂單明細
@@ -216,5 +217,10 @@ class MemberController extends Controller
                 'orders' => $orders,
             ],
         ], 200);
+    }
+
+    public function getOrderDetail(Request $request)
+    {
+        return '123';
     }
 }

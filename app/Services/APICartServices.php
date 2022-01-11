@@ -571,6 +571,7 @@ class APICartServices
                                                 "campaignName" => $item->campaign_name,
                                                 "productId" => $item->product_id,
                                                 "productName" => $item->product_name,
+                                                "sellingPrice" => $item->selling_price,
                                                 "productPhoto" => $campaign_gift['PROD'][$item->promotional_campaign_id][$item->product_id]['photo'],
                                                 "assignedQty" => $item->assignedQty
                                             );
