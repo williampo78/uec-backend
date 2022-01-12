@@ -90,6 +90,9 @@ Route::group(['middleware' => 'jwt.v2.verify'], function () {
     Route::group(['prefix' => 'member'], function () {
         // 取得會員訂單列表
         Route::get('/orders', [MemberController::class, 'getOrders']);
+
+        // 取得會員訂單詳細內容
+        Route::get('/orders/{order_no}', [MemberController::class, 'getOrderDetails']);
     });
 });
 

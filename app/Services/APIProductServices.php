@@ -269,7 +269,6 @@ class APIProductServices
                     //$is_cart = json_decode($response, true);
                 }
             }
-
             $product_id = 0;
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $product) {
@@ -291,8 +290,6 @@ class APIProductServices
                         foreach ($is_collection as $k => $v) {
                             if ($v['product_id'] == $product->id) {
                                 $collection = true;
-                            } else {
-                                $collection = false;
                             }
                         }
                     }
@@ -573,8 +570,6 @@ class APIProductServices
                 foreach ($is_collection as $k => $v) {
                     if ($v['product_id'] == $id) {
                         $collection = true;
-                    } else {
-                        $collection = false;
                     }
                 }
             }
@@ -650,7 +645,6 @@ class APIProductServices
             $products = $this->getProducts();
 
             $login = Auth::guard('api')->check();
-            $collection = false;
             $is_collection = [];
             if ($login) {
                 $member_id = Auth::guard('api')->user()->member_id;
@@ -660,6 +654,7 @@ class APIProductServices
                 }
             }
             foreach ($rel_prod as $rel) {
+                $collection = false;
                 //echo $products[$rel->related_product_id]->promotion_start_at;
                 $promotional = [];
                 if ($now >= $products[$rel->related_product_id]->promotion_start_at && $now <= $products[$rel->related_product_id]->promotion_end_at) {
@@ -679,8 +674,6 @@ class APIProductServices
                     foreach ($is_collection as $k => $v) {
                         if ($v['product_id'] == $rel->related_product_id) {
                             $collection = true;
-                        } else {
-                            $collection = false;
                         }
                     }
                 }

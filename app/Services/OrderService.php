@@ -2,18 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\Order;
 use App\Models\Invoice;
-use App\Models\Shipment;
+use App\Models\InvoiceAllowance;
+use App\Models\InvoiceAllowanceDetail;
+use App\Models\InvoiceDetail;
+use App\Models\Order;
+use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
-use App\Models\InvoiceDetail;
 use App\Models\ProductPhotos;
+use App\Models\ReturnRequest;
+use App\Models\Shipment;
 use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
 use Illuminate\Support\Facades\DB;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
 
 class OrderService
 {
@@ -248,6 +249,10 @@ class OrderService
         $order_payments = OrderPayment::orderBy('created_at', 'asc')
             ->get();
 
+        // 退貨申請單
+        $return_requests = ReturnRequest::orderBy('id', 'desc')
+            ->get();
+
         foreach ($order_details as $order_detail) {
             // 將託運單號加入訂單明細中
             foreach ($shipments as $shipment) {
@@ -325,6 +330,20 @@ class OrderService
                 }
 
                 $order->order_payments->push($order_payment);
+            }
+        }
+
+        // 將退貨申請單加入訂單中
+        foreach ($return_requests as $return_request) {
+            if ($orders->contains('id', $return_request->order_id)) {
+                $order = $orders->firstWhere('id', $return_request->order_id);
+
+                // 檢查退貨申請單是否有定義
+                if (!isset($order->return_requests)) {
+                    $order->return_requests = collect();
+                }
+
+                $order->return_requests->push($return_request);
             }
         }
 
