@@ -1,6 +1,5 @@
 <div id="SkuComponent">
     <div class="form-horizontal">
-        {{-- <button @click="testdescartes" type="button">測試Descartes function</button> --}}
         <div class="row form-group">
             <div class="col-sm-12">
                 <div class="col-sm-2 ">
@@ -25,12 +24,7 @@
                 </div>
             </div>
         </div>
-        {{-- <div v-if="products.spec_dimension == 0">
-        單規格
-    </div>
-    <div v-if="products.spec_dimension == 1">
-        一維多規格
-    </div> --}}
+
         <div class="row form-group">
             <div class="col-sm-6" v-if="products.spec_dimension >= 1">
                 <div class="col-sm-2 no-pa">
@@ -83,7 +77,7 @@
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <input class="form-control spec_1_va" :name="'spec_1_va['+spec_1_key+']'"
-                                            v-model="spec_1.name">
+                                            v-model="spec_1.name" data-va="spec_1_va">
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
@@ -118,7 +112,7 @@
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <input class="form-control spec_2_va" :name="'spec_2_va['+spec_2_key+']'"
-                                            v-model="spec_2.name">
+                                            v-model="spec_2.name" data-va="spec_2_va">
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
@@ -170,7 +164,7 @@
                 <td>
                     <div class="form-group" >
                         <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
-                            :name="'pos_item_no['+SkuKey+']'">
+                            :name="'pos_item_no['+SkuKey+']'" data-va="pos_item_no">
                     </div>
                 </td>
                 <td>

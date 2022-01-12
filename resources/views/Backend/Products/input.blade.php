@@ -627,7 +627,6 @@
                         </div>
                     </div>
                     <hr>
-
                     <div id="page-2">
                         @include('Backend.Products.inputSpec')
                     </div>
@@ -1073,11 +1072,13 @@
                 $(".spec_1_va").each(function() {
                     $(this).rules("add", {
                         required: true,
+                        notRepeating: true,
                     });
                 })
                 $(".spec_2_va").each(function() {
                     $(this).rules("add", {
                         required: true,
+                        notRepeating: true,
                     });
                 })
                 $(".pos_item_no_va").each(function() {
@@ -1122,6 +1123,11 @@
             $("#new-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
+                    var item_num = Object.keys(JSON.parse($('#SkuListdata').val())).length;
+                    if(item_num <= 0) {
+                        alert('至少輸入一個品項')
+                        return false ;
+                    }
                     $('#save_data').prop('disabled', true);
                     form.submit();
                 },
