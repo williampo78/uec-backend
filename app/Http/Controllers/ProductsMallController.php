@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\BrandsService ;
+use App\Services\BrandsService;
 use App\Services\ProductsService;
-use App\Services\SupplierService ;
-use Illuminate\Support\Facades\Log;
-use App\Services\WebCategoryHierarchyService ;
+use App\Services\SupplierService;
+use App\Services\WebCategoryHierarchyService;
+use Illuminate\Http\Request;
 
 class ProductsMallController extends Controller
 {
@@ -18,33 +17,32 @@ class ProductsMallController extends Controller
      */
     private $productsService;
     public function __construct(ProductsService $productsService,
-    SupplierService $supplierService ,
-    BrandsService $brandsService,
-    WebCategoryHierarchyService $webCategoryHierarchyService)
-    {
+        SupplierService $supplierService,
+        BrandsService $brandsService,
+        WebCategoryHierarchyService $webCategoryHierarchyService) {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
-        $this->brandsService = $brandsService ;
-        $this->webCategoryHierarchyService = $webCategoryHierarchyService ;
+        $this->brandsService = $brandsService;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
     }
 
     public function index(Request $request)
     {
-        $in = $request->input() ;
+        $in = $request->input();
 
         $result = [
             'products' => [],
-        ] ;
+        ];
 
-        if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ; 
+        if (count($in) !== 0) {
+            $result['products'] = $this->productsService->getProducts($in);
             $this->productsService->restructureProducts($result['products']);
         }
-    
-        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
 
-        return view('Backend.ProductsMall.list',$result);
+        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
+        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content(); //供應商
+
+        return view('Backend.ProductsMall.list', $result);
     }
 
     /**
@@ -76,18 +74,18 @@ class ProductsMallController extends Controller
      */
     public function show($id)
     {
-        $result = [] ; 
-        $result['products'] = $this->productsService->showProducts($id) ; 
+        $result = [];
+        $result['products'] = $this->productsService->showProducts($id);
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
+        $result['brands'] = $this->brandsService->getBrands(); // 廠牌
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
-        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id);//前台分類
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
-        $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
-        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 
-        $result['related_products'] = $this->productsService->getRelatedProducts($id) ;
-        return view('Backend.ProductsMall.show',$result) ;
+        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id); //前台分類
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
+        $result['spac_list'] = $this->productsService->getProductSpac($id);
+        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
+        $result['related_products'] = $this->productsService->getRelatedProducts($id);
+        return view('Backend.ProductsMall.show', $result);
     }
 
     /**
@@ -98,18 +96,18 @@ class ProductsMallController extends Controller
      */
     public function edit($id)
     {
-        $result = [] ; 
-        $result['products'] = $this->productsService->showProducts($id) ; 
+        $result = [];
+        $result['products'] = $this->productsService->showProducts($id);
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
+        $result['brands'] = $this->brandsService->getBrands(); // 廠牌
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
-        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id);//前台分類
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
-        $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
-        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 
-        $result['related_products'] = $this->productsService->getRelatedProducts($id) ;
-        return view('Backend.ProductsMall.input',$result) ;
+        $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id); //前台分類
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
+        $result['spac_list'] = $this->productsService->getProductSpac($id);
+        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
+        $result['related_products'] = $this->productsService->getRelatedProducts($id);
+        return view('Backend.ProductsMall.input', $result);
     }
 
     /**
@@ -121,9 +119,9 @@ class ProductsMallController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $in = $request->input() ; 
-        $file = $request->file() ;
-        $this->productsService->updateProductSmall($in , $file , $id) ;
+        $in = $request->input();
+        $file = $request->file();
+        $this->productsService->updateProductSmall($in, $file, $id);
         $act = 'upd';
         $route_name = 'product_small';
         return view('Backend.success', compact('route_name', 'act'));
@@ -138,29 +136,43 @@ class ProductsMallController extends Controller
     {
         //
     }
-    public function ajax(Request $request){
+    public function ajax(Request $request)
+    {
         $in = $request->input();
-        $status = true ; 
+        $status = true;
         switch ($in['type']) {
-            case 'DelCategoryInProduct': 
+            case 'DelCategoryInProduct':
                 try {
-                    $this->webCategoryHierarchyService->DelCategoryInProduct($in) ; 
+                    $this->webCategoryHierarchyService->DelCategoryInProduct($in);
                 } catch (\Throwable $th) {
-                    $status = false ; 
+                    $status = false;
                 }
                 break;
-            case 'DelRelatedProducts' : 
+            case 'DelRelatedProducts':
                 try {
-                    $this->webCategoryHierarchyService->DelRelatedProducts($in['id']) ; 
+                    $this->webCategoryHierarchyService->DelRelatedProducts($in['id']);
                 } catch (\Throwable $th) {
-                    $status = false ; 
+                    $status = false;
                 }
+                break;
+            case 'DelGoogleShopPhoto':
+                try {
+                    $this->productsService->delGoogleShopPhoto($in['id']);
+                } catch (\Throwable $th) {
+                    $status = false;
+                }
+                break;
+            case 'DelItemPhotos':
+                // try {
+                    $this->productsService->delItemPhotos($in['item_id']);
+                // } catch (\Throwable $th) {
+                //     $status = false;
+                // }
                 break;
             default:
                 break;
         }
 
-        
         return response()->json([
             'status' => $status,
             'in' => $request->input(),

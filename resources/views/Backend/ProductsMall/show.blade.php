@@ -334,7 +334,7 @@
                                         </div>
                                         <div class="col-sm-3">
                                             <img :ref="'GoogleShopPhoto'"
-                                                src="{{ $products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
+                                                src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
                                                 style="max-width:100%;">
                                         </div>
 
