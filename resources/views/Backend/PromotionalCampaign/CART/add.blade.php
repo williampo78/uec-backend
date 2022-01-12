@@ -191,8 +191,8 @@
             renderPrdModalProductType(product_types);
             renderGiftModalProductType(product_types);
 
-            $('#prd-modal-product-type option[value="A"]').remove(); // 移除加購品
-            $('#prd-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
+            $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove(); // 移除贈品、加購品
+            $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
 
             $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
             $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
