@@ -10,8 +10,8 @@ return [
 
     // TapPay 收款商家
     'merchant_id' => [
-        'TAPPAY_CREDITCARD' => 'uarktech_CTBC',
-        'TAPPAY_LINEPAY' => 'uarktech_LINEPAY'
+        'TAPPAY_CREDITCARD' => env('TAP_PAY_CREDITCARD'),
+        'TAPPAY_LINEPAY' => env('TAP_PAY_LINEPAY')
     ],
 
     //銀行對帳系統交易明細
