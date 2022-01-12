@@ -183,19 +183,6 @@ class APITapPayService
             //更新付款狀態
             $order_payment = OrderPayment::where('id', '=', $data->id)->update(['payment_status' => 'COMPLETED', 'latest_api_status' => 'S']);
 
-            //更新會員點數
-            if ($status['points'] != 0) {
-                $pointData['point'] = $status['points'];
-                $pointData['orderId'] = $status['order_no'];
-                $pointData['type'] = 'USED';
-                $pointData['callFrom'] = 'EC';
-                $used_member = $status['member_id'];
-                $pointStatus = $this->apiService->changeMemberPoint($pointData, $used_member);
-                $pointStatus = json_decode($pointStatus, true);
-                $thisStatus = ($pointStatus['status'] == '200' ? 'S' : 'E');
-                $order_payment = OrderPayment::where('id', '=', $data->id)->update(['point_api_status' => $thisStatus, 'point_api_date' => $pointStatus['timestamp'], 'point_api_log' => json_encode($pointStatus)]);
-            }
-
             //建立出貨單頭
             $shipData = [];
             $shipData['agent_id'] = 1;

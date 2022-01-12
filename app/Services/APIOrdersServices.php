@@ -201,11 +201,11 @@ class APIOrdersServices
                         $discount = 0;
                     }
                     if ($order['point_discount'] < 0) { //有用點數折現金
-                        $discount_rate[$seq] = round(($item['amount'] / $order['total_price']) * 100);
+                        $discount_rate[$seq] = ($item['amount'] / $order['total_price']);
                         $point_rate += $discount_rate[$seq];
                     } else {
                         $discount_rate[$seq] = 0;
-                        $point_rate = 100;
+                        $point_rate = 1;
                     }
                     $details[$seq] = [
                         "order_id" => $order_id,
@@ -219,8 +219,8 @@ class APIOrdersServices
                         "campaign_discount" => $discount,
                         "subtotal" => $item['amount'],
                         "record_identity" => "M",
-                        "point_discount" => -$discount_rate[$seq],
-                        "points" => (-$discount_rate[$seq] / $cart['point']['exchangeRate']),
+                        "point_discount" => round(-$discount_rate[$seq] * $order['points']),
+                        "points" => round(-$discount_rate[$seq] / $cart['point']['exchangeRate']) * $order['points'],
                         "utm_source" => $utm_info[$item['itemId']]->utm_source,
                         "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
                         "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
@@ -439,9 +439,9 @@ class APIOrdersServices
             }
 
             $pointData = [];
-            if ($point_rate != 100) { //點數比例加總不等於100時，把最後一筆資料的比例做修正
+            if ($point_rate != 1) { //點數比例加總不等於1時，把最後一筆資料的比例做修正
                 $detail = OrderDetail::where('order_id', '=', $order_id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
-                $pointData['point_discount'] = $detail->point_discount - 100 + $point_rate;
+                $pointData['point_discount'] = $detail->point_discount - 1 + $point_rate;
                 $pointData['points'] = ($pointData['point_discount'] / $cart['point']['exchangeRate']);
                 OrderDetail::where('id', $detail->id)->update($pointData);
             }
@@ -476,28 +476,52 @@ class APIOrdersServices
             }
 
 
-            //TapPay
-            $webData['prime'] = $order['taypay_prime'];
-            $tapPay = $this->apiTapPayService->payByPrime($webData);
-            $tapPayResult = json_decode($tapPay, true);
-            if ($tapPayResult['status'] == 0) {
-                $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => $now]);
-                if ($payment) {
-                    $result['status'] = 200;
-                    $result['payment_url'] = $tapPayResult['payment_url'];
+            //更新會員點數
+            if ($order['points'] != 0) {
+
+                $pointData['point'] = $webData['points'];
+                $pointData['orderId'] = $webData['order_no'];
+                $pointData['type'] = 'USED';
+                $pointData['callFrom'] = 'EC';
+                $used_member = $webData['member_id'];
+                $pointStatus = $this->apiService->changeMemberPoint($pointData, $used_member);
+                $pointStatus = json_decode($pointStatus, true);
+                $thisStatus = ($pointStatus['status'] == '200' ? 'S' : 'E');
+                $order_payment = OrderPayment::where('id', '=', $payment_id)->update(['point_api_status' => $thisStatus, 'point_api_date' => $pointStatus['timestamp'], 'point_api_log' => json_encode($pointStatus)]);
+                if ($order_payment && $pointStatus['status'] == '200') {
+                    $isTapPay = 1;
                 } else {
-                    $result['status'] = 401;
+                    $isTapPay = 0;
                 }
             } else {
-                $result['status'] = $tapPayResult['status'];
+                $isTapPay = 1;
             }
 
+            //TapPay
+            if ($isTapPay) {
+                $webData['prime'] = $order['taypay_prime'];
+                $tapPay = $this->apiTapPayService->payByPrime($webData);
+                $tapPayResult = json_decode($tapPay, true);
+                if ($tapPayResult['status'] == 0) {
+                    $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => $now]);
+                    if ($payment) {
+                        $result['status'] = 200;
+                        $result['payment_url'] = $tapPayResult['payment_url'];
+                    } else {
+                        $result['status'] = 401;
+                        $result['payment_url'] = null;
+                    }
+                } else {
+                    $result['status'] = $tapPayResult['status'];
+                    $result['payment_url'] = null;
+                }
+            }
             DB::commit();
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
             $result['status'] = 401;
+            $result['payment_url'] = $e;
         }
 
         return $result;

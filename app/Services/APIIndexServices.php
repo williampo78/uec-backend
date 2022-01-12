@@ -5,17 +5,21 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Services\APIProductServices;
+use App\Services\APIWebService;
 
 class APIIndexServices
 {
 
     private $apiProductService;
+    private $apiWebService;
 
-    public function __construct(APIProductServices $apiProductService)
+    public function __construct(APIProductServices $apiProductService, APIWebService $apiWebService)
     {
         $this->apiProductService = $apiProductService;
+        $this->apiWebService = $apiWebService;
     }
 
     public function getIndex($params = null)
@@ -44,7 +48,26 @@ class APIIndexServices
         $prd_H080A = [];
         $prd_H080B = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
+        $login = Auth::guard('api')->check();
+        $collection = false;
+        $is_collection = [];
+        if ($login) {
+            $member_id = Auth::guard('api')->user()->member_id;
+            if ($member_id > 0) {
+                $response = $this->apiWebService->getMemberCollections();
+                $is_collection = json_decode($response, true);
+            }
+        }
         foreach ($ads as $ad_slot) {
+            if (isset($is_collection)) {
+                foreach ($is_collection as $k => $v) {
+                    if ($v['product_id'] == $ad_slot->product_id) {
+                        $collection = true;
+                    } else {
+                        $collection = false;
+                    }
+                }
+            }
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
                     'name' => $ad_slot->texts,
@@ -99,15 +122,16 @@ class APIIndexServices
                                 }
                             }
                             $product_info[] = array(
-                                'prod_id' => $product->id,
-                                'prod_no' => $product->product_no,
-                                'prod_name' => $product->product_name,
-                                'prod_unit' => $product->uom,
-                                'prod_list_price' => $product->list_price,
-                                'prod_price' => $product->selling_price,
-                                'prod_photo_path' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
-                                'promotion_desc' => $promotion_desc."##",
+                                'product_id' => $product->id,
+                                'product_no' => $product->product_no,
+                                'product_name' => $product->product_name,
+                                'product_unit' => $product->uom,
+                                'list_price' => $product->list_price,
+                                'selling_price' => $product->selling_price,
+                                'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                                'promotion_desc' => $promotion_desc,
                                 'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                                "collection" => $collection,
                             );
                         }
 
@@ -122,15 +146,16 @@ class APIIndexServices
                     }
                 } else if ($ad_slot->product_assigned_type == 'P') {
                     $product_info[$ad_slot->slot_code][] = array(
-                        'prod_id' => $ad_slot->product_id,
-                        'prod_no' => $products[$ad_slot->product_id]->product_no,
-                        'prod_name' => $products[$ad_slot->product_id]->product_name,
-                        'prod_unit' => $products[$ad_slot->product_id]->uom,
-                        'prod_list_price' => $products[$ad_slot->product_id]->list_price,
-                        'prod_price' => $products[$ad_slot->product_id]->selling_price,
-                        'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                        'product_id' => $ad_slot->product_id,
+                        'product_no' => $products[$ad_slot->product_id]->product_no,
+                        'product_name' => $products[$ad_slot->product_id]->product_name,
+                        'product_unit' => $products[$ad_slot->product_id]->uom,
+                        'list_price' => $products[$ad_slot->product_id]->list_price,
+                        'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                        'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                         'promotion_desc' => $promotion_desc,
                         'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                        "collection" => $collection,
                     );
 
                     $data[$ad_slot->slot_code] = array(
@@ -148,12 +173,12 @@ class APIIndexServices
                 $product_info = [];
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
                     $product_info[$ad_slot->slot_code][] = array(
-                        'prod_id' => $products[$ad_slot->product_id]->id,
-                        'prod_no' => $products[$ad_slot->product_id]->product_no,
-                        'prod_name' => $products[$ad_slot->product_id]->product_name,
-                        'prod_unit' => $products[$ad_slot->product_id]->uom,
-                        'prod_price' => $products[$ad_slot->product_id]->selling_price,
-                        'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                        'product_id' => $products[$ad_slot->product_id]->id,
+                        'product_no' => $products[$ad_slot->product_id]->product_no,
+                        'product_name' => $products[$ad_slot->product_id]->product_name,
+                        'product_unit' => $products[$ad_slot->product_id]->uom,
+                        'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                        'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                         'mobile_applicable' => $ad_slot->is_mobile_applicable,
                         'desktop_applicable' => $ad_slot->is_desktop_applicable
                     );
@@ -196,32 +221,34 @@ class APIIndexServices
                     }
                     if ($ad_slot->slot_code == 'H080A') {
                         $prd_H080A[] = array(
-                            'prod_id' => $products[$ad_slot->product_id]->id,
-                            'prod_no' => $products[$ad_slot->product_id]->product_no,
-                            'prod_name' => $products[$ad_slot->product_id]->product_name,
-                            'prod_unit' => $products[$ad_slot->product_id]->uom,
-                            'prod_list_price' => $products[$ad_slot->product_id]->list_price,
-                            'prod_price' => $products[$ad_slot->product_id]->selling_price,
-                            'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                            'product_id' => $products[$ad_slot->product_id]->id,
+                            'product_no' => $products[$ad_slot->product_id]->product_no,
+                            'product_name' => $products[$ad_slot->product_id]->product_name,
+                            'product_unit' => $products[$ad_slot->product_id]->uom,
+                            'list_price' => $products[$ad_slot->product_id]->list_price,
+                            'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                            'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
                             'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            "collection" => $collection,
                         );
                     }
                     if ($ad_slot->slot_code == 'H080B') {
                         $prd_H080B[] = array(
-                            'prod_id' => $products[$ad_slot->product_id]->id,
-                            'prod_no' => $products[$ad_slot->product_id]->product_no,
-                            'prod_name' => $products[$ad_slot->product_id]->product_name,
-                            'prod_unit' => $products[$ad_slot->product_id]->uom,
-                            'prod_list_price' => $products[$ad_slot->product_id]->list_price,
-                            'prod_price' => $products[$ad_slot->product_id]->selling_price,
-                            'prod_photo_path' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                            'product_id' => $products[$ad_slot->product_id]->id,
+                            'product_no' => $products[$ad_slot->product_id]->product_no,
+                            'product_name' => $products[$ad_slot->product_id]->product_name,
+                            'product_unit' => $products[$ad_slot->product_id]->uom,
+                            'list_price' => $products[$ad_slot->product_id]->list_price,
+                            'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                            'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
                             'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            "collection" => $collection,
                         );
                     }
                 }
