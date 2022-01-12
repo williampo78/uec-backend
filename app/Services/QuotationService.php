@@ -84,15 +84,20 @@ class QuotationService
 
     public function addQuotation($data)
     {
+        $result = [
+            'message' => '' ,
+            'status'  => true ,
+        ] ;
 
         $user_id = Auth::user()->id;
         $now = Carbon::now();
 
         $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION');
         if (!$hierarchy) {
-            return false;
+            $result['message'] = 'approval_hierarchy table 沒有該使用者';
+            $result['status']  = false ; 
+            return $result ;
         }
-        // dd($data) ;
         DB::beginTransaction();
         try {
             $quotationData = [];
@@ -113,7 +118,6 @@ class QuotationService
             if ($data['status_code'] == 'REVIEWING') {
                 $quotationData['submitted_at'] = $now;
             }
-
             $quotation_id = Quotation::insertGetId($quotationData);
 
             $detailData = [];
@@ -121,23 +125,24 @@ class QuotationService
                 foreach ($data['item'] as $k => $item_id) {
                     $detailData[$k]['product_item_id'] = $item_id;
                     $detailData[$k]['quotation_id'] = $quotation_id;
-                    $detailData[$k]['unit_price'] = $data['price'][$k] * 1; //目前匯率皆為1
+                    $detailData[$k]['unit_price'] = round($data['price'][$k] * 1); //目前匯率皆為1
                     $detailData[$k]['original_unit_price'] = $data['price'][$k];
                     $detailData[$k]['created_by'] = $user_id;
                     $detailData[$k]['created_at'] = $now;
                     $detailData[$k]['updated_by'] = $user_id;
                     $detailData[$k]['updated_at'] = $now;
+                    //unit_price unit_nontax_price  unit_tax_price
                     if ($data['tax'] == 2) { //應稅內含
                         if ($data['is_tax_included'] == '1') { // 報價含稅
                             $tax_num = round($data['price'][$k] / 1.05, 2);
-                            $detailData[$k]['unit_nontax_price'] = $tax_num; //本幣單價未稅金額
-                            $detailData[$k]['unit_tax_price'] = $data['price'][$k] - $tax_num; //本幣單價稅額
+                            $detailData[$k]['unit_nontax_price'] = round($tax_num); //本幣單價未稅金額
+                            $detailData[$k]['unit_tax_price'] = round($data['price'][$k] - $tax_num); //本幣單價稅額
                             $detailData[$k]['original_unit_price'] = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
                             $detailData[$k]['original_unit_nontax_price'] = $tax_num; //未稅金額
                             $detailData[$k]['original_unit_tax_price'] = $data['price'][$k] - $tax_num; //稅額
                         } else { //報價不含稅
-                            $detailData[$k]['unit_nontax_price'] = $data['price'][$k]; //本幣單價未稅金額
-                            $detailData[$k]['unit_tax_price'] = (($data['price'][$k] * 1.05) - $data['price'][$k]); //本幣單價稅額
+                            $detailData[$k]['unit_nontax_price'] = round($data['price'][$k]); //本幣單價未稅金額
+                            $detailData[$k]['unit_tax_price'] = round((($data['price'][$k] * 1.05) - $data['price'][$k])); //本幣單價稅額
                             $detailData[$k]['original_unit_price'] = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
                             $detailData[$k]['original_unit_nontax_price'] = $data['price'][$k]; //未稅金額
                             $detailData[$k]['original_unit_tax_price'] = (($data['price'][$k] * 1.05) - $data['price'][$k]); //稅額
@@ -167,15 +172,13 @@ class QuotationService
             }
 
             DB::commit();
-            $result = true;
+            $result['status'] = true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
-
-            $result = false;
+            $result['status'] = false;
         }
-
-        // return $result;
+        return $result;
     }
 
     public function getQuotationDetail($quotation_id)
@@ -227,20 +230,24 @@ class QuotationService
             'updated_at' => $now,
             'is_tax_included' => isset($data['is_tax_included']) ? $data['is_tax_included'] : null,
         ];
-
+        if ($data['status_code'] == 'REVIEWING') {
+            $quotationData['submitted_at'] = $now;
+        }
         Quotation::where('id', $quotation_id)->update($quotationData);
+        // round
+         //unit_price unit_nontax_price  unit_tax_price
         foreach ($data['item'] as $k => $item_id) {
             if ($data['tax'] == 2) { //應稅內含
                 if ($data['is_tax_included'] == '1') { // 報價含稅
                     $tax_num = round($data['price'][$k] / 1.05, 2);
-                    $unit_nontax_price = $tax_num; //本幣單價未稅金額
-                    $unit_tax_price = $data['price'][$k] - $tax_num; //本幣單價稅額
+                    $unit_nontax_price = round($tax_num); //本幣單價未稅金額
+                    $unit_tax_price = round($data['price'][$k] - $tax_num); //本幣單價稅額
                     $original_unit_price = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
                     $original_unit_nontax_price = $tax_num; //未稅金額
                     $original_unit_tax_price = $data['price'][$k] - $tax_num; //稅額
                 } else { //報價不含稅
-                    $unit_nontax_price = $data['price'][$k]; //本幣單價未稅金額
-                    $unit_tax_price = (($data['price'][$k] * 1.05) - $data['price'][$k]); //本幣單價稅額
+                    $unit_nontax_price = round($data['price'][$k]); //本幣單價未稅金額
+                    $unit_tax_price = round((($data['price'][$k] * 1.05) - $data['price'][$k])); //本幣單價稅額
                     $original_unit_price = $data['price'][$k]; //報價金額 原幣單價(畫面上輸入的單價)
                     $original_unit_nontax_price = $data['price'][$k]; //未稅金額
                     $original_unit_tax_price = (($data['price'][$k] * 1.05) - $data['price'][$k]); //稅額
@@ -255,7 +262,7 @@ class QuotationService
 
             $quotationDetailData = [
                 'product_item_id' => $item_id,
-                'unit_price' => $data['price'][$k],
+                'unit_price' => round($data['price'][$k]),
                 'original_unit_price' => $data['price'][$k],
                 'updated_at' => $now,
                 'updated_by' => $user_id,

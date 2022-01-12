@@ -16,16 +16,15 @@
 
                         @csrf
                         <div class="row">
-
                             <!-- 欄位 -->
                             <div class="col-sm-12">
-
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group" id="supplier">
                                             <label for="supplier">供應商<span class="redtext">*</span></label>
                                             <select class="form-control js-select2-department" name="supplier_id"
                                                 id="supplier_id">
+                                                <option value="">無</option>
                                                 @foreach ($supplier as $v)
                                                     <option value='{{ $v['id'] }}'
                                                         {{ isset($quotation['trade_date']) && $quotation['trade_date'] == $v['id'] ? 'selected' : '' }}>
@@ -90,16 +89,16 @@
                                             <div class="col-sm-6">
                                                 <label>
                                                     <input type="radio" name="is_tax_included" value="1"
-                                                        {{ isset($quotation['is_tax_included']) && $quotation['tax'] == '1' ? 'checked' : '' }}>
-                                                    未稅
+                                                        {{ isset($quotation['is_tax_included']) && $quotation['is_tax_included'] == '1' ? 'checked' : '' }}>
+                                                   含稅
                                                 </label>
                                             </div>
                                             <div class="col-sm-6">
 
                                                 <label>
                                                     <input type="radio" name="is_tax_included" value="0"
-                                                        {{ isset($quotation['is_tax_included']) && $quotation['tax'] == '0' ? 'checked' : '' }}>
-                                                    含稅
+                                                        {{ isset($quotation['is_tax_included']) && $quotation['is_tax_included'] == '0' ? 'checked' : '' }}>
+                                                    未稅
                                                 </label>
                                             </div>
 
@@ -166,7 +165,7 @@
         $(document).ready(function() {
 
             is_tax_included_status();
-
+            
             $('#btn-addNewRow').click(function() {
                 AddItemRow("process", "input");
             });
@@ -187,15 +186,19 @@
                     form.submit();
                 },
                 rules: {
-                    submitted_at: {
+                    trade_date: {
                         required: true
                     },
                     is_tax_included: {
                         required: $('#tax').val() !== 0
-                    }
+                    },
+                    supplier_id:{
+                        required: true
+                    },
                 },
                 messages: {
-                    submitted_at: "請輸入報價日期",
+                    trade_date: "請輸入報價日期",
+                    supplier_id: "請選取供應商"
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {

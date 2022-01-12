@@ -76,14 +76,16 @@ class QuotationController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'quotation';
-        $act = 'add';
         $data = $request->except('_token');
-        if (isset($data['status_code'])) {
-            $act = $data['status_code'];
-        }
-        $this->quotationService->addQuotation($data);
-        return view('Backend.success', compact('route_name', 'act'));
+        $result = $this->quotationService->addQuotation($data);
+        $result['route_name'] = 'quotation';
+        $result['act'] = 'add';
+        
+        if ($result['status']) {
+            return view('Backend.success', compact('route_name', 'act'));
+        } else {
+            return view('Backend.error', $result);
+        };
     }
 
     /**
@@ -166,7 +168,7 @@ class QuotationController extends Controller
                 $data['quotationDetails'] = $this->quotationService->getQuotationDetail($rs['id'])->transform(function ($obj, $key) use ($brands) {
 
                     $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
-           
+
                     $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
 
                     if ($obj->spec_1_value !== '') {
@@ -176,8 +178,8 @@ class QuotationController extends Controller
                     if ($obj->spec_2_value !== '') {
                         $obj->combination_name .= '-' . $obj->spec_2_value;
                     }
-                    if($obj->product_name == ''){
-                        $obj->combination_name = false ;
+                    if ($obj->product_name == '') {
+                        $obj->combination_name = false;
                     }
                     $obj->brands_name = $brandsName; //不做join key find val
                     return $obj;
