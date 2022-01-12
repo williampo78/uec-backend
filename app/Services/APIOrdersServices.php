@@ -19,14 +19,16 @@ use App\Models\ProductItems;
 use App\Models\OrderPayment;
 use App\Services\APITapPayService;
 use App\Services\StockService;
+use App\Services\APIService;
 
 class APIOrdersServices
 {
 
-    public function __construct(APITapPayService $apiTapPayService, StockService $stockService)
+    public function __construct(APITapPayService $apiTapPayService, StockService $stockService, APIService $apiService)
     {
         $this->apiTapPayService = $apiTapPayService;
         $this->stockService = $stockService;
+        $this->apiService = $apiService;
     }
 
 
@@ -118,6 +120,7 @@ class APIOrdersServices
         foreach ($product_items as $product_item) {
             $prod_info[$product_item->product_id] = $product_item;
         }
+
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -189,7 +192,7 @@ class APIOrdersServices
             //訂單單身
             $seq = 0;
             $details = [];
-            $detail_count = [];
+            $detail_count = 0;
             $point_rate = 0;
             $discount_group = 0;
             foreach ($cart['list'] as $products) {
