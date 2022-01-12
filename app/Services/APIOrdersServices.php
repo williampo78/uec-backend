@@ -509,9 +509,11 @@ class APIOrdersServices
                         $result['payment_url'] = $tapPayResult['payment_url'];
                     } else {
                         $result['status'] = 401;
+                        $result['payment_url'] = null;
                     }
                 } else {
                     $result['status'] = $tapPayResult['status'];
+                    $result['payment_url'] = null;
                 }
             }
             DB::commit();
@@ -519,6 +521,7 @@ class APIOrdersServices
             DB::rollBack();
             Log::info($e);
             $result['status'] = 401;
+            $result['payment_url'] = $e;
         }
 
         return $result;

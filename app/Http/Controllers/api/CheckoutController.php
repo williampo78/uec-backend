@@ -215,7 +215,7 @@ class CheckoutController extends Controller
                 } else {
                     $status = false;
                     $err = $dataOrder['status'];
-                    $data = null;
+                    $data = $dataOrder['payment_url'];
                 }
             } else {
                 $status = false;
