@@ -116,8 +116,8 @@ class IndexController extends Controller
     {
         $level1 = $this->universalService->getLookupValues('QA_CATEGORY');
         $data = [];
-        $items = [];
         foreach ($level1 as $code => $name) {
+            $items = [];
             $input['code'] = $code;
             $level2 = $this->webContentsService->getFooter($input, 'QA');
             foreach ($level2 as $k => $v) {
