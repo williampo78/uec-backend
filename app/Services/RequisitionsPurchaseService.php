@@ -36,7 +36,7 @@ class RequisitionsPurchaseService
             ->leftJoin('warehouse', 'requisitions_purchase.warehouse_id', '=', 'warehouse.id')
             ->where('requisitions_purchase.agent_id', $agent_id);
         if (!empty($requset['select_start_date'])) {
-            $select_start_date = Carbon::parse($requset['start_launched_at'])->format('Y-m-d H:i:s');
+            $select_start_date = Carbon::parse($requset['select_start_date'])->format('Y-m-d H:i:s');
             $rs->whereDate('trade_date', '>=', $select_start_date);
         }
         if (!empty($requset['select_end_date'])) {
