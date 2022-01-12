@@ -160,7 +160,8 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr class="CategoryHierarchyProducts" v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
+                                                <tr class="CategoryHierarchyProducts"
+                                                    v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
                                                     @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
                                                     @drop="drop" draggable="true" :data-index="CategoryKey"
                                                     :data-type="'Category'">
@@ -177,7 +178,8 @@
 
                                             </tbody>
                                         </table>
-                                        <span id="CategoryHierarchyProducts_error_msg" style="display: none" class="redtext">必須填寫</span>
+                                        <span id="CategoryHierarchyProducts_error_msg" style="display: none"
+                                            class="redtext">必須填寫</span>
                                     </div>
                                     <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
                                         rows="10">@{{ CategoryHierarchyProducts }}</textarea>
@@ -302,8 +304,10 @@
                                                     class="redtext">*</span></label>
                                         </div>
                                         <div class="col-sm-11">
-                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
-                                            <span id="description_error_msg" style="display: none" class="redtext">必須填寫</span>
+                                            <textarea id="description" name="description"
+                                                placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
+                                            <span id="description_error_msg" style="display: none"
+                                                class="redtext">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -318,7 +322,8 @@
                                         <div class="col-sm-11">
                                             <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
                                                 accept=".jpg,.jpeg,.png">{{ $products->specification }}</textarea>
-                                                <span id="specification_error_msg" style="display: none" class="redtext">必須填寫</span>
+                                            <span id="specification_error_msg" style="display: none"
+                                                class="redtext">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -334,17 +339,18 @@
                                             </label>
                                         </div>
                                         <div class="col-sm-2">
-                                            <input type="file" name="google_shop_photo_name" accept=".jpg,.jpeg,.png"
+                                            <input type="file" name="google_shop_photo_name" accept="image/*"
                                                 @change="google_shop">
                                             <input type="hidden" name="google_shop_photo_name_old"
                                                 value="{{ $products->google_shop_photo_name }}">
                                         </div>
                                         <div class="col-sm-3">
-                                            <img :ref="'GoogleShopPhoto'"
-                                                src="{{ $products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
+                                            <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
+                                                src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
                                                 style="max-width:100%;">
                                         </div>
-
+                                        <button v-if="products.google_shop_photo_name" type="button" class="btn btn-large btn-danger btn-sm"
+                                            @click="DelGoogleShop()">刪除</button>
                                     </div>
                                 </div>
                             </div>
@@ -364,7 +370,6 @@
                                                         <th class="col-sm-1">規格2</th>
                                                         <th class="col-sm-1">Item圖示</th>
                                                         <th class="col-sm-1">功能</th>
-
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -377,14 +382,20 @@
                                                         </td>
                                                         <td>
                                                             <div v-if="Item.photo_name">
-                                                                <img  :src="file_cdn + Item.photo_name" style="max-width:100%;">
+                                                                <img :src="file_cdn + Item.photo_name"
+                                                                    style="max-width:100%;">
                                                             </div>
                                                         </td>
                                                         <td>
-                                                            <button type="button" data-toggle="modal" data-target="#item_photo_list" class="btn btn-large btn-warning btn-sm" @click="frombtn(Item,key)">選擇圖片</button>
+                                                            <button type="button" data-toggle="modal"
+                                                                data-target="#item_photo_list"
+                                                                class="btn btn-large btn-warning btn-sm"
+                                                                @click="frombtn(Item,key)">選擇圖片</button>
+                                                            <button type="button" v-if="Item.photo_name"
+                                                                class="btn btn-large btn-danger btn-sm"
+                                                                @click="DelItemPhotos(Item,key)">刪除</button>
                                                         </td>
                                                     </tr>
-
                                                 </tbody>
                                             </table>
                                             <textarea name="ProductsItem_Json" style="display:none" cols="30"
@@ -499,28 +510,28 @@
 
             $("#new-form").validate({
                 submitHandler: function(form) {
-                    if(ck_description.getData().trim().length == 0 ){
-                        $('#description_error_msg').show() ;
-                        alert('商品內容不能為空') ;
-                        return false ;
-                    }else{
-                        $('#description_error_msg').hide() ;
-                    }
-                    
-                    if(ck_specification.getData().trim().length == 0 ){
-                        $('#specification_error_msg').show() ;
-                        alert('商品規格不能為空') ;
-                        return false ;
-                    }else{
-                        $('#specification_error_msg').hide() ;
+                    if (ck_description.getData().trim().length == 0) {
+                        $('#description_error_msg').show();
+                        alert('商品內容不能為空');
+                        return false;
+                    } else {
+                        $('#description_error_msg').hide();
                     }
 
-                    if($('.CategoryHierarchyProducts').length == 0){
-                        alert('至少要新增一項分類') ;
-                        $('#CategoryHierarchyProducts_error_msg').show() ;
-                        return false ;
-                    }else{
-                        $('#CategoryHierarchyProducts_error_msg').hide() ;
+                    if (ck_specification.getData().trim().length == 0) {
+                        $('#specification_error_msg').show();
+                        alert('商品規格不能為空');
+                        return false;
+                    } else {
+                        $('#specification_error_msg').hide();
+                    }
+
+                    if ($('.CategoryHierarchyProducts').length == 0) {
+                        alert('至少要新增一項分類');
+                        $('#CategoryHierarchyProducts_error_msg').show();
+                        return false;
+                    } else {
+                        $('#CategoryHierarchyProducts_error_msg').hide();
                     }
                     $('#save_data').prop('disabled', true);
                     form.submit();
@@ -580,8 +591,8 @@
                     ProductsItem: @json($products_item),
                     DefaultassetImg: '{{ asset('asset/img/default_item.png') }}',
                     file_cdn: @json(config('filesystems.disks.s3.url')),
-                    product_photos:@json($product_photos),
-                    ready_photo : [] ,
+                    product_photos: @json($product_photos),
+                    ready_photo: [],
                 }
             },
             mounted() {
@@ -618,14 +629,6 @@
                     value.category_name = isset[0].name;
                     value.status = 'old';
                 })
-                // console.log(this.ProductsItem) ; 
-                // this.ProductsItem.map(function(value, key) {
-                //     if (value.photo_name == null) {
-                //         value.imgesUrl = vm.DefaultassetImg;
-                //     } else {
-                //         value.imgesUrl = vm.file_cdn + value.photo_name;
-                //     }
-                // })
                 this.CategoryListFilter(); // 先將原先的分類拔除
             },
             methods: {
@@ -805,28 +808,55 @@
                         e.target.value = '';
                     } else {
                         this.$refs.GoogleShopPhoto.src = URL.createObjectURL(file);
+                        this.products.google_shop_photo_name = file ; 
                     }
                 },
-                frombtn(item , key) {
-                    this.ready_photo[0] = item ;
-                    this.ready_photo[1] = key ;  
-                    console.log(this.ready_photo) ; 
+                DelGoogleShop() {
+                    var check = confirm('你確定要刪除Google Shop圖檔嗎?');
+                    $('.show_GoogleShopPhoto').attr('src', this.DefaultassetImg);
+                    $('input[name="google_shop_photo_name_old"]').val('');
+                    $('input[name="google_shop_photo_name"]').val('');
+                    this.products.google_shop_photo_name = '' ;
+                    if (check) {
+                        axios.post('/backend/product_small/ajax', {
+                                id: this.products.id,
+                                _token: '{{ csrf_token() }}',
+                                type: 'DelGoogleShopPhoto',
+                            })
+                            .then(function(response) {
+                          
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                            });
+                    } 
                 },
-                AddPhoto(photo , key){
-                    ProductsItemKey = this.ready_photo[1] ;
-                    this.ProductsItem[ProductsItemKey].photo_name = photo.photo_name ; 
-                }
-                // item_photo(e, key) {
-                //     let file = e.target.files[0];
-                //     let type = e.target.files[0].type;
-                //     if (type !== 'image/jpeg' && type !== 'image/png') {
-                //         alert('格式錯誤');
-                //         e.target.value = '';
-                //         this.$refs.img[key].src = URL.createObjectURL(file);
-                //     } else {
-                //         this.$refs.img[key].src = URL.createObjectURL(file);
-                //     }
-                // }
+                DelItemPhotos(item,key){
+                    var check = confirm('你確定要刪除該筆Item圖檔嗎?');
+                    if(check){
+                        this.ProductsItem[key].photo_name = '' ; 
+
+                        axios.post('/backend/product_small/ajax', {
+                                item_id: item.id,
+                                _token: '{{ csrf_token() }}',
+                                type: 'DelItemPhotos',
+                            })
+                            .then(function(response) {
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                            });
+                    }
+                },
+                frombtn(item, key) {
+                    this.ready_photo[0] = item;
+                    this.ready_photo[1] = key;
+                },
+                AddPhoto(photo, key) {
+                    ProductsItemKey = this.ready_photo[1];
+                    this.ProductsItem[ProductsItemKey].photo_name = photo.photo_name;
+                },
+
             },
             computed: {},
             watch: {

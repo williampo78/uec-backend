@@ -797,4 +797,32 @@ class ProductsService
         }
 
     }
+    /**
+     * 由products id 刪除 google_shop_photo_name
+     */
+    public function delGoogleShopPhoto($products_id){
+        $Products = Products::where('id',$products_id)->first();
+        ImageUpload::DelPhoto($Products->google_shop_photo_name);
+        $user_id = Auth::user()->id;
+        $Products->update([
+                'google_shop_photo_name' => '',
+                'updated_by' => $user_id
+        ]);
+        return true ; 
+    }
+    /**
+     * 由products id 刪除 google_shop_photo_name
+     */
+    public function delItemPhotos($item_id){
+        $user_id = Auth::user()->id;
+
+        $Products = Products::where('id',$item_id)->first();
+
+        ProductItems::where('id',$item_id)->update([
+            'photo_name'=>'',
+            'updated_by'=>$user_id
+        ]);
+
+        return true ; 
+    }
 }
