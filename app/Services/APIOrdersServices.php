@@ -521,7 +521,7 @@ class APIOrdersServices
             DB::rollBack();
             Log::info($e);
             $result['status'] = 401;
-            $result['payment_url'] = $e;
+            $result['payment_url'] = null;
         }
 
         return $result;
