@@ -40,41 +40,38 @@ class PromotionalCampaignPrdController extends Controller
     public function index(Request $request)
     {
         $promotional_campaigns = [];
-        $query_data = [];
+        $query_datas = [];
 
-        $query_data = $request->only([
+        $query_datas = $request->only([
             'campaign_name',
             'active',
             'campaign_type',
-            'start_at',
-            'end_at',
+            'start_at_start',
+            'start_at_end',
             'product_no',
         ]);
 
-        $query_data['level_code'] = self::LEVEL_CODE;
+        // 活動類型
+        $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
-        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_data) < 2) {
-            return view('Backend.PromotionalCampaign.PRD.list');
+        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
+            return view(
+                'Backend.PromotionalCampaign.PRD.list',
+                compact('campaign_types')
+            );
         }
 
-        $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns($query_data);
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => self::LEVEL_CODE]);
+        $query_datas['level_code'] = self::LEVEL_CODE;
 
-        // $promotional_campaigns = $promotional_campaigns->map(function ($obj, $key) {
-        //     /*
-        //      * 列表狀態
-        //      * 當前時間在上架時間內，且活動的狀態為啟用，列為生效
-        //      * 其他為失效
-        //      */
-        //     $obj->launch_status = (Carbon::now()->between($obj->start_at, $obj->end_at) && $obj->active == 1) ? '生效' : '失效';
-
-        //     return $obj;
-        // });
+        $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns($query_datas);
 
         return view(
             'Backend.PromotionalCampaign.PRD.list',
-            compact('promotional_campaigns', 'campaign_types', 'query_data')
+            compact('promotional_campaigns', 'campaign_types')
         );
     }
 
@@ -85,7 +82,10 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function create()
     {
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => self::LEVEL_CODE]);
+        $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
         $suppliers = $this->supplier_service->getSuppliers();
 
         return view(

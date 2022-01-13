@@ -301,7 +301,7 @@
                                                     class="redtext">*</span></label>
                                         </div>
                                         <div class="col-sm-11">
-                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容" ></textarea>
+                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容" >{{$products->description}}</textarea>
                                             <span id="description_error_msg" style="display: none" class="redtext">必須填寫</span>
                                         </div>
                                     </div>
@@ -316,7 +316,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
-                                                accept=".jpg,.jpeg,.png"></textarea>
+                                                accept=".jpg,.jpeg,.png">{{$products->specification}}</textarea>
                                                 <span id="specification_error_msg" style="display: none" class="redtext">必須填寫</span>
                                         </div>
                                     </div>
@@ -334,15 +334,15 @@
                                         </div>
                                         <div class="col-sm-3">
                                             <img :ref="'GoogleShopPhoto'"
-                                                src="{{ $products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
-                                                style="max-width:100%;">
+                                                src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
+                                                style="max-width:40%;">
                                         </div>
 
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-8">
                                     <div class="form-group">
                                         <div class="col-sm-1">
                                             <label class="control-label">Item圖示<span
@@ -370,7 +370,7 @@
                                                         </td>
                                                         <td>
                                                             <div v-if="Item.photo_name">
-                                                                <img  :src="file_cdn + Item.photo_name" style="max-width:100%;">
+                                                                <img  :src="file_cdn + Item.photo_name" style="max-width:40%;">
                                                             </div>
                                                         </td>
                                                         {{-- <td>

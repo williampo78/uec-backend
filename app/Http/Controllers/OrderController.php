@@ -48,27 +48,19 @@ class OrderController extends Controller
             $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i');
 
             // 訂單狀態
-            if (isset(config('uec.order_status_code_options')[$order->status_code])) {
-                $order->status_code = config('uec.order_status_code_options')[$order->status_code];
-            }
+            $order->status_code = config('uec.order_status_code_options')[$order->status_code] ?? null;
 
             // 付款方式
-            if (isset(config('uec.payment_method_options')[$order->payment_method])) {
-                $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
-            }
+            $order->payment_method = config('uec.payment_method_options')[$order->payment_method] ?? null;
 
             // 物流方式
-            if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
-                $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
-            }
+            $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
 
             // 出貨單明細
             if (isset($order->shipments)) {
                 $order->shipments = $order->shipments->take(1)->map(function ($shipment) {
                     // 出貨單狀態
-                    if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
-                        $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
-                    }
+                    $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code] ?? null;
 
                     return $shipment->only([
                         'status_code',
@@ -176,25 +168,23 @@ class OrderController extends Controller
         $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i');
 
         // 訂單狀態
-        if (isset(config('uec.order_status_code_options')[$order->status_code])) {
-            $order->status_code = config('uec.order_status_code_options')[$order->status_code];
-        }
+        $order->status_code = config('uec.order_status_code_options')[$order->status_code] ?? null;
 
         // 付款方式
-        if (isset(config('uec.payment_method_options')[$order->payment_method])) {
-            $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
-        }
+        $order->payment_method = config('uec.payment_method_options')[$order->payment_method] ?? null;
 
         // 付款狀態
-        if (isset(config('uec.order_pay_status_options')[$order->pay_status])) {
-            $order->pay_status = config('uec.order_pay_status_options')[$order->pay_status];
-        }
+        $order->pay_status = config('uec.order_pay_status_options')[$order->pay_status] ?? null;
 
         // 免運門檻
         $order->shipping_free_threshold = number_format($order->shipping_free_threshold);
 
         // 收件地址
-        $order->receiver_address = $order->receiver_city . $order->receiver_district . $order->receiver_address;
+        $address = '';
+        $address .= $order->receiver_city ?? '';
+        $address .= $order->receiver_district ?? '';
+        $address .= $order->receiver_address ?? '';
+        $order->receiver_address = $address;
 
         // 商品總價
         $order->total_amount = number_format($order->total_amount);
@@ -212,19 +202,16 @@ class OrderController extends Controller
         $order->paid_amount = number_format($order->paid_amount);
 
         // 發票用途
-        if (isset(config('uec.invoice_usage_options')[$order->invoice_usage])) {
-            $order->invoice_usage = config('uec.invoice_usage_options')[$order->invoice_usage];
-        }
+        $order->invoice_usage = config('uec.invoice_usage_options')[$order->invoice_usage] ?? null;
 
         // 載具類型
-        if (isset(config('uec.carrier_type_options')[$order->carrier_type])) {
-            $order->carrier_type = config('uec.carrier_type_options')[$order->carrier_type];
-        }
+        $order->carrier_type = config('uec.carrier_type_options')[$order->carrier_type] ?? null;
 
         $lookup_values_v_service = new LookupValuesVService;
         // 發票捐贈機構
         if (isset($order->donated_institution)) {
-            $order->donated_institution_name = $lookup_values_v_service->getDonatedInstitutions([
+            $order->donated_institution_name = $lookup_values_v_service->getLookupValuesVs([
+                'type_code' => 'DONATED_INSTITUTION',
                 'code' => $order->donated_institution,
             ])->first()['description'];
         }
@@ -263,16 +250,12 @@ class OrderController extends Controller
         }
 
         // 物流方式
-        if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
-            $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
-        }
+        $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
 
         if (isset($order->shipments)) {
             $order->shipments = $order->shipments->take(1)->map(function ($shipment) {
                 // 出貨單狀態
-                if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
-                    $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
-                }
+                $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code] ?? null;
 
                 return $shipment->only([
                     'status_code',
@@ -299,9 +282,7 @@ class OrderController extends Controller
                 $order_detail->point_discount = number_format($order_detail->point_discount);
 
                 // 訂單明細身分
-                if (isset(config('uec.order_record_identity_options')[$order_detail->record_identity])) {
-                    $order_detail->record_identity = config('uec.order_record_identity_options')[$order_detail->record_identity];
-                }
+                $order_detail->record_identity = config('uec.order_record_identity_options')[$order_detail->record_identity] ?? null;
 
                 // 累計已銷退的活動折扣金額
                 $order_detail->returned_campaign_discount = number_format($order_detail->returned_campaign_discount);
@@ -346,9 +327,7 @@ class OrderController extends Controller
                 $invoice->type = isset($invoice->invoice_allowance_id) ? '發票折讓' : '發票開立';
 
                 // 課稅別
-                if (isset(config('uec.tax_type_options')[$invoice->tax_type])) {
-                    $invoice->tax_type = config('uec.tax_type_options')[$invoice->tax_type];
-                }
+                $invoice->tax_type = config('uec.tax_type_options')[$invoice->tax_type] ?? null;
 
                 // 金額
                 $invoice->amount = number_format($invoice->amount);
@@ -393,17 +372,13 @@ class OrderController extends Controller
                 $order_payment->created_at_format = Carbon::parse($order_payment->created_at)->format('Y-m-d H:i');
 
                 // 類型
-                if (isset(config('uec.payment_type_options')[$order_payment->payment_type])) {
-                    $order_payment->payment_type = config('uec.payment_type_options')[$order_payment->payment_type];
-                }
+                $order_payment->payment_type = config('uec.payment_type_options')[$order_payment->payment_type] ?? null;
 
                 // 金額
                 $order_payment->amount = number_format($order_payment->amount);
 
                 // 金流狀態
-                if (isset(config('uec.payment_status_options')[$order_payment->payment_status])) {
-                    $order_payment->payment_status = config('uec.payment_status_options')[$order_payment->payment_status];
-                }
+                $order_payment->payment_status = config('uec.payment_status_options')[$order_payment->payment_status] ?? null;
 
                 // 請款/退款API最近一次呼叫時間
                 if (isset($order_payment->latest_api_date)) {
@@ -425,14 +400,10 @@ class OrderController extends Controller
         if (isset($order->order_campaign_discounts)) {
             $order->order_campaign_discounts = $order->order_campaign_discounts->map(function ($order_campaign_discount) {
                 // 活動階層
-                if (isset(config('uec.campaign_level_code_options')[$order_campaign_discount->level_code])) {
-                    $order_campaign_discount->level_code = config('uec.campaign_level_code_options')[$order_campaign_discount->level_code];
-                }
+                $order_campaign_discount->level_code = config('uec.campaign_level_code_options')[$order_campaign_discount->level_code] ?? null;
 
                 // 身分
-                if (isset(config('uec.order_record_identity_options')[$order_campaign_discount->record_identity])) {
-                    $order_campaign_discount->record_identity = config('uec.order_record_identity_options')[$order_campaign_discount->record_identity];
-                }
+                $order_campaign_discount->record_identity = config('uec.order_record_identity_options')[$order_campaign_discount->record_identity] ?? null;
 
                 // 折扣金額
                 $order_campaign_discount->discount = number_format($order_campaign_discount->discount);

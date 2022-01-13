@@ -34,9 +34,7 @@ class OrdersExport implements FromArray, WithHeadings, WithEvents
             $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i');
 
             // 訂單狀態
-            if (isset(config('uec.order_status_code_options')[$order->status_code])) {
-                $order->status_code = config('uec.order_status_code_options')[$order->status_code];
-            }
+            $order->status_code = config('uec.order_status_code_options')[$order->status_code] ?? null;
 
             // 訂單成立當下是否免運
             $order->is_shipping_free = $order->is_shipping_free == 1 ? 'Y' : 'N';
@@ -75,14 +73,10 @@ class OrdersExport implements FromArray, WithHeadings, WithEvents
             }
 
             // 物流方式
-            if (isset(config('uec.lgst_method_options')[$order->lgst_method])) {
-                $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method];
-            }
+            $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
 
             // 付款方式
-            if (isset(config('uec.payment_method_options')[$order->payment_method])) {
-                $order->payment_method = config('uec.payment_method_options')[$order->payment_method];
-            }
+            $order->payment_method = config('uec.payment_method_options')[$order->payment_method] ?? null;
 
             // 發票開立時間
             if (isset($order->invoice_date)) {

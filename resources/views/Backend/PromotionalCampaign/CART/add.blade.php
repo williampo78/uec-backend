@@ -153,6 +153,20 @@
                     end_at: {
                         greaterThan: "結束時間必須大於開始時間",
                     },
+                    n_value: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
+                    x_value: {
+                        digits: "只可輸入正整數",
+                        min: function() {
+                            if ($('#campaign_type').val() == 'CART02') {
+                                return '只可輸入正整數';
+                            }
+
+                            return '請輸入不小於 0 的數值';
+                        },
+                    },
                 },
                 errorClass: "help-block",
                 errorElement: "span",
@@ -191,8 +205,8 @@
             renderPrdModalProductType(product_types);
             renderGiftModalProductType(product_types);
 
-            $('#prd-modal-product-type option[value="A"]').remove(); // 移除加購品
-            $('#prd-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
+            $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove(); // 移除贈品、加購品
+            $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
 
             $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
             $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
@@ -253,12 +267,12 @@
                     'selling_price_max': $('#prd-modal-selling-price-max').val(),
                     'start_created_at': $('#prd-modal-start-created-at').val(),
                     'end_created_at': $('#prd-modal-end-created-at').val(),
-                    'start_launched_at': $('#prd-modal-start-launched-at').val(),
-                    'end_launched_at': $('#prd-modal-end-launched-at').val(),
+                    'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
+                    'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
                     'product_type': $('#prd-modal-product-type').val(),
                     'limit': $('#prd-modal-limit').val(),
                     'exist_products': Object.keys(prd_product_list),
-                }
+                };
 
                 getProducts(query_datas).then(products => {
                     prd_modal_product_list = products;
@@ -321,12 +335,12 @@
                     'selling_price_max': $('#gift-modal-selling-price-max').val(),
                     'start_created_at': $('#gift-modal-start-created-at').val(),
                     'end_created_at': $('#gift-modal-end-created-at').val(),
-                    'start_launched_at': $('#gift-modal-start-launched-at').val(),
-                    'end_launched_at': $('#gift-modal-end-launched-at').val(),
+                    'start_launched_at_start': $('#gift-modal-start-launched-at-start').val(),
+                    'start_launched_at_end': $('#gift-modal-start-launched-at-end').val(),
                     'product_type': $('#gift-modal-product-type').val(),
                     'limit': $('#gift-modal-limit').val(),
                     'exist_products': Object.keys(gift_product_list),
-                }
+                };
 
                 getProducts(query_datas).then(products => {
                     gift_modal_product_list = products;

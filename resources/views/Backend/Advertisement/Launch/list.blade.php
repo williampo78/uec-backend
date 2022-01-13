@@ -4,11 +4,6 @@
 
 @section('style')
     <style>
-        .modal-body label,
-        .modal-body th {
-            color: blue;
-        }
-
         .fa.fa-check {
             color: green;
         }
@@ -35,54 +30,58 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕 -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="">
+                        <form id="search-form" class="form-horizontal" method="GET" action="">
                             <div class="row">
-                                <div class="col-sm-3">
-                                    <div class="col-sm-3 text-right">
-                                        <h5>版位</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2-slot-id" name="slot_id" id="slot_id">
-                                            <option></option>
-                                            @isset($ad_slots)
-                                                @foreach ($ad_slots as $obj)
-                                                    <option value='{{ $obj->id }}'
-                                                        {{ isset($query_data['slot_id']) && $obj->id == $query_data['slot_id'] ? 'selected' : '' }}>
-                                                        【{{ $obj->slot_code }}】{{ $obj->slot_desc }}</option>
-                                                @endforeach
-                                            @endisset
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-3">
-                                    <div class="col-sm-4 text-right">
-                                        <h5>上下架狀態</h5>
-                                    </div>
-                                    <div class="col-sm-8">
-                                        <select class="form-control js-select2-launch-status" name="launch_status"
-                                            id="launch_status">
-                                            <option value=''></option>
-                                            <option value='enabled'
-                                                {{ isset($query_data['launch_status']) && $query_data['launch_status'] == 'enabled' ? 'selected' : '' }}>
-                                                上架</option>
-                                            <option value='disabled'
-                                                {{ isset($query_data['launch_status']) && $query_data['launch_status'] == 'disabled' ? 'selected' : '' }}>
-                                                下架</option>
-                                        </select>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">版位</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-slot-id" name="slot_id" id="slot_id">
+                                                <option></option>
+                                                @isset($ad_slots)
+                                                    @foreach ($ad_slots as $obj)
+                                                        <option value='{{ $obj->id }}'
+                                                            {{ $obj->id == request()->input('slot_id') ? 'selected' : '' }}>
+                                                            【{{ $obj->slot_code }}】{{ $obj->slot_desc }}</option>
+                                                    @endforeach
+                                                @endisset
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="col-sm-6">
-                                    <div class="col-sm-3 text-right">
-                                        <h5>上架起日：</h5>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">上下架狀態</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-launch-status" name="launch_status"
+                                                id="launch_status">
+                                                <option value=''></option>
+                                                <option value='enabled'
+                                                    {{ 'enabled' == request()->input('launch_status') ? 'selected' : '' }}>
+                                                    上架</option>
+                                                <option value='disabled'
+                                                    {{ 'disabled' == request()->input('launch_status') ? 'selected' : '' }}>
+                                                    下架</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <label class="control-label">上架起日</label>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class='input-group date' id='datetimepicker_start_at'>
                                                 <input type='text' class="form-control datetimepicker-input"
                                                     data-target="#datetimepicker_start_at" name="start_at" id="start_at"
-                                                    value="{{ $query_data['start_at'] ?? '' }}" autocomplete="off" />
+                                                    value="{{ request()->input('start_at') }}" autocomplete="off" />
                                                 <span class="input-group-addon" data-target="#datetimepicker_start_at"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -90,15 +89,15 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-1">
-                                        <h5>～</h5>
+                                    <div class="col-sm-1 text-center">
+                                        <label class="control-label">～</label>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class='input-group date' id='datetimepicker_end_at'>
                                                 <input type='text' class="form-control datetimepicker-input"
                                                     data-target="#datetimepicker_end_at" name="end_at" id="end_at"
-                                                    value="{{ $query_data['end_at'] ?? '' }}" autocomplete="off" />
+                                                    value="{{ request()->input('end_at') }}" autocomplete="off" />
                                                 <span class="input-group-addon" data-target="#datetimepicker_end_at"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -110,10 +109,16 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-sm-12 text-right">
-                                    @if ($share_role_auth['auth_query'])
-                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
-                                    @endif
+                                <div class="col-sm-8"></div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-9 text-right">
+                                            @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -273,7 +278,7 @@
                         if (content.slot_icon_name_url) {
                             $('#modal-slot-icon-name').empty().append(
                                 `<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`
-                                );
+                            );
                         } else {
                             $('#modal-slot-icon-name').empty().append(
                                 `<i class="fa fa-times fa-lg"></i>`);
@@ -355,12 +360,16 @@
                             switch (value.image_action) {
                                 // URL
                                 case 'U':
-                                    link_content =
-                                        `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
+                                    if (value.link_content) {
+                                        link_content =
+                                            `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
+                                    }
                                     break;
                                     // 商品分類
                                 case 'C':
-                                    link_content = `商品分類: ${value.link_content}`;
+                                    if (value.link_content) {
+                                        link_content = `商品分類: ${value.link_content}`;
+                                    }
                                     break;
                             }
 

@@ -28,7 +28,6 @@ class PromotionalCampaignService
     public function getPromotionalCampaigns($query_data = [])
     {
         $agent_id = Auth::user()->agent_id;
-        $promotional_campaigns = null;
 
         $promotional_campaigns = PromotionalCampaigns::select(
             'promotional_campaigns.id',
@@ -52,12 +51,12 @@ class PromotionalCampaignService
             ->where('lookup_values_v.agent_id', $agent_id)
             ->where('lookup_values_v.type_code', 'CAMPAIGN_TYPE');
 
-        if (!empty($query_data['id'])) {
+        if (isset($query_data['id'])) {
             $promotional_campaigns = $promotional_campaigns->where('promotional_campaigns.id', $query_data['id']);
         }
 
         // 活動階層查詢 (PRD：單品、CART：滿額)
-        if (!empty($query_data['level_code'])) {
+        if (isset($query_data['level_code'])) {
             $promotional_campaigns = $promotional_campaigns->where('promotional_campaigns.level_code', $query_data['level_code']);
         }
 
@@ -67,7 +66,7 @@ class PromotionalCampaignService
         }
 
         // 狀態查詢
-        if (!empty($query_data['active'])) {
+        if (isset($query_data['active'])) {
             if ($query_data['active'] == 'enabled') {
                 $promotional_campaigns = $promotional_campaigns->where('promotional_campaigns.active', 1);
             } elseif ($query_data['active'] == 'disabled') {
@@ -76,24 +75,18 @@ class PromotionalCampaignService
         }
 
         // 行銷類型查詢
-        if (!empty($query_data['campaign_type'])) {
+        if (isset($query_data['campaign_type'])) {
             $promotional_campaigns = $promotional_campaigns->where('promotional_campaigns.campaign_type', $query_data['campaign_type']);
         }
 
-        try {
-            // 上架起始日查詢
-            if (!empty($query_data['start_at'])) {
-                $start_at = Carbon::parse($query_data['start_at'])->format('Y-m-d H:i:s');
-                $promotional_campaigns = $promotional_campaigns->where('promotional_campaigns.start_at', '>=', $start_at);
-            }
+        // 上架開始時間起始日
+        if (!empty($query_data['start_at_start'])) {
+            $promotional_campaigns = $promotional_campaigns->whereDate('promotional_campaigns.start_at', '>=', $query_data['start_at_start']);
+        }
 
-            // 上架結束日查詢
-            if (!empty($query_data['end_at'])) {
-                $end_at = Carbon::parse($query_data['end_at'])->format('Y-m-d H:i:s');
-                $promotional_campaigns = $promotional_campaigns->where('promotional_campaigns.end_at', '<=', $end_at);
-            }
-        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-            Log::warning($e->getMessage());
+        // 上架開始時間結束日
+        if (!empty($query_data['start_at_end'])) {
+            $promotional_campaigns = $promotional_campaigns->whereDate('promotional_campaigns.start_at', '<=', $query_data['start_at_end']);
         }
 
         $promotional_campaigns = $promotional_campaigns->orderBy("promotional_campaigns.start_at", "desc")
@@ -236,7 +229,10 @@ class PromotionalCampaignService
                 $create_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
             }
 
-            $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['code' => $create_data['campaign_type']]);
+            $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+                'type_code' => 'CAMPAIGN_TYPE',
+                'code' => $create_data['campaign_type'],
+            ]);
             $campaign_type = $campaign_types->first();
             $create_data['level_code'] = $campaign_type->udf_01;
             $create_data['category_code'] = $campaign_type->udf_03;

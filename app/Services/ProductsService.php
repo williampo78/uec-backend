@@ -29,10 +29,12 @@ class ProductsService
 
     public function getProducts($input_data = [])
     {
-        DB::enableQueryLog();
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
-        $products = Products::select('products.*', 'supplier.name AS supplier_name')
+        $products = Products::select(
+            'products.*',
+            'supplier.name AS supplier_name'
+        )
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
 
@@ -43,6 +45,7 @@ class ProductsService
                     ->on('web_category_products.product_id', '=', 'products.id');
             });
         }
+
         //庫存類型
         if (isset($input_data['stock_type'])) {
             $products->where('products.stock_type', '=', $input_data['stock_type']);
@@ -91,7 +94,7 @@ class ProductsService
         if (isset($input_data['product_type'])) {
             $products->where('products.product_type', $input_data['product_type']);
         }
-        // dd($now) ;
+
         //上架狀態
         if (isset($input_data['approval_status'])) {
             switch ($input_data['approval_status']) {
@@ -124,17 +127,16 @@ class ProductsService
             }
         }
 
-        //上架起始日
-        if (!empty($input_data['start_launched_at'])) {
-            // $start_launched_at = Carbon::parse()->startOfDay();
-            $products->whereDate('products.start_launched_at', '>=', $input_data['start_launched_at']);
+        //上架起開始時間
+        if (!empty($input_data['start_launched_at_start'])) {
+            $products->whereDate('products.start_launched_at', '>=', $input_data['start_launched_at_start']);
         }
-        //上架結束日
-        if (!empty($input_data['end_launched_at'])) {
-            // $input_data['end_launched_at'] = $input_data['end_launched_at'] . ' 23:59:59';
-            // $end_launched_at = Carbon::parse($input_data['end_launched_at'])->endOfDay();
-            $products->whereDate('products.start_launched_at', '<=', $input_data['start_launched_at']);
-        };
+
+        //上架起結束時間
+        if (!empty($input_data['start_launched_at_end'])) {
+            $products->whereDate('products.start_launched_at', '<=', $input_data['start_launched_at_end']);
+        }
+
         // 最低售價
         if (isset($input_data['selling_price_min'])) {
             $products->where('products.selling_price', '>=', $input_data['selling_price_min']);
@@ -145,21 +147,14 @@ class ProductsService
             $products->where('products.selling_price', '<=', $input_data['selling_price_max']);
         }
 
-        try {
-            // 建檔日起始日期
-            if (!empty($input_data['start_created_at'])) {
-                $start_created_at = Carbon::parse($input_data['start_created_at'])->format('Y-m-d H:i:s');
-                $products->where('products.created_at', '>=', $start_created_at);
-            }
+        // 建檔日起始日期
+        if (!empty($input_data['start_created_at'])) {
+            $products->whereDate('products.created_at', '>=', $input_data['start_created_at']);
+        }
 
-            // 建檔日結束日期
-            if (!empty($input_data['end_created_at'])) {
-                $input_data['end_created_at'] = $input_data['end_created_at'] . ' 23:59:59';
-                $end_created_at = Carbon::parse($input_data['end_created_at'])->format('Y-m-d H:i:s');
-                $products->where('products.created_at', '<=', $end_created_at);
-            }
-        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-            Log::warning($e->getMessage());
+        // 建檔日結束日期
+        if (!empty($input_data['end_created_at'])) {
+            $products->whereDate('products.created_at', '<=', $input_data['end_created_at']);
         }
 
         //限制筆數
@@ -167,8 +162,9 @@ class ProductsService
             $products->limit($input_data['limit']);
         }
 
-        $result = $products->get();
-        return $result;
+        $products = $products->get();
+
+        return $products;
     }
 
     public function addProducts($in, $file)
@@ -448,13 +444,19 @@ class ProductsService
         $result = $ProductItems->get();
         return $result;
     }
-    public function getItemsAndProduct()
+    public function getItemsAndProduct($in = [])
     {
         $agent_id = Auth::user()->agent_id;
         $ProductItems = ProductItems::
-            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom')
+            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom','brands.brand_name as brand_name' )
             ->where('product_items.agent_id', $agent_id)
-            ->leftJoin('products', 'products.id', '=', 'product_items.product_id');
+            ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
+            ->leftJoin('brands','brands.id' ,'=' ,'products.brand_id')
+            ;
+        if (isset($in['supplier_id']) && $in['supplier_id'] !== '') {
+            $ProductItems->where('products.supplier_id', $in['supplier_id']);
+        }
+
         $result = $ProductItems->get();
         return $result;
     }
@@ -783,12 +785,12 @@ class ProductsService
     public function checkPosItemNo($PosItemNo, $ItemNo)
     {
         if ($ItemNo !== '') { //編輯才會進來這裡檢查是否是自己的 pos_item_no
-            $updateCheck = ProductItems::where('pos_item_no', $PosItemNo)->where('item_no', $ItemNo); 
-            if($updateCheck->count() > 0 ){
-                return true ;
+            $updateCheck = ProductItems::where('pos_item_no', $PosItemNo)->where('item_no', $ItemNo);
+            if ($updateCheck->count() > 0) {
+                return true;
             }
         }
-        
+
         $ProductItems = ProductItems::where('pos_item_no', $PosItemNo);
         if ($ProductItems->count() > 0) { //已存在
             return false;
@@ -796,5 +798,35 @@ class ProductsService
             return true;
         }
 
+    }
+    /**
+     * 由products id 刪除 google_shop_photo_name
+     */
+    public function delGoogleShopPhoto($products_id)
+    {
+        $Products = Products::where('id', $products_id)->first();
+        ImageUpload::DelPhoto($Products->google_shop_photo_name);
+        $user_id = Auth::user()->id;
+        $Products->update([
+            'google_shop_photo_name' => '',
+            'updated_by' => $user_id,
+        ]);
+        return true;
+    }
+    /**
+     * 由products id 刪除 google_shop_photo_name
+     */
+    public function delItemPhotos($item_id)
+    {
+        $user_id = Auth::user()->id;
+
+        $Products = Products::where('id', $item_id)->first();
+
+        ProductItems::where('id', $item_id)->update([
+            'photo_name' => '',
+            'updated_by' => $user_id,
+        ]);
+
+        return true;
     }
 }

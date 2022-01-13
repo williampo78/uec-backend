@@ -222,6 +222,20 @@
                             }
                         },
                     },
+                    n_value: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
+                    x_value: {
+                        digits: "只可輸入正整數",
+                        min: function() {
+                            if (['PRD02', 'PRD04'].includes($('#campaign_type').val())) {
+                                return '只可輸入正整數';
+                            }
+
+                            return '請輸入不小於 0 的數值';
+                        },
+                    },
                 },
                 errorClass: "help-block",
                 errorElement: "span",
@@ -260,8 +274,8 @@
             renderPrdModalProductType(product_types);
             renderGiftModalProductType(product_types);
 
-            $('#prd-modal-product-type option[value="A"]').remove(); // 移除加購品
-            $('#prd-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
+            $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove(); // 移除贈品、加購品
+            $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
 
             $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
             $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
@@ -313,60 +327,30 @@
                     $('#prd-block').show();
                     $('#gift-block').hide();
                     $('#x_value').closest('.form-group').show().find('div:last').show();
-
-                    renderPrdModalProductType(product_types);
-                    // 移除贈品、加購品
-                    $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove();
-                    // 預設為一般品
-                    $('#prd-modal-product-type option[value="N"]').prop("selected", true);
                     break;
                     // ﹝單品﹞第N件(含)以上，折X元
                 case 'PRD02':
                     $('#prd-block').show();
                     $('#gift-block').hide();
                     $('#x_value').closest('.form-group').show().find('div:last').hide();
-
-                    renderPrdModalProductType(product_types);
-                    // 移除贈品、加購品
-                    $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove();
-                    // 預設為一般品
-                    $('#prd-modal-product-type option[value="N"]').prop("selected", true);
                     break;
                     // ﹝單品﹞滿N件，每件打X折
                 case 'PRD03':
                     $('#prd-block').show();
                     $('#gift-block').hide();
                     $('#x_value').closest('.form-group').show().find('div:last').show();
-
-                    renderPrdModalProductType(product_types);
-                    // 移除贈品、加購品
-                    $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove();
-                    // 預設為一般品
-                    $('#prd-modal-product-type option[value="N"]').prop("selected", true);
                     break;
                     // ﹝單品﹞滿N件，每件折X元
                 case 'PRD04':
                     $('#prd-block').show();
                     $('#gift-block').hide();
                     $('#x_value').closest('.form-group').show().find('div:last').hide();
-
-                    renderPrdModalProductType(product_types);
-                    // 移除贈品、加購品
-                    $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove();
-                    // 預設為一般品
-                    $('#prd-modal-product-type option[value="N"]').prop("selected", true);
                     break;
                     // ﹝單品﹞滿N件，送贈品
                 case 'PRD05':
                     $('#prd-block').show();
                     $('#gift-block').show();
                     $('#x_value').closest('.form-group').hide();
-
-                    renderPrdModalProductType(product_types);
-                    // 移除加購品
-                    $('#prd-modal-product-type option[value="A"]').remove();
-                    // 預設為贈品
-                    $('#prd-modal-product-type option[value="G"]').prop("selected", true);
                     break;
             }
 
@@ -423,12 +407,12 @@
                     'selling_price_max': $('#prd-modal-selling-price-max').val(),
                     'start_created_at': $('#prd-modal-start-created-at').val(),
                     'end_created_at': $('#prd-modal-end-created-at').val(),
-                    'start_launched_at': $('#prd-modal-start-launched-at').val(),
-                    'end_launched_at': $('#prd-modal-end-launched-at').val(),
+                    'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
+                    'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
                     'product_type': $('#prd-modal-product-type').val(),
                     'limit': $('#prd-modal-limit').val(),
                     'exist_products': Object.keys(prd_product_list),
-                }
+                };
 
                 getProducts(query_datas).then(products => {
                     prd_modal_product_list = products;
@@ -489,12 +473,12 @@
                     'selling_price_max': $('#gift-modal-selling-price-max').val(),
                     'start_created_at': $('#gift-modal-start-created-at').val(),
                     'end_created_at': $('#gift-modal-end-created-at').val(),
-                    'start_launched_at': $('#gift-modal-start-launched-at').val(),
-                    'end_launched_at': $('#gift-modal-end-launched-at').val(),
+                    'start_launched_at_start': $('#gift-modal-start-launched-at-start').val(),
+                    'start_launched_at_end': $('#gift-modal-start-launched-at-end').val(),
                     'product_type': $('#gift-modal-product-type').val(),
                     'limit': $('#gift-modal-limit').val(),
                     'exist_products': Object.keys(gift_product_list),
-                }
+                };
 
                 getProducts(query_datas).then(products => {
                     gift_modal_product_list = products;

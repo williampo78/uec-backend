@@ -52,12 +52,12 @@ function init() {
         showClear: true,
     });
 
-    $("#datetimepicker-prd-modal-start-launched-at").datetimepicker({
+    $("#datetimepicker-prd-modal-start-launched-at-start").datetimepicker({
         format: "YYYY-MM-DD",
         showClear: true,
     });
 
-    $("#datetimepicker-prd-modal-end-launched-at").datetimepicker({
+    $("#datetimepicker-prd-modal-start-launched-at-end").datetimepicker({
         format: "YYYY-MM-DD",
         showClear: true,
     });
@@ -72,12 +72,12 @@ function init() {
         showClear: true,
     });
 
-    $("#datetimepicker-gift-modal-start-launched-at").datetimepicker({
+    $("#datetimepicker-gift-modal-start-launched-at-start").datetimepicker({
         format: "YYYY-MM-DD",
         showClear: true,
     });
 
-    $("#datetimepicker-gift-modal-end-launched-at").datetimepicker({
+    $("#datetimepicker-gift-modal-start-launched-at-end").datetimepicker({
         format: "YYYY-MM-DD",
         showClear: true,
     });
@@ -323,22 +323,9 @@ function renderGiftModalProductList(products) {
     });
 }
 
-function getProducts(query_datas) {
+function getProducts(datas) {
     return axios
-        .post("/backend/promotional_campaign/ajax/products", {
-            supplier_id: query_datas.supplier_id,
-            product_no: query_datas.product_no,
-            product_name: query_datas.product_name,
-            selling_price_min: query_datas.selling_price_min,
-            selling_price_max: query_datas.selling_price_max,
-            start_created_at: query_datas.start_created_at,
-            end_created_at: query_datas.end_created_at,
-            start_launched_at: query_datas.start_launched_at,
-            end_launched_at: query_datas.end_launched_at,
-            product_type: query_datas.product_type,
-            limit: query_datas.limit,
-            exist_products: query_datas.exist_products,
-        })
+        .post("/backend/promotional_campaign/ajax/products", datas)
         .then(function (response) {
             return response.data;
         })

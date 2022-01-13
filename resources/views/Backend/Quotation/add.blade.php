@@ -16,22 +16,24 @@
 
                         @csrf
                         <div class="row">
-
                             <!-- 欄位 -->
                             <div class="col-sm-12">
-
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group" id="supplier">
                                             <label for="supplier">供應商<span class="redtext">*</span></label>
                                             <select class="form-control js-select2-department" name="supplier_id"
                                                 id="supplier_id">
+                                                @if(!isset($quotation['supplier_id']))
+                                                <option disabled selected> </option>
+                                                @endif
                                                 @foreach ($supplier as $v)
                                                     <option value='{{ $v['id'] }}'
-                                                        {{ isset($quotation['trade_date']) && $quotation['trade_date'] == $v['id'] ? 'selected' : '' }}>
+                                                        {{ isset($quotation['supplier_id']) && $quotation['supplier_id'] == $v['id'] ? 'selected' : '' }}>
                                                         {{ $v['name'] }}</option>
                                                 @endforeach
                                             </select>
+                                            <input style="display: none;" type="text" name="old_supplier_id" id="old_supplier_id"  value="{{ $quotation['supplier_id'] ?? '' }}">
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
@@ -90,16 +92,16 @@
                                             <div class="col-sm-6">
                                                 <label>
                                                     <input type="radio" name="is_tax_included" value="1"
-                                                        {{ isset($quotation['is_tax_included']) && $quotation['tax'] == '1' ? 'checked' : '' }}>
-                                                    未稅
+                                                        {{ isset($quotation['is_tax_included']) && $quotation['is_tax_included'] == '1' ? 'checked' : '' }}>
+                                                    含稅
                                                 </label>
                                             </div>
                                             <div class="col-sm-6">
 
                                                 <label>
                                                     <input type="radio" name="is_tax_included" value="0"
-                                                        {{ isset($quotation['is_tax_included']) && $quotation['tax'] == '0' ? 'checked' : '' }}>
-                                                    含稅
+                                                        {{ isset($quotation['is_tax_included']) && $quotation['is_tax_included'] == '0' ? 'checked' : '' }}>
+                                                    未稅
                                                 </label>
                                             </div>
 
@@ -170,9 +172,21 @@
             $('#btn-addNewRow').click(function() {
                 AddItemRow("process", "input");
             });
-
             $('#supplier_id').select2();
             $('#tax').select2();
+            $('#supplier_id').on('change', function() {
+                var this_supplier_id = $(this).find(":selected").val() ; 
+                if($('.js-select2-item').length > 0){       
+                    if($('#old_supplier_id').val() !== ''){
+                        if($('#old_supplier_id').val() !== $(this).find(":selected").val()){
+                            alert('請先將品項刪除在切換供應商')
+                            $("#supplier_id").val($('#old_supplier_id').val()).trigger('change');
+                        }
+                    }
+                }else{
+                    $('#old_supplier_id').val(this_supplier_id);
+                }
+            });
 
             var quotation_id = '{{ $id ?? '' }}';
             if (quotation_id != '') {
@@ -187,15 +201,19 @@
                     form.submit();
                 },
                 rules: {
-                    submitted_at: {
+                    trade_date: {
                         required: true
                     },
                     is_tax_included: {
                         required: $('#tax').val() !== 0
-                    }
+                    },
+                    supplier_id: {
+                        required: true
+                    },
                 },
                 messages: {
-                    submitted_at: "請輸入報價日期",
+                    trade_date: "請輸入報價日期",
+                    supplier_id: "請選取供應商"
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -220,61 +238,96 @@
             });
 
             function AddItemRow(get_type, position) {
+                $("#btn-addNewRow").prop('disabled', true);
+                var supplier_id = $('#supplier_id').val();
+                if (supplier_id == '') {
+                    alert('請先選擇供應商才能新增品項');
+                    $("#btn-addNewRow").prop('disabled', false);
+                    return false;
+                }
                 var curRow = parseInt($('#rowNo').val());
                 var newRow = curRow + 1;
-                $(" <div class='add_row product_item_count' id='div-addrow-" + position + newRow + "'>" +
-                    "<div class='row'>" +
-                    "<input class='form-control' name='itemname[]' id='" + position + "itemname-" + newRow +
-                    "' type='hidden'>" +
-                    "<div class='col-sm-6' >" +
-                    "<div class='input-group'>" +
-                    "<select class='form-control js-select2-item product_item_va' name='item[" + newRow +
-                    "]' id='" + position + "item-" + newRow + "' data-key='" + newRow + "'>" +
-                    "<option value=''></option>" +
-                    "</select>" +
-                    "<span class='input-group-btn'>" +
-                    "<button class='btn copy_btn' type='button' data-key='" + newRow +
-                    "'><i class='fa fa-copy'></i></button>" +
-                    "</span>" +
-                    "</div>" +
-                    "</div>" +
-                    "<div class='col-sm-2' >" +
-                    "<input class='form-control qty price_va' name='price[" + newRow + "]' id='" + position +
-                    "price-" + newRow + "'  type='number' min='0'>" +
-                    "</div>" +
-                    "<div class='col-sm-3' >" +
-                    "<input class='form-control' name='minimum_purchase_qty[" + newRow + "]' id='" + position +
-                    "minimum_purchase_qty-" + newRow + "' readonly >" +
-                    "</div>" +
-                    "<div class='col-sm-1'>" +
-                    "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
-                    "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
-                    "</div>" +
-                    "</div>" +
-                    "</div>"
-                ).appendTo($('#ItemDiv'));
-                $(".js-select2-item").select2({
-                    allowClear: true,
-                    theme: "bootstrap",
-                    placeholder: "請選擇品項"
-                });
 
-                $('button[id^=btn-delete-]').click(function() {
-                    $("#div-addrow-" + position + $(this).val()).remove();
-                    return false;
-                });
-                let product = @json($products_item);
-                $.each(product, function(key, value) {
-                    let text_value = value.item_no + "-" + value.brands_name + "-" + value.product_name +
-                        "-" + value.spec_1_value + "-" + value.spec_2_value;
-                    $("#" + position + "item-" + newRow).append($("<option></option>").attr("value", value
-                        .id).text(text_value));
-                });
-                $('#rowNo').val(newRow);
+                // let product = @json($products_item);
+                $.ajax({
+                        url: "/backend/quotation/ajax",
+                        type: "POST",
+                        data: {
+                            "get_type": "supplierGetProducts",
+                            "supplier_id": $('#supplier_id').val(),
+                            _token: '{{ csrf_token() }}'
+                        },
+                        enctype: 'multipart/form-data',
+                    })
+                    .done(function(data) {
+                        $(" <div class='add_row product_item_count' id='div-addrow-" + position + newRow +
+                            "'>" +
+                            "<div class='row'>" +
+                            "<input class='form-control' name='itemname[]' id='" + position + "itemname-" +
+                            newRow +
+                            "' type='hidden'>" +
+                            "<div class='col-sm-6' >" +
+                            "<div class='input-group'>" +
+                            "<select class='form-control js-select2-item product_item_va' name='item[" +
+                            newRow +
+                            "]' id='" + position + "item-" + newRow + "' data-key='" + newRow + "'>" +
+                            "<option value=''></option>" +
+                            "</select>" +
+                            "<span class='input-group-btn'>" +
+                            "<button class='btn copy_btn' type='button' data-key='" + newRow +
+                            "'><i class='fa fa-copy'></i></button>" +
+                            "</span>" +
+                            "</div>" +
+                            "</div>" +
+                            "<div class='col-sm-2' >" +
+                            "<input class='form-control qty price_va' name='price[" + newRow + "]' id='" +
+                            position +
+                            "price-" + newRow + "'  type='number' min='0'>" +
+                            "</div>" +
+                            "<div class='col-sm-3' >" +
+                            "<input class='form-control' name='minimum_purchase_qty[" + newRow + "]' id='" +
+                            position +
+                            "minimum_purchase_qty-" + newRow + "' readonly >" +
+                            "</div>" +
+                            "<div class='col-sm-1'>" +
+                            "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
+                            "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>"
+                        ).appendTo($('#ItemDiv'));
+                        $(".js-select2-item").select2({
+                            allowClear: true,
+                            theme: "bootstrap",
+                            placeholder: "請選擇品項"
+                        });
+
+                        $('button[id^=btn-delete-]').click(function() {
+                            $("#div-addrow-" + position + $(this).val()).remove();
+                            return false;
+                        });
+                        $.each(data.products, function(key, value) {
+                            let text_value = value.item_no + "-" + value.brand_name + "-" + value
+                                .product_name;
+                            if (value.spec_1_value !== '') {
+                                text_value += "-" + value.spec_1_value;
+                            }
+                            if (value.spec_2_value !== '') {
+                                text_value += "-" + value.spec_2_value;
+                            }
+                            $("#" + position + "item-" + newRow).append($("<option></option>").attr(
+                                "value", value
+                                .id).text(text_value));
+                        });
+                        $('#rowNo').val(newRow);
+                        $("#btn-addNewRow").prop('disabled', false);
+                    });
+
+
             }
 
 
-
+            //update才會執行該function
             function getItem(quotation_id) {
                 var curRow = parseInt($('#rowNo').val());
                 var position = 'input';
@@ -289,10 +342,16 @@
                         if (itemVal.id == value.product_items_id) {
                             selected = 'selected';
                         }
-                        itemOption += "<option value=" + itemVal.id + " " + selected + ">" + value
-                            .product_items_no + "-" + itemVal.brands_name + "-" + itemVal
-                            .product_name + "-" + itemVal.spec_1_value + "-" + itemVal
-                            .spec_2_value + "</option>";
+                        itemOption += "<option value=" + itemVal.id + " " + selected + ">" + value.product_items_no + "-" + itemVal.brand_name + "-" + itemVal.product_name ;
+                        if(itemVal.spec_1_value !== ''){
+                            itemOption += "-" +  itemVal.spec_1_value ;
+                        }
+                        if(itemVal.spec_2_value !== ''){
+                            itemOption += "-" +  itemVal.spec_2_value ;
+                        }
+
+                        itemOption += "</option>" ;
+
                         let text_value = value.item_no + "-" + value.brands_name + "-" + value
                             .product_name + "-" + value.spec_1_value + "-" + value.spec_2_value;
                     });

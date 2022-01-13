@@ -49,7 +49,6 @@ class APIIndexServices
         $prd_H080B = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
         $login = Auth::guard('api')->check();
-        $collection = false;
         $is_collection = [];
         if ($login) {
             $member_id = Auth::guard('api')->user()->member_id;
@@ -59,20 +58,13 @@ class APIIndexServices
             }
         }
         foreach ($ads as $ad_slot) {
-            if (isset($is_collection)) {
-                foreach ($is_collection as $k => $v) {
-                    if ($v['product_id'] == $ad_slot->product_id) {
-                        $collection = true;
-                    } else {
-                        $collection = false;
-                    }
-                }
-            }
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
                     'name' => $ad_slot->texts,
                     'url' => $ad_slot->target_url,
                     'target_blank' => $ad_slot->is_target_blank,
+                    'target_campaign' => $ad_slot->target_campaign_id,
+                    'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
@@ -121,6 +113,14 @@ class APIIndexServices
                                     $promotional[] = $Label->promotional_label;
                                 }
                             }
+                            if (isset($is_collection)) {
+                                $collection = false;
+                                foreach ($is_collection as $k => $v) {
+                                    if ($v['product_id'] == $product->id) {
+                                        $collection = true;
+                                    }
+                                }
+                            }
                             $product_info[] = array(
                                 'product_id' => $product->id,
                                 'product_no' => $product->product_no,
@@ -145,6 +145,28 @@ class APIIndexServices
                         );
                     }
                 } else if ($ad_slot->product_assigned_type == 'P') {
+
+                    $promotional = [];
+                    if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
+                        $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
+                    } else {
+                        $promotion_desc = null;
+                    }
+
+                    if (isset($promotion[$ad_slot->product_id])) {
+                        foreach ($promotion[$ad_slot->product_id] as $k => $Label) { //取活動標籤
+                            $promotional[] = $Label->promotional_label;
+                        }
+                    }
+                    if (isset($is_collection)) {
+                        $collection = false;
+                        foreach ($is_collection as $k => $v) {
+                            if ($v['product_id'] == $ad_slot->product_id) {
+                                $collection = true;
+                            }
+                        }
+                    }
+
                     $product_info[$ad_slot->slot_code][] = array(
                         'product_id' => $ad_slot->product_id,
                         'product_no' => $products[$ad_slot->product_id]->product_no,
@@ -217,6 +239,14 @@ class APIIndexServices
                     if (isset($promotion[$ad_slot->product_id])) {
                         foreach ($promotion[$ad_slot->product_id] as $k => $Label) { //取活動標籤
                             $promotional[] = $Label->promotional_label;
+                        }
+                    }
+                    if (isset($is_collection)) {
+                        $collection = false;
+                        foreach ($is_collection as $k => $v) {
+                            if ($v['product_id'] == $ad_slot->product_id) {
+                                $collection = true;
+                            }
                         }
                     }
                     if ($ad_slot->slot_code == 'H080A') {

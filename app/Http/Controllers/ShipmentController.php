@@ -43,25 +43,25 @@ class ShipmentController extends Controller
             $shipment->created_at_format = Carbon::parse($shipment->created_at)->format('Y-m-d H:i');
 
             // 物流方式
-            if (isset(config('uec.lgst_method_options')[$shipment->lgst_method])) {
-                $shipment->lgst_method = config('uec.lgst_method_options')[$shipment->lgst_method];
-            }
+            $shipment->lgst_method = config('uec.lgst_method_options')[$shipment->lgst_method] ?? null;
 
             // 出貨單狀態
-            if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
-                $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
-            }
+            $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code] ?? null;
 
             // 出貨時間
-            $shipment->shipped_at = Carbon::parse($shipment->shipped_at)->format('Y-m-d H:i');
-
-            // 物流廠商
-            if (isset(config('uec.lgst_company_code_options')[$shipment->lgst_company_code])) {
-                $shipment->lgst_company_code = config('uec.lgst_company_code_options')[$shipment->lgst_company_code];
+            if (isset($shipment->shipped_at)) {
+                $shipment->shipped_at = Carbon::parse($shipment->shipped_at)->format('Y-m-d H:i');
             }
 
+            // 物流廠商
+            $shipment->lgst_company_code = config('uec.lgst_company_code_options')[$shipment->lgst_company_code] ?? null;
+
             // 收件地址
-            $shipment->ship_to_address = $shipment->ship_to_city . $shipment->ship_to_district . $shipment->ship_to_address;
+            $address = '';
+            $address .= $shipment->ship_to_city ?? '';
+            $address .= $shipment->ship_to_district ?? '';
+            $address .= $shipment->ship_to_address ?? '';
+            $shipment->ship_to_address = $address;
 
             return $shipment->only([
                 'shipments_id',
@@ -165,20 +165,22 @@ class ShipmentController extends Controller
         $shipment->created_at_format = Carbon::parse($shipment->created_at)->format('Y-m-d H:i');
 
         // 出貨單狀態
-        if (isset(config('uec.shipment_status_code_options')[$shipment->status_code])) {
-            $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code];
-        }
+        $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code] ?? null;
 
         // 物流廠商
-        if (isset(config('uec.lgst_company_code_options')[$shipment->lgst_company_code])) {
-            $shipment->lgst_company_code = config('uec.lgst_company_code_options')[$shipment->lgst_company_code];
-        }
+        $shipment->lgst_company_code = config('uec.lgst_company_code_options')[$shipment->lgst_company_code] ?? null;
 
         // 收件地址
-        $shipment->ship_to_address = $shipment->ship_to_city . $shipment->ship_to_district . $shipment->ship_to_address;
+        $address = '';
+        $address .= $shipment->ship_to_city ?? '';
+        $address .= $shipment->ship_to_district ?? '';
+        $address .= $shipment->ship_to_address ?? '';
+        $shipment->ship_to_address = $address;
 
         // EDI轉出時間
-        $shipment->edi_exported_at = Carbon::parse($shipment->edi_exported_at)->format('Y-m-d H:i');
+        if (isset($shipment->edi_exported_at)) {
+            $shipment->edi_exported_at = Carbon::parse($shipment->edi_exported_at)->format('Y-m-d H:i');
+        }
 
         // 出貨時間
         if (isset($shipment->shipped_at)) {
@@ -219,9 +221,7 @@ class ShipmentController extends Controller
         }
 
         // 物流方式
-        if (isset(config('uec.lgst_method_options')[$shipment->lgst_method])) {
-            $shipment->lgst_method = config('uec.lgst_method_options')[$shipment->lgst_method];
-        }
+        $shipment->lgst_method = config('uec.lgst_method_options')[$shipment->lgst_method] ?? null;
 
         // 出貨單明細
         if (isset($shipment->shipment_details)) {

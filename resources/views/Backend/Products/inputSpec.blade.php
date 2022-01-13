@@ -139,7 +139,7 @@
             </div>
         </div>
     </div>
-    <textarea style="display: none" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
+    <textarea style="display: none" name="SkuListdata" id="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
     <table id="sku_table" class="table table-striped table-bordered table-hover">
         <thead>
             <tr>

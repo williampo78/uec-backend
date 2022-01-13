@@ -42,7 +42,7 @@
             <ul>
                 <a href="#page-1">
                     <li class="sysinfo-li sysinfo-activie" id="click-page-1">
-                        前台資料
+                        基本資料
                     </li>
                 </a>
                 <a href="#page-2">
@@ -1123,7 +1123,7 @@
             $("#new-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    var item_num = Object.keys(JSON.parse($('#SkuListdata').val())).length;
+                    var item_num = JSON.parse($('#SkuListdata').val()).length;
                     if(item_num <= 0) {
                         alert('至少輸入一個品項')
                         return false ;

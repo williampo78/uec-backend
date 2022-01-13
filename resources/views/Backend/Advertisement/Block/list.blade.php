@@ -4,10 +4,6 @@
 
 @section('style')
     <style>
-        .modal-body label,
-        .modal-body th {
-            color: blue;
-        }
 
         .fa.fa-check {
             color: green;
@@ -35,64 +31,73 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕 -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="">
+                        <form id="search-form" class="form-horizontal" method="GET" action="">
                             <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <h5>適用頁面</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2-applicable-page" name="applicable_page"
-                                            id="applicable_page">
-                                            <option></option>
-                                            @foreach ($applicable_pages as $obj)
-                                                <option value='{{ $obj->code }}'
-                                                    {{ isset($query_data['applicable_page']) && $obj->code == $query_data['applicable_page'] ? 'selected' : '' }}>
-                                                    {{ $obj->description }}</option>
-                                            @endforeach
-                                        </select>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">適用頁面</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-applicable-page" name="applicable_page"
+                                                id="applicable_page">
+                                                <option></option>
+                                                @foreach ($applicable_pages as $obj)
+                                                    <option value='{{ $obj->code }}'
+                                                        {{ $obj->code == request()->input('applicable_page') ? 'selected' : '' }}>
+                                                        {{ $obj->description }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-3">
-                                    <div class="col-sm-3">
-                                        <h5>適用設備</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2-device" name="device" id="device">
-                                            <option value=''></option>
-                                            <option value='desktop'
-                                                {{ isset($query_data['device']) && $query_data['device'] == 'desktop' ? 'selected' : '' }}>
-                                                Desktop</option>
-                                            <option value='mobile'
-                                                {{ isset($query_data['device']) && $query_data['device'] == 'mobile' ? 'selected' : '' }}>
-                                                Mobile</option>
-                                        </select>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">適用設備</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-device" name="device" id="device">
+                                                <option value=''></option>
+                                                <option value='desktop'
+                                                    {{ 'desktop' == request()->input('device') ? 'selected' : '' }}>
+                                                    Desktop</option>
+                                                <option value='mobile'
+                                                    {{ 'mobile' == request()->input('device') ? 'selected' : '' }}>
+                                                    Mobile</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-3">
-                                    <div class="col-sm-3">
-                                        <h5>狀態</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control js-select2-active" name="active" id="active">
-                                            <option value=''></option>
-                                            <option value='enabled'
-                                                {{ isset($query_data['active']) && $query_data['active'] == 'enabled' ? 'selected' : '' }}>
-                                                啟用</option>
-                                            <option value='disabled'
-                                                {{ isset($query_data['active']) && $query_data['active'] == 'disabled' ? 'selected' : '' }}>
-                                                關閉</option>
-                                        </select>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">狀態</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-active" name="active" id="active">
+                                                <option value=''></option>
+                                                <option value='enabled'
+                                                    {{ 'enabled' == request()->input('active') ? 'selected' : '' }}>
+                                                    啟用</option>
+                                                <option value='disabled'
+                                                    {{ 'disabled' == request()->input('active') ? 'selected' : '' }}>
+                                                    關閉</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="col-sm-2 text-right">
-                                    <div class="col-sm-12">
-                                        @if ($share_role_auth['auth_query'])
-                                            <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
-                                        @endif
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-9 text-right">
+                                            @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
