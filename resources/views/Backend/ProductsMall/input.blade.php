@@ -347,7 +347,7 @@
                                         <div class="col-sm-3">
                                             <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
                                                 src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
-                                                style="max-width:100%;">
+                                                style="max-width:40%;">
                                         </div>
                                         <button v-if="products.google_shop_photo_name" type="button" class="btn btn-large btn-danger btn-sm"
                                             @click="DelGoogleShop()">刪除</button>
@@ -362,7 +362,7 @@
                                                     class="redtext">*</span></label>
                                             {{-- product_items --}}
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-8">
                                             <table class="table table-striped table-bordered table-hover">
                                                 <thead>
                                                     <tr>
@@ -383,7 +383,7 @@
                                                         <td>
                                                             <div v-if="Item.photo_name">
                                                                 <img :src="file_cdn + Item.photo_name"
-                                                                    style="max-width:100%;">
+                                                                    style="max-width:40%;">
                                                             </div>
                                                         </td>
                                                         <td>
