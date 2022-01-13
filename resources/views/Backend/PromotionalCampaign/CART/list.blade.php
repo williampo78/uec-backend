@@ -2,16 +2,6 @@
 
 @section('title', '滿額活動管理')
 
-@section('style')
-    <style>
-        .modal-body label,
-        .modal-body th {
-            color: blue;
-        }
-
-    </style>
-@endsection
-
 @section('content')
     <!--新增-->
     <div id="page-wrapper">
