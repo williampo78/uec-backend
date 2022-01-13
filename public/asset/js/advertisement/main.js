@@ -40,9 +40,25 @@ function init(datas = {}) {
         showClear: true,
     });
 
+    $("#datetimepicker_start_at").on("dp.change", function (e) {
+        if (e.oldDate === null) {
+            $(this)
+                .data("DateTimePicker")
+                .date(new Date(e.date._d.setHours(00, 00, 00)));
+        }
+    });
+
     $('#datetimepicker_end_at').datetimepicker({
         format: 'YYYY-MM-DD HH:mm',
         showClear: true,
+    });
+
+    $("#datetimepicker_end_at").on("dp.change", function (e) {
+        if (e.oldDate === null) {
+            $(this)
+                .data("DateTimePicker")
+                .date(new Date(e.date._d.setHours(23, 59, 59)));
+        }
     });
 
     $('.colorpicker').colorpicker({
