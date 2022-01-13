@@ -63,6 +63,8 @@ class APIIndexServices
                     'name' => $ad_slot->texts,
                     'url' => $ad_slot->target_url,
                     'target_blank' => $ad_slot->is_target_blank,
+                    'target_campaign' => $ad_slot->target_campaign_id,
+                    'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
