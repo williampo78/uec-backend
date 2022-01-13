@@ -154,6 +154,20 @@
                     end_at: {
                         greaterThan: "結束時間必須大於開始時間",
                     },
+                    n_value: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
+                    x_value: {
+                        digits: "只可輸入正整數",
+                        min: function() {
+                            if ($('#campaign_type').val() == 'CART02') {
+                                return '只可輸入正整數';
+                            }
+
+                            return '請輸入不小於 0 的數值';
+                        },
+                    },
                 },
                 errorClass: "help-block",
                 errorElement: "span",
