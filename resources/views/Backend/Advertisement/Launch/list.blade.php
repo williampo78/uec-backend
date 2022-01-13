@@ -4,10 +4,6 @@
 
 @section('style')
     <style>
-        .modal-body label,
-        .modal-body th {
-            color: blue;
-        }
 
         .fa.fa-check {
             color: green;
