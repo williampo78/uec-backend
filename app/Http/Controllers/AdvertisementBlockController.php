@@ -31,12 +31,11 @@ class AdvertisementBlockController extends Controller
         $query_datas = $request->only(['applicable_page', 'device', 'active']);
 
         $ad_slots = $this->advertisement_service->getSlots($query_datas);
-        $applicable_pages = $this->lookup_values_v_service->getApplicablePages();
+        $applicable_pages = $this->lookup_values_v_service->getLookupValuesVs([
+            'type_code' => 'APPLICABLE_PAGE',
+        ]);
 
-        return view(
-            'Backend.Advertisement.Block.list',
-            compact('ad_slots', 'applicable_pages')
-        );
+        return view('Backend.Advertisement.Block.list', compact('ad_slots', 'applicable_pages'));
     }
 
     /**

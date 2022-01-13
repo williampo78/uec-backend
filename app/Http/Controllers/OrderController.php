@@ -210,7 +210,8 @@ class OrderController extends Controller
         $lookup_values_v_service = new LookupValuesVService;
         // 發票捐贈機構
         if (isset($order->donated_institution)) {
-            $order->donated_institution_name = $lookup_values_v_service->getDonatedInstitutions([
+            $order->donated_institution_name = $lookup_values_v_service->getLookupValuesVs([
+                'type_code' => 'DONATED_INSTITUTION',
                 'code' => $order->donated_institution,
             ])->first()['description'];
         }
