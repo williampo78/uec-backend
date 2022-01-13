@@ -82,7 +82,7 @@ class QuotationController extends Controller
         $result['act'] = 'add';
         
         if ($result['status']) {
-            return view('Backend.success', compact('route_name', 'act'));
+            return view('Backend.success', $result);
         } else {
             return view('Backend.error', $result);
         };

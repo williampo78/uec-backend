@@ -94,7 +94,7 @@ class QuotationService
 
         $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION');
         if (!$hierarchy) {
-            $result['message'] = 'approval_hierarchy table 沒有該使用者';
+            $result['message'] = '您未被設定於單據簽核流程中，請聯繫系統管理員';
             $result['status']  = false ; 
             return $result ;
         }
