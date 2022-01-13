@@ -46,8 +46,8 @@ class PromotionalCampaignPrdController extends Controller
             'campaign_name',
             'active',
             'campaign_type',
-            'start_at',
-            'end_at',
+            'start_at_start',
+            'start_at_end',
             'product_no',
         ]);
 

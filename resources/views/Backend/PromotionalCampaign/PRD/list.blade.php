@@ -27,12 +27,12 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕 -->
                     <div class="panel-heading">
-                        <form id="search-form" method="GET" action="">
+                        <form id="search-form" class="form-horizontal" method="GET" action="">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="row">
-                                        <div class="col-sm-3 text-right">
-                                            <h5>活動名稱</h5>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">活動名稱</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="campaign_name" id="campaign_name"
@@ -42,9 +42,9 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="row">
-                                        <div class="col-sm-3 text-right">
-                                            <h5>狀態</h5>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">狀態</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control js-select2-active" name="active" id="active">
@@ -61,9 +61,9 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="row">
-                                        <div class="col-sm-3 text-right">
-                                            <h5>活動類型</h5>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">活動類型</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control js-select2-campaign-type" name="campaign_type"
@@ -81,46 +81,49 @@
                                     </div>
                                 </div>
                             </div>
-                            <br />
 
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="row">
-                                        <div class="col-sm-3 text-right">
-                                            <h5>上架時間起</h5>
+                                        <div class="col-sm-3">
+                                            <label class="control-label">上架時間起</label>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class='input-group date' id='datetimepicker_start_at'>
-                                                <input type='text' class="form-control datetimepicker-input"
-                                                    data-target="#datetimepicker_start_at" name="start_at" id="start_at"
-                                                    value="{{ request()->input('start_at') }}" autocomplete="off" />
-                                                <span class="input-group-addon" data-target="#datetimepicker_start_at"
-                                                    data-toggle="datetimepicker">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                            <div class="form-group">
+                                                <div class='input-group date' id='datetimepicker_start_at_start'>
+                                                    <input type='text' class="form-control datetimepicker-input"
+                                                        data-target="#datetimepicker_start_at_start" name="start_at_start" id="start_at_start"
+                                                        value="{{ request()->input('start_at_start') }}" autocomplete="off" />
+                                                    <span class="input-group-addon" data-target="#datetimepicker_start_at_start"
+                                                        data-toggle="datetimepicker">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-sm-1">
-                                            <h5>～</h5>
+                                        <div class="col-sm-1 text-center">
+                                            <label class="control-label">～</label>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class='input-group date' id='datetimepicker_end_at'>
-                                                <input type='text' class="form-control datetimepicker-input"
-                                                    data-target="#datetimepicker_end_at" name="end_at" id="end_at"
-                                                    value="{{ request()->input('end_at') }}" autocomplete="off" />
-                                                <span class="input-group-addon" data-target="#datetimepicker_end_at"
-                                                    data-toggle="datetimepicker">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                            <div class="form-group">
+                                                <div class='input-group date' id='datetimepicker_start_at_end'>
+                                                    <input type='text' class="form-control datetimepicker-input"
+                                                        data-target="#datetimepicker_start_at_end" name="start_at_end" id="start_at_end"
+                                                        value="{{ request()->input('start_at_end') }}" autocomplete="off" />
+                                                    <span class="input-group-addon" data-target="#datetimepicker_start_at_end"
+                                                        data-toggle="datetimepicker">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="row">
-                                        <div class="col-sm-3 text-right">
-                                            <h5>商品序號</h5>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">商品序號</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no" id="product_no"
@@ -128,13 +131,16 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="row">
-                                <div class="col-sm-12 text-right">
-                                    @if ($share_role_auth['auth_query'])
-                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
-                                    @endif
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-9 text-right">
+                                            @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -236,25 +242,25 @@
                 placeholder: '',
             });
 
-            $('#datetimepicker_start_at').datetimepicker({
+            $('#datetimepicker_start_at_start').datetimepicker({
                 format: 'YYYY-MM-DD',
                 showClear: true,
             });
 
-            $('#datetimepicker_end_at').datetimepicker({
+            $('#datetimepicker_start_at_end').datetimepicker({
                 format: 'YYYY-MM-DD',
                 showClear: true,
             });
 
-            $("#datetimepicker_start_at").on("dp.change", function(e) {
-                if ($('#end_at').val()) {
-                    $('#datetimepicker_end_at').datetimepicker('minDate', e.date);
+            $("#datetimepicker_start_at_start").on("dp.change", function(e) {
+                if ($('#start_at_end').val()) {
+                    $('#datetimepicker_start_at_end').datetimepicker('minDate', e.date);
                 }
             });
 
-            $("#datetimepicker_end_at").on("dp.change", function(e) {
-                if ($('#start_at').val()) {
-                    $('#datetimepicker_start_at').datetimepicker('maxDate', e.date);
+            $("#datetimepicker_start_at_end").on("dp.change", function(e) {
+                if ($('#start_at_start').val()) {
+                    $('#datetimepicker_start_at_start').datetimepicker('maxDate', e.date);
                 }
             });
 
