@@ -222,6 +222,20 @@
                             }
                         },
                     },
+                    n_value: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
+                    x_value: {
+                        digits: "只可輸入正整數",
+                        min: function() {
+                            if (['PRD02', 'PRD04'].includes($('#campaign_type').val())) {
+                                return '只可輸入正整數';
+                            }
+
+                            return '請輸入不小於 0 的數值';
+                        },
+                    },
                 },
                 errorClass: "help-block",
                 errorElement: "span",
