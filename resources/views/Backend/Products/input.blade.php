@@ -1123,7 +1123,7 @@
             $("#new-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    var item_num = Object.keys(JSON.parse($('#SkuListdata').val())).length;
+                    var item_num = JSON.parse($('#SkuListdata').val()).length;
                     if(item_num <= 0) {
                         alert('至少輸入一個品項')
                         return false ;
