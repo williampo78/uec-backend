@@ -89,7 +89,7 @@
         <ul>
             <a href="#page-1">
                 <li class="sysinfo-li sysinfo-activie" id="click-page-1">
-                    前台資料
+                    基本資料
                 </li>
             </a>
             <a href="#page-2">
