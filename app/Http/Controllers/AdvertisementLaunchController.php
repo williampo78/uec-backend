@@ -33,12 +33,12 @@ class AdvertisementLaunchController extends Controller
      */
     public function index(Request $request)
     {
-        $query_data = [];
+        $query_datas = [];
 
-        $query_data = $request->only(['slot_id', 'launch_status', 'start_at', 'end_at']);
+        $query_datas = $request->only(['slot_id', 'launch_status', 'start_at', 'end_at']);
 
         $ad_slots = $this->advertisement_service->getSlots();
-        $ad_slot_contents = $this->advertisement_service->getSlotContents($query_data);
+        $ad_slot_contents = $this->advertisement_service->getSlotContents($query_datas);
 
         $ad_slot_contents = $ad_slot_contents->map(function ($obj, $key) {
             /*
@@ -53,7 +53,7 @@ class AdvertisementLaunchController extends Controller
 
         return view(
             'Backend.Advertisement.Launch.list',
-            compact('ad_slots', 'ad_slot_contents', 'query_data')
+            compact('ad_slots', 'ad_slot_contents')
         );
     }
 

@@ -99,9 +99,9 @@
                                         <label class="control-label">上架日期</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-gift-modal-start-launched-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-start-launched-at" id="gift-modal-start-launched-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-start-launched-at" data-toggle="datetimepicker">
+                                        <div class='input-group date' id='datetimepicker-gift-modal-start-launched-at-start'>
+                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-start-launched-at-start" id="gift-modal-start-launched-at-start" autocomplete="off" />
+                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-start-launched-at-start" data-toggle="datetimepicker">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
                                         </div>
@@ -110,9 +110,9 @@
                                         <label class="control-label">~</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-gift-modal-end-launched-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-end-launched-at" id="gift-modal-end-launched-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-end-launched-at" data-toggle="datetimepicker">
+                                        <div class='input-group date' id='datetimepicker-gift-modal-start-launched-at-end'>
+                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-gift-modal-start-launched-at-end" id="gift-modal-start-launched-at-end" autocomplete="off" />
+                                            <span class="input-group-addon" data-target="#datetimepicker-gift-modal-start-launched-at-end" data-toggle="datetimepicker">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
                                         </div>

@@ -174,7 +174,7 @@
                                     <div class="col-sm-2">
                                         <label class="control-label">上架時間起<span class="redtext">*</span></label>
                                     </div>
-                                    <div class="col-sm-9" id="div_start_launched_at">
+                                    <div class="col-sm-9">
                                         <div class='input-group date' id='datetimepicker'>
                                             <input type='text' class="form-control" name="start_launched_at"
                                                 id="start_launched_at" value="{{ $products->start_launched_at }}" readonly/>

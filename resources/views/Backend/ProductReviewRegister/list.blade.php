@@ -186,17 +186,16 @@
                                         <h5>上架時間</h5>
                                     </div>
                                     <div class="col-sm-8">
-                                        <div class="form-group" id="div_start_launched_at">
+                                        <div class="form-group">
                                             <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="start_launched_at"
-                                                    id="start_launched_at"
-                                                    value="{{ request()->input('start_launched_at') }}" />
+                                                <input type='text' class="form-control" name="start_launched_at_start"
+                                                    id="start_launched_at_start"
+                                                    value="{{ request()->input('start_launched_at_start') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
                                             </div>
                                         </div>
-
                                     </div>
                                     <div class="col-sm-1 text-center">
                                         <h5>～</h5>
@@ -204,11 +203,11 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="col-sm-8">
-                                        <div class="form-group" id="div_end_launched_at">
+                                        <div class="form-group">
                                             <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="end_launched_at"
-                                                    id="end_launched_at"
-                                                    value="{{ request()->input('end_launched_at') }}" />
+                                                <input type='text' class="form-control" name="start_launched_at_end"
+                                                    id="start_launched_at_end"
+                                                    value="{{ request()->input('start_launched_at_end') }}" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -262,7 +261,8 @@
                                 @foreach ($products as $key => $val)
                                     <tr>
                                         <td>
-                                            <a class="btn btn-info btn-sm" href="{{ route('product_review_register.show', $val->id) }}">
+                                            <a class="btn btn-info btn-sm"
+                                                href="{{ route('product_review_register.show', $val->id) }}">
                                                 <i class="fa fa-search"></i></a>
                                             @if ($share_role_auth['auth_update'])
                                                 @if ($val->launched_status == '未設定' || $val->launched_status == '上架駁回' || $val->launched_status == '商品下架')
@@ -374,7 +374,7 @@
                             product_id: product.id,
                         })
                         .then(function(response) {
-                            alert('下架成功')  ; 
+                            alert('下架成功');
                             history.go(0);
                             // console.log(response);
                         })
