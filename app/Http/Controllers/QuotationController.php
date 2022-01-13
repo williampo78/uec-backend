@@ -112,10 +112,7 @@ class QuotationController extends Controller
         $result['quotation'] = $this->quotationService->getQuotationById($id);
         $result['quotation_details'] = $this->quotationService->getQuotationDetail($id);
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
-            $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
-            return $obj;
-        });
+        $result['products_item'] = $this->productsService->getItemsAndProduct(['supplier_id'=>$result['quotation']->supplier_id]);
         $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'upd';
         $result['id'] = $id;
@@ -159,13 +156,13 @@ class QuotationController extends Controller
 
     public function ajax(Request $request)
     {
-        $rs = $request->all();
-        switch ($rs['get_type']) {
+        $in = $request->all();
+        switch ($in['get_type']) {
             case 'showQuotation':
                 $data = [];
-                $data['quotation'] = $this->quotationService->getQuotationById($rs['id']);
+                $data['quotation'] = $this->quotationService->getQuotationById($in['id']);
                 $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($rs['id'])->transform(function ($obj, $key) use ($brands) {
+                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($in['id'])->transform(function ($obj, $key) use ($brands) {
 
                     $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
 
@@ -184,10 +181,22 @@ class QuotationController extends Controller
                     $obj->brands_name = $brandsName; //不做join key find val
                     return $obj;
                 });
-                $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($rs['id']);
+                $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($in['id']);
 
                 $data['taxlist'] = config('uec.tax_option');
                 return view('Backend.Quotation.show', $data);
+                break;
+            //供應商取得商品
+            case 'supplierGetProducts':
+               $products =  $this->productsService->getItemsAndProduct([
+                    'supplier_id' => $in['supplier_id'],
+                ]);
+                
+                return response()->json([
+                    'requestData'=>$in,
+                    'products' =>$products ,
+                ]);
+
                 break;
             default:
                 # code...
