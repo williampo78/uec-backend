@@ -229,7 +229,10 @@ class PromotionalCampaignService
                 $create_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
             }
 
-            $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['code' => $create_data['campaign_type']]);
+            $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+                'type_code' => 'CAMPAIGN_TYPE',
+                'code' => $create_data['campaign_type'],
+            ]);
             $campaign_type = $campaign_types->first();
             $create_data['level_code'] = $campaign_type->udf_01;
             $create_data['category_code'] = $campaign_type->udf_03;

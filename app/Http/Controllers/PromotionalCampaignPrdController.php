@@ -52,7 +52,10 @@ class PromotionalCampaignPrdController extends Controller
         ]);
 
         // 活動類型
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => self::LEVEL_CODE]);
+        $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
         if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
@@ -79,7 +82,10 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function create()
     {
-        $campaign_types = $this->lookup_values_v_service->getCampaignTypes(['udf_01' => self::LEVEL_CODE]);
+        $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
         $suppliers = $this->supplier_service->getSuppliers();
 
         return view(

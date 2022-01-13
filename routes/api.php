@@ -1,18 +1,19 @@
 <?php
 
-use App\Http\Controllers\api\AuthController;
-use App\Http\Controllers\api\CheckoutController;
-use App\Http\Controllers\api\DradviceController;
-use App\Http\Controllers\api\IndexController;
-use App\Http\Controllers\api\MemberController;
-use App\Http\Controllers\api\MemberInfoController;
-use App\Http\Controllers\api\MessagesController;
-use App\Http\Controllers\api\PointInfoController;
-use App\Http\Controllers\api\ProductController;
-use App\Http\Controllers\api\ShoppingController;
-use App\Http\Controllers\api\StockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\IndexController;
+use App\Http\Controllers\api\OrderController;
+use App\Http\Controllers\api\StockController;
+use App\Http\Controllers\api\MemberController;
+use App\Http\Controllers\api\ProductController;
+use App\Http\Controllers\api\CheckoutController;
+use App\Http\Controllers\api\DradviceController;
+use App\Http\Controllers\api\MessagesController;
+use App\Http\Controllers\api\ShoppingController;
+use App\Http\Controllers\api\PointInfoController;
+use App\Http\Controllers\api\MemberInfoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +113,14 @@ Route::group(['prefix' => 'members'], function () {
 Route::group(['prefix' => 'member'], function () {
     // 重設會員密碼
     Route::post('/password', [MemberController::class, 'resetPassword']);
+});
+
+Route::group(['prefix' => 'order'], function () {
+    // 取得訂單取消原因的選項
+    Route::get('/cancel-reason-options', [OrderController::class, 'getCancelReasonOptions']);
+
+    // 取得訂單退貨原因的選項
+    Route::get('/return-reason-options', [OrderController::class, 'getReturnReasonOptions']);
 });
 
 Route::group(['prefix' => 'shopping'], function () {
