@@ -4,7 +4,6 @@
 
 @section('style')
     <style>
-
         .fa.fa-check {
             color: green;
         }
@@ -361,12 +360,16 @@
                             switch (value.image_action) {
                                 // URL
                                 case 'U':
-                                    link_content =
-                                        `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
+                                    if (value.link_content) {
+                                        link_content =
+                                            `URL: <a href="${value.link_content}" target="_blank">${value.link_content}</a>`;
+                                    }
                                     break;
                                     // 商品分類
                                 case 'C':
-                                    link_content = `商品分類: ${value.link_content}`;
+                                    if (value.link_content) {
+                                        link_content = `商品分類: ${value.link_content}`;
+                                    }
                                     break;
                             }
 
