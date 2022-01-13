@@ -38,6 +38,7 @@ use App\Http\Controllers\PromotionalCampaignPrdController;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
+use App\Http\Controllers\InventoryController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -91,6 +92,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/order_supplier/ajax', [OrderSupplierController::class, 'ajax']);
     Route::resource('/purchase', PurchaseController::class, ['names' => ['index' => 'purchase']]); // 進貨單
     Route::post('/purchase/ajax', [PurchaseController::class, 'ajax']);
+
+    //庫存單
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory'); // 庫存單列表
+    Route::get('/inventory/ajax/excel', [InventoryController::class, 'exportExcel'])->name('inventory.export_excel'); // 庫存單匯出excel
 
     Route::resource('/test', TestController::class, ['names' => ['index' => 'test']]);
     Route::resource('/roles', RolesController::class, ['names' => ['index' => 'roles']]);

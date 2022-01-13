@@ -8,6 +8,8 @@ return [
      */
     'web_category_hierarchy_levels' => '2',
 
+    'config_key' => 'EC_WAREHOUSE_GOODS',
+
     /*
      * 預設為測試環境
      *
