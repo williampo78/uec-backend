@@ -116,8 +116,11 @@ Route::group(['prefix' => 'member'], function () {
 });
 
 Route::group(['prefix' => 'order'], function () {
-    // 取得訂單取消原因
+    // 取得訂單取消原因的選項
     Route::get('/cancel-reason-options', [OrderController::class, 'getCancelReasonOptions']);
+
+    // 取得訂單退貨原因的選項
+    Route::get('/return-reason-options', [OrderController::class, 'getReturnReasonOptions']);
 });
 
 Route::group(['prefix' => 'shopping'], function () {

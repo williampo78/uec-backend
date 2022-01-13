@@ -44,4 +44,35 @@ class OrderController extends Controller
             'results' => $cancel_req_reasons,
         ], 200);
     }
+
+    /**
+     * 取得訂單退貨原因的選項
+     *
+     * @return json
+     */
+    public function getReturnReasonOptions()
+    {
+        $return_req_reasons = $this->lookup_values_v_service->getLookupValuesVs([
+            'is_agent_id_disable' => true,
+            'type_code' => 'RETURN_REQ_REASON',
+        ]);
+
+        $return_req_reasons->transform(function ($return_req_reason) {
+            return $return_req_reason->only([
+                'code',
+                'description',
+            ]);
+        });
+
+        if (count($return_req_reasons) < 1) {
+            return response()->json([
+                'message' => '選項不存在',
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => '取得成功',
+            'results' => $return_req_reasons,
+        ], 200);
+    }
 }
