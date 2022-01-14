@@ -2,19 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\Invoice;
-use App\Models\InvoiceAllowance;
-use App\Models\InvoiceAllowanceDetail;
-use App\Models\InvoiceDetail;
+use Carbon\Carbon;
 use App\Models\Order;
-use App\Models\OrderCampaignDiscount;
+use App\Models\Invoice;
+use App\Models\Shipment;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
+use App\Models\InvoiceDetail;
 use App\Models\ProductPhotos;
 use App\Models\ReturnRequest;
-use App\Models\Shipment;
 use App\Models\ShipmentDetail;
+use App\Models\InvoiceAllowance;
 use Illuminate\Support\Facades\DB;
+use App\Models\OrderCampaignDiscount;
+use App\Models\InvoiceAllowanceDetail;
 
 class OrderService
 {
@@ -372,5 +373,26 @@ class OrderService
         });
 
         return $orders;
+    }
+
+    /**
+     * 是否可以取消訂單
+     *
+     * @param string $order_date
+     * @param integer $limit_mins
+     * @return boolean
+     */
+    public function canCancelOrder(string $order_date, int $limit_mins) :bool
+    {
+        $can_cancel_order = false;
+        $now = Carbon::now();
+        $limit_date = Carbon::parse($order_date)->addMinutes($limit_mins);
+
+        // 現在時間<=限制時間
+        if ($now->lessThanOrEqualTo($limit_date)) {
+            $can_cancel_order = true;
+        }
+
+        return $can_cancel_order;
     }
 }
