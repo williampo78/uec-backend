@@ -22,7 +22,7 @@ class OrderController extends Controller
     public function getCancelReasonOptions()
     {
         $cancel_req_reasons = $this->lookup_values_v_service->getLookupValuesVs([
-            'is_agent_id_disable' => true,
+            'disable_agent_id_auth' => true,
             'type_code' => 'CANCEL_REQ_REASON',
         ]);
 
@@ -53,7 +53,7 @@ class OrderController extends Controller
     public function getReturnReasonOptions()
     {
         $return_req_reasons = $this->lookup_values_v_service->getLookupValuesVs([
-            'is_agent_id_disable' => true,
+            'disable_agent_id_auth' => true,
             'type_code' => 'RETURN_REQ_REASON',
         ]);
 
