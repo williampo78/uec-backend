@@ -8,6 +8,7 @@ use App\Http\Requests\api\GetMemberOrdersRequest;
 use App\Http\Requests\api\ResetMemberPasswordRequest;
 use App\Services\APIService;
 use App\Services\OrderService;
+use App\Services\SysConfigService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -15,12 +16,22 @@ use Illuminate\Support\Str;
 class MemberController extends Controller
 {
     private $api_service;
+    private $sys_config_service;
 
-    public function __construct(APIService $api_service)
-    {
+    public function __construct(
+        APIService $api_service,
+        SysConfigService $sys_config_service
+    ) {
         $this->api_service = $api_service;
+        $this->sys_config_service = $sys_config_service;
     }
 
+    /**
+     * 重設會員密碼
+     *
+     * @param ResetMemberPasswordRequest $request
+     * @return json
+     */
     public function resetPassword(ResetMemberPasswordRequest $request)
     {
         $token = $request->bearerToken();
@@ -62,6 +73,12 @@ class MemberController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * 取得會員訂單
+     *
+     * @param GetMemberOrdersRequest $request
+     * @return json
+     */
     public function getOrders(GetMemberOrdersRequest $request)
     {
         try {
@@ -221,6 +238,12 @@ class MemberController extends Controller
         ], 200);
     }
 
+    /**
+     * 取得會員訂單詳細內容
+     *
+     * @param GetMemberOrderDetailsRequest $request
+     * @return json
+     */
     public function getOrderDetails(GetMemberOrderDetailsRequest $request)
     {
         try {
@@ -248,6 +271,17 @@ class MemberController extends Controller
             ], 404);
         }
 
+        // 系統設定檔
+        $sys_configs = $this->sys_config_service->getSysConfigs();
+
+        // 訂單成立後x分鐘內可取消
+        $cancel_limit_mins = (int) $sys_configs->first(function ($config) {
+            return $config->config_key == 'CANCEL_LIMIT_MINS';
+        })->config_value;
+
+        // 是否可以取消訂單
+        $order->can_cancel_order = $order_service->canCancelOrder($order->ordered_date, $cancel_limit_mins);
+
         // 訂單時間
         $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s');
 
@@ -274,12 +308,12 @@ class MemberController extends Controller
 
         // 收件者姓名
         if (isset($order->receiver_name)) {
-            $order->receiver_name = (string)Str::of($order->receiver_name)->mask('*', 0, 1)->mask('*', -1, 1);
+            $order->receiver_name = (string) Str::of($order->receiver_name)->mask('*', 0, 1)->mask('*', -1, 1);
         }
 
         // 收件者手機
         if (isset($order->receiver_mobile)) {
-            $order->receiver_mobile = (string)Str::of($order->receiver_mobile)->mask('*', -3);
+            $order->receiver_mobile = (string) Str::of($order->receiver_mobile)->mask('*', -3);
         }
 
         // 收件者地址
@@ -428,6 +462,7 @@ class MemberController extends Controller
             'invoice_date',
             'invoice_gui_number',
             'invoice_title',
+            'can_cancel_order',
         ]);
 
         return response()->json([

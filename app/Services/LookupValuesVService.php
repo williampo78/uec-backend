@@ -17,7 +17,7 @@ class LookupValuesVService
     {
         $results = Lookup_values_v::where('active', 1);
 
-        if (!isset($query_datas['is_agent_id_disable'])) {
+        if (!isset($query_datas['disable_agent_id_auth'])) {
             $agent_id = Auth::user()->agent_id;
             $results = $results->where('agent_id', $agent_id);
         }

@@ -14,6 +14,7 @@ use App\Models\ProductPhotos;
 use App\Models\ReturnRequest;
 use App\Models\Shipment;
 use App\Models\ShipmentDetail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -78,6 +79,9 @@ class OrderService
         $orders = $orders->orderBy('ordered_date', 'desc')
             ->get();
 
+        $order_ids = $orders->pluck('id');
+        $order_nos = $orders->pluck('order_no')->unique();
+
         // 訂單明細
         $order_details = OrderDetail::select(
             'order_details.*',
@@ -102,12 +106,16 @@ class OrderService
             $order_details = $order_details->where('products.product_name', 'LIKE', "%{$query_datas['product_name']}%");
         }
 
-        $order_details = $order_details->orderBy('order_details.order_id', 'asc')
+        $order_details = $order_details->whereIn('order_details.order_id', $order_ids)
+            ->orderBy('order_details.order_id', 'asc')
             ->orderBy('order_details.seq', 'asc')
             ->get();
 
+        $order_detail_product_ids = $order_details->pluck('product_id')->unique();
+
         // 商品圖片
-        $product_photos = ProductPhotos::orderBy('product_id', 'asc')
+        $product_photos = ProductPhotos::whereIn('product_id', $order_detail_product_ids)
+            ->orderBy('product_id', 'asc')
             ->orderBy('sort', 'asc')
             ->get();
 
@@ -133,10 +141,14 @@ class OrderService
             $shipments = $shipments->where('status_code', $query_datas['shipment_status_code']);
         }
 
-        $shipments = $shipments->get();
+        $shipments = $shipments->whereIn('order_no', $order_nos)
+            ->get();
+
+        $shipment_ids = $shipments->pluck('id');
 
         // 出貨單明細
-        $shipment_details = ShipmentDetail::get();
+        $shipment_details = ShipmentDetail::whereIn('shipment_id', $shipment_ids)
+            ->get();
 
         // 將出貨單明細加入出貨單中
         foreach ($shipment_details as $shipment_detail) {
@@ -173,7 +185,8 @@ class OrderService
             $order_campaign_discounts = $order_campaign_discounts->where('promotional_campaigns.campaign_name', 'LIKE', "%{$query_datas['campaign_name']}%");
         }
 
-        $order_campaign_discounts = $order_campaign_discounts->orderBy('order_campaign_discounts.group_seq', 'asc')
+        $order_campaign_discounts = $order_campaign_discounts->whereIn('order_campaign_discounts.order_id', $order_ids)
+            ->orderBy('order_campaign_discounts.group_seq', 'asc')
             ->orderBy('order_campaign_discounts.order_detail_id', 'asc')
             ->get();
 
@@ -188,10 +201,14 @@ class OrderService
             'remark',
             'random_no',
         )
+            ->whereIn('order_no', $order_nos)
             ->get();
 
+        $invoice_ids = $invoices->pluck('invoice_id');
+
         // 發票開立明細
-        $invoice_details = InvoiceDetail::orderBy('invoice_id', 'asc')
+        $invoice_details = InvoiceDetail::whereIn('invoice_id', $invoice_ids)
+            ->orderBy('invoice_id', 'asc')
             ->orderBy('seq', 'asc')
             ->get();
 
@@ -221,10 +238,14 @@ class OrderService
             'invoices.random_no',
         )
             ->join('invoices', 'invoice_allowance.invoice_id', 'invoices.id')
+            ->whereIn('invoice_allowance.order_no', $order_nos)
             ->get();
 
+        $invoice_allowance_ids = $invoice_allowances->pluck('invoice_allowance_id');
+
         // 發票折讓明細
-        $invoice_allowance_details = InvoiceAllowanceDetail::orderBy('invoice_allowance_id', 'asc')
+        $invoice_allowance_details = InvoiceAllowanceDetail::whereIn('invoice_allowance_id', $invoice_allowance_ids)
+            ->orderBy('invoice_allowance_id', 'asc')
             ->orderBy('seq', 'asc')
             ->get();
 
@@ -246,11 +267,13 @@ class OrderService
         $all_invoices = $all_invoices->sortBy('transaction_date');
 
         // 訂單金流單
-        $order_payments = OrderPayment::orderBy('created_at', 'asc')
+        $order_payments = OrderPayment::whereIn('order_no', $order_nos)
+            ->orderBy('created_at', 'asc')
             ->get();
 
         // 退貨申請單
-        $return_requests = ReturnRequest::orderBy('id', 'desc')
+        $return_requests = ReturnRequest::whereIn('order_id', $order_ids)
+            ->orderBy('id', 'desc')
             ->get();
 
         foreach ($order_details as $order_detail) {
@@ -261,7 +284,6 @@ class OrderService
                         $order_detail->package_no = $shipment->package_no;
                     }
                 }
-
             }
 
             // 將訂單明細加入訂單中
@@ -372,5 +394,26 @@ class OrderService
         });
 
         return $orders;
+    }
+
+    /**
+     * 是否可以取消訂單
+     *
+     * @param string $order_date
+     * @param integer $limit_mins
+     * @return boolean
+     */
+    public function canCancelOrder(string $order_date, int $limit_mins): bool
+    {
+        $can_cancel_order = false;
+        $now = Carbon::now();
+        $limit_date = Carbon::parse($order_date)->addMinutes($limit_mins);
+
+        // 現在時間<=限制時間
+        if ($now->lessThanOrEqualTo($limit_date)) {
+            $can_cancel_order = true;
+        }
+
+        return $can_cancel_order;
     }
 }
