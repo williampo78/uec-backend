@@ -180,7 +180,7 @@ class APIWebService
         $s3 = config('filesystems.disks.s3.url');
         $collection = [];
         $member_id = Auth::guard('api')->user()->member_id;
-        $collects = DB::table('member_collections')->select('products.id', 'products.product_name', 'products.selling_price', 'products.list_price')
+        $collects = DB::table('member_collections')->select('products.id', 'products.product_no', 'products.product_name', 'products.selling_price', 'products.list_price')
             ->Join('products', 'member_collections.product_id', '=', 'products.id')
             ->where('member_collections.member_id', '=', $member_id)
             ->where('member_collections.status', '=', 0)->get();
@@ -189,7 +189,7 @@ class APIWebService
 
             $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));
             //echo $discount;
-            $collection[] = array('product_id' => $collect->id, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'product_discount' => intval($discount), 'product_photo' => (isset($photo['photo_name']) ? $s3 . $photo['photo_name'] : null));
+            $collection[] = array('product_id' => $collect->id, 'product_no' => $collect->product_no, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'product_discount' => intval($discount), 'product_photo' => (isset($photo['photo_name']) ? $s3 . $photo['photo_name'] : null));
         }
 
         return json_encode($collection);
