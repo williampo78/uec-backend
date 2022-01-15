@@ -3,13 +3,20 @@
 namespace App\Services;
 
 use App\Models\SysConfig;
+use Illuminate\Database\Eloquent\Collection;
 
 class SysConfigService
 {
-    public function getSysConfigs()
+    /**
+     * 取得系統設定檔
+     *
+     * @param array $datas
+     * @return Collection
+     */
+    public function getSysConfigs(array $datas = []) :Collection
     {
-        $result = SysConfig::get();
+        $sys_configs = SysConfig::where('active', 1)->get();
 
-        return $result;
+        return $sys_configs;
     }
 }

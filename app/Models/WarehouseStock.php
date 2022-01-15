@@ -8,5 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class WarehouseStock extends Model
 {
     use HasFactory;
+
     protected $table = 'warehouse_stock';
+    protected $guarded = [];
 }
