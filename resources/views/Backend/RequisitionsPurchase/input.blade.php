@@ -193,8 +193,11 @@
                                             </div>
                                         </div>
                                         {{-- 數量 --}}
-                                        <div class="col-sm-1"><input class="form-control"
-                                                v-model="details[detailKey].item_qty" type="number" :min="details[detailKey].min_purchase_qty">
+                                        <div class="col-sm-1">
+                                            <div class="form-group">
+                                            <input class="form-control item_qty"
+                                                v-model="details[detailKey].item_qty" :name="'item_qty['+detailKey+']'" type="number" :min="details[detailKey].min_purchase_qty">
+                                            </div>
                                         </div>
                                         {{-- 單位 --}}
                                         <div class="col-sm-1"><input class="form-control" readonly
@@ -359,7 +362,11 @@
                 },
                 //送出
                 submitBtn(status) {
-                    
+                    $(".item_qty").each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    })
                     $(".item_price").each(function() {
                         $(this).rules("add", {
                             required: true,
@@ -369,7 +376,6 @@
                             },
                         });
                     })
-                
                     this.status = status;
                     this.$nextTick(() => {
                         $('#new-form').submit();
@@ -474,10 +480,7 @@
                 detailsCount() {
                     var vm = this ; 
                     if(this.switch_computed === 0){
-                        console.log('computed detailsCount switch_computed false');
                         return false ; 
-                    }else{
-                        console.log('computed detailsCount switch_computed true');
                     }
                     var details = this.details;
                     var requisitions_purchase = this.requisitions_purchase
