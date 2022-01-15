@@ -92,6 +92,7 @@ return [
         'SHIPPED' => '已出貨',
         'DELIVERED' => '已配達',
         'REFUSED' => '客拒收 / 客未取',
+        'CANCELLED' => '已取消',
         'VOIDED' => '已作廢',
     ],
 

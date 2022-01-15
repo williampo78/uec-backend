@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\api;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class GetMemberOrdersRequest extends FormRequest
+class ResetPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,15 +28,14 @@ class GetMemberOrdersRequest extends FormRequest
     public function rules()
     {
         return [
-            'date' => 'required|date',
+            'password' => 'required',
         ];
     }
 
     public function messages()
     {
         return [
-            'date.required' => '日期不能為空',
-            'date.date' => '日期格式錯誤',
+            'password.required' => '會員密碼不能為空',
         ];
     }
 
