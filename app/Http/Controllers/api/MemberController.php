@@ -428,6 +428,8 @@ class MemberController extends Controller
                     'qty',
                     'unit_price',
                     'subtotal',
+                    'product_id',
+                    'product_no',
                 ]);
             });
         }
