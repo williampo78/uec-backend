@@ -25,12 +25,19 @@ jQuery.validator.addMethod("dateGreaterThanNow", function (value, element, param
     }
  */
 jQuery.validator.addMethod("monthIntervalVerify", function (value, element, obj) {
-    let startTime = new Date(obj.start_time);
-    let endTime = new Date(obj.end_time);
-    endTime.setMonth(endTime.getMonth() - obj.month_num);
-    return startTime > endTime;
+    if(!obj.isExecution){
+        return true ;
+    }
+    let startTime = new Date(obj.startTime);
+    let endTime = new Date(obj.endTime);
+    let startEndRange = endTime - startTime ; 
+    let nowTime = new Date() ;
+    let RangeTime = new Date(); 
+    let setTime = RangeTime - nowTime ;
+    return startEndRange > setTime;
 }, function (params, element) {
-    return `起訖最多不可超過 ${params.month_num} 個月`;
+    console.log(element) ; 
+    return `起訖最多不可超過 ${params.monthNum} 個月`;
 });
 jQuery.validator.addMethod("notRepeating", function (value, element, params) {
     var prefix = params;

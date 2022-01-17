@@ -28,7 +28,7 @@
                                         <div class="col-sm-9">
                                             <div class='input-group' id='supplier_deliver_date_dp'>
                                                 <select class="form-control js-select2-department" name="supplier"
-                                                    id="supplier" value="{{ request()->input('company_number') }}">
+                                                    id="supplier" value="{{ request()->input('supplier') }}">
                                                     <option value=""></option>
                                                     @foreach ($supplier as $v)
                                                         <option value='{{ $v['id'] }}'
@@ -59,7 +59,7 @@
                                             <div class='input-group'>
                                                 <input class="form-control" name="order_supplier_number"
                                                     id="order_supplier_number"
-                                                    value="{{ request()->input('company_number') }}">
+                                                    value="{{ request()->input('order_supplier_number') }}">
                                             </div>
                                         </div>
                                     </div>
@@ -234,15 +234,23 @@
                     trade_date_start: {
                         required: {
                             depends: function(element) {
-                                return $('#order_supplier_number').val() == '' && $('#number').val() ==
-                                    '';
+                                if($('#order_supplier_number').val() !=='' || $('#number').val() !== ''){
+                                    return false ;
+                                }else{
+                                    return true ;
+                                }
                             }
                         },
                         monthIntervalVerify: function() {
+                            isExecution = true
+                            if($('#order_supplier_number').val() !=='' || $('#number').val() !== ''){
+                                isExecution = false ;
+                            }
                             let obj = {
                                 startTime: $('#trade_date_start').val(),
                                 endTime: $('#trade_date_end').val(),
                                 monthNum: 6,
+                                isExecution:isExecution,
                             }
                             return obj;
                         },
@@ -250,8 +258,11 @@
                     trade_date_end: {
                         required: {
                             depends: function(element) {
-                                return $('#order_supplier_number').val() == '' && $('#number').val() ==
-                                    '' || $('#trade_date_start').val() !== '';
+                                if($('#order_supplier_number').val() !=='' || $('#number').val() !== ''){
+                                    return false ;
+                                }else{
+                                    return true ;
+                                }
                             }
                         },
                     },
