@@ -40,7 +40,7 @@ class InventoryController extends Controller
         $params['supplier'] = $this->supplierService->getSuppliers();
         $params['warehouses'] = $this->warehouseService->getWarehouseList();
 
-        return view('Backend.inventory.list', $params);
+        return view('Backend.Inventory.list', $params);
     }
 
     /**

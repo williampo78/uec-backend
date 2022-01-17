@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Exports\OrderRefundExport;
+use App\Services\OrderRefundService;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+class OrderRefundController extends Controller
+{
+    private $orderRefundService;
+
+    public function __construct(OrderRefundService $OrderRefundService)
+    {
+        $this->orderRefundService = $OrderRefundService;
+    }
+
+    /**
+     * @param Request $request
+     * @return View
+     * @Author: Eric
+     * @DateTime: 2022/1/14 上午 11:18
+     */
+    public function index(Request $request):view
+    {
+        $orderRefunds = $this->orderRefundService->getOrderRefunds($request->toArray());
+        $orderRefunds = $this->orderRefundService->handleOrderRefunds($orderRefunds);
+
+        $params = [];
+        $params['orderRefunds'] = $orderRefunds;
+
+        return view('Backend.OrderRefund.list', $params);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @Author: Eric
+     * @DateTime: 2022/1/17 下午 01:42
+     */
+    public function getDetail(Request $request)
+    {
+        if(empty($request->id)){
+            return responst()->json([
+                'status' => false,
+                'message' => '發生錯誤，缺少參數'
+            ]);
+        }
+
+        $id = $request->id;
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                //退貨資料
+                'return_request' => $this->orderRefundService->getReturnRequest($id),
+                //退貨明細
+                'return_details' => $this->orderRefundService->getReturnDetails($id),
+                //退款資訊
+                'return_information' => $this->orderRefundService->getReturnInformation($id),
+            ],
+            'message' => ''
+        ]);
+    }
+
+    /**
+     * 匯出excel
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @Author: Eric
+     * @DateTime: 2022/1/14 上午 11:18
+     */
+    public function exportExcel(Request $request)
+    {
+        $orderRefunds = $this->orderRefundService->getExcelData($request->toArray());
+        $orderRefunds = $this->orderRefundService->handleExcelData($orderRefunds);
+
+        return Excel::download(new OrderRefundExport($orderRefunds), 'orderRefunds.xlsx');
+    }
+}

@@ -149,4 +149,20 @@ return [
         '3' => '零稅率',
     ],
 
+    //退貨申請單狀態
+    'return_request_status_options' => [
+        'CREATED' => '新建立',
+        'VOIDED' => '已作廢',
+        'PROCESSING' => '處理中',
+        'COMPLETED' => '退貨完成',
+        'FAILED' => '退貨失敗',
+    ],
+
+    //orders狀態
+    'order_refund_status_options' => [
+        'PENDING' => '待退款',
+        'COMPLETED' => '退款成功',
+        'FAILED' => '退款失敗',
+        'VOIDED' => '已作廢',
+    ],
 ];
