@@ -161,6 +161,10 @@ class CheckoutController extends Controller
                 $v_invocie = Validator::make($request->invoice, [
                     'carrier_no' => 'required|min:8|max:8',
                 ], $errInvoice);
+            } else {
+                $errInvoice = [];
+                $v_invocie = Validator::make($request->invoice, [], $errInvoice);
+
             }
         } elseif ($request->invoice['usage'] == 'C') { //三聯式，公司戶電子發票
             $errInvoice = [
