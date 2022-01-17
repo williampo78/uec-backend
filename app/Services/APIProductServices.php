@@ -54,18 +54,20 @@ class APIProductServices
         if ($config_levels == '3') {
             $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
-                    inner join `products_v` prod on prod.`id` =cate_prod.`product_id`
+                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at`";
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N'";
             if ($keyword) {
                 $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
+                $strSQL .= " or prod.product_no like '%" . $keyword . "%'";
                 $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
                 $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
-                if ($config_levels == 3) {
-                    $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
-                }
+                $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or prod.keywords like '%" . $keyword . "%'";
+                $strSQL .= " or prod.supplier_name like '%" . $keyword . "%'";
+                $strSQL .= " or prod.brand_name like '%" . $keyword . "%'";
                 $strSQL .= ")";
             }
             $strSQL .= " group by cate.`id`
@@ -73,17 +75,18 @@ class APIProductServices
         } elseif ($config_levels == '2') {
             $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
-                    inner join `products_v` prod on prod.`id` =cate_prod.`product_id`
+                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` ";
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
             if ($keyword) {
                 $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
+                $strSQL .= " or prod.product_no like '%" . $keyword . "%'";
                 $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
                 $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
-                if ($config_levels == 3) {
-                    $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
-                }
+                $strSQL .= " or prod.keywords like '%" . $keyword . "%'";
+                $strSQL .= " or prod.supplier_name like '%" . $keyword . "%'";
+                $strSQL .= " or prod.brand_name like '%" . $keyword . "%'";
                 $strSQL .= ")";
             }
             $strSQL .= " group by cate.`id`
@@ -198,19 +201,22 @@ class APIProductServices
                     FROM product_photos
                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
                     from web_category_products
-                    inner join products p on p.id=web_category_products.product_id
+                    inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N'";
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
             $strSQL .= " or p.product_no like '%" . $keyword . "%'";
+            $strSQL .= " or p.keywords like '%" . $keyword . "%'";
             $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
             $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.supplier_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.brand_name like '%" . $keyword . "%'";
             if ($config_levels == 3) {
                 $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
             }
@@ -393,19 +399,23 @@ class APIProductServices
         $config_levels = config('uec.web_category_hierarchy_levels');
         $strSQL = "select cate1.id, cate1.category_name
                     from web_category_products
-                    inner join products p on p.id=web_category_products.product_id
+                    inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
 
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N'";
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.product_no like '%" . $keyword . "%'";
             $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
             $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.keywords like '%" . $keyword . "%'";
+            $strSQL .= " or p.supplier_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.brand_name like '%" . $keyword . "%'";
             if ($config_levels == 3) {
                 $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
             }
