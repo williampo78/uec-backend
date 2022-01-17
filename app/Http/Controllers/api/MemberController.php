@@ -14,11 +14,13 @@ use App\Services\OrderService;
 use App\Services\SysConfigService;
 use App\Services\WarehouseService;
 use Illuminate\Support\Facades\DB;
+use App\Models\ReturnRequestDetail;
 use App\Models\StockTransactionLog;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\LookupValuesVService;
+use App\Services\ReturnRequestService;
 use App\Services\WarehouseStockService;
 use App\Http\Requests\api\GetOrderRequest;
 use App\Http\Requests\api\CancelOrderRequest;
@@ -542,7 +544,7 @@ class MemberController extends Controller
         // 是否可以取消訂單
         if (!$order_service->canCancelOrder($order->status_code, $order->ordered_date, $cancel_limit_mins)) {
             return response()->json([
-                'message' => '訂單已進入處理階段或已超過限制時間，不可取消訂單',
+                'message' => '訂單已進入處理階段/已超過限制時間，不可取消訂單',
             ], 423);
         }
 
@@ -733,6 +735,7 @@ class MemberController extends Controller
         }
 
         $order_service = new OrderService;
+        $return_request_service = new ReturnRequestService;
         $order_no = $request->route('order_no');
         $code = $request->input('code');
         $remark = $request->input('remark');
@@ -762,7 +765,7 @@ class MemberController extends Controller
         // 是否可以申請退貨
         if (!$order_service->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id)) {
             return response()->json([
-                'message' => '商品尚未配達或已超過鑑賞期，不可申請退貨',
+                'message' => '商品尚未配達/已超過鑑賞期/退貨處理中，不可申請退貨',
             ], 423);
         }
 
@@ -783,10 +786,12 @@ class MemberController extends Controller
         DB::beginTransaction();
 
         try {
+            $request_no = $return_request_service->generateRequestNo();
+
             // 新增退貨申請單
             $return_request = ReturnRequest::create([
                 'agent_id' => 1,
-                // 'request_no' => ,
+                'request_no' => $request_no,
                 'request_date' => $now,
                 'member_id' => $member_id,
                 'order_id' => $order->id,
@@ -806,21 +811,20 @@ class MemberController extends Controller
                 'created_by' => -1,
                 'updated_by' => -1,
             ]);
-/*
+
             // 訂單明細
             if (isset($order->order_details)) {
                 foreach ($order->order_details as $order_detail) {
-                    // 新增庫存異動紀錄
-                    StockTransactionLog::create([
-                        'transaction_type' => 'ORDER_CANCEL',
-                        'transaction_date' => $now,
-                        'warehouse_id' => $warehouse->id,
+                    // 新增退貨申請單明細
+                    ReturnRequestDetail::create([
+                        'return_request_id' => $return_request->id,
+                        'seq' => $order_detail->seq,
+                        'order_detail_id' => $order_detail->id,
                         'product_item_id' => $order_detail->product_item_id,
                         'item_no' => $order_detail->item_no,
-                        'transaction_qty' => $order_detail->qty,
-                        'source_doc_no' => $order->order_no,
-                        'source_table_name' => 'order_details',
-                        'source_table_id' => $order_detail->id,
+                        'request_qty' => $order_detail->qty,
+                        'passed_qty' => 0,
+                        'failed_qty' => 0,
                         'created_by' => -1,
                         'updated_by' => -1,
                     ]);
@@ -830,14 +834,10 @@ class MemberController extends Controller
             // 更新訂單
             Order::findOrFail($order->id)
                 ->update([
-                    'status_code' => 'CANCELLED',
-                    'refund_status' => 'PENDING',
-                    'cancel_req_reason_code' => $code,
-                    'cancel_req_remark' => $remark,
-                    'cancelled_at' => $now,
+                    'return_request_id' => $return_request->id,
                     'updated_by' => -1,
                 ]);
-*/
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -851,7 +851,8 @@ class MemberController extends Controller
         return response()->json([
             'message' => '訂單退貨成功',
             'results' => [
-                'cancelled_at' => $now->format('Y-m-d H:i:s'),
+                'return_no' => $request_no,
+                'return_date' => $now->format('Y-m-d H:i:s'),
             ],
         ], 200);
     }
