@@ -34,7 +34,7 @@ class APIIndexServices
                 from `ad_slots` ad1
                 inner join `ad_slot_contents` ad2 on ad2.`slot_id`=ad1.`id`
                 inner join `ad_slot_content_details` ad3 on ad3.`ad_slot_content_id`=ad2.`id`
-                where current_timestamp() between ad2.`start_at` and ad2.`end_at` ";
+                where current_timestamp() between ad2.`start_at` and ad2.`end_at` and ad1.active = 1 and ad2.active = 1 ";
         if ($params == 1) {
             $strSQL .= " and ad1.`applicable_page` !='HOME'";
         } else {

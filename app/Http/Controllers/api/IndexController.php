@@ -119,6 +119,7 @@ class IndexController extends Controller
         foreach ($level1 as $code => $name) {
             $items = [];
             $input['code'] = $code;
+            $input['active'] = 1;
             $level2 = $this->webContentsService->getFooter($input, 'QA');
             foreach ($level2 as $k => $v) {
                 $items[$k]['sort'] = $v['sort'];
