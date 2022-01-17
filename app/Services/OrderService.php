@@ -400,21 +400,59 @@ class OrderService
     /**
      * 是否可以取消訂單
      *
-     * @param string $order_date
-     * @param integer $limit_mins
+     * @param string $status_code 訂單狀態
+     * @param string $order_date 訂單成立時間
+     * @param integer $cancel_limit_mins 訂單取消限制時間
      * @return boolean
      */
-    public function canCancelOrder(string $order_date, int $limit_mins): bool
+    public function canCancelOrder(string $status_code, string $order_date, int $cancel_limit_mins): bool
     {
-        $can_cancel_order = false;
         $now = Carbon::now();
-        $limit_date = Carbon::parse($order_date)->addMinutes($limit_mins);
+        $cancel_limit_date = Carbon::parse($order_date)->addMinutes($cancel_limit_mins);
 
-        // 現在時間<=限制時間
-        if ($now->lessThanOrEqualTo($limit_date)) {
-            $can_cancel_order = true;
+        if ($status_code != 'CREATED') {
+            return false;
         }
 
-        return $can_cancel_order;
+        // 現在時間>訂單取消限制時間
+        if ($now->greaterThan($cancel_limit_date)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 是否可以申請退貨
+     *
+     * @param string $status_code 訂單狀態
+     * @param string|null $delivered_at 商品配達時間
+     * @param string|null $cooling_off_due_date 鑑賞期截止時間
+     * @param integer|null $return_request_id 退貨申請單id
+     * @return boolean
+     */
+    public function canReturnOrder(string $status_code, ?string $delivered_at, ?string $cooling_off_due_date, ?int $return_request_id): bool
+    {
+        $now = Carbon::now();
+        $cooling_off_due_date = Carbon::parse($cooling_off_due_date);
+
+        if ($status_code != 'CLOSED') {
+            return false;
+        }
+
+        if (isset($return_request_id)) {
+            return false;
+        }
+
+        if (!isset($delivered_at) || !isset($cooling_off_due_date)) {
+            return false;
+        }
+
+        // 現在時間>鑑賞期截止時間
+        if ($now->greaterThan($cooling_off_due_date)) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CancelOrderRequest extends FormRequest
+class ReturnOrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -43,6 +43,13 @@ class CancelOrderRequest extends FormRequest
             'order_no' => 'required|regex:/^OD[0-9]{6}[0-9a-zA-Z]{6}$/',
             'code' => 'required',
             'remark' => 'max:300',
+            'name' => 'required|max:10',
+            'mobile' => 'required_without:telephone|max:20',
+            'telephone' => 'required_without:mobile|required_with:telephone_ext|max:20',
+            'telephone_ext' => 'max:10',
+            'city' => 'required|max:10',
+            'district' => 'required|max:10',
+            'address' => 'required|max:40',
         ];
     }
 
@@ -51,8 +58,22 @@ class CancelOrderRequest extends FormRequest
         return [
             'order_no.required' => '訂單編號不能為空',
             'order_no.regex' => '訂單編號格式錯誤',
-            'code.required' => '取消原因代碼不能為空',
-            'remark.max' => '取消說明不能超過:max個字',
+            'code.required' => '退貨原因代碼不能為空',
+            'remark.max' => '退貨說明不能超過:max個字',
+            'name.required' => '退貨人姓名不能為空',
+            'name.max' => '退貨人姓名不能超過:max個字',
+            'mobile.required_without' => '退貨人手機、退貨人電話需擇一填寫',
+            'mobile.max' => '退貨人手機不能超過:max個字',
+            'telephone.required_without' => '退貨人手機、退貨人電話需擇一填寫',
+            'telephone.required_with' => '退貨人電話不能為空',
+            'telephone.max' => '退貨人電話不能超過:max個字',
+            'telephone_ext.max' => '退貨人電話分機不能超過:max個字',
+            'city.required' => '退貨人縣市不能為空',
+            'city.max' => '退貨人縣市不能超過:max個字',
+            'district.required' => '退貨人行政區不能為空',
+            'district.max' => '退貨人行政區不能超過:max個字',
+            'address.required' => '退貨人道路名稱不能為空',
+            'address.max' => '退貨人道路名稱不能超過:max個字',
         ];
     }
 
