@@ -94,6 +94,12 @@ Route::group(['middleware' => 'jwt.v2.verify'], function () {
 
         // 取得會員訂單詳細內容
         Route::get('/orders/{order_no}', [MemberController::class, 'getOrderDetails']);
+
+        // 取消訂單
+        Route::post('/orders/{order_no}/cancel', [MemberController::class, 'cancelOrder']);
+
+        // 申請退貨
+        // Route::post('/orders/{order_no}/return', [MemberController::class, 'getOrderDetails']);
     });
 });
 

@@ -2,13 +2,11 @@
 
 namespace App\Http\Requests\api;
 
-use Illuminate\Support\Facades\Log;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ResetMemberPasswordRequest extends FormRequest
+class GetOrderDetailRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,6 +18,20 @@ class ResetMemberPasswordRequest extends FormRequest
         return true;
     }
 
+    public function validationData(): array
+    {
+        // Retrieve the route parameters
+        $route_parameters = $this
+            ->route()
+            ->parameters();
+
+        // Retrieve the request data
+        $request_data = $this->all();
+
+        // Return both as data for the validation
+        return array_merge($request_data, $route_parameters);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -28,14 +40,15 @@ class ResetMemberPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'password' => 'required',
+            'order_no' => 'required|regex:/^OD[0-9]{6}[0-9a-zA-Z]{6}$/',
         ];
     }
 
     public function messages()
     {
         return [
-            'password.required' => '會員密碼不能為空',
+            'order_no.required' => '訂單編號不能為空',
+            'order_no.regex' => '訂單編號格式錯誤',
         ];
     }
 
