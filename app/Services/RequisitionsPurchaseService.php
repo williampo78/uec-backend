@@ -134,21 +134,25 @@ class RequisitionsPurchaseService
     {
         $agent_id = Auth::user()->agent_id;
 
-        return RequisitionsPurchase::where('agent_id', $agent_id)->where('is_transfer' , '0')->get();
+        return RequisitionsPurchase::where('agent_id', $agent_id)->where('is_transfer', '0')->get();
     }
     public function createRequisitionsPurchase($input)
     { //建立請購單
+        $result = [] ;
         $requisitions_purchase_detail = json_decode($input['requisitions_purchase_detail'], true);
         unset($input['requisitions_purchase_detail']); // 移除json
+        unset($input['item_price']); // 移除json
         unset($input['_token']);
+        unset($input['old_supplier_id']);
         $requisitions_purchase = $input;
-
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
-        $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION'); // 取得簽核者
+        $hierarchy = $this->hierarchyService->getHierarchyCode('REQUISITION_PUR'); // 取得簽核者
         if (!$hierarchy) {
-            return false;
+            $result['message'] = '您未被設定於單據簽核流程中，請聯繫系統管理員';
+            $result['status']  = false ; 
+            return $result ;
         }
         DB::beginTransaction();
         try {
@@ -156,19 +160,32 @@ class RequisitionsPurchaseService
             $requisitions_purchase['agent_id'] = $agent_id;
             $requisitions_purchase['number'] = $this->universalService->getDocNumber('requisitions_purchase');
             $requisitions_purchase['created_at'] = $now; //創建時間
-            $requisitions_purchase['next_approver'] = $hierarchy[0];
+            $requisitions_purchase['updated_at'] = $now;
             $requisitions_purchase['created_by'] = $user_id;
+            $requisitions_purchase['updated_by'] = $user_id;
+            $requisitions_purchase['next_approver'] = $hierarchy[0];
             $requisitions_purchase_id = RequisitionsPurchase::insertGetId($requisitions_purchase);
+
             if (isset($requisitions_purchase_detail)) {
                 foreach ($requisitions_purchase_detail as $key => $val) {
                     unset($requisitions_purchase_detail[$key]['id']);
                     unset($requisitions_purchase_detail[$key]['min_purchase_qty']);
                     unset($requisitions_purchase_detail[$key]['item_uom']);
+                    unset($requisitions_purchase_detail[$key]['old_item_price']);
                     $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
-                    // $requisitions_purchase_detail[$key]['total_price'] = $requisitions_purchase['total_price'];
+                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
+                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
+                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
+                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
+                    $requisitions_purchase_detail[$key]['created_by'] = $user_id;
+                    $requisitions_purchase_detail[$key]['created_at'] = $now;
+                    $requisitions_purchase_detail[$key]['updated_by'] = $user_id;
+                    $requisitions_purchase_detail[$key]['updated_at'] = $now;
                 }
                 RequisitionsPurchaseDetail::insert($requisitions_purchase_detail);
+
             }
+
             if ($requisitions_purchase['status'] == 'REVIEWING') {
                 //簽核log
                 foreach ($hierarchy as $seq_no => $reviewer) {
@@ -184,23 +201,32 @@ class RequisitionsPurchaseService
             }
 
             DB::commit();
-            $result = true;
+            $result['status'] = true;
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
 
-            $result = false;
+            $result['status'] = false;
         }
 
         return $result;
     }
     public function updateRequisitionsPurchase($input)
     { //編輯請購單
+        $result = [] ;
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         $requisitions_purchase_detail_in = json_decode($input['requisitions_purchase_detail'], true);
+
+        $hierarchy = $this->hierarchyService->getHierarchyCode('REQUISITION_PUR'); // 取得簽核者
+        if (!$hierarchy) {
+            $result['message'] = '您未被設定於單據簽核流程中，請聯繫系統管理員';
+            $result['status']  = false ; 
+            return $result ;
+        }
         DB::beginTransaction();
+  
         try {
             $requisitions_purchase_in = [
                 'supplier_id' => $input['supplier_id'],
@@ -215,6 +241,8 @@ class RequisitionsPurchaseService
                 'total_price' => $input['total_price'],
                 'remark' => $input['remark'],
                 'status' => $input['status'],
+                'updated_by' => $user_id,
+                'updated_at' => $now,
             ];
             RequisitionsPurchase::where('id', $input['id'])->update($requisitions_purchase_in);
             foreach ($requisitions_purchase_detail_in as $key => $item) {
@@ -229,19 +257,18 @@ class RequisitionsPurchaseService
                 $indata['original_subtotal_tax_price'] = $item['original_subtotal_tax_price'];
                 $indata['subtotal_tax_price'] = $item['subtotal_tax_price'];
                 $indata['currency_code'] = $input['currency_code'];
+                $indata['updated_by'] = $user_id;
                 $indata['updated_at'] = $now;
                 $indata['is_gift'] = $item['is_gift'];
                 if ($item['id'] == '') {
+                    $indata['created_by'] = $user_id;
+                    $indata['created_at'] = $now;
                     RequisitionsPurchaseDetail::insert($indata);
                 } else {
                     RequisitionsPurchaseDetail::where('id', $item['id'])->update($indata);
                 }
             }
             if ($input['status'] == 'REVIEWING') {
-                $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION'); // 取得簽核者
-                if (!$hierarchy) {
-                    return false;
-                }
                 //簽核log
                 foreach ($hierarchy as $seq_no => $reviewer) {
                     $reviewLogData['requisitions_purchase_id'] = $input['id'];
@@ -255,14 +282,13 @@ class RequisitionsPurchaseService
                 }
             }
             DB::commit();
-            $result = true;
+            $result['status'] = true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
 
-            $result = false;
+            $result['status'] = false;
         }
-
         return $result;
     }
     public function delrequisitionsPurchase($id)

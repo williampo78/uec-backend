@@ -288,14 +288,16 @@ class QuotationService
     }
     public function getItemLastPrice($in)
     {
-        $result = Quotation::select(DB::raw('quotation_details.original_unit_price'))
+        $result = Quotation::select(
+            DB::raw('quotation_details.original_unit_nontax_price as original_unit_nontax_price'),
+            DB::raw('quotation_details.original_unit_tax_price as original_unit_tax_price'))
             ->join('quotation_details', 'quotation.id', 'quotation_details.quotation_id')
             ->where('quotation.supplier_id', $in['supplier_id'])
             ->where('quotation.currency_code', $in['currency_code'])
             ->where('quotation.tax', $in['tax'])
             ->where('quotation.status_code', 'APPROVED')
             ->where('quotation_details.product_item_id', $in['product_item_id'])
-            ->orderBy('quotation.closed_at')
+            ->orderBy('quotation.closed_at','desc')
             ->limit(1)
             ->get();
         return $result;

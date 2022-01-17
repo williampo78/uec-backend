@@ -76,15 +76,8 @@ class RequisitionsPurchaseController extends Controller
             'tax' => 0,
         ];
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
-        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
-            $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
-            $obj->text = $obj->item_no . '-' . $brands[$obj->brand_id]['brand_name'] . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
-            return $obj;
-        });
-
-        $result['taxList'] = config('uec.tax_option'); //取德稅別列表
+        $result['supplier'] = $this->supplierService->getSuppliers();
+        $result['taxList'] = config('uec.tax_option'); //取得稅別列表
 
         return view('Backend.RequisitionsPurchase.input', $result);
     }
@@ -98,6 +91,15 @@ class RequisitionsPurchaseController extends Controller
     public function store(Request $request)
     {
         $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input()); //創建請購單
+        $result['route_name'] = 'requisitions_purchase';
+        $result['act'] = 'add';
+
+        if ($result['status']) {
+            return view('Backend.success', $result);
+        } else {
+            return view('Backend.error', $result);
+        };
+
         $act = 'add';
         $route_name = 'requisitions_purchase';
         return view('Backend.success', compact('route_name', 'act'));
@@ -117,7 +119,7 @@ class RequisitionsPurchaseController extends Controller
         $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($id)->transform(function ($obj, $key) use ($brands) {
 
             $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
-   
+
             $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
 
             if ($obj->spec_1_value !== '') {
@@ -127,8 +129,8 @@ class RequisitionsPurchaseController extends Controller
             if ($obj->spec_2_value !== '') {
                 $obj->combination_name .= '-' . $obj->spec_2_value;
             }
-            if($obj->product_name == ''){
-                $obj->combination_name = false ;
+            if ($obj->product_name == '') {
+                $obj->combination_name = false;
             }
             $obj->brands_name = $brandsName; //不做join key find val
 
@@ -136,7 +138,7 @@ class RequisitionsPurchaseController extends Controller
         });
 
         $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id); //簽核紀錄
-        // dd($requisitionsPurchaseDetail) ; 
+        // dd($requisitionsPurchaseDetail) ;
         return response()->json([
             'requisitionsPurchase' => json_encode($requisitionsPurchase),
             'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail),
@@ -155,14 +157,13 @@ class RequisitionsPurchaseController extends Controller
     {
         $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionPurchaseById($id);
         $result['requisitionsPurchaseDetail'] = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($id);
-
-        // dd($result) ;
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
-            $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
-            $obj->text = $obj->item_no . '-' . $brands[$obj->brand_id]['brand_name'] . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
+
+        $result['itemOptions'] = $this->productsService->getItemsAndProduct([
+            'supplier_id' => $result['requisitionsPurchase']['supplier_id'],
+        ])->transform(function ($obj, $key) {
+            $obj->text = $obj->item_no . '-' . $obj->brand_name . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
             return $obj;
         });
 
@@ -181,9 +182,13 @@ class RequisitionsPurchaseController extends Controller
     {
         // dump($request->input());
         $result = $this->requisitionsPurchaseService->updateRequisitionsPurchase($request->input()); //創建請購單
-        $act = 'upd';
-        $route_name = 'requisitions_purchase';
-        return view('Backend.success', compact('route_name', 'act'));
+        $result['route_name'] = 'requisitions_purchase';
+        $result['act'] = 'upd';
+        if ($result['status']) {
+            return view('Backend.success', $result);
+        } else {
+            return view('Backend.error', $result);
+        };
     }
 
     /**
@@ -212,12 +217,25 @@ class RequisitionsPurchaseController extends Controller
     {
         $rs = $request->all();
 
-        if ($rs['get_type'] === 'requisitions_purchase') {
-            $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($rs['id']);
-            echo "OK@@" . json_encode($data);
-        } elseif ($rs['get_type'] === 'requisitions_purchase_detail') {
-            $data = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($rs['id']);
-            echo "OK@@" . json_encode($data);
+        switch ($rs['get_type']) {
+            case 'requisitions_purchase':
+                $data = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($rs['id']);
+                echo "OK@@" . json_encode($data);
+                break;
+            case 'requisitions_purchase_detail':
+                $data = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($rs['id']);
+                echo "OK@@" . json_encode($data);
+                break;
+            case 'getItemOption':
+                $products_item = $this->productsService->getItemsAndProduct(['supplier_id' => $rs['supplier_id']])->transform(function ($obj, $key) {
+                    $obj->text = $obj->item_no . '-' . $obj->brand_name . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
+                    return $obj;
+                });
+                return response()->json(['rs' => $rs, 'products_item' => $products_item]);
+                break;
+            default:
+                # code...
+                break;
         }
     }
     public function ajaxDelPurchaseDetail(Request $request)
@@ -233,10 +251,21 @@ class RequisitionsPurchaseController extends Controller
     public function getItemLastPrice(Request $request)
     {
         $in = $request->input();
-        $getItemLastPrice = $this->quotationService->getItemLastPrice($in)->toArray();
-        $original_unit_price = isset($getItemLastPrice[0]['original_unit_price']) ? $getItemLastPrice[0]['original_unit_price'] : null;
+        $getItemLastPrice = $this->quotationService->getItemLastPrice($in)->first();
+        if($getItemLastPrice == null){
+            return response()->json([
+                'original_unit_nontax_price' => null,
+            ]);
+        };
+
+        if($getItemLastPrice->original_unit_nontax_price || $getItemLastPrice->original_unit_tax_price){
+            $tem_price = null ;
+        }else{
+            $tem_price = $getItemLastPrice->original_unit_nontax_price +  $getItemLastPrice->original_unit_tax_price ; 
+        }
+
         return response()->json([
-            'original_unit_price' => $original_unit_price,
+            'original_unit_nontax_price' => $tem_price,
         ]);
     }
 

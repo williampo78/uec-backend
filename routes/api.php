@@ -96,7 +96,7 @@ Route::group(['middleware' => 'jwt.v2.verify'], function () {
         Route::get('/orders/{order_no}', [MemberController::class, 'getOrderDetails']);
 
         // 取消訂單
-        // Route::post('/orders/{order_no}/cancel', [MemberController::class, 'getOrderDetails']);
+        Route::post('/orders/{order_no}/cancel', [MemberController::class, 'cancelOrder']);
 
         // 申請退貨
         // Route::post('/orders/{order_no}/return', [MemberController::class, 'getOrderDetails']);
