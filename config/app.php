@@ -183,6 +183,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
         App\Providers\MacroServiceProvider::class,
+        App\Providers\StrServiceProvider::class,
     ],
 
     /*

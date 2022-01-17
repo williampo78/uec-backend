@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\api\CancelOrderRequest;
-use App\Http\Requests\api\GetOrderDetailRequest;
-use App\Http\Requests\api\GetOrderRequest;
-use App\Http\Requests\api\ResetPasswordRequest;
+use Carbon\Carbon;
 use App\Models\Order;
-use App\Models\OrderPayment;
 use App\Models\Shipment;
-use App\Models\StockTransactionLog;
-use App\Models\WarehouseStock;
+use Illuminate\Support\Str;
+use App\Models\OrderPayment;
 use App\Services\APIService;
-use App\Services\LookupValuesVService;
+use App\Models\ReturnRequest;
+use App\Models\WarehouseStock;
 use App\Services\OrderService;
 use App\Services\SysConfigService;
 use App\Services\WarehouseService;
-use App\Services\WarehouseStockService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\StockTransactionLog;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Services\LookupValuesVService;
+use App\Services\WarehouseStockService;
+use App\Http\Requests\api\GetOrderRequest;
+use App\Http\Requests\api\CancelOrderRequest;
+use App\Http\Requests\api\ReturnOrderRequest;
+use App\Http\Requests\api\ResetPasswordRequest;
+use App\Http\Requests\api\GetOrderDetailRequest;
 
 class MemberController extends Controller
 {
@@ -294,7 +296,10 @@ class MemberController extends Controller
         })->config_value;
 
         // 是否可以取消訂單
-        $order->can_cancel_order = $order_service->canCancelOrder($order->ordered_date, $cancel_limit_mins);
+        $order->can_cancel_order = $order_service->canCancelOrder($order->status_code, $order->ordered_date, $cancel_limit_mins);
+
+        // 是否可以申請退貨
+        $order->can_return_order = $order_service->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id);
 
         // 訂單時間
         $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s');
@@ -322,12 +327,12 @@ class MemberController extends Controller
 
         // 收件者姓名
         if (isset($order->receiver_name)) {
-            $order->receiver_name = (string) Str::of($order->receiver_name)->mask('*', 0, 1)->mask('*', -1, 1);
+            $order->receiver_name = (string) Str::of($order->receiver_name)->myMask('*', 0, 1)->myMask('*', -1, 1);
         }
 
         // 收件者手機
         if (isset($order->receiver_mobile)) {
-            $order->receiver_mobile = (string) Str::of($order->receiver_mobile)->mask('*', -3);
+            $order->receiver_mobile = (string) Str::of($order->receiver_mobile)->myMask('*', -3);
         }
 
         // 收件者地址
@@ -423,6 +428,8 @@ class MemberController extends Controller
                     'qty',
                     'unit_price',
                     'subtotal',
+                    'product_id',
+                    'product_no',
                 ]);
             });
         }
@@ -477,6 +484,7 @@ class MemberController extends Controller
             'invoice_gui_number',
             'invoice_title',
             'can_cancel_order',
+            'can_return_order',
         ]);
 
         return response()->json([
@@ -485,6 +493,12 @@ class MemberController extends Controller
         ], 200);
     }
 
+    /**
+     * 取消訂單
+     *
+     * @param CancelOrderRequest $request
+     * @return json
+     */
     public function cancelOrder(CancelOrderRequest $request)
     {
         try {
@@ -517,13 +531,6 @@ class MemberController extends Controller
             ], 404);
         }
 
-        // 訂單狀態非新建立的狀態
-        if ($order->status_code != 'CREATED') {
-            return response()->json([
-                'message' => '訂單已進入處理階段，不可取消訂單',
-            ], 423);
-        }
-
         // 系統設定檔
         $sys_configs = $this->sys_config_service->getSysConfigs();
 
@@ -533,9 +540,9 @@ class MemberController extends Controller
         })->config_value;
 
         // 是否可以取消訂單
-        if (!$order_service->canCancelOrder($order->ordered_date, $cancel_limit_mins)) {
+        if (!$order_service->canCancelOrder($order->status_code, $order->ordered_date, $cancel_limit_mins)) {
             return response()->json([
-                'message' => '已超過限制時間，不可取消訂單',
+                'message' => '訂單已進入處理階段或已超過限制時間，不可取消訂單',
             ], 423);
         }
 
@@ -603,6 +610,7 @@ class MemberController extends Controller
                     ->update([
                         'status_code' => 'CANCELLED',
                         'pay_status' => 'VOIDED',
+                        'refund_status' => 'NA',
                         'cancel_req_reason_code' => $code,
                         'cancel_req_remark' => $remark,
                         'cancelled_at' => $now,
@@ -702,6 +710,146 @@ class MemberController extends Controller
 
         return response()->json([
             'message' => '訂單取消成功',
+            'results' => [
+                'cancelled_at' => $now->format('Y-m-d H:i:s'),
+            ],
+        ], 200);
+    }
+
+    /**
+     * 申請退貨
+     *
+     * @param ReturnOrderRequest $request
+     * @return json
+     */
+    public function returnOrder(ReturnOrderRequest $request)
+    {
+        try {
+            $member_id = auth('api')->userOrFail()->member_id;
+        } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
+            return response()->json([
+                'message' => '會員不存在',
+            ], 404);
+        }
+
+        $order_service = new OrderService;
+        $order_no = $request->route('order_no');
+        $code = $request->input('code');
+        $remark = $request->input('remark');
+        $name = $request->input('name');
+        $mobile = $request->input('mobile');
+        $telephone = $request->input('telephone');
+        $telephone_ext = $request->input('telephone_ext');
+        $city = $request->input('city');
+        $district = $request->input('district');
+        $address = $request->input('address');
+        $now = Carbon::now();
+
+        // 取得訂單
+        $order = $order_service->getOrders([
+            'revision_no' => 0,
+            'order_no' => $order_no,
+            'member_id' => $member_id,
+        ])->first();
+
+        // 訂單不存在
+        if (!isset($order)) {
+            return response()->json([
+                'message' => '訂單不存在',
+            ], 404);
+        }
+
+        // 是否可以申請退貨
+        if (!$order_service->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id)) {
+            return response()->json([
+                'message' => '商品尚未配達或已超過鑑賞期，不可申請退貨',
+            ], 423);
+        }
+
+        // 取得訂單退貨原因
+        $return_req_reason = $this->lookup_values_v_service->getLookupValuesVs([
+            'disable_agent_id_auth' => true,
+            'type_code' => 'RETURN_REQ_REASON',
+            'code' => $code,
+        ])->first();
+
+        // 退貨原因代碼不存在
+        if (!isset($return_req_reason)) {
+            return response()->json([
+                'message' => '退貨原因代碼不存在',
+            ], 404);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // 新增退貨申請單
+            $return_request = ReturnRequest::create([
+                'agent_id' => 1,
+                // 'request_no' => ,
+                'request_date' => $now,
+                'member_id' => $member_id,
+                'order_id' => $order->id,
+                'order_no' => $order->order_no,
+                'status_code' => 'CREATED',
+                'refund_method' => $order->payment_method,
+                'lgst_method' => $order->lgst_method,
+                'req_name' => $name,
+                'req_mobile' => $mobile,
+                'req_city' => $city,
+                'req_district' => $district,
+                'req_address' => $address,
+                'req_telephone' => $telephone,
+                'req_telephone_ext' => $telephone_ext,
+                'req_reason_code' => $code,
+                'req_remark' => $remark,
+                'created_by' => -1,
+                'updated_by' => -1,
+            ]);
+/*
+            // 訂單明細
+            if (isset($order->order_details)) {
+                foreach ($order->order_details as $order_detail) {
+                    // 新增庫存異動紀錄
+                    StockTransactionLog::create([
+                        'transaction_type' => 'ORDER_CANCEL',
+                        'transaction_date' => $now,
+                        'warehouse_id' => $warehouse->id,
+                        'product_item_id' => $order_detail->product_item_id,
+                        'item_no' => $order_detail->item_no,
+                        'transaction_qty' => $order_detail->qty,
+                        'source_doc_no' => $order->order_no,
+                        'source_table_name' => 'order_details',
+                        'source_table_id' => $order_detail->id,
+                        'created_by' => -1,
+                        'updated_by' => -1,
+                    ]);
+                }
+            }
+
+            // 更新訂單
+            Order::findOrFail($order->id)
+                ->update([
+                    'status_code' => 'CANCELLED',
+                    'refund_status' => 'PENDING',
+                    'cancel_req_reason_code' => $code,
+                    'cancel_req_remark' => $remark,
+                    'cancelled_at' => $now,
+                    'updated_by' => -1,
+                ]);
+*/
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'message' => '其他錯誤',
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => '訂單退貨成功',
             'results' => [
                 'cancelled_at' => $now->format('Y-m-d H:i:s'),
             ],
