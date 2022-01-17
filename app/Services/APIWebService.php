@@ -189,7 +189,7 @@ class APIWebService
 
             $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));
             //echo $discount;
-            $collection[] = array('product_id' => $collect->id, 'product_no' => $collect->product_no, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'product_discount' => intval($discount), 'product_photo' => (isset($photo['photo_name']) ? $s3 . $photo['photo_name'] : null));
+            $collection[] = array('product_id' => $collect->id, 'product_no' => $collect->product_no, 'product_name' => $collect->product_name, 'selling_price' => intval($collect->selling_price), 'list_price' => intval($collect->list_price), 'product_discount' => intval($discount), 'product_photo' => (isset($photo['photo_name']) ? $s3 . $photo['photo_name'] : null));
         }
 
         return json_encode($collection);
