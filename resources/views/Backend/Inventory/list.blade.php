@@ -3,45 +3,7 @@
 @section('title', '庫存彙總表')
 
 @section('style')
-    <style>
-        .modal-dialog {
-            max-width: 100%;
-        }
 
-        .is-dangerous-stock{
-            background-color: #ba3f4e;
-            color: white;
-        }
-
-        .modal-dialog .modal-body .panel {
-            margin: 0;
-            border-radius: 0;
-        }
-
-        .modal-dialog .modal-body .panel .panel-heading {
-            height: 4rem;
-        }
-
-        .no-border-bottom {
-            border-bottom: 0;
-        }
-
-        .amount-panel .row {
-            padding: 1rem;
-        }
-
-        .tab-content {
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            padding: 30px;
-        }
-
-        #tab-lgst-info tbody th {
-            text-align: right;
-        }
-
-    </style>
 @endsection
 
 @section('content')

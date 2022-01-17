@@ -39,6 +39,7 @@ use CKSource\CKFinderBridge\Controller\CKFinderController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\OrderRefundController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -96,6 +97,14 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     //庫存單
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory'); // 庫存單列表
     Route::get('/inventory/ajax/excel', [InventoryController::class, 'exportExcel'])->name('inventory.export_excel'); // 庫存單匯出excel
+
+    //退貨申請單管理
+    Route::group(['prefix' => 'order_refund'], function(){
+        Route::get('/', [OrderRefundController::class, 'index'])->name('order_refund'); // 列表
+        Route::get('/ajax/excel', [OrderRefundController::class, 'exportExcel'])->name('order_refund.export_excel'); // 匯出excel
+        Route::get('/ajax/detail', [OrderRefundController::class, 'getDetail'])->name('order_refund.detail'); // 詳細資料
+    });
+
 
     Route::resource('/test', TestController::class, ['names' => ['index' => 'test']]);
     Route::resource('/roles', RolesController::class, ['names' => ['index' => 'roles']]);

@@ -161,6 +161,10 @@ class CheckoutController extends Controller
                 $v_invocie = Validator::make($request->invoice, [
                     'carrier_no' => 'required|min:8|max:8',
                 ], $errInvoice);
+            } else {
+                $errInvoice = [];
+                $v_invocie = Validator::make($request->invoice, [], $errInvoice);
+
             }
         } elseif ($request->invoice['usage'] == 'C') { //三聯式，公司戶電子發票
             $errInvoice = [
@@ -182,8 +186,10 @@ class CheckoutController extends Controller
 
         }
 
-        if ($v_invocie->fails()) {
-            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v_invocie->errors()]);
+        if ($v_invocie) {
+            if ($v_invocie->fails()) {
+                return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v_invocie->errors()]);
+            }
         }
 
         $member_id = Auth::guard('api')->user()->member_id;

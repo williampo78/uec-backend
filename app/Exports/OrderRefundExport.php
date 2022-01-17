@@ -4,9 +4,8 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Sheet;
 
-class InventoryExport implements FromCollection, WithHeadings
+class OrderRefundExport implements FromCollection, WithHeadings
 {
     private $collection;
 
@@ -18,19 +17,27 @@ class InventoryExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            '倉庫',
+            '項次',
+            '退貨申請時間',
+            '退貨申請單號',
+            '訂單編號',
+            '會員帳號',
+            '狀態',
+            '物流方式',
+            '退貨完成時間',
+            '退款方式',
+            '退款狀態',
+            '訂購人',
+            '取件聯絡人',
+            '取件聯絡手機',
+            '取件地址',
             'Item編號',
             '商品名稱',
             '規格一',
             '規格二',
-            'POS品號',
-            '庫存類型',
-            '安全庫存量',
-            '庫存量',
-            '售價(含稅)',
-            '平均成本(含稅)',
-            '毛利率',
-            '庫存成本(含稅)',
+            '申請數量',
+            '檢驗合格數量',
+            '檢驗不合格數',
         ];
     }
 
