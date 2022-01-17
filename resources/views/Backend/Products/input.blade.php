@@ -658,7 +658,7 @@
                         id: '',
                         sort_key: 0,
                         sort: 0,
-                        spec_1_value: 0,
+                        spec_1_value: '',
                         spec_1_only_key: 0,
                         item_no: '',
                         supplier_item_no: '',
