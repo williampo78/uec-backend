@@ -228,6 +228,7 @@ class APIProductServices
         if ($id) {//依產品編號找相關分類
             $strSQL .= " and web_category_products.product_id=" . $id;
         }
+        $strSQL .= " order by web_category_products.sort ";
 
         $products = DB::select($strSQL);
         $data = [];

@@ -182,7 +182,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
-        App\Providers\MacroServiceProvider::class,
+        App\Providers\ExcelServiceProvider::class,
         App\Providers\StrServiceProvider::class,
     ],
 
