@@ -372,11 +372,16 @@
                 })
                 .then(function(response) {
 
+                    if(response.data.status == false){
+                        alert('發生錯誤');
+                        return false;
+                    }
+
                     let return_request = response.data.data.return_request;
                     let return_details = response.data.data.return_details;
                     let return_information = response.data.data.return_information;
 
-                    console.log(return_request);
+
                     //檢視資料內的內容 start
                     //退貨申請單號
                     $('#modal-request-no').text(return_request.request_no);
@@ -392,8 +397,8 @@
                     $('#modal-req-remark').text(return_request.req_remark);
                     //物流方式
                     $('#modal-lgst-method').text(return_request.lgst_method);
-                    //物流廠商 #TODO 不知道取哪個值
-                    //$('#').text()
+                    //物流廠商
+                    $('#modal-return-request').text(return_request.lgst_company)
                     //會員編號
                     $('#modal-member-id').text(return_request.member_id);
                     //訂購人

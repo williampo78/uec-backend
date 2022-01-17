@@ -93,7 +93,7 @@
                                                 <label class="control-label">物流廠商</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-shipping-free-threshold">{{ config('uec.lgst_company_code_options')['CHOICE'] }}</p>
+                                                <p class="form-control-static" id="modal-return-request"></p>
                                             </div>
                                         </div>
                                     </div>

@@ -190,6 +190,8 @@ class OrderRefundService
         $ReturnRequest->status_code = config('uec.return_request_status_options')[$ReturnRequest->status_code] ?? null;
         //物流方式
         $ReturnRequest->lgst_method = config('uec.lgst_method_options')[$ReturnRequest->lgst_method] ?? null;
+        //物流廠商
+        $ReturnRequest->lgst_company = config('uec.lgst_company_code_options')[$ReturnRequest->lgst_company_code] ?? null;
 
         return $ReturnRequest;
     }
