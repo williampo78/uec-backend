@@ -302,7 +302,7 @@
                     var expect_deliver_date = $('#expect_deliver_date').val();
                     var get_order_supplier_id = $('#get_order_supplier_id').val();
                     axios.post('/backend/order_supplier/ajax', {
-                            "type": "show_supplier",
+                            "type": "supplier_deliver_time",
                             _token: '{{ csrf_token() }}',
                             'id': get_order_supplier_id,
                             'supplier_deliver_date': supplier_deliver_date,
