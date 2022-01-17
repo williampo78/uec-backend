@@ -182,8 +182,10 @@ class CheckoutController extends Controller
 
         }
 
-        if ($v_invocie->fails()) {
-            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v_invocie->errors()]);
+        if ($v_invocie) {
+            if ($v_invocie->fails()) {
+                return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v_invocie->errors()]);
+            }
         }
 
         $member_id = Auth::guard('api')->user()->member_id;
