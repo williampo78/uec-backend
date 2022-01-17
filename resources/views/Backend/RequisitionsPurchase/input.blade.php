@@ -561,7 +561,6 @@
                         sum_total_tax_price = vm.NumberAdd(sum_total_tax_price,obj.subtotal_tax_price);
                         sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price,obj.original_subtotal_tax_price);
                     });
-                    // console.log(requisitions_purchase.tax);
                     //表頭計算稅
                     switch (requisitions_purchase.tax) {
                         case '0': //免稅
@@ -574,9 +573,6 @@
                             //     break;
                         case '2': //應稅內含                     
                             // 單頭金額欄位計算方式
-                            // ◆   total_tax_price = sum(單身subtotal_tax_price )
-                            // ◆   original_total_tax_price  = sum(單身original_subtotal_tax_price )
-                            console.log(sum_original_total_tax_price);
                             requisitions_purchase.total_tax_price = sum_total_tax_price; //稅額(本幣)
                             requisitions_purchase.original_total_tax_price = sum_original_total_tax_price; //原幣稅額
 
@@ -641,7 +637,6 @@
                             const req = async () => {
                                 const response = await axios.get('/backend/getItemLastPrice/' +
                                     whereGet);
-                                console.log(response.data);
                                 details[getSelectKey].item_price = response.data.item_price;
                                 details[getSelectKey].old_item_price = response.data.item_price;
                             }
