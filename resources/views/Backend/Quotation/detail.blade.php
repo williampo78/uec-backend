@@ -11,7 +11,10 @@
             <div id="ajaxHtmlappendthis">
 
             </div>
-           
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
+                    關閉視窗</button>
+            </div>
         </div>
         <!-- /.modal-content -->
     </div>
