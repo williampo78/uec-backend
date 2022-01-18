@@ -262,6 +262,15 @@ class APIProductServices
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword);
         if ($products) {
             $promotion = self::getPromotion('product_card');
+            foreach ($promotion as $k => $v) {
+                $promotion_txt = '';
+                foreach ($v as $label) {
+                    if ($promotion_txt != $label->promotional_label) {
+                        $promotional[$k][] = $label->promotional_label;
+                        $promotion_txt = $label->promotional_label;
+                    }
+                }
+            }
             $login = Auth::guard('api')->check();
             $collection = false;
             $cart = false;
@@ -279,7 +288,7 @@ class APIProductServices
             $product_id = 0;
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $product) {
-                    $promotional = [];
+                    //$promotional = [];
                     if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
                         $promotion_desc = $product->promotion_desc;
                     } else {
@@ -287,11 +296,13 @@ class APIProductServices
                     }
                     $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
 
+                    /*
                     if (isset($promotion[$product->id])) {
                         foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
                             $promotional[] = $Label->promotional_label;
                         }
                     }
+                    */
 
                     if (isset($is_collection)) {
                         foreach ($is_collection as $k => $v) {
@@ -319,7 +330,7 @@ class APIProductServices
                             'product_discount' => intval($discount),
                             'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
                             'promotion_desc' => $promotion_desc,
-                            'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
                             'collections' => $collection,
                             'cart' => $cart
                         );
@@ -374,10 +385,11 @@ class APIProductServices
         $strSQL = "select pcp.product_id, pc.*
                 from promotional_campaigns pc
                 inner join  promotional_campaign_products pcp on pcp.promotional_campaign_id=pc.id
-                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1 ";
+                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1 order by pcp.product_id";
 
         $promotional = DB::select($strSQL);
         $data = [];
+        $label = '';
         foreach ($promotional as $promotion) {
             if ($type == 'product_card') {
                 $data[$promotion->product_id][] = $promotion;
