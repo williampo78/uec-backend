@@ -740,7 +740,11 @@ class APICartServices
             $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
                 $act = 'upd';
-                $qty = ($input['item_qty'] + (isset($data[0]['qty']) ? $data[0]['qty'] : 0));
+                if ($data[0]['status_code'] == 0) {
+                    $qty = ($input['item_qty'] + (isset($data[0]['qty']) ? $data[0]['qty'] : 0));
+                } else {
+                    $qty = $input['item_qty'];
+                }
             } else {
                 $act = 'add';
             }
