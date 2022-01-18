@@ -196,8 +196,7 @@
                                         <div class="col-sm-1">
                                             <div class="form-group">
                                                 <input class="form-control item_qty" v-model="details[detailKey].item_qty"
-                                                    :name="'item_qty['+detailKey+']'" type="number"
-                                                    :min="details[detailKey].min_purchase_qty">
+                                                    :name="'item_qty['+detailKey+']'" :min="0" type="number">
                                             </div>
                                         </div>
                                         {{-- 單位 --}}
@@ -288,7 +287,7 @@
                         item_number: obj.product_items_no, //品項編號
                         item_name: obj.product_name, //品項名稱
                         item_brand: '', //品項品牌(商品join)
-                        min_purchase_qty: obj.min_purchase_qty, //最小採購量
+                        min_purchase_qty: 0, //最小採購量
                         item_uom: obj.uom, //品項單位(商品join)
                         item_price: obj.item_price, //單價
                         item_qty: obj.item_qty, //數量
@@ -366,6 +365,10 @@
                     $(".item_qty").each(function() {
                         $(this).rules("add", {
                             required: true,
+                            digits:true,
+                            messages:{
+                                digits: '請輸入正整數'
+                            },
                         });
                     })
                     $(".item_price").each(function() {
@@ -447,7 +450,7 @@
                 });
                 //驗證
                 $("#new-form").validate({
-                    // debug: true,
+                    debug: true,
                     submitHandler: function(form) {
                         var item_num = $('.detailsdata').length;
                         if (item_num <= 0) {
@@ -510,6 +513,9 @@
                         if (obj.is_gift) { //如果是贈品則不計算單價
                             if (obj.item_price) {
                                 obj.item_price = 0;
+                                obj.subtotal_tax_price = 0 ;
+                                obj.original_subtotal_tax_price = 0 ;
+                                obj.original_subtotal_price = 0 ; 
                             }
                         } else {
                             if (vm.detailsUpdate.length > 0 && obj.old_item_price == 0) { //因為編輯撈取如果是贈品會抓不到 單價 需要另外ajax 取得
@@ -544,7 +550,7 @@
                                 case '2': //應稅內含
                                     // ◆   本幣稅額 subtotal_tax_price  = subtotal_price - (subtotal_price/1.05)  四捨五入到整數位
                                     // ◆   原幣稅額 original_subtotal_tax_price = original_subtotal_price - (original_subtotal_price/1.05)  四捨五入到小數後2位
-                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(2); //(本幣)稅額
+                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(0); //(本幣)稅額
                                     obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
                                     break;
                                 case '3': //零稅率
@@ -627,8 +633,8 @@
                             details[getSelectKey].item_number = obj.item_no; //品項編號
                             details[getSelectKey].item_brand = obj.brand; //品牌
                             details[getSelectKey].item_uom = obj.uom; // 單位
-                            details[getSelectKey].min_purchase_qty = obj.min_purchase_qty; //最小採購量
-                            details[getSelectKey].item_qty = obj.min_purchase_qty; //最小採購量
+                            // details[getSelectKey].min_purchase_qty = obj.min_purchase_qty; //最小採購量
+                            // details[getSelectKey].item_qty = obj.min_purchase_qty; //最小採購量
                             var find_this_item_id = obj.id;
                             //帶出價格
                             var whereGet = '?supplier_id=' + $('#supplier_id').val() +
