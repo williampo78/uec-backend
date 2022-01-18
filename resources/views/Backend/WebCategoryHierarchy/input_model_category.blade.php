@@ -52,7 +52,7 @@
                               <span v-if="addCategory.act == 'edit'"> 編輯 </span>
                               <span v-else>新增</span>
                           </button>
-                          <button type="button" class="btn btn-warning hidden-model" data-dismiss="modal"><i
+                          <button type="button" class="btn btn-danger hidden-model" data-dismiss="modal"><i
                                   class="fa fa-fw fa-close"></i>
                               關閉</button>
                       </div>

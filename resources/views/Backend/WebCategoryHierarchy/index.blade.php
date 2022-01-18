@@ -397,6 +397,16 @@
                             default:
                                 break;
                         }
+                        if(type == 'EditCategory'){
+                            var act_msg = '編輯';
+                        }else{
+                            var act_msg = '新增'; 
+                        }
+                        if(response.status == 200){
+                            alert(act_msg+'成功')
+                        }else{
+                            alert(act_msg +'失敗')
+                        }
                     }
                     if (checkstatus) {
                         PostAjax();
@@ -472,7 +482,11 @@
                                 type: 'SortCategory',
                                 JsonData: JSON.stringify(InData),
                             });
-                            console.log(response);
+                            if(response.status == 200){
+                                alert('儲存排序成功');
+                            }else{
+                                alert('儲存排序失敗');
+                            }
                         }
 
                         SeveSortAjax();
