@@ -185,7 +185,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag)
     {
 
         //分類總覽階層
@@ -233,8 +233,14 @@ class APIProductServices
 
         if ($id) {//依產品編號找相關分類
             $strSQL .= " and web_category_products.product_id=" . $id;
+            $strSQL .= " order by web_category_products.sort ";
         }
-        $strSQL .= " order by web_category_products.sort ";
+
+        if ($order_by == 'launched') {
+            $strSQL .= " order by p.start_launched_at " . $sort_flag;
+        } else if ($order_by == 'price') {
+            $strSQL .= " order by p.selling_price " . $sort_flag;
+        }
 
         $products = DB::select($strSQL);
         $data = [];
@@ -258,8 +264,10 @@ class APIProductServices
         $page = $input['page'];
         $selling_price_min = $input['price_min'];
         $selling_price_max = $input['price_max'];
-        $sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC;
-        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword);
+        $order_by = ($input['order_by'] ? $input['order_by'] : 'launched');
+        $sort_flag = ($input['sort'] ? $input['sort'] : 'DESC');
+        //$sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC;
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             foreach ($promotion as $k => $v) {
@@ -288,7 +296,6 @@ class APIProductServices
             $product_id = 0;
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $product) {
-                    //$promotional = [];
                     if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
                         $promotion_desc = $product->promotion_desc;
                     } else {
@@ -296,13 +303,6 @@ class APIProductServices
                     }
                     $discount = ($product->list_price == 0 ? 0 : ceil(($product->selling_price / $product->list_price) * 100));
 
-                    /*
-                    if (isset($promotion[$product->id])) {
-                        foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
-                            $promotional[] = $Label->promotional_label;
-                        }
-                    }
-                    */
 
                     if (isset($is_collection)) {
                         foreach ($is_collection as $k => $v) {
@@ -340,7 +340,7 @@ class APIProductServices
 
                 }
             }
-            array_multisort(array_column($data, 'selling_price'), $sort_flag, $data);
+            //array_multisort(array_column($data, 'selling_price'), $sort_flag, $data);
             $searchResult = self::getPages($data, $size, $page);
         } else {
             $searchResult = '404';
