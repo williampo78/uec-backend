@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderPaymentsReportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QAController;
 use App\Http\Controllers\ItemController;
@@ -105,6 +106,11 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
         Route::get('/ajax/detail', [OrderRefundController::class, 'getDetail'])->name('order_refund.detail'); // 詳細資料
     });
 
+    //金流對帳單
+    Route::group(['prefix' => 'order_payments_report'], function(){
+        Route::get('/', [OrderPaymentsReportController::class, 'index'])->name('order_payments_report'); // 列表
+        Route::get('/ajax/excel', [OrderPaymentsReportController::class, 'exportExcel'])->name('order_payments_report.export_excel'); // 匯出excel
+    });
 
     Route::resource('/test', TestController::class, ['names' => ['index' => 'test']]);
     Route::resource('/roles', RolesController::class, ['names' => ['index' => 'roles']]);
