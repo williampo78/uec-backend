@@ -199,7 +199,7 @@
                                         <td>{{ $data['status_code'][$v['status']] ?? '' }}</td>
                                         <td>{{ $v['requisitions_purchase_number'] }}</td>
                                         <td>{{ $v['expect_deliver_date'] }}</td>
-                                        <td>{{ $v['supplier_deliver_date'] }}</td>
+                                        <td>{{ $v['edi_exported_at'] }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
