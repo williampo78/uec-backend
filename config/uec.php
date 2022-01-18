@@ -166,4 +166,12 @@ return [
         'FAILED' => '退款失敗',
         'VOIDED' => '已作廢',
     ],
+
+    //order_payments資料新增原因
+    'order_payment_record_created_reason' => [
+        'ORDER_CREATED' => '訂單成立',
+        'ORDER_CANCELLED' => '訂單取消',
+        'RETURNED' => '銷退',
+        'ORDER_VOIDED' => '訂單作廢',
+    ]
 ];

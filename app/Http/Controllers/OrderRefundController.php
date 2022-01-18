@@ -4,16 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Exports\OrderRefundExport;
 use App\Services\OrderRefundService;
+use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 class OrderRefundController extends Controller
 {
     private $orderRefundService;
+    private $role_service;
 
-    public function __construct(OrderRefundService $OrderRefundService)
+    public function __construct(
+        OrderRefundService $OrderRefundService,
+        RoleService $role_service
+    )
     {
         $this->orderRefundService = $OrderRefundService;
+        $this->role_service = $role_service;
     }
 
     /**
@@ -24,8 +30,16 @@ class OrderRefundController extends Controller
      */
     public function index(Request $request):view
     {
-        $orderRefunds = $this->orderRefundService->getOrderRefunds($request->toArray());
-        $orderRefunds = $this->orderRefundService->handleOrderRefunds($orderRefunds);
+        $orderRefunds = collect();
+
+        //有權限
+        if ($this->role_service->getOtherRoles()['auth_query']) {
+            //有搜尋條件才會進行處理
+            if (empty($request->toArray()) === false) {
+                $orderRefunds = $this->orderRefundService->getOrderRefunds($request->toArray());
+                $orderRefunds = $this->orderRefundService->handleOrderRefunds($orderRefunds);
+            }
+        }
 
         $params = [];
         $params['orderRefunds'] = $orderRefunds;
@@ -73,6 +87,11 @@ class OrderRefundController extends Controller
      */
     public function exportExcel(Request $request)
     {
+        //無權限
+        if($this->role_service->getOtherRoles()['auth_export'] == false) {
+            return response('Forbidden', 403);
+        }
+
         $orderRefunds = $this->orderRefundService->getExcelData($request->toArray());
         $orderRefunds = $this->orderRefundService->handleExcelData($orderRefunds);
 
