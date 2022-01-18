@@ -143,6 +143,7 @@ class RequisitionsPurchaseService
         unset($input['requisitions_purchase_detail']); // 移除json
         unset($input['item_price']); // 移除json
         unset($input['_token']);
+        unset($input['item_qty']);
         unset($input['old_supplier_id']);
         $requisitions_purchase = $input;
         $user_id = Auth::user()->id;
