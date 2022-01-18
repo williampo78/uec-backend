@@ -252,21 +252,17 @@ class RequisitionsPurchaseController extends Controller
     {
         $in = $request->input();
         $getItemLastPrice = $this->quotationService->getItemLastPrice($in)->first();
-        if($getItemLastPrice == null){
+        if ($getItemLastPrice == null) {
             return response()->json([
-                'original_unit_nontax_price' => null,
+                'item_price' => null,
+            ]);
+        } else {
+            $tem_price = $getItemLastPrice->original_unit_nontax_price + $getItemLastPrice->original_unit_tax_price;
+            return response()->json([
+                'item_price' => $tem_price,
             ]);
         };
 
-        if($getItemLastPrice->original_unit_nontax_price || $getItemLastPrice->original_unit_tax_price){
-            $tem_price = null ;
-        }else{
-            $tem_price = $getItemLastPrice->original_unit_nontax_price +  $getItemLastPrice->original_unit_tax_price ; 
-        }
-
-        return response()->json([
-            'original_unit_nontax_price' => $tem_price,
-        ]);
     }
 
 }

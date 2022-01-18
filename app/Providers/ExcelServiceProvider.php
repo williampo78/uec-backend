@@ -5,7 +5,7 @@ namespace App\Providers;
 use Maatwebsite\Excel\Sheet;
 use Illuminate\Support\ServiceProvider;
 
-class MacroServiceProvider extends ServiceProvider
+class ExcelServiceProvider extends ServiceProvider
 {
     /**
      * Register services.

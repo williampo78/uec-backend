@@ -99,7 +99,7 @@ Route::group(['middleware' => 'jwt.v2.verify'], function () {
         Route::post('/orders/{order_no}/cancel', [MemberController::class, 'cancelOrder']);
 
         // 申請退貨
-        // Route::post('/orders/{order_no}/return', [MemberController::class, 'getOrderDetails']);
+        Route::post('/orders/{order_no}/return', [MemberController::class, 'returnOrder']);
     });
 });
 

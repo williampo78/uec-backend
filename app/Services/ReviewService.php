@@ -20,7 +20,7 @@ class ReviewService
      * @return bool
      */
     public function updateReview($data , string $type){
-        $reviewer = Auth::user()->id;
+        $reviewer = Auth::user()->id; //審核人
         $now = Carbon::now();
         $id = $data['id'];
         unset($data['id']);
@@ -41,9 +41,8 @@ class ReviewService
         }
         //更新review_log table
         DB::table($reviewLogTable)->where($table.'_id' , $id)->where('reviewer' , $reviewer)->update($data);
-        $created_by = isset($data['created_by']) ? $data['created_by'] : null ; 
-        //取得下一個簽核者
-        $next_approver = $this->hierarchyService->getNextApproval($type ,$created_by);
+        $next_sql_no  = DB::table($reviewLogTable)->where($table.'_id' , $id)->where('reviewer' , $reviewer)->first()->seq_no += 1 ;  //取得下一個seq_no      
+        $next_approver = DB::table($reviewLogTable)->where($table.'_id' , $id)->where('seq_no' , $next_sql_no)->first()->reviewer ?? null; //where seq_no 取得下一個簽核者
         $updateData['updated_at'] = $now;
 
         //簽核通過
@@ -73,7 +72,6 @@ class ReviewService
         }
 
         DB::table($table)->where('id', $id)->update($updateData);
-
         return true;
     }
 }

@@ -22,7 +22,7 @@
                     <div class="row">
                         <input style="display:none;" name="id" value="{{ $requisitionsPurchase->id ?? '' }}">
                         <!-- 欄位 -->
-                        <input type="hidden" v-model='switch_computed' >
+                        <input type="hidden" v-model='switch_computed'>
                         <div class="col-sm-12">
                             <div class="row">
                                 <div class="col-sm-4">
@@ -195,8 +195,9 @@
                                         {{-- 數量 --}}
                                         <div class="col-sm-1">
                                             <div class="form-group">
-                                            <input class="form-control item_qty"
-                                                v-model="details[detailKey].item_qty" :name="'item_qty['+detailKey+']'" type="number" :min="details[detailKey].min_purchase_qty">
+                                                <input class="form-control item_qty" v-model="details[detailKey].item_qty"
+                                                    :name="'item_qty['+detailKey+']'" type="number"
+                                                    :min="details[detailKey].min_purchase_qty">
                                             </div>
                                         </div>
                                         {{-- 單位 --}}
@@ -273,7 +274,7 @@
                     itemOptions: @json(isset($itemOptions) ? $itemOptions : []),
                     supplier: @json($supplier),
                     supplier_id: '',
-                    switch_computed : 0,
+                    switch_computed: 0,
                 }
             },
             created() {
@@ -294,12 +295,12 @@
                         is_gift: obj.is_gift, // 是否為贈品
                         subtotal_tax_price: obj.subtotal_tax_price, ////(本幣)稅額
                         original_subtotal_tax_price: obj.original_subtotal_tax_price, //原幣稅額
-                        old_item_price : 0 ,
+                        old_item_price: 0,
                     });
                 });
                 this.$nextTick(() => {
-                    vm.details = addArray ;
-                    this.switch_computed = 1 ;
+                    vm.details = addArray;
+                    this.switch_computed = 1;
                 });
             },
             methods: {
@@ -337,7 +338,7 @@
                         .catch(function(error) {
                             console.log('ERROR');
                         })
-                        
+
                 },
                 //刪除品項
                 ItemListDel(id, key) {
@@ -395,12 +396,29 @@
                         var req = async () => {
                             const response = await axios.get('/backend/getItemLastPrice/' +
                                 whereGet);
-                            details[key].item_price = response.data.original_unit_price;
-                            details[key].item_price = response.data.original_unit_price;
+                            details[key].item_price = response.data.item_price;
+                            details[key].item_price = response.data.item_price;
 
                         }
                         req();
                     });
+                },
+                //計算福點數
+                NumberAdd(arg1, arg2) {
+                    var r1, r2, m, n;
+                    try {
+                        r1 = arg1.toString().split(".")[1].length
+                    } catch (e) {
+                        r1 = 0
+                    }
+                    try {
+                        r2 = arg2.toString().split(".")[1].length
+                    } catch (e) {
+                        r2 = 0
+                    }
+                    m = Math.pow(10, Math.max(r1, r2))
+                    n = (r1 >= r2) ? r1 : r2;
+                    return ((arg1 * m + arg2 * m) / m).toFixed(n);
                 },
             },
             mounted: function mounted() {
@@ -478,21 +496,23 @@
             },
             computed: {
                 detailsCount() {
-                    var vm = this ; 
-                    if(this.switch_computed === 0){
-                        return false ; 
+                    var vm = this;
+                    if (this.switch_computed === 0) {
+                        return false;
                     }
                     var details = this.details;
                     var requisitions_purchase = this.requisitions_purchase
                     var sum_price = 0;
+                    var sum_original_total_tax_price = 0.00;
+                    var sum_total_tax_price = 0.00;
                     $.each(details, function(key, obj) {
                         //原幣小計 = 單價 * 數量
                         if (obj.is_gift) { //如果是贈品則不計算單價
-                            if(obj.item_price){
+                            if (obj.item_price) {
                                 obj.item_price = 0;
                             }
-                        }else{
-                            if(vm.detailsUpdate.length > 0 && obj.old_item_price == 0){ //因為編輯撈取如果是贈品會抓不到 單價 需要另外ajax 取得
+                        } else {
+                            if (vm.detailsUpdate.length > 0 && obj.old_item_price == 0) { //因為編輯撈取如果是贈品會抓不到 單價 需要另外ajax 取得
                                 var whereGet = '?supplier_id=' + $('#supplier_id').val() +
                                     '&currency_code=' + $('#currency_code').val() +
                                     '&tax=' + requisitions_purchase.tax +
@@ -500,12 +520,12 @@
                                 var req = async () => {
                                     const response = await axios.get('/backend/getItemLastPrice/' +
                                         whereGet);
-                                    details[key].item_price = response.data.original_unit_price;
-                                    details[key].old_item_price = response.data.original_unit_price;
+                                    details[key].item_price = response.data.item_price;
+                                    details[key].old_item_price = response.data.item_price;
                                 }
                                 req();
-                            }else{
-                                obj.item_price = obj.old_item_price ; 
+                            } else {
+                                obj.item_price = obj.old_item_price;
                             }
                         }
                         if (obj.item_qty > 0 && obj.item_price) {
@@ -522,36 +542,41 @@
                                     //     obj.original_subtotal_tax_price = (obj.original_subtotal_price * 0.05).toFixed(2); //原幣稅額
                                     //     break;
                                 case '2': //應稅內含
-                                    obj.subtotal_tax_price = ((obj.original_subtotal_price * 1.05).toFixed(
-                                        2)) - obj.subtotal_price; //(本幣)稅額
-                                    obj.original_subtotal_tax_price = ((obj.original_subtotal_price * 1.05)
-                                        .toFixed(2)) - obj.subtotal_price //原幣稅額
+                                    // ◆   本幣稅額 subtotal_tax_price  = subtotal_price - (subtotal_price/1.05)  四捨五入到整數位
+                                    // ◆   原幣稅額 original_subtotal_tax_price = original_subtotal_price - (original_subtotal_price/1.05)  四捨五入到小數後2位
+                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(2); //(本幣)稅額
+                                    obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
                                     break;
                                 case '3': //零稅率
                                     obj.subtotal_tax_price = 0; //(本幣)稅額
                                     obj.original_subtotal_tax_price = 0 //原幣稅額
                                     break;
                             }
+                            // $tes = $ire ? : ;
                             //將稅金寫近來
                         } else {
                             obj.subtotal_price = 0;
                         }
                         sum_price += obj.subtotal_price;
+                        sum_total_tax_price = vm.NumberAdd(sum_total_tax_price,obj.subtotal_tax_price);
+                        sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price,obj.original_subtotal_tax_price);
                     });
-                    // console.log(requisitions_purchase.tax);
                     //表頭計算稅
                     switch (requisitions_purchase.tax) {
                         case '0': //免稅
-                            requisitions_purchase.original_total_txa_price = 0; //原幣稅額
+                            requisitions_purchase.original_total_tax_price = 0; //原幣稅額
                             requisitions_purchase.total_tax_price = 0; //稅額(本幣)
                             break;
-                        case '1': // 應稅
-                            requisitions_purchase.original_total_tax_price = sum_price * 0.05; //原幣稅額
-                            requisitions_purchase.total_tax_price = sum_price * 0.05; //稅額(本幣)
-                            break;
-                        case '2': //應稅內含
-                            requisitions_purchase.original_total_tax_price = (sum_price * 0.05).toFixed(2); //原幣稅額
-                            requisitions_purchase.total_tax_price = (sum_price * 0.05).toFixed(2); //稅額(本幣)
+                            // case '1': // 應稅
+                            //     requisitions_purchase.original_total_tax_price = sum_price * 0.05; //原幣稅額
+                            //     requisitions_purchase.total_tax_price = sum_price * 0.05; //稅額(本幣)
+                            //     break;
+                        case '2': //應稅內含                     
+                            // 單頭金額欄位計算方式
+                            requisitions_purchase.total_tax_price = sum_total_tax_price; //稅額(本幣)
+                            requisitions_purchase.original_total_tax_price = sum_original_total_tax_price; //原幣稅額
+
+
                             break;
                         case '3': //零稅率
                             requisitions_purchase.original_total_tax_price = 0; //原幣稅額
@@ -612,8 +637,8 @@
                             const req = async () => {
                                 const response = await axios.get('/backend/getItemLastPrice/' +
                                     whereGet);
-                                details[getSelectKey].item_price = response.data.original_unit_price;
-                                details[getSelectKey].old_item_price = response.data.original_unit_price;
+                                details[getSelectKey].item_price = response.data.item_price;
+                                details[getSelectKey].old_item_price = response.data.item_price;
                             }
                             req();
                         }
