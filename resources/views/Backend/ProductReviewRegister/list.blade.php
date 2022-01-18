@@ -239,7 +239,7 @@
                             </div>
                         </div> --}}
                         <hr>
-                        <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
+                        <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_data">
                             <thead>
                                 <tr>
                                     <th style="width: 15%">功能</th>
@@ -322,6 +322,14 @@
 @section('js')
     <script>
         $(document).ready(function() {
+            $(document).ready(function() {
+                $('#table_data').DataTable({
+                        "order": [
+                            [1, "asc"]
+                        ]
+                    }
+                );
+            });
             $("#stock_type").select2({
                 allowClear: true,
                 theme: "bootstrap",
