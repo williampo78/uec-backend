@@ -11,6 +11,8 @@ use App\Models\Products;
 use App\Models\Product_spec_info;
 use App\Models\RelatedProducts;
 use App\Services\UniversalService;
+use App\Models\ProductAttributes;
+
 use Batch;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -657,7 +659,20 @@ class ProductsService
                     );
                 };
             }
-
+            if($in['product_attributes_change'] == 'true'){
+                ProductAttributes::where('attribute_type' ,'CERTIFICATE')->where('product_id' , $id)->delete();
+                $add_product_attributes = [] ;
+                foreach($in['product_attributes'] as $key => $val){
+                    $add_product_attributes[$key]['attribute_type'] = 'CERTIFICATE' ; 
+                    $add_product_attributes[$key]['product_attribute_lov_id'] = $val ; 
+                    $add_product_attributes[$key]['product_id'] = $id ;
+                    $add_product_attributes[$key]['created_by'] = $user_id ;
+                    $add_product_attributes[$key]['updated_by'] = $user_id ;
+                    $add_product_attributes[$key]['created_at'] = $now ;
+                    $add_product_attributes[$key]['updated_at'] = $now ;
+                }
+                ProductAttributes::insert($add_product_attributes);
+            }
             DB::commit();
             return true;
         } catch (\Exception $e) {
