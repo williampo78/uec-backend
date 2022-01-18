@@ -48,6 +48,15 @@ class APIIndexServices
         $prd_H080A = [];
         $prd_H080B = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
+        foreach ($promotion as $k => $v) {
+            $promotion_txt = '';
+            foreach ($v as $label) {
+                if ($promotion_txt != $label->promotional_label) {
+                    $promotional[$k][] = $label->promotional_label;
+                    $promotion_txt = $label->promotional_label;
+                }
+            }
+        }
         $login = Auth::guard('api')->check();
         $is_collection = [];
         if ($login) {
@@ -87,32 +96,19 @@ class APIIndexServices
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
             } elseif ($ad_slot->slot_type == 'S') {
-                $promotional = [];
                 if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
                     $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
                 } else {
                     $promotion_desc = null;
                 }
-
-                if (isset($promotion[$ad_slot->product_id])) {
-                    foreach ($promotion[$ad_slot->product_id] as $k => $Label) { //取活動標籤
-                        $promotional[] = $Label->promotional_label;
-                    }
-                }
                 if ($ad_slot->product_assigned_type == 'C') {
                     if (isset($categoryProducts[$ad_slot->web_category_hierarchy_id])) {
                         $product_info = [];
                         foreach ($categoryProducts[$ad_slot->web_category_hierarchy_id] as $product) {
-                            $promotional = [];
                             if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
                                 $promotion_desc = $product->promotion_desc;
                             } else {
                                 $promotion_desc = null;
-                            }
-                            if (isset($promotion[$product->id])) {
-                                foreach ($promotion[$product->id] as $k => $Label) { //取活動標籤
-                                    $promotional[] = $Label->promotional_label;
-                                }
                             }
                             if (isset($is_collection)) {
                                 $collection = false;
@@ -131,7 +127,7 @@ class APIIndexServices
                                 'selling_price' => $product->selling_price,
                                 'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
                                 'promotion_desc' => $promotion_desc,
-                                'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                                'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
                                 "collection" => $collection,
                             );
                         }
@@ -147,18 +143,12 @@ class APIIndexServices
                     }
                 } else if ($ad_slot->product_assigned_type == 'P') {
 
-                    $promotional = [];
                     if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
                         $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
                     } else {
                         $promotion_desc = null;
                     }
 
-                    if (isset($promotion[$ad_slot->product_id])) {
-                        foreach ($promotion[$ad_slot->product_id] as $k => $Label) { //取活動標籤
-                            $promotional[] = $Label->promotional_label;
-                        }
-                    }
                     if (isset($is_collection)) {
                         $collection = false;
                         foreach ($is_collection as $k => $v) {
@@ -177,7 +167,7 @@ class APIIndexServices
                         'selling_price' => $products[$ad_slot->product_id]->selling_price,
                         'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
                         'promotion_desc' => $promotion_desc,
-                        'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                        'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                         "collection" => $collection,
                     );
 
@@ -191,56 +181,12 @@ class APIIndexServices
                     );
                 }
             } elseif ($ad_slot->slot_type == 'IS') {
-                /*
-                $image_info = [];
-                $product_info = [];
-                if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
-                    $product_info[$ad_slot->slot_code][] = array(
-                        'product_id' => $products[$ad_slot->product_id]->id,
-                        'product_no' => $products[$ad_slot->product_id]->product_no,
-                        'product_name' => $products[$ad_slot->product_id]->product_name,
-                        'product_unit' => $products[$ad_slot->product_id]->uom,
-                        'selling_price' => $products[$ad_slot->product_id]->selling_price,
-                        'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
-                        'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                        'desktop_applicable' => $ad_slot->is_desktop_applicable
-                    );
-                }
-                if ($ad_slot->data_type == 'IMG') {
-
-                    $image_info[$ad_slot->slot_code][] = array(
-                        'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
-                        'img_alt' => $ad_slot->image_alt,
-                        'img_title' => $ad_slot->image_title,
-                        'img_abstract' => $ad_slot->image_abstract,
-                        'img_action' => $ad_slot->image_action,
-                        'url' => $ad_slot->target_url,
-                        'target_blank' => $ad_slot->is_target_blank,
-                        'target_campaign' => $ad_slot->target_campaign_id,
-                        'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
-                        'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                        'desktop_applicable' => $ad_slot->is_desktop_applicable
-                    );
-                }
-
-                $data[$ad_slot->slot_code] = array(
-                    'images' => (isset($product_info[$ad_slot->slot_code]) ? $product_info[$ad_slot->slot_code] : []),
-                    'products' => (isset($product_info[$ad_slot->slot_code]) ? $product_info[$ad_slot->slot_code] : [])
-                );
-                */
 
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
-                    $promotional = [];
                     if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
                         $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
                     } else {
                         $promotion_desc = null;
-                    }
-
-                    if (isset($promotion[$ad_slot->product_id])) {
-                        foreach ($promotion[$ad_slot->product_id] as $k => $Label) { //取活動標籤
-                            $promotional[] = $Label->promotional_label;
-                        }
                     }
                     if (isset($is_collection)) {
                         $collection = false;
@@ -262,7 +208,7 @@ class APIIndexServices
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
-                            'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                             "collection" => $collection,
                         );
                     }
@@ -278,7 +224,7 @@ class APIIndexServices
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'promotion_desc' => $promotion_desc,
-                            'promotion_label' => (count($promotional) > 0 ? $promotional : null),
+                            'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                             "collection" => $collection,
                         );
                     }

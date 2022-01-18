@@ -35,13 +35,13 @@
                                     </select>
                                 </div>
                                 <div class="col-sm-1 text-right">
-                                    <h5>問題描述</h5>
+                                    <h5>項目類別</h5>
                                 </div>
                                 <div class="col-sm-3"><input class="form-control" name="content_name"
                                         id="content_name" placeholder="模糊查詢"
                                         value="{{ $data['getData']['content_name'] ?? '' }}"></div>
                                 <div class="col-sm-1 text-right">
-                                    <h5>類型</h5>
+                                    <h5>項目類型</h5>
                                 </div>
                                 <div class="col-sm-3">
                                     <select name="target" id="target" class="js-select2">
@@ -107,9 +107,13 @@
                                 @foreach ($data['footer'] as $item)
                                     <tr>
                                         <td>
+                                            @if($share_role_auth['auth_query'])
+                                                <a class="btn btn-info btn-sm"
+                                                   href="{{ route('webcontents.show' , $item->id) }}"><i class="fa fa-search"></i></a>
+                                            @endif
                                             @if ($share_role_auth['auth_update'])
                                                 <a class="btn btn-info btn-sm"
-                                                    href="{{ route('webcontents.edit', $item->id) }}">修改</a>
+                                                   href="{{ route('webcontents.edit', $item->id) }}">修改</a>
                                             @endif
                                         </td>
                                         <td>{{ $data['code'][$item->parent_code] }}</td>

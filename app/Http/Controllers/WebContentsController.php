@@ -75,6 +75,10 @@ class WebContentsController extends Controller
     public function show($id)
     {
         //
+        $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
+        $data['target'] = $this->universalService->getFooterContentTarget();
+        $data['webcontent'] = WebContents::find($id);
+        return view('Backend.WebContents.view', compact('data'));
     }
 
     /**

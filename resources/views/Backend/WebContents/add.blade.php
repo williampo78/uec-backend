@@ -190,7 +190,7 @@
                         required: true,
                     },
                     content_url: {
-                        url: true,
+                        required: true,
                     },
                 },
                 errorClass: "help-block",
