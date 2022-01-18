@@ -33,6 +33,7 @@ class IndexController extends Controller
         $items = [];
         foreach ($level1 as $code => $name) {
             $input['code'] = $code;
+            $input['active'] = 1;
             $level2 = $this->webContentsService->getFooter($input, 'FOOTER');
             foreach ($level2 as $k => $v) {
                 $items[$v['parent_code']][$k]['content_id'] = $v['id'];
