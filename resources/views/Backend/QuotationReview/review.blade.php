@@ -28,7 +28,9 @@
                                     <div class="col-sm-1"><label> 匯率</label></div>
                                     <div class="col-sm-3">{{ $data['quotation']['exchange_rate'] }}</div>
                                     <div class="col-sm-1"><label> 稅別</label></div>
-                                    <div class="col-sm-3">{{ $data['taxList'][$data['quotation']['tax']] ?? '' }}
+                                    <div class="col-sm-3">
+                                        {{ $data['taxList'][$data['quotation']['tax']] ?? 'error' }}
+                                        {{ $data['quotation']['tax'] != '2' ? '' :($data['quotation']['is_tax_included'] == 1?' (含稅價)':' (未稅價)')}}
                                     </div>
                                 </div>
 
