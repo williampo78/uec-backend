@@ -22,6 +22,7 @@
                                         <div class="col-sm-9">
                                             <select class="form-control js-select2-department" name="supplier"
                                                 id="supplier">
+                                                <option value=""></option>
                                                 @foreach ($supplier as $val)
                                                     <option value='{{ $val['id'] }}'>{{ $val['name'] }}</option>
                                                 @endforeach
@@ -103,8 +104,8 @@
                                         <div class="col-sm-4">
                                             <div class="form-group" id="">
                                                 <div class='input-group date' id='start_launched_at_start'>
-                                                    <input type='text' class="form-control" name="start_launched_at_start"
-                                                        value="" />
+                                                    <input type='text' class="form-control"
+                                                        name="start_launched_at_start" value="" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -129,14 +130,27 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="col-sm-3">
+                                            <h5>商品類型</h5>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-department" name="product_type"
+                                                id="product_type">
+                                                <option value=""></option>
+                                                <option value="一般品">一般品</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-5">
+                                        <div class="col-sm-3">
                                             <h5>筆數限制</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <input class="form-control" name="limit" id="limit"
-                                                type="number" value="100" max="100" min="0" readonly>
+                                            <input class="form-control" name="limit" id="limit" type="number"
+                                                value="100" max="100" min="0" readonly>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-1">
                                         <button type="button" class="btn btn-success text-right"
                                             style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
                                     </div>
@@ -193,13 +207,13 @@
                                                     :true-value="1" :false-value="0">
                                             </div>
                                         </td>
-                                        <td>@{{ product . product_no }}</td>
-                                        <td>@{{ product . product_name }}</td>
-                                        <td>@{{ product . product_name }}</td>
-                                        <td>@{{ product . start_launched_at }}</td>
-                                        <td>@{{ product . launched_status }}</td>
-                                        <td>@{{ product . gross_margin }}</td>
-                                        <td>@{{ product . supplier_name }}</td>
+                                        <td>@{{ product.product_no }}</td>
+                                        <td>@{{ product.product_name }}</td>
+                                        <td>@{{ product.product_name }}</td>
+                                        <td>@{{ product.start_launched_at }}</td>
+                                        <td>@{{ product.launched_status }}</td>
+                                        <td>@{{ product.gross_margin }}</td>
+                                        <td>@{{ product.supplier_name }}</td>
                                     </tr>
                                 </tbody>
                             </table>

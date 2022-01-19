@@ -294,6 +294,11 @@
                     theme: "bootstrap",
                     placeholder: "請選擇"
                 });
+                $('#product_type').select2({
+                    allowClear: true,
+                    theme: "bootstrap",
+                    placeholder: "請選擇"
+                });
                 // $('#products_model_list').DataTable({
                 //     "lengthChange": false
                 // });
