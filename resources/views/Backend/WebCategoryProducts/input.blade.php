@@ -156,10 +156,12 @@
             },
             methods: {
                 productsGetAjax() {
-                    var create_start_date = $('input[name="create_start_date"]').val();
-                    var create_end_date = $('input[name="create_end_date"]').val();
-                    var select_start_date = $('input[name="select_start_date"]').val();
-                    var select_end_date = $('input[name="select_end_date"]').val();
+                    var start_created_at = $('input[name="start_created_at"]').val();
+                    var end_created_at = $('input[name="end_created_at"]').val();
+                    var start_launched_at_start = $('input[name="start_launched_at_start"]').val();
+                    var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
+                    var supplier_id = $('#supplier').val() ;
+                    var limit = $('#limit').val();
                     var filter_product_id = [];
                     this.category_products_list.find((todo, index) => {
                         filter_product_id.push(todo.product_id);
@@ -169,17 +171,31 @@
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'getProductsList',
+                            supplier_id:supplier_id,
                             product_no: this.select_req.product_no,
                             product_name: this.select_req.product_name,
                             selling_price_min: this.select_req.selling_price_min,
                             selling_price_max: this.select_req.selling_price_max,
-                            create_start_date: create_start_date,
-                            create_end_date: create_end_date,
-                            select_start_date: select_start_date,
-                            select_end_date: select_end_date,
+                            start_created_at: start_created_at,
+                            end_created_at: end_created_at,
+                            start_launched_at_start: start_launched_at_start, //上架 - 起
+                            start_launched_at_end: start_launched_at_end, //上架 - 止
                             filter_product_id: filter_product_id, //排除掉 ID
+                            limit:limit,
                         });
-                        console.log(response);
+                        // 'supplier_id': $('#prd-modal-supplier-id').val(),
+                        // 'product_no': $('#prd-modal-product-no').val(),
+                        // 'product_name': $('#prd-modal-product-name').val(),
+                        // 'selling_price_min': $('#prd-modal-selling-price-min').val(),
+                        // 'selling_price_max': $('#prd-modal-selling-price-max').val(),
+                        // 'start_created_at': $('#prd-modal-start-created-at').val(),
+                        // 'end_created_at': $('#prd-modal-end-created-at').val(),
+                        // 'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
+                        // 'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
+                        // 'product_type': $('#prd-modal-product-type').val(),
+                        // 'limit': $('#prd-modal-limit').val(),
+                        // 'exist_products': Object.keys(prd_product_list),
+                        // console.log(response);
                         this.result_products = response.data.result.data;
                     }
                     req();
@@ -252,24 +268,24 @@
 
                 },
                 TESTFUNCTION() {
-                    var create_start_date = $('input[name="create_start_date"]').val();
-                    var create_end_date = $('input[name="create_end_date"]').val();
-                    var select_start_date = $('input[name="select_start_date"]').val();
-                    var select_end_date = $('input[name="select_end_date"]').val();
+                    var start_created_at = $('input[name="start_created_at"]').val();
+                    var end_created_at = $('input[name="end_created_at"]').val();
+                    var start_launched_at_start = $('input[name="start_launched_at_start"]').val();
+                    var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
                 }
             },
             mounted: function() {
 
-                $('#create_start_date').datetimepicker({
+                $('#start_created_at').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-                $('#create_end_date').datetimepicker({
+                $('#end_created_at').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-                $('#select_start_date').datetimepicker({
+                $('#start_launched_at_start').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
-                $('#select_end_date').datetimepicker({
+                $('#start_launched_at_end').datetimepicker({
                     format: 'YYYY-MM-DD',
                 });
 

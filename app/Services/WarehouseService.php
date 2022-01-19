@@ -24,6 +24,7 @@ class WarehouseService
     {
         $warehouses = Warehouse::where('delete', 0);
 
+        // 代碼
         if (isset($datas['number'])) {
             $warehouses = $warehouses->where('number', $datas['number']);
         }

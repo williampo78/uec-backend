@@ -87,6 +87,7 @@ class QuotationReviewController extends Controller
         $data['taxList'] = config('uec.tax_option');
         $data['quotation'] = $this->quotationService->getQuotationById($id);
         $data['quotation_detail'] = $this->quotationService->getQuotationDetail($id);
+        // dd($data['quotation_detail']) ; 
         $data['quotation_detail_log'] = $this->quotationService->getQuotationReviewLog($id);
         return view('Backend.QuotationReview.review' , compact('data'));
     }

@@ -450,7 +450,7 @@
                 });
                 //驗證
                 $("#new-form").validate({
-                    debug: true,
+                    // debug: true,
                     submitHandler: function(form) {
                         var item_num = $('.detailsdata').length;
                         if (item_num <= 0) {

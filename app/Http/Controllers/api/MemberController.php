@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers\api;
 
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\api\CancelOrderRequest;
+use App\Http\Requests\api\GetOrderDetailRequest;
+use App\Http\Requests\api\GetOrdersRequest;
+use App\Http\Requests\api\ResetPasswordRequest;
+use App\Http\Requests\api\ReturnOrderRequest;
 use App\Models\Order;
-use App\Models\Shipment;
-use Illuminate\Support\Str;
 use App\Models\OrderPayment;
-use App\Services\APIService;
 use App\Models\ReturnRequest;
+use App\Models\ReturnRequestDetail;
+use App\Models\Shipment;
+use App\Models\StockTransactionLog;
 use App\Models\WarehouseStock;
+use App\Services\APIService;
+use App\Services\LookupValuesVService;
 use App\Services\OrderService;
+use App\Services\ReturnRequestService;
 use App\Services\SysConfigService;
 use App\Services\WarehouseService;
-use Illuminate\Support\Facades\DB;
-use App\Models\ReturnRequestDetail;
-use App\Models\StockTransactionLog;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Services\LookupValuesVService;
-use App\Services\ReturnRequestService;
 use App\Services\WarehouseStockService;
-use App\Http\Requests\api\GetOrderRequest;
-use App\Http\Requests\api\CancelOrderRequest;
-use App\Http\Requests\api\ReturnOrderRequest;
-use App\Http\Requests\api\ResetPasswordRequest;
-use App\Http\Requests\api\GetOrderDetailRequest;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {
@@ -53,7 +53,6 @@ class MemberController extends Controller
     public function resetPassword(ResetPasswordRequest $request)
     {
         $token = $request->bearerToken();
-        $request_payloads = $request->input();
 
         if (empty($token)) {
             return response()->json([
@@ -61,7 +60,9 @@ class MemberController extends Controller
             ], 404);
         }
 
-        $results = $this->api_service->resetPassword($token, $request_payloads);
+        $results = $this->api_service->resetPassword($token, [
+            'password' => $request->input('password'),
+        ]);
 
         // 發生錯誤
         if ($results['status_code'] != 200) {
@@ -94,10 +95,10 @@ class MemberController extends Controller
     /**
      * 取得會員訂單
      *
-     * @param GetOrderRequest $request
+     * @param GetOrdersRequest $request
      * @return json
      */
-    public function getOrders(GetOrderRequest $request)
+    public function getOrders(GetOrdersRequest $request)
     {
         try {
             $member_id = auth('api')->userOrFail()->member_id;
@@ -262,7 +263,7 @@ class MemberController extends Controller
      * @param GetOrderDetailRequest $request
      * @return json
      */
-    public function getOrderDetails(GetOrderDetailRequest $request)
+    public function getOrderDetail(GetOrderDetailRequest $request)
     {
         try {
             $member_id = auth('api')->userOrFail()->member_id;
@@ -273,12 +274,11 @@ class MemberController extends Controller
         }
 
         $order_service = new OrderService;
-        $order_no = $request->route('order_no');
 
         // 取得訂單
         $order = $order_service->getOrders([
             'revision_no' => 0,
-            'order_no' => $order_no,
+            'order_no' => $request->route('order_no'),
             'member_id' => $member_id,
         ])->first();
 
@@ -289,13 +289,9 @@ class MemberController extends Controller
             ], 404);
         }
 
-        // 系統設定檔
-        $sys_configs = $this->sys_config_service->getSysConfigs();
-
         // 訂單成立後x分鐘內可取消
-        $cancel_limit_mins = (int) $sys_configs->first(function ($config) {
-            return $config->config_key == 'CANCEL_LIMIT_MINS';
-        })->config_value;
+        $sys_config = $this->sys_config_service->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
+        $cancel_limit_mins = isset($sys_config) ? (int) $sys_config->config_value : null;
 
         // 是否可以取消訂單
         $order->can_cancel_order = $order_service->canCancelOrder($order->status_code, $order->ordered_date, $cancel_limit_mins);
@@ -514,15 +510,12 @@ class MemberController extends Controller
         $order_service = new OrderService;
         $warehouse_service = new WarehouseService;
         $warehouse_stock_service = new WarehouseStockService;
-        $order_no = $request->route('order_no');
-        $code = $request->input('code');
-        $remark = $request->input('remark');
         $now = Carbon::now();
 
         // 取得訂單
         $order = $order_service->getOrders([
             'revision_no' => 0,
-            'order_no' => $order_no,
+            'order_no' => $request->route('order_no'),
             'member_id' => $member_id,
         ])->first();
 
@@ -533,13 +526,9 @@ class MemberController extends Controller
             ], 404);
         }
 
-        // 系統設定檔
-        $sys_configs = $this->sys_config_service->getSysConfigs();
-
         // 訂單成立後x分鐘內可取消
-        $cancel_limit_mins = (int) $sys_configs->first(function ($config) {
-            return $config->config_key == 'CANCEL_LIMIT_MINS';
-        })->config_value;
+        $sys_config = $this->sys_config_service->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
+        $cancel_limit_mins = isset($sys_config) ? (int) $sys_config->config_value : null;
 
         // 是否可以取消訂單
         if (!$order_service->canCancelOrder($order->status_code, $order->ordered_date, $cancel_limit_mins)) {
@@ -552,7 +541,7 @@ class MemberController extends Controller
         $cancel_req_reason = $this->lookup_values_v_service->getLookupValuesVs([
             'disable_agent_id_auth' => true,
             'type_code' => 'CANCEL_REQ_REASON',
-            'code' => $code,
+            'code' => $request->input('code'),
         ])->first();
 
         // 取消原因代碼不存在
@@ -563,9 +552,8 @@ class MemberController extends Controller
         }
 
         // 商城良品倉
-        $ec_warehouse_goods = $sys_configs->first(function ($config) {
-            return $config->config_key == 'EC_WAREHOUSE_GOODS';
-        })->config_value;
+        $sys_config = $this->sys_config_service->getSysConfigByConfigKey('EC_WAREHOUSE_GOODS');
+        $ec_warehouse_goods = isset($sys_config) ? $sys_config->config_value : null;
 
         // 取得倉庫
         $warehouse = $warehouse_service->getWarehouses([
@@ -582,8 +570,8 @@ class MemberController extends Controller
                     ->update([
                         'status_code' => 'CANCELLED',
                         'refund_status' => 'PENDING',
-                        'cancel_req_reason_code' => $code,
-                        'cancel_req_remark' => $remark,
+                        'cancel_req_reason_code' => $request->input('code'),
+                        'cancel_req_remark' => $request->input('remark'),
                         'cancelled_at' => $now,
                         'updated_by' => -1,
                     ]);
@@ -603,7 +591,6 @@ class MemberController extends Controller
                     'created_by' => -1,
                     'updated_by' => -1,
                 ]);
-
             }
             // 未付款
             else {
@@ -613,8 +600,8 @@ class MemberController extends Controller
                         'status_code' => 'CANCELLED',
                         'pay_status' => 'VOIDED',
                         'refund_status' => 'NA',
-                        'cancel_req_reason_code' => $code,
-                        'cancel_req_remark' => $remark,
+                        'cancel_req_reason_code' => $request->input('code'),
+                        'cancel_req_remark' => $request->input('remark'),
                         'cancelled_at' => $now,
                         'updated_by' => -1,
                     ]);
@@ -736,22 +723,12 @@ class MemberController extends Controller
 
         $order_service = new OrderService;
         $return_request_service = new ReturnRequestService;
-        $order_no = $request->route('order_no');
-        $code = $request->input('code');
-        $remark = $request->input('remark');
-        $name = $request->input('name');
-        $mobile = $request->input('mobile');
-        $telephone = $request->input('telephone');
-        $telephone_ext = $request->input('telephone_ext');
-        $city = $request->input('city');
-        $district = $request->input('district');
-        $address = $request->input('address');
         $now = Carbon::now();
 
         // 取得訂單
         $order = $order_service->getOrders([
             'revision_no' => 0,
-            'order_no' => $order_no,
+            'order_no' => $request->route('order_no'),
             'member_id' => $member_id,
         ])->first();
 
@@ -773,7 +750,7 @@ class MemberController extends Controller
         $return_req_reason = $this->lookup_values_v_service->getLookupValuesVs([
             'disable_agent_id_auth' => true,
             'type_code' => 'RETURN_REQ_REASON',
-            'code' => $code,
+            'code' => $request->input('code'),
         ])->first();
 
         // 退貨原因代碼不存在
@@ -799,15 +776,16 @@ class MemberController extends Controller
                 'status_code' => 'CREATED',
                 'refund_method' => $order->payment_method,
                 'lgst_method' => $order->lgst_method,
-                'req_name' => $name,
-                'req_mobile' => $mobile,
-                'req_city' => $city,
-                'req_district' => $district,
-                'req_address' => $address,
-                'req_telephone' => $telephone,
-                'req_telephone_ext' => $telephone_ext,
-                'req_reason_code' => $code,
-                'req_remark' => $remark,
+                'req_name' => $request->input('name'),
+                'req_mobile' => $request->input('mobile'),
+                'req_city' => $request->input('city'),
+                'req_district' => $request->input('district'),
+                'req_address' => $request->input('address'),
+                'req_zip_code' => $request->input('zip_code'),
+                'req_telephone' => $request->input('telephone'),
+                'req_telephone_ext' => $request->input('telephone_ext'),
+                'req_reason_code' => $request->input('code'),
+                'req_remark' => $request->input('remark'),
                 'created_by' => -1,
                 'updated_by' => -1,
             ]);

@@ -41,8 +41,9 @@ class QuotationService
         }
 
         if (isset($data['select_start_date']) && isset($data['select_end_date'])) {
-            $quotation->whereBetween('quotation.created_at', [$data['select_start_date'], $data['select_end_date']]);
+            $quotation->whereBetween('quotation.trade_date', [$data['select_start_date'], $data['select_end_date']]);
         }
+        // trade_date
 
         if (isset($data['company_number'])) {
             $quotation->where('company_number', $data['company_number']);

@@ -27,11 +27,11 @@ class RequisitionsPurchaseService
 
         $rs = RequisitionsPurchase::select(
             'requisitions_purchase.*',
-            DB::RAW('user.name as user_name'),
+            DB::RAW('users.user_name as user_name'),
             DB::RAW('supplier.name as supplier_name'),
             DB::RAW('warehouse.name as warehouse_name')
         )
-            ->leftJoin('user', 'requisitions_purchase.created_by', '=', 'user.id')
+            ->leftJoin('users', 'requisitions_purchase.created_by', '=', 'users.id')
             ->leftJoin('supplier', 'requisitions_purchase.supplier_id', '=', 'supplier.id')
             ->leftJoin('warehouse', 'requisitions_purchase.warehouse_id', '=', 'warehouse.id')
             ->where('requisitions_purchase.agent_id', $agent_id);
@@ -199,6 +199,7 @@ class RequisitionsPurchaseService
                     $reviewLogData['reviewer'] = $reviewer;
                     RequisitionsPurchaseReviewLog::insert($reviewLogData);
                 }
+                RequisitionsPurchase::where('id',$requisitions_purchase_id)->update(['submitted_at' => $now]);
             }
 
             DB::commit();
@@ -281,6 +282,7 @@ class RequisitionsPurchaseService
                     $reviewLogData['reviewer'] = $reviewer;
                     RequisitionsPurchaseReviewLog::insert($reviewLogData);
                 }
+                RequisitionsPurchase::where('id',$input['id'])->update(['submitted_at' => $now]);
             }
             DB::commit();
             $result['status'] = true;

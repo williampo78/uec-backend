@@ -115,6 +115,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control supplier_id" name="supplier_id">
+                                            <option value=""></option>
                                             @foreach ($supplier as $val)
                                                 <option value="{{ $val->id }}">{{ $val->name }}</option>
                                             @endforeach
@@ -155,6 +156,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control category_id" name="category_id">
+                                            <option value=""></option>
                                             @foreach ($pos as $key => $val)
                                                 <option value="{{ $val->id }}"> {{ $val->name }}</option>
                                             @endforeach
@@ -171,6 +173,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control brand_id" name="brand_id" id="brand_id">
+                                            <option value=""></option>
                                             @foreach ($brands as $val)
                                                 <option value="{{ $val->id }}">{{ $val->brand_name }}</option>
                                             @endforeach
@@ -352,19 +355,19 @@
                                         <label class="control-label">長</label>
                                     </div>
                                     <div class="col-sm-2">
-                                        <input class="form-control" name="length" type="number" min="0" value="0">
+                                        <input class="form-control" name="length" type="number" min="0" value="">
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">寬</label>
                                     </div>
                                     <div class="col-sm-2 ">
-                                        <input class="form-control" name="width" type="number" min="0" value="0">
+                                        <input class="form-control" name="width" type="number" min="0" value="">
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">高</label>
                                     </div>
                                     <div class="col-sm-2">
-                                        <input class="form-control" name="height" type="number" min="0" value="0">
+                                        <input class="form-control" name="height" type="number" min="0" value="">
                                     </div>
                                 </div>
                             </div>
@@ -374,7 +377,7 @@
                                         <label class="control-label">重量(公克)<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name="weight" type="number" min="0" value="0">
+                                        <input class="form-control" name="weight" type="number" min="0" value="">
                                     </div>
                                 </div>
                             </div>
@@ -386,7 +389,7 @@
                                         <label class="control-label">市價(含稅)<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="list_price" type="number" min="0" value="0">
+                                        <input class="form-control" name="list_price" type="number" min="0" value="">
                                     </div>
                                 </div>
                             </div>
@@ -397,7 +400,7 @@
                                         <label class="control-label">售價(含稅)<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="selling_price" type="number" min="0" value="0">
+                                        <input class="form-control" name="selling_price" type="number" min="0" value="">
                                     </div>
                                 </div>
                             </div>
@@ -664,9 +667,9 @@
                         supplier_item_no: '',
                         ean: '',
                         pos_item_no: '',
-                        safty_qty: 0,
-                        is_additional_purchase: 0,
-                        status: 0,
+                        safty_qty: '',
+                        is_additional_purchase: 1,
+                        status: 1,
                     }],
                     products: {
                         spec_dimension: 0,
@@ -727,7 +730,7 @@
                                     supplier_item_no: '',
                                     ean: '',
                                     pos_item_no: '',
-                                    safty_qty: 0,
+                                    safty_qty: '',
                                     is_additional_purchase: 1,
                                     status: 1,
                                 })
@@ -775,7 +778,7 @@
                                     supplier_item_no: '',
                                     ean: '',
                                     pos_item_no: '',
-                                    safty_qty: 0,
+                                    safty_qty: '',
                                     is_additional_purchase: 1,
                                     status: 1,
                                 })
@@ -869,9 +872,9 @@
                                     supplier_item_no: '',
                                     ean: '',
                                     pos_item_no: '',
-                                    safty_qty: 0,
-                                    is_additional_purchase: 0,
-                                    status: 0,
+                                    safty_qty: '',
+                                    is_additional_purchase: 1,
+                                    status: 1,
                                 }];
                                 break;
                             case '1': //一維多規格

@@ -20,7 +20,7 @@
                                             <h5>供應商</h5>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control js-select2-department" name="suvplier"
+                                            <select class="form-control js-select2-department" name="supplier"
                                                 id="supplier">
                                                 @foreach ($supplier as $val)
                                                     <option value='{{ $val['id'] }}'>{{ $val['name'] }}</option>
@@ -74,8 +74,8 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group" id="">
-                                                <div class='input-group date' id='create_start_date'>
-                                                    <input type='text' class="form-control" name="create_start_date"
+                                                <div class='input-group date' id='start_created_at'>
+                                                    <input type='text' class="form-control" name="start_created_at"
                                                         value="" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
@@ -87,8 +87,8 @@
                                             <h5>~</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class='input-group date' id='create_end_date'>
-                                                <input type='text' class="form-control" name="create_end_date"
+                                            <div class='input-group date' id='end_created_at'>
+                                                <input type='text' class="form-control" name="end_created_at"
                                                     value="" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -102,8 +102,8 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group" id="">
-                                                <div class='input-group date' id='select_start_date'>
-                                                    <input type='text' class="form-control" name="select_start_date"
+                                                <div class='input-group date' id='start_launched_at_start'>
+                                                    <input type='text' class="form-control" name="start_launched_at_start"
                                                         value="" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
@@ -115,8 +115,8 @@
                                             <h5>~</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class='input-group date' id='select_end_date'>
-                                                <input type='text' class="form-control" name="select_end_date"
+                                            <div class='input-group date' id='start_launched_at_end'>
+                                                <input type='text' class="form-control" name="start_launched_at_end"
                                                     value="" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -132,7 +132,7 @@
                                             <h5>筆數限制</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <input class="form-control" name="company_number" id="company_number"
+                                            <input class="form-control" name="limit" id="limit"
                                                 type="number" value="100" max="100" min="0" readonly>
                                         </div>
                                     </div>
@@ -197,7 +197,7 @@
                                         <td>@{{ product . product_name }}</td>
                                         <td>@{{ product . product_name }}</td>
                                         <td>@{{ product . start_launched_at }}</td>
-                                        <td>@{{ product . launched_status_desc }}</td>
+                                        <td>@{{ product . launched_status }}</td>
                                         <td>@{{ product . gross_margin }}</td>
                                         <td>@{{ product . supplier_name }}</td>
                                     </tr>

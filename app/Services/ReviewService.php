@@ -66,11 +66,6 @@ class ReviewService
             $updateData['next_approver'] = null;
         }
 
-        // 各表不同欄位調整
-        if ($type=='REQUISITION_PUR'){
-            unset($updateData['closed_at']);
-        }
-
         DB::table($table)->where('id', $id)->update($updateData);
         return true;
     }

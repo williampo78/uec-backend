@@ -686,6 +686,7 @@ class ProductsService
         $ProductAuditLog = ProductAuditLog::select('product_audit_log.*', 'users.user_name AS user_name')
             ->orderBy('product_audit_log.updated_at', 'DESC')
             ->leftJoin('users', 'users.id', '=', 'product_audit_log.updated_by')
+            ->where('product_audit_log.product_id' , $product_id)
             ->get();
         return $ProductAuditLog;
     }
@@ -694,6 +695,7 @@ class ProductsService
         $getProductReviewLog = ProductReviewLog::select('product_review_log.*', 'discontinued_user.user_name AS discontinued_user_name')
             ->orderBy('product_review_log.updated_at', 'DESC')
             ->leftJoin('users as discontinued_user', 'discontinued_user.id', '=', 'product_review_log.discontinued_by')
+            ->where('product_review_log.product_id' , $id)
             ->get();
         return $getProductReviewLog;
     }
@@ -783,6 +785,7 @@ class ProductsService
             Products::where('id', $in['product_id'])->update([
                 'approval_status' => 'CANCELLED',
                 'updated_by' => $user_id,
+                'end_launched_at' =>$now,
             ]);
             DB::commit();
             $result = true;

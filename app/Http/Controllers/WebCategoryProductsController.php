@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\SupplierService;
+use App\Services\ProductsService;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 
@@ -11,9 +12,11 @@ class WebCategoryProductsController extends Controller
     private $webCategoryHierarchyService;
     private $supplierService;
     public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService,
-        SupplierService $supplierService) {
+        SupplierService $supplierService,
+        ProductsService $productsService) {
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
         $this->supplierService = $supplierService;
+        $this->productsService = $productsService; 
     }
     /**
      * Display a listing of the resource.
@@ -114,7 +117,8 @@ class WebCategoryProductsController extends Controller
         $result = [];
         switch ($in['type']) {
             case 'getProductsList':
-                $result['data'] = $this->webCategoryHierarchyService->get_products_v($in);
+                $result['data'] = $this->productsService->getProducts($in) ; 
+                $this->productsService->restructureProducts($result['data']);
                 foreach ($result['data'] as $key => $val) {
                     $result['data'][$key]->check_use = 0;
                 };

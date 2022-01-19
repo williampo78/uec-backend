@@ -232,12 +232,6 @@
 
                     <!-- Table list -->
                     <div class="panel-body">
-                        {{-- <div class="row">
-                            <div class="col-sm-2">
-                                <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}"><i
-                                        class="fa fa-plus"></i> 創建</a>
-                            </div>
-                        </div> --}}
                         <hr>
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_data">
                             <thead>
