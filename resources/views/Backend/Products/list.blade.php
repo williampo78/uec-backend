@@ -237,7 +237,7 @@
                         <div class="row">
                             <div class="col-sm-2">
                                 <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}"><i
-                                        class="fa fa-plus"></i> 創建</a>
+                                        class="fa fa-plus"></i> 新增</a>
                             </div>
                         </div>
                         <hr>
