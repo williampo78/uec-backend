@@ -70,7 +70,7 @@
                                             <div class="form-group" id="div_doc_number">
                                                 <label for="doc_number">網頁標題</label>
                                                 <input class="form-control" name="meta_title" id="meta_title"
-                                                    value="{{ isset($a->meta_title) }}">
+                                                    value="{{ $category_hierarchy_content->meta_title }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
