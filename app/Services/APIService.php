@@ -497,9 +497,8 @@ class APIService
      * @param array $payloads
      * @return array
      */
-    public function resetPassword($token, $payloads)
+    public function resetPassword(string $token, array $payloads): array
     {
-        $password = $payloads['password'];
         $endpoint = '/crm/v2/members/reset-password';
 
         $response = $this->http_client->request('POST', $endpoint, [
@@ -512,9 +511,7 @@ class APIService
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
             ],
-            'json' => [
-                'password' => $password,
-            ],
+            'json' => $payloads,
         ]);
 
         $status_code = $response->getStatusCode();
