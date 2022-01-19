@@ -41,6 +41,7 @@ use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OrderRefundController;
+use App\Http\Controllers\SummaryStockController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -185,6 +186,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/webcontents', WebContentsController::class, ['names' => ['index' => 'webcontents']]);
 
     Route::resource('/buyout_products_report', BuyoutProductsReportController::class, ['names' => ['index' => 'buyout_products_report']]);
+
+    Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');
