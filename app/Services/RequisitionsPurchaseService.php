@@ -31,7 +31,7 @@ class RequisitionsPurchaseService
             DB::RAW('supplier.name as supplier_name'),
             DB::RAW('warehouse.name as warehouse_name')
         )
-            ->leftJoin('user', 'requisitions_purchase.created_by', '=', 'user.id')
+            ->leftJoin('users', 'requisitions_purchase.created_by', '=', 'user.id')
             ->leftJoin('supplier', 'requisitions_purchase.supplier_id', '=', 'supplier.id')
             ->leftJoin('warehouse', 'requisitions_purchase.warehouse_id', '=', 'warehouse.id')
             ->where('requisitions_purchase.agent_id', $agent_id);
