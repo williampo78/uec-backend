@@ -167,6 +167,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <select class="form-control supplier_id" name="supplier_id">
+                                        <option value=""></option>
                                         @foreach ($supplier as $val)
                                         <option value="{{ $val->id }}" {{ $products->supplier_id == $val->id ?
                                             'selected' : '' }}>
@@ -210,6 +211,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <select class="form-control category_id" name="category_id">
+                                        <option value=""></option>
                                         @foreach ($pos as $key => $val)
                                         <option value="{{ $val->id }}" {{ $products->category_id == $val->id ? 'selected' :
                                             '' }}>
@@ -228,6 +230,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <select class="form-control brand_id" name="brand_id" id="brand_id">
+                                        <option value=""></option>
                                         @foreach ($brands as $val)
                                         <option value="{{ $val->id }}" {{ $products->brand_id == $val->id ? 'selected' : ''
                                             }}>
