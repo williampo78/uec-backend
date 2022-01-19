@@ -158,6 +158,8 @@ class OrderController extends Controller
 
     public function getDetail(Request $request)
     {
+        $lookup_values_v_service = new LookupValuesVService;
+
         $order_id = $request->input('order_id');
 
         $order = $this->order_service->getOrders([
@@ -201,20 +203,23 @@ class OrderController extends Controller
         // 結帳金額
         $order->paid_amount = number_format($order->paid_amount);
 
-        // 發票用途
-        $order->invoice_usage = config('uec.invoice_usage_options')[$order->invoice_usage] ?? null;
-
         // 載具類型
         $order->carrier_type = config('uec.carrier_type_options')[$order->carrier_type] ?? null;
 
-        $lookup_values_v_service = new LookupValuesVService;
         // 發票捐贈機構
-        if (isset($order->donated_institution)) {
-            $order->donated_institution_name = $lookup_values_v_service->getLookupValuesVs([
+        if (isset($order->donated_institution)
+            && $order->invoice_usage == 'D'
+        ) {
+            $lookup_values_v = $lookup_values_v_service->getLookupValuesVs([
                 'type_code' => 'DONATED_INSTITUTION',
                 'code' => $order->donated_institution,
-            ])->first()['description'];
+            ])->first();
+
+            $order->donated_institution_name = isset($lookup_values_v) ? "{$order->donated_institution}-{$lookup_values_v->description}" : null;
         }
+
+        // 發票用途
+        $order->invoice_usage = config('uec.invoice_usage_options')[$order->invoice_usage] ?? null;
 
         // 取消 / 作廢時間
         if (isset($order->cancelled_at)) {
