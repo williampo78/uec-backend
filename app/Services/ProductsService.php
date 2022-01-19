@@ -785,6 +785,7 @@ class ProductsService
             Products::where('id', $in['product_id'])->update([
                 'approval_status' => 'CANCELLED',
                 'updated_by' => $user_id,
+                'end_launched_at' =>$now,
             ]);
             DB::commit();
             $result = true;
