@@ -45,7 +45,7 @@
                                     <tr>
                                         <th>商品編號</th>
                                         <th>商品名稱</th>
-                                        <th>國際條碼</th>
+                                        <th>POS品號</th>
                                         <th>單價</th>
                                         <th>最小採購量</th>
                                     </tr>
@@ -54,7 +54,14 @@
                                     <tbody>
                                         <tr>
                                             <td>{{ $v['product_items_no'] }}</td>
-                                            <td>{{ $v['product_name'] }}</td>
+                                            <td>{{ $v['product_name'] }}
+                                                @if($v['spec_1_value'])
+                                                    - {{$v['spec_1_value']}}
+                                                @endif
+                                                @if($v['spec_2_value'])
+                                                - {{$v['spec_2_value']}}
+                                            @endif
+                                            </td>
                                             <td>{{ $v['pos_item_no'] }}</td>
                                             <td>{{ $v['original_unit_price'] }}</td>
                                             <td>{{ $v['min_purchase_qty'] }}</td>

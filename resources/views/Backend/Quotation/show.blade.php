@@ -16,7 +16,9 @@
                     <div class="col-sm-1"><label> 匯率</label></div>
                     <div class="col-sm-3">{{ $quotation->exchange_rate }}</div>
                     <div class="col-sm-1"><label> 稅別</label></div>
-                    <div class="col-sm-3">{{ $taxlist[$quotation->tax] ?? 'error' }}</div>
+                    <div class="col-sm-3">{{ $taxlist[$quotation->tax] ?? 'error' }}
+                        {{ $quotation->tax!=2?'':($quotation->is_tax_included == 1?' (含稅價)':' (未稅價)')}}
+                    </div>
                 </div>
 
                 <div class="row form-group">
@@ -32,7 +34,7 @@
                         <tr>
                             <th>商品編號</th>
                             <th>商品名稱</th>
-                            <th>國際條碼</th>
+                            <th>POS品號</th>
                             <th>單價</th>
                             <th>最小採購量</th>
                         </tr>
