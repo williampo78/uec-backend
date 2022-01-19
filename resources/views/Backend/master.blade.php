@@ -107,8 +107,9 @@
         @endisset
         var UecConfig = @json(Config('uec'));
         $(document).ready(function() {
-            $('#table_list').DataTable();
-
+            $('#table_list').DataTable({
+                "aaSorting": []
+            });
         });
     </script>
 

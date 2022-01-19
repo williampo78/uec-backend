@@ -25,6 +25,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control select2-default" name="supplier" id="supplier">
+                                            <option value=""></option>
                                             @foreach ($supplier as $v)
                                                 <option value='{{ $v['id'] }}'
                                                     {{ $v['id'] == request()->input('supplier') ? 'selected' : '' }}>
@@ -172,7 +173,7 @@
                                                     onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
                                             @endif
                                         </td>
-                                        <td>{{ $v['trade_date'] }}</td>
+                                        <td>{{date('Y-m-d', strtotime($v['trade_date']));}}</td>
                                         <td>{{ $v['doc_number'] }}</td>
                                         <td>{{ $v['supplier_name'] }}</td>
                                         <td>
