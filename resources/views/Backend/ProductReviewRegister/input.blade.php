@@ -140,7 +140,7 @@
                                     <div class="col-sm-9">
                                         <div class='input-group date' id='datetimepicker'>
                                             <input type='text' class="form-control" name="start_launched_at"
-                                                id="start_launched_at" value="{{ $products->start_launched_at }}" />
+                                                id="start_launched_at" value="" />
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -156,7 +156,7 @@
                                     <div class="col-sm-9">
                                         <div class='input-group date' id='datetimepicker2'>
                                             <input type='text' class="form-control" name="end_launched_at"
-                                                id="end_launched_at" value="{{ $products->end_launched_at }}" />
+                                                id="end_launched_at" value="" />
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -259,15 +259,33 @@
 @section('js')
     <script>
         $(document).ready(function() {
+
+
             $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
+                format: 'YYYY-MM-DD HH:mm:ss',
             });
             $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
+                format: 'YYYY-MM-DD HH:mm:ss',
             });
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
+
+            $("#datetimepicker").on("dp.change", function(e) {
+                if (e.oldDate === null) {
+                    $(this)
+                        .data("DateTimePicker")
+                        .date(new Date(e.date._d.setHours(00, 00, 00)));
+                }
+            });
+
+            $("#datetimepicker2").on("dp.change", function(e) {
+                if (e.oldDate === null) {
+                    $(this)
+                        .data("DateTimePicker")
+                        .date(new Date(e.date._d.setHours(23, 59, 59)));
+                }
+            });
             //start_launched_at
             //end_launched_at
             $("#new-form").validate({

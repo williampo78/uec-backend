@@ -695,6 +695,7 @@ class ProductsService
         $getProductReviewLog = ProductReviewLog::select('product_review_log.*', 'discontinued_user.user_name AS discontinued_user_name')
             ->orderBy('product_review_log.updated_at', 'DESC')
             ->leftJoin('users as discontinued_user', 'discontinued_user.id', '=', 'product_review_log.discontinued_by')
+            ->where('product_review_log.product_id' , $id)
             ->get();
         return $getProductReviewLog;
     }
