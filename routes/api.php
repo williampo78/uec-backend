@@ -93,7 +93,7 @@ Route::group(['middleware' => 'jwt.v2.verify'], function () {
         Route::get('/orders', [MemberController::class, 'getOrders']);
 
         // 取得會員訂單詳細內容
-        Route::get('/orders/{order_no}', [MemberController::class, 'getOrderDetails']);
+        Route::get('/orders/{order_no}', [MemberController::class, 'getOrderDetail']);
 
         // 取消訂單
         Route::post('/orders/{order_no}/cancel', [MemberController::class, 'cancelOrder']);

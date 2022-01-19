@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderPaymentsReportController;
+use App\Http\Controllers\TertiaryCategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QAController;
 use App\Http\Controllers\ItemController;
@@ -78,6 +79,13 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/supplier_type', SupplierTypeController::class, ['names' => ['index' => 'supplier_type']]);
     Route::resource('/primary_category', PrimaryCategoryController::class, ['names' => ['index' => 'primary_category']]);
     Route::resource('/category', CategoryController::class, ['names' => ['index' => 'category']]);
+    //商品小分類
+    Route::get('/tertiary_category', [TertiaryCategoryController::class, 'index'])->name('tertiary_category'); //列表
+    Route::get('/tertiary_category/create', [TertiaryCategoryController::class, 'create'])->name('tertiary_category.create'); //新增
+    Route::post('/tertiary_category/store', [TertiaryCategoryController::class, 'store'])->name('tertiary_category.store'); //新增post
+    Route::get('/tertiary_category/{id}/edit', [TertiaryCategoryController::class, 'edit'])->name('tertiary_category.edit'); //更新
+    Route::put('/tertiary_category/{id}', [TertiaryCategoryController::class, 'update'])->name('tertiary_category.update'); //更新post
+
     Route::resource('/requisitions_purchase', RequisitionsPurchaseController::class, ['names' => ['index' => 'requisitions_purchase']]); //請購單
 
     Route::get('/getItemLastPrice', [RequisitionsPurchaseController::class, 'getItemLastPrice']); //請購單
