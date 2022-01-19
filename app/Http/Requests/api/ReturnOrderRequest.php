@@ -44,12 +44,13 @@ class ReturnOrderRequest extends FormRequest
             'code' => 'required',
             'remark' => 'max:300',
             'name' => 'required|max:10',
-            'mobile' => 'required_without:telephone|max:20',
+            'mobile' => 'required_without:telephone|max:10',
             'telephone' => 'required_without:mobile|required_with:telephone_ext|max:20',
             'telephone_ext' => 'max:10',
             'city' => 'required|max:10',
             'district' => 'required|max:10',
             'address' => 'required|max:40',
+            'zip_code' => 'required|max:10',
         ];
     }
 
@@ -74,6 +75,8 @@ class ReturnOrderRequest extends FormRequest
             'district.max' => '退貨人行政區不能超過:max個字',
             'address.required' => '退貨人道路名稱不能為空',
             'address.max' => '退貨人道路名稱不能超過:max個字',
+            'zip_code.required' => '退貨人郵遞區號不能為空',
+            'zip_code.max' => '退貨人郵遞區號不能超過:max個字',
         ];
     }
 

@@ -167,7 +167,7 @@
                                                     :data-type="'Category'">
                                                     <td style="vertical-align:middle">
                                                         <i class="fa fa-list"></i>
-                                                        @{{ Category . category_name }}
+                                                        @{{ Category.category_name }}
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
@@ -224,7 +224,7 @@
                                                     draggable="true" :data-index="key" :data-type="'Products'">
                                                     <td style="vertical-align:middle">
                                                         <i class="fa fa-list"></i>
-                                                        @{{ Product . product_name }}
+                                                        @{{ Product.product_name }}
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
@@ -238,6 +238,38 @@
                                     <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
                                         rows="10">@{{ RelatedProducts }}</textarea>
 
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <label class="control-label">認證</label><span class="redtext">*</span>：
+                                        </div>
+                                        @foreach ($product_attribute_lov as $key => $obj)
+                                            <div class="col-sm-2">
+                                                <label class="radio-inline">
+                                                    <input class="product_attributes" type="checkbox" name="product_attributes[]"
+                                                        value="{{ $obj->id }}"
+                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                    {{ $obj->description }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                        <input class="product_attributes_change" type="hidden" value="false" name="product_attributes_change">
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 ">
+                                            <label class="control-label ">商品序號</label><span
+                                                class="redtext">*</span>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" name="product_no"
+                                                value="{{ $products->product_no }}" readonly>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
@@ -349,8 +381,8 @@
                                                 src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
                                                 style="max-width:40%;">
                                         </div>
-                                        <button v-if="products.google_shop_photo_name" type="button" class="btn btn-large btn-danger btn-sm"
-                                            @click="DelGoogleShop()">刪除</button>
+                                        <button v-if="products.google_shop_photo_name" type="button"
+                                            class="btn btn-large btn-danger btn-sm" @click="DelGoogleShop()">刪除</button>
                                     </div>
                                 </div>
                             </div>
@@ -375,10 +407,10 @@
                                                 <tbody>
                                                     <tr v-for="(Item , key ) in ProductsItem">
                                                         <td style="vertical-align:middle">
-                                                            @{{ Item . spec_1_value }}
+                                                            @{{ Item.spec_1_value }}
                                                         </td>
                                                         <td style="vertical-align:middle">
-                                                            @{{ Item . spec_2_value }}
+                                                            @{{ Item.spec_2_value }}
                                                         </td>
                                                         <td>
                                                             <div v-if="Item.photo_name">
@@ -474,6 +506,11 @@
             $('#promotion_end_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
             });
+            $('.product_attributes').on('change', function(){ // on change of state
+                $('.product_attributes_change').val('true');
+                // console.log('product_attributes on change');
+            })
+        
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
@@ -808,7 +845,7 @@
                         e.target.value = '';
                     } else {
                         this.$refs.GoogleShopPhoto.src = URL.createObjectURL(file);
-                        this.products.google_shop_photo_name = file ; 
+                        this.products.google_shop_photo_name = file;
                     }
                 },
                 DelGoogleShop() {
@@ -816,7 +853,7 @@
                     $('.show_GoogleShopPhoto').attr('src', this.DefaultassetImg);
                     $('input[name="google_shop_photo_name_old"]').val('');
                     $('input[name="google_shop_photo_name"]').val('');
-                    this.products.google_shop_photo_name = '' ;
+                    this.products.google_shop_photo_name = '';
                     if (check) {
                         axios.post('/backend/product_small/ajax', {
                                 id: this.products.id,
@@ -824,25 +861,24 @@
                                 type: 'DelGoogleShopPhoto',
                             })
                             .then(function(response) {
-                          
+
                             })
                             .catch(function(error) {
                                 console.log(error);
                             });
-                    } 
+                    }
                 },
-                DelItemPhotos(item,key){
+                DelItemPhotos(item, key) {
                     var check = confirm('你確定要刪除該筆Item圖檔嗎?');
-                    if(check){
-                        this.ProductsItem[key].photo_name = '' ; 
+                    if (check) {
+                        this.ProductsItem[key].photo_name = '';
 
                         axios.post('/backend/product_small/ajax', {
                                 item_id: item.id,
                                 _token: '{{ csrf_token() }}',
                                 type: 'DelItemPhotos',
                             })
-                            .then(function(response) {
-                            })
+                            .then(function(response) {})
                             .catch(function(error) {
                                 console.log(error);
                             });

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\BrandsService;
+use App\Services\ProductAttributeLovService;
+use App\Services\ProductAttributesService;
 use App\Services\ProductsService;
 use App\Services\SupplierService;
 use App\Services\WebCategoryHierarchyService;
@@ -19,11 +21,15 @@ class ProductsMallController extends Controller
     public function __construct(ProductsService $productsService,
         SupplierService $supplierService,
         BrandsService $brandsService,
-        WebCategoryHierarchyService $webCategoryHierarchyService) {
+        WebCategoryHierarchyService $webCategoryHierarchyService,
+        ProductAttributeLovService $productAttributeLovService,
+        ProductAttributesService $productAttributesService) {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
         $this->brandsService = $brandsService;
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
+        $this->productAttributeLovService = $productAttributeLovService;
+        $this->productAttributesService = $productAttributesService;
     }
 
     public function index(Request $request)
@@ -107,6 +113,12 @@ class ProductsMallController extends Controller
         $result['spac_list'] = $this->productsService->getProductSpac($id);
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
         $result['related_products'] = $this->productsService->getRelatedProducts($id);
+        $result['product_attribute_lov'] = $this->productAttributeLovService->getProductAttributeLov(['attribute_type' => 'CERTIFICATE']); //取checkbox 設定
+        $result['product_attributes'] = $this->productAttributesService->getProductAttributes([
+            'product_id' => $id,
+            'attribute_type' => 'CERTIFICATE',
+        ])->keyBy('product_attribute_lov_id')
+        ->toArray();
         return view('Backend.ProductsMall.input', $result);
     }
 
@@ -164,7 +176,7 @@ class ProductsMallController extends Controller
                 break;
             case 'DelItemPhotos':
                 // try {
-                    $this->productsService->delItemPhotos($in['item_id']);
+                $this->productsService->delItemPhotos($in['item_id']);
                 // } catch (\Throwable $th) {
                 //     $status = false;
                 // }

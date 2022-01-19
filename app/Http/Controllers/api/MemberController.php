@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\LookupValuesVService;
 use App\Services\ReturnRequestService;
 use App\Services\WarehouseStockService;
-use App\Http\Requests\api\GetOrderRequest;
+use App\Http\Requests\api\GetOrdersRequest;
 use App\Http\Requests\api\CancelOrderRequest;
 use App\Http\Requests\api\ReturnOrderRequest;
 use App\Http\Requests\api\ResetPasswordRequest;
@@ -94,10 +94,10 @@ class MemberController extends Controller
     /**
      * 取得會員訂單
      *
-     * @param GetOrderRequest $request
+     * @param GetOrdersRequest $request
      * @return json
      */
-    public function getOrders(GetOrderRequest $request)
+    public function getOrders(GetOrdersRequest $request)
     {
         try {
             $member_id = auth('api')->userOrFail()->member_id;
@@ -262,7 +262,7 @@ class MemberController extends Controller
      * @param GetOrderDetailRequest $request
      * @return json
      */
-    public function getOrderDetails(GetOrderDetailRequest $request)
+    public function getOrderDetail(GetOrderDetailRequest $request)
     {
         try {
             $member_id = auth('api')->userOrFail()->member_id;
@@ -746,6 +746,7 @@ class MemberController extends Controller
         $city = $request->input('city');
         $district = $request->input('district');
         $address = $request->input('address');
+        $zip_code = $request->input('zip_code');
         $now = Carbon::now();
 
         // 取得訂單
@@ -804,6 +805,7 @@ class MemberController extends Controller
                 'req_city' => $city,
                 'req_district' => $district,
                 'req_address' => $address,
+                'req_zip_code' => $zip_code,
                 'req_telephone' => $telephone,
                 'req_telephone_ext' => $telephone_ext,
                 'req_reason_code' => $code,

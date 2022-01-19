@@ -185,7 +185,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag=null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null)
     {
 
         //分類總覽階層
@@ -797,33 +797,35 @@ class APIProductServices
      * 取得活動贈品內容
      * @param
      */
-    public function getCampaignGiftByID($campaign_id)
+    public function getCampaignGiftByID($campaigns)
     {
+        $explode_campaign = explode(",", $campaigns);
         $s3 = config('filesystems.disks.s3.url');
         $gifts = $this->getCampaignGift();
         $now = Carbon::now();
         $giftAway = [];
-        if (isset($gifts['PROD'][$campaign_id])) {
-            foreach ($gifts['PROD'][$campaign_id] as $gift) {
-                if ($now >= $gift->start_at && $now <= $gift->end_at) {
-                    $giftAway[] = array(
-                        "productName" => $gift->product_name,
-                        "productPhoto" => ($gift->photo ? $s3 . $gift->photo : null),
-                        "assignedQty" => $gift->assignedQty,
-                    );
+        foreach ($explode_campaign as $k => $campaign_id) {
+            if (isset($gifts['PROD'][$campaign_id])) {
+                foreach ($gifts['PROD'][$campaign_id] as $gift) {
+                    if ($now >= $gift->start_at && $now <= $gift->end_at) {
+                        $giftAway[] = array(
+                            "productName" => $gift->product_name,
+                            "productPhoto" => ($gift->photo ? $s3 . $gift->photo : null),
+                            "assignedQty" => $gift->assignedQty,
+                        );
+                    }
                 }
             }
-            if (count($giftAway) > 0) {
-                $result['status'] = 200;
-                $result['result'] = $giftAway;
-            } else {
-                $result['status'] = 401;
-                $result['result'] = null;
-            }
+        }
+
+        if (count($giftAway) > 0) {
+            $result['status'] = 200;
+            $result['result'] = $giftAway;
         } else {
             $result['status'] = 401;
             $result['result'] = null;
         }
+
         return $result;
     }
 
