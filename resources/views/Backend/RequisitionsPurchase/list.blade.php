@@ -25,6 +25,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control" name="supplier_id" id="supplier_id">
+                                            <option value=""></option>
                                             @foreach ($supplier as $obj)
                                                 <option value='{{ $obj->id }}'
                                                     {{ request()->input('supplier_id') == $obj->id ? 'selected="selected"' : '' }}>
@@ -58,7 +59,7 @@
                                                     草稿</option>
                                                 <option value='reviewing'
                                                     {{ request()->input('status') == 'reviewing' ? 'selected="selected"' : '' }}>
-                                                    簽核</option>
+                                                    簽核中</option>
                                                 <option value='approved'
                                                     {{ request()->input('status') == 'approved' ? 'selected="selected"' : '' }}>
                                                     已核准</option>
@@ -199,8 +200,8 @@
                                                     @default
                                                 @endswitch
                                             </td>
-                                            <td>{{ $obj->created_at }}</td>
-                                            <td>尚未有該欄位</td>
+                                            <td>{{ $obj->submitted_at }}</td>
+                                            <td>{{ $obj->closed_at }}</td>
                                         </tr>
                                     @endforeach
                                 @endif
