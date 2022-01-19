@@ -199,6 +199,7 @@ class RequisitionsPurchaseService
                     $reviewLogData['reviewer'] = $reviewer;
                     RequisitionsPurchaseReviewLog::insert($reviewLogData);
                 }
+                RequisitionsPurchase::where('id',$requisitions_purchase_id)->update(['submitted_at' => $now]);
             }
 
             DB::commit();
@@ -281,6 +282,7 @@ class RequisitionsPurchaseService
                     $reviewLogData['reviewer'] = $reviewer;
                     RequisitionsPurchaseReviewLog::insert($reviewLogData);
                 }
+                RequisitionsPurchase::where('id',$input['id'])->update(['submitted_at' => $now]);
             }
             DB::commit();
             $result['status'] = true;

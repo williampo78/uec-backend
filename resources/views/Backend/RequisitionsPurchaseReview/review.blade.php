@@ -91,7 +91,13 @@
                                         <td>{{ $k+1 }}</td>
                                         <td>{{ $logVal['user_name'] }}</td>
                                         <td>{{ $logVal['review_at'] }}</td>
-                                        <td>{{ $logVal['review_result'] }}</td>
+                                        <td>
+                                            @if($logVal['review_result'] == '1')
+                                            核准
+                                            @elseif($logVal['review_result'] == '0')
+                                            駁回
+                                            @endif
+                                        </td>
                                         <td>{{ $logVal['review_remark'] }}</td>
                                     </tr>
                                     </tbody>
@@ -103,10 +109,10 @@
                                 <div class="row form-group">
                                     <div class="col-sm-1"><label> 簽核結果</label></div>
                                     <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="1">簽核
+                                        <input class="form-check-input" name="review_result" type="radio" value="1">核准
                                     </label>
                                     <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="0">取消
+                                        <input class="form-check-input" name="review_result" type="radio" value="0">駁回
                                     </label>
                                     <label for="">
                                         <div class="review_result_error"></div>
