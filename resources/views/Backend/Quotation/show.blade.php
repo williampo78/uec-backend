@@ -17,7 +17,7 @@
                     <div class="col-sm-3">{{ $quotation->exchange_rate }}</div>
                     <div class="col-sm-1"><label> 稅別</label></div>
                     <div class="col-sm-3">{{ $taxlist[$quotation->tax] ?? 'error' }}
-                        {{ $quotation->tax!=2?'':($quotation->is_tax_included == 1?' (含稅價)':' (未稅價)')}}
+                        {{ $quotation->tax != 2 ? '' : ($quotation->is_tax_included == 1 ? ' (含稅價)' : ' (未稅價)') }}
                     </div>
                 </div>
 
@@ -52,7 +52,7 @@
                                 </td>
                                 <td>{{ $val->ean }}</td>
                                 <td>{{ $val->original_unit_price }}</td>
-                                <td></td>
+                                <td>{{ $val->min_purchase_qty }}</td>
                             </tr>
                         @endforeach
 
