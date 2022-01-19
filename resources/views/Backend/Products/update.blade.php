@@ -568,7 +568,7 @@
                                     <label class="control-label">修改時間</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                    <input class="form-control" name="keyword" id="keyword" value="{{$products->updated_at}}" readonly>
                                 </div>
                             </div>
                         </div>

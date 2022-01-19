@@ -686,6 +686,7 @@ class ProductsService
         $ProductAuditLog = ProductAuditLog::select('product_audit_log.*', 'users.user_name AS user_name')
             ->orderBy('product_audit_log.updated_at', 'DESC')
             ->leftJoin('users', 'users.id', '=', 'product_audit_log.updated_by')
+            ->where('product_audit_log.product_id' , $product_id)
             ->get();
         return $ProductAuditLog;
     }
