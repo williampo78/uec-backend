@@ -5,9 +5,8 @@
         <div class="panel panel-primary">
             <div class="panel-heading"> 商品上架審核</div>
             <div class="panel-body" id="CategoryHierarchyContentInput">
-                <form role="form" id="new-form" method="POST"
-                    action="{{ route('product_review.update', $products->id) }}" enctype="multipart/form-data"
-                    novalidaten="ovalidate">
+                <form role="form" id="new-form" method="POST" action="{{ route('product_review.update', $products->id) }}"
+                    enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
                     <div class="form-horizontal">
@@ -19,7 +18,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
-                                            <input type="radio" name="review_result" value="1" checked>
+                                            <input type="radio" name="review_result" value="1">
                                             核准
                                         </label>
                                     </div>
@@ -177,7 +176,8 @@
                                     <div class="col-sm-9">
                                         <div class='input-group date' id='datetimepicker'>
                                             <input type='text' class="form-control" name="start_launched_at"
-                                                id="start_launched_at" value="{{ $products->start_launched_at }}" readonly/>
+                                                id="start_launched_at" value="{{ $products->start_launched_at }}"
+                                                readonly />
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -193,7 +193,7 @@
                                     <div class="col-sm-9">
                                         <div class='input-group date' id='datetimepicker2'>
                                             <input type='text' class="form-control" name="end_launched_at"
-                                                id="end_launched_at" value="{{ $products->end_launched_at }}" readonly/>
+                                                id="end_launched_at" value="{{ $products->end_launched_at }}" readonly />
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-calendar"></span>
                                             </span>
@@ -268,7 +268,6 @@
                                                         @default
                                                             尚未審核
                                                     @endswitch
-                                                    {{ $val->review_result }}
                                                 </td>
                                                 <td>{{ $val->review_remark }}</td>
                                                 <td>{{ $val->discontinued_at }}</td>
@@ -301,6 +300,40 @@
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
+            $("#new-form").validate({
+                // debug: true,
+                submitHandler: function(form) {
+                    $('#save_data').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    review_result: {
+                        required: true,
+                    },
+
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length || element.is(':radio')) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
         });
     </script>
 @endsection
