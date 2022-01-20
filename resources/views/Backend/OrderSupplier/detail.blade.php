@@ -112,7 +112,14 @@
                                         <td>@{{detail.item_price}}</td>
                                         <td>@{{detail.uom}}</td>
                                         <td>@{{detail.subtotal_price}}</td>
-                                        <td>@{{detail.is_giveaway}}</td>
+                                        <td>
+                                            <div v-if="detail.is_giveaway">
+                                                是
+                                            </div>
+                                            <div v-else>
+                                                否
+                                            </div>
+                                        </td>
                                         <td>@{{detail.min_purchase_qty}}</td>
                                         <td>@{{detail.purchase_qty}}</td>
                                     </tr>

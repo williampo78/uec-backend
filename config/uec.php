@@ -132,6 +132,24 @@ return [
         'VOIDED' => '已作廢',
     ],
 
+    // 金流狀態-請款
+    'payment_pay_status_options' => [
+        'NA' => '不須處理',
+        'PENDING' => '待請款',
+        'COMPLETED' => '請款成功',
+        'FAILED' => '請款失敗',
+        'VOIDED' => '已作廢',
+    ],
+
+    // 金流狀態-退款
+    'payment_refund_status_options' => [
+        'NA' => '不須處理',
+        'PENDING' => '待退款',
+        'COMPLETED' => '退款成功',
+        'FAILED' => '退款失敗',
+        'VOIDED' => '已作廢',
+    ],
+
     // 活動階層
     'campaign_level_code_options' => [
         'PRD' => '單品',

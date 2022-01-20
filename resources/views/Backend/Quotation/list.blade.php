@@ -56,7 +56,7 @@
                                                 {{ request()->input('status') == 'drafted' ? 'selected' : '' }}>草稿
                                             </option>
                                             <option value='reviewing'
-                                                {{ request()->input('status') == 'reviewing' ? 'selected' : '' }}>簽核
+                                                {{ request()->input('status') == 'reviewing' ? 'selected' : '' }}>簽核中
                                             </option>
                                             <option value='approved'
                                                 {{ request()->input('status') == 'approved' ? 'selected' : '' }}>已核准
@@ -72,7 +72,7 @@
                             <div class="row">
                                 <div class="col-sm-5">
                                     <div class="col-sm-2">
-                                        <h5>日期：</h5>
+                                        <h5>報價日期：</h5>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_select_start_date">

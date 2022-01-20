@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExternalInventoryDailyReportController;
 use App\Http\Controllers\OrderPaymentsReportController;
 use App\Http\Controllers\TertiaryCategoryController;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +74,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/admin', AdminController::class);
     Route::resource('/item', ItemController::class, ['names' => ['index' => 'item']]);
     Route::resource('/supplier', SupplierController::class, ['names' => ['index' => 'supplier']]);
+    Route::post('/supplier/ajax', [SupplierController::class, 'ajax']);
+
     Route::post('/item/ajaxphoto/del', [ItemController::class, 'ajax_del_Item_photo']); //刪除照片ajax
     Route::post('/contact/ajax/del', [ContactController::class, 'ajax_del_contact']); //刪除聯絡人
     Route::resource('/warehouse', WarehouseController::class, ['names' => ['index' => 'warehouse']]);
@@ -107,6 +110,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     //庫存單
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory'); // 庫存單列表
     Route::get('/inventory/ajax/excel', [InventoryController::class, 'exportExcel'])->name('inventory.export_excel'); // 庫存單匯出excel
+
+    //外倉庫存日報表
+    Route::get('/external_inventory_daily_report', [ExternalInventoryDailyReportController::class, 'index'])->name('external_inventory_daily_report'); // 庫存單列表
+    Route::get('/external_inventory_daily_report/ajax/excel', [ExternalInventoryDailyReportController::class, 'exportExcel'])->name('external_inventory_daily_report.export_excel'); // 庫存單匯出excel
 
     //退貨申請單管理
     Route::group(['prefix' => 'order_refund'], function(){

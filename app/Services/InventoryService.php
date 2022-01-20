@@ -20,6 +20,13 @@ use App\Models\InvoiceAllowanceDetail;
 
 class InventoryService
 {
+    /**
+     * 取得列表資料
+     * @param array $request
+     * @return Collection
+     * @Author: Eric
+     * @DateTime: 2022/1/20 上午 10:34
+     */
     public function getInventories($request = [])
     {
         $sysConfig = SysConfig::where('agent_id', Auth::user()->agent_id)
@@ -81,6 +88,13 @@ class InventoryService
         return $builder->get();
     }
 
+    /**
+     * 整理列表資料
+     * @param Collection $inventories
+     * @return Collection
+     * @Author: Eric
+     * @DateTime: 2022/1/20 上午 10:34
+     */
     public function handleInventories(collection $inventories)
     {
         return $inventories->map(function ($inventory) {
@@ -99,6 +113,8 @@ class InventoryService
             $inventory->stock_type = $stock_type_chinese;
             //安全庫存
             $inventory->safty_qty = is_null($inventory->safty_qty) ? null : number_format($inventory->safty_qty);
+            //庫存量(計算總量用)
+            $inventory->original_stock_qty = $inventory->stock_qty;
             //庫存量
             $inventory->stock_qty = is_null($inventory->stock_qty) ? null : number_format($inventory->stock_qty);
             //毛利率
@@ -110,6 +126,65 @@ class InventoryService
             //庫存成本
             $inventory->stock_amount = is_null($inventory->stock_amount) ? null : number_format($inventory->stock_amount, 2);
             return $inventory;
+        });
+    }
+
+    /**
+     * 整理Excel資料
+     * @param Collection $inventories
+     * @return Collection
+     * @Author: Eric
+     * @DateTime: 2022/1/20 上午 10:34
+     */
+    public function handleExcelData(collection $inventories)
+    {
+        return $inventories->map(function ($inventory) {
+
+            switch ($inventory->stock_type) {
+                case 'A':
+                    $stock_type_chinese = '買斷[A]';
+                    break;
+                case 'B':
+                    $stock_type_chinese = '寄售[B]';
+                    break;
+                default:
+                    $stock_type_chinese = '';
+            }
+
+            $inventory->stock_type = $stock_type_chinese;
+            //安全庫存
+            $inventory->safty_qty = is_null($inventory->safty_qty) ? null : number_format($inventory->safty_qty);
+            //庫存量(計算總量用)
+            $inventory->original_stock_qty = $inventory->stock_qty;
+            //庫存量
+            $inventory->stock_qty = is_null($inventory->stock_qty) ? null : number_format($inventory->stock_qty);
+            //毛利率
+            $inventory->gross_margin = is_null($inventory->gross_margin) ? null : $inventory->gross_margin . '%';
+            //售價
+            $inventory->selling_price = is_null($inventory->selling_price) ? null : number_format($inventory->selling_price, 2);
+            //平均成本
+            $inventory->item_cost = is_null($inventory->item_cost) ? null : number_format($inventory->item_cost, 2);
+            //庫存成本
+            $inventory->stock_amount = is_null($inventory->stock_amount) ? null : number_format($inventory->stock_amount, 2);
+            //低於安全庫存量
+            $inventory->is_dangerous = $inventory->is_dangerous == 1 ? '是' : '否';
+
+            return [
+                (string)$inventory->name,
+                (string)$inventory->item_no,
+                (string)$inventory->product_name,
+                (string)$inventory->spec_1_value,
+                (string)$inventory->spec_2_value,
+                (string)$inventory->pos_item_no,
+                (string)$inventory->stock_type,
+                (string)$inventory->safty_qty,
+                (string)$inventory->stock_qty,
+                (string)$inventory->selling_price,
+                (string)$inventory->item_cost,
+                (string)$inventory->gross_margin,
+                (string)$inventory->stock_amount,
+                (string)$inventory->is_dangerous
+            ];
         });
     }
 }

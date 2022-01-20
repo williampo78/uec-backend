@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', isset($Supplier) ? '編輯供應商資料' :'新建供應商資料')
+@section('title', isset($Supplier) ? '編輯供應商資料' : '新建供應商資料')
 
 @section('content')
     <div id="page-wrapper" style="min-height: 508px;">
@@ -38,10 +38,11 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_supplier_type">
                                             <label for="supplier_type">供應商類別 <span style="color:red;">*</span></label>
-                                            <select class="form-control js-select2" name="supplier_type_id" id="">
+                                            <select class="form-control" name="supplier_type_id" id="supplier_type_id">
+                                                <option value=""></option>
                                                 @foreach ($SupplierType as $obj)
                                                     <option value='{{ $obj->id }}'
-                                                        {{ (old('bluesign') ?? (isset($Supplier) ? $Supplier->display_number : '')) == $obj->id ? 'selected' : '' }}>
+                                                        {{ (old('bluesign') ?? (isset($Supplier) ? $Supplier->supplier_type_id : '')) == $obj->id ? 'selected' : '' }}>
                                                         {{ $obj->name }}</option>
                                                 @endforeach
                                             </select>
@@ -49,14 +50,15 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_display_number">
-                                            <label for="display_number">供應商編號</label>
+                                            <label for="display_number">供應商編號<span style="color:red;">*</span></label>
                                             <input class="form-control" name="display_number" id="display_number"
                                                 value="{{ old('display_number') ?? (isset($Supplier) ? $Supplier->display_number : '') }}">
+                                            <input type="hidden" id="old_display_number" value="{{ old('display_number') ?? (isset($Supplier) ? $Supplier->display_number : '') }}">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_company_number">
-                                            <label for="company_number">統一編號</label>
+                                            <label for="company_number">統一編號<span style="color:red;">*</span></label>
                                             <input class="form-control" name="company_number" id="company_number"
                                                 value="{{ old('company_number') ?? (isset($Supplier) ? $Supplier->company_number : '') }}">
                                         </div>
@@ -67,7 +69,7 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_short_name">
-                                            <label for="short_name">簡稱</label>
+                                            <label for="short_name">簡稱<span style="color:red;">*</span></label>
                                             <input class="form-control" name="short_name" id="short_name"
                                                 value="{{ old('short_name') ?? (isset($Supplier) ? $Supplier->short_name : '') }}">
                                         </div>
@@ -80,15 +82,17 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class="form-group" id="div_pay_condition">
-                                            <label for="pay_condition">付款條件</label>
+                                        <div class="form-group">
+                                            <label for="payment_term">付款條件</label>
 
-                                            <select class="form-control js-select2" name="pay_condition_id"
-                                                id="pay_condition_id" tabindex="-1" aria-hidden="true">
-                                                <option value="0">請選擇</option>
-                                                <option value="1">付款條件A</option>
-                                                <option value="2">付款條件B</option>
-                                                <option value="3">付款條件C</option>
+                                            <select class="form-control" name="payment_term" id="payment_term"
+                                                tabindex="-1" aria-hidden="true">
+                                                <option value=""></option>
+                                                @foreach ($getPaymentTerms as $obj)
+                                                <option value="{{$obj->code}}" 
+                                                    {{isset($Supplier) && $Supplier->payment_term  == $obj->code ? 'selected' : '' }}
+                                                    >{{$obj->description}}</option>
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
@@ -360,7 +364,8 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button class="btn btn-success" type="button" @click="submitBtn" id="btn-save"><i class="fa fa-check"></i> 完成</button>
+                                                <button class="btn btn-success" type="button" @click="submitBtn"
+                                                    id="btn-save"><i class="fa fa-check"></i> 完成</button>
                                                 <a href="{{ route('supplier') }}" class="btn btn-danger"
                                                     id="btn-cancel"><i class="fa fa-ban"></i> 取消</a>
                                             </div>
@@ -425,68 +430,128 @@
 
                 },
                 submitBtn() {
-                    console.log('TEST') ;
+                    console.log('TEST');
                     $("#formData").submit();
                 },
             }
         })
 
         new contact().$mount('#contact_table')
-
-        $('.js-select2').select2({
+        $('#supplier_type_id').select2({
             allowClear: true,
             theme: "bootstrap",
-            placeholder: '',
+            placeholder: '請選擇',
         });
+        $('#payment_term').select2({
+            allowClear: true,
+            theme: "bootstrap",
+            placeholder: '請選擇',
+        });
+
 
         // 驗證表單
         $("#formData").validate({
-                // debug: true,
-                submitHandler: function(form) {
-                    $('#btn-save').prop('disabled', true);
-                    form.submit();
+            // debug: true,
+            submitHandler: function(form) {
+                $('#btn-save').prop('disabled', true);
+                form.submit();
+            },
+            rules: {
+                supplier_type_id: {
+                    required: true,
                 },
-                rules: {
-                    supplier_type_id: {
-                        required: true,
-                    },
-                    name: {
-                        required: true,
-                    },
+                name: {
+                    required: true,
                 },
-                messages: {
-                    supplier_type_id: {
-                        required: "請選擇類型",
+                display_number: {
+                    required: true,
+                    remote: {
+                        param: function(element) {
+                            return {
+                                url: "/backend/supplier/ajax",
+                                type: "post",
+                                dataType: "json",
+                                cache: false,
+                                data: {
+                                    display_number: $('#display_number').val(),
+                                    type: 'checkDisplayNumber',
+                                },
+                                dataFilter: function(data) {
+                                    data = JSON.parse(data)
+                                    return data.result
+                                },
+                            }
+                        },
+                        depends: function(element) {
+                            return $('#display_number').val() !== $('#old_display_number').val();
+                        },
                     },
-                    name: {
-                        required: "請填寫名稱",
-                    },
-                },
-                errorClass: "help-block",
-                errorElement: "span",
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent());
-                        return;
+                    isEnglishNumber:{
+                        param: function() {
+                            let obj = {
+                                number: $('#display_number').val(),
+                            }
+                            return obj;
+                        },
+                        depends: function(element) {
+                            return true;
+                        },
                     }
+                },
+                company_number: {
+                    required: true,
+                    isTWCompanyNumber: {
+                        param: function() {
+                            let obj = {
+                                number: $('#company_number').val(),
+                            }
+                            return obj;
+                        },
+                        depends: function(element) {
+                            return true;
+                        },
+                    },
+                },
+                short_name: {
+                    required: true,
+                }
+            },
+            messages: {
+                supplier_type_id: {
+                    required: "請選擇類型",
+                },
+                name: {
+                    required: "請填寫名稱",
+                },
+                display_number: {
+                    remote: 'POS品號重複',
+                }
+            },
+            errorClass: "help-block",
+            errorElement: "span",
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                    return;
+                }
 
-                    if (element.closest(".form-group").length) {
-                        element.closest(".form-group").append(error);
-                        return;
-                    }
+                if (element.closest(".form-group").length) {
+                    element.closest(".form-group").append(error);
+                    return;
+                }
 
-                    error.insertAfter(element);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").addClass("has-error");
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-                success: function(label, element) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-            });
+                error.insertAfter(element);
+            },
+            highlight: function(element, errorClass, validClass) {
+                $(element).closest(".form-group").addClass("has-error");
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).closest(".form-group").removeClass("has-error");
+            },
+            success: function(label, element) {
+                $(element).closest(".form-group").removeClass("has-error");
+            },
+        });
     </script>
 @endsection
 @endsection
