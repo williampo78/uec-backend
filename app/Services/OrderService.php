@@ -120,20 +120,6 @@ class OrderService
             ->orderBy('sort', 'asc')
             ->get();
 
-        // 將商品圖片加入訂單明細中
-        foreach ($product_photos as $product_photo) {
-            if ($order_details->contains('product_id', $product_photo->product_id)) {
-                $order_detail = $order_details->firstWhere('product_id', $product_photo->product_id);
-
-                // 檢查出貨單明細是否有定義
-                if (!isset($order_detail->product_photos)) {
-                    $order_detail->product_photos = collect();
-                }
-
-                $order_detail->product_photos->push($product_photo);
-            }
-        }
-
         // 出貨單
         $shipments = new Shipment;
 
@@ -285,6 +271,18 @@ class OrderService
                         $order_detail->package_no = $shipment->package_no;
                     }
                 }
+            }
+
+            // 將商品圖片加入訂單明細中
+            if ($product_photos->contains('product_id', $order_detail->product_id)) {
+                $product_photo = $product_photos->firstWhere('product_id', $order_detail->product_id);
+
+                // 檢查商品圖片是否有定義
+                if (!isset($order_detail->product_photos)) {
+                    $order_detail->product_photos = collect();
+                }
+
+                $order_detail->product_photos->push($product_photo);
             }
 
             // 將訂單明細加入訂單中
