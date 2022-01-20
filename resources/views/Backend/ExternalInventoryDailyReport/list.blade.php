@@ -1,6 +1,6 @@
 @extends('Backend.master')
 
-@section('title', '庫存彙總表')
+@section('title', '外倉(秋雨)庫存日報表')
 
 @section('style')
 
@@ -12,7 +12,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 庫存彙總表</h1>
+                <h1 class="page-header"><i class="fa fa-list"></i> 外倉(秋雨)庫存日報表</h1>
             </div>
         </div>
 
@@ -23,6 +23,24 @@
                     <div class="panel-heading">
                         <form id="search-form" class="form-horizontal" method="GET" action="">
                             <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <h5>庫存日期<span class="text-danger">*</span></h5>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="form-group">
+                                            <div class='input-group date' id='datetimepicker_counting_date'>
+                                                <input type='text' class="form-control" name="counting_date"
+                                                       id="counting_date"
+                                                       value="{{ empty(request()->input('counting_date')) ? date('Y-m-d', strtotime('-1 day')) : request()->input('counting_date') }}" />
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3">
@@ -57,22 +75,6 @@
                                                 </option>
                                                 <option value="B"
                                                     {{ request()->input('stock_type') == 'B' ? 'selected' : '' }}>寄售[B]</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">庫存狀態</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-order-status-code" id="stock_status"
-                                                    name="stock_status">
-                                                <option></option>
-                                                <option value='0' {{ request()->input('stock_status') == 0 ? 'selected' : '' }}>正常</option>
-                                                <option value='1' {{ request()->input('stock_status') == 1 ? 'selected' : '' }}>低於正常庫存量</option>
                                             </select>
                                         </div>
                                     </div>
@@ -113,7 +115,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3">
@@ -129,15 +130,32 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3">
+                                            <label class="control-label">庫存狀態</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2-order-status-code" id="is_dangerous"
+                                                    name="is_dangerous">
+                                                <option></option>
+                                                <option value='0' {{ request()->input('is_dangerous') == '0' ? 'selected' : '' }}>正常</option>
+                                                <option value='1' {{ request()->input('is_dangerous') == '1' ? 'selected' : '' }}>低於正常庫存量</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
                                             <label class="control-label">供應商</label>
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control select2-shipment-status-code"
-                                                    id="supplier" name="supplier">
+                                                    id="supplier_id" name="supplier_id">
                                                 <option value=""></option>
                                                 @foreach ($supplier as $v)
                                                     <option value='{{ $v['id'] }}'
-                                                        {{ request()->input('supplier') && $v['id'] == request()->input('supplier') ? 'selected' : '' }}>
+                                                        {{ request()->input('supplier_id') && $v['id'] == request()->input('supplier_id') ? 'selected' : '' }}>
                                                         {{ $v['name'] }}
                                                     </option>
                                                 @endforeach
@@ -150,7 +168,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="col-sm-3">
-                                        <label class="control-label">庫存總量：{{ number_format($inventories->sum('original_stock_qty')) }}</label>
+                                        <label class="control-label">庫存總量：{{ number_format($dailyReports->sum('original_stock_qty')) }}</label>
                                     </div>
                                     <div class="col-sm-9"></div>
                                 </div>
@@ -163,7 +181,7 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_export'])
-                                                <button data-url="{{ route('inventory.export_excel') }}" class="btn btn-primary" id="btn-export-excel" type="button"><i
+                                                <button data-url="{{ route('external_inventory_daily_report.export_excel') }}" class="btn btn-primary" id="btn-export-excel" type="button"><i
                                                         class="fa fa-file-excel-o"></i>
                                                     匯出EXCEL</button>
                                             @endif
@@ -187,6 +205,7 @@
                                    id="inventory_table">
                                 <thead>
                                     <tr>
+                                        <th>庫存日期</th>
                                         <th>倉庫</th>
                                         <th>Item編號</th>
                                         <th>商品名稱</th>
@@ -194,32 +213,46 @@
                                         <th>規格二</th>
                                         <th>POS品號</th>
                                         <th>庫存類型</th>
+                                        <th>供應商</th>
+                                        <th>到期日</th>
+                                        <th>是否追加</th>
                                         <th>安全庫存量</th>
                                         <th>庫存量</th>
-                                        <th>售價(含稅)</th>
-                                        <th>平均成本(含稅)</th>
-                                        <th>毛利率</th>
-                                        <th>庫存成本(含稅)</th>
+                                        <th>售價(未稅)</th>
+                                        <th>平均成本(未稅)</th>
+                                        <th>毛利率(未稅)</th>
+                                        <th>庫存成本(未稅)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($inventories as $inventory)
+                                    @foreach($dailyReports as $dailyReport)
                                         <tr>
-                                            <td>{{ $inventory->name }}</td>
-                                            <td>{{ $inventory->item_no }}</td>
-                                            <td>{{ $inventory->product_name }}</td>
-                                            <td>{{ $inventory->spec_1_value }}</td>
-                                            <td>{{ $inventory->spec_2_value }}</td>
-                                            <td>{{ $inventory->pos_item_no }}</td>
-                                            <td>{{ $inventory->stock_type }}</td>
-                                            <td>{{ $inventory->safty_qty }}</td>
-                                            <td class="{{ $inventory->is_dangerous == 1 ? 'is-dangerous-stock' : null }}">
-                                                {{ $inventory->stock_qty }}
+                                            <td>{{ $dailyReport->counting_date }}</td>
+                                            <td>{{ $dailyReport->warehouse_name }}</td>
+                                            <td>{{ $dailyReport->item_no }}</td>
+                                            <td>{{ $dailyReport->product_name }}</td>
+                                            <td>{{ $dailyReport->spec_1_value }}</td>
+                                            <td>{{ $dailyReport->spec_2_value }}</td>
+                                            <td>{{ $dailyReport->pos_item_no }}</td>
+                                            <td>{{ $dailyReport->stock_type }}</td>
+                                            <td>{{ $dailyReport->supplier_name }}</td>
+                                            <td>{{ $dailyReport->expiry_date }}</td>
+                                            <td>{{ $dailyReport->is_additional_purchase }}</td>
+                                            <td>{{ $dailyReport->safty_qty }}</td>
+                                            <td>
+                                                @if($dailyReport->is_dangerous == 1)
+                                                <span class="label-danger text-white" style="color: #fff;">
+                                                    <i class="fa fa-exclamation-triangle"></i>
+                                                    {{ $dailyReport->stock_qty }}
+                                                </span>
+                                                @else
+                                                    {{ $dailyReport->stock_qty }}
+                                                @endif
                                             </td>
-                                            <td>{{ $inventory->selling_price }}</td>
-                                            <td>{{ $inventory->item_cost }}</td>
-                                            <td>{{ $inventory->gross_margin }}</td>
-                                            <td>{{ $inventory->stock_amount }}</td>
+                                            <td>{{ $dailyReport->selling_price }}</td>
+                                            <td>{{ $dailyReport->item_cost }}</td>
+                                            <td>{{ $dailyReport->gross_margin }}</td>
+                                            <td>{{ $dailyReport->stock_amount }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -236,8 +269,56 @@
     <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
     <script>
         $(function() {
+
+            $('#datetimepicker_counting_date').datetimepicker({
+                format: 'YYYY-MM-DD',
+                showClear: true,
+            });
+
             $('#inventory_table').dataTable({
                 "aaSorting": []
+            });
+
+            // 驗證表單
+            $("#search-form").validate({
+                submitHandler: function(form) {
+                    $('#btn-search').prop('disabled', true);
+                    form.submit();
+                },
+                rules: {
+                    counting_date: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    counting_date: {
+                        required: '必填',
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
             });
 
             // 匯出excel
@@ -247,18 +328,19 @@
 
                 axios.get(url, {
                     params: {
+                        counting_date:$('#counting_date').val(),
                         warehouse:$('#warehouse').val(),
                         stock_type:$('#stock_type').val(),
-                        stock_status:$('#stock_status').val(),
                         item_no_start:$('#item_no_start').val(),
-                        ordered_date_end:$('#ordered_date_end').val(),
+                        item_no_end:$('#item_no_end').val(),
                         product_name:$('#product_name').val(),
-                        product_name:$('#product_name').val(),
+                        is_dangerous:$('#is_dangerous').val(),
+                        supplier_id:$('#supplier_id').val(),
                     },
                     responseType: 'blob',
                 })
                 .then(function(response) {
-                    saveAs(response.data, "inventories.xlsx");
+                    saveAs(response.data, "external_inventory_daily_reports.xlsx");
                 })
                 .catch(function(error) {
                     console.log(error);

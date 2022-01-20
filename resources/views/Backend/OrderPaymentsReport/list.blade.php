@@ -192,6 +192,7 @@
 @endsection
 
 @section('js')
+    <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
     <script>
         $(function() {
             $('#datetimepicker_date_start').datetimepicker({

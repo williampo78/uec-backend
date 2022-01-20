@@ -99,6 +99,8 @@ class InventoryService
             $inventory->stock_type = $stock_type_chinese;
             //安全庫存
             $inventory->safty_qty = is_null($inventory->safty_qty) ? null : number_format($inventory->safty_qty);
+            //庫存量(計算總量用)
+            $inventory->original_stock_qty = $inventory->stock_qty;
             //庫存量
             $inventory->stock_qty = is_null($inventory->stock_qty) ? null : number_format($inventory->stock_qty);
             //毛利率
