@@ -376,14 +376,18 @@ class OrderController extends Controller
                 // 時間
                 $order_payment->created_at_format = Carbon::parse($order_payment->created_at)->format('Y-m-d H:i');
 
+                // 金流狀態
+                if ($order_payment->payment_type == 'PAY') {
+                    $order_payment->payment_status = config('uec.payment_pay_status_options')[$order_payment->payment_status] ?? null;
+                } else {
+                    $order_payment->payment_status = config('uec.payment_refund_status_options')[$order_payment->payment_status] ?? null;
+                }
+
                 // 類型
                 $order_payment->payment_type = config('uec.payment_type_options')[$order_payment->payment_type] ?? null;
 
                 // 金額
                 $order_payment->amount = number_format($order_payment->amount);
-
-                // 金流狀態
-                $order_payment->payment_status = config('uec.payment_status_options')[$order_payment->payment_status] ?? null;
 
                 // 請款/退款API最近一次呼叫時間
                 if (isset($order_payment->latest_api_date)) {
