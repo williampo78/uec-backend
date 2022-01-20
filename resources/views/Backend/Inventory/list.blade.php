@@ -71,8 +71,8 @@
                                             <select class="form-control select2-order-status-code" id="stock_status"
                                                     name="stock_status">
                                                 <option></option>
-                                                <option value='0' {{ request()->input('stock_status') == 0 ? 'selected' : '' }}>正常</option>
-                                                <option value='1' {{ request()->input('stock_status') == 1 ? 'selected' : '' }}>低於正常庫存量</option>
+                                                <option value='0' {{ request()->input('stock_status') == '0' ? 'selected' : '' }}>正常</option>
+                                                <option value='1' {{ request()->input('stock_status') == '1' ? 'selected' : '' }}>低於正常庫存量</option>
                                             </select>
                                         </div>
                                     </div>
@@ -212,14 +212,21 @@
                                             <td>{{ $inventory->spec_2_value }}</td>
                                             <td>{{ $inventory->pos_item_no }}</td>
                                             <td>{{ $inventory->stock_type }}</td>
-                                            <td>{{ $inventory->safty_qty }}</td>
-                                            <td class="{{ $inventory->is_dangerous == 1 ? 'is-dangerous-stock' : null }}">
-                                                {{ $inventory->stock_qty }}
+                                            <td class="text-right">{{ $inventory->safty_qty }}</td>
+                                            <td class="text-right">
+                                                @if($inventory->is_dangerous == 1)
+                                                    <span class="label-danger text-white" style="color: #fff;">
+                                                    <i class="fa fa-exclamation-triangle"></i>
+                                                    {{ $inventory->stock_qty }}
+                                                </span>
+                                                @else
+                                                    {{ $inventory->stock_qty }}
+                                                @endif
                                             </td>
-                                            <td>{{ $inventory->selling_price }}</td>
-                                            <td>{{ $inventory->item_cost }}</td>
-                                            <td>{{ $inventory->gross_margin }}</td>
-                                            <td>{{ $inventory->stock_amount }}</td>
+                                            <td class="text-right">{{ $inventory->selling_price }}</td>
+                                            <td class="text-right">{{ $inventory->item_cost }}</td>
+                                            <td class="text-right">{{ $inventory->gross_margin }}</td>
+                                            <td class="text-right">{{ $inventory->stock_amount }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

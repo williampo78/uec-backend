@@ -70,7 +70,7 @@ class InventoryController extends Controller
         }
 
         $inventories = $this->inventoryService->getInventories($request->toArray());
-        $inventories = $this->inventoryService->handleInventories($inventories);
+        $inventories = $this->inventoryService->handleExcelData($inventories);
 
         return Excel::download(new InventoryExport($inventories), 'inventories.xlsx');
     }
