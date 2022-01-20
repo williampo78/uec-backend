@@ -85,6 +85,7 @@ class ProductsController extends Controller
     {
         $result = [] ; 
         $result['products'] = $this->productsService->showProducts($id) ; 
+        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ; 
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌

@@ -451,7 +451,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="control-label">
-                                        <a href="#">修改紀錄</a>
+                                        <a href="#" data-toggle="modal" data-target="#model_category">修改紀錄</a>
                                     </label>
                                 </div>
                             </div>
@@ -780,6 +780,7 @@
                         {{-- 二維多規格結束 --}}
                         {{-- <button class="btn btn-large btn-primary" type="submit">儲存</button> --}}
                 </form>
+                @include('Backend.Products.model_update_log')
             </div>
         </div>
     </div>
