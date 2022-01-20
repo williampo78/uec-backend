@@ -296,6 +296,20 @@
                                         <div class="col-sm-1">
                                             <label class="control-label">促銷小標</label>
                                         </div>
+                                        <div class="col-sm-6">
+                                            <input class="form-control" name="promotion_desc"
+                                                value="{{ $products->promotion_desc }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">促銷小標生效時間
+                                            </label>
+                                        </div>
                                         <div class="col-sm-2">
                                             <div class='input-group date'>
                                                 <input type='text' class="form-control" name="promotion_start_at"
@@ -312,20 +326,7 @@
                                                     id="promotion_end_at" value="{{ $products->promotion_end_at }}" />
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">促銷小標生效時間
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input class="form-control" name="promotion_desc"
-                                                value="{{ $products->promotion_desc }}">
-                                        </div>
+                                   
                                     </div>
                                 </div>
                             </div>
@@ -519,6 +520,20 @@
             });
             $('#promotion_end_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
+            });
+            $("#promotion_start_at").on("dp.change", function(e) {
+                if (e.oldDate === null) {
+                    $(this)
+                        .data("DateTimePicker")
+                        .date(new Date(e.date._d.setHours(00, 00, 00)));
+                }
+            });
+            $("#promotion_end_at").on("dp.change", function(e) {
+                if (e.oldDate === null) {
+                    $(this)
+                        .data("DateTimePicker")
+                        .date(new Date(e.date._d.setHours(23, 59, 59)));
+                }
             });
             $('.product_attributes').on('change', function() { // on change of state
                 $('.product_attributes_change').val('true');

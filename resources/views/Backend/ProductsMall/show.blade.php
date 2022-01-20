@@ -260,6 +260,20 @@
                                         <div class="col-sm-1">
                                             <label class="control-label">促銷小標</label>
                                         </div>
+                                        <div class="col-sm-6">
+                                            <input class="form-control" name="promotion_desc"
+                                                value="{{ $products->promotion_desc }}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-1">
+                                            <label class="control-label">促銷小標生效時間
+                                            </label>
+                                        </div>
                                         <div class="col-sm-2">
                                             <div class='input-group date'>
                                                 <input type='text' class="form-control" name="promotion_start_at"
@@ -275,20 +289,6 @@
                                                 <input type='text' class="form-control" name="promotion_end_at"
                                                     id="promotion_end_at" value="{{ $products->promotion_end_at }}" readonly />
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">促銷小標生效時間
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input class="form-control" name="promotion_desc"
-                                                value="{{ $products->promotion_desc }}" readonly>
                                         </div>
                                     </div>
                                 </div>
