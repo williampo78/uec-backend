@@ -810,7 +810,7 @@ class APIProductServices
                     if ($now >= $gift->start_at && $now <= $gift->end_at) {
                         $giftAway[] = array(
                             "productName" => $gift->product_name,
-                            "productPhoto" => ($gift->photo ? $s3 . $gift->photo : null),
+                            "productPhoto" => ($gift->photo ? $gift->photo : null),
                             "assignedQty" => $gift->assignedQty,
                         );
                     }

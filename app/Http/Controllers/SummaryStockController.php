@@ -127,4 +127,23 @@ class SummaryStockController extends Controller
         $export = new ReportExport($title, $data);
         return Excel::download($export, '進耗存彙總表' . date('Y-m-d') . '.xlsx');
     }
+
+
+    public function ajaxDetail(Request $request)
+    {
+
+        $getData = $request->input();
+        $rs = $this->summaryStock->setSummaryCost($getData['smonth']);
+        return $rs;
+        if ($rs['status']) {
+            $status = true;
+        } else {
+            $status = false;
+        }
+        return response()->json([
+            'status' => true,
+            'message' => $rs['message'],
+            'results' => $rs['result'],
+        ], 200);
+    }
 }
