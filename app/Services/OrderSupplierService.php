@@ -55,7 +55,7 @@ class OrderSupplierService
         if (isset($data['requisitions_purchase_number'])) {
             $result->where('requisitions_purchase.number', 'like', '%' . $data['requisitions_purchase_number'] . '%');
         }
-
+        $result->orderBy('order_supplier.number' ,'DESC');
         $result = $result->get();
 
         return $result;

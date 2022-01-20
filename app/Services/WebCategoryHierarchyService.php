@@ -132,7 +132,7 @@ class WebCategoryHierarchyService
         }
 
         if ($confi_levels == 2) {
-            $query = "SELECT level_two.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,
+            $query = "SELECT level_two.id as id, level_two.meta_title , CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,
             level_two.content_type ,'' as level_three ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
             FROM (SELECT * FROM web_category_hierarchy WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $whereID . ") level_two ON level_two.parent_id = level_one.id
@@ -206,7 +206,7 @@ class WebCategoryHierarchyService
     }
     public function edit_category_hierarchy_content($in, $id)
     {
-        $resut = false;
+        $result = false;
         $category_products_list = json_decode($in['category_products_list_json'], true);
         $user_id = Auth::user()->id;
         $now = Carbon::now();
@@ -235,13 +235,13 @@ class WebCategoryHierarchyService
                 }
             }
             DB::commit();
-            $resut = true;
+            $result = true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
-            $resut = false;
+            $result = false;
         }
-        return $resut;
+        return $result;
     }
 
     public function del_category_hierarchy_content($id)

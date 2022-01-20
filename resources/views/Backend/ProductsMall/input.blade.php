@@ -244,19 +244,20 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <div class="col-sm-12">
-                                            <label class="control-label">認證</label><span class="redtext">*</span>：
+                                            <label class="control-label">認證</label>：
                                         </div>
                                         @foreach ($product_attribute_lov as $key => $obj)
                                             <div class="col-sm-2">
                                                 <label class="radio-inline">
-                                                    <input class="product_attributes" type="checkbox" name="product_attributes[]"
-                                                        value="{{ $obj->id }}"
+                                                    <input class="product_attributes" type="checkbox"
+                                                        name="product_attributes[]" value="{{ $obj->id }}"
                                                         {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
                                                     {{ $obj->description }}
                                                 </label>
                                             </div>
                                         @endforeach
-                                        <input class="product_attributes_change" type="hidden" value="false" name="product_attributes_change">
+                                        <input class="product_attributes_change" type="hidden" value="false"
+                                            name="product_attributes_change">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -500,17 +501,30 @@
     <script>
         // Get all sections that have an ID defined
         $(document).ready(function() {
+            $('#start_created_at').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#end_created_at').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#start_launched_at_start').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#start_launched_at_end').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+
             $('#promotion_start_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
             });
             $('#promotion_end_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
             });
-            $('.product_attributes').on('change', function(){ // on change of state
+            $('.product_attributes').on('change', function() { // on change of state
                 $('.product_attributes_change').val('true');
                 // console.log('product_attributes on change');
             })
-        
+
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
@@ -735,10 +749,12 @@
                     this.CategoryList = list;
                 },
                 productsGetAjax() {
-                    var create_start_date = $('input[name="create_start_date"]').val();
-                    var create_end_date = $('input[name="create_end_date"]').val();
-                    var select_start_date = $('input[name="select_start_date"]').val();
-                    var select_end_date = $('input[name="select_end_date"]').val();
+                    var start_created_at = $('input[name="start_created_at"]').val();
+                    var end_created_at = $('input[name="end_created_at"]').val();
+                    var start_launched_at_start = $('input[name="start_launched_at_start"]').val();
+                    var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
+                    var supplier_id = $('#supplier').val();
+                    var limit = $('#limit').val();
                     var filter_product_id = [];
                     this.RelatedProducts.find((todo, index) => {
                         filter_product_id.push(todo.related_product_id);
@@ -747,15 +763,17 @@
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'getProductsList',
+                            supplier_id: supplier_id,
                             product_no: this.select_req.product_no,
                             product_name: this.select_req.product_name,
                             selling_price_min: this.select_req.selling_price_min,
                             selling_price_max: this.select_req.selling_price_max,
-                            create_start_date: create_start_date,
-                            create_end_date: create_end_date,
-                            select_start_date: select_start_date,
-                            select_end_date: select_end_date,
+                            start_created_at: start_created_at,
+                            end_created_at: end_created_at,
+                            start_launched_at_start: start_launched_at_start,
+                            start_launched_at_end: start_launched_at_end,
                             filter_product_id: filter_product_id, //排除掉 ID
+                            limit: limit,
                         });
                         this.result_products = response.data.result.data;
                     }

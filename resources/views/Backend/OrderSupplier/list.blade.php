@@ -24,6 +24,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control js-select2-department" name="supplier" id="supplier">
+                                            <option value=""></option>
                                             @foreach ($data['supplier'] as $v)
                                                 <option value='{{ $v['id'] }}'
                                                     {{ isset($data['getData']['supplier']) && $v['id'] == $data['getData']['supplier'] ? 'selected' : '' }}>
@@ -55,7 +56,7 @@
                                                 草稿</option>
                                             <option value='reviewing'
                                                 {{ isset($data['getData']['status']) && $data['getData']['status'] == 'reviewing' ? 'selected' : '' }}>
-                                                簽核</option>
+                                                簽核中</option>
                                             <option value='approved'
                                                 {{ isset($data['getData']['status']) && $data['getData']['status'] == 'approved' ? 'selected' : '' }}>
                                                 已核准</option>
@@ -182,11 +183,13 @@
                                                 <a class="btn btn-info btn-sm"
                                                     href="{{ route('order_supplier.edit', $v['id']) }}">修改</a>
                                             @endif
+                                            @if ($share_role_auth['auth_update'] && $v['status'] == 'APPROVED' && $v['created_by'] == $data['user_id'])
 
                                             <button class="btn btn-warning btn-sm" data-toggle="modal"
                                                 data-target="#row_supplier_deliver"
-                                                @click="supplier_deliver({{ $v }})">預進日</button>
-
+                                                @click="supplier_deliver({{ $v }})">預進日
+                                            </button>
+                                            @endif
                                             @if ($share_role_auth['auth_delete'] && $v['status'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
                                                 <button class="btn btn-danger btn-sm" type="button"
                                                     @click="delBtn({{ $v['id'] }})">刪除</button>
@@ -279,8 +282,16 @@
 
         new showRequisitions().$mount('#page-wrapper');
         $(document).ready(function() {
-            $('#supplier').select2();
-            $('#status').select2();
+            $('#supplier').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: '',
+            });
+            $('#status').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: '',
+            });
 
             $('#datetimepicker').datetimepicker({
                 format: 'YYYY-MM-DD',

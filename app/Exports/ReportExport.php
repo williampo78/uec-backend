@@ -3,7 +3,6 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-
 // use Maatwebsite\Excel\Concerns\FromCollection;
 
 class ReportExport implements FromCollection
@@ -16,40 +15,49 @@ class ReportExport implements FromCollection
         $this->title = $title;
         $this->data = $data;
     }
+
     public function collection()
     {
         return collect($this->createData());
     }
+
+    public function toString($value): string
+    {
+        return $value;
+    }
+
+
     //TEST
     public function createData()
     {
         $title = $this->title;
         $result[] = $title;
-        foreach($this->arrangeData() as $val){
-            $result[] = $val ; 
+        foreach ($this->arrangeData() as $val) {
+            $result[] = $val;
         }
         return $result;
     }
+
     public function arrangeData()
     {
         $data = $this->data;
         $title = $this->title;
         $result = [];
-        $index = 0 ;
+        $index = 0;
         foreach ($data as $datakey => $dataval) {
-            $index ++   ;
+            $index++;
             foreach ($title as $titleKey => $titleVal) {
                 switch ($titleKey) {
                     case 'index':
-                        $result[$datakey][$titleKey] = $index ; 
+                        $result[$datakey][$titleKey] = $index;
                         break;
                     default:
-                        $result[$datakey][$titleKey] = $data[$datakey][$titleKey];
+                        $result[$datakey][$titleKey] = ($data[$datakey][$titleKey] == 0 ? $this->toString($data[$datakey][$titleKey]) : $data[$datakey][$titleKey]);
                         break;
                 }
             }
         }
-        return $result ;
+        return $result;
     }
 
 }

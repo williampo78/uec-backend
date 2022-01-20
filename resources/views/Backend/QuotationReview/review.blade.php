@@ -45,7 +45,7 @@
                                     <tr>
                                         <th>商品編號</th>
                                         <th>商品名稱</th>
-                                        <th>國際條碼</th>
+                                        <th>POS品號</th>
                                         <th>單價</th>
                                         <th>最小採購量</th>
                                     </tr>
@@ -54,7 +54,14 @@
                                     <tbody>
                                         <tr>
                                             <td>{{ $v['product_items_no'] }}</td>
-                                            <td>{{ $v['product_name'] }}</td>
+                                            <td>{{ $v['product_name'] }}
+                                                @if($v['spec_1_value'])
+                                                    - {{$v['spec_1_value']}}
+                                                @endif
+                                                @if($v['spec_2_value'])
+                                                - {{$v['spec_2_value']}}
+                                            @endif
+                                            </td>
                                             <td>{{ $v['pos_item_no'] }}</td>
                                             <td>{{ $v['original_unit_price'] }}</td>
                                             <td>{{ $v['min_purchase_qty'] }}</td>
@@ -80,7 +87,13 @@
                                             <td>{{ $k + 1 }}</td>
                                             <td>{{ $logVal['user_name'] }}</td>
                                             <td>{{ $logVal['review_at'] }}</td>
-                                            <td>{{ $logVal['review_result'] }}</td>
+                                            <td>{{ $logVal['review_result'] }}
+                                                @if($logVal['review_result'] == '1')
+                                                核准
+                                                @elseif($logVal['review_result'] == '0')
+                                                駁回
+                                                @endif
+                                            </td>
                                             <td>{{ $logVal['review_remark'] }}</td>
                                         </tr>
                                     </tbody>
@@ -92,10 +105,10 @@
                                 <div class="row form-group">
                                     <div class="col-sm-1"><label> 簽核結果</label></div>
                                     <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="1">簽核
+                                        <input class="form-check-input" name="review_result" type="radio" value="1">核准
                                     </label>
                                     <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="0">取消
+                                        <input class="form-check-input" name="review_result" type="radio" value="0">駁回
                                     </label>
                                     <label for="">
                                         <div class="review_result_error"></div>
