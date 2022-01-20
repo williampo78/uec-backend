@@ -73,6 +73,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/admin', AdminController::class);
     Route::resource('/item', ItemController::class, ['names' => ['index' => 'item']]);
     Route::resource('/supplier', SupplierController::class, ['names' => ['index' => 'supplier']]);
+    Route::post('/supplier/ajax', [SupplierController::class, 'ajax']);
+
     Route::post('/item/ajaxphoto/del', [ItemController::class, 'ajax_del_Item_photo']); //刪除照片ajax
     Route::post('/contact/ajax/del', [ContactController::class, 'ajax_del_contact']); //刪除聯絡人
     Route::resource('/warehouse', WarehouseController::class, ['names' => ['index' => 'warehouse']]);

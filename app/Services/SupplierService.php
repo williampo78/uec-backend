@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class SupplierService
 {
@@ -35,12 +36,24 @@ class SupplierService
     public function addSupplier($inputdata)
     {
         $inputdata['agent_id'] = Auth::user()->agent_id;
-
+        $inputdata['created_by'] = Auth::user()->id;
+        $inputdata['updated_by'] = Auth::user()->id;
+        DB::beginTransaction();
         try {
-            return Supplier::create($inputdata);
+            DB::commit();
+            Supplier::create($inputdata);
+            $result = true;
         } catch (\Exception $e) {
-            Log::info($e);
+            DB::rollBack();
+            Log::warning($e->getMessage());
+            $result = false;
         }
+        return $result ;
+
+    }
+    public function checkDisplayNumber($DisplayNumber){
+        $check = Supplier::where('display_number',$DisplayNumber)->count();
+        return $check == 0 ; 
     }
 
     public function showSupplier($id)
@@ -55,7 +68,9 @@ class SupplierService
 
         return Supplier::where('id', $id)->update($input);
     }
-
+    public function getPaymentTerms(){
+       return DB::table('lookup_values')->where('lookup_type_id','9')->get();
+    }
 
 
 }

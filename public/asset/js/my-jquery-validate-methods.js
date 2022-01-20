@@ -54,3 +54,16 @@ jQuery.validator.addMethod("notRepeating", function (value, element, params) {
     return `已跟其他輸入的欄位重複`;
 });
 
+jQuery.validator.addMethod("isTWCompanyNumber", function (value, element, obj) {
+    var regexp = /^[0-9]{8}$/;
+    return regexp.test(obj.number);
+}, function (params, element) {
+    return `統一編號必須為8碼、只能輸入數字`;
+});
+jQuery.validator.addMethod("isEnglishNumber", function (value, element, obj) {
+    var regexp = /^[A-Za-z0-9]+$/
+    return regexp.test(obj.number);
+}, function (params, element) {
+    return `只能輸入英文以及數字`;
+});
+// ^[A-Za-z0-9]+$

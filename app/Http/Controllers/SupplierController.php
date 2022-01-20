@@ -40,6 +40,7 @@ class SupplierController extends Controller
     public function create()
     {
         $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
+        $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
         return view('Backend.Supplier.input', $result);
     }
 
@@ -52,9 +53,10 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         $input = $request->input();
-
+        $act = 'add';
+        $route_name = 'supplier';
         $result = $this->supplierService->addSupplier($input);
-        return redirect(route('supplier'));
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -82,6 +84,8 @@ class SupplierController extends Controller
         $result['Supplier'] = $this->supplierService->showSupplier($id);
         $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
         $result['Contact'] = $this->contactService->getContact('Supplier',$id);
+        $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
+
         return view('Backend.Supplier.input', $result);
     }
 
@@ -99,7 +103,9 @@ class SupplierController extends Controller
         unset($input['contact_json']) ;
         $this->contactService->createContact('tablename' , $contact_json) ;
         $result = $this->supplierService->updateSupplier($input, $id);
-        return redirect(route('supplier'));
+        $act = 'upd';
+        $route_name = 'supplier';
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -111,5 +117,20 @@ class SupplierController extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function ajax(Request $request){
+        $in = $request->input() ;
+        switch ($in['type']) {
+            case 'checkDisplayNumber':
+                $result = $this->supplierService->checkDisplayNumber($in['display_number']);
+                break;
+            default:
+                # code...
+                break;
+        }
+        return response()->json([
+            'req' => $request->input(),
+            'result' =>  $result,
+        ]);
     }
 }
