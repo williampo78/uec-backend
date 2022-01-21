@@ -138,7 +138,7 @@ class RequisitionsPurchaseService
     }
     public function createRequisitionsPurchase($input)
     { //建立請購單
-        $result = [] ;
+        $result = [];
         $requisitions_purchase_detail = json_decode($input['requisitions_purchase_detail'], true);
         unset($input['requisitions_purchase_detail']); // 移除json
         unset($input['item_price']); // 移除json
@@ -152,8 +152,8 @@ class RequisitionsPurchaseService
         $hierarchy = $this->hierarchyService->getHierarchyCode('REQUISITION_PUR'); // 取得簽核者
         if (!$hierarchy) {
             $result['message'] = '您未被設定於單據簽核流程中，請聯繫系統管理員';
-            $result['status']  = false ; 
-            return $result ;
+            $result['status'] = false;
+            return $result;
         }
         DB::beginTransaction();
         try {
@@ -199,7 +199,7 @@ class RequisitionsPurchaseService
                     $reviewLogData['reviewer'] = $reviewer;
                     RequisitionsPurchaseReviewLog::insert($reviewLogData);
                 }
-                RequisitionsPurchase::where('id',$requisitions_purchase_id)->update(['submitted_at' => $now]);
+                RequisitionsPurchase::where('id', $requisitions_purchase_id)->update(['submitted_at' => $now]);
             }
 
             DB::commit();
@@ -216,7 +216,7 @@ class RequisitionsPurchaseService
     }
     public function updateRequisitionsPurchase($input)
     { //編輯請購單
-        $result = [] ;
+        $result = [];
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         $requisitions_purchase_detail_in = json_decode($input['requisitions_purchase_detail'], true);
@@ -224,68 +224,71 @@ class RequisitionsPurchaseService
         $hierarchy = $this->hierarchyService->getHierarchyCode('REQUISITION_PUR'); // 取得簽核者
         if (!$hierarchy) {
             $result['message'] = '您未被設定於單據簽核流程中，請聯繫系統管理員';
-            $result['status']  = false ; 
-            return $result ;
+            $result['status'] = false;
+            return $result;
         }
         DB::beginTransaction();
-  
+
         try {
-            $requisitions_purchase_in = [
-                'supplier_id' => $input['supplier_id'],
-                'trade_date' => $input['trade_date'],
-                'number' => $input['number'],
-                'warehouse_id' => $input['warehouse_id'],
-                'currency_code' => $input['currency_code'],
-                'currency_price' => $input['currency_price'],
-                'original_total_tax_price' => $input['original_total_tax_price'],
-                'tax' => $input['tax'],
-                'total_tax_price' => $input['total_tax_price'],
-                'total_price' => $input['total_price'],
-                'remark' => $input['remark'],
-                'status' => $input['status'],
-                'updated_by' => $user_id,
-                'updated_at' => $now,
-            ];
-            RequisitionsPurchase::where('id', $input['id'])->update($requisitions_purchase_in);
-            foreach ($requisitions_purchase_detail_in as $key => $item) {
-                $indata = [];
-                unset($requisitions_purchase_detail_in[$key]['created_at']);
-                unset($requisitions_purchase_detail_in[$key]['updated_at']);
-                $indata['product_item_id'] = $item['product_item_id']; //20211221欄位改名為product_item_id
-                $indata['item_qty'] = $item['item_qty'];
-                $indata['item_price'] = $item['item_price'];
-                $indata['item_number'] = $item['item_number'];
-                $indata['subtotal_price'] = $item['subtotal_price'];
-                $indata['original_subtotal_tax_price'] = $item['original_subtotal_tax_price'];
-                $indata['subtotal_tax_price'] = $item['subtotal_tax_price'];
-                $indata['currency_code'] = $input['currency_code'];
-                $indata['updated_by'] = $user_id;
-                $indata['updated_at'] = $now;
-                $indata['is_gift'] = $item['is_gift'];
-                if ($item['id'] == '') {
-                    $indata['created_by'] = $user_id;
-                    $indata['created_at'] = $now;
-                    RequisitionsPurchaseDetail::insert($indata);
-                } else {
-                    RequisitionsPurchaseDetail::where('id', $item['id'])->update($indata);
-                }
+        $requisitions_purchase_in = [
+            'supplier_id' => $input['supplier_id'],
+            'trade_date' => $input['trade_date'],
+            'number' => $input['number'],
+            'warehouse_id' => $input['warehouse_id'],
+            'currency_code' => $input['currency_code'],
+            'currency_price' => $input['currency_price'],
+            'original_total_tax_price' => $input['original_total_tax_price'],
+            'tax' => $input['tax'],
+            'total_tax_price' => $input['total_tax_price'],
+            'total_price' => $input['total_price'],
+            'remark' => $input['remark'],
+            'status' => $input['status'],
+            'updated_by' => $user_id,
+            'updated_at' => $now,
+        ];
+
+        RequisitionsPurchase::where('id', $input['id'])->update($requisitions_purchase_in);
+
+        foreach ($requisitions_purchase_detail_in as $key => $item) {
+            $indata = [];
+            unset($requisitions_purchase_detail_in[$key]['created_at']);
+            unset($requisitions_purchase_detail_in[$key]['updated_at']);
+            $indata['product_item_id'] = $item['product_item_id']; //20211221欄位改名為product_item_id
+            $indata['item_qty'] = $item['item_qty'];
+            $indata['item_price'] = $item['item_price'];
+            $indata['item_number'] = $item['item_number'];
+            $indata['subtotal_price'] = $item['subtotal_price'];
+            $indata['original_subtotal_tax_price'] = $item['original_subtotal_tax_price'];
+            $indata['subtotal_tax_price'] = $item['subtotal_tax_price'];
+            $indata['currency_code'] = $input['currency_code'];
+            $indata['updated_by'] = $user_id;
+            $indata['updated_at'] = $now;
+            $indata['is_gift'] = $item['is_gift'];
+            if ($item['id'] == '') {
+                $indata['created_by'] = $user_id;
+                $indata['created_at'] = $now;
+                $indata['requisitions_purchase_id'] = $input['id'];
+                RequisitionsPurchaseDetail::insert($indata);
+            } else {
+                RequisitionsPurchaseDetail::where('id', $item['id'])->update($indata);
             }
-            if ($input['status'] == 'REVIEWING') {
-                //簽核log
-                foreach ($hierarchy as $seq_no => $reviewer) {
-                    $reviewLogData['requisitions_purchase_id'] = $input['id'];
-                    $reviewLogData['created_by'] = $user_id;
-                    $reviewLogData['created_at'] = $now;
-                    $reviewLogData['updated_by'] = $user_id;
-                    $reviewLogData['updated_at'] = $now;
-                    $reviewLogData['seq_no'] = $seq_no + 1;
-                    $reviewLogData['reviewer'] = $reviewer;
-                    RequisitionsPurchaseReviewLog::insert($reviewLogData);
-                }
-                RequisitionsPurchase::where('id',$input['id'])->update(['submitted_at' => $now]);
+        }
+        if ($input['status'] == 'REVIEWING') {
+            //簽核log
+            foreach ($hierarchy as $seq_no => $reviewer) {
+                $reviewLogData['requisitions_purchase_id'] = $input['id'];
+                $reviewLogData['created_by'] = $user_id;
+                $reviewLogData['created_at'] = $now;
+                $reviewLogData['updated_by'] = $user_id;
+                $reviewLogData['updated_at'] = $now;
+                $reviewLogData['seq_no'] = $seq_no + 1;
+                $reviewLogData['reviewer'] = $reviewer;
+                RequisitionsPurchaseReviewLog::insert($reviewLogData);
             }
-            DB::commit();
-            $result['status'] = true;
+            RequisitionsPurchase::where('id', $input['id'])->update(['submitted_at' => $now]);
+        }
+        DB::commit();
+        $result['status'] = true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);

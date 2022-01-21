@@ -287,7 +287,7 @@
                         item_number: obj.product_items_no, //品項編號
                         item_name: obj.product_name, //品項名稱
                         item_brand: '', //品項品牌(商品join)
-                        min_purchase_qty: 0, //最小採購量
+                        min_purchase_qty: obj.min_purchase_qty, //最小採購量
                         item_uom: obj.uom, //品項單位(商品join)
                         item_price: obj.item_price, //單價
                         item_qty: obj.item_qty, //數量
@@ -633,7 +633,7 @@
                             details[getSelectKey].item_number = obj.item_no; //品項編號
                             details[getSelectKey].item_brand = obj.brand; //品牌
                             details[getSelectKey].item_uom = obj.uom; // 單位
-                            // details[getSelectKey].min_purchase_qty = obj.min_purchase_qty; //最小採購量
+                            details[getSelectKey].min_purchase_qty = obj.min_purchase_qty; //最小採購量
                             // details[getSelectKey].item_qty = obj.min_purchase_qty; //最小採購量
                             var find_this_item_id = obj.id;
                             //帶出價格
