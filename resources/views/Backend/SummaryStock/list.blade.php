@@ -64,7 +64,8 @@
                                 @if ($share_role_auth['auth_create'])
                                     <div class="col-sm-1">
                                         <button data-url=""
-                                                class="btn btn-danger" id="btn-excute" type="button"  {{ $excel_url ?? 'disabled' }}>
+                                                class="btn btn-danger" id="btn-excute"
+                                                type="button" {{ $excel_url ?? 'disabled' }}>
                                             <i class="fa fa-bar-chart"></i>
                                             資料滾算
                                         </button>
@@ -239,7 +240,7 @@
             });
             //資料滾算
             $('#btn-excute').click(function () {
-                var smonth = $("#smonth").val();
+                var smonth = $("#smonth").val();//01
                 if (smonth == '') {
                     swal('系統訊息', '月份必填', 'error');
                 } else {
@@ -260,8 +261,43 @@
                             data: {"smonth": smonth, _token: '{{ csrf_token() }}'},
                             async: true,
                         }).done(function (data) {
-                            console.log(data);
-                            //swal(data.message, data.results, (data.status ? 'success' : 'error'));
+                            if (data.alert) {
+                                swal({
+                                    title: "已有" + smonth + "的滾算紀錄，確定要重新滾算?",
+                                    text: "年月：" + smonth,
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonClass: "btn-danger",
+                                    confirmButtonText: "確認",
+                                    closeOnConfirm: false,
+                                    cancelButtonText: "取消",
+                                    showLoaderOnConfirm: true
+                                }, function () {
+                                    $.ajax({
+                                        url: "/backend/summary_stock/ajax",
+                                        type: "POST",
+                                        data: {"smonth": smonth, _token: '{{ csrf_token() }}'},
+                                        async: true,
+                                    }).done(function (data) {
+                                        swal(data.message, data.results, (data.status ? 'success' : 'error'));
+                                    });
+                                });
+                            } else {
+                                swal(data.message, data.results, (data.status ? 'success' : 'error'));
+
+                                /*
+                                $.ajax({
+                                    url: "/backend/summary_stock/ajax",
+                                    type: "POST",
+                                    data: {"smonth": smonth, _token: '{{ csrf_token() }}'},
+                                    async: false,
+                                }).done(function (data) {
+                                    console.log("A3:");
+                                    console.log(data);
+                                    swal(data.message, data.results, (data.status ? 'success' : 'error'));
+                                });
+                                */
+                            }
                         });
                     });
                 }
