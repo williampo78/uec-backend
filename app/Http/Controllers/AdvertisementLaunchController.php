@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Facades\ImageUpload;
-use Illuminate\Http\Request;
-use App\Services\ProductsService;
-use Illuminate\Support\Facades\Log;
 use App\Services\AdvertisementService;
+use App\Services\ProductsService;
 use App\Services\WebCategoryHierarchyService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AdvertisementLaunchController extends Controller
 {
@@ -51,10 +49,7 @@ class AdvertisementLaunchController extends Controller
             return $obj;
         });
 
-        return view(
-            'Backend.Advertisement.Launch.list',
-            compact('ad_slots', 'ad_slot_contents')
-        );
+        return view('Backend.Advertisement.Launch.list', compact('ad_slots', 'ad_slot_contents'));
     }
 
     /**
@@ -68,10 +63,7 @@ class AdvertisementLaunchController extends Controller
         $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
         $products = $this->product_service->getProducts();
 
-        return view(
-            'Backend.Advertisement.Launch.add',
-            compact('ad_slots', 'product_category', 'products')
-        );
+        return view('Backend.Advertisement.Launch.add', compact('ad_slots', 'product_category', 'products'));
     }
 
     /**
@@ -84,17 +76,14 @@ class AdvertisementLaunchController extends Controller
     {
         $input_data = $request->except('_token');
 
-        if (! $this->advertisement_service->addSlotContents($input_data)) {
+        if (!$this->advertisement_service->addSlotContents($input_data)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
         $route_name = 'advertisemsement_launch';
         $act = 'add';
 
-        return view(
-            'Backend.success',
-            compact('route_name', 'act')
-        );
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -163,10 +152,7 @@ class AdvertisementLaunchController extends Controller
         $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
         $products = $this->product_service->getProducts();
 
-        return view(
-            'Backend.Advertisement.Launch.update',
-            compact('ad_slot_content', 'product_category', 'products')
-        );
+        return view('Backend.Advertisement.Launch.update', compact('ad_slot_content', 'product_category', 'products'));
     }
 
     /**
@@ -181,17 +167,14 @@ class AdvertisementLaunchController extends Controller
         $input_data = $request->except('_token', '_method');
         $input_data['slot_content_id'] = $slot_content_id;
 
-        if (! $this->advertisement_service->updateSlotContents($input_data)) {
+        if (!$this->advertisement_service->updateSlotContents($input_data)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
         $route_name = 'advertisemsement_launch';
         $act = 'upd';
 
-        return view(
-            'Backend.success',
-            compact('route_name', 'act')
-        );
+        return view('Backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -294,19 +277,19 @@ class AdvertisementLaunchController extends Controller
         $slot_content_id = $request->input('slot_content_id');
 
         if ($active == 0) {
-            return response()->json(
-                ['status' => true]
-            );
+            return response()->json([
+                'status' => true,
+            ]);
         }
 
         if ($this->advertisement_service->canSlotContentActive($slot_id, $start_at, $end_at, $slot_content_id)) {
-            return response()->json(
-                ['status' => true]
-            );
+            return response()->json([
+                'status' => true,
+            ]);
         }
 
-        return response()->json(
-            ['status' => false]
-        );
+        return response()->json([
+            'status' => false,
+        ]);
     }
 }

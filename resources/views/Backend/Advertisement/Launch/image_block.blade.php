@@ -3,12 +3,12 @@
         <table class='table table-striped table-bordered table-hover' style='width:100%'>
             <thead>
                 <tr>
-                    <th class="text-nowrap">排序</th>
-                    <th class="text-nowrap">圖片</th>
+                    <th class="text-nowrap">排序 <span style="color:red;">*</span></th>
+                    <th class="text-nowrap">圖片 <span style="color:red;">*</span></th>
                     <th class="text-nowrap">alt</th>
                     <th class="text-nowrap">標題</th>
                     <th class="text-nowrap">摘要</th>
-                    <th class="text-nowrap">連結內容</th>
+                    <th class="text-nowrap">連結內容 <span style="color:red;">*</span></th>
                     <th class="text-nowrap">另開視窗</th>
                     <th class="text-nowrap">功能</th>
                 </tr>
