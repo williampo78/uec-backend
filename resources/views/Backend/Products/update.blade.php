@@ -322,7 +322,7 @@
                                     <label class="control-label">最小採購量</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="min_purchase_qty" type="number" min="0" value="0"
+                                    <input class="form-control" name="min_purchase_qty" type="number" min="0"
                                         value="{{ $products->min_purchase_qty }}">
                                 </div>
                             </div>

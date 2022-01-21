@@ -26,6 +26,7 @@
             border-bottom: 1px solid #ddd;
             padding: 30px;
         }
+
     </style>
 @endsection
 
@@ -249,7 +250,8 @@
             });
 
 
-            $('#slot_id').empty().append(`<option value="${content.slot_id}">【${content.slot_code}】${content.slot_desc}</option>`).prop(
+            $('#slot_id').empty().append(
+                `<option value="${content.slot_id}">【${content.slot_code}】${content.slot_desc}</option>`).prop(
                 'disabled', true);
             $('#start_at').val(content.start_at);
             $('#end_at').val(content.end_at);
@@ -267,18 +269,20 @@
 
             // 開放編輯 版位主色、版位icon、版位標題
             if (content.is_user_defined == 1) {
-                $('#slot_color_code').prop('disabled', false).val(content.slot_color_code);
-                $('#slot_icon_name').prop('disabled', false);
+                enableSlotColorCode();
+                enableSlotIconName();
+                enableSlotTitle();
+
+                $('#slot_color_code').val(content.slot_color_code);
                 $(`<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`)
                     .insertBefore('#slot_icon_name');
-                $('#slot_title').prop('disabled', false).val(content.slot_title);
+                $('#slot_title').val(content.slot_title);
+            }
+            // 開放編輯 版位主色
+            else if (content.is_user_defined == 2) {
+                enableSlotColorCode();
 
-                $('#slot_color_code').prev('label').append(' <span style="color:red;">*</span>');
-                $('#slot_icon_name').closest('.form-group').find('label').append(
-                    ' <span style="color:red;">*</span>');
-                $('#slot_title').prev('label').append(' <span style="color:red;">*</span>');
-
-                validateUserDefinedBlock();
+                $('#slot_color_code').val(content.slot_color_code);
             }
 
             $.each(details, function(key, value) {
@@ -302,7 +306,8 @@
                         }
 
                         if (value.target_cate_hierarchy_id) {
-                            $(`#image-block table > tbody [name="image_block_target_cate_hierarchy_id[${value.id}]"]`).val(value.target_cate_hierarchy_id).trigger('change');
+                            $(`#image-block table > tbody [name="image_block_target_cate_hierarchy_id[${value.id}]"]`)
+                                .val(value.target_cate_hierarchy_id).trigger('change');
                         }
 
                         if (value.is_target_blank == 1) {
@@ -331,7 +336,8 @@
                         }
 
                         if (value.target_cate_hierarchy_id) {
-                            $(`#text-block table > tbody [name="text_block_target_cate_hierarchy_id[${value.id}]"]`).val(value.target_cate_hierarchy_id).trigger('change');
+                            $(`#text-block table > tbody [name="text_block_target_cate_hierarchy_id[${value.id}]"]`)
+                                .val(value.target_cate_hierarchy_id).trigger('change');
                         }
 
                         if (value.is_target_blank == 1) {
@@ -343,13 +349,15 @@
                         if (value.product_id) {
                             addProductBlockProduct(product_select_options, value);
 
-                            $(`#tab-product table > tbody [name="product_block_product_product_id[${value.id}]"]`).val(value.product_id).trigger('change');
+                            $(`#tab-product table > tbody [name="product_block_product_product_id[${value.id}]"]`)
+                                .val(value.product_id).trigger('change');
                         }
 
                         if (value.web_category_hierarchy_id) {
                             addProductBlockCategory(product_category_select_options, value);
 
-                            $(`#tab-category table > tbody [name="product_block_product_web_category_hierarchy_id[${value.id}]"]`).val(value.web_category_hierarchy_id).trigger('change');
+                            $(`#tab-category table > tbody [name="product_block_product_web_category_hierarchy_id[${value.id}]"]`)
+                                .val(value.web_category_hierarchy_id).trigger('change');
                         }
                         break;
                 }

@@ -162,11 +162,11 @@
                     var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
                     var supplier_id = $('#supplier').val() ;
                     var limit = $('#limit').val();
+                    var product_type = $('#product_type').val();
                     var filter_product_id = [];
                     this.category_products_list.find((todo, index) => {
                         filter_product_id.push(todo.product_id);
                     })
-                    // console.log(filter_product_id)  ;
                     var req = async () => {
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
@@ -182,20 +182,8 @@
                             start_launched_at_end: start_launched_at_end, //上架 - 止
                             filter_product_id: filter_product_id, //排除掉 ID
                             limit:limit,
+                            product_type:product_type,
                         });
-                        // 'supplier_id': $('#prd-modal-supplier-id').val(),
-                        // 'product_no': $('#prd-modal-product-no').val(),
-                        // 'product_name': $('#prd-modal-product-name').val(),
-                        // 'selling_price_min': $('#prd-modal-selling-price-min').val(),
-                        // 'selling_price_max': $('#prd-modal-selling-price-max').val(),
-                        // 'start_created_at': $('#prd-modal-start-created-at').val(),
-                        // 'end_created_at': $('#prd-modal-end-created-at').val(),
-                        // 'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
-                        // 'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
-                        // 'product_type': $('#prd-modal-product-type').val(),
-                        // 'limit': $('#prd-modal-limit').val(),
-                        // 'exist_products': Object.keys(prd_product_list),
-                        // console.log(response);
                         this.result_products = response.data.result.data;
                     }
                     req();
@@ -214,7 +202,7 @@
                                 product_id: todo.id,
                                 item_cost: todo.item_cost,
                                 launched_status: todo.launched_status,
-                                launched_status_desc: todo.launched_status_desc,
+                                launched_status_desc: todo.launched_status,
                                 product_name: todo.product_name,
                                 product_no: todo.product_no,
                                 selling_price: todo.selling_price,

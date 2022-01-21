@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-sm-3">
             <div class="form-group">
-                <label for="slot">版位</label>
+                <label for="slot">版位 <span style="color:red;">*</span></label>
                 <select class="form-control js-select2-slot-id" name="slot_id" id="slot_id">
                     <option></option>
                 </select>
@@ -10,7 +10,7 @@
         </div>
 
         <div class="col-sm-6">
-            <label>上架時間</label>
+            <label>上架時間 <span style="color:red;">*</span></label>
             <div class="row">
                 <div class="col-sm-5">
                     <div class="form-group">
@@ -46,7 +46,7 @@
 
         <div class="col-sm-3">
             <div class="form-group">
-                <label>狀態</label>
+                <label>狀態 <span style="color:red;">*</span></label>
                 <div class="row">
                     <div class="col-sm-6">
                         <label class="radio-inline">

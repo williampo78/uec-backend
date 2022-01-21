@@ -22,7 +22,7 @@
                         <th>售價(含稅)</th>
                         <th>上架日期</th>
                         <th>上架狀態</th>
-                        <th>毛利</th>
+                        <th>毛利(%)</th>
                         <th>功能</th>
                     </tr>
                 </thead>
@@ -33,7 +33,7 @@
                         <td>@{{category_products_list.product_name}}</td>
                         <td>@{{category_products_list.selling_price}}</td>
                         <td>@{{category_products_list.start_launched_at}} ~ @{{category_products_list.end_launched_at}}</td>
-                        <td>@{{category_products_list.launched_status}}</td>
+                        <td>@{{category_products_list.launched_status_desc}}</td>
                         <td>@{{category_products_list.gross_margin}}</td>
                         <td>
                             <button class="btn btn-danger btn-sm" type="button" @click="del_category_products_list(category_products_list_key)">刪除</button>
