@@ -134,9 +134,10 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control js-select2-department" name="product_type"
-                                                id="product_type">
-                                                <option value=""></option>
-                                                <option value="一般品">一般品</option>
+                                                id="product_type" disabled>
+                                                <option value="N" selected >一般品</option>
+                                                <option value="G">贈品</option>
+                                                <option value="A">加購品</option>
                                             </select>
                                         </div>
                                     </div>
