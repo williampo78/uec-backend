@@ -203,6 +203,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/buyout_products_report', BuyoutProductsReportController::class, ['names' => ['index' => 'buyout_products_report']]);
 
     Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
+    Route::post('/summary_stock/ajax', [SummaryStockController::class, 'ajaxDetail']);
 });
 
 Route::get('/', [LoginAuthController::class, 'index'])->name('login');

@@ -64,7 +64,7 @@
                                 @if ($share_role_auth['auth_create'])
                                     <div class="col-sm-1">
                                         <button data-url=""
-                                                class="btn btn-danger" id="btn-excute" type="button">
+                                                class="btn btn-danger" id="btn-excute" type="button"  {{ $excel_url ?? 'disabled' }}>
                                             <i class="fa fa-bar-chart"></i>
                                             資料滾算
                                         </button>
@@ -81,7 +81,7 @@
                                 @endif
                                 @if ($share_role_auth['auth_query'])
                                     <div class="col-sm-1">
-                                        <button class="btn btn-warning" id="btn-search"><i
+                                        <button class="btn btn-warning" id="btn-search" type="submit"><i
                                                 class="fa fa-search "></i> 查詢
                                         </button>
                                     </div>
@@ -236,6 +236,35 @@
                 success: function (label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
+            });
+            //資料滾算
+            $('#btn-excute').click(function () {
+                var smonth = $("#smonth").val();
+                if (smonth == '') {
+                    swal('系統訊息', '月份必填', 'error');
+                } else {
+                    swal({
+                        title: "確定要滾算進耗存資料?",
+                        text: "年月：" + smonth,
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonClass: "btn-danger",
+                        confirmButtonText: "確認",
+                        closeOnConfirm: false,
+                        cancelButtonText: "取消",
+                        showLoaderOnConfirm: true
+                    }, function () {
+                        $.ajax({
+                            url: "/backend/summary_stock/ajax",
+                            type: "POST",
+                            data: {"smonth": smonth, _token: '{{ csrf_token() }}'},
+                            async: true,
+                        }).done(function (data) {
+                            console.log(data);
+                            //swal(data.message, data.results, (data.status ? 'success' : 'error'));
+                        });
+                    });
+                }
             });
         })
 
