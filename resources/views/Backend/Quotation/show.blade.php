@@ -8,7 +8,24 @@
                     <div class="col-sm-1"><label> 供應商</label></div>
                     <div class="col-sm-3">{{ $quotation->supplier_name }}</div>
                     <div class="col-sm-1"><label> 狀態</label></div>
-                    <div class="col-sm-3">{{ $quotation->status_code }}</div>
+                    <div class="col-sm-3">
+                        @switch( $quotation->status_code )
+                            @case('DRAFTED')
+                                草稿
+                            @break
+                            @case('REVIEWING')
+                                簽核中
+                            @break
+                            @case('APPROVED')
+                                已核准
+                            @break
+                            @case('REJECTED')
+                                已駁回
+                            @break
+                            @default
+                                
+                        @endswitch
+                    </div>
                 </div>
                 <div class="row form-group">
                     <div class="col-sm-1"><label> 幣別</label></div>
@@ -50,7 +67,7 @@
                                         {{ $val->combination_name }}
                                     @endif
                                 </td>
-                                <td>{{ $val->ean }}</td>
+                                <td>{{ $val->pos_item_no }}</td>
                                 <td>{{ $val->original_unit_price }}</td>
                                 <td>{{ $val->min_purchase_qty }}</td>
                             </tr>
