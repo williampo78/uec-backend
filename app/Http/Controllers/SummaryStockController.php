@@ -134,14 +134,10 @@ class SummaryStockController extends Controller
 
         $getData = $request->input();
         $rs = $this->summaryStock->setSummaryCost($getData['smonth']);
-        return $rs;
-        if ($rs['status']) {
-            $status = true;
-        } else {
-            $status = false;
-        }
+
         return response()->json([
-            'status' => true,
+            'status' => $rs['status'],
+            'alert' => $rs['alert'],
             'message' => $rs['message'],
             'results' => $rs['result'],
         ], 200);

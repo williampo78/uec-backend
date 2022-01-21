@@ -30,8 +30,8 @@
                         <table class='table table-striped table-bordered table-hover' style='width:100%'>
                             <thead>
                                 <tr>
-                                    <th class="text-nowrap">排序</th>
-                                    <th class="text-nowrap">商品</th>
+                                    <th class="text-nowrap">排序 <span style="color:red;">*</span></th>
+                                    <th class="text-nowrap">商品 <span style="color:red;">*</span></th>
                                     <th class="text-nowrap">功能</th>
                                 </tr>
                             </thead>
@@ -49,8 +49,8 @@
                         <table class='table table-striped table-bordered table-hover' style='width:100%'>
                             <thead>
                                 <tr>
-                                    <th class="text-nowrap">排序</th>
-                                    <th class="text-nowrap">分類</th>
+                                    <th class="text-nowrap">排序 <span style="color:red;">*</span></th>
+                                    <th class="text-nowrap">分類 <span style="color:red;">*</span></th>
                                     <th class="text-nowrap">功能</th>
                                 </tr>
                             </thead>

@@ -6,28 +6,10 @@ function init(datas = {}) {
     let product_select_options = datas.product_select_options ? datas.product_select_options : '';
 
     if (ad_slot_select_options) {
-        $('#slot_id').append(ad_slot_select_options).prev('label').append(' <span style="color:red;">*</span>');
+        $('#slot_id').append(ad_slot_select_options);
+    } else {
+        $('#slot_id').prev('label').find('span').remove();
     }
-
-    $('#start_at').closest('.row').prev('label').append(' <span style="color:red;">*</span>');
-    $('#active_enabled').closest('.form-group').children('label').append(
-        ' <span style="color:red;">*</span>');
-
-    $('#image-block table > thead th').filter(function (i) {
-        return $.inArray(i, [0, 1, 5]) > -1;
-    }).append(' <span style="color:red;">*</span>');
-
-    $('#text-block table > thead th').filter(function (i) {
-        return $.inArray(i, [0, 1, 2]) > -1;
-    }).append(' <span style="color:red;">*</span>');
-
-    $('#tab-product table > thead th').filter(function (i) {
-        return $.inArray(i, [0, 1]) > -1;
-    }).append(' <span style="color:red;">*</span>');
-
-    $('#tab-category table > thead th').filter(function (i) {
-        return $.inArray(i, [0, 1]) > -1;
-    }).append(' <span style="color:red;">*</span>');
 
     $('.js-select2-slot-id').select2({
         allowClear: true,
@@ -144,6 +126,48 @@ function init(datas = {}) {
     $(document).on('click', '.btn-delete-product-category', function () {
         if (confirm('確定要刪除嗎?')) {
             $(this).parents('tr').remove();
+        }
+    });
+
+    // 切換圖檔連結內容選項時，清除其他選項的值
+    $(document).on('click', '[name^="image_block_image_action"]', function () {
+        let image_action = $(this).val();
+        let form_group_element = $(this).closest('.form-group');
+
+        switch (image_action) {
+            case 'X':
+                form_group_element.find('[name^="image_block_target_url"]').val('');
+                form_group_element.find('[name^="image_block_target_cate_hierarchy_id"]').val('').trigger('change');
+                break;
+
+            case 'U':
+                form_group_element.find('[name^="image_block_target_cate_hierarchy_id"]').val('').trigger('change');
+                break;
+
+            case 'C':
+                form_group_element.find('[name^="image_block_target_url"]').val('');
+                break;
+        }
+    });
+
+    // 切換文字連結內容選項時，清除其他選項的值
+    $(document).on('click', '[name^="text_block_image_action"]', function () {
+        let image_action = $(this).val();
+        let form_group_element = $(this).closest('.form-group');
+
+        switch (image_action) {
+            case 'X':
+                form_group_element.find('[name^="text_block_target_url"]').val('');
+                form_group_element.find('[name^="text_block_target_cate_hierarchy_id"]').val('').trigger('change');
+                break;
+
+            case 'U':
+                form_group_element.find('[name^="text_block_target_cate_hierarchy_id"]').val('').trigger('change');
+                break;
+
+            case 'C':
+                form_group_element.find('[name^="text_block_target_url"]').val('');
+                break;
         }
     });
 }
@@ -458,4 +482,61 @@ function addProductBlockCategory(product_category_select_options, datas = {}) {
     $('#product-block-category-row-no').val(parseInt(product_block_category_row_no) + 1);
 
     validateProductBlockCategory(product_block_category_row_no);
+}
+
+// 啟用版位主色
+function enableSlotColorCode() {
+    $('#slot_color_code').prop('disabled', false);
+
+    if ($('#slot_color_code').prev('label').find('span').length < 1) {
+        $('#slot_color_code').prev('label').append(' <span style="color:red;">*</span>');
+    }
+
+    validateSlotColorCode();
+}
+
+// 啟用版位icon
+function enableSlotIconName() {
+    $('#slot_icon_name').prop('disabled', false);
+
+    if ($('#slot_icon_name').closest('.form-group').find('label > span').length < 1) {
+        $('#slot_icon_name').closest('.form-group').find('label').append(' <span style="color:red;">*</span>');
+    }
+
+    validateSlotIconName();
+}
+
+// 啟用版位標題
+function enableSlotTitle() {
+    $('#slot_title').prop('disabled', false);
+
+    if ($('#slot_title').prev('label').find('span').length < 1) {
+        $('#slot_title').prev('label').append(' <span style="color:red;">*</span>');
+    }
+
+    validateSlotTitle();
+}
+
+// 停用版位主色
+function disableSlotColorCode() {
+    $('#slot_color_code').prop('disabled', true);
+    $('#slot_color_code').prev('label').find('span').remove();
+
+    removeSlotColorCodeValidation();
+}
+
+// 停用版位icon
+function disableSlotIconName() {
+    $('#slot_icon_name').prop('disabled', true);
+    $('#slot_icon_name').prev('label').find('span').remove();
+
+    removeSlotIconNameValidation();
+}
+
+// 停用版位標題
+function disableSlotTitle() {
+    $('#slot_title').prop('disabled', true);
+    $('#slot_title').prev('label').find('span').remove();
+
+    removeSlotTitleValidation();
 }
