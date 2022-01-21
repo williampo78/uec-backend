@@ -26,6 +26,7 @@
             border-bottom: 1px solid #ddd;
             padding: 30px;
         }
+
     </style>
 @endsection
 
@@ -212,35 +213,21 @@
 
                 // 開放編輯 版位主色、版位icon、版位標題
                 if (is_user_defined == 1) {
-                    $('#slot_color_code').prop('disabled', false);
-                    $('#slot_icon_name').prop('disabled', false);
-                    $('#slot_title').prop('disabled', false);
-
-                    if ($('#slot_color_code').prev('label').find('span').length < 1) {
-                        $('#slot_color_code').prev('label').append(' <span style="color:red;">*</span>');
-                    }
-
-                    if ($('#slot_icon_name').closest('.form-group').find('label > span').length < 1) {
-                        $('#slot_icon_name').closest('.form-group').find('label').append(' <span style="color:red;">*</span>');
-                    }
-
-                    if ($('#slot_title').prev('label').find('span').length < 1) {
-                        $('#slot_title').prev('label').append(' <span style="color:red;">*</span>');
-                    }
-
-                    validateUserDefinedBlock();
+                    enableSlotColorCode();
+                    enableSlotIconName();
+                    enableSlotTitle();
                 }
-                // 關閉編輯 版位主色、版位icon、版位標題，皆為必填
+                // 開放編輯 版位主色
+                else if (is_user_defined == 2) {
+                    enableSlotColorCode();
+                    disableSlotIconName();
+                    disableSlotTitle();
+                }
+                // 關閉編輯 版位主色、版位icon、版位標題
                 else {
-                    $('#slot_color_code').prop('disabled', true);
-                    $('#slot_icon_name').prop('disabled', true);
-                    $('#slot_title').prop('disabled', true);
-
-                    $('#slot_color_code').prev('label').find('span').remove();
-                    $('#slot_icon_name').prev('label').find('span').remove();
-                    $('#slot_title').prev('label').find('span').remove();
-
-                    removeUserDefinedBlockValidation();
+                    disableSlotColorCode();
+                    disableSlotIconName();
+                    disableSlotTitle();
                 }
 
                 switch (slot_type) {
@@ -250,24 +237,28 @@
                         $('#text-block').hide();
                         $('#product-block').hide();
                         break;
+
                         // 文字
                     case 'T':
                         $('#image-block').hide();
                         $('#text-block').show();
                         $('#product-block').hide();
                         break;
+
                         // 商品
                     case 'S':
                         $('#image-block').hide();
                         $('#text-block').hide();
                         $('#product-block').show();
                         break;
+
                         // 圖檔+商品
                     case 'IS':
                         $('#image-block').show();
                         $('#text-block').hide();
                         $('#product-block').show();
                         break;
+
                     default:
                         $('#image-block').hide();
                         $('#text-block').hide();

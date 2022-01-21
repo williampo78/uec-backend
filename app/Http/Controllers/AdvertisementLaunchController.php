@@ -200,9 +200,7 @@ class AdvertisementLaunchController extends Controller
         $products = $this->product_service->getProducts();
         $products_format = [];
         foreach ($products as $value) {
-            if (isset($products_format[$value['id']])) {
-                $products_format[$value['id']] = "{$value['product_no']} {$value['product_name']}";
-            }
+            $products_format[$value['id']] = "{$value['product_no']} {$value['product_name']}";
         }
 
         $ad_slot_content = $this->advertisement_service->getSlotContentById($slot_content_id);

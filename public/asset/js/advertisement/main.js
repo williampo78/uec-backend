@@ -483,3 +483,60 @@ function addProductBlockCategory(product_category_select_options, datas = {}) {
 
     validateProductBlockCategory(product_block_category_row_no);
 }
+
+// 啟用版位主色
+function enableSlotColorCode() {
+    $('#slot_color_code').prop('disabled', false);
+
+    if ($('#slot_color_code').prev('label').find('span').length < 1) {
+        $('#slot_color_code').prev('label').append(' <span style="color:red;">*</span>');
+    }
+
+    validateSlotColorCode();
+}
+
+// 啟用版位icon
+function enableSlotIconName() {
+    $('#slot_icon_name').prop('disabled', false);
+
+    if ($('#slot_icon_name').closest('.form-group').find('label > span').length < 1) {
+        $('#slot_icon_name').closest('.form-group').find('label').append(' <span style="color:red;">*</span>');
+    }
+
+    validateSlotIconName();
+}
+
+// 啟用版位標題
+function enableSlotTitle() {
+    $('#slot_title').prop('disabled', false);
+
+    if ($('#slot_title').prev('label').find('span').length < 1) {
+        $('#slot_title').prev('label').append(' <span style="color:red;">*</span>');
+    }
+
+    validateSlotTitle();
+}
+
+// 停用版位主色
+function disableSlotColorCode() {
+    $('#slot_color_code').prop('disabled', true);
+    $('#slot_color_code').prev('label').find('span').remove();
+
+    removeSlotColorCodeValidation();
+}
+
+// 停用版位icon
+function disableSlotIconName() {
+    $('#slot_icon_name').prop('disabled', true);
+    $('#slot_icon_name').prev('label').find('span').remove();
+
+    removeSlotIconNameValidation();
+}
+
+// 停用版位標題
+function disableSlotTitle() {
+    $('#slot_title').prop('disabled', true);
+    $('#slot_title').prev('label').find('span').remove();
+
+    removeSlotTitleValidation();
+}

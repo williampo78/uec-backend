@@ -105,12 +105,15 @@ function validateProductBlockCategory(row_no) {
     });
 }
 
-// 加入使用者自定義區塊欄位驗證
-function validateUserDefinedBlock() {
+// 加入版位主色欄位驗證
+function validateSlotColorCode() {
     $("#slot_color_code").rules("add", {
         required: true,
     });
+}
 
+// 加入版位icon欄位驗證
+function validateSlotIconName() {
     $("#slot_icon_name").rules("add", {
         required: {
             depends: function (element) {
@@ -123,20 +126,29 @@ function validateUserDefinedBlock() {
             accept: '請上傳圖片',
         },
     });
+}
 
+// 加入版位標題欄位驗證
+function validateSlotTitle() {
     $("#slot_title").rules("add", {
         required: true,
     });
 }
 
-// 移除使用者自定義區塊欄位驗證
-function removeUserDefinedBlockValidation() {
+// 移除版位主色欄位驗證
+function removeSlotColorCodeValidation() {
     $("#slot_color_code").rules("remove");
     $("#slot_color_code").closest(".form-group").removeClass("has-error").find('.help-block').hide();
+}
 
+// 移除版位icon欄位驗證
+function removeSlotIconNameValidation() {
     $("#slot_icon_name").rules("remove");
     $("#slot_icon_name").closest(".form-group").removeClass("has-error").find('.help-block').hide();
+}
 
+// 移除版位標題欄位驗證
+function removeSlotTitleValidation() {
     $("#slot_title").rules("remove");
     $("#slot_title").closest(".form-group").removeClass("has-error").find('.help-block').hide();
 }

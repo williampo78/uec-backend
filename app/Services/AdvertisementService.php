@@ -299,6 +299,10 @@ class AdvertisementService
                 $content_data['slot_color_code'] = $input_data['slot_color_code'] ?? null;
                 $content_data['slot_title'] = $input_data['slot_title'] ?? null;
             }
+            // 使用者自定義版位，新增主色
+            elseif ($slot['is_user_defined'] == 2) {
+                $content_data['slot_color_code'] = $input_data['slot_color_code'] ?? null;
+            }
 
             if ($slot['slot_type'] == 'S' || $slot['slot_type'] == 'IS') {
                 $content_data['product_assigned_type'] = $input_data['product_assigned_type'] ?? null;
