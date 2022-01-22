@@ -47,6 +47,7 @@ class APICartServices
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
             $data[$datas->product_id] = $datas;
             $data[$datas->product_id]['item_photo'] = (isset($ProductPhotos->photo_name) ? $s3 . $ProductPhotos->photo_name : null);
+            $data['items'][$datas->product_id][$datas->item_id] = $datas;
         }
         return $data;
     }
@@ -159,9 +160,16 @@ class APICartServices
             $cartGift = [];
             $assigned = [];
             foreach ($cartInfo as $items => $item) {
-                $cartQty[$item->product_id][$item->item_id] = $item->item_qty; //購物車數量
-                $cartAmount[$item->product_id] = intval($item->selling_price); //商品售價
-                $cartDetail[$item->product_id][$item->item_id] = $item; //購物車內容
+                if ($items == 'item_photo') continue;
+                if ($items == 'items') continue;
+                $cartQty[$items][$item['item_id']] = $item->item_qty; //購物車數量
+                $cartAmount[$items] = intval($item->selling_price); //商品售價
+                //$cartDetail[$items][$item['item_id']] = $item; //購物車內容
+            }
+            foreach ($cartInfo['items'] as $prdouct_id => $items){
+                foreach ($items as $item_id=>$item){
+                    $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
+                }
             }
             //行銷活動
             foreach ($campaigns as $product_id => $item) {
@@ -205,7 +213,9 @@ class APICartServices
                         if ($qty >= $campaign['PRD']['DISCOUNT'][$product_id]->n_value && $unit_qty > 0) {
                             if ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD01') { //﹝單品﹞第N件(含)以上，打X折
                                 $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000*0.85
-                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                foreach ($cartDetail[$product_id] as $item_id => $item_info) {
+                                    $detail_qty = $item_info->item_qty;
                                     $tmp_qty = $detail_qty;
                                     if ($unit_qty >= $tmp_qty) { // 3 >= 2
                                         //item_id折多少
@@ -247,16 +257,16 @@ class APICartServices
                                             "campaignProdList" => $giftAway
                                         );
                                     }
-                                    $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
-                                    $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
+                                    $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemId" => $cartDetail[$product_id][$item_id]->item_id,
-                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
+                                        "itemId" => $item_info->item_id,
+                                        "itemNo" => $item_info->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -273,7 +283,9 @@ class APICartServices
                                 }
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD02') { //﹝單品﹞第N件(含)以上，折X元
                                 $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000-200
-                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                foreach ($cartDetail[$product_id] as $item_id => $item_info) {
+                                    $detail_qty = $item_info->item_qty;
                                     $tmp_qty = $detail_qty;
                                     if ($unit_qty >= $tmp_qty) { // 3 >= 2
                                         //item_id折多少
@@ -315,16 +327,16 @@ class APICartServices
                                         );
                                     }
 
-                                    $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
-                                    $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
+                                    $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemId" => $cartDetail[$product_id][$item_id]->item_id,
-                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
+                                        "itemId" => $item_info->item_id,
+                                        "itemNo" => $item_info->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -341,35 +353,35 @@ class APICartServices
                                 }
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD03') { //﹝單品﹞滿N件，每件打X折
                                 $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000*0.85
+                                //找符合的item放##7
+                                if (isset($campaign['PRD']['GIFT'][$product_id])) {
+                                    $prod_gift = array(
+                                        "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                        "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                        "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                        "campaignProdList" => $giftAway
+                                    );
+                                }
 
-                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                foreach ($cartDetail[$product_id] as $item_id => $item_info) {
+                                    $detail_qty = $item_info->item_qty;
                                     $tmp_qty = $detail_qty;
                                     $amount = $tmp_qty * $price;
                                     $return_qty = $tmp_qty;
                                     $unit_price = round($amount / $return_qty);
 
-                                    //找符合的item放
-                                    if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                                        $prod_gift = array(
-                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                            "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                            "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                            "campaignProdList" => $giftAway
-                                        );
-                                    }
 
-                                    $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
-                                    $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemId" => $cartDetail[$product_id][$item_id]->item_id,
-                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
-                                        "itemSpec1" => $spec1,
-                                        "itemSpec2" => $spec2,
+                                        "itemId" => $item_info->item_id,
+                                        "itemNo" => $item_info->item_no,
+                                        "itemSpec1" => $item_info->item_spec1,
+                                        "itemSpec2" => $item_info->item_spec2,
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
@@ -386,30 +398,33 @@ class APICartServices
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD04') { //﹝單品﹞滿N件，每件折X元
                                 $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000-200
 
-                                foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                //找符合的item放
+                                if (isset($campaign['PRD']['GIFT'][$product_id])) {
+                                    $prod_gift = array(
+                                        "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                        "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                        "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                        "campaignProdList" => $giftAway
+                                    );
+                                }
+
+                                //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                                foreach ($cartDetail[$product_id] as $item_id => $item_info) {
+                                    $detail_qty = $item_info->item_qty;
                                     $tmp_qty = $detail_qty;
                                     $amount = $tmp_qty * $price;
                                     $return_qty = $tmp_qty;
                                     $unit_price = round($amount / $return_qty);
-                                    //找符合的item放
-                                    if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                                        $prod_gift = array(
-                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                            "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                            "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                            "campaignProdList" => $giftAway
-                                        );
-                                    }
-                                    $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
-                                    $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                                    $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
+                                    $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
+                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
                                     $product[] = array(
-                                        "itemId" => $cartDetail[$product_id][$item_id]->item_id,
-                                        "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
+                                        "itemId" => $item_info->item_id,
+                                        "itemNo" => $item_info->item_no,
                                         "itemSpec1" => $spec1,
                                         "itemSpec2" => $spec2,
                                         "itemPrice" => intval($unit_price),
@@ -435,68 +450,71 @@ class APICartServices
                                     "campaignProdList" => $giftAway
                                 );
                             }
-                            foreach ($item as $item_id => $detail_qty) { //取得item規格數量
-                                $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
-                                $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                                $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                            //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                            foreach ($cartDetail[$product_id] as $item_id => $item_info) {
+                                $detail_qty = $item_info->item_qty;
+                                $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
+                                $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
+                                $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                 $stock = 0;
                                 if ($stock_info) {
                                     $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                 }
                                 $product[] = array(
-                                    "itemId" => $cartDetail[$product_id][$item_id]->item_id,
-                                    "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
+                                    "itemId" => $item_info->item_id,
+                                    "itemNo" => $item_info->item_no,
                                     "itemSpec1" => $spec1,
                                     "itemSpec2" => $spec2,
-                                    "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
+                                    "itemPrice" => intval($item_info->selling_price),
                                     "itemQty" => $detail_qty,
-                                    "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
+                                    "amount" => intval($item_info->selling_price * $detail_qty),
                                     "itemStock" => $stock,
                                     "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
-                                    "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->id:null),
-                                    "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->campaign_name:null),
+                                    "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
+                                    "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
                                 );
-                                $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
+                                $cartTotal += intval($item_info->selling_price * $detail_qty);
                             };
                         }
                     } else { //不在活動內
-                        foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                        //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                        //找符合的item放
+                        if (isset($campaign['PRD']['GIFT'][$product_id])) {
+                            $prod_gift = array(
+                                "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                "campaignProdList" => $giftAway
+                            );
+                        }
+                        foreach ($cartDetail[$product_id] as $item_id => $item_info) {
+                            $detail_qty = $item_info->item_qty;
 
-                            //找符合的item放
-                            if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                                $prod_gift = array(
-                                    "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                    "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                    "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                    "campaignProdList" => $giftAway
-                                );
-                            }
-
-                            $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
-                            $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                            $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                            $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
+                            $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
+                            $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                             $stock = 0;
                             if ($stock_info) {
                                 $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                             }
                             $product[] = array(
-                                "itemId" => $cartDetail[$product_id][$item_id]->item_id,
-                                "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
+                                "itemId" => $item_info->item_id,
+                                "itemNo" => $item_info->item_no,
                                 "itemSpec1" => $spec1,
                                 "itemSpec2" => $spec2,
-                                "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
+                                "itemPrice" => intval($item_info->selling_price),
                                 "itemQty" => $detail_qty,
-                                "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
+                                "amount" => intval($item_info->selling_price * $detail_qty),
                                 "itemStock" => $stock,
                                 "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
-                                "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->id:null),
-                                "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName:null),
+                                "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
+                                "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
                                 "campaignDiscountStatus" => false,
                                 "campaignGiftAway" => $prod_gift
                             );
-                            $cartTotal += intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty);
+                            $cartTotal += intval($item_info->selling_price * $detail_qty);
                         };
                     }
 
@@ -509,23 +527,25 @@ class APICartServices
                         }
                     }
                 } else {
-                    foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                    //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
+                    foreach ($cartDetail[$product_id] as $item_id => $item_info) {
+                        $detail_qty = $item_info->item_qty;
                         $product_type = 'expired';
-                        $spec1 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec1 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec1);
-                        $spec2 = ($cartDetail[$product_id][$item_id]->item_spec1 == 0 || $cartDetail[$product_id][$item_id]->item_spec2 == '' ? null : $cartDetail[$product_id][$item_id]->item_spec2);
-                        $stock_info = $this->stockService->getStockByItem($warehouseCode, $cartDetail[$product_id][$item_id]->item_id);
+                        $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
+                        $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
+                        $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                         $stock = 0;
                         if ($stock_info) {
                             $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                         }
                         $product[] = array(
-                            "itemId" => $cartDetail[$product_id][$item_id]->item_id,
-                            "itemNo" => $cartDetail[$product_id][$item_id]->item_no,
+                            "itemId" => $item_info->item_id,
+                            "itemNo" => $item_info->item_no,
                             "itemSpec1" => $spec1,
                             "itemSpec2" => $spec2,
-                            "itemPrice" => intval($cartDetail[$product_id][$item_id]->selling_price),
+                            "itemPrice" => intval($item_info->selling_price),
                             "itemQty" => $detail_qty,
-                            "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
+                            "amount" => intval($item_info->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                             "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
