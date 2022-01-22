@@ -418,6 +418,9 @@ class MemberController extends Controller
                     $order_detail->photo_url = $photo_url;
                 }
 
+                // 是否可購買
+                $order_detail->can_buy = $order_detail->record_identity == 'M' ? true : false;
+
                 return $order_detail->only([
                     'photo_url',
                     'product_name',
@@ -428,6 +431,7 @@ class MemberController extends Controller
                     'subtotal',
                     'product_id',
                     'product_no',
+                    'can_buy',
                 ]);
             });
         }
