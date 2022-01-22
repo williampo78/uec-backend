@@ -9,8 +9,8 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\UsersController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\PhotosController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CategoryController;
@@ -129,15 +129,15 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     });
 
     Route::resource('/test', TestController::class, ['names' => ['index' => 'test']]);
-    Route::resource('/roles', RolesController::class, ['names' => ['index' => 'roles']]);
+    Route::resource('/roles', RoleController::class, ['names' => ['index' => 'roles']]);
 
     // 使用者管理
-    Route::resource('/profile', UsersController::class, ['names' => ['index' => 'profile']]);
-    Route::resource('/users', UsersController::class, ['names' => ['index' => 'users']]);
-    Route::post('/users/ajax/is-user-account-repeat', [UsersController::class, 'isUserAccountRepeat']); //驗證使用者帳號是否重複
-    Route::get('/user_profile', [UsersController::class, 'profile']);
-    Route::post('/user_profile', [UsersController::class, 'updateProfile']);
-    Route::post('/users/ajax', [UsersController::class, 'ajaxDetail']);
+    Route::resource('/profile', UserController::class, ['names' => ['index' => 'profile']]);
+    Route::resource('/users', UserController::class, ['names' => ['index' => 'users']]);
+    Route::post('/users/ajax/is-user-account-repeat', [UserController::class, 'isUserAccountRepeat']); //驗證使用者帳號是否重複
+    Route::get('/user_profile', [UserController::class, 'profile']);
+    Route::post('/user_profile', [UserController::class, 'updateProfile']);
+    Route::post('/users/ajax', [UserController::class, 'ajaxDetail']);
 
     Route::resource('/qa', QAController::class, ['names' => ['index' => 'qa']]);
     Route::resource('/web_category_hierarchy', WebCategoryHierarchyController::class, ['names' => ['index' => 'web_category_hierarchy']]);

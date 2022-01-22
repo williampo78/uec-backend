@@ -19,7 +19,7 @@
 
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form id="search-form" method="GET" action="" enctype="multipart/form-data">
+                        <form id="search-form" method="GET" action="">
                             <div class="row">
                                 <div class="col-sm-2 text-right">
                                     <h5>角色</h5>

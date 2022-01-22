@@ -21,7 +21,7 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_account">
+                                            <div class="form-group">
                                                 <label for="account">帳號</label>
                                                 <input class="form-control" name="user_account" id="user_account"
                                                     value="{{ $data['user_account'] }}" readonly>
@@ -43,7 +43,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_email">
+                                            <div class="form-group">
                                                 <label for="email">信箱 <span style="color:red;">*</span></label>
                                                 <input class="form-control" name="user_email" id="user_email"
                                                     value="{{ $data['user_email'] }}">

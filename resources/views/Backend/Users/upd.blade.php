@@ -23,22 +23,22 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_account">
-                                                <label for="account">帳號 <span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                <label for="user_account">帳號 <span style="color: red;">*</span></label>
                                                 <input class="form-control" disabled name="user_account" id="user_account"
                                                     value="{{ $data['user']['user_account'] }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_user_name">
-                                                <label for="password">名稱 <span class="text-danger">*</span></label>
-                                                <input class="form-control" name="user_name"
-                                                    id="user_name" value="{{ $data['user']['user_name'] }}">
+                                            <div class="form-group">
+                                                <label for="user_name">名稱 <span style="color: red;">*</span></label>
+                                                <input class="form-control" name="user_name" id="user_name"
+                                                    value="{{ $data['user']['user_name'] }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="name">狀態 <span class="text-danger">*</span></label>
+                                                <label>狀態 <span style="color: red;">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
@@ -60,22 +60,22 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_user_password">
-                                                <label for="name">密碼 <span class="text-danger">*不需變更請留空白</span></label>
+                                            <div class="form-group">
+                                                <label for="user_password">密碼 <span style="color: red;">*不需變更請留空白</span></label>
                                                 <input class="form-control" name="user_password" id="user_password"
                                                     type="password">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_email">
-                                                <label for="email">信箱 <span class="text-danger">*</span></label>
-                                                <input class="form-control" name="user_email"
-                                                    id="user_email" value="{{ $data['user']['user_email'] }}">
+                                            <div class="form-group">
+                                                <label for="user_email">信箱 <span style="color: red;">*</span></label>
+                                                <input class="form-control" name="user_email" id="user_email"
+                                                    value="{{ $data['user']['user_email'] }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_supplier_id">
-                                                <label for="email">供應商 <span
+                                            <div class="form-group">
+                                                <label for="supplier_id">供應商 <span
                                                         class="text-primary">*供應商專用的帳號才指定供應商</span></label>
                                                 <select name="supplier_id" id="supplier_id" class="js-select2">
                                                     <option value="">請選擇</option>
@@ -100,15 +100,15 @@
                                                 <div class="row">
                                                     <div class="col-sm-10">
                                                         <label class="checkbox-inline">
-                                                            <input type="checkbox" name="role[]"
-                                                                value="{{ $item['id'] }}" id="role_{{ $item['id'] }}"
-                                                                data-id="{{ $item['is_for_supplier'] }}"
+                                                            <input type="checkbox" name="role[]" value="{{ $item['id'] }}"
+                                                                id="role_{{ $item['id'] }}"
+                                                                data-is-for-supplier="{{ $item['is_for_supplier'] }}"
                                                                 {{ isset($data['user_roles'][$item['id']]) == 1 ? 'checked' : '' }}>{{ $item['role_name'] }}
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-2">
                                                         @if ($item['is_for_supplier'] == 1)
-                                                            <span class="text-danger">供應商專用</span>
+                                                            <span style="color: red;">供應商專用</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -118,11 +118,12 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="row">
-                                <div class="col-xs-12 text-center">
+                                <div class="col-sm-12">
                                     <div class="form-group">
-                                        <button class="btn btn-success" id="btn-save" type="button"><i
-                                                class="fa fa-check"></i> 完成
+                                        <button type="button" class="btn btn-success" id="btn-save"><i
+                                                class="fa fa-save"></i> 儲存
                                         </button>
                                         <button type="button" class="btn btn-danger" id="btn-cancel"><i
                                                 class="fa fa-ban"></i> 取消
@@ -155,9 +156,20 @@
                 window.location.href = '{{ route('users') }}';
             });
 
-            $('input[name="role[]"]').on('click', function() {
-                if ($('input[name="role[]"][data-id="1"]:checked').length < 1) {
-                    $("#supplier_id").val('').trigger('change');
+            // 有選取供應商專用
+            if ($('input[name^="role"][data-is-for-supplier="1"]:checked').length < 1) {
+                $("#supplier_id").prop('disabled', true);
+            }
+
+            // 點選授權角色
+            $('input[name^="role"]').on('click', function() {
+                // 有選取供應商專用
+                if ($('input[name^="role"][data-is-for-supplier="1"]:checked').length > 0) {
+                    $('#supplier_id').prop('disabled', false);
+                }
+                // 未選取供應商專用
+                else {
+                    $("#supplier_id").prop('disabled', true).val('').trigger('change');
                 }
             });
 
@@ -181,7 +193,8 @@
                     supplier_id: {
                         required: {
                             depends: function(element) {
-                                return $('input[name="role[]"][data-id="1"]:checked').length > 0;
+                                return $('input[name^="role"][data-is-for-supplier="1"]:checked')
+                                    .length > 0;
                             }
                         },
                     },

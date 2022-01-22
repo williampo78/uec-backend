@@ -106,7 +106,7 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class="form-group" id="div_email">
+                                        <div class="form-group">
                                             <label for="email">電子信箱</label>
                                             <input class="form-control" name="email" id="email"
                                                 value="{{ old('email') ?? (isset($Supplier) ? $Supplier->email : '') }}">
@@ -215,7 +215,7 @@
                                 </div>
                                 {{-- <div class="row" style="display:none">
                                         <div class="col-sm-3">
-                                            <div class="form-group" id="div_accountant_list">
+                                            <div class="form-group">
                                                 <label for="accountant_list">會計科目</label>
                                                 <select class="form-control js-select2" name="accountant_list_id"
                                                     id="category">

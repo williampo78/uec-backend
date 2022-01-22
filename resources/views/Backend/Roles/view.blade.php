@@ -28,14 +28,14 @@
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="name">名稱 <span class="text-danger">*</span></label>
+                                                <label for="name">名稱</label>
                                                 <input class="form-control validate[required]" name="role_name" disabled
                                                     id="role_name" value="{{ $data['role']->role_name }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="name">狀態 <span class="text-danger">*</span></label>
+                                                <label for="name">狀態</label>
                                                 <div class="row">
                                                     <div class="col-sm-2">
                                                         <input type="radio" name="active" id="active1" disabled
@@ -52,7 +52,7 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="name">供應商專用 <span class="text-danger">*</span></label>
+                                                <label for="name">供應商專用</label>
                                                 <div class="row">
                                                     <div class="col-sm-2">
                                                         <input type="radio" disabled name="is_for_supplier"

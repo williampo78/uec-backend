@@ -19,7 +19,7 @@
                             <div class="col-sm-12">
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        <div class="form-group" id="div_account">
+                                        <div class="form-group">
                                             <label for="account">類別 <span class="text-danger">*</span></label>
                                             <select name="parent_code" id="parent_code"
                                                     class="js-select2">

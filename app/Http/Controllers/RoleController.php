@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\RolesPermissionService;
 use App\Services\UniversalService;
 
-class RolesController extends Controller
+class RoleController extends Controller
 {
     private $rolesPermission;
     private $universalService;
