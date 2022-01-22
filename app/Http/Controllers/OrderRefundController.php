@@ -48,6 +48,7 @@ class OrderRefundController extends Controller
     }
 
     /**
+     * 退貨詳細資料
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @Author: Eric
@@ -56,7 +57,7 @@ class OrderRefundController extends Controller
     public function getDetail(Request $request)
     {
         if(empty($request->id)){
-            return responst()->json([
+            return response()->json([
                 'status' => false,
                 'message' => '發生錯誤，缺少參數'
             ]);

@@ -83,7 +83,7 @@ class OrderRefundService
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.new_order_id');
+            ->join('orders as o', 'o.id', '=', 'rr.order_id'); //join條件調整
 
         //處理where
         $builder = $this->handleBuilder($builder, $request);
@@ -166,14 +166,15 @@ class OrderRefundService
             rr.status_code,
             rr.completed_at,
             rr.lgst_method,
-            rr.req_reason_code,
             rr.req_remark,
             rr.req_name,
             rr.req_mobile,
             rr.req_city,
             rr.req_district,
             rr.req_address,
-            o.member_id, o.buyer_name';
+            rr.lgst_company_code,
+            o.member_account, o.buyer_name,
+            lvv.description as req_reason_description';
 
         $ReturnRequest = DB::table('return_requests as rr')
             ->selectRaw($select)
@@ -213,7 +214,7 @@ class OrderRefundService
             rr.lgst_method,
             rr.completed_at,
             rr.refund_method,
-            o.refund_status,
+            o_new.refund_status,
             o.buyer_name,
             rr.req_name,
             rr.req_mobile,
@@ -230,10 +231,11 @@ class OrderRefundService
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.new_order_id')
+            ->join('orders as o', 'o.id', '=', 'rr.order_id')  //join條件調整
             ->join('return_request_details as rrd', 'rrd.return_request_id', '=', 'rr.id')
             ->join('product_items as pi', 'pi.id', '=', 'rrd.product_item_id')
             ->join('products as p', 'p.id', '=', 'pi.product_id')
+            ->leftJoin('orders as o_new', 'o.id', '=', 'rr.new_order_id')  //add
             ->orderBy('rr.id');
 
         //處理where

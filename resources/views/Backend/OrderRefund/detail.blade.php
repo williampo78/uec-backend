@@ -73,7 +73,7 @@
                                                 <label class="control-label">退貨說明</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-req-remark"></p>
+                                                <p class="form-control-static modal-req-remark"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -110,7 +110,7 @@
                                                 <label class="control-label">會員編號</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-member-id"></p>
+                                                <p class="form-control-static" id="modal-member-account"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -120,7 +120,7 @@
                                                 <label class="control-label">訂購人</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p class="form-control-static" id="buyer-name"></p>
+                                                <p class="form-control-static" id="modal-buyer-name"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -188,7 +188,7 @@
                                                 <label class="control-label">退貨原因</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-req-reason-code"></p>
+                                                <p class="form-control-static" id="modal-req-reason-description"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -198,7 +198,7 @@
                                                 <label class="control-label">退貨備註</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-req-remark"></p>
+                                                <p class="form-control-static modal-req-remark"></p>
                                             </div>
                                         </div>
                                     </div>
