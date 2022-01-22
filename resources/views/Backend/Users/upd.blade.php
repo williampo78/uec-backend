@@ -37,7 +37,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
+                                            <div class="form-group">
                                                 <label for="name">狀態 <span class="text-danger">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">

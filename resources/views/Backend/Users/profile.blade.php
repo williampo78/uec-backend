@@ -36,7 +36,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_name">
+                                            <div class="form-group">
                                                 <label for="name">姓名 <span style="color:red;">*</span></label>
                                                 <input class="form-control" name="user_name" id="user_name"
                                                     value="{{ $data['user_name'] }}">

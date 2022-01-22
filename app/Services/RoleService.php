@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\Session;
 
 class RoleService
 {
-    public function __construct()
-    {
-    }
-
     public function putUserRolesSession()
     {
         $user_id = Auth::user()->id;

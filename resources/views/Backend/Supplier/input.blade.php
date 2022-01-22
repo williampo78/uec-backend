@@ -75,7 +75,7 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class="form-group" id="div_name">
+                                        <div class="form-group">
                                             <label for="name">完整名稱 <span style="color:red;">*</span></label>
                                             <input class="form-control" name="name" id="name"
                                                 value="{{ old('name') ?? (isset($Supplier) ? $Supplier->name : '') }}">
@@ -89,7 +89,7 @@
                                                 tabindex="-1" aria-hidden="true">
                                                 <option value=""></option>
                                                 @foreach ($getPaymentTerms as $obj)
-                                                <option value="{{$obj->code}}" 
+                                                <option value="{{$obj->code}}"
                                                     {{isset($Supplier) && $Supplier->payment_term  == $obj->code ? 'selected' : '' }}
                                                     >{{$obj->description}}</option>
                                                 @endforeach

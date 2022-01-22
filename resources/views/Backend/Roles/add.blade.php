@@ -29,14 +29,14 @@
 
                                     <div class="row">
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
+                                            <div class="form-group">
                                                 <label for="role_name" class="control-label">名稱 <span
                                                         class="text-danger">*</span></label>
                                                 <input class="form-control" name="role_name" id="role_name">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
+                                            <div class="form-group">
                                                 <label class="control-label">狀態 <span
                                                         class="text-danger">*</span></label>
                                                 <div class="row">
@@ -55,7 +55,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
+                                            <div class="form-group">
                                                 <label class="control-label">供應商專用 <span
                                                         class="text-danger">*</span></label>
                                                 <div class="row">
@@ -169,7 +169,7 @@
 
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <div class="form-group text-center">
+                                            <div class="form-group">
                                                 <button type="button" class="btn btn-success" id="btn-save"><i
                                                         class="fa fa-save"></i> 儲存
                                                 </button>

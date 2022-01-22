@@ -27,7 +27,7 @@ class RolesController extends Controller
         $getData = $request->all();
         $data['role'] = ($getData ? $this->rolesPermission->getRoles($getData) : []);
         $data['user'] = $this->universalService->getUser();
-        $data['getData'] = $getData;
+
         return view('Backend.Roles.list', compact('data'));
     }
 
