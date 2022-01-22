@@ -8,6 +8,8 @@ use App\Services\SupplierService ;
 use App\Services\BrandsService ;
 use App\Services\WebCategoryHierarchyService ;
 use App\Services\CategoriesSerivce ;
+use App\Exports\ReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 class ProductsController extends Controller
 {
     private $productsService;
@@ -39,7 +41,13 @@ class ProductsController extends Controller
         if(count($in) !== 0 ){
             $result['products'] = $this->productsService->getProducts($in) ; 
             $this->productsService->restructureProducts($result['products']);
+      
         }
+        $q = empty($in) ? '?' : '&' ;
+        $result['excel_url'] = $request->fullUrl() . $q . 'export=true';
+        if (isset($in['export'])) { //匯出報表
+            return $this->export($in);
+         }
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
 
@@ -160,6 +168,66 @@ class ProductsController extends Controller
             'requestData'=> $in,
             'result' => $result,
         ]);
+    }
+    public function export($in)
+    {
+        $data = $this->productsService->getItemsJoinProducts($in);
+        $pos =  $this->categoriesSerivce->getPosCategories()->keyBy('id');
+        $this->productsService->restructureItemsProducts($data , $pos);
+        $title = [
+            "stock_type_cn" => "庫存類型",
+            "product_no" => "商品序號",
+            "supplier_name" => "供應商",
+            "product_name" => "商品名稱",
+            "tax_type_cn" => "課稅別",
+            "primary_category" => "POS大分類",
+            "category_name" => "POS中分類",
+            "tertiary_categories_name" => "POS小分類",
+            "brand_name" => "品牌",
+            "model" => "商品型號",
+            "lgst_temperature_cn" => "溫層",
+            "lgst_method_cn" => "配送方式",
+            "delivery_type_cn" => "商品交期",
+            "has_expiry_date" => "效期控管",
+            "expiry_days" => "效期天數",
+            "product_type_cn" => "商品類型",
+            "is_discontinued_cn" => "停售",
+            "length" => "材積-長(公分)",
+            "width" => "材積-寬(公分)",
+            "height" => "材積-高(公分)",
+            "weight" => "重量(公克)",
+            "list_price" => "市價(含稅)",
+            "selling_price" => "售價(含稅)",
+            "item_cost" => "成本(含稅)", // products_v
+            "gross_margin" => "毛利(%)", // products_v
+            "patent_no" => "專利字號",
+            "is_with_warranty_cn" => "是否保固",
+            "warranty_days" => "保固期限(天)",
+            "warranty_scope" => "保固範圍",
+            "web_category_products_id" => "前台分類", //需要對多拿單欄位逗號分隔
+            "keywords" => "關聯關鍵字",
+            "related_product_id" => "關聯性商品", //需要對多拿單欄位逗號分隔
+            "promotion_desc" => "促銷小標",
+            "promotion_start_at" => "促銷小標生效時間起",
+            "promotion_end_at" => "促銷小標生效時間訖",
+            "start_launched_at" => "上架時間起",
+            "end_launched_at" => "上架時間訖",
+            "launched_status" => "上架狀態",
+            "spec_dimension_cn" => "規格類型",
+            "spec_1" => "規格一",
+            "spec_2" => "規格二",
+            "item_no" => "Item編號",
+            "supplier_item_no" => "廠商貨號",
+            "ean" => "國際條碼",
+            "pos_item_no" => "POS品號",
+            "safty_qty" => "安全庫存量",
+            "is_additional_purchase_cn" => "是否追加",
+            "status_cn" => "狀態",
+        ];
+        // 47。
+        $export = new ReportExport($title, $data->toArray());
+        return Excel::download($export, '商品主檔'.date('Y-m-d').'.xlsx');
+        return true ; 
     }
 
 }

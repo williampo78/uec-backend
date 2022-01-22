@@ -30,15 +30,15 @@
 
                                     <div class="row">
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
-                                                <label for="name">名稱 <span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                <label for="name">名稱 <span style="color: red;">*</span></label>
                                                 <input class="form-control" name="role_name" id="role_name"
                                                     value="{{ $data['role']->role_name }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
-                                                <label for="name">狀態 <span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                <label for="name">狀態 <span style="color: red;">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
@@ -58,20 +58,20 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
-                                                <label for="name">供應商專用 <span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                <label for="name">供應商專用 <span style="color: red;">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-2">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="is_for_supplier" id="is_for_supplier1"
-                                                                {{ $data['role']->is_for_supplier1 == 1 ? 'checked' : '' }}
+                                                                {{ $data['role']->is_for_supplier == 1 ? 'checked' : '' }}
                                                                 value="1">是
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-2">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="is_for_supplier" id="is_for_supplier0"
-                                                                {{ $data['role']->is_for_supplier1 == 0 ? 'checked' : '' }}
+                                                                {{ $data['role']->is_for_supplier == 0 ? 'checked' : '' }}
                                                                 value="0">否
                                                         </label>
                                                     </div>
@@ -181,7 +181,7 @@
 
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <div class="form-group text-center">
+                                            <div class="form-group">
                                                 <button type="button" class="btn btn-success" id="btn-save"><i
                                                         class="fa fa-save"></i> 儲存
                                                 </button>

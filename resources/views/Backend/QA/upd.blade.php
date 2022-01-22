@@ -23,7 +23,7 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_account">
+                                            <div class="form-group">
                                                 <label for="parent_code">類別 <span class="text-danger">*</span></label>
                                                 <select name="parent_code" id="parent_code" class="js-select2">
                                                     <option value=""></option>
@@ -43,7 +43,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="div_name">
+                                            <div class="form-group">
                                                 <label for="name">狀態 <span class="text-danger">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">
@@ -66,7 +66,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <div class="form-group" id="div_email">
+                                            <div class="form-group">
                                                 <label for="content_name">問題描述 <span class="text-danger">*</span></label>
                                                 <input class="form-control" name="content_name" id="content_name"
                                                     value="{{ $data['webcontent']['content_name'] }}">
@@ -75,7 +75,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <div class="form-group" id="div_email">
+                                            <div class="form-group">
                                                 <label for="content_name">問題解答 <span class="text-danger">*</span></label>
                                                 <textarea id="editor" name="content_text"
                                                     placeholder="請在這裡填寫內容">{{ $data['webcontent']['content_text'] }}</textarea>

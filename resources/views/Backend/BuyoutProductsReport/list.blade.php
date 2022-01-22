@@ -133,7 +133,9 @@
                                 <div class="col-sm-4 text-right">
                                     <div class="col-sm-9">
                                         <a class="btn btn-info" target="_blank" href='{{ $excel_url  ?? ''}} '
-                                            {{ $excel_url ?? 'disabled' }}>匯出EXCEL</a>
+                                            {{ $excel_url ?? 'disabled' }}>
+                                            <i class="fa fa-file-excel-o"></i>
+                                            匯出EXCEL</a>
                                     </div>
                                     <div class="col-sm-3">
                                         <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>

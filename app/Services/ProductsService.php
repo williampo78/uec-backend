@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CategoryProducts;
+use App\Models\ProductAttributes;
 use App\Models\ProductAuditLog;
 use App\Models\ProductItems;
 use App\Models\ProductPhotos;
@@ -11,8 +12,6 @@ use App\Models\Products;
 use App\Models\Product_spec_info;
 use App\Models\RelatedProducts;
 use App\Services\UniversalService;
-use App\Models\ProductAttributes;
-
 use Batch;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -450,11 +449,11 @@ class ProductsService
     {
         $agent_id = Auth::user()->agent_id;
         $ProductItems = ProductItems::
-            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom','brands.brand_name as brand_name' )
+            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
             ->where('product_items.agent_id', $agent_id)
             ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
-            ->leftJoin('brands','brands.id' ,'=' ,'products.brand_id')
-            ;
+            ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
+        ;
         if (isset($in['supplier_id']) && $in['supplier_id'] !== '') {
             $ProductItems->where('products.supplier_id', $in['supplier_id']);
         }
@@ -536,7 +535,7 @@ class ProductsService
 
             // 毛利
             $obj->gross_margin = 10;
-            // dd($obj) ;
+
             return $obj;
         });
     }
@@ -659,18 +658,18 @@ class ProductsService
                     );
                 };
             }
-            if($in['product_attributes_change'] == 'true'){
-                ProductAttributes::where('attribute_type' ,'CERTIFICATE')->where('product_id' , $id)->delete();
-                $add_product_attributes = [] ;
-                if(isset($in['product_attributes'])){
-                    foreach($in['product_attributes'] as $key => $val){
-                        $add_product_attributes[$key]['attribute_type'] = 'CERTIFICATE' ; 
-                        $add_product_attributes[$key]['product_attribute_lov_id'] = $val ; 
-                        $add_product_attributes[$key]['product_id'] = $id ;
-                        $add_product_attributes[$key]['created_by'] = $user_id ;
-                        $add_product_attributes[$key]['updated_by'] = $user_id ;
-                        $add_product_attributes[$key]['created_at'] = $now ;
-                        $add_product_attributes[$key]['updated_at'] = $now ;
+            if ($in['product_attributes_change'] == 'true') {
+                ProductAttributes::where('attribute_type', 'CERTIFICATE')->where('product_id', $id)->delete();
+                $add_product_attributes = [];
+                if (isset($in['product_attributes'])) {
+                    foreach ($in['product_attributes'] as $key => $val) {
+                        $add_product_attributes[$key]['attribute_type'] = 'CERTIFICATE';
+                        $add_product_attributes[$key]['product_attribute_lov_id'] = $val;
+                        $add_product_attributes[$key]['product_id'] = $id;
+                        $add_product_attributes[$key]['created_by'] = $user_id;
+                        $add_product_attributes[$key]['updated_by'] = $user_id;
+                        $add_product_attributes[$key]['created_at'] = $now;
+                        $add_product_attributes[$key]['updated_at'] = $now;
                     }
                     ProductAttributes::insert($add_product_attributes);
                 }
@@ -688,7 +687,7 @@ class ProductsService
         $ProductAuditLog = ProductAuditLog::select('product_audit_log.*', 'users.user_name AS user_name')
             ->orderBy('product_audit_log.updated_at', 'DESC')
             ->leftJoin('users', 'users.id', '=', 'product_audit_log.updated_by')
-            ->where('product_audit_log.product_id' , $product_id)
+            ->where('product_audit_log.product_id', $product_id)
             ->get();
         return $ProductAuditLog;
     }
@@ -697,7 +696,7 @@ class ProductsService
         $getProductReviewLog = ProductReviewLog::select('product_review_log.*', 'discontinued_user.user_name AS discontinued_user_name')
             ->orderBy('product_review_log.updated_at', 'DESC')
             ->leftJoin('users as discontinued_user', 'discontinued_user.id', '=', 'product_review_log.discontinued_by')
-            ->where('product_review_log.product_id' , $id)
+            ->where('product_review_log.product_id', $id)
             ->get();
         return $getProductReviewLog;
     }
@@ -787,7 +786,7 @@ class ProductsService
             Products::where('id', $in['product_id'])->update([
                 'approval_status' => 'CANCELLED',
                 'updated_by' => $user_id,
-                'end_launched_at' =>$now,
+                'end_launched_at' => $now,
             ]);
             DB::commit();
             $result = true;
@@ -849,4 +848,333 @@ class ProductsService
 
         return true;
     }
+    /**
+     * 取得商品 items
+     *
+     */
+    public function getItemsJoinProducts($request)
+    {
+        $agent_id = Auth::user()->agent_id;
+        $now = Carbon::now();
+        $query = ProductItems::select(
+            DB::raw('product_items.*'),
+            DB::raw('products.*'),
+            DB::raw('supplier.name as supplier_name'), //供應商
+            DB::raw('brands.brand_name as brand_name'),
+            DB::raw('products_v.item_cost as item_cost'),
+            DB::raw('products_v.gross_margin as gross_margin'),
+            DB::raw('(group_concat(web_category_products.id) ) as web_category_products_id'),
+            DB::raw('(group_concat(related_products.related_product_id) ) as related_product_id'),
+            )
+            ->leftJoin('products', 'products.id', 'product_items.product_id')
+            ->leftJoin('products_v', 'products_v.id', 'product_items.product_id')
+            ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
+            ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
+            ->leftJoin('web_category_products' , 'web_category_products.product_id' , '=' , 'products.id')
+            ->leftJoin('related_products' , 'related_products.product_id' , '=' , 'products.id')
+            ->groupBy('product_items.id');
+        if (isset($request['web_category_hierarchy_id'])) {
+            $web_category_hierarchy_id = $request['web_category_hierarchy_id'];
+            $query->join('web_category_products', function ($join) use ($web_category_hierarchy_id) {
+                $join->where('web_category_products.web_category_hierarchy_id', '=', $web_category_hierarchy_id)
+                    ->on('web_category_products.product_id', '=', 'products.id');
+            });
+        }
+
+        //庫存類型
+        if (isset($request['stock_type'])) {
+            $query = $query->where('products.stock_type', '=', $request['stock_type']);
+        }
+
+        //商品序號
+        if (isset($request['product_no'])) {
+            $product_no = explode(',', $request['product_no']);
+            $product_no = array_unique($product_no);
+
+            foreach ($product_no as $key => $val) {
+                if ($key == 0) {
+                    $query = $query->where('products.product_no', 'like', '%' . $val . '%');
+                } else {
+                    $query = $query->orWhere('products.product_no', 'like', '%' . $val . '%');
+                }
+            }
+        }
+
+        //供應商
+        if (isset($request['supplier_id'])) {
+            $query = $query->where('products.supplier_id', $request['supplier_id']);
+        }
+
+        //商品通路
+        if (isset($request['selling_channel'])) {
+            $query = $query->where('products.selling_channel', $request['selling_channel']);
+        }
+
+        //商品名稱
+        if (isset($request['product_name'])) {
+            $query = $query->where('products.product_name', 'like', '%' . $request['product_name'] . '%');
+        }
+
+        //前台分類
+        if (isset($request['category_id'])) {
+            $query = $query->where('products.category_id', $request['category_id']);
+        }
+
+        //配送方式
+        if (isset($request['lgst_method'])) {
+            $query = $query->where('products.lgst_method', $request['lgst_method']);
+        }
+
+        //商品類型
+        if (isset($request['product_type'])) {
+            $query = $query->where('products.product_type', $request['product_type']);
+        }
+
+        //上架狀態
+        if (isset($request['approval_status'])) {
+            switch ($request['approval_status']) {
+                //商品上架
+                case 'APPROVED_STATUS_ON':
+                    $query = $query->where(function ($query) use ($now) {
+                        $query->where('products.approval_status', '=', 'APPROVED')
+                            ->where('products.start_launched_at', '<=', $now)
+                            ->where('products.end_launched_at', '>=', $now);
+                    });
+                    break;
+                //商品下架
+                case 'APPROVED_STATUS_OFF':
+                    $query = $query->where(function ($query) use ($now) {
+                        $query->where('products.approval_status', '=', 'APPROVED')
+                            ->where('products.start_launched_at', '>', $now)
+                            ->orWhere('products.end_launched_at', '<', $now);
+                    });
+                    $query = $query->where(function ($query) {
+                        $query->orWhere('products.approval_status', '=', 'CANCELLED');
+                    });
+                    break;
+                default:
+                    $query = $query->where('products.approval_status', '=', $request['approval_status']);
+                    break;
+            }
+        }
+
+        //上架起開始時間
+        if (!empty($request['start_launched_at_start'])) {
+            $query = $query->whereDate('products.start_launched_at', '>=', $request['start_launched_at_start']);
+        }
+
+        //上架起結束時間
+        if (!empty($request['start_launched_at_end'])) {
+            $query = $query->whereDate('products.start_launched_at', '<=', $request['start_launched_at_end']);
+        }
+
+        // 最低售價
+        if (isset($request['selling_price_min'])) {
+            $query = $query->where('products.selling_price', '>=', $request['selling_price_min']);
+        }
+
+        // 最高售價
+        if (isset($request['selling_price_max'])) {
+            $query = $query->where('products.selling_price', '<=', $request['selling_price_max']);
+        }
+
+        // 建檔日起始日期
+        if (!empty($request['start_created_at'])) {
+            $query = $query->whereDate('products.created_at', '>=', $request['start_created_at']);
+        }
+
+        // 建檔日結束日期
+        if (!empty($request['end_created_at'])) {
+            $query = $query->whereDate('products.created_at', '<=', $request['end_created_at']);
+        }
+
+        // //限制筆數
+        if (isset($request['limit'])) {
+            $query = $query->limit(1000);
+        }
+
+        $query = $query->get();
+
+        return $query;
+
+    }
+    /**
+     * 商品items整理
+     *
+     *
+     */
+    public function restructureItemsProducts($products, $pos)
+    {
+        $products->transform(function ($obj, $key) use ($pos) {
+            // 上架日期
+            $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
+
+            // 售價
+            $obj->selling_price = number_format($obj->selling_price);
+
+            // 上架狀態
+            switch ($obj->approval_status) {
+                case 'NA':
+                    $obj->launched_status = '未設定';
+                    break;
+
+                case 'REVIEWING':
+                    $obj->launched_status = '上架申請';
+                    break;
+
+                case 'REJECTED':
+                    $obj->launched_status = '上架駁回';
+                    break;
+
+                case 'CANCELLED':
+                    $obj->launched_status = '商品下架';
+                    break;
+
+                case 'APPROVED':
+                    $obj->launched_status = Carbon::now()->between($obj->start_launched_at, $obj->end_launched_at) ? '商品上架' : '商品下架';
+                    break;
+                default:
+                    $obj->launched_status = 'NULL' ;
+                    break;
+            }
+
+
+            //庫存類型
+            switch ($obj->stock_type) {
+                case 'A':
+                    $obj->stock_type_cn = '買斷 [A]';
+                    break;
+                case 'B':
+                    $obj->stock_type_cn = '寄售 [B]';
+                    break;
+                case 'T':
+                    $obj->stock_type_cn = '轉單 [T]';
+                    break;
+                default:
+                    $obj->stock_type_cn = '庫存類型錯誤';
+                    break;
+            }
+            //課稅別
+            switch ($obj->tax_type) {
+                case 'TAXABLE':
+                    $obj->tax_type_cn = '應稅(5%)';
+                    break;
+                case 'NON_TAXABLE':
+                    $obj->tax_type_cn = '免稅';
+                    break;
+                default:
+                    $obj->tax_type_cn = '課稅別錯誤';
+                    break;
+            }
+            //小分類找到中大分類
+            if (isset($pos[$obj->category_id])) {
+                $obj->primary_category = $pos[$obj->category_id]['primary_category']; //POS大分類
+                $obj->category_name = $pos[$obj->category_id]['category_name']; //POS中分類
+                $obj->tertiary_categories_name = $pos[$obj->category_id]['tertiary_categories_name']; //POS小分類
+            } else {
+                $obj->primary_category = '分類異常';
+                $obj->category_name = '分類異常';
+                $obj->tertiary_categories_name = '分類異常';
+            }
+            //溫層
+            switch ($obj->lgst_temperature) {
+                case 'NORMAL':
+                    $obj->lgst_temperature_cn = '常溫';
+                    break;
+                default:
+                    $obj->lgst_temperature_cn = '';
+                    break;
+            }
+            //商品交期
+            switch ($obj->lgst_method) {
+                case 'HOME':
+                    $obj->lgst_method_cn = '宅配';
+                    break;
+                case 'FAMILY':
+                    $obj->lgst_method_cn = '全家取貨';
+                    break;
+                case 'STORE':
+                    $obj->lgst_method_cn = '門市取貨';
+                    break;
+                default:
+                    $obj->lgst_method_cn = '';
+                    # code...
+                    break;
+            }
+            //商品交期
+            switch ($obj->delivery_type) {
+                case 'IN_STOCK':
+                    $obj->delivery_type_cn = '現貨';
+                    break;
+                case 'PRE_ORDER':
+                    $obj->delivery_type_cn = '預購';
+                    break;
+                case 'CUSTOMIZED':
+                    $obj->delivery_type_cn = '訂製';
+                    break;
+                default:
+                    $obj->delivery_type_cn = '';
+                    break;
+            }
+            //商品類別
+            switch ($obj->product_type) {
+                case 'N':
+                    $obj->product_type_cn = '一般品(normal)';
+                    break;
+                case 'G':
+                    $obj->product_type_cn = '贈品(gift)';
+                    break;
+                case 'A':
+                    $obj->product_type_cn = '加購品(additional)';
+                    break;
+                default:
+                    $obj->product_type_cn = '';
+                    break;
+            }
+            //停售
+            if($obj->is_discontinued){
+                $obj->is_discontinued_cn = '是' ; 
+            }else{
+                $obj->is_discontinued_cn = '否' ;
+            }
+            //是否有保固
+            if($obj->is_with_warranty){
+                $obj->is_with_warranty_cn ='有';
+            }else{
+                $obj->is_with_warranty_cn ='沒有';
+            }
+            //規格類型
+            switch ($obj->spec_dimension) {
+                case '0':
+                    $obj->spec_dimension_cn = '單規格';
+                    break;
+                case '1':
+                    $obj->spec_dimension_cn = '一維多規格';
+                    break;
+                case '2':
+                    $obj->spec_dimension_cn = '二維多規格';
+                    break;
+                default:
+                    $obj->spec_dimension_cn = '';
+                    break;
+            }
+            //是否追加
+            if($obj->is_additional_purchase){
+                $obj->is_additional_purchase_cn = '是' ;
+            }else{
+                $obj->is_additional_purchase_cn = '否' ;
+            }
+            if($obj->status){
+                $obj->status_cn = '是' ;
+            }else{
+                $obj->status_cn = '否' ; 
+
+            }
+
+            $obj->gross_margin = 10;
+
+            return $obj;
+        });
+    }
+
 }

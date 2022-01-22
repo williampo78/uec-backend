@@ -30,7 +30,7 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
-                                        <div class="form-group" id="div_name">
+                                        <div class="form-group">
                                             <label for="name">分類名稱 <span style="color:red;">*</span></label>
                                             <input class="form-control" name="name" id="name">
                                         </div>

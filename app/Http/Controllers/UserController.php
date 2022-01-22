@@ -9,7 +9,7 @@ use App\Services\UsersService;
 use App\Services\UniversalService;
 use App\Services\SupplierService;
 use App\Services\RolesPermissionService;
-class UsersController extends Controller
+class UserController extends Controller
 {
 
     private $usersService;
@@ -35,7 +35,7 @@ class UsersController extends Controller
         $getData = $request->all();
         $data['role'] = ($getData ? $this->usersService->getUsers($getData) : []);
         $data['user'] = $this->universalService->getUser();
-        $data['getData'] = $getData;
+
         return view('Backend.Users.list', compact('data'));
     }
 

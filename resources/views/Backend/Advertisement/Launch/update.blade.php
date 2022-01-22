@@ -372,10 +372,21 @@
                 // 指定商品
                 case 'P':
                     $('#product_assigned_type_product').click();
+
+                    if ($(`#tab-product table > tbody > tr`).length > 0) {
+                        $('#product_assigned_type_category').parent('label').hide();
+                        $('#product-block-tab a[href="#tab-category"]').parent('li').hide();
+                    }
                     break;
+
                     // 指定分類
                 case 'C':
                     $('#product_assigned_type_category').click();
+
+                    if ($(`#tab-category table > tbody > tr`).length > 0) {
+                        $('#product_assigned_type_product').parent('label').hide();
+                        $('#product-block-tab a[href="#tab-product"]').parent('li').hide();
+                    }
                     break;
             }
 

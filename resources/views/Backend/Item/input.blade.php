@@ -168,7 +168,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_name">
+                                            <div class="form-group">
                                                 <label for="name">名稱 <span class="error">
                                                         {{ $errors->first('name') }}
                                                     </span></label>
@@ -177,7 +177,7 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_name_en">
+                                            <div class="form-group">
                                                 <label for="name_en">名稱(英文) <span class="error">
                                                         {{ $errors->first('name_en') }}
                                                     </span></label>

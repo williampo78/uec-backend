@@ -127,7 +127,7 @@
                                                 {{ request()->input('lgst_method') == 'FAMILY' ? 'selected' : '' }}>全家取貨
                                             </option>
                                             <option value="Store"
-                                                {{ request()->input('lgst_method') == 'Store' ? 'selected' : '' }}>門市取貨
+                                                {{ request()->input('lgst_method') == 'STORE' ? 'selected' : '' }}>門市取貨
                                             </option>
 
                                         </select>
