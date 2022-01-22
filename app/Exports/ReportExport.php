@@ -52,7 +52,7 @@ class ReportExport implements FromCollection
                         $result[$datakey][$titleKey] = $index;
                         break;
                     default:
-                        $result[$datakey][$titleKey] = ($data[$datakey][$titleKey] == 0 ? $this->toString($data[$datakey][$titleKey]) : $data[$datakey][$titleKey]);
+                        $result[$datakey][$titleKey] = ($data[$datakey][$titleKey] === 0 ? $this->toString($data[$datakey][$titleKey]) : $data[$datakey][$titleKey]);
                         break;
                 }
             }

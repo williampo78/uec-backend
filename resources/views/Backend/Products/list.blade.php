@@ -127,8 +127,8 @@
                                             <option value="FAMILY"
                                                 {{ request()->input('lgst_method') == 'FAMILY' ? 'selected' : '' }}>全家取貨
                                             </option>
-                                            <option value="Store"
-                                                {{ request()->input('lgst_method') == 'Store' ? 'selected' : '' }}>門市取貨
+                                            <option value="STORE"
+                                                {{ request()->input('lgst_method') == 'STORE' ? 'selected' : '' }}>門市取貨
                                             </option>
 
                                         </select>
@@ -224,10 +224,25 @@
                                     <div class="col-sm-3">
                                         <input class="form-control" name="limit" id="limit " readonly value="500">
                                     </div>
-                                    <div class="col-sm-5 text-right">
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-9"></div>
+                                @if ($share_role_auth['auth_export'])
+                                    <div class="col-sm-1">
+                                        <a class="btn btn-primary" target="_blank" href='{{ $excel_url  ?? ''}} '
+                                        {{ $excel_url ?? 'disabled' }}>
+                                        <i class="fa fa-file-excel-o"></i>
+                                        匯出EXCEL</a>
+                                    </div>
+                                @endif
+                                <div class="col-sm-1"></div>
+                                @if ($share_role_auth['auth_query'])
+                                    <div class="col-sm-1">
                                         <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
                                     </div>
-                                </div>
+                                @endif
                             </div>
                         </form>
                     </div>
