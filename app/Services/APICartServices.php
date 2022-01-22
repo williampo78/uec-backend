@@ -453,8 +453,8 @@ class APICartServices
                                     "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                     "itemStock" => $stock,
                                     "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
-                                    "campaignDiscountId" => null,
-                                    "campaignDiscountName" => null,
+                                    "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->id:null),
+                                    "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->campaign_name:null),
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
                                 );
@@ -491,8 +491,8 @@ class APICartServices
                                 "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                                 "itemStock" => $stock,
                                 "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
-                                "campaignDiscountId" => null,
-                                "campaignDiscountName" => null,
+                                "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->id:null),
+                                "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id])?$campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName:null),
                                 "campaignDiscountStatus" => false,
                                 "campaignGiftAway" => $prod_gift
                             );
@@ -528,8 +528,8 @@ class APICartServices
                             "amount" => intval($cartDetail[$product_id][$item_id]->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
-                            "campaignDiscountId" => null,
-                            "campaignDiscountName" => null,
+                            "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
+                            "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->Name,
                             "campaignDiscountStatus" => false,
                             "campaignGiftAway7" => []
                         );

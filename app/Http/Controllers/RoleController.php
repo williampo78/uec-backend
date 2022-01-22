@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\RolesPermissionService;
 use App\Services\UniversalService;
 
-class RolesController extends Controller
+class RoleController extends Controller
 {
     private $rolesPermission;
     private $universalService;
@@ -27,7 +27,7 @@ class RolesController extends Controller
         $getData = $request->all();
         $data['role'] = ($getData ? $this->rolesPermission->getRoles($getData) : []);
         $data['user'] = $this->universalService->getUser();
-        $data['getData'] = $getData;
+
         return view('Backend.Roles.list', compact('data'));
     }
 

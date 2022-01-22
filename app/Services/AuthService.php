@@ -22,6 +22,7 @@ class AuthService
 
         $err = null;
         $error_code = $this->apiService->getErrorCode();
+        $input['channel'] = "EC";
         $fields = json_encode($input);
         $response = $this->apiService->memberLogin($fields);
         $result = json_decode($response, true);

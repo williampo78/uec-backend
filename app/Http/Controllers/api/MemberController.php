@@ -418,6 +418,9 @@ class MemberController extends Controller
                     $order_detail->photo_url = $photo_url;
                 }
 
+                // 是否可購買
+                $order_detail->can_buy = $order_detail->record_identity == 'M' ? true : false;
+
                 return $order_detail->only([
                     'photo_url',
                     'product_name',
@@ -428,6 +431,7 @@ class MemberController extends Controller
                     'subtotal',
                     'product_id',
                     'product_no',
+                    'can_buy',
                 ]);
             });
         }
@@ -563,6 +567,13 @@ class MemberController extends Controller
         DB::beginTransaction();
 
         try {
+            // (-)退款
+            $amount = $order->paid_amount == 0 ? $order->paid_amount : $order->paid_amount * -1;
+            // (+)歸還點數折抵金額
+            $point_discount = $order->point_discount == 0 ? $order->point_discount : $order->point_discount * -1;
+            // (+)歸還點數
+            $points = $order->points == 0 ? $order->points : $order->points * -1;
+
             // 已付款
             if ($order->is_paid == 1) {
                 // 更新訂單
@@ -584,9 +595,9 @@ class MemberController extends Controller
                     'payment_type' => 'REFUND',
                     'payment_method' => $order->payment_method,
                     'payment_status' => 'PENDING',
-                    'amount' => $order->paid_amount * -1,
-                    'point_discount' => $order->point_discount * -1,
-                    'points' => $order->points * -1,
+                    'amount' => $amount,
+                    'point_discount' => $point_discount,
+                    'points' => $points,
                     'record_created_reason' => 'ORDER_CANCELLED',
                     'created_by' => -1,
                     'updated_by' => -1,
@@ -626,8 +637,8 @@ class MemberController extends Controller
                         'payment_method' => $order->payment_method,
                         'payment_status' => 'NA',
                         'amount' => 0,
-                        'point_discount' => $order->point_discount * -1,
-                        'points' => $order->points * -1,
+                        'point_discount' => $point_discount,
+                        'points' => $points,
                         'record_created_reason' => 'ORDER_CANCELLED',
                         'created_by' => -1,
                         'updated_by' => -1,

@@ -61,7 +61,9 @@ class AdvertisementLaunchController extends Controller
     {
         $ad_slots = $this->advertisement_service->getSlots();
         $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
-        $products = $this->product_service->getProducts();
+        $products = $this->product_service->getProducts([
+            'product_type' => 'N',
+        ]);
 
         return view('Backend.Advertisement.Launch.add', compact('ad_slots', 'product_category', 'products'));
     }
@@ -150,7 +152,9 @@ class AdvertisementLaunchController extends Controller
         }
 
         $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
-        $products = $this->product_service->getProducts();
+        $products = $this->product_service->getProducts([
+            'product_type' => 'N',
+        ]);
 
         return view('Backend.Advertisement.Launch.update', compact('ad_slot_content', 'product_category', 'products'));
     }

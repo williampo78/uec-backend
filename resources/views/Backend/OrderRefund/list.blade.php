@@ -381,83 +381,12 @@
                     let return_details = response.data.data.return_details;
                     let return_information = response.data.data.return_information;
 
-
-                    //檢視資料內的內容 start
-                    //退貨申請單號
-                    $('#modal-request-no').text(return_request.request_no);
-                    //退貨申請時間
-                    $('#modal-request-date').text(return_request.request_date);
-                    //訂單編號
-                    $('#modal-order-no').text(return_request.order_no);
-                    //退貨單狀態
-                    $('#modal-status-code').text(return_request.status_code);
-                    //退貨完成時間
-                    $('#modal-completed-at').text(return_request.completed_at);
-                    //退貨說明
-                    $('#modal-req-remark').text(return_request.req_remark);
-                    //物流方式
-                    $('#modal-lgst-method').text(return_request.lgst_method);
-                    //物流廠商
-                    $('#modal-return-request').text(return_request.lgst_company)
-                    //會員編號
-                    $('#modal-member-id').text(return_request.member_id);
-                    //訂購人
-                    $('#modal-buyer-name').text(return_request.buyer_name);
-                    //取件聯絡人
-                    $('#modal-req-name').text(return_request.req_name);
-                    //取件聯絡手機
-                    $('#modal-req-mobile').text(return_request.req_mobile);
-                    //取件聯絡電話
-                    $('#modal-req-telephone').text(return_request.req_telephone);
-                    //取件聯絡地址
-                    $('#modal-req-fulladdress').text(`${return_request.req_city}${return_request.req_district}${return_request.req_address}`);
-                    //退貨原因
-                    $('#modal-req-reason-code').text(return_request.req_reason_code);
-                    //退貨備註
-                    $('#modal-req-remark').text(return_request.req_remark);
-
-                    //檢視資料內的內容 end
-
-                    let list = '';
-                    //退款明細 start
-                    $.each(return_details, function(index, value){
-
-                        list += `<tr>
-                                    <td class="text-nowrap">${index + 1 }</td>
-                                    <td class="text-nowrap">${value.item_no}</td>
-                                    <td class="text-nowrap">${value.product_name}</td>
-                                    <td class="text-nowrap">${value.spec_1}</td>
-                                    <td class="text-nowrap">${value.spec_2}</td>
-                                    <td class="text-nowrap">${value.request_qty}</td>
-                                    <td class="text-nowrap">${value.passed_qty}</td>
-                                    <td class="text-nowrap">${value.failed_qty}</td>
-                                </tr>`;
-                        index++
-                    })
-
-                    $('#return_details_content').append(list);
-                    //退款明細 end
-
-                    list = '';
-
-                    //處理退貨明細資料 start
-                    $.each(return_information, function(index, value){
-
-                        list += `<tr>
-                                    <td class="text-nowrap">${index + 1 }</td>
-                                    <td class="text-nowrap">${value.created_at}</td>
-                                    <td class="text-nowrap">${value.payment_type_desc}</td>
-                                    <td class="text-nowrap">Tappay</td>
-                                    <td class="text-nowrap">${value.amount}</td>
-                                    <td class="text-nowrap">${value.payment_status_desc}</td>
-                                    <td class="text-nowrap">${value.latest_api_date == null ? '' : value.latest_api_date}</td>
-                                    <td class="text-nowrap">${value.remark == null ? '' : value.remark}</td>
-                                </tr>`;
-                        index++
-                    })
-
-                    $('#return_information_content').append(list);
-                    //處理退貨明細資料 end
+                    //檢視資料內的內容
+                    handleReturnRequest(return_request);
+                    //退款明細
+                    handleReturnDetails(return_details);
+                    //處理退貨明細資料
+                    handleReturnInformation(return_information);
 
                     $('#order_refund_detail').modal('show');
                 })
@@ -491,5 +420,94 @@
                 });
             });
         });
+
+        //檢視資料內的內容
+        function handleReturnRequest(return_request)
+        {
+            //檢視資料內的內容 start
+            //退貨申請單號
+            $('#modal-request-no').text(return_request.request_no);
+            //退貨申請時間
+            $('#modal-request-date').text(return_request.request_date);
+            //訂單編號
+            $('#modal-order-no').text(return_request.order_no);
+            //退貨單狀態
+            $('#modal-status-code').text(return_request.status_code);
+            //退貨完成時間
+            $('#modal-completed-at').text(return_request.completed_at);
+            //退貨說明
+            $('#modal-req-remark').text(return_request.req_remark);
+            //物流方式
+            $('#modal-lgst-method').text(return_request.lgst_method);
+            //物流廠商
+            $('#modal-return-request').text(return_request.lgst_company)
+            //會員編號
+            $('#modal-member-account').text(return_request.member_account);
+            //訂購人
+            $('#modal-buyer-name').text(return_request.buyer_name);
+            //取件聯絡人
+            $('#modal-req-name').text(return_request.req_name);
+            //取件聯絡手機
+            $('#modal-req-mobile').text(return_request.req_mobile);
+            //取件聯絡電話
+            $('#modal-req-telephone').text(return_request.req_telephone);
+            //取件聯絡地址
+            $('#modal-req-fulladdress').text(`${return_request.req_city}${return_request.req_district}${return_request.req_address}`);
+            //退貨原因
+            $('#modal-req-reason-description').text(return_request.req_reason_description);
+            //退貨備註
+            $('.modal-req-remark').text(return_request.req_remark);
+
+            //檢視資料內的內容 end
+        }
+
+        //退款明細
+        function handleReturnDetails(return_details)
+        {
+            let list = '';
+            //退款明細 start
+            $.each(return_details, function(index, value){
+
+                list += `<tr>
+                                    <td class="text-nowrap">${index + 1 }</td>
+                                    <td class="text-nowrap">${value.item_no}</td>
+                                    <td class="text-nowrap">${value.product_name}</td>
+                                    <td class="text-nowrap">${value.spec_1}</td>
+                                    <td class="text-nowrap">${value.spec_2}</td>
+                                    <td class="text-nowrap">${value.request_qty}</td>
+                                    <td class="text-nowrap">${value.passed_qty}</td>
+                                    <td class="text-nowrap">${value.failed_qty}</td>
+                                </tr>`;
+                index++
+            })
+
+            $('#return_details_content').append(list);
+            //退款明細 end
+        }
+
+        //處理退貨明細資料
+        function handleReturnInformation(return_information)
+        {
+            let list = '';
+
+            //處理退貨明細資料 start
+            $.each(return_information, function(index, value){
+
+                list += `<tr>
+                                    <td class="text-nowrap">${index + 1 }</td>
+                                    <td class="text-nowrap">${value.created_at}</td>
+                                    <td class="text-nowrap">${value.payment_type_desc}</td>
+                                    <td class="text-nowrap">Tappay</td>
+                                    <td class="text-nowrap">${value.amount}</td>
+                                    <td class="text-nowrap">${value.payment_status_desc}</td>
+                                    <td class="text-nowrap">${value.latest_api_date == null ? '' : value.latest_api_date}</td>
+                                    <td class="text-nowrap">${value.remark == null ? '' : value.remark}</td>
+                                </tr>`;
+                index++
+            })
+
+            $('#return_information_content').append(list);
+            //處理退貨明細資料 end
+        }
     </script>
 @endsection

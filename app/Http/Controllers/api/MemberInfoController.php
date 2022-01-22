@@ -127,6 +127,7 @@ class MemberInfoController extends Controller
         $data['cityId'] = $request['cityId'];
         $data['districtId'] = $request['districtId'];
         $data['address'] = $request['address'];
+        $data['registeredSource'] = "EC";
 
         $err = null;
         $error_code = $this->apiService->getErrorCode();
