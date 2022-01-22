@@ -46,6 +46,7 @@ class DradviceController extends Controller
         $err = null;
         $input['mobile'] = $request->mobile;
         $input['password'] = $request->password;
+        $input['channel'] = "EC";
         $fields = json_encode($input);
         $response = $this->apiService->memberLogin($fields);
         $result = json_decode($response, true);

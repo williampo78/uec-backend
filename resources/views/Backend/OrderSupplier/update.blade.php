@@ -12,29 +12,23 @@
                             enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
-
                             <div class="row">
-
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="supplier">請購單</label>
-                                                <input class="form-control" id="number"
+                                                <label for="requisitions_purchase_number">請購單</label>
+                                                <input class="form-control" id="requisitions_purchase_number"
                                                     value="{{ $order_supplier['requisitions_purchase_number'] ?? '' }}"
                                                     readonly>
                                             </div>
                                         </div>
-                                        <input type="hidden" name="requisitions_purchase_id"
-                                            value="{{ $order_supplier['requisitions_purchase_id'] }}">
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_trade_date">
-                                                <label for="trade_date">採購日期</label>
+                                                <label for="trade_date">採購日期<span class="redtext">*</span></label>
                                                 <div class='input-group date' id='datetimepicker'>
-                                                    <input type='text' class="form-control" name="trade_date"
-                                                        id="trade_date"
-                                                        value="{{ $order_supplier['trade_date'] ?? '' }}" />
+                                                    <input type='text' class="form-control" name="trade_date" id="trade_date" value="{{ $order_supplier['trade_date'] ?? '' }}"/>
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -48,7 +42,8 @@
                                                     value="{{ $order_supplier['number'] ?? '' }}" readonly>
                                             </div>
                                         </div>
-
+                                    </div>
+                                    <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="supplier">供應商</label>
@@ -72,7 +67,8 @@
                                                     value="{{ $order_supplier['receiver_address'] ?? '' }}">
                                             </div>
                                         </div>
-
+                                    </div>
+                                    <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label for="currency_code">幣別</label>
@@ -115,6 +111,8 @@
                                                     v-model="order_supplier.original_total_price" readonly>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="row">
 
                                         <div class="col-sm-4">
                                             <div class="form-group">
@@ -151,6 +149,8 @@
                                                     v-model="order_supplier.total_price" readonly>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="row">
 
                                         <div class="col-sm-4">
                                             <div class="form-group">
@@ -168,7 +168,6 @@
                                                     value="{{ $order_supplier['invoice_name'] ?? '' }}">
                                             </div>
                                         </div>
-
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="invoice_address">發票地址</label>
@@ -176,6 +175,8 @@
                                                     value="{{ $order_supplier['invoice_address'] ?? '' }}">
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="row">
 
                                         <div class="col-sm-4">
                                             <div class="form-group">
@@ -214,6 +215,8 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    {{-- </div> --}}
 
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -275,9 +278,12 @@
                                                 </div>
                                                 {{-- 採購量 --}}
                                                 <div class="col-sm-1">
-                                                    <input class="form-control" type="number"
-                                                        v-model="detail.purchase_qty" :min="0" :max="detail.item_qty"
-                                                        @change="detailsCount">
+                                                    <div class="form-group">
+                                                        <input class="form-control purchase_qty"
+                                                            v-model="detail.purchase_qty" :max="detail.item_qty"
+                                                            :name="'purchase_qty['+detailKey+']'" :min="0" type="number"
+                                                            @change="detailsCount">
+                                                    </div>
                                                 </div>
                                                 {{-- 單位 --}}
                                                 <div class="col-sm-1">
@@ -308,7 +314,7 @@
                                                     儲存草稿</button>
                                                 <button class="btn btn-success" type="button"
                                                     @click="submitBtn('APPROVED')"><i class="fa fa-save"></i>
-                                                    儲存並轉單</button>
+                                                    儲存並核單</button>
                                                 <button class="btn btn-danger" type="button" @click="cancel()"><i
                                                         class="fa fa-ban"></i> 取消</button>
                                             </div>
@@ -336,8 +342,7 @@
                     }
                 },
                 created() {
-                    console.log(this.order_supplier);
-                    console.log(this.order_supplier_detail);
+
                 },
                 methods: {
                     submitBtn(status) {
@@ -366,7 +371,7 @@
                                     case '0': //免稅
                                         price = obj.purchase_qty * obj.item_price;
                                         obj.original_subtotal_price = obj.purchase_qty * obj
-                                        .item_price; // 數量 * 金錢
+                                            .item_price; // 數量 * 金錢
                                         sum_price += price;
                                         break;
                                     case '1': //應稅
@@ -413,6 +418,7 @@
                     $('#datetimepicker3').datetimepicker({
                         format: 'YYYY-MM-DD',
                     });
+              
                     $("#new-form").validate({
                         // debug: true,
                         submitHandler: function(form) {
@@ -445,7 +451,7 @@
                             }
                             console.log(element);
 
-                            // error.insertAfter(element);
+                            error.insertAfter(element);
                         },
                         highlight: function(element, errorClass, validClass) {
                             $(element).closest(".form-group").addClass("has-error");
@@ -454,6 +460,16 @@
                             $(element).closest(".form-group").removeClass("has-error");
                         },
                     });
+                    $(".purchase_qty").each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                            digits:true,
+                            messages:{
+                                digits: '請輸入正整數',
+                                max:'採購量不能大於請購量',
+                            },
+                        });
+                    })
                 },
             })
 

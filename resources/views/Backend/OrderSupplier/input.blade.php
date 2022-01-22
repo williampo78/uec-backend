@@ -24,12 +24,12 @@
                                             </select2>
                                         </div>
                                     </div>
-                                    {{-- <input type="hidden" name="requisitions_purchase_id" v-model="requisitions_purchase_id"> --}}
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">採購日期<span class="redtext">*</span></label>
                                             <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="trade_date" id="trade_date"/>
+                                                <input type='text' class="form-control" name="trade_date"
+                                                    id="trade_date" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -39,7 +39,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="number">採購單號<span class="redtext">*</span></label>
-                                            <input class="form-control" id="number" v-model="order_supplier.number" readonly>
+                                            <input class="form-control" id="number" v-model="order_supplier.number"
+                                                readonly>
                                         </div>
                                     </div>
 
@@ -174,7 +175,7 @@
                                             <label for="supplier_deliver_date">廠商交貨日</label>
                                             <div class='input-group date' id='datetimepicker2'>
                                                 <input type='text' class="form-control" name="supplier_deliver_date"
-                                                    id="supplier_deliver_date"/>
+                                                    id="supplier_deliver_date" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -187,7 +188,7 @@
                                             <label for="expect_deliver_date">預計進貨日</label>
                                             <div class='input-group date' id='datetimepicker3'>
                                                 <input type='text' class="form-control" name="expect_deliver_date"
-                                                    id="expect_deliver_date"/>
+                                                    id="expect_deliver_date" />
                                                 <span class="input-group-addon">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -199,8 +200,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group" id="div_remark">
                                             <label for="remark">備註</label>
-                                            <textarea class="form-control" rows="3" name="remark"
-                                                id="remark"></textarea>
+                                            <textarea class="form-control" rows="3" name="remark" id="remark"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -231,8 +231,7 @@
                                             {{-- 贈品 --}}
                                             <div class="col-sm-1">
                                                 <div v-if="detail.is_giveaway">
-                                                    <input type="checkbox" class="big-checkbox" 
-                                                        checked disabled>
+                                                    <input type="checkbox" class="big-checkbox" checked disabled>
                                                 </div>
 
                                                 <div v-else>
@@ -251,8 +250,11 @@
                                             </div>
                                             {{-- 採購量 --}}
                                             <div class="col-sm-1">
-                                                <input class="form-control" type="number" v-model="detail.purchase_qty"
-                                                    :min="0" :max="detail.item_qty" @change="detailsCount">
+                                                <div class="form-group">
+                                                    <input class="form-control purchase_qty" v-model="detail.purchase_qty"
+                                                        :max="detail.item_qty" :name="'purchase_qty['+detailKey+']'"
+                                                        :min="0" type="number" @change="detailsCount">
+                                                </div>
                                             </div>
                                             {{-- 單位 --}}
                                             <div class="col-sm-1">
@@ -286,7 +288,7 @@
                                             <button class="btn btn-success" type="button" @click="submitBtn('DRAFTED')"><i
                                                     class="fa fa-save"></i> 儲存草稿</button>
                                             <button class="btn btn-success" type="button" @click="submitBtn('APPROVED')"><i
-                                                    class="fa fa-save"></i> 儲存並轉單</button>
+                                                    class="fa fa-save"></i> 儲存並核單</button>
                                             <button class="btn btn-danger" type="button" @click="cancel()"><i
                                                     class="fa fa-ban"></i> 取消</button>
                                         </div>
@@ -334,11 +336,10 @@
                     });
                 },
                 cancel() {
-                    return history.go(-1) ;
+                    return history.go(-1);
                 },
                 detailsCount() {
                     var taxtype = String(this.order_supplier.tax);
-
                     var original_total_tax_price = 0; // 原幣稅額
                     var original_total_price = 0; // 原幣總金額
                     var total_tax_price = 0; //(本幣)稅額
@@ -346,7 +347,7 @@
                     var sum_price = 0;
                     $.each(this.order_supplier_detail, function(key, obj) {
                         if (obj.is_giveaway) { //如果是贈品則不計算單價
-                            console.log('is_gift true') ;
+                            // console.log('is_gift true');
                             obj.subtotal_price = 0;
                             obj.original_subtotal_price = 0;
                         } else {
@@ -382,6 +383,16 @@
                     this.order_supplier.total_tax_price = total_tax_price;
                     this.order_supplier.total_price = sum_price;
                     this.order_supplier.sum_price = sum_price;
+                    $(".purchase_qty").each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                            digits: true,
+                            messages: {
+                                digits: '請輸入正整數',
+                                max: '採購量不能大於請購量',
+                            },
+                        });
+                    })
                 },
             },
             mounted: function() {
@@ -400,7 +411,7 @@
                     format: 'YYYY-MM-DD',
                 });
                 $("#new-form").validate({
-                    // debug: true,
+                    debug: true,
                     submitHandler: function(form) {
                         $('#save_data').prop('disabled', true);
                         form.submit();
@@ -429,9 +440,7 @@
                             element.parent().append(error);
                             return;
                         }
-                        console.log(element);
-
-                        // error.insertAfter(element);
+                        error.insertAfter(element);
                     },
                     highlight: function(element, errorClass, validClass) {
                         $(element).closest(".form-group").addClass("has-error");
@@ -443,9 +452,11 @@
             },
 
         })
+
         Vue.component("select2", {
             props: ["options", "value", "order_supplier", "order_supplier_detail"],
             template: "#select2-template",
+            mixins: [requisitions],
             mounted: function() {
                 var vm = this;
                 $(this.$el).select2({
@@ -486,7 +497,7 @@
                         order_supplier.original_total_tax_price = requisitionsPurchase
                             .original_total_tax_price; // 原幣稅額
                         order_supplier.original_total_price = requisitionsPurchase
-                            .original_total_price; // 原幣總金額
+                        .original_total_price; // 原幣總金額
                         order_supplier.total_tax_price = requisitionsPurchase.total_tax_price; //(本幣)稅額
                         order_supplier.total_price = requisitionsPurchase.total_price; //(本幣)總金額
                         order_supplier.tax = requisitionsPurchase.tax;
@@ -514,7 +525,7 @@
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
                                 requisitions_purchase_dtl_id: obj
-                                    .id, // requisitions_purchase_detail
+                                .id, // requisitions_purchase_detail
                                 product_item_id: obj.product_item_id, //  品項ID
                                 combination_name: obj.combination_name, //顯示的品項名稱
                                 item_no: obj.item_number, //編號
@@ -526,7 +537,7 @@
                                 uom: obj.uom, //單位
                                 original_subtotal_price: obj.original_subtotal_price, //原幣小計
                                 subtotal_price: obj.subtotal_price,
-                                pos_item_no:obj.pos_item_no,
+                                pos_item_no: obj.pos_item_no,
                             });
                         });
                     }
@@ -537,7 +548,6 @@
                 $(this.$el).off().select2("destroy");
             }
         });
-
         new requisitions().$mount('#requisitions_vue_app');
     </script>
 

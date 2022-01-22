@@ -1,24 +1,29 @@
-
 // 初始化資料
 function init(datas = {}) {
-    let ad_slot_select_options = datas.ad_slot_select_options ? datas.ad_slot_select_options : '';
-    let product_category_select_options = datas.product_category_select_options ? datas.product_category_select_options : '';
-    let product_select_options = datas.product_select_options ? datas.product_select_options : '';
+    let ad_slot_select_options = datas.ad_slot_select_options
+        ? datas.ad_slot_select_options
+        : "";
+    let product_category_select_options = datas.product_category_select_options
+        ? datas.product_category_select_options
+        : "";
+    let product_select_options = datas.product_select_options
+        ? datas.product_select_options
+        : "";
 
     if (ad_slot_select_options) {
-        $('#slot_id').append(ad_slot_select_options);
+        $("#slot_id").append(ad_slot_select_options);
     } else {
-        $('#slot_id').prev('label').find('span').remove();
+        $("#slot_id").prev("label").find("span").remove();
     }
 
-    $('.js-select2-slot-id').select2({
+    $(".js-select2-slot-id").select2({
         allowClear: true,
         theme: "bootstrap",
-        placeholder: '',
+        placeholder: "",
     });
 
-    $('#datetimepicker_start_at').datetimepicker({
-        format: 'YYYY-MM-DD HH:mm',
+    $("#datetimepicker_start_at").datetimepicker({
+        format: "YYYY-MM-DD HH:mm",
         showClear: true,
     });
 
@@ -30,8 +35,8 @@ function init(datas = {}) {
         }
     });
 
-    $('#datetimepicker_end_at').datetimepicker({
-        format: 'YYYY-MM-DD HH:mm',
+    $("#datetimepicker_end_at").datetimepicker({
+        format: "YYYY-MM-DD HH:mm",
         showClear: true,
     });
 
@@ -43,130 +48,222 @@ function init(datas = {}) {
         }
     });
 
-    $('.colorpicker').colorpicker({
+    $(".colorpicker").colorpicker({
         format: "hex",
         align: "left",
-        customClass: 'colorpicker-2x',
+        customClass: "colorpicker-2x",
         sliders: {
             saturation: {
                 maxLeft: 200,
-                maxTop: 200
+                maxTop: 200,
             },
             hue: {
-                maxTop: 200
+                maxTop: 200,
             },
             alpha: {
-                maxTop: 200
-            }
-        }
+                maxTop: 200,
+            },
+        },
     });
 
     // 點擊指定商品radio button
-    $('#product_assigned_type_product').on('click', function () {
-        $('#product-block-tab a[href="#tab-product"]').tab('show');
+    $("#product_assigned_type_product").on("click", function () {
+        $('#product-block-tab a[href="#tab-product"]').tab("show");
     });
 
     // 點擊指定分類radio button
-    $('#product_assigned_type_category').on('click', function () {
-        $('#product-block-tab a[href="#tab-category"]').tab('show');
+    $("#product_assigned_type_category").on("click", function () {
+        $('#product-block-tab a[href="#tab-category"]').tab("show");
     });
 
     // 點擊商品tab
-    $('#product-block-tab a[href="#tab-product"]').on('show.bs.tab', function (e) {
-        $('#product_assigned_type_product').prop('checked', true);
-    });
+    $('#product-block-tab a[href="#tab-product"]').on(
+        "show.bs.tab",
+        function (e) {
+            $("#product_assigned_type_product").prop("checked", true);
+        }
+    );
 
     // 點擊分類tab
-    $('#product-block-tab a[href="#tab-category"]').on('show.bs.tab', function (e) {
-        $('#product_assigned_type_category').prop('checked', true);
-    });
+    $('#product-block-tab a[href="#tab-category"]').on(
+        "show.bs.tab",
+        function (e) {
+            $("#product_assigned_type_category").prop("checked", true);
+        }
+    );
 
     // 新增圖檔
-    $('#btn-new-image').on('click', function () {
+    $("#btn-new-image").on("click", function () {
         addImageBlock(product_category_select_options);
     });
 
     // 刪除圖檔
-    $(document).on('click', '.btn-delete-image', function () {
-        if (confirm('確定要刪除嗎?')) {
-            $(this).parents('tr').remove();
+    $(document).on("click", ".btn-delete-image", function () {
+        if (confirm("確定要刪除嗎?")) {
+            $(this).parents("tr").remove();
         }
     });
 
     // 新增文字
-    $('#btn-new-text').on('click', function () {
+    $("#btn-new-text").on("click", function () {
         addTextBlock(product_category_select_options);
     });
 
     // 刪除文字
-    $(document).on('click', '.btn-delete-text', function () {
-        if (confirm('確定要刪除嗎?')) {
-            $(this).parents('tr').remove();
+    $(document).on("click", ".btn-delete-text", function () {
+        if (confirm("確定要刪除嗎?")) {
+            $(this).parents("tr").remove();
         }
     });
 
     // 新增商品的指定商品
-    $('#btn-new-product-product').on('click', function () {
+    $("#btn-new-product-product").on("click", function () {
         addProductBlockProduct(product_select_options);
+
+        // 編輯才做
+        if (!ad_slot_select_options) {
+            // 當指定商品有項目時，隱藏指定分類的選項
+            if ($(`#tab-product table > tbody > tr`).length > 0) {
+                $("#product_assigned_type_category").parent("label").hide();
+                $('#product-block-tab a[href="#tab-category"]')
+                    .parent("li")
+                    .hide();
+            }
+        }
     });
 
     // 刪除商品的指定商品
-    $(document).on('click', '.btn-delete-product-product', function () {
-        if (confirm('確定要刪除嗎?')) {
-            $(this).parents('tr').remove();
+    $(document).on("click", ".btn-delete-product-product", function () {
+        if (confirm("確定要刪除嗎?")) {
+            $(this).parents("tr").remove();
+
+            // 編輯才做
+            if (!ad_slot_select_options) {
+                // 當指定商品沒有任何項目時，顯示指定分類的選項
+                if ($(`#tab-product table > tbody > tr`).length < 1) {
+                    $("#product_assigned_type_category").parent("label").show();
+                    $('#product-block-tab a[href="#tab-category"]')
+                        .parent("li")
+                        .show();
+
+                    // 當指定分類有項目時，隱藏指定商品的選項
+                    if ($(`#tab-category table > tbody > tr`).length > 0) {
+                        $("#product_assigned_type_product")
+                            .parent("label")
+                            .hide();
+                        $('#product-block-tab a[href="#tab-product"]')
+                            .parent("li")
+                            .hide();
+                        $("#product_assigned_type_category").click();
+                    }
+                }
+            }
         }
     });
 
     // 新增商品的指定分類
-    $('#btn-new-product-category').on('click', function () {
+    $("#btn-new-product-category").on("click", function () {
         addProductBlockCategory(product_category_select_options);
+
+        // 編輯才做
+        if (!ad_slot_select_options) {
+            // 當指定分類有項目時，隱藏指定商品的選項
+            if ($(`#tab-category table > tbody > tr`).length > 0) {
+                $("#product_assigned_type_product").parent("label").hide();
+                $('#product-block-tab a[href="#tab-product"]')
+                    .parent("li")
+                    .hide();
+            }
+        }
     });
 
     // 刪除商品的指定分類
-    $(document).on('click', '.btn-delete-product-category', function () {
-        if (confirm('確定要刪除嗎?')) {
-            $(this).parents('tr').remove();
+    $(document).on("click", ".btn-delete-product-category", function () {
+        if (confirm("確定要刪除嗎?")) {
+            $(this).parents("tr").remove();
+
+            // 編輯才做
+            if (!ad_slot_select_options) {
+                // 當指定分類沒有任何項目時，顯示指定商品的選項
+                if ($(`#tab-category table > tbody > tr`).length < 1) {
+                    $("#product_assigned_type_product").parent("label").show();
+                    $('#product-block-tab a[href="#tab-product"]')
+                        .parent("li")
+                        .show();
+
+                    // 當指定商品有項目時，隱藏指定分類的選項
+                    if ($(`#tab-product table > tbody > tr`).length > 0) {
+                        $("#product_assigned_type_category")
+                            .parent("label")
+                            .hide();
+                        $('#product-block-tab a[href="#tab-category"]')
+                            .parent("li")
+                            .hide();
+                        $("#product_assigned_type_product").click();
+                    }
+                }
+            }
         }
     });
 
     // 切換圖檔連結內容選項時，清除其他選項的值
-    $(document).on('click', '[name^="image_block_image_action"]', function () {
+    $(document).on("click", '[name^="image_block_image_action"]', function () {
         let image_action = $(this).val();
-        let form_group_element = $(this).closest('.form-group');
+        let form_group_element = $(this).closest(".form-group");
 
         switch (image_action) {
-            case 'X':
-                form_group_element.find('[name^="image_block_target_url"]').val('');
-                form_group_element.find('[name^="image_block_target_cate_hierarchy_id"]').val('').trigger('change');
+            case "X":
+                form_group_element
+                    .find('[name^="image_block_target_url"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="image_block_target_cate_hierarchy_id"]')
+                    .val("")
+                    .trigger("change");
                 break;
 
-            case 'U':
-                form_group_element.find('[name^="image_block_target_cate_hierarchy_id"]').val('').trigger('change');
+            case "U":
+                form_group_element
+                    .find('[name^="image_block_target_cate_hierarchy_id"]')
+                    .val("")
+                    .trigger("change");
                 break;
 
-            case 'C':
-                form_group_element.find('[name^="image_block_target_url"]').val('');
+            case "C":
+                form_group_element
+                    .find('[name^="image_block_target_url"]')
+                    .val("");
                 break;
         }
     });
 
     // 切換文字連結內容選項時，清除其他選項的值
-    $(document).on('click', '[name^="text_block_image_action"]', function () {
+    $(document).on("click", '[name^="text_block_image_action"]', function () {
         let image_action = $(this).val();
-        let form_group_element = $(this).closest('.form-group');
+        let form_group_element = $(this).closest(".form-group");
 
         switch (image_action) {
-            case 'X':
-                form_group_element.find('[name^="text_block_target_url"]').val('');
-                form_group_element.find('[name^="text_block_target_cate_hierarchy_id"]').val('').trigger('change');
+            case "X":
+                form_group_element
+                    .find('[name^="text_block_target_url"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="text_block_target_cate_hierarchy_id"]')
+                    .val("")
+                    .trigger("change");
                 break;
 
-            case 'U':
-                form_group_element.find('[name^="text_block_target_cate_hierarchy_id"]').val('').trigger('change');
+            case "U":
+                form_group_element
+                    .find('[name^="text_block_target_cate_hierarchy_id"]')
+                    .val("")
+                    .trigger("change");
                 break;
 
-            case 'C':
-                form_group_element.find('[name^="text_block_target_url"]').val('');
+            case "C":
+                form_group_element
+                    .find('[name^="text_block_target_url"]')
+                    .val("");
                 break;
         }
     });
@@ -174,11 +271,11 @@ function init(datas = {}) {
 
 // 取得版位下拉選項
 function getAdSlotSelectOptions(datas = []) {
-    let options = '';
+    let options = "";
 
     $.each(datas, function (key, value) {
         options += `
-            <option value='${value['id']}' data-is-user-defined="${value['is_user_defined']}" data-slot-type="${value['slot_type']}">【${value['slot_code']}】${value['slot_desc']}</option>
+            <option value='${value["id"]}' data-is-user-defined="${value["is_user_defined"]}" data-slot-type="${value["slot_type"]}">【${value["slot_code"]}】${value["slot_desc"]}</option>
         `;
     });
 
@@ -187,11 +284,11 @@ function getAdSlotSelectOptions(datas = []) {
 
 // 取得商品分類下拉選項
 function getProductCategorySelectOptions(datas = []) {
-    let options = '';
+    let options = "";
 
     $.each(datas, function (key, value) {
         options += `
-            <option value='${value['id']}'>${value['name']}</option>
+            <option value='${value["id"]}'>${value["name"]}</option>
         `;
     });
 
@@ -200,28 +297,32 @@ function getProductCategorySelectOptions(datas = []) {
 
 // 取得商品下拉選項
 function getProductSelectOptions(datas = []) {
-    let options = '';
+    let options = "";
 
     $.each(datas, function (key, value) {
         options += `
-            <option value='${value['id']}'>${value['product_no']} ${value['product_name']}</option>
+            <option value='${value["id"]}'>${value["product_no"]} ${value["product_name"]}</option>
         `;
     });
 
     return options;
 }
 
-function addImageBlock(product_category_select_options = '', datas = {}) {
-    let image_block_row_no = datas.id ? datas.id : $('#image-block-row-no').val();
-    let image_block_id = datas.id ? datas.id : 'new';
-    let sort = datas.sort ? datas.sort : '';
-    let image_name_url = datas.image_name_url ? `<img src="${datas.image_name_url}" class="img-responsive" width="400" height="400" />` : '';
-    let image_alt = datas.image_alt ? datas.image_alt : '';
-    let image_title = datas.image_title ? datas.image_title : '';
-    let image_abstract = datas.image_abstract ? datas.image_abstract : '';
-    let target_url = datas.target_url ? datas.target_url : '';
+function addImageBlock(product_category_select_options = "", datas = {}) {
+    let image_block_row_no = datas.id
+        ? datas.id
+        : $("#image-block-row-no").val();
+    let image_block_id = datas.id ? datas.id : "new";
+    let sort = datas.sort ? datas.sort : "";
+    let image_name_url = datas.image_name_url
+        ? `<img src="${datas.image_name_url}" class="img-responsive" width="400" height="400" />`
+        : "";
+    let image_alt = datas.image_alt ? datas.image_alt : "";
+    let image_title = datas.image_title ? datas.image_title : "";
+    let image_abstract = datas.image_abstract ? datas.image_abstract : "";
+    let target_url = datas.target_url ? datas.target_url : "";
 
-    $('#image-block table > tbody').append(`
+    $("#image-block table > tbody").append(`
         <tr>
             <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_id}">
             <td>
@@ -308,25 +409,25 @@ function addImageBlock(product_category_select_options = '', datas = {}) {
         </tr>
     `);
 
-    $('.js-select2-image-block-product-category').select2({
+    $(".js-select2-image-block-product-category").select2({
         allowClear: true,
         theme: "bootstrap",
-        placeholder: '',
+        placeholder: "",
     });
 
-    $('#image-block-row-no').val(parseInt(image_block_row_no) + 1);
+    $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
 
     validateImageBlock(image_block_row_no);
 }
 
 function addTextBlock(product_category_select_options, datas = {}) {
-    let text_block_row_no = datas.id ? datas.id : $('#text-block-row-no').val();
-    let text_block_id = datas.id ? datas.id : 'new';
-    let sort = datas.sort ? datas.sort : '';
-    let texts = datas.texts ? datas.texts : '';
-    let target_url = datas.target_url ? datas.target_url : '';
+    let text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
+    let text_block_id = datas.id ? datas.id : "new";
+    let sort = datas.sort ? datas.sort : "";
+    let texts = datas.texts ? datas.texts : "";
+    let target_url = datas.target_url ? datas.target_url : "";
 
-    $('#text-block table > tbody').append(`
+    $("#text-block table > tbody").append(`
         <tr>
             <input type="hidden" name="text_block_id[${text_block_row_no}]" value="${text_block_id}">
             <td>
@@ -397,23 +498,25 @@ function addTextBlock(product_category_select_options, datas = {}) {
         </tr>
     `);
 
-    $('.js-select2-text-block-product-category').select2({
+    $(".js-select2-text-block-product-category").select2({
         allowClear: true,
         theme: "bootstrap",
-        placeholder: '',
+        placeholder: "",
     });
 
-    $('#text-block-row-no').val(parseInt(text_block_row_no) + 1);
+    $("#text-block-row-no").val(parseInt(text_block_row_no) + 1);
 
     validateTextBlock(text_block_row_no);
 }
 
 function addProductBlockProduct(product_select_options, datas = {}) {
-    let product_block_product_row_no = datas.id ? datas.id : $('#product-block-product-row-no').val();
-    let product_block_product_id = datas.id ? datas.id : 'new';
-    let sort = datas.sort ? datas.sort : '';
+    let product_block_product_row_no = datas.id
+        ? datas.id
+        : $("#product-block-product-row-no").val();
+    let product_block_product_id = datas.id ? datas.id : "new";
+    let sort = datas.sort ? datas.sort : "";
 
-    $('#tab-product table > tbody').append(`
+    $("#tab-product table > tbody").append(`
         <tr>
             <input type="hidden" name="product_block_product_id[${product_block_product_row_no}]" value="${product_block_product_id}">
             <td>
@@ -435,23 +538,27 @@ function addProductBlockProduct(product_select_options, datas = {}) {
         </tr>
     `);
 
-    $('.js-select2-product-block-product').select2({
+    $(".js-select2-product-block-product").select2({
         allowClear: true,
         theme: "bootstrap",
-        placeholder: '',
+        placeholder: "",
     });
 
-    $('#product-block-product-row-no').val(parseInt(product_block_product_row_no) + 1);
+    $("#product-block-product-row-no").val(
+        parseInt(product_block_product_row_no) + 1
+    );
 
     validateProductBlockProduct(product_block_product_row_no);
 }
 
 function addProductBlockCategory(product_category_select_options, datas = {}) {
-    let product_block_category_row_no = datas.id ? datas.id : $('#product-block-category-row-no').val();
-    let product_block_category_id = datas.id ? datas.id : 'new';
-    let sort = datas.sort ? datas.sort : '';
+    let product_block_category_row_no = datas.id
+        ? datas.id
+        : $("#product-block-category-row-no").val();
+    let product_block_category_id = datas.id ? datas.id : "new";
+    let sort = datas.sort ? datas.sort : "";
 
-    $('#tab-category table > tbody').append(`
+    $("#tab-category table > tbody").append(`
         <tr>
             <input type="hidden" name="product_block_category_id[${product_block_category_row_no}]" value="${product_block_category_id}">
             <td>
@@ -473,23 +580,27 @@ function addProductBlockCategory(product_category_select_options, datas = {}) {
         </tr>
     `);
 
-    $('.js-select2-product-block-category').select2({
+    $(".js-select2-product-block-category").select2({
         allowClear: true,
         theme: "bootstrap",
-        placeholder: '',
+        placeholder: "",
     });
 
-    $('#product-block-category-row-no').val(parseInt(product_block_category_row_no) + 1);
+    $("#product-block-category-row-no").val(
+        parseInt(product_block_category_row_no) + 1
+    );
 
     validateProductBlockCategory(product_block_category_row_no);
 }
 
 // 啟用版位主色
 function enableSlotColorCode() {
-    $('#slot_color_code').prop('disabled', false);
+    $("#slot_color_code").prop("disabled", false);
 
-    if ($('#slot_color_code').prev('label').find('span').length < 1) {
-        $('#slot_color_code').prev('label').append(' <span style="color:red;">*</span>');
+    if ($("#slot_color_code").prev("label").find("span").length < 1) {
+        $("#slot_color_code")
+            .prev("label")
+            .append(' <span style="color:red;">*</span>');
     }
 
     validateSlotColorCode();
@@ -497,10 +608,16 @@ function enableSlotColorCode() {
 
 // 啟用版位icon
 function enableSlotIconName() {
-    $('#slot_icon_name').prop('disabled', false);
+    $("#slot_icon_name").prop("disabled", false);
 
-    if ($('#slot_icon_name').closest('.form-group').find('label > span').length < 1) {
-        $('#slot_icon_name').closest('.form-group').find('label').append(' <span style="color:red;">*</span>');
+    if (
+        $("#slot_icon_name").closest(".form-group").find("label > span")
+            .length < 1
+    ) {
+        $("#slot_icon_name")
+            .closest(".form-group")
+            .find("label")
+            .append(' <span style="color:red;">*</span>');
     }
 
     validateSlotIconName();
@@ -508,10 +625,12 @@ function enableSlotIconName() {
 
 // 啟用版位標題
 function enableSlotTitle() {
-    $('#slot_title').prop('disabled', false);
+    $("#slot_title").prop("disabled", false);
 
-    if ($('#slot_title').prev('label').find('span').length < 1) {
-        $('#slot_title').prev('label').append(' <span style="color:red;">*</span>');
+    if ($("#slot_title").prev("label").find("span").length < 1) {
+        $("#slot_title")
+            .prev("label")
+            .append(' <span style="color:red;">*</span>');
     }
 
     validateSlotTitle();
@@ -519,24 +638,24 @@ function enableSlotTitle() {
 
 // 停用版位主色
 function disableSlotColorCode() {
-    $('#slot_color_code').prop('disabled', true);
-    $('#slot_color_code').prev('label').find('span').remove();
+    $("#slot_color_code").prop("disabled", true);
+    $("#slot_color_code").prev("label").find("span").remove();
 
     removeSlotColorCodeValidation();
 }
 
 // 停用版位icon
 function disableSlotIconName() {
-    $('#slot_icon_name').prop('disabled', true);
-    $('#slot_icon_name').prev('label').find('span').remove();
+    $("#slot_icon_name").prop("disabled", true);
+    $("#slot_icon_name").prev("label").find("span").remove();
 
     removeSlotIconNameValidation();
 }
 
 // 停用版位標題
 function disableSlotTitle() {
-    $('#slot_title').prop('disabled', true);
-    $('#slot_title').prev('label').find('span').remove();
+    $("#slot_title").prop("disabled", true);
+    $("#slot_title").prev("label").find("span").remove();
 
     removeSlotTitleValidation();
 }

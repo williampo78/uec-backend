@@ -46,6 +46,7 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
         }
 
+        $credentials['channel'] = "EC";
         $fields = json_encode($credentials);
         $response = $this->apiService->memberLogin($fields);
         $result = json_decode($response, true);
@@ -275,6 +276,7 @@ class AuthController extends Controller
             if ($result['status'] == '201') {
                 $login['mobile'] = $data['mobile'];
                 $login['password'] = $data['password'];
+                $login['channel'] = "EC";
                 $fields = json_encode($login);
                 $response = $this->apiService->memberLogin($fields);
                 $login_result = json_decode($response, true);
