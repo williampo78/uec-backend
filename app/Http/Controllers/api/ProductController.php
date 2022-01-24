@@ -176,4 +176,40 @@ class ProductController extends Controller
 
     }
 
+    /*
+     * 取得產品分類資料 - 麵包屑用
+     */
+    public function getBreadcrumbCategory(Request $request)
+    {
+        $error_code = $this->apiService->getErrorCode();
+
+        $messages = [
+            'category_id.required' => '分類編號不能為空',
+            'category_id.numeric' => '分類編號必須為數字'
+        ];
+
+
+        $v = Validator::make($request->all(), [
+            'category_id' => 'required|numeric'
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+
+        $keyword = ($request['category_id'] ? $request['category_id'] : '');
+        $result = $this->apiProductService->getBreadcrumbCategory($keyword);
+        if ($result == '404') {
+            $status = false;
+            $err = '404';
+            $list = [];
+        } else {
+            $status = true;
+            $err = '';
+            $list = $result;
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+
+    }
+
 }

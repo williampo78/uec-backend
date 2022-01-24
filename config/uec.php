@@ -15,7 +15,8 @@ return [
      *
      */
     'isTesting' => env('UEC_TEST', 'true'),
-    'mailPrefix' => "[ 電商測試 ]",
+    'mailPrefix' => env('MAIL_PREFIX', '[ 電商測試 ]'),
+    'mailFrom'=>env('MAIL_FROM_ADDRESS'),
 
     // 版位類型
     'ad_slot_type_option' => [
@@ -28,13 +29,13 @@ return [
     ],
 
     //  狀態
-    'active_option' => [
+    'active_options' => [
         1 => '啟用',
         0 => '關閉',
     ],
 
     //  狀態2
-    'active2_option' => [
+    'active2_options' => [
         1 => '生效',
         0 => '失效',
     ],

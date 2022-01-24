@@ -45,6 +45,9 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('/advanceSearchCategory', [ProductController::class, 'getProductSearchResultCategory']);
 
     Route::get('/stock', [StockController::class, 'getItemStock']);
+
+    //Breadcrumb for category
+    Route::post('/BreadcrumbCategory', [ProductController::class, 'getBreadcrumbCategory']);
 });
 
 // jwt驗證

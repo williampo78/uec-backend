@@ -829,4 +829,58 @@ class APIProductServices
         return $result;
     }
 
+    /*
+     * 麵包屑 - 分類
+     */
+    public function getBreadcrumbCategory($category = null)
+    {
+        //分類總覽階層
+        $config_levels = config('uec.web_category_hierarchy_levels');
+
+        //根據階層顯示層級資料
+        if ($config_levels == '3') {
+            $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
+                    inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
+                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
+                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
+                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
+                    where cate.`active`=1
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N'";
+            if ($category) {
+                $strSQL .= " and cate.`id`=".$category;
+            }
+            $strSQL .= " group by cate.`id`
+                    order by cate2.`sort`, cate1.`sort`, cate.`sort`";
+        } elseif ($config_levels == '2') {
+            $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
+                    inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
+                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
+                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
+                    where cate.`active`=1
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
+            if ($category) {
+                $strSQL .= " and cate.`id`=".$category;
+            }
+            $strSQL .= " group by cate.`id`
+                    order by cate1.`sort`, cate.`sort`";
+        }
+        $categorys = DB::select($strSQL);
+        $data = [];
+        foreach ($categorys as $category) {
+            $data['level1']["id"] = $category->L1ID;
+            $data['level1']["name"] = $category->L1_NAME;
+            if ($config_levels == '3') {
+                $data['level2']["id"] = $category->L2ID;
+                $data['level2']["name"] = $category->L2_NAME;
+                $data['level3']['id'] = $category->id;
+                $data['level3']['name'] = $category->category_name;
+
+            } else if ($config_levels == '2') {
+                $data['level2']['id'] = $category->id;
+                $data['level2']['name'] = $category->category_name;
+            }
+        }
+        return $data;
+
+    }
 }

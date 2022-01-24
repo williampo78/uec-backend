@@ -163,8 +163,8 @@
                                                 @endisset
                                             </td>
                                             <td>
-                                                @isset(config('uec.active_option')[$obj->active])
-                                                    {{ config('uec.active_option')[$obj->active] }}
+                                                @isset(config('uec.active_options')[$obj->active])
+                                                    {{ config('uec.active_options')[$obj->active] }}
                                                 @endisset
                                             </td>
                                             <td>{!! nl2br(e($obj->remark)) !!}</td>
