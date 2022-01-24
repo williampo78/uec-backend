@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Services\WebContentsService;
-use App\Services\UniversalService;
 use App\Models\WebContents;
+use App\Services\UniversalService;
+use App\Services\WebContentsService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 class QAController extends Controller
 {
     private $webContentsService;
 
-    public function __construct(WebContentsService $webContentsService, UniversalService $universalService)
-    {
+    public function __construct(
+        WebContentsService $webContentsService,
+        UniversalService $universalService
+    ) {
         $this->webContentsService = $webContentsService;
         $this->universalService = $universalService;
     }
@@ -28,7 +31,7 @@ class QAController extends Controller
         $data['footer'] = ($getData ? $this->webContentsService->getFooter($getData, 'QA') : []);
         $data['user'] = $this->universalService->getUser();
         $data['code'] = $this->universalService->getLookupValues('QA_CATEGORY');
-        $data['getData'] = $getData;
+
         return view('Backend.QA.list', compact('data'));
     }
 
@@ -68,7 +71,21 @@ class QAController extends Controller
      */
     public function show($id)
     {
-        //
+        $web_content = $this->webContentsService->getWebContents([
+            'id' => $id,
+            'type_code' => 'QA_CATEGORY',
+            'apply_to' => 'QA',
+        ])->first();
+
+        $payloads = [
+            'description' => $web_content->description,
+            'sort' => $web_content->sort,
+            'active' => config('uec.active_options')[$web_content->active] ?? null,
+            'content_name' => $web_content->content_name,
+            'content_text' => $web_content->content_text,
+        ];
+
+        return response()->json($payloads);
     }
 
     /**
@@ -94,7 +111,7 @@ class QAController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->input();
-        $input = $request->except('_token' , '_method');
+        $input = $request->except('_token', '_method');
         $act = 'upd';
         $route_name = 'qa';
         $input['id'] = $id;

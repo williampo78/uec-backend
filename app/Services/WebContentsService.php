@@ -1,15 +1,14 @@
 <?php
 
-
 namespace App\Services;
 
 use App\Models\Lookup_values_v;
 use App\Models\WebContents;
-
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class WebContentsService
 {
@@ -60,13 +59,13 @@ class WebContentsService
             $webData['active'] = $inputdata['active'];
             $webData['content_name'] = $inputdata['content_name'];
             $webData['sort'] = $inputdata['sort'];
-            $webData['content_target'] = isset($inputdata['content_target'])?$inputdata['content_target']:null;
-            $webData['content_url'] = isset($inputdata['content_url'])?$inputdata['content_url']:null;
+            $webData['content_target'] = isset($inputdata['content_target']) ? $inputdata['content_target'] : null;
+            $webData['content_url'] = isset($inputdata['content_url']) ? $inputdata['content_url'] : null;
             $webData['content_text'] = $inputdata['content_text'];
             if ($inputdata['apply_to'] == 'FOOTER') {
                 if ($webData['content_target'] == 'S') {
                     $webData['content_text'] = null;
-                } else if ($webData['content_target'] =='H') {
+                } else if ($webData['content_target'] == 'H') {
                     $webData['content_url'] = null;
                 } else {
                     $webData['content_url'] = null;
@@ -79,8 +78,8 @@ class WebContentsService
             $webData['updated_at'] = $now;
             if ($act == 'add') {
                 $new_id = WebContents::insertGetId($webData);
-            } else if ($act =='upd') {
-                WebContents::where('id' , $inputdata['id'])->update($webData);
+            } else if ($act == 'upd') {
+                WebContents::where('id', $inputdata['id'])->update($webData);
                 $new_id = $inputdata['id'];
             }
             DB::commit();
@@ -96,5 +95,44 @@ class WebContentsService
         }
 
         return $result;
+    }
+
+    /**
+     * 商城頁面內容設定
+     *
+     * @param array $datas
+     * @return Collection
+     */
+    public function getWebContents(array $datas = []): Collection
+    {
+        $agent_id = Auth::user()->agent_id;
+
+        $web_contents = WebContents::select(
+            'web_contents.*',
+            'lookup_values_v.description'
+        )
+            ->leftJoin('lookup_values_v', 'web_contents.parent_code', '=', 'lookup_values_v.code')
+            ->where('web_contents.agent_id', $agent_id)
+            ->where('lookup_values_v.agent_id', $agent_id);
+
+        if (isset($datas['id'])) {
+            $web_contents = $web_contents->where('web_contents.id', $datas['id']);
+        }
+
+        // 類別代碼
+        if (isset($datas['type_code'])) {
+            $web_contents = $web_contents->where('lookup_values_v.type_code', $datas['type_code']);
+        }
+
+        // 應用層面
+        if (isset($datas['apply_to'])) {
+            $web_contents = $web_contents->where('web_contents.apply_to', $datas['apply_to']);
+        }
+
+        $web_contents = $web_contents->orderBy('web_contents.parent_code', 'asc')
+            ->orderBy('web_contents.sort', 'asc')
+            ->get();
+
+        return $web_contents;
     }
 }
