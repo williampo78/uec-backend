@@ -83,12 +83,10 @@ jQuery.validator.addMethod(
 jQuery.validator.addMethod(
     "notRepeating",
     function (value, element, params) {
-        var prefix = params;
         var fund = $(element).data("va");
         var selector = jQuery.validator.format(
             "[name!='{0}'][data-va='" + fund + "']",
             element.name,
-            prefix
         );
         var matches = new Array();
         $(selector).each(function (index, item) {
