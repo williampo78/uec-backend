@@ -277,7 +277,7 @@
 
                         if (content.slot_icon_name_url) {
                             $('#modal-slot-icon-name').empty().append(
-                                `<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`
+                                `<img src="${content.slot_icon_name_url}" class="img-responsive" width="50" height="50" />`
                             );
                         } else {
                             $('#modal-slot-icon-name').empty().append(

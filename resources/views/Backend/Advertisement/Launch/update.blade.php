@@ -274,7 +274,7 @@
                 enableSlotTitle();
 
                 $('#slot_color_code').val(content.slot_color_code);
-                $(`<img src="${content.slot_icon_name_url}" class="img-responsive" width="400" height="400" />`)
+                $(`<img src="${content.slot_icon_name_url}" class="img-responsive" width="50" height="50" />`)
                     .insertBefore('#slot_icon_name');
                 $('#slot_title').val(content.slot_title);
             }

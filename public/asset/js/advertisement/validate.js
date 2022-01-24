@@ -3,6 +3,7 @@ function validateImageBlock(row_no) {
     $(`#image-block table > tbody [name="image_block_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
+        unique: ".unique_image_block_sort",
     });
 
     $(`#image-block table > tbody [name="image_block_image_name[${row_no}]"]`).rules("add", {
@@ -49,6 +50,7 @@ function validateTextBlock(row_no) {
     $(`#text-block table > tbody [name="text_block_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
+        unique: ".unique_text_block_sort",
     });
 
     $(`#text-block table > tbody [name="text_block_texts[${row_no}]"]`).rules("add", {
@@ -86,10 +88,12 @@ function validateProductBlockProduct(row_no) {
     $(`#tab-product table > tbody [name="product_block_product_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
+        unique: ".unique_product_block_product_sort",
     });
 
     $(`#tab-product table > tbody [name="product_block_product_product_id[${row_no}]"]`).rules("add", {
         required: true,
+        unique: ".unique_product_block_product_product_id",
     });
 }
 
@@ -98,10 +102,12 @@ function validateProductBlockCategory(row_no) {
     $(`#tab-category table > tbody [name="product_block_category_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
+        unique: ".unique_product_block_category_sort",
     });
 
     $(`#tab-category table > tbody [name="product_block_product_web_category_hierarchy_id[${row_no}]"]`).rules("add", {
         required: true,
+        unique: ".unique_product_block_product_web_category_hierarchy_id",
     });
 }
 
