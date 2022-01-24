@@ -54,7 +54,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <button id="btn-save" class="btn btn-success" type="submit"><i class="fa fa-check"></i> 完成</button>
+                                        <button id="btn-save" class="btn btn-success" type="submit"><i class="fa fa-check"></i> 儲存 </button>
                                         <a class="btn btn-danger" href=""><i class="fa fa-ban"></i> 取消</a>
                                     </div>
                                 </div>
