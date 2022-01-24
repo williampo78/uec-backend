@@ -118,6 +118,7 @@
                 @method('PUT')
                 <div id="page-1">
                     <input name="id" value="{{$products->id}}" style="display: none">
+                    <input type="hidden" id="edit_readonly" value="{{$products->edit_readonly}}">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
@@ -166,7 +167,7 @@
                                     <label class="control-label">供應商<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <select class="form-control supplier_id" name="supplier_id">
+                                    <select class="form-control supplier_id" name="supplier_id" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                         <option value=""></option>
                                         @foreach ($supplier as $val)
                                         <option value="{{ $val->id }}" {{ $products->supplier_id == $val->id ?
@@ -183,7 +184,7 @@
                                     <label class="control-label">商品名稱<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="product_name" value="{{ $products->product_name }}">
+                                    <input class="form-control" id="product_name" name="product_name" value="{{ $products->product_name }}">
                                 </div>
                             </div>
                         </div>
@@ -195,12 +196,12 @@
                                     <label class="control-label">課稅別<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <select class="form-control tax_type" name="tax_type">
-                                        <option value="TAXABLE" {{ $products->tax_type == 'TAXABLE' ? 'selected' : '' }}>
-                                            應稅(5%)</option>
-                                        <option value="NON_TAXABLE" {{ $products->tax_type == 'NON_TAXABLE' ? 'selected' :
-                                            '' }}>免稅</option>
-                                    </select>
+                                    @if($products->tax_type == 'TAXABLE')
+                                    <input class="form-control" value="應稅(5%)">
+                                    @elseif($products->tax_type == 'NON_TAXABLE')
+                                    <input class="form-control" value="免稅">
+                                    @endif
+                                    <input type="hidden" class="form-control" id="tax_type" name="tax_type" value="{{ $products->tax_type }}">
                                 </div>
                             </div>
                         </div>
@@ -210,7 +211,7 @@
                                     <label class="control-label">POS分類<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <select class="form-control category_id" name="category_id">
+                                    <select class="form-control category_id" name="category_id" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                         <option value=""></option>
                                         @foreach ($pos as $key => $val)
                                         <option value="{{ $val->id }}" {{ $products->category_id == $val->id ? 'selected' :
@@ -229,7 +230,7 @@
                                     <label class="control-label">品牌<span class="redtext">*</span></label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <select class="form-control brand_id" name="brand_id" id="brand_id">
+                                    <select class="form-control brand_id" name="brand_id" id="brand_id" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                         <option value=""></option>
                                         @foreach ($brands as $val)
                                         <option value="{{ $val->id }}" {{ $products->brand_id == $val->id ? 'selected' : ''
@@ -582,7 +583,7 @@
                                     <label class="control-label">商品簡述</label>
                                 </div>
                                 <div class="col-sm-10">
-                                    <input class="form-control" name="product_brief_1"
+                                    <input class="form-control product_brief" name="product_brief_1"
                                         value="{{ $products->product_brief_1 }}">
                                 </div>
                             </div>
@@ -594,7 +595,7 @@
                                 <div class="col-sm-1 ">
                                 </div>
                                 <div class="col-sm-10">
-                                    <input class="form-control" name="product_brief_2"
+                                    <input class="form-control product_brief" name="product_brief_2"
                                         value="{{ $products->product_brief_2 }}">
                                 </div>
                             </div>
@@ -606,7 +607,7 @@
                                 <div class="col-sm-1 ">
                                 </div>
                                 <div class="col-sm-10">
-                                    <input class="form-control" name="product_brief_3"
+                                    <input class="form-control product_brief" name="product_brief_3"
                                         value="{{ $products->product_brief_3 }}">
                                 </div>
                             </div>
@@ -676,7 +677,7 @@
                                     </div>
                                     <div class="col-sm-10">
                                         <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                        <input type="file" @change="fileSelected" multiple>
+                                        <input type="file" @change="fileSelected" multiple {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                         <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                             multiple>
                                     </div>
@@ -702,7 +703,7 @@
                                         <p>
                                             排序: @{{ key + 1 }}
                                             <button class="btn btn-danger pull-right btn-events-none" type="button"
-                                                @click="delImages(key)" style="pointer-events: auto;">
+                                                @click="delImages(key)" style="pointer-events: auto;" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </p>
@@ -783,7 +784,7 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        <button class="btn btn-primary btn-sm" type="button"
+                                        <button class="btn btn-primary btn-sm" type="button" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}
                                             @click="AddSpecToSkuList('1')">新增項目
                                         </button>
                                     </th>
@@ -830,7 +831,7 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        <button class="btn btn-primary btn-sm" type="button"
+                                        <button class="btn btn-primary btn-sm" type="button" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}
                                             @click="AddSpecToSkuList('2')">新增項目
                                         </button>
                                     </th>
@@ -881,7 +882,7 @@
                         </div>
                         <div class="cola-sm-2">
                             <button class="btn btn-primary btn-sm" type="button"
-                                @click="change_safty_qty_all">套用</button>
+                                @click="change_safty_qty_all" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>套用</button>
                         </div>
                     </div>
                 </div>
@@ -922,13 +923,13 @@
                                 </div>
                             </td>
                             <td>
-                                <select class="form-control js-select2" v-model="Sku.is_additional_purchase">
+                                <select class="form-control js-select2" v-model="Sku.is_additional_purchase" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                     <option value="1">是</option>
                                     <option value="0">否</option>
                                 </select>
                             </td>
                             <td>
-                                <select class="form-control js-select2" v-model="Sku.status">
+                                <select class="form-control js-select2" v-model="Sku.status" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                     <option value="1">啟用</option>
                                     <option value="0">停用</option>
                                 </select>
@@ -1202,7 +1203,6 @@
                     let metadata = {
                         type: 'image/jpeg',
                     };
-                    console.log(this.old_imges[i]) ; 
                     var filename = this.old_imges[i].photo_name.split('/');
                     let file = new File([data], filename[2], metadata);
                     file.src = data;
@@ -1245,7 +1245,6 @@
         delImages(index) {
             var yes = confirm('你確定要刪除嗎？');
             if (yes) {
-                console.log(this.images); 
                 if(this.images[index].id){
                     axios.post('/backend/del_photos', {
                         id: this.images[index].id,
@@ -1367,6 +1366,7 @@
         }
     }
     $(document).ready(function () {
+ 
         $('input[type=radio][name=stock_type]').change(function() {
                 if($(this).val() == 'T'){
                     $('.stock_type_list').hide();
@@ -1377,7 +1377,7 @@
         $(".supplier_id").select2({
             allowClear: true,
             theme: "bootstrap",
-            placeholder: "請選擇"
+            placeholder: "請選擇",
         });
         $(".tax_type").select2({
             allowClear: true,
@@ -1392,8 +1392,20 @@
         $(".category_id").select2({
             allowClear: true,
             theme: "bootstrap",
-            placeholder: "請選擇"
+            placeholder: "請選擇",
         });
+        if($('#edit_readonly').val() === '1'){
+            $("#new-form :input").attr("readonly", true);
+            $("#product_name").attr("readonly",false);
+            $(".product_brief").attr("readonly",false);
+            // $("select").select2("readonly", true);
+
+            // $(".supplier_id").select2("readonly", true);
+            // $(".tax_type").select2("readonly", true);
+            // $(".brand_id").select2("readonly", true);
+            // $(".category_id").select2("readonly", true);
+            console.log('readonly all');
+        }
         $(document).on("click", "#save_data", function() {
                 $(".safty_qty_va").each(function(){
                     $(this).rules("add", {

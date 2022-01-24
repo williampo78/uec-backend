@@ -297,11 +297,11 @@ class ProductsService
         try {
             $update = [
                 'stock_type' => $in['stock_type'],
-                'supplier_id' => $in['supplier_id'],
+                // 'supplier_id' => $in['supplier_id'],
                 'product_name' => $in['product_name'],
                 'tax_type' => $in['tax_type'],
-                'category_id' => $in['category_id'],
-                'brand_id' => $in['brand_id'],
+                // 'category_id' => $in['category_id'],
+                // 'brand_id' => $in['brand_id'],
                 'model' => $in['model'],
                 'lgst_method' => $in['lgst_method'],
                 'lgst_temperature' => $in['lgst_temperature'],
@@ -333,6 +333,16 @@ class ProductsService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ];
+            if(isset($in['supplier_id']) && $in['supplier_id'] !== ''){
+                $update['supplier_id'] = $in['supplier_id'] ; 
+            }
+            if(isset($in['category_id']) && $in['category_id'] !== ''){
+                $update['category_id'] = $in['category_id'] ; 
+            }
+            if(isset($in['brand_id']) && $in['brand_id'] !== ''){
+                $update['brand_id'] = $in['brand_id'] ; 
+            }
+
             Products::where('id', $products_id)->update($update);
             $logCreateIn = [
                 'product_id' => $products_id,
