@@ -1,5 +1,5 @@
 @extends('Backend.master')
-@section('title', '新增子分類管理')
+@section('title', '新增中分類管理')
 @section('content')
     <!--新增-->
     <div id="page-wrapper">
@@ -7,7 +7,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增分類</h1>
+                <h1 class="page-header"><i class="fa fa-plus"></i> 新增中分類</h1>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group" id="div_category">
-                                                <label for="category">主分類 <span style="color:red;">*</span></label>
+                                                <label for="category">大分類 <span style="color:red;">*</span></label>
                                                 <select class="form-control js-select2" name="primary_category_id">
                                                     <option value=""></option>
                                                     @foreach($primary_category as $k => $v)
