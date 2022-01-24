@@ -406,7 +406,7 @@
                         req();
                     });
                 },
-                //計算福點數
+                //計算小數
                 NumberAdd(arg1, arg2) {
                     var r1, r2, m, n;
                     try {
@@ -543,13 +543,7 @@
                                     obj.subtotal_tax_price = 0; //(本幣)稅額
                                     obj.original_subtotal_tax_price = 0 //原幣稅額
                                     break;
-                                    // case '1': // 應稅
-                                    //     obj.subtotal_tax_price = (obj.subtotal_price * 0.05).toFixed(2);; //(本幣)稅額
-                                    //     obj.original_subtotal_tax_price = (obj.original_subtotal_price * 0.05).toFixed(2); //原幣稅額
-                                    //     break;
                                 case '2': //應稅內含
-                                    // ◆   本幣稅額 subtotal_tax_price  = subtotal_price - (subtotal_price/1.05)  四捨五入到整數位
-                                    // ◆   原幣稅額 original_subtotal_tax_price = original_subtotal_price - (original_subtotal_price/1.05)  四捨五入到小數後2位
                                     obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(0); //(本幣)稅額
                                     obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
                                     break;
