@@ -365,7 +365,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <button class="btn btn-success" type="button" @click="submitBtn"
-                                                    id="btn-save"><i class="fa fa-check"></i> 完成</button>
+                                                    id="btn-save"><i class="fa fa-check"></i> 儲存</button>
                                                 <a href="{{ route('supplier') }}" class="btn btn-danger"
                                                     id="btn-cancel"><i class="fa fa-ban"></i> 取消</a>
                                             </div>

@@ -61,6 +61,7 @@
                                                 <a class="btn btn-info btn-sm"
                                                     href="{{ route('supplier') }}/{{ $obj->id }}/edit" value="1">
                                                     <i class="fa fa-pencil"></i>
+                                                    編輯
                                                 </a>
                                                 @endif
                                             </td>
