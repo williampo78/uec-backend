@@ -191,8 +191,8 @@
                                                 <td>{{ $obj->campaign_name ?? '' }}</td>
                                                 <td>{{ $obj->description ?? '' }}</td>
                                                 <td>
-                                                    @isset(config('uec.active2_option')[$obj->active])
-                                                        {{ config('uec.active2_option')[$obj->active] }}
+                                                    @isset(config('uec.active2_options')[$obj->active])
+                                                        {{ config('uec.active2_options')[$obj->active] }}
                                                     @endisset
                                                 </td>
                                                 <td>

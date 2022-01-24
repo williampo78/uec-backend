@@ -139,7 +139,9 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/user_profile', [UserController::class, 'updateProfile']);
     Route::post('/users/ajax', [UserController::class, 'ajaxDetail']);
 
+    // 常見問題Q&A
     Route::resource('/qa', QAController::class, ['names' => ['index' => 'qa']]);
+
     Route::resource('/web_category_hierarchy', WebCategoryHierarchyController::class, ['names' => ['index' => 'web_category_hierarchy']]);
     Route::post('/web_category_hierarchy/ajax', [WebCategoryHierarchyController::class, 'ajax']);
     Route::resource('/web_category_products', WebCategoryProductsController::class, ['names' => ['index' => 'web_category_products']]);

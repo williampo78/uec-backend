@@ -19,7 +19,7 @@
 
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
+                        <form id="search-form" method="GET" action="">
                             <div class="row">
                                 <div class="col-sm-1 text-right">
                                     <h5>類別</h5>
@@ -29,7 +29,7 @@
                                         <option value="">請選擇</option>
                                         @foreach ($data['category'] as $cate)
                                             <option value="{{ $cate['code'] }}"
-                                                {{ isset($data['getData']['code']) && $data['getData']['code'] == $cate['code'] ? 'selected' : '' }}>
+                                                {{ $cate['code'] == request()->input('code') ? 'selected' : '' }}>
                                                 {{ $cate['description'] }}</option>
                                         @endforeach
                                     </select>
@@ -39,25 +39,24 @@
                                 </div>
                                 <div class="col-sm-3"><input class="form-control" name="content_name"
                                         id="content_name" placeholder="模糊查詢"
-                                        value="{{ $data['getData']['content_name'] ?? '' }}"></div>
+                                        value="{{ request()->input('content_name') }}"></div>
                                 <div class="col-sm-1 text-right">
                                     <h5>狀態</h5>
                                 </div>
                                 <div class="col-sm-2">
                                     <select class="form-control js-select2-active" name="active" id="active">
-                                        <option value="1"
-                                            {{ isset($data['getData']['active']) && $data['getData']['active'] == '1' ? 'selected' : '' }}>
+                                        <option value=''></option>
+                                        <option value="1" {{ '1' == request()->input('active') ? 'selected' : '' }}>
                                             啟用
                                         </option>
-                                        <option value="0"
-                                            {{ isset($data['getData']['active']) && $data['getData']['active'] == '0' ? 'selected' : '' }}>
+                                        <option value="0" {{ '0' == request()->input('active') ? 'selected' : '' }}>
                                             關閉
                                         </option>
                                     </select>
                                 </div>
                                 @if ($share_role_auth['auth_query'])
                                     <div class="col-sm-1 text-right">
-                                        <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
                                     </div>
                                 @endif
                             </div>
@@ -78,22 +77,29 @@
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">功能</th>
-                                    <th class="col-sm-1">類別</th>
-                                    <th class="col-sm-1">排序</th>
-                                    <th class="col-sm-5">問題描述</th>
-                                    <th class="col-sm-1">狀態</th>
-                                    <th class="col-sm-2">最後異動時間</th>
-                                    <th class="col-sm-1">最後異動者</th>
+                                    <th class="text-nowrap">功能</th>
+                                    <th class="text-nowrap">類別</th>
+                                    <th class="text-nowrap">排序</th>
+                                    <th class="text-nowrap">問題描述</th>
+                                    <th class="text-nowrap">狀態</th>
+                                    <th class="text-nowrap">最後異動時間</th>
+                                    <th class="text-nowrap">最後異動者</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($data['footer'] as $item)
                                     <tr>
                                         <td>
+                                            @if ($share_role_auth['auth_query'])
+                                                <button type="button" class="btn btn-info btn-sm qa_detail"
+                                                    data-web-content-id="{{ $item->id }}" title="檢視">
+                                                    <i class="fa fa-search"></i>
+                                                </button>
+                                            @endif
+
                                             @if ($share_role_auth['auth_update'])
                                                 <a class="btn btn-info btn-sm"
-                                                    href="{{ route('qa.edit', $item->id) }}">修改</a>
+                                                    href="{{ route('qa.edit', $item->id) }}">編輯</a>
                                             @endif
                                         </td>
                                         <td>{{ $data['code'][$item->parent_code] }}</td>
@@ -108,11 +114,11 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
+    @include('Backend.QA.detail')
 @endsection
 
 @section('js')
@@ -124,7 +130,29 @@
         });
 
         $('.js-select2-active').select2({
+            allowClear: true,
             theme: "bootstrap",
+            placeholder: '',
+        });
+
+        $('#table_list tbody').on('click', '.qa_detail', function() {
+            let web_content_id = $(this).attr("data-web-content-id");
+
+            axios.get(`/backend/qa/${web_content_id}`)
+                .then(function(response) {
+                    let web_content = response.data;
+
+                    $('#modal-description').empty().append(`${web_content.description}`);
+                    $('#modal-sort').empty().append(`${web_content.sort}`);
+                    $('#modal-active').empty().append(`${web_content.active}`);
+                    $('#modal-content-name').empty().append(`${web_content.content_name}`);
+                    $('#modal-content-text').empty().append(`${web_content.content_text}`);
+
+                    $('#qa_detail').modal('show');
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
         });
     </script>
 @endsection

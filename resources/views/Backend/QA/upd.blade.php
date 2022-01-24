@@ -24,7 +24,7 @@
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="parent_code">類別 <span class="text-danger">*</span></label>
+                                                <label for="parent_code">類別 <span style="color: red;">*</span></label>
                                                 <select name="parent_code" id="parent_code" class="js-select2">
                                                     <option value=""></option>
                                                     @foreach ($data['category'] as $cate)
@@ -37,14 +37,14 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_sort">
-                                                <label for="password">排序 <span class="text-danger">*</span></label>
+                                                <label for="sort">排序 <span style="color: red;">*</span></label>
                                                 <input class="form-control" type="number" name="sort" id="sort"
                                                     value="{{ $data['webcontent']['sort'] }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="name">狀態 <span class="text-danger">*</span></label>
+                                                <label>狀態 <span style="color: red;">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
@@ -67,7 +67,7 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label for="content_name">問題描述 <span class="text-danger">*</span></label>
+                                                <label for="content_name">問題描述 <span style="color: red;">*</span></label>
                                                 <input class="form-control" name="content_name" id="content_name"
                                                     value="{{ $data['webcontent']['content_name'] }}">
                                             </div>
@@ -76,21 +76,21 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label for="content_name">問題解答 <span class="text-danger">*</span></label>
+                                                <label for="editor">問題解答 <span style="color: red;">*</span></label>
                                                 <textarea id="editor" name="content_text"
                                                     placeholder="請在這裡填寫內容">{{ $data['webcontent']['content_text'] }}</textarea>
 
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
+
                             <div class="row">
-                                <div class="col-xs-12 text-center">
+                                <div class="col-sm-12">
                                     <div class="form-group">
-                                        <button class="btn btn-success" id="btn-save" type="button"><i
-                                                class="fa fa-check"></i> 完成
+                                        <button type="button" class="btn btn-success" id="btn-save"><i
+                                                class="fa fa-save"></i> 儲存
                                         </button>
                                         <button type="button" class="btn btn-danger" id="btn-cancel"><i
                                                 class="fa fa-ban"></i> 取消
@@ -171,6 +171,7 @@
                     sort: {
                         required: true,
                         digits: true,
+                        min: 1,
                     },
                     active: {
                         required: true,
@@ -180,6 +181,12 @@
                     },
                     content_text: {
                         required: true,
+                    },
+                },
+                messages: {
+                    sort: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
                     },
                 },
                 errorClass: "help-block",
