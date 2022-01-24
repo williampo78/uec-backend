@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Services\BrandsService;
-use App\Services\ProductAttributeLovService;
-use App\Services\ProductAttributesService;
 use App\Services\ProductsService;
 use App\Services\SupplierService;
+use App\Services\ProductAttributesService;
+use App\Services\ProductAttributeLovService;
 use App\Services\WebCategoryHierarchyService;
-use Illuminate\Http\Request;
 
 class ProductsMallController extends Controller
 {
@@ -103,7 +104,31 @@ class ProductsMallController extends Controller
     public function edit($id)
     {
         $result = [];
-        $result['products'] = $this->productsService->showProducts($id);
+        $products = $this->productsService->showProducts($id) ;
+        $products->launched_status = '' ; 
+        $products->launched_at = ($products->start_launched_at || $products->end_launched_at) ? "{$products->start_launched_at} ~ {$products->end_launched_at}" : '';
+        switch ($products->approval_status) {
+            case 'NA':
+                $products->edit_readonly = '0' ; 
+                break;
+
+            case 'REVIEWING':
+                $products->edit_readonly = '1' ; 
+                break;
+
+            case 'REJECTED':
+                $products->edit_readonly = '0' ; 
+                break;
+
+            case 'CANCELLED':
+                $products->edit_readonly = '0' ; 
+                break;
+            case 'APPROVED':
+                $products->edit_readonly = Carbon::now()->between($products->start_launched_at, $products->end_launched_at) ? '1' : '0';
+                break;
+        }
+        $result['products'] = $products ;
+
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌

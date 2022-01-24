@@ -148,7 +148,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                data-toggle="modal" data-target="#model_category">新增分類</button>
+                                                data-toggle="modal" data-target="#model_category" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>新增分類</button>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
@@ -172,7 +172,7 @@
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
                                                             @click="Del(Category,CategoryKey,'Category')"
-                                                            v-show="RoleAuthJson.auth_delete">刪除</button>
+                                                            v-show="RoleAuthJson.auth_delete" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>刪除</button>
                                                     </td>
                                                 </tr>
 
@@ -207,7 +207,7 @@
                                         <div class="col-sm-10">
                                             {{-- related_products table --}}
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                data-toggle="modal" data-target="#model_related_products">新增商品</button>
+                                                data-toggle="modal" data-target="#model_related_products" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>新增商品</button>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
@@ -228,7 +228,7 @@
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
-                                                            @click="Del(Product ,key ,'Products')">刪除</button>
+                                                            @click="Del(Product ,key ,'Products')" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>刪除</button>
                                                     </td>
                                                 </tr>
 
@@ -251,7 +251,9 @@
                                                 <label class="radio-inline">
                                                     <input class="product_attributes" type="checkbox"
                                                         name="product_attributes[]" value="{{ $obj->id }}"
-                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}
+                                                        {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}
+                                                        >
                                                     {{ $obj->description }}
                                                 </label>
                                             </div>
@@ -282,6 +284,7 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <input class="form-control" name="order_limited_qty"
+                                            {{$products->edit_readonly == '1' ? 'readonly' : '' ; }}
                                                 value="{{ $products->order_limited_qty }}">
                                         </div>
                                     </div>
@@ -374,7 +377,7 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <input type="file" name="google_shop_photo_name" accept="image/*"
-                                                @change="google_shop">
+                                                @change="google_shop" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
                                             <input type="hidden" name="google_shop_photo_name_old"
                                                 value="{{ $products->google_shop_photo_name }}">
                                         </div>
@@ -424,10 +427,10 @@
                                                             <button type="button" data-toggle="modal"
                                                                 data-target="#item_photo_list"
                                                                 class="btn btn-large btn-warning btn-sm"
-                                                                @click="frombtn(Item,key)">選擇圖片</button>
+                                                                @click="frombtn(Item,key)" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>選擇圖片</button>
                                                             <button type="button" v-if="Item.photo_name"
                                                                 class="btn btn-large btn-danger btn-sm"
-                                                                @click="DelItemPhotos(Item,key)">刪除</button>
+                                                                @click="DelItemPhotos(Item,key)" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>刪除</button>
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -537,7 +540,6 @@
             });
             $('.product_attributes').on('change', function() { // on change of state
                 $('.product_attributes_change').val('true');
-                // console.log('product_attributes on change');
             })
 
             var ck_description;

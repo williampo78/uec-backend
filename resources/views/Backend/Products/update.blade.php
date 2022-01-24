@@ -1398,13 +1398,6 @@
             $("#new-form :input").attr("readonly", true);
             $("#product_name").attr("readonly",false);
             $(".product_brief").attr("readonly",false);
-            // $("select").select2("readonly", true);
-
-            // $(".supplier_id").select2("readonly", true);
-            // $(".tax_type").select2("readonly", true);
-            // $(".brand_id").select2("readonly", true);
-            // $(".category_id").select2("readonly", true);
-            console.log('readonly all');
         }
         $(document).on("click", "#save_data", function() {
                 $(".safty_qty_va").each(function(){
