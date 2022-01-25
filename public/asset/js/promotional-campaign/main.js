@@ -183,7 +183,7 @@ function renderPrdProductList(products) {
                 <td>${launched_status}</td>
                 <td>${gross_margin}</td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-delete-prd"><i class='fa fa-ban'></i> 刪除</button>
+                    <button type="button" class="btn btn-danger btn-delete-prd"><i class='fa fa-trash-o'></i> 刪除</button>
                 </td>
             </tr>
         `);
@@ -268,7 +268,7 @@ function renderGiftProductList(products) {
                     </div>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-delete-gift"><i class='fa fa-ban'></i> 刪除</button>
+                    <button type="button" class="btn btn-danger btn-delete-gift"><i class='fa fa-trash-o'></i> 刪除</button>
                 </td>
             </tr>
         `);

@@ -404,7 +404,7 @@ function addImageBlock(product_category_select_options = "", datas = {}) {
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-image"><i class='fa fa-ban'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-image"><i class='fa fa-trash-o'></i> 刪除</button>
             </td>
         </tr>
     `);
@@ -493,7 +493,7 @@ function addTextBlock(product_category_select_options, datas = {}) {
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-text"><i class='fa fa-ban'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-text"><i class='fa fa-trash-o'></i> 刪除</button>
             </td>
         </tr>
     `);
@@ -533,7 +533,7 @@ function addProductBlockProduct(product_select_options, datas = {}) {
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-product-product"><i class='fa fa-ban'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-product-product"><i class='fa fa-trash-o'></i> 刪除</button>
             </td>
         </tr>
     `);
@@ -575,7 +575,7 @@ function addProductBlockCategory(product_category_select_options, datas = {}) {
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-product-category"><i class='fa fa-ban'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-product-category"><i class='fa fa-trash-o'></i> 刪除</button>
             </td>
         </tr>
     `);
