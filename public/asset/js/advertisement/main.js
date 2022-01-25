@@ -638,24 +638,21 @@ function enableSlotTitle() {
 
 // 停用版位主色
 function disableSlotColorCode() {
-    $("#slot_color_code").prop("disabled", true);
-    $("#slot_color_code").prev("label").find("span").remove();
+    $("#slot_color_code").prop("disabled", true).val('').prev("label").find("span").remove();
 
     removeSlotColorCodeValidation();
 }
 
 // 停用版位icon
 function disableSlotIconName() {
-    $("#slot_icon_name").prop("disabled", true);
-    $("#slot_icon_name").prev("label").find("span").remove();
+    $("#slot_icon_name").prop("disabled", true).val('').prev("label").find("span").remove();
 
     removeSlotIconNameValidation();
 }
 
 // 停用版位標題
 function disableSlotTitle() {
-    $("#slot_title").prop("disabled", true);
-    $("#slot_title").prev("label").find("span").remove();
+    $("#slot_title").prop("disabled", true).val('').prev("label").find("span").remove();
 
     removeSlotTitleValidation();
 }

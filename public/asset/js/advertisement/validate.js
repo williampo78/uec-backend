@@ -13,6 +13,7 @@ function validateImageBlock(row_no) {
             }
         },
         accept: "image/*",
+        filesize: [2, 'MB'],
         messages: {
             required: '請上傳圖片',
             accept: '請上傳圖片',
@@ -127,6 +128,7 @@ function validateSlotIconName() {
             }
         },
         accept: "image/*",
+        filesize: [2, 'MB'],
         messages: {
             required: '請上傳圖片',
             accept: '請上傳圖片',
