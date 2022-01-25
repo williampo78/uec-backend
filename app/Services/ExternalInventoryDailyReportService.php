@@ -85,6 +85,12 @@ class ExternalInventoryDailyReportService
             (case when p.tax_type = 'TABLEABLE' then round(p.selling_price/1.05, 2) else selling_price end) as selling_price,
             get_latest_product_cost(p.id, false) as item_cost";
 
+        $sub_query = DB::table('choice_inventory')
+            ->selectRaw('product_item_id, sum(qty) as goods_qty')
+            ->where('counting_date', $request['counting_date'])
+            ->where('section_key', 'N')
+            ->groupBy('product_item_id');
+
         $builder = DB::query()
             ->selectRaw($select1)
             ->fromSub(function ($query) use ($select2, $request) {
@@ -97,11 +103,7 @@ class ExternalInventoryDailyReportService
 
                 return $this->handleBuilder($builder, $request);
             }, 'i')
-            ->joinSub("select product_item_id, sum(qty) as goods_qty
-			    from choice_inventory ci
-			    where counting_date = '2021-12-24'
-			    and section_key = 'N'
-			    group by product_item_id", 'goods_summary', 'goods_summary.product_item_id', '=', 'i.product_item_id', 'left');
+            ->leftJoinSub($sub_query, 'goods_summary', 'goods_summary.product_item_id', '=', 'i.product_item_id');
 
 
         //庫存狀態
