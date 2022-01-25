@@ -125,9 +125,10 @@
                                 </div>
                                 {{-- row 2 end --}}
                             </div>
+                        </form>
+
                     </div>
 
-                    </form>
                 </div>
 
                 <!-- Table list -->
@@ -265,12 +266,15 @@
                                 }
                             }
                         },
+                        dateGreaterEqualThan: function () {
+                            return $('#trade_date_start').val();
+                        },
                     },
 
                 },
                 messages: {
                     end_launched_at: {
-                        greaterThan: "結束時間必須大於開始時間",
+                        dateGreaterEqualThan: "結束時間必須大於等於開始時間",
                     },
                 },
                 errorClass: "help-block",

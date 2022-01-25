@@ -53,6 +53,40 @@ jQuery.validator.addMethod(
     "不可輸入重複的內容"
 );
 
+jQuery.validator.addMethod(
+    "filesize",
+    function (value, element, param) {
+        let filesize = 0;
+
+        if (element.files[0]) {
+            filesize = element.files[0].size;
+
+            switch (param[1]) {
+                case "KB":
+                    filesize = filesize / 1024;
+                    break;
+
+                case "MB":
+                    filesize = filesize / 1024 / 1024;
+                    break;
+
+                case "GB":
+                    filesize = filesize / 1024 / 1024 / 1024;
+                    break;
+            }
+        }
+
+        return this.optional(element) || filesize <= param[0];
+    },
+    function (params, element) {
+        if (params[1]) {
+            return `檔案大小不可超過${params[0]}${params[1]}`;
+        }
+
+        return `檔案大小不可超過${params[0]}Bytes`;
+    }
+);
+
 /**
  *  let obj  = {
         startTime :$('#trade_date_start').val(),
@@ -72,12 +106,27 @@ jQuery.validator.addMethod(
         let nowTime = new Date();
         let RangeTime = new Date();
         let setTime = RangeTime - nowTime;
-        return startEndRange > setTime;
+        console.log(startEndRange , setTime)
+        return startEndRange >= setTime;
     },
     function (params, element) {
         console.log(element);
         return `起訖最多不可超過 ${params.monthNum} 個月`;
     }
+);
+// 比較大於等於時間
+jQuery.validator.addMethod(
+    "dateGreaterEqualThan",
+    function (value, element, params) {
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) >= new Date(params);
+        }
+
+        return (
+            (isNaN(value) && isNaN(params)) || Number(value) > Number(params)
+        );
+    },
+    "必須大於 {0}"
 );
 
 jQuery.validator.addMethod(
@@ -86,7 +135,7 @@ jQuery.validator.addMethod(
         var fund = $(element).data("va");
         var selector = jQuery.validator.format(
             "[name!='{0}'][data-va='" + fund + "']",
-            element.name,
+            element.name
         );
         var matches = new Array();
         $(selector).each(function (index, item) {
