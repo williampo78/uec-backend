@@ -53,6 +53,7 @@ class AuthController extends Controller
         $error_code = $this->apiService->getErrorCode();
         unset($credentials['mobile']);
         unset($credentials['password']);
+        unset($credentials['channel']);
         try {
             if ($result['status'] == '200') {
                 $status = true;
