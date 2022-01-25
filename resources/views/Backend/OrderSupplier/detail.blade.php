@@ -101,6 +101,7 @@
                                         <th>單位</th>
                                         <th>小計</th>
                                         <th>贈品</th>
+                                        <th>採購量</th>
                                         <th>最小採購量</th>
                                         <th>進貨量</th>
                                     </tr>
@@ -120,6 +121,7 @@
                                                 否
                                             </div>
                                         </td>
+                                        <td>@{{detail.item_qty}}</td>
                                         <td>@{{detail.min_purchase_qty}}</td>
                                         <td>@{{detail.purchase_qty}}</td>
                                     </tr>

@@ -229,7 +229,6 @@
             },
             methods: {
                 showBtn(id) {
-                    console.log(id) ;
                     var vm = this;
                     axios.post('/backend/order_supplier/ajax', {
                             "type": "show_supplier",
@@ -239,6 +238,7 @@
                         .then(function(response) {
                             vm.show_supplier = response.data.orderSupplier ; 
                             vm.show_detail = response.data.orderSupplierDetail ;
+                            console.log(response.data.orderSupplierDetail) ; 
                             $('.toggle-show-model').click();
                         })
                         .catch(function(error) {
