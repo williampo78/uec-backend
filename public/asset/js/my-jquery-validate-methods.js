@@ -72,12 +72,27 @@ jQuery.validator.addMethod(
         let nowTime = new Date();
         let RangeTime = new Date();
         let setTime = RangeTime - nowTime;
-        return startEndRange > setTime;
+        console.log(startEndRange , setTime)
+        return startEndRange >= setTime;
     },
     function (params, element) {
         console.log(element);
         return `起訖最多不可超過 ${params.monthNum} 個月`;
     }
+);
+// 比較大於等於時間
+jQuery.validator.addMethod(
+    "dateGreaterEqualThan",
+    function (value, element, params) {
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) >= new Date(params);
+        }
+
+        return (
+            (isNaN(value) && isNaN(params)) || Number(value) > Number(params)
+        );
+    },
+    "必須大於 {0}"
 );
 
 jQuery.validator.addMethod(
