@@ -125,9 +125,10 @@
                                 </div>
                                 {{-- row 2 end --}}
                             </div>
+                        </form>
+
                     </div>
 
-                    </form>
                 </div>
 
                 <!-- Table list -->
