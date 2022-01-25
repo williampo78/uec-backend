@@ -210,10 +210,11 @@ class ProductsController extends Controller
             "tertiary_categories_name" => "POS小分類",
             "brand_name" => "品牌",
             "model" => "商品型號",
+            "selling_channel_cn" => "商品通路",//商品通路
             "lgst_temperature_cn" => "溫層",
             "lgst_method_cn" => "配送方式",
             "delivery_type_cn" => "商品交期",
-            "has_expiry_date" => "效期控管",
+            "has_expiry_date_cn" => "效期控管",
             "expiry_days" => "效期天數",
             "product_type_cn" => "商品類型",
             "is_discontinued_cn" => "停售",
@@ -229,9 +230,10 @@ class ProductsController extends Controller
             "is_with_warranty_cn" => "是否保固",
             "warranty_days" => "保固期限(天)",
             "warranty_scope" => "保固範圍",
-            "web_category_products_id" => "前台分類", //需要對多拿單欄位逗號分隔
+            "web_category_products_category_name" => "前台分類", //需要對多拿單欄位逗號分隔
             "keywords" => "關聯關鍵字",
-            "related_product_id" => "關聯性商品", //需要對多拿單欄位逗號分隔
+            "related_product_name" => "關聯性商品", //需要對多拿單欄位逗號分隔
+            "order_limited_qty" => "每單限購數量",//每單限購數量
             "promotion_desc" => "促銷小標",
             "promotion_start_at" => "促銷小標生效時間起",
             "promotion_end_at" => "促銷小標生效時間訖",
@@ -239,8 +241,8 @@ class ProductsController extends Controller
             "end_launched_at" => "上架時間訖",
             "launched_status" => "上架狀態",
             "spec_dimension_cn" => "規格類型",
-            "spec_1" => "規格一",
-            "spec_2" => "規格二",
+            "spec_1_value" => "規格一",
+            "spec_2_value" => "規格二",
             "item_no" => "Item編號",
             "supplier_item_no" => "廠商貨號",
             "ean" => "國際條碼",

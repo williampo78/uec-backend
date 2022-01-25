@@ -333,14 +333,14 @@ class ProductsService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ];
-            if(isset($in['supplier_id']) && $in['supplier_id'] !== ''){
-                $update['supplier_id'] = $in['supplier_id'] ; 
+            if (isset($in['supplier_id']) && $in['supplier_id'] !== '') {
+                $update['supplier_id'] = $in['supplier_id'];
             }
-            if(isset($in['category_id']) && $in['category_id'] !== ''){
-                $update['category_id'] = $in['category_id'] ; 
+            if (isset($in['category_id']) && $in['category_id'] !== '') {
+                $update['category_id'] = $in['category_id'];
             }
-            if(isset($in['brand_id']) && $in['brand_id'] !== ''){
-                $update['brand_id'] = $in['brand_id'] ; 
+            if (isset($in['brand_id']) && $in['brand_id'] !== '') {
+                $update['brand_id'] = $in['brand_id'];
             }
 
             Products::where('id', $products_id)->update($update);
@@ -873,15 +873,23 @@ class ProductsService
             DB::raw('brands.brand_name as brand_name'),
             DB::raw('products_v.item_cost as item_cost'),
             DB::raw('products_v.gross_margin as gross_margin'),
-            DB::raw('(group_concat(web_category_products.id) ) as web_category_products_id'),
-            DB::raw('(group_concat(related_products.related_product_id) ) as related_product_id'),
-            )
+            DB::raw('(group_concat(web_category_products.category_name) ) as web_category_products_category_name'),
+            DB::raw('(group_concat(related_products.product_name) ) as related_product_name'),
+        )
             ->leftJoin('products', 'products.id', 'product_items.product_id')
             ->leftJoin('products_v', 'products_v.id', 'product_items.product_id')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
-            ->leftJoin('web_category_products' , 'web_category_products.product_id' , '=' , 'products.id')
-            ->leftJoin('related_products' , 'related_products.product_id' , '=' , 'products.id')
+            ->leftJoin(
+            DB::raw("(SELECT 
+            web_category_products.product_id,
+            web_category_hierarchy.category_name
+            FROM web_category_products
+            LEFT JOIN web_category_hierarchy ON web_category_products.web_category_hierarchy_id = web_category_hierarchy.id ) AS web_category_products"), 'web_category_products.product_id', '=', 'products.id')
+            ->leftJoin(
+            DB::raw("(SELECT related_products.related_product_id,
+            products.product_name 
+            FROM related_products LEFT JOIN products ON related_products.related_product_id = products.id) AS related_products") , 'related_products.related_product_id', '=', 'products.id')
             ->groupBy('product_items.id');
         if (isset($request['web_category_hierarchy_id'])) {
             $web_category_hierarchy_id = $request['web_category_hierarchy_id'];
@@ -1044,10 +1052,9 @@ class ProductsService
                     $obj->launched_status = Carbon::now()->between($obj->start_launched_at, $obj->end_launched_at) ? '商品上架' : '商品下架';
                     break;
                 default:
-                    $obj->launched_status = 'NULL' ;
+                    $obj->launched_status = 'NULL';
                     break;
             }
-
 
             //庫存類型
             switch ($obj->stock_type) {
@@ -1129,29 +1136,48 @@ class ProductsService
             //商品類別
             switch ($obj->product_type) {
                 case 'N':
-                    $obj->product_type_cn = '一般品(normal)';
+                    $obj->product_type_cn = '一般品';
                     break;
                 case 'G':
-                    $obj->product_type_cn = '贈品(gift)';
+                    $obj->product_type_cn = '贈品';
                     break;
                 case 'A':
-                    $obj->product_type_cn = '加購品(additional)';
+                    $obj->product_type_cn = '加購品';
                     break;
                 default:
                     $obj->product_type_cn = '';
                     break;
             }
+            switch ($obj->selling_channel) {
+                case 'EC':
+                    $obj->selling_channel_cn = '網路獨賣';
+                    break;
+                case 'STORE':
+                    $obj->selling_channel_cn = '門市限定';
+                    break;
+                case 'WHOLE':
+                    $obj->selling_channel_cn = '全通路';
+                    break;
+                default:
+                    $obj->selling_channel_cn = '無';
+                    break;
+            }
+            if ($obj->has_expiry_date) {
+                $obj->has_expiry_date_cn = '有';
+            } else {
+                $obj->has_expiry_date_cn = '無';
+            }
             //停售
-            if($obj->is_discontinued){
-                $obj->is_discontinued_cn = '是' ; 
-            }else{
-                $obj->is_discontinued_cn = '否' ;
+            if ($obj->is_discontinued) {
+                $obj->is_discontinued_cn = '是';
+            } else {
+                $obj->is_discontinued_cn = '否';
             }
             //是否有保固
-            if($obj->is_with_warranty){
-                $obj->is_with_warranty_cn ='有';
-            }else{
-                $obj->is_with_warranty_cn ='沒有';
+            if ($obj->is_with_warranty) {
+                $obj->is_with_warranty_cn = '有';
+            } else {
+                $obj->is_with_warranty_cn = '沒有';
             }
             //規格類型
             switch ($obj->spec_dimension) {
@@ -1169,15 +1195,15 @@ class ProductsService
                     break;
             }
             //是否追加
-            if($obj->is_additional_purchase){
-                $obj->is_additional_purchase_cn = '是' ;
-            }else{
-                $obj->is_additional_purchase_cn = '否' ;
+            if ($obj->is_additional_purchase) {
+                $obj->is_additional_purchase_cn = '是';
+            } else {
+                $obj->is_additional_purchase_cn = '否';
             }
-            if($obj->status){
-                $obj->status_cn = '是' ;
-            }else{
-                $obj->status_cn = '否' ; 
+            if ($obj->status) {
+                $obj->status_cn = '是';
+            } else {
+                $obj->status_cn = '否';
 
             }
 
