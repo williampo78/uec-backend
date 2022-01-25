@@ -13,6 +13,7 @@ use App\Services\APIOrdersServices;
 use Validator;
 use App\Services\APITapPayService;
 
+
 class CheckoutController extends Controller
 {
 
@@ -251,6 +252,8 @@ class CheckoutController extends Controller
         $data['status'] = $request['status'];
         $data['payment_type'] = 'PAY';
         $data['response_info'] = $request->getContent();
+        $data['ip'] = $request->getClientIp();
+
         $result = $this->apiTapPay->tapPayNotifyLog($data);
     }
 
