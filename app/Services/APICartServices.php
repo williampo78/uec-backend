@@ -166,8 +166,8 @@ class APICartServices
                 $cartAmount[$items] = intval($item->selling_price); //商品售價
                 //$cartDetail[$items][$item['item_id']] = $item; //購物車內容
             }
-            foreach ($cartInfo['items'] as $prdouct_id => $items){
-                foreach ($items as $item_id=>$item){
+            foreach ($cartInfo['items'] as $prdouct_id => $items) {
+                foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                 }
             }
@@ -587,7 +587,7 @@ class APICartServices
                                     $stock_check = $this->stockService->getStockByProd($warehouseCode, $item->product_id);
                                     if (isset($stock_check)) {
                                         if ($this->stockService->getStockByProd($warehouseCode, $item->product_id)->stock_qty > 0) { //有足夠庫存
-                                            $cartGift[] = array(
+                                            $cartGift[0] = array(
                                                 "campaignId" => $item->promotional_campaign_id,
                                                 "campaignName" => $item->campaign_name,
                                                 "productId" => $item->product_id,
