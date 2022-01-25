@@ -1,5 +1,5 @@
 @extends('Backend.master')
-@section('title', '主分類管理')
+@section('title', '大分類管理')
 @section('content')
     <!--列表-->
     <div id="page-wrapper">
@@ -7,7 +7,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-bank"></i> 主分類管理</h1>
+                <h1 class="page-header"><i class="fa fa-bank"></i> 大分類管理</h1>
             </div>
         </div>
 

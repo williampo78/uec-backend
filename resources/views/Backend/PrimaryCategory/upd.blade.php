@@ -1,10 +1,10 @@
 @extends('Backend.master')
-@section('title', '編輯主分類管理')
+@section('title', '編輯大分類管理')
 @section('content')
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-pencil"></i> 編輯分類</h1>
+                <h1 class="page-header"><i class="fa fa-pencil"></i> 編輯大分類</h1>
             </div>
             <!-- /.col-sm-12 -->
         </div>
