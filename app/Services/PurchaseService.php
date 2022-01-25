@@ -35,7 +35,7 @@ class PurchaseService
             $purchase->where('order_supplier.number', $in['order_supplier_number']);
         }
         if (isset($in['trade_date_start']) && $in['trade_date_start'] && isset($in['trade_date_end']) && $in['trade_date_end']) { //進貨日期
-            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'], $in['trade_date_end']]);
+            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'] .' 00:00:00', $in['trade_date_end'] .' 23:59:59']);
         }
         if (isset($in['number']) && $in['number']) { //進貨單號
             $purchase->where('purchase.number', $in['number']);
