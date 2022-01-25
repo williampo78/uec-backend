@@ -170,7 +170,7 @@
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
                                                             @click="Del(Category,CategoryKey,'Category')"
-                                                            v-show="RoleAuthJson.auth_delete">刪除</button>
+                                                            v-show="RoleAuthJson.auth_delete" disabled>刪除</button>
                                                     </td>
                                                 </tr>
 
@@ -225,7 +225,7 @@
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
-                                                            @click="Del(Product ,key ,'Products')">刪除</button>
+                                                            @click="Del(Product ,key ,'Products')" disabled>刪除</button>
                                                     </td>
                                                 </tr>
 
@@ -353,6 +353,7 @@
                                             <table class="table table-striped table-bordered table-hover">
                                                 <thead>
                                                     <tr>
+                                                        <th class="col-sm-1">Item編號</th>
                                                         <th class="col-sm-1">規格1</th>
                                                         <th class="col-sm-1">規格2</th>
                                                         <th class="col-sm-1">Item圖示</th>
@@ -362,6 +363,9 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr v-for="(Item , key ) in ProductsItem">
+                                                        <td style="vertical-align:middle">
+                                                            @{{Item.item_no}}
+                                                        </td>
                                                         <td style="vertical-align:middle">
                                                             @{{ Item . spec_1_value }}
                                                         </td>
