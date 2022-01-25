@@ -238,7 +238,6 @@
                         .then(function(response) {
                             vm.show_supplier = response.data.orderSupplier ; 
                             vm.show_detail = response.data.orderSupplierDetail ;
-                            console.log(response.data.orderSupplierDetail) ; 
                             $('.toggle-show-model').click();
                         })
                         .catch(function(error) {
@@ -260,7 +259,6 @@
                                 } else {
                                     alert('刪除失敗');
                                 }
-                                console.log(response);
                             })
                             .catch(function(error) {
                                 console.log('ERROR');
@@ -308,7 +306,6 @@
             $("#supplier_deliver_form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    console.log(form);
                     var supplier_deliver_date = $('#supplier_deliver_date').val();
                     var expect_deliver_date = $('#expect_deliver_date').val();
                     var get_order_supplier_id = $('#get_order_supplier_id').val();
@@ -321,7 +318,6 @@
                         })
                         .then(function(response) {
                             if (response.data.result) {
-                                console.log(response.data) ; 
                                 alert('修改成功');
                                 history.go(0);
                             } else {
@@ -371,7 +367,7 @@
 
         function del(id, doc_number) {
             if (confirm("確定要刪除採購單" + doc_number + "?")) {
-                console.log("del-" + id)
+                // console.log("del-" + id)
                 document.getElementById("del-" + id).submit();
             }
             return false;
