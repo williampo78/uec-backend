@@ -175,8 +175,8 @@
             $('#supplier_id').select2();
             $('#tax').select2();
             $('#supplier_id').on('change', function() {
-                var this_supplier_id = $(this).find(":selected").val() ; 
-                if($('.js-select2-item').length > 0){       
+                var this_supplier_id = $(this).find(":selected").val() ;
+                if($('.js-select2-item').length > 0){
                     if($('#old_supplier_id').val() !== ''){
                         if($('#old_supplier_id').val() !== $(this).find(":selected").val()){
                             alert('請先將品項刪除在切換供應商')
@@ -291,7 +291,7 @@
                             "</div>" +
                             "<div class='col-sm-1'>" +
                             "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
-                            "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
+                            "' value='" + newRow + "'><i class='fa fa-trash-o'></i> 刪除</button>" +
                             "</div>" +
                             "</div>" +
                             "</div>"
@@ -388,7 +388,7 @@
                         "<div class='col-sm-1'>" +
                         "<button type='button' data-details='" + value.quotation_details_id +
                         "' class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
-                        "' value='" + newRow + "'><i class='fa fa-ban'></i> 刪除</button>" +
+                        "' value='" + newRow + "'><i class='fa fa-trash-o'></i> 刪除</button>" +
                         "</div>" +
                         "</div>" +
                         "</div>"

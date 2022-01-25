@@ -1,7 +1,7 @@
 @extends('Backend.master')
 
 <link rel="stylesheet" href="{{ URL::asset('asset/css/login.css') }}">
-@section('title', '諾亞克 uERP - 登入系統')
+@section('title', '諾亞克 uEC - 登入系統')
 
 @section('content')
     <div class="limiter">
@@ -14,7 +14,7 @@
                 </div>
                 <div class="login100-form-title" style="background-image: url('/asset/img/bg-01.jpg'); color:#ffffff;">
                     <span class="login100-form-title-1">
-                        諾亞克 uERP 企業管理系統
+                        諾亞克 uEC 電商後台管理系統
                     </span>
                 </div>
                 <form class="login100-form validate-form" method="POST" action="{{ route('login.custom') }}">

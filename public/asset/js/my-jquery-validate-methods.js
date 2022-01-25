@@ -1,4 +1,4 @@
-// 密碼格式驗證
+// 驗證密碼格式
 jQuery.validator.addMethod(
     "passwordCheck",
     function (value, element, params) {
@@ -53,6 +53,7 @@ jQuery.validator.addMethod(
     "不可輸入重複的內容"
 );
 
+// 驗證檔案大小限制
 jQuery.validator.addMethod(
     "filesize",
     function (value, element, param) {
