@@ -237,9 +237,9 @@ class APIProductServices
         }
 
         if ($order_by == 'launched') {
-            $strSQL .= " order by p.start_launched_at " . $sort_flag;
+            $strSQL .= " order by p.id, p.start_launched_at " . $sort_flag;
         } else if ($order_by == 'price') {
-            $strSQL .= " order by p.selling_price " . $sort_flag;
+            $strSQL .= " order by p.id, p.selling_price " . $sort_flag;
         }
 
         $products = DB::select($strSQL);
