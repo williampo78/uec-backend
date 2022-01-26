@@ -16,7 +16,8 @@ class SummaryStockService
 {
     public function getSummaryStock($data)
     {
-        $result = StockMonthlySummary::select("stock_monthly_summary.*", "products.product_name","product_items.item_no","product_items.spec_1_value","product_items.spec_2_value",
+        $result = StockMonthlySummary::select("stock_monthly_summary.*", "products.product_name","product_items.item_no","product_items.spec_2_value",
+            DB::raw("(CASE WHEN product_items.spec_1_value = '0' THEN '' ELSE product_items.spec_1_value END) AS spec_1_value"),
             DB::raw("0 as adj_qty"),
             DB::raw("0 as adj_amount"),
             DB::raw("0 as shift_qty"),

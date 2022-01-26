@@ -105,6 +105,10 @@ class SummaryStockController extends Controller
     public function export($data)
     {
         $title = [
+            "item_no" => "Item編號",
+            "product_name" => "商品名稱",
+            "spec_1_value" => "規格1",
+            "spec_2_value" => "規格2",
             "begin_qty" => "期初數量",
             "begin_amount" => "期初金額",
             "item_cost" => "單位成本",

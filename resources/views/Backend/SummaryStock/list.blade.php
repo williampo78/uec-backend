@@ -162,7 +162,7 @@
                                     <tr>
                                         <td align="center">{{$item->item_no}}</td>
                                         <td nowrap="nowrap">{{$item->product_name}}</td>
-                                        <td nowrap="nowrap">{{($item->spec_1_value=='0'?'':$item->spec_1_value)}}</td>
+                                        <td nowrap="nowrap">{{$item->spec_1_value}}</td>
                                         <td nowrap="nowrap">{{$item->spec_2_value}}</td>
                                         <td align="right">{{$item->begin_qty}}</td>
                                         <td align="right">{{number_format($item->begin_amount)}}</td>
