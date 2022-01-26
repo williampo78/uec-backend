@@ -48,6 +48,9 @@ Route::group(['prefix' => 'v1'], function () {
 
     //Breadcrumb for category
     Route::post('/BreadcrumbCategory', [ProductController::class, 'getBreadcrumbCategory']);
+
+    //UTM
+    Route::get('/utm', [IndexController::class, 'getUTM']);
 });
 
 // jwt驗證

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Services\APIProductServices;
 use App\Services\APIWebService;
+use App\Models\Lookup_values_v;
 
 class APIIndexServices
 {
@@ -282,6 +283,15 @@ class APIIndexServices
             );
         }
         return $data;
+    }
+
+    public function getUTM($params = null)
+    {
+        $result = Lookup_values_v::select('udf_01 as url')
+            ->where('type_code', 'UTM_PAGE')
+            ->where('code', $params)
+            ->where('active', 1)->get();
+        return $result;
     }
 
 
