@@ -3,9 +3,10 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 // use Maatwebsite\Excel\Concerns\FromCollection;
 
-class ReportExport implements FromCollection
+class ReportExport implements FromCollection , WithStrictNullComparison
 {
     protected $title;
     protected $data;
@@ -21,13 +22,6 @@ class ReportExport implements FromCollection
         return collect($this->createData());
     }
 
-    public function toString($value): string
-    {
-        return $value;
-    }
-
-
-    //TEST
     public function createData()
     {
         $title = $this->title;
@@ -52,7 +46,7 @@ class ReportExport implements FromCollection
                         $result[$datakey][$titleKey] = $index;
                         break;
                     default:
-                        $result[$datakey][$titleKey] = ($data[$datakey][$titleKey] === 0 ? $this->toString($data[$datakey][$titleKey]) : $data[$datakey][$titleKey]);
+                        $result[$datakey][$titleKey] = $data[$datakey][$titleKey];
                         break;
                 }
             }
