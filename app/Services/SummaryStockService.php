@@ -16,17 +16,18 @@ class SummaryStockService
 {
     public function getSummaryStock($data)
     {
-        $result = StockMonthlySummary::select("stock_monthly_summary.*", "products.product_name",
+        $result = StockMonthlySummary::select("stock_monthly_summary.*", "products.product_name","product_items.item_no","product_items.spec_1_value","product_items.spec_2_value",
             DB::raw("0 as adj_qty"),
             DB::raw("0 as adj_amount"),
             DB::raw("0 as shift_qty"),
             DB::raw("0 as shift_amount"),
             )
             ->join("products", "products.id", "=", "stock_monthly_summary.product_id")
-            ->where("stock_monthly_summary.transaction_month", $data['smonth']);
+            ->where("stock_monthly_summary.transaction_month", $data['smonth'])
+            ->join("product_items", "product_items.id", "=", "stock_monthly_summary.product_item_id");
 
         if ($data['item_id_start'] != '' && $data['item_id_end'] != '') {
-            $result = $result->whereBetween('stock_monthly_summary.product_item_id', [$data['item_id_start'], $data['item_id_end']]);
+            $result = $result->whereBetween('product_items.item_no', [$data['item_id_start'].'%', $data['item_id_end'].'%']);
         }
 
         if ($data['product_name'] != '') {
@@ -353,6 +354,7 @@ class SummaryStockService
             $item_cost = round(($value->begin_amount + $value->rcv_amount + $value->rtv_amount) / ($end_qty == 0 ? 1 : $end_qty), 2);//推算單位成本
             $sales_amount = round($value->sales_qty * $item_cost, 2);//推算銷貨金額
             $sales_return_amount = round($value->sales_return_qty * $item_cost, 2);//推算銷退金額
+            $end_amount = $end_qty * $item_cost;
             $webDataUpd[$key] = [
                 "id" => $value->id,
                 "rcv_qty" => ($value->rcv_qty == 0 ? 0 : $value->rcv_qty),
@@ -362,6 +364,7 @@ class SummaryStockService
                 "sales_qty" => ($value->sales_qty == 0 ? 0 : $value->sales_qty),
                 "sales_return_qty" => ($value->sales_return_qty == 0 ? 0 : $value->sales_return_qty),
                 "end_qty" => ($end_qty == 0 ? 0 : $end_qty),
+                "end_amount" => ($end_amount == 0 ? 0 : $end_amount),
                 "item_cost" => ($item_cost == 0 ? 0 : $item_cost),
                 "sales_amount" => ($sales_amount == 0 ? 0 : $sales_amount),
                 "sales_return_amount" => ($sales_return_amount == 0 ? 0 : $sales_return_amount),

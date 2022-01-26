@@ -237,15 +237,18 @@ class APIProductServices
         }
 
         if ($order_by == 'launched') {
-            $strSQL .= " order by p.start_launched_at " . $sort_flag;
+            $strSQL .= " order by p.start_launched_at " . $sort_flag .", p.id";
         } else if ($order_by == 'price') {
-            $strSQL .= " order by p.selling_price " . $sort_flag;
+            $strSQL .= " order by p.selling_price " . $sort_flag .", p.id";
         }
 
         $products = DB::select($strSQL);
         $data = [];
+        $product_id = 0;
         foreach ($products as $product) {
+            if ($product->id == $product_id) continue;
             $data[$product->web_category_hierarchy_id][] = $product;
+            $product_id = $product->id;
         }
         return $data;
     }
@@ -847,7 +850,7 @@ class APIProductServices
                     where cate.`active`=1
                     and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N'";
             if ($category) {
-                $strSQL .= " and cate.`id`=".$category;
+                $strSQL .= " and cate.`id`=" . $category;
             }
             $strSQL .= " group by cate.`id`
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
@@ -859,7 +862,7 @@ class APIProductServices
                     where cate.`active`=1
                     and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
             if ($category) {
-                $strSQL .= " and cate.`id`=".$category;
+                $strSQL .= " and cate.`id`=" . $category;
             }
             $strSQL .= " group by cate.`id`
                     order by cate1.`sort`, cate.`sort`";

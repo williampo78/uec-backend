@@ -137,4 +137,32 @@ class IndexController extends Controller
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data]);
     }
 
+    public function getUTM(Request $request)
+    {
+        $status = false;
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $messages = [
+            'code.required' => '代碼不能為空',
+        ];
+
+        $v = Validator::make($request->all(), [
+            'code' => 'required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => '資料錯誤', 'result' => $v->errors()]);
+        }
+        $result = $this->apiIndexService->getUTM($request['code']);
+        if (count($result) >0){
+            $status = true;
+            $err = '';
+        } else {
+            $status = false;
+            $err = '404';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $result]);
+
+    }
+
 }
