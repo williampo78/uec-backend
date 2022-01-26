@@ -184,6 +184,7 @@ class APICartServices
                     }
                 }
             }
+            $productRow = 0;
             foreach ($cartQty as $product_id => $item) {
                 $product = [];
                 $prod_gift = [];
@@ -280,7 +281,11 @@ class APICartServices
                                         "campaignGiftAway" => $prod_gift
                                     );
                                     $cartTotal += intval($amount);
+                                    if ($product_type == 'effective') {
+                                        $productRow++;
+                                    }
                                 }
+
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD02') { //﹝單品﹞第N件(含)以上，折X元
                                 $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000-200
                                 //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
@@ -350,7 +355,12 @@ class APICartServices
                                         "campaignGiftAway" => $prod_gift
                                     );
                                     $cartTotal += intval($amount);
+
+                                    if ($product_type == 'effective') {
+                                        $productRow++;
+                                    }
                                 }
+
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD03') { //﹝單品﹞滿N件，每件打X折
                                 $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000*0.85
                                 //找符合的item放##7
@@ -393,6 +403,9 @@ class APICartServices
                                         "campaignGiftAway" => $prod_gift
                                     );
                                     $cartTotal += intval($amount);
+                                    if ($product_type == 'effective') {
+                                        $productRow++;
+                                    }
                                 }
 
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD04') { //﹝單品﹞滿N件，每件折X元
@@ -438,6 +451,9 @@ class APICartServices
                                         "campaignGiftAway" => $prod_gift
                                     );
                                     $cartTotal += intval($amount);
+                                    if ($product_type == 'effective') {
+                                        $productRow++;
+                                    }
                                 }
                             }
                         } else { //沒有打折的件數
@@ -476,6 +492,9 @@ class APICartServices
                                     "campaignGiftAway" => $prod_gift
                                 );
                                 $cartTotal += intval($item_info->selling_price * $detail_qty);
+                                if ($product_type == 'effective') {
+                                    $productRow++;
+                                }
                             };
                         }
                     } else { //不在活動內
@@ -515,6 +534,9 @@ class APICartServices
                                 "campaignGiftAway" => $prod_gift
                             );
                             $cartTotal += intval($item_info->selling_price * $detail_qty);
+                            if ($product_type == 'effective') {
+                                $productRow++;
+                            }
                         };
                     }
 
@@ -649,7 +671,7 @@ class APICartServices
             $cart = [];
             $cart = array(
                 "feeInfo" => $feeInfo,
-                "productRow" => count($cartInfo),
+                "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
                 "discount" => $cartDiscount,

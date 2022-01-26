@@ -244,8 +244,11 @@ class APIProductServices
 
         $products = DB::select($strSQL);
         $data = [];
+        $product_id = 0;
         foreach ($products as $product) {
+            if ($product->id == $product_id) continue;
             $data[$product->web_category_hierarchy_id][] = $product;
+            $product_id = $product->id;
         }
         return $data;
     }

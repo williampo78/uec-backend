@@ -136,6 +136,8 @@
                                 <tr>
                                     <th>Item編號</th>
                                     <th>商品名稱</th>
+                                    <th>規格1</th>
+                                    <th>規格2</th>
                                     <th>期初數量</th>
                                     <th>期初金額</th>
                                     <th>單位成本</th>
@@ -158,8 +160,10 @@
                                 <tbody>
                                 @foreach($info as $item)
                                     <tr>
-                                        <td align="center">{{$item->product_item_id}}</td>
+                                        <td align="center">{{$item->item_no}}</td>
                                         <td nowrap="nowrap">{{$item->product_name}}</td>
+                                        <td nowrap="nowrap">{{($item->spec_1_value=='0'?'':$item->spec_1_value)}}</td>
+                                        <td nowrap="nowrap">{{$item->spec_2_value}}</td>
                                         <td align="right">{{$item->begin_qty}}</td>
                                         <td align="right">{{number_format($item->begin_amount)}}</td>
                                         <td align="right">{{$item->item_cost}}</td>
