@@ -159,6 +159,8 @@ class OrderRefundService
 
     public function getReturnRequest(int $id)
     {
+        $agent_id = Auth::user()->agent_id;
+
         $select = 'rr.*,
             rr.request_no,
             rr.request_date,
@@ -179,8 +181,11 @@ class OrderRefundService
         $ReturnRequest = DB::table('return_requests as rr')
             ->selectRaw($select)
             ->join('orders as o', 'o.id', '=', 'rr.new_order_id')
+            ->leftJoin('lookup_values_v as lvv', 'lvv.code', '=', 'rr.req_reason_code')
             ->where('rr.id', $id)
-            ->where('rr.agent_id', Auth::user()->agent_id)
+            ->where('rr.agent_id', $agent_id)
+            ->where('lvv.agent_id', $agent_id)
+            ->where('lvv.type_code', 'RETURN_REQ_REASON')
             ->first();
 
         if (empty($ReturnRequest)) {

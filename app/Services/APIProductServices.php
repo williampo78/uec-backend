@@ -874,10 +874,16 @@ class APIProductServices
                 $data['level2']["name"] = $category->L2_NAME;
                 $data['level3']['id'] = $category->id;
                 $data['level3']['name'] = $category->category_name;
+                $data['level3']['meta_title'] = $category->meta_title;
+                $data['level3']['meta_description'] = $category->meta_description;
+                $data['level3'][$category->id]['meta_keywords'] = $category->meta_keywords;
 
             } else if ($config_levels == '2') {
                 $data['level2']['id'] = $category->id;
                 $data['level2']['name'] = $category->category_name;
+                $data['level2']['meta_title'] = $category->meta_title;
+                $data['level2']['meta_description'] = $category->meta_description;
+                $data['level2']['meta_keywords'] = $category->meta_keywords;
             }
         }
         return $data;
