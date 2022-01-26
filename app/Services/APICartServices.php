@@ -658,7 +658,7 @@ class APICartServices
                 "point" => $info->data->point,
                 "discountRate" => $info->data->discountRate,
                 "exchangeRate" => $info->data->exchangeRate,
-                "discountMax" => ($info->data->point > 0 ? $total_amount * $info->data->discountRate : 0),
+                "discountMax" => ($info->data->point > 0 ? floor($total_amount * $info->data->discountRate) : 0),
             );
 
             //運費規則
