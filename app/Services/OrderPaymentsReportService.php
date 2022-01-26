@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\OrderCampaignDiscount;
 use App\Models\InvoiceAllowanceDetail;
+use Carbon\Carbon;
 
 class OrderPaymentsReportService
 {
@@ -130,6 +131,8 @@ class OrderPaymentsReportService
             $OrderPaymentsReport->record_created_reason = config('uec.order_payment_record_created_reason')[$OrderPaymentsReport->record_created_reason] ?? null;
             $OrderPaymentsReport->created_at = date('Y-m-d', strtotime($OrderPaymentsReport->created_at));
             $OrderPaymentsReport->amount = is_null($OrderPaymentsReport->amount) ? null : number_format($OrderPaymentsReport->amount);
+            // 發票日期
+            $OrderPaymentsReport->invoice_date = Carbon::parse($OrderPaymentsReport->invoice_date)->format('Y-m-d');
 
             return $OrderPaymentsReport;
         });
@@ -151,7 +154,9 @@ class OrderPaymentsReportService
             //資料新增原因
             $item->record_created_reason = config('uec.order_payment_record_created_reason')[$item->record_created_reason] ?? null;
             $item->created_at = date('Y-m-d', strtotime($item->created_at));
-            $item->amount = is_null($item->amount) ? null : number_format($item->amount);
+            $item->amount = is_null($item->amount) ? null : $item->amount;
+            // 發票日期
+            $item->invoice_date = Carbon::parse($item->invoice_date)->format('Y-m-d');
 
             return [
                 (string)$index + 1, //項次
@@ -161,7 +166,7 @@ class OrderPaymentsReportService
                 (string)$item->payment_method, //金流方式
                 '', //分期期數
                 (string)$item->status_desc, //狀態
-                (string)$item->amount, //金額
+                $item->amount, //金額
                 (string)$item->invoice_no, //發票號碼
                 (string)$item->invoice_date, //發票日期
                 (string)$item->record_created_reason, //備註

@@ -98,11 +98,11 @@
                                         <th>商品編號</th>
                                         <th>商品名稱</th>
                                         <th>單價</th>
-                                        <th>最小採購量</th>
+                                        <th>採購量</th>
                                         <th>單位</th>
                                         <th>小計</th>
                                         <th>贈品</th>
-                                        <th>採購量</th>
+                                        <th>最小採購量</th>
                                         <th>進貨量</th>
                                     </tr>
                                 </thead>

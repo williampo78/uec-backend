@@ -120,11 +120,11 @@ class InventoryService
             //毛利率
             $inventory->gross_margin = is_null($inventory->gross_margin) ? null : $inventory->gross_margin . '%';
             //售價
-            $inventory->selling_price = is_null($inventory->selling_price) ? null : number_format($inventory->selling_price, 2);
+            $inventory->selling_price = is_null($inventory->selling_price) ? null : number_format($inventory->selling_price);
             //平均成本
             $inventory->item_cost = is_null($inventory->item_cost) ? null : number_format($inventory->item_cost, 2);
             //庫存成本
-            $inventory->stock_amount = is_null($inventory->stock_amount) ? null : number_format($inventory->stock_amount, 2);
+            $inventory->stock_amount = is_null($inventory->stock_amount) ? null : number_format($inventory->stock_amount);
             return $inventory;
         });
     }
@@ -161,11 +161,11 @@ class InventoryService
             //毛利率
             $inventory->gross_margin = is_null($inventory->gross_margin) ? null : $inventory->gross_margin . '%';
             //售價
-            $inventory->selling_price = is_null($inventory->selling_price) ? null : number_format($inventory->selling_price, 2);
+            $inventory->selling_price = is_null($inventory->selling_price) ? null : $inventory->selling_price;
             //平均成本
-            $inventory->item_cost = is_null($inventory->item_cost) ? null : number_format($inventory->item_cost, 2);
+            $inventory->item_cost = is_null($inventory->item_cost) ? null : $inventory->item_cost;
             //庫存成本
-            $inventory->stock_amount = is_null($inventory->stock_amount) ? null : number_format($inventory->stock_amount, 2);
+            $inventory->stock_amount = is_null($inventory->stock_amount) ? null : $inventory->stock_amount;
             //低於安全庫存量
             $inventory->is_dangerous = $inventory->is_dangerous == 1 ? '是' : '否';
 
@@ -179,10 +179,10 @@ class InventoryService
                 (string)$inventory->stock_type,
                 (string)$inventory->safty_qty,
                 (string)$inventory->stock_qty,
-                (string)$inventory->selling_price,
-                (string)$inventory->item_cost,
+                $inventory->selling_price,
+                $inventory->item_cost,
                 (string)$inventory->gross_margin,
-                (string)$inventory->stock_amount,
+                $inventory->stock_amount,
                 (string)$inventory->is_dangerous
             ];
         });

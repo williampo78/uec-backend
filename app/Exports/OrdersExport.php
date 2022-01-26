@@ -4,15 +4,18 @@ namespace App\Exports;
 
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
+use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class OrdersExport implements FromArray, WithHeadings, WithEvents
+class OrdersExport implements FromArray, WithHeadings, WithColumnWidths, WithStyles, WithStrictNullComparison
 {
     private $orders;
     private $total_rows = 0;
+    private $merge_cell_rows = [];
 
     public function __construct($orders)
     {
@@ -105,6 +108,7 @@ class OrdersExport implements FromArray, WithHeadings, WithEvents
 
             if (isset($order->order_details)) {
                 $is_first = true;
+                $merge_cell_first_row = $count + 1;
                 foreach ($order->order_details as $order_detail) {
                     $ori_qty = $order_detail->qty + $order_detail->returned_qty;
                     $ori_campaign_discount = $order_detail->campaign_discount + $order_detail->returned_campaign_discount;
@@ -137,16 +141,18 @@ class OrdersExport implements FromArray, WithHeadings, WithEvents
                         $order_detail->package_no,
                     ];
 
-                    $row = [$count++];
+                    $row = [$count];
                     if ($is_first) {
                         $row = array_merge($row, $order_columns, $order_detail_columns);
                         $is_first = false;
                     } else {
                         $emtpy_columns = array_fill(0, 17, '');
                         $row = array_merge($row, $emtpy_columns, $order_detail_columns);
+                        $this->merge_cell_rows[$merge_cell_first_row] = $count + 1;
                     }
 
                     $body[] = $row;
+                    $count++;
                 }
             } else {
                 $row = [$count++];
@@ -208,98 +214,107 @@ class OrdersExport implements FromArray, WithHeadings, WithEvents
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function registerEvents(): array
+    public function columnWidths(): array
     {
         return [
-            AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->styleCells(
-                    'A1:AN1',
-                    [
-                        'alignment' => [
-                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                        ],
-                        'font' => [
-                            'bold' => true,
-                        ],
-                    ]
-                );
+            'A' => 10,
+            'B' => 20,
+            'C' => 20,
+            'D' => 10,
+            'E' => 20,
+            'F' => 10,
+            'G' => 10,
+            'H' => 20,
+            'I' => 20,
+            'J' => 20,
+            'K' => 20,
+            'L' => 20,
+            'M' => 20,
+            'N' => 20,
+            'O' => 10,
+            'P' => 20,
+            'Q' => 20,
+            'R' => 10,
+            'S' => 20,
+            'T' => 20,
+            'U' => 20,
+            'V' => 30,
+            'W' => 10,
+            'X' => 10,
+            'Y' => 10,
+            'Z' => 15,
+            'AA' => 10,
+            'AB' => 10,
+            'AC' => 10,
+            'AD' => 10,
+            'AE' => 10,
+            'AF' => 10,
+            'AG' => 15,
+            'AH' => 10,
+            'AI' => 15,
+            'AJ' => 10,
+            'AK' => 15,
+            'AL' => 10,
+            'AM' => 15,
+            'AN' => 15,
+        ];
+    }
 
-                $alignment_datas = [
-                    'left' => ['D', 'F', 'N', 'T', 'U', 'V', 'W', 'X', 'AN'],
-                    'center' => ['A', 'B', 'C', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'P', 'Q', 'S'],
-                    'right' => ['O', 'R', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'],
-                ];
+    public function styles(Worksheet $sheet)
+    {
+        // 對齊方式
+        $alignment_datas = [
+            'left' => ['D', 'F', 'N', 'T', 'U', 'V', 'W', 'X', 'AN'],
+            'center' => ['A', 'B', 'C', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'P', 'Q', 'S'],
+            'right' => ['O', 'R', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'],
+        ];
 
-                foreach ($alignment_datas as $method => $columns) {
-                    switch ($method) {
-                        case 'left':
-                            foreach ($columns as $column) {
-                                $event->sheet->getDelegate()->getStyle($column . '2:' . $column . $this->total_rows)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
-                            }
-                            break;
-                        case 'center':
-                            foreach ($columns as $column) {
-                                $event->sheet->getDelegate()->getStyle($column . '2:' . $column . $this->total_rows)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                            }
-                            break;
-                        case 'right':
-                            foreach ($columns as $column) {
-                                $event->sheet->getDelegate()->getStyle($column . '2:' . $column . $this->total_rows)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-                            }
-                            break;
+        foreach ($alignment_datas as $method => $columns) {
+            switch ($method) {
+                case 'left':
+                    foreach ($columns as $column) {
+                        $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
                     }
-                }
+                    break;
 
-                $width_datas = [
-                    'A' => 10,
-                    'B' => 20,
-                    'C' => 20,
-                    'D' => 10,
-                    'E' => 20,
-                    'F' => 10,
-                    'G' => 10,
-                    'H' => 20,
-                    'I' => 20,
-                    'J' => 20,
-                    'K' => 20,
-                    'L' => 20,
-                    'M' => 20,
-                    'N' => 20,
-                    'O' => 10,
-                    'P' => 20,
-                    'Q' => 20,
-                    'R' => 10,
-                    'S' => 20,
-                    'T' => 20,
-                    'U' => 20,
-                    'V' => 30,
-                    'W' => 10,
-                    'X' => 10,
-                    'Y' => 10,
-                    'Z' => 15,
-                    'AA' => 10,
-                    'AB' => 10,
-                    'AC' => 10,
-                    'AD' => 10,
-                    'AE' => 10,
-                    'AF' => 10,
-                    'AG' => 15,
-                    'AH' => 10,
-                    'AI' => 15,
-                    'AJ' => 10,
-                    'AK' => 15,
-                    'AL' => 10,
-                    'AM' => 15,
-                    'AN' => 15,
-                ];
+                case 'center':
+                    foreach ($columns as $column) {
+                        $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    }
+                    break;
 
-                foreach ($width_datas as $cloumn => $width) {
-                    $event->sheet->getDelegate()->getColumnDimension($cloumn)->setWidth($width);
+                case 'right':
+                    foreach ($columns as $column) {
+                        $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                    }
+                    break;
+            }
+        }
+
+        // 合併儲存格
+        if (!empty($this->merge_cell_rows)) {
+            $merge_cell_columns = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
+            foreach ($this->merge_cell_rows as $first_row => $end_row) {
+                foreach ($merge_cell_columns as $column) {
+                    $sheet->mergeCells("{$column}{$first_row}:{$column}{$end_row}");
                 }
-            },
+            }
+        }
+
+        return [
+            'A1:AN1' => [
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                ],
+                'font' => [
+                    'bold' => true,
+                ],
+            ],
+            "A1:AN{$this->total_rows}" => [
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+            ],
         ];
     }
 }
