@@ -148,7 +148,8 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                data-toggle="modal" data-target="#model_category" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>新增分類</button>
+                                                data-toggle="modal" data-target="#model_category"
+                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增分類</button>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
@@ -172,7 +173,8 @@
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
                                                             @click="Del(Category,CategoryKey,'Category')"
-                                                            v-show="RoleAuthJson.auth_delete" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>刪除</button>
+                                                            v-show="RoleAuthJson.auth_delete"
+                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除</button>
                                                     </td>
                                                 </tr>
 
@@ -207,7 +209,8 @@
                                         <div class="col-sm-10">
                                             {{-- related_products table --}}
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                data-toggle="modal" data-target="#model_related_products" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>新增商品</button>
+                                                data-toggle="modal" data-target="#model_related_products"
+                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增商品</button>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
@@ -228,7 +231,8 @@
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
-                                                            @click="Del(Product ,key ,'Products')" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>刪除</button>
+                                                            @click="Del(Product ,key ,'Products')"
+                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除</button>
                                                     </td>
                                                 </tr>
 
@@ -252,8 +256,7 @@
                                                     <input class="product_attributes" type="checkbox"
                                                         name="product_attributes[]" value="{{ $obj->id }}"
                                                         {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}
-                                                        {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}
-                                                        >
+                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                                     {{ $obj->description }}
                                                 </label>
                                             </div>
@@ -284,7 +287,7 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <input class="form-control" name="order_limited_qty"
-                                            {{$products->edit_readonly == '1' ? 'readonly' : '' ; }}
+                                                {{ $products->edit_readonly == '1' ? 'readonly' : '' }}
                                                 value="{{ $products->order_limited_qty }}">
                                         </div>
                                     </div>
@@ -329,7 +332,7 @@
                                                     id="promotion_end_at" value="{{ $products->promotion_end_at }}" />
                                             </div>
                                         </div>
-                                   
+
                                     </div>
                                 </div>
                             </div>
@@ -377,7 +380,8 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <input type="file" name="google_shop_photo_name" accept="image/*"
-                                                @change="google_shop" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
+                                                @change="google_shop"
+                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                             <input type="hidden" name="google_shop_photo_name_old"
                                                 value="{{ $products->google_shop_photo_name }}">
                                         </div>
@@ -413,7 +417,7 @@
                                                 <tbody>
                                                     <tr v-for="(Item , key ) in ProductsItem">
                                                         <td style="vertical-align:middle">
-                                                            @{{Item.item_no}}
+                                                            @{{ Item.item_no }}
                                                         </td>
                                                         <td style="vertical-align:middle">
                                                             @{{ Item.spec_1_value }}
@@ -426,21 +430,25 @@
                                                                 <img :src="file_cdn + Item.photo_name"
                                                                     style="max-width:40%;">
                                                             </div>
+                                                            <input class="photo_name_hidden" type="hidden"
+                                                                :value="Item.photo_name">
                                                         </td>
                                                         <td>
                                                             <button type="button" data-toggle="modal"
                                                                 data-target="#item_photo_list"
                                                                 class="btn btn-large btn-warning btn-sm"
-                                                                @click="frombtn(Item,key)" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>選擇圖片</button>
+                                                                @click="frombtn(Item,key)"
+                                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>選擇圖片</button>
                                                             <button type="button" v-if="Item.photo_name"
                                                                 class="btn btn-large btn-danger btn-sm"
-                                                                @click="DelItemPhotos(Item,key)" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>刪除</button>
+                                                                @click="DelItemPhotos(Item,key)"
+                                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除</button>
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <textarea name="ProductsItem_Json" style="display:none" cols="30"
-                                                rows="10">@{{ ProductsItem }}</textarea>
+                                            <textarea id="ProductsItem_Json" name="ProductsItem_Json" style="display:none"
+                                                cols="30" rows="10">@{{ ProductsItem }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -582,10 +590,19 @@
 
             $("#new-form").validate({
                 submitHandler: function(form) {
+                    let ProductsItem_Json = JSON.parse($('#ProductsItem_Json').val());
+                    var status = true ; 
+                    $.each(ProductsItem_Json, function(key, value) {
+                        if(value.photo_name == null){
+                            alert('每個item必須選擇圖示') ;
+                            status = false ;
+                            return false;
+                        }
+                    });
                     if (ck_description.getData().trim().length == 0) {
                         $('#description_error_msg').show();
                         alert('商品內容不能為空');
-                        return false;
+                        status = false;
                     } else {
                         $('#description_error_msg').hide();
                     }
@@ -593,7 +610,7 @@
                     if (ck_specification.getData().trim().length == 0) {
                         $('#specification_error_msg').show();
                         alert('商品規格不能為空');
-                        return false;
+                        status = false;
                     } else {
                         $('#specification_error_msg').hide();
                     }
@@ -601,12 +618,16 @@
                     if ($('.CategoryHierarchyProducts').length == 0) {
                         alert('至少要新增一項分類');
                         $('#CategoryHierarchyProducts_error_msg').show();
-                        return false;
+                        status = false;
                     } else {
                         $('#CategoryHierarchyProducts_error_msg').hide();
                     }
-                    $('#save_data').prop('disabled', true);
-                    form.submit();
+                    if(status){
+                        $('#save_data').prop('disabled', true);
+                        form.submit();
+                    }else{
+                        return false ; 
+                    }
                 },
                 rules: {
                     product_name: {
