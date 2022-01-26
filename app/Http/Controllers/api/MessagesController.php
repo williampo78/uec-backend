@@ -27,6 +27,7 @@ class MessagesController extends Controller
      */
     public function index(Request $request)
     {
+
         $member_id = Auth::guard('api')->user()->member_id;
         $url = '/drm/v1/members/' . $member_id . '/messages';
         $error_code = $this->apiService->getErrorCode();

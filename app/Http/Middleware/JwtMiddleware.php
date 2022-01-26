@@ -2,14 +2,16 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Members;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Log;
+use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-class JwtMiddleware
+class JwtMiddleware extends BaseMiddleware
 {
     /**
      * Handle an incoming request.
@@ -20,40 +22,29 @@ class JwtMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        try {
-            if ($request->bearerToken()) {
-                $token = $request->bearerToken();
-                if (Auth::guard('api')->check()) {
-                    if (!$token == Auth::guard('api')->user()->api_token) {
-                        Log::info($request);
-                        return response()->json(['status' => false, 'error_code' => '202', 'error_msg' => '無效的Token', 'result' => []]);
-                    }
-                } else {
-                    return response()->json(['status' => false, 'error_code' => '202', 'error_msg' => '@無效的Token', 'result' => []]);
-                }
-                /*
-                $member = Members::where('api_token', '=', $token)->get()->toArray();
-                if (sizeof($member) >0) {
-                    $request->merge(array("member" => $member[0]['member_id']));
-                } else {
-                    Log::info($request);
-                    return response()->json(['status' => false, 'error_code' => '202', 'error_msg' => '無效的Token', 'result' => []]);
-                }
-                */
-            } else {
-                Log::info($request);
-                return response()->json(['status' => false, 'error_code' => '202', 'error_msg' => '無效的Token', 'result' => []]);
-            }
+        $this->checkForToken($request);
 
-            //$member = JWTAuth::parseToken()->authenticate();
-        } catch (Exception $e) {
-            Log::info($e);
+        try {
+            JWTAuth::parseToken()->authenticate();
+        } catch (\Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
-                return response()->json(['status' => 'Token is Invalid']);
+                return response()->json([
+                    'message' => '無效的token'
+                ], 401);
             } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-                return response()->json(['status' => 'Token is Expired']);
+                try {
+                    $token = $this->auth->refresh();
+                    Auth::guard('api')->onceUsingId($this->auth->manager()->getPayloadFactory()->buildClaimsCollection()->toPlainArray()['sub']);
+                    return $this->setAuthenticationHeader($next($request), $token);
+                } catch (JWTException $exception) {
+                    return response()->json([
+                        'message' => 'token已過期'
+                    ], 401);
+                }
             } else {
-                return response()->json(['status' => false, 'error_code' => '202', 'error_msg' => '無效的Token', 'result' => []]);
+                return response()->json([
+                    'message' => 'token不存在'
+                ], 404);
             }
         }
 

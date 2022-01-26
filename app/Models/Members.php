@@ -3,10 +3,9 @@
 namespace App\Models;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
-
 use Illuminate\Notifications\Notifiable;
-//use Tymon\JWTAuth\JWTAuth as Authenticatable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+
 class Members extends Authenticatable implements JWTSubject
 {
     use Notifiable;
