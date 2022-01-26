@@ -579,6 +579,7 @@ class APICartServices
             }
             $total_amount = ($cartTotal - $cartDiscount);
             if (isset($campaign_gift['CART'])) {
+                $compare_value = 0;
                 foreach ($campaign_gift['CART'] as $items => $item) {
                     if ($total_amount >= $item->n_value) {
                         if ($now >= $item->start_launched_at && $now <= $item->end_launched_at) { //在上架期間內
@@ -587,7 +588,8 @@ class APICartServices
                                     $stock_check = $this->stockService->getStockByProd($warehouseCode, $item->product_id);
                                     if (isset($stock_check)) {
                                         if ($this->stockService->getStockByProd($warehouseCode, $item->product_id)->stock_qty > 0) { //有足夠庫存
-                                            $cartGift[0] = array(
+                                            if ($compare_value > $item->n_value) continue;
+                                            $cartGift[] = array(
                                                 "campaignId" => $item->promotional_campaign_id,
                                                 "campaignName" => $item->campaign_name,
                                                 "productId" => $item->product_id,
@@ -596,6 +598,7 @@ class APICartServices
                                                 "productPhoto" => $campaign_gift['PROD'][$item->promotional_campaign_id][$item->product_id]['photo'],
                                                 "assignedQty" => $item->assignedQty
                                             );
+                                            $compare_value = $item->n_value;
                                         }
                                     }
                                 }
