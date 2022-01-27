@@ -288,7 +288,6 @@ class MemberInfoController extends Controller
         $messages = [
             'name.required' => '姓名不能為空',
             'mobile.required' => '手機不能為空',
-            'email.required' => 'E-mail不能為空',
             'zip_code.required' => '郵遞區號不能為空',
             'city_name.required' => '縣市名稱不能為空',
             'city_id.required' => '縣市編號不能為空',
@@ -299,7 +298,6 @@ class MemberInfoController extends Controller
 
         $v = Validator::make($request->all(), [
             'name' => 'required',
-            'mobile' => 'required',
             'email' => 'required',
             'zip_code' => 'required',
             'city_name' => 'required',
