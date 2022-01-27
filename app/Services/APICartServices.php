@@ -258,8 +258,6 @@ class APICartServices
                                             "campaignProdList" => $giftAway
                                         );
                                     }
-                                    $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
-                                    $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
                                     $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
@@ -268,8 +266,8 @@ class APICartServices
                                     $product[] = array(
                                         "itemId" => $item_info->item_id,
                                         "itemNo" => $item_info->item_no,
-                                        "itemSpec1" => $spec1,
-                                        "itemSpec2" => $spec2,
+                                        "itemSpec1" => $item_info->item_spec1,
+                                        "itemSpec2" => $item_info->item_spec2,
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
@@ -332,8 +330,6 @@ class APICartServices
                                         );
                                     }
 
-                                    $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
-                                    $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
                                     $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
@@ -342,8 +338,8 @@ class APICartServices
                                     $product[] = array(
                                         "itemId" => $item_info->item_id,
                                         "itemNo" => $item_info->item_no,
-                                        "itemSpec1" => $spec1,
-                                        "itemSpec2" => $spec2,
+                                        "itemSpec1" => $item_info->item_spec1,
+                                        "itemSpec2" => $item_info->item_spec2,
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
@@ -428,8 +424,6 @@ class APICartServices
                                     $amount = $tmp_qty * $price;
                                     $return_qty = $tmp_qty;
                                     $unit_price = round($amount / $return_qty);
-                                    $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
-                                    $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
                                     $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
                                     if ($stock_info) {
@@ -438,8 +432,8 @@ class APICartServices
                                     $product[] = array(
                                         "itemId" => $item_info->item_id,
                                         "itemNo" => $item_info->item_no,
-                                        "itemSpec1" => $spec1,
-                                        "itemSpec2" => $spec2,
+                                        "itemSpec1" => $item_info->item_spec1,
+                                        "itemSpec2" => $item_info->item_spec2,
                                         "itemPrice" => intval($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
@@ -469,8 +463,6 @@ class APICartServices
                             //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             foreach ($cartDetail[$product_id] as $item_id => $item_info) {
                                 $detail_qty = $item_info->item_qty;
-                                $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
-                                $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
                                 $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                 $stock = 0;
                                 if ($stock_info) {
@@ -479,8 +471,8 @@ class APICartServices
                                 $product[] = array(
                                     "itemId" => $item_info->item_id,
                                     "itemNo" => $item_info->item_no,
-                                    "itemSpec1" => $spec1,
-                                    "itemSpec2" => $spec2,
+                                    "itemSpec1" => $item_info->item_spec1,
+                                    "itemSpec2" => $item_info->item_spec2,
                                     "itemPrice" => intval($item_info->selling_price),
                                     "itemQty" => $detail_qty,
                                     "amount" => intval($item_info->selling_price * $detail_qty),
@@ -511,8 +503,6 @@ class APICartServices
                         foreach ($cartDetail[$product_id] as $item_id => $item_info) {
                             $detail_qty = $item_info->item_qty;
 
-                            $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
-                            $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
                             $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                             $stock = 0;
                             if ($stock_info) {
@@ -521,8 +511,8 @@ class APICartServices
                             $product[] = array(
                                 "itemId" => $item_info->item_id,
                                 "itemNo" => $item_info->item_no,
-                                "itemSpec1" => $spec1,
-                                "itemSpec2" => $spec2,
+                                "itemSpec1" => $item_info->item_spec1,
+                                "itemSpec2" => $item_info->item_spec2,
                                 "itemPrice" => intval($item_info->selling_price),
                                 "itemQty" => $detail_qty,
                                 "amount" => intval($item_info->selling_price * $detail_qty),
@@ -553,8 +543,6 @@ class APICartServices
                     foreach ($cartDetail[$product_id] as $item_id => $item_info) {
                         $detail_qty = $item_info->item_qty;
                         $product_type = 'expired';
-                        $spec1 = ($item_info->item_spec1 == 0 ? null : $item_info->item_spec1);
-                        $spec2 = ($item_info->item_spec2 == '' ? null : $item_info->item_spec2);
                         $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                         $stock = 0;
                         if ($stock_info) {
@@ -563,8 +551,8 @@ class APICartServices
                         $product[] = array(
                             "itemId" => $item_info->item_id,
                             "itemNo" => $item_info->item_no,
-                            "itemSpec1" => $spec1,
-                            "itemSpec2" => $spec2,
+                            "itemSpec1" => $item_info->item_spec1,
+                            "itemSpec2" => $item_info->item_spec2,
                             "itemPrice" => intval($item_info->selling_price),
                             "itemQty" => $detail_qty,
                             "amount" => intval($item_info->selling_price * $detail_qty),
