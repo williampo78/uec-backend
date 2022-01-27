@@ -35,7 +35,7 @@ class JwtMiddleware extends BaseMiddleware
                 try {
                     $token = $this->auth->refresh();
                     Auth::guard('api')->onceUsingId($this->auth->manager()->getPayloadFactory()->buildClaimsCollection()->toPlainArray()['sub']);
-                    return $this->setAuthenticationHeader($next($request), $token);
+                    return $this->setAuthenticationHeader($next($request)->header('Access-Control-Allow-Headers', 'Origin, Methods, Content-Type, Authorization'), $token);
                 } catch (JWTException $exception) {
                     return response()->json([
                         'message' => 'token已過期'
