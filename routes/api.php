@@ -92,7 +92,7 @@ Route::group(['middleware' => 'jwt.verify'], function () {
 });
 
 // jwt v2驗證
-Route::group(['middleware' => 'jwt.v2.verify'], function () {
+Route::group(['middleware' => 'jwt.verify'], function () {
     // 單一會員
     Route::group(['prefix' => 'member'], function () {
         // 取得會員訂單列表
