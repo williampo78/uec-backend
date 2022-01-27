@@ -237,9 +237,9 @@ class APIProductServices
         }
 
         if ($order_by == 'launched') {
-            $strSQL .= " order by p.start_launched_at " . $sort_flag .", p.id";
+            $strSQL .= " order by p.start_launched_at " . $sort_flag . ", p.id";
         } else if ($order_by == 'price') {
-            $strSQL .= " order by p.selling_price " . $sort_flag .", p.id";
+            $strSQL .= " order by p.selling_price " . $sort_flag . ", p.id";
         }
 
         $products = DB::select($strSQL);
@@ -412,8 +412,15 @@ class APIProductServices
 
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
-        $strSQL = "select cate1.id, cate1.category_name
-                    from web_category_products
+
+        $strSQL = "select cate1.id , cate1.category_name ,count(cate1.id) as count";
+        if ($config_levels == 3) {
+            $strSQL .= ",cate2.id as L2, cate2.category_name as L2_Name,cate3.id as L1, cate3.category_name as L1_Name ";
+        } else {
+            $strSQL .= ",cate2.id as L1, cate2.category_name as L1_Name ";
+        }
+
+        $strSQL .= "from web_category_products
                     inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
@@ -443,14 +450,62 @@ class APIProductServices
         if ($category) {//依分類搜尋
             $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
         }
+        $strSQL .= " group by cate1.id";
+        if ($config_levels == 2) {
+            $strSQL .= " order by cate2.sort, cate1.sort";
+        } else {
+            $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
+        }
         $products = DB::select($strSQL);
         if ($products) {
             $data = [];
             $product_id = 0;
-            foreach ($products as $product) {
-                if ($product_id == $product->id) continue;
-                $data[] = array("category_id" => $product->id, 'category_name' => $product->category_name);
-                $product_id = $product->id;
+            foreach ($products as $category) {
+                if ($config_levels == 2) {
+                    $sub[$category->L1][] = array(
+                        'id' => $category->id,
+                        'name' => $category->category_name,
+                        'count' => $category->count
+                    );
+                } elseif ($config_levels == 3) {
+                    $sub[$category->L2][$category->L2][] = array(
+                        'id' => $category->id,
+                        'name' => $category->category_name,
+                        'count' => $category->count
+                    );
+                }
+            }
+            $cate = 0;
+            if ($config_levels == 2) {
+                foreach ($products as $category) {
+                    if ($cate == $category->L1) continue;
+                    $data[] = array(
+                        'id' => $category->L1,
+                        'name' => $category->L1_Name,
+                        'sub' => $sub[$category->L1]
+                    );
+                    $cate = $category->L1;
+                }
+            } elseif ($config_levels == 3) {
+                $subCate = 0;
+                foreach ($products as $category) {
+                    if ($subCate == $category->L2) continue;
+                    $main[] = array(
+                        'id' => $category->L2,
+                        'name' => $category->L2_Name,
+                        'sub' => $sub[$category->L1][$category->L2]
+                    );
+                    $subCate = $category->L2;
+                }
+                foreach ($products as $category) {
+                    if ($cate == $category->L1) continue;
+                    $data[] = array(
+                        'id' => $category->L2,
+                        'name' => $category->L2_Name,
+                        'sub' => $main[$category->L1]
+                    );
+                    $cate = $category->L1;
+                }
             }
             return $data;
         } else {

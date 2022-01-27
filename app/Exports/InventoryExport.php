@@ -3,51 +3,27 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Events\AfterSheet;
-use Maatwebsite\Excel\Sheet;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class InventoryExport implements FromCollection, WithHeadings, WithEvents
+class InventoryExport implements FromCollection, WithHeadings, WithColumnWidths, WithStyles, WithStrictNullComparison
 {
     private $collection;
+    private $total_rows = 0;
 
     public function __construct($collection)
     {
         $this->collection = $collection;
-    }
-
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class    => function(AfterSheet $event) {
-
-                $array = [
-                    'H:H',
-                    'I:I',
-                    'J:J',
-                    'K:K',
-                    'L:L',
-                    'M:M'
-                ];
-
-                foreach ($array as $item){
-                    $event->sheet->styleCells(
-                        $item,
-                        [
-                            'alignment' => [
-                                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT,
-                            ],
-                        ]
-                    );
-                }
-
-            },
-        ];
+        $this->total_rows += $this->collection->count();
     }
 
     public function headings(): array
     {
+        $this->total_rows++;
+
         return [
             '倉庫',
             'Item編號',
@@ -62,13 +38,101 @@ class InventoryExport implements FromCollection, WithHeadings, WithEvents
             '平均成本(含稅)',
             '毛利率',
             '庫存成本(含稅)',
-            '低於安全庫存量'
+            '低於安全庫存量',
+        ];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 15,
+            'B' => 15,
+            'C' => 30,
+            'D' => 10,
+            'E' => 10,
+            'F' => 15,
+            'G' => 10,
+            'H' => 15,
+            'I' => 10,
+            'J' => 15,
+            'K' => 15,
+            'L' => 10,
+            'M' => 15,
+            'N' => 15,
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        // 對齊方式
+        $alignment_datas = [
+            'left' => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'N'],
+            'center' => [],
+            'right' => ['H', 'I', 'J', 'K', 'L', 'M'],
+        ];
+
+        foreach ($alignment_datas as $method => $columns) {
+            switch ($method) {
+                case 'left':
+                    foreach ($columns as $column) {
+                        $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                    }
+                    break;
+
+                case 'center':
+                    foreach ($columns as $column) {
+                        $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    }
+                    break;
+
+                case 'right':
+                    foreach ($columns as $column) {
+                        $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                    }
+                    break;
+            }
+        }
+
+        // 數字格式
+        $number_format_datas = [
+            [
+                'format' => '#,##0.00',
+                'columns' => ['K'],
+            ],
+            [
+                'format' => '#,##0',
+                'columns' => ['J', 'M'],
+            ],
+        ];
+
+        foreach ($number_format_datas as $data) {
+            foreach ($data['columns'] as $column) {
+                $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")
+                    ->getNumberFormat()
+                    ->setFormatCode($data['format']);
+            }
+        }
+
+        return [
+            'A1:N1' => [
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                ],
+                'font' => [
+                    'bold' => true,
+                ],
+            ],
+            "A1:N{$this->total_rows}" => [
+                'alignment' => [
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+            ],
         ];
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return $this->collection;
