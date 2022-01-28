@@ -298,7 +298,7 @@ class MemberInfoController extends Controller
 
         $v = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required',
+            'mobile' => 'required',
             'zip_code' => 'required',
             'city_name' => 'required',
             'city_id' => 'required',
