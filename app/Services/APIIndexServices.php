@@ -68,7 +68,6 @@ class APIIndexServices
             }
         }
         foreach ($ads as $ad_slot) {
-            if (!isset($products[$ad_slot->product_id])) continue;
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
                     'name' => $ad_slot->texts,
@@ -98,6 +97,7 @@ class APIIndexServices
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
             } elseif ($ad_slot->slot_type == 'S') {
+                if (!isset($products[$ad_slot->product_id])) continue;
                 if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
                     $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
                 } else {
@@ -183,7 +183,7 @@ class APIIndexServices
                     );
                 }
             } elseif ($ad_slot->slot_type == 'IS') {
-
+                if (!isset($products[$ad_slot->product_id])) continue;
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
                     if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
                         $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
