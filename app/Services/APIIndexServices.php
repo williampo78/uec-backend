@@ -97,12 +97,6 @@ class APIIndexServices
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
             } elseif ($ad_slot->slot_type == 'S') {
-                if (!isset($products[$ad_slot->product_id])) continue;
-                if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
-                    $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
-                } else {
-                    $promotion_desc = null;
-                }
                 if ($ad_slot->product_assigned_type == 'C') {
                     if (isset($categoryProducts[$ad_slot->web_category_hierarchy_id])) {
                         $product_info = [];
@@ -144,7 +138,7 @@ class APIIndexServices
                         );
                     }
                 } else if ($ad_slot->product_assigned_type == 'P') {
-
+                    if (!isset($products[$ad_slot->product_id])) continue;
                     if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
                         $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
                     } else {
@@ -159,7 +153,6 @@ class APIIndexServices
                             }
                         }
                     }
-
                     $product_info[$ad_slot->slot_code][] = array(
                         'product_id' => $ad_slot->product_id,
                         'product_no' => $products[$ad_slot->product_id]->product_no,
