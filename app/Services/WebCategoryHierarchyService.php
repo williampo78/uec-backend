@@ -133,7 +133,7 @@ class WebCategoryHierarchyService
 
         if ($confi_levels == 2) {
             $query = "SELECT level_two.id as id, level_two.meta_title , CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,
-            level_two.content_type ,'' as level_three ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
+            level_two.content_type ,'' as meta_title ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
             FROM (SELECT * FROM web_category_hierarchy WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $whereID . ") level_two ON level_two.parent_id = level_one.id
             " . $where . " ORDER BY level_one.category_name, level_two.category_name";
