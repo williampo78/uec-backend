@@ -429,7 +429,7 @@
 
             let invoices = {};
 
-            $('#table_list tbody').on('click', '.order_detail', function() {
+            $(document).on('click', '.order_detail', function() {
                 let order_id = $(this).attr("data-order");
                 invoices = {};
 

@@ -248,7 +248,7 @@
                 }
             });
 
-            $('#table_list tbody').on('click', '.slot_content_detail', function() {
+            $(document).on('click', '.slot_content_detail', function() {
                 let slot_content_id = $(this).attr("data-slot-content-id");
 
                 axios.post('/backend/advertisemsement_launch/ajax/detail', {

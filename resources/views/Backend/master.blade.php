@@ -105,8 +105,10 @@
         @isset($share_role_auth)
             var RoleAuthJson = @json($share_role_auth) ;
         @endisset
+
         var UecConfig = @json(Config('uec'));
-        $(document).ready(function() {
+
+        $(function() {
             $('#table_list').DataTable({
                 "aaSorting": []
             });

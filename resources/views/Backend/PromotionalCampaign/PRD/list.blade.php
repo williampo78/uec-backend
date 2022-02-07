@@ -254,7 +254,7 @@
                 }
             });
 
-            $('#table_list tbody').on('click', '.promotional_campaign_detail', function() {
+            $(document).on('click', '.promotional_campaign_detail', function() {
                 let promotional_campaign_id = $(this).attr("data-promotional-campaign-id");
 
                 axios.post('/backend/promotional_campaign/ajax/detail', {

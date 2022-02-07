@@ -46,6 +46,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
@@ -77,6 +78,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="col-sm-4">
@@ -107,7 +111,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="col-sm-4">
-                                                <label class="control-label">會員編號</label>
+                                                <label class="control-label">會員帳號</label>
                                             </div>
                                             <div class="col-sm-8">
                                                 <p class="form-control-static" id="modal-member-account"></p>
@@ -164,6 +168,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
@@ -255,7 +260,6 @@
                                         <th class="text-nowrap">對象</th>
                                         <th class="text-nowrap">金額</th>
                                         <th class="text-nowrap">狀態</th>
-                                        <th class="text-nowrap">狀態變更時間</th>
                                         <th class="text-nowrap">備註</th>
                                     </tr>
                                 </thead>

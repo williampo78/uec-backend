@@ -147,21 +147,21 @@
                     <div class="panel-body">
                         <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
-                                   id="order_refund_table">
+                                   id="table_list">
                                 <thead>
                                     <tr>
-                                        <th>項次</th>
-                                        <th>日期</th>
-                                        <th>訂單編號</th>
-                                        <th>類型</th>
-                                        <th>金流方式</th>
-                                        <th>分期期數</th>
-                                        <th>狀態</th>
-                                        <th>金額</th>
-                                        <th>發票號碼</th>
-                                        <th>發票日期</th>
-                                        <th>備註</th>
-                                        <th>收款行</th>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">日期</th>
+                                        <th class="text-nowrap">訂單編號</th>
+                                        <th class="text-nowrap">類型</th>
+                                        <th class="text-nowrap">金流方式</th>
+                                        <th class="text-nowrap">分期期數</th>
+                                        <th class="text-nowrap">狀態</th>
+                                        <th class="text-nowrap">金額</th>
+                                        <th class="text-nowrap">發票號碼</th>
+                                        <th class="text-nowrap">發票日期</th>
+                                        <th class="text-nowrap">備註</th>
+                                        <th class="text-nowrap">收款行</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -217,12 +217,7 @@
                 }
             });
 
-            $('#order_refund_table').dataTable({
-                "aaSorting": []
-            });
-
             $.validator.addMethod("date_grid", function(value, element) {
-
                 let start_date = $('#date_start').val();
                 let end_date = $('#date_end').val();
                 if(start_date == '' || end_date == ''){
@@ -237,6 +232,7 @@
                 if(diffDays > 90){
                     return false;
                 }
+
                 return true;
 
             }, "開始和結束不得超過90天");
@@ -294,7 +290,6 @@
 
             // 匯出excel
             $('#btn-export-excel').on('click', function() {
-
                 let url = $(this).data('url');
 
                 axios.get(url, {
