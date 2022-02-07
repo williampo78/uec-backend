@@ -183,7 +183,7 @@ class APIIndexServices
                     );
                 }
             } elseif ($ad_slot->slot_type == 'IS') {
-                if (!isset($products[$ad_slot->product_id])) continue;
+
                 if ($ad_slot->data_type == 'PRD' && isset($products[$ad_slot->product_id])) {
                     if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
                         $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
