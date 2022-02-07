@@ -181,20 +181,14 @@ class AdvertisementService
             }
         }
 
-        try {
-            // 上架起始日查詢
-            if (!empty($query_data['start_at'])) {
-                $start_at = Carbon::parse($query_data['start_at'])->format('Y-m-d H:i:s');
-                $result = $result->where('ad_slot_contents.start_at', '>=', $start_at);
-            }
+        // 上架起始日查詢
+        if (!empty($query_data['start_at'])) {
+            $result = $result->whereDate('ad_slot_contents.start_at', '>=', $query_data['start_at']);
+        }
 
-            // 上架結束日查詢
-            if (!empty($query_data['end_at'])) {
-                $end_at = Carbon::parse($query_data['end_at'])->format('Y-m-d H:i:s');
-                $result = $result->where('ad_slot_contents.end_at', '<=', $end_at);
-            }
-        } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-            Log::warning($e->getMessage());
+        // 上架結束日查詢
+        if (!empty($query_data['end_at'])) {
+            $result = $result->whereDate('ad_slot_contents.end_at', '<=', $query_data['end_at']);
         }
 
         $result = $result->orderBy("ad_slots.applicable_page", "asc")
