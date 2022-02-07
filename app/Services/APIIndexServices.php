@@ -68,6 +68,7 @@ class APIIndexServices
             }
         }
         foreach ($ads as $ad_slot) {
+            if (!isset($products[$ad_slot->product_id])) continue;
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
                     'name' => $ad_slot->texts,
