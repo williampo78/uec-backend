@@ -33,12 +33,12 @@ class AdvertisementLaunchController extends Controller
     {
         $query_datas = [];
 
-        $query_datas = $request->only(['slot_id', 'launch_status', 'start_at', 'end_at']);
+        $query_datas = $request->only(['slot_id', 'launch_status', 'start_at_start', 'start_at_end']);
 
         $ad_slots = $this->advertisement_service->getSlots();
         $ad_slot_contents = $this->advertisement_service->getSlotContents($query_datas);
 
-        $ad_slot_contents = $ad_slot_contents->map(function ($obj, $key) {
+        $ad_slot_contents = $ad_slot_contents->map(function ($obj) {
             /*
              * 上下架狀態
              * 當前時間在上架時間內，且廣告上架內容的狀態為啟用，列為上架

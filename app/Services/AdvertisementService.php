@@ -181,14 +181,14 @@ class AdvertisementService
             }
         }
 
-        // 上架起始日查詢
-        if (!empty($query_data['start_at'])) {
-            $result = $result->whereDate('ad_slot_contents.start_at', '>=', $query_data['start_at']);
+        // 上架起始日開始時間
+        if (!empty($query_data['start_at_start'])) {
+            $result = $result->whereDate('ad_slot_contents.start_at', '>=', $query_data['start_at_start']);
         }
 
-        // 上架結束日查詢
-        if (!empty($query_data['end_at'])) {
-            $result = $result->whereDate('ad_slot_contents.end_at', '<=', $query_data['end_at']);
+        // 上架起始日結束時間
+        if (!empty($query_data['start_at_end'])) {
+            $result = $result->whereDate('ad_slot_contents.start_at', '<=', $query_data['start_at_end']);
         }
 
         $result = $result->orderBy("ad_slots.applicable_page", "asc")
