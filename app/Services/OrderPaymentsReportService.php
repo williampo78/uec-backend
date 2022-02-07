@@ -128,20 +128,23 @@ class OrderPaymentsReportService
      * @Author: Eric
      * @DateTime: 2022/1/17 上午 11:23
      */
-    public function handleOrderPaymentsReports(Collection $OrderPaymentsReports)
+    public function handleOrderPaymentsReports(Collection $orderPaymentReports)
     {
-        return $OrderPaymentsReports->map(function ($OrderPaymentsReport) {
+        return $orderPaymentReports->map(function ($orderPaymentReport) {
 
-            $OrderPaymentsReport->payment_type = config('uec.payment_type_options')[$OrderPaymentsReport->payment_type] ?? null;
-            $OrderPaymentsReport->payment_method = config('uec.payment_method_options')[$OrderPaymentsReport->payment_method] ?? null;
+            $orderPaymentReport->payment_type = config('uec.payment_type_options')[$orderPaymentReport->payment_type] ?? null;
+            $orderPaymentReport->payment_method = config('uec.payment_method_options')[$orderPaymentReport->payment_method] ?? null;
             //資料新增原因
-            $OrderPaymentsReport->record_created_reason = config('uec.order_payment_record_created_reason')[$OrderPaymentsReport->record_created_reason] ?? null;
-            $OrderPaymentsReport->created_at = date('Y-m-d', strtotime($OrderPaymentsReport->created_at));
-            $OrderPaymentsReport->amount = is_null($OrderPaymentsReport->amount) ? null : number_format($OrderPaymentsReport->amount);
-            // 發票日期
-            $OrderPaymentsReport->invoice_date = Carbon::parse($OrderPaymentsReport->invoice_date)->format('Y-m-d');
+            $orderPaymentReport->record_created_reason = config('uec.order_payment_record_created_reason')[$orderPaymentReport->record_created_reason] ?? null;
+            $orderPaymentReport->created_at = date('Y-m-d', strtotime($orderPaymentReport->created_at));
+            $orderPaymentReport->amount = is_null($orderPaymentReport->amount) ? null : number_format($orderPaymentReport->amount);
 
-            return $OrderPaymentsReport;
+            // 發票日期
+            if (isset($orderPaymentReport->invoice_date)) {
+                $orderPaymentReport->invoice_date = Carbon::parse($orderPaymentReport->invoice_date)->format('Y-m-d');
+            }
+
+            return $orderPaymentReport;
         });
     }
 
@@ -162,8 +165,11 @@ class OrderPaymentsReportService
             $item->record_created_reason = config('uec.order_payment_record_created_reason')[$item->record_created_reason] ?? null;
             $item->created_at = date('Y-m-d', strtotime($item->created_at));
             $item->amount = is_null($item->amount) ? null : $item->amount;
+
             // 發票日期
-            $item->invoice_date = Carbon::parse($item->invoice_date)->format('Y-m-d');
+            if (isset($item->invoice_date)) {
+                $item->invoice_date = Carbon::parse($item->invoice_date)->format('Y-m-d');
+            }
 
             return [
                 (string) $index + 1, //項次
