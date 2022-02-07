@@ -343,7 +343,7 @@
                                         <td>${product.selling_price}</td>
                                         <td>${product.launched_at}</td>
                                         <td>${product.launched_status}</td>
-                                        <td>${product.gross_margin}</td>
+                                        <td>${product.gross_margin ? product.gross_margin : ''}</td>
                                     </tr>
                                 `);
                             });
