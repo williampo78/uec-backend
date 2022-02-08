@@ -81,25 +81,17 @@
     <script src="{{ asset('asset/js/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('asset/js/additional-methods.min.js') }}"></script>
     <script src="{{ asset('asset/js/messages_zh_TW.min.js') }}"></script>
-    <script src="{{ asset('asset/js/my-jquery-validate-methods.js') }}"></script>
 
     <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
     <script src="{{ asset('asset/js/clipboard.min.js') }}"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.debug.js"></script>
-    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/morrisjs/morris.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
     <script src="{{ asset('asset/js/init.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
-    <script src="{{ asset('asset/js/jquery.validationEngine.js') }}"></script>
-    <script src="{{ asset('asset/js/jquery.validationEngine-zh_TW.js') }}"></script>
-    <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
-    <script src="{{ asset('asset/js/axios.min.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ mix('js/app.js') }}"></script>
 
     <script>
         @isset($share_role_auth)

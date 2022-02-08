@@ -549,7 +549,7 @@
                 if (e.oldDate === null) {
                     $(this)
                         .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(00, 00, 00)));
+                        .date(new Date(e.date._d.setHours(0, 0, 0)));
                 }
             });
             $("#promotion_end_at").on("dp.change", function (e) {

@@ -1,3 +1,6 @@
+import Swal from 'sweetalert2'
+import jQuery from 'jquery'
+
 window._ = require('lodash');
 
 /**
@@ -26,3 +29,13 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/**
+ * sweetalert2
+ */
+window.Swal = Swal;
+
+/**
+ * JQuery
+ */
+// window.$ = window.jQuery = jQuery;
