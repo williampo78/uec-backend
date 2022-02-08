@@ -101,7 +101,7 @@ class IndexController extends Controller
         $data['content_text'] = $request['content_text'];
 
         Mail::send('mail.contact', $data, function ($message ) use($data) {
-            $message->to(array(config('uec.mailTo')))->subject(config('uec.mailPrefix').' 與我們聯繫');
+            $message->to(config('uec.mailTo'))->subject(config('uec.mailPrefix').' 與我們聯繫');
         });
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => '信件發送成功']);
 
