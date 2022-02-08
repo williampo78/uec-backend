@@ -1,5 +1,5 @@
 // 初始化資料
-function init(datas = {}) {
+init = function (datas = {}) {
     let ad_slot_select_options = datas.ad_slot_select_options
         ? datas.ad_slot_select_options
         : "";
@@ -31,7 +31,7 @@ function init(datas = {}) {
         if (e.oldDate === null) {
             $(this)
                 .data("DateTimePicker")
-                .date(new Date(e.date._d.setHours(00, 00, 00)));
+                .date(new Date(e.date._d.setHours(0, 0, 0)));
         }
     });
 
@@ -270,7 +270,7 @@ function init(datas = {}) {
 }
 
 // 取得版位下拉選項
-function getAdSlotSelectOptions(datas = []) {
+getAdSlotSelectOptions = function (datas = []) {
     let options = "";
 
     $.each(datas, function (key, value) {
@@ -283,7 +283,7 @@ function getAdSlotSelectOptions(datas = []) {
 }
 
 // 取得商品分類下拉選項
-function getProductCategorySelectOptions(datas = []) {
+getProductCategorySelectOptions = function (datas = []) {
     let options = "";
 
     $.each(datas, function (key, value) {
@@ -296,7 +296,7 @@ function getProductCategorySelectOptions(datas = []) {
 }
 
 // 取得商品下拉選項
-function getProductSelectOptions(datas = []) {
+getProductSelectOptions = function (datas = []) {
     let options = "";
 
     $.each(datas, function (key, value) {
@@ -308,7 +308,7 @@ function getProductSelectOptions(datas = []) {
     return options;
 }
 
-function addImageBlock(product_category_select_options = "", datas = {}) {
+addImageBlock = function (product_category_select_options = "", datas = {}) {
     let image_block_row_no = datas.id
         ? datas.id
         : $("#image-block-row-no").val();
@@ -420,7 +420,7 @@ function addImageBlock(product_category_select_options = "", datas = {}) {
     validateImageBlock(image_block_row_no);
 }
 
-function addTextBlock(product_category_select_options, datas = {}) {
+addTextBlock = function (product_category_select_options, datas = {}) {
     let text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
     let text_block_id = datas.id ? datas.id : "new";
     let sort = datas.sort ? datas.sort : "";
@@ -509,7 +509,7 @@ function addTextBlock(product_category_select_options, datas = {}) {
     validateTextBlock(text_block_row_no);
 }
 
-function addProductBlockProduct(product_select_options, datas = {}) {
+addProductBlockProduct = function (product_select_options, datas = {}) {
     let product_block_product_row_no = datas.id
         ? datas.id
         : $("#product-block-product-row-no").val();
@@ -551,7 +551,7 @@ function addProductBlockProduct(product_select_options, datas = {}) {
     validateProductBlockProduct(product_block_product_row_no);
 }
 
-function addProductBlockCategory(product_category_select_options, datas = {}) {
+addProductBlockCategory = function (product_category_select_options, datas = {}) {
     let product_block_category_row_no = datas.id
         ? datas.id
         : $("#product-block-category-row-no").val();
@@ -594,7 +594,7 @@ function addProductBlockCategory(product_category_select_options, datas = {}) {
 }
 
 // 啟用版位主色
-function enableSlotColorCode() {
+enableSlotColorCode = function () {
     $("#slot_color_code").prop("disabled", false);
 
     if ($("#slot_color_code").prev("label").find("span").length < 1) {
@@ -607,7 +607,7 @@ function enableSlotColorCode() {
 }
 
 // 啟用版位icon
-function enableSlotIconName() {
+enableSlotIconName = function () {
     $("#slot_icon_name").prop("disabled", false);
 
     if (
@@ -624,7 +624,7 @@ function enableSlotIconName() {
 }
 
 // 啟用版位標題
-function enableSlotTitle() {
+enableSlotTitle = function () {
     $("#slot_title").prop("disabled", false);
 
     if ($("#slot_title").prev("label").find("span").length < 1) {
@@ -637,21 +637,21 @@ function enableSlotTitle() {
 }
 
 // 停用版位主色
-function disableSlotColorCode() {
+disableSlotColorCode = function () {
     $("#slot_color_code").prop("disabled", true).val('').prev("label").find("span").remove();
 
     removeSlotColorCodeValidation();
 }
 
 // 停用版位icon
-function disableSlotIconName() {
+disableSlotIconName = function () {
     $("#slot_icon_name").prop("disabled", true).val('').prev("label").find("span").remove();
 
     removeSlotIconNameValidation();
 }
 
 // 停用版位標題
-function disableSlotTitle() {
+disableSlotTitle = function () {
     $("#slot_title").prop("disabled", true).val('').prev("label").find("span").remove();
 
     removeSlotTitleValidation();
