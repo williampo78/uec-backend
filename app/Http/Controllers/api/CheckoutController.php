@@ -206,10 +206,10 @@ class CheckoutController extends Controller
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
         */
 
+        $data = [];
         if ($response['status'] == '404') {
             $status = false;
             $err = $response['status'];
-            $data = [];
         } else {
             //Step1, 檢核金額
             if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
