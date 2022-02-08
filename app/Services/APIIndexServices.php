@@ -138,42 +138,44 @@ class APIIndexServices
                         );
                     }
                 } else if ($ad_slot->product_assigned_type == 'P') {
-                    if (!isset($products[$ad_slot->product_id])) continue;
-                    if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
-                        $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
-                    } else {
-                        $promotion_desc = null;
-                    }
+                    if (isset($products[$ad_slot->product_id])) {
+                        if ($now >= $products[$ad_slot->product_id]->promotion_start_at && $now <= $products[$ad_slot->product_id]->promotion_end_at) {
+                            $promotion_desc = $products[$ad_slot->product_id]->promotion_desc;
+                        } else {
+                            $promotion_desc = null;
+                        }
 
-                    if (isset($is_collection)) {
-                        $collection = false;
-                        foreach ($is_collection as $k => $v) {
-                            if ($v['product_id'] == $ad_slot->product_id) {
-                                $collection = true;
+                        if (isset($is_collection)) {
+                            $collection = false;
+                            foreach ($is_collection as $k => $v) {
+                                if ($v['product_id'] == $ad_slot->product_id) {
+                                    $collection = true;
+                                }
                             }
                         }
-                    }
-                    $product_info[$ad_slot->slot_code][] = array(
-                        'product_id' => $ad_slot->product_id,
-                        'product_no' => $products[$ad_slot->product_id]->product_no,
-                        'product_name' => $products[$ad_slot->product_id]->product_name,
-                        'product_unit' => $products[$ad_slot->product_id]->uom,
-                        'list_price' => $products[$ad_slot->product_id]->list_price,
-                        'selling_price' => $products[$ad_slot->product_id]->selling_price,
-                        'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
-                        'promotion_desc' => $promotion_desc,
-                        'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
-                        "collection" => $collection,
-                    );
 
-                    $data[$ad_slot->slot_code] = array(
-                        'slot_color_code' => $ad_slot->slot_color_code,
-                        'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
-                        'slot_title' => $ad_slot->slot_title,
-                        'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                        'desktop_applicable' => $ad_slot->is_desktop_applicable,
-                        'products' => $product_info[$ad_slot->slot_code]
-                    );
+                        $product_info[$ad_slot->slot_code][] = array(
+                            'product_id' => $ad_slot->product_id,
+                            'product_no' => $products[$ad_slot->product_id]->product_no,
+                            'product_name' => $products[$ad_slot->product_id]->product_name,
+                            'product_unit' => $products[$ad_slot->product_id]->uom,
+                            'list_price' => $products[$ad_slot->product_id]->list_price,
+                            'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                            'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                            'promotion_desc' => $promotion_desc,
+                            'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
+                            "collection" => $collection,
+                        );
+
+                        $data[$ad_slot->slot_code] = array(
+                            'slot_color_code' => $ad_slot->slot_color_code,
+                            'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
+                            'slot_title' => $ad_slot->slot_title,
+                            'mobile_applicable' => $ad_slot->is_mobile_applicable,
+                            'desktop_applicable' => $ad_slot->is_desktop_applicable,
+                            'products' => $product_info[$ad_slot->slot_code]
+                        );
+                    }
                 }
             } elseif ($ad_slot->slot_type == 'IS') {
 
