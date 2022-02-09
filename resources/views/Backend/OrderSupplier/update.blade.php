@@ -22,6 +22,7 @@
                                                 <input class="form-control" id="requisitions_purchase_number"
                                                     value="{{ $order_supplier['requisitions_purchase_number'] ?? '' }}"
                                                     readonly>
+                                                    <input type="hidden" name="requisitions_purchase_id"  value="{{$order_supplier['requisitions_purchase_id']}}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">

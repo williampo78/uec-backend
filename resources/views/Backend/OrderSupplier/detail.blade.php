@@ -55,7 +55,7 @@
                             </div>
                             <div class="row">
                                 <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 採購單號</label></div>
+                                    <div class="col-sm-2 text-right"><label> 請購單號</label></div>
                                     <div class="col-sm-4">@{{ show_supplier . requisitions_purchase_number }}
                                     </div>
                                     <div class="col-sm-2 text-right"><label> 發票抬頭</label></div>

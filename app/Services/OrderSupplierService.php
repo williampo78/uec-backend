@@ -129,7 +129,6 @@ class OrderSupplierService
         $now = Carbon::now();
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
-
         DB::beginTransaction();
         try {
             $orderSupplierData = [
