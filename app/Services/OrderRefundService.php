@@ -2,23 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-use App\Models\Invoice;
-use App\Models\ReturnRequest;
-use App\Models\ReturnRequestDetail;
-use App\Models\Shipment;
-use App\Models\OrderDetail;
-use App\Models\OrderPayment;
-use App\Models\InvoiceDetail;
-use App\Models\ProductPhotos;
-use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
-use App\Models\SysConfig;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
 
 class OrderRefundService
 {
@@ -98,14 +85,22 @@ class OrderRefundService
      * @Author: Eric
      * @DateTime: 2022/1/17 上午 11:23
      */
-    public function handleOrderRefunds(Collection $OrderRefunds)
+    public function handleOrderRefunds(Collection $orderRefunds)
     {
-        return $OrderRefunds->map(function ($OrderRefund) {
-            $OrderRefund->status_code = config('uec.return_request_status_options')[$OrderRefund->status_code] ?? null;
-            $OrderRefund->refund_method = config('uec.payment_method_options')[$OrderRefund->refund_method] ?? null;
-            $OrderRefund->lgst_method = config('uec.lgst_method_options')[$OrderRefund->lgst_method] ?? null;
+        return $orderRefunds->map(function ($orderRefund) {
+            // 退貨申請時間
+            $orderRefund->request_date = Carbon::parse($orderRefund->request_date)->format('Y-m-d H:i');
 
-            return $OrderRefund;
+            // 退貨完成時間
+            if (isset($orderRefund->completed_at)) {
+                $orderRefund->completed_at = Carbon::parse($orderRefund->completed_at)->format('Y-m-d H:i');
+            }
+
+            $orderRefund->status_code = config('uec.return_request_status_options')[$orderRefund->status_code] ?? null;
+            $orderRefund->refund_method = config('uec.payment_method_options')[$orderRefund->refund_method] ?? null;
+            $orderRefund->lgst_method = config('uec.lgst_method_options')[$orderRefund->lgst_method] ?? null;
+
+            return $orderRefund;
         });
     }
 
@@ -141,20 +136,22 @@ class OrderRefundService
              when payment_status = 'FAILED' then '退款失敗'
              when payment_status = 'VOIDED' then '已作廢'
              else '' end) as payment_status_desc,
-            latest_api_date,
             remark";
 
-        $result = DB::table('order_payments')
+        $order_payments = DB::table('order_payments')
             ->selectRaw($select)
             ->where('source_table_name', 'return_requests')
-            ->where('source_table_id', $id);
-
-        return DB::table('order_payments')
-            ->selectRaw($select)
-            ->where('source_table_name', 'orders')
             ->where('source_table_id', $id)
-            ->unionAll($result)
             ->get();
+
+        $order_payments->transform(function ($order_payment) {
+            // 建立時間
+            $order_payment->created_at = Carbon::parse($order_payment->created_at)->format('Y-m-d H:i');
+
+            return $order_payment;
+        });
+
+        return $order_payments;
     }
 
     public function getReturnRequest(int $id)
@@ -178,9 +175,9 @@ class OrderRefundService
             o.member_account, o.buyer_name,
             lvv.description as req_reason_description';
 
-        $ReturnRequest = DB::table('return_requests as rr')
+        $returnRequest = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.new_order_id')
+            ->join('orders as o', 'o.id', '=', 'rr.order_id')
             ->leftJoin('lookup_values_v as lvv', 'lvv.code', '=', 'rr.req_reason_code')
             ->where('rr.id', $id)
             ->where('rr.agent_id', $agent_id)
@@ -188,18 +185,26 @@ class OrderRefundService
             ->where('lvv.type_code', 'RETURN_REQ_REASON')
             ->first();
 
-        if (empty($ReturnRequest)) {
+        if (empty($returnRequest)) {
             return null;
         }
 
-        //退貨單狀態
-        $ReturnRequest->status_code = config('uec.return_request_status_options')[$ReturnRequest->status_code] ?? null;
-        //物流方式
-        $ReturnRequest->lgst_method = config('uec.lgst_method_options')[$ReturnRequest->lgst_method] ?? null;
-        //物流廠商
-        $ReturnRequest->lgst_company = config('uec.lgst_company_code_options')[$ReturnRequest->lgst_company_code] ?? null;
+        // 退貨申請時間
+        $returnRequest->request_date = Carbon::parse($returnRequest->request_date)->format('Y-m-d H:i');
 
-        return $ReturnRequest;
+        // 退貨完成時間
+        if (isset($returnRequest->completed_at)) {
+            $returnRequest->completed_at = Carbon::parse($returnRequest->completed_at)->format('Y-m-d H:i');
+        }
+
+        //退貨單狀態
+        $returnRequest->status_code = config('uec.return_request_status_options')[$returnRequest->status_code] ?? null;
+        //物流方式
+        $returnRequest->lgst_method = config('uec.lgst_method_options')[$returnRequest->lgst_method] ?? null;
+        //物流廠商
+        $returnRequest->lgst_company = config('uec.lgst_company_code_options')[$returnRequest->lgst_company_code] ?? null;
+
+        return $returnRequest;
     }
 
     /**
@@ -236,12 +241,11 @@ class OrderRefundService
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.order_id')  //join條件調整
+            ->join('orders as o', 'o.id', '=', 'rr.order_id') //join條件調整
             ->join('return_request_details as rrd', 'rrd.return_request_id', '=', 'rr.id')
             ->join('product_items as pi', 'pi.id', '=', 'rrd.product_item_id')
             ->join('products as p', 'p.id', '=', 'pi.product_id')
-            ->leftJoin('orders as o_new', 'o.id', '=', 'rr.new_order_id')  //add
-            ->orderBy('rr.id');
+            ->leftJoin('orders as o_new', 'o_new.id', '=', 'rr.new_order_id'); //add
 
         //處理where
         $builder = $this->handleBuilder($builder, $request);
@@ -261,6 +265,13 @@ class OrderRefundService
     public function handleExcelData(Collection $collection)
     {
         return $collection->map(function ($item, $index) {
+            // 退貨申請時間
+            $item->request_date = Carbon::parse($item->request_date)->format('Y-m-d H:i');
+
+            // 退貨完成時間
+            if (isset($item->completed_at)) {
+                $item->completed_at = Carbon::parse($item->completed_at)->format('Y-m-d H:i');
+            }
 
             //退貨申請單狀態
             $item->status_code = config('uec.return_request_status_options')[$item->status_code] ?? null;
@@ -272,27 +283,27 @@ class OrderRefundService
             $item->refund_status = config('uec.order_refund_status_options')[$item->refund_status] ?? null;
 
             return [
-                (string)$index + 1, //項次
-                (string)$item->request_date, //退貨申請時間
-                (string)$item->request_no, //退貨申請單號
-                (string)$item->order_no, //訂單編號
-                (string)$item->member_account, //會員帳號
-                (string)$item->status_code, //狀態
-                (string)$item->lgst_method, //物流方式
-                (string)$item->completed_at, //退貨完成時間
-                (string)$item->refund_method, //退款方式
-                (string)$item->refund_status, //退款狀態
-                (string)$item->buyer_name, //訂購人
-                (string)$item->req_name, //取件聯絡人
-                (string)$item->req_mobile, //取件聯絡手機
+                (string) $index + 1, //項次
+                (string) $item->request_date, //退貨申請時間
+                (string) $item->request_no, //退貨申請單號
+                (string) $item->order_no, //訂單編號
+                (string) $item->member_account, //會員帳號
+                (string) $item->status_code, //狀態
+                (string) $item->lgst_method, //物流方式
+                (string) $item->completed_at, //退貨完成時間
+                (string) $item->refund_method, //退款方式
+                (string) $item->refund_status, //退款狀態
+                (string) $item->buyer_name, //訂購人
+                (string) $item->req_name, //取件聯絡人
+                (string) $item->req_mobile, //取件聯絡手機
                 sprintf('%s%s%s', $item->req_city, $item->req_district, $item->req_address), //取件地址
-                (string)$item->item_no, //Item編號
-                (string)$item->product_name, //商品名稱
-                (string)$item->spec_1_value, //規格一
-                (string)$item->spec_2_value, //規格二
-                (string)$item->request_qty, //申請數量
-                (string)$item->passed_qty, //檢驗合格數量
-                (string)$item->failed_qty, //檢驗不合格數
+                (string) $item->item_no, //Item編號
+                (string) $item->product_name, //商品名稱
+                (string) $item->spec_1_value, //規格一
+                (string) $item->spec_2_value, //規格二
+                (string) $item->request_qty, //申請數量
+                (string) $item->passed_qty, //檢驗合格數量
+                (string) $item->failed_qty, //檢驗不合格數
             ];
         });
     }

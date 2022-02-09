@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\OrdersExport;
 use App\Services\LookupValuesVService;
+use App\Services\MoneyAmountService;
 use App\Services\OrderService;
 use App\Services\RoleService;
 use Carbon\Carbon;
@@ -159,6 +160,7 @@ class OrderController extends Controller
     public function getDetail(Request $request)
     {
         $lookup_values_v_service = new LookupValuesVService;
+        $money_amount_service = new MoneyAmountService;
 
         $order_id = $request->input('order_id');
 
@@ -322,7 +324,7 @@ class OrderController extends Controller
 
         // 發票資訊
         if (isset($order->invoices)) {
-            $order->invoices = $order->invoices->map(function ($invoice) {
+            $order->invoices = $order->invoices->map(function ($invoice) use ($money_amount_service) {
                 // 時間
                 if (isset($invoice->transaction_date)) {
                     $invoice->transaction_date = Carbon::parse($invoice->transaction_date)->format('Y-m-d');
@@ -330,6 +332,20 @@ class OrderController extends Controller
 
                 // 類型
                 $invoice->type = isset($invoice->invoice_allowance_id) ? '發票折讓' : '發票開立';
+
+                // 有統編，總稅額需要從總金額計算出來
+                if (isset($invoice->cust_gui_number)) {
+                    $money_amount_service->setTaxType($invoice->tax_type)
+                        ->setPrice($invoice->amount)
+                        ->calculateNontaxPrice()
+                        ->calculateTaxPrice();
+
+                    $invoice->total_tax = $money_amount_service->getTaxPrice();
+                }
+                // 無統編，總稅額為0
+                else {
+                    $invoice->total_tax = 0;
+                }
 
                 // 課稅別
                 $invoice->tax_type = config('uec.tax_type_options')[$invoice->tax_type] ?? null;
@@ -361,6 +377,7 @@ class OrderController extends Controller
                     'type',
                     'invoice_no',
                     'tax_type',
+                    'total_tax',
                     'amount',
                     'remark',
                     'random_no',

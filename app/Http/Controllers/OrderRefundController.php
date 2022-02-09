@@ -8,6 +8,7 @@ use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+
 class OrderRefundController extends Controller
 {
     private $orderRefundService;
@@ -16,8 +17,7 @@ class OrderRefundController extends Controller
     public function __construct(
         OrderRefundService $OrderRefundService,
         RoleService $role_service
-    )
-    {
+    ) {
         $this->orderRefundService = $OrderRefundService;
         $this->role_service = $role_service;
     }
@@ -28,7 +28,7 @@ class OrderRefundController extends Controller
      * @Author: Eric
      * @DateTime: 2022/1/14 上午 11:18
      */
-    public function index(Request $request):view
+    public function index(Request $request): view
     {
         $orderRefunds = collect();
 
@@ -56,10 +56,10 @@ class OrderRefundController extends Controller
      */
     public function getDetail(Request $request)
     {
-        if(empty($request->id)){
+        if (empty($request->id)) {
             return response()->json([
                 'status' => false,
-                'message' => '發生錯誤，缺少參數'
+                'message' => '發生錯誤，缺少參數',
             ]);
         }
 
@@ -75,7 +75,7 @@ class OrderRefundController extends Controller
                 //退款資訊
                 'return_information' => $this->orderRefundService->getReturnInformation($id),
             ],
-            'message' => ''
+            'message' => '',
         ]);
     }
 
@@ -89,7 +89,7 @@ class OrderRefundController extends Controller
     public function exportExcel(Request $request)
     {
         //無權限
-        if($this->role_service->getOtherRoles()['auth_export'] == false) {
+        if ($this->role_service->getOtherRoles()['auth_export'] == false) {
             return response('Forbidden', 403);
         }
 

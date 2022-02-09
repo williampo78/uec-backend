@@ -2,24 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-use App\Models\Invoice;
-use App\Models\ReturnRequest;
-use App\Models\ReturnRequestDetail;
-use App\Models\Shipment;
-use App\Models\OrderDetail;
-use App\Models\OrderPayment;
-use App\Models\InvoiceDetail;
-use App\Models\ProductPhotos;
-use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
-use App\Models\SysConfig;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
-use Carbon\Carbon;
 
 class OrderPaymentsReportService
 {
@@ -53,10 +39,6 @@ class OrderPaymentsReportService
             $builder = $builder->where('op.payment_status', $request['payment_status']);
         }
 
-        $builder->orderBy('created_at', 'asc');
-        $builder->orderBy('order_no', 'asc');
-        $builder->orderBy('payment_type', 'asc');
-
         return $builder;
     }
 
@@ -89,7 +71,28 @@ class OrderPaymentsReportService
             o.invoice_no, o.invoice_date, op.record_created_reason,
             '國泰世華' as bank_name";
 
+        $select3 = "op.created_at, op.order_no, op.payment_type, op.payment_method,
+            (case when op.payment_status = 'PENDING' then '待退款'
+                when op.payment_status = 'COMPLETED' then '退款成功'
+                when op.payment_status = 'FAILED' then '退款失敗'
+                when op.payment_status = 'VOIDED' then '已作廢'
+            else '' end) as status_desc,
+            op.amount,
+            o.invoice_no, o.invoice_date, op.record_created_reason,
+            '國泰世華' as bank_name
+        ";
+
         $builder = DB::table('order_payments as op')
+            ->selectRaw($select2)
+            ->join('orders as o', function ($join) {
+                $join->where('op.source_table_name', '=', 'orders')
+                    ->on('o.id', '=', 'op.source_table_id');
+            })
+            ->where('op.payment_type', 'PAY');
+
+        $builder = $this->handleBuilder($builder, $request);
+
+        $builder2 = DB::table('order_payments as op')
             ->selectRaw($select1)
             ->join('return_requests as rr', function ($join) {
                 $join->on('op.source_table_id', '=', 'rr.id')
@@ -98,22 +101,26 @@ class OrderPaymentsReportService
             ->join('orders as o', 'o.id', '=', 'rr.order_id')
             ->where('op.payment_type', 'REFUND');
 
-        $builder = $this->handleBuilder($builder, $request);
+        $builder2 = $this->handleBuilder($builder2, $request);
 
-        $builder2 = DB::table('order_payments as op')
-            ->selectRaw($select2)
+        $builder3 = DB::table('order_payments as op')
+            ->selectRaw($select3)
             ->join('orders as o', function ($join) {
                 $join->where('op.source_table_name', '=', 'orders')
                     ->on('o.id', '=', 'op.source_table_id');
-
             })
-            ->where('op.payment_type', 'PAY')
-            ->unionAll($builder);
+            ->where('op.payment_type', 'REFUND')
+            ->where('op.amount', '!=', 0);
 
-        $builder2 = $this->handleBuilder($builder2, $request);
+        $builder3 = $this->handleBuilder($builder3, $request);
 
-        return $builder2->get();
+        $builder = $builder->unionAll($builder2)
+            ->unionAll($builder3)
+            ->orderBy('created_at', 'asc')
+            ->orderBy('order_no', 'asc')
+            ->orderBy('payment_type', 'asc');
 
+        return $builder->get();
     }
 
     /**
@@ -121,20 +128,23 @@ class OrderPaymentsReportService
      * @Author: Eric
      * @DateTime: 2022/1/17 上午 11:23
      */
-    public function handleOrderPaymentsReports(Collection $OrderPaymentsReports)
+    public function handleOrderPaymentsReports(Collection $orderPaymentReports)
     {
-        return $OrderPaymentsReports->map(function ($OrderPaymentsReport) {
+        return $orderPaymentReports->map(function ($orderPaymentReport) {
 
-            $OrderPaymentsReport->payment_type = config('uec.payment_type_options')[$OrderPaymentsReport->payment_type] ?? null;
-            $OrderPaymentsReport->payment_method = config('uec.payment_method_options')[$OrderPaymentsReport->payment_method] ?? null;
+            $orderPaymentReport->payment_type = config('uec.payment_type_options')[$orderPaymentReport->payment_type] ?? null;
+            $orderPaymentReport->payment_method = config('uec.payment_method_options')[$orderPaymentReport->payment_method] ?? null;
             //資料新增原因
-            $OrderPaymentsReport->record_created_reason = config('uec.order_payment_record_created_reason')[$OrderPaymentsReport->record_created_reason] ?? null;
-            $OrderPaymentsReport->created_at = date('Y-m-d', strtotime($OrderPaymentsReport->created_at));
-            $OrderPaymentsReport->amount = is_null($OrderPaymentsReport->amount) ? null : number_format($OrderPaymentsReport->amount);
-            // 發票日期
-            $OrderPaymentsReport->invoice_date = Carbon::parse($OrderPaymentsReport->invoice_date)->format('Y-m-d');
+            $orderPaymentReport->record_created_reason = config('uec.order_payment_record_created_reason')[$orderPaymentReport->record_created_reason] ?? null;
+            $orderPaymentReport->created_at = date('Y-m-d', strtotime($orderPaymentReport->created_at));
+            $orderPaymentReport->amount = is_null($orderPaymentReport->amount) ? null : number_format($orderPaymentReport->amount);
 
-            return $OrderPaymentsReport;
+            // 發票日期
+            if (isset($orderPaymentReport->invoice_date)) {
+                $orderPaymentReport->invoice_date = Carbon::parse($orderPaymentReport->invoice_date)->format('Y-m-d');
+            }
+
+            return $orderPaymentReport;
         });
     }
 
@@ -155,22 +165,25 @@ class OrderPaymentsReportService
             $item->record_created_reason = config('uec.order_payment_record_created_reason')[$item->record_created_reason] ?? null;
             $item->created_at = date('Y-m-d', strtotime($item->created_at));
             $item->amount = is_null($item->amount) ? null : $item->amount;
+
             // 發票日期
-            $item->invoice_date = Carbon::parse($item->invoice_date)->format('Y-m-d');
+            if (isset($item->invoice_date)) {
+                $item->invoice_date = Carbon::parse($item->invoice_date)->format('Y-m-d');
+            }
 
             return [
-                (string)$index + 1, //項次
-                (string)$item->created_at, //日期
-                (string)$item->order_no, //訂單編號
-                (string)$item->payment_type, //類型
-                (string)$item->payment_method, //金流方式
+                (string) $index + 1, //項次
+                (string) $item->created_at, //日期
+                (string) $item->order_no, //訂單編號
+                (string) $item->payment_type, //類型
+                (string) $item->payment_method, //金流方式
                 '', //分期期數
-                (string)$item->status_desc, //狀態
+                (string) $item->status_desc, //狀態
                 $item->amount, //金額
-                (string)$item->invoice_no, //發票號碼
-                (string)$item->invoice_date, //發票日期
-                (string)$item->record_created_reason, //備註
-                (string)$item->bank_name //收款行
+                (string) $item->invoice_no, //發票號碼
+                (string) $item->invoice_date, //發票日期
+                (string) $item->record_created_reason, //備註
+                (string) $item->bank_name, //收款行
             ];
         });
     }

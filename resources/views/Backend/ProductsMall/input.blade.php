@@ -8,7 +8,7 @@
             /* background: #ce1f59 !important; */
         }
 
-        .elements-box>tr>td>* {
+        .elements-box > tr > td > * {
             pointer-events: none;
         }
 
@@ -55,8 +55,9 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
-                <form role="form" id="new-form" method="POST" action="{{ route('product_small.update', $products->id) }}"
-                    enctype="multipart/form-data" novalidaten="ovalidate">
+                <form role="form" id="new-form" method="POST"
+                      action="{{ route('product_small.update', $products->id) }}"
+                      enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
                     <div class="form-horizontal">
@@ -99,7 +100,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no"
-                                                value="{{ $products->product_no }}" readonly>
+                                                   value="{{ $products->product_no }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -112,7 +113,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="supplier_name"
-                                                value="{{ $products->supplier_name }}" readonly>
+                                                   value="{{ $products->supplier_name }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -123,7 +124,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_name"
-                                                value="{{ $products->product_name }}">
+                                                   value="{{ $products->product_name }}">
                                         </div>
                                     </div>
                                 </div>
@@ -134,7 +135,7 @@
                                         <div class="col-sm-12">
                                             <label class="control-label">
                                                 <a href="{{ route('products.show', $products->id) }}"
-                                                    target="_blank">查看基本資訊</a>
+                                                   target="_blank">查看基本資訊</a>
                                             </label>
                                         </div>
                                     </div>
@@ -148,43 +149,45 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                data-toggle="modal" data-target="#model_category"
-                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增分類</button>
+                                                    data-toggle="modal" data-target="#model_category"
+                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增分類
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
                                         <table class="table table-striped table-bordered table-hover">
                                             <thead>
-                                                <tr>
-                                                    <th class="col-sm-11">名稱</th>
-                                                    <th class="col-sm-1">功能</th>
-                                                </tr>
+                                            <tr>
+                                                <th class="col-sm-11">名稱</th>
+                                                <th class="col-sm-1">功能</th>
+                                            </tr>
                                             </thead>
                                             <tbody>
-                                                <tr class="CategoryHierarchyProducts"
-                                                    v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
-                                                    @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
-                                                    @drop="drop" draggable="true" :data-index="CategoryKey"
-                                                    :data-type="'Category'">
-                                                    <td style="vertical-align:middle">
-                                                        <i class="fa fa-list"></i>
-                                                        @{{ Category.category_name }}
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-danger"
+                                            <tr class="CategoryHierarchyProducts"
+                                                v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
+                                                @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
+                                                @drop="drop" draggable="true" :data-index="CategoryKey"
+                                                :data-type="'Category'">
+                                                <td style="vertical-align:middle">
+                                                    <i class="fa fa-list"></i>
+                                                    @{{ Category.category_name }}
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger"
                                                             @click="Del(Category,CategoryKey,'Category')"
                                                             v-show="RoleAuthJson.auth_delete"
-                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除</button>
-                                                    </td>
-                                                </tr>
+                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
+                                                    </button>
+                                                </td>
+                                            </tr>
 
                                             </tbody>
                                         </table>
                                         <span id="CategoryHierarchyProducts_error_msg" style="display: none"
-                                            class="redtext">必須填寫</span>
+                                              class="redtext">必須填寫</span>
                                     </div>
                                     <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
-                                        rows="10">@{{ CategoryHierarchyProducts }}</textarea>
+                                              rows="10">@{{ CategoryHierarchyProducts }}</textarea>
                                 </div>
                             </div>
                             <div class="row">
@@ -195,7 +198,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <input class="form-control" name="keywords"
-                                                value="{{ $products->keywords }}">
+                                                   value="{{ $products->keywords }}">
                                         </div>
                                     </div>
                                 </div>
@@ -209,38 +212,40 @@
                                         <div class="col-sm-10">
                                             {{-- related_products table --}}
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                data-toggle="modal" data-target="#model_related_products"
-                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增商品</button>
+                                                    data-toggle="modal" data-target="#model_related_products"
+                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增商品
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
                                         <table class="table table-striped table-bordered table-hover">
                                             <thead>
-                                                <tr>
-                                                    <th class="col-sm-11">名稱</th>
-                                                    <th class="col-sm-1">功能</th>
-                                                </tr>
+                                            <tr>
+                                                <th class="col-sm-11">名稱</th>
+                                                <th class="col-sm-1">功能</th>
+                                            </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
-                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                    draggable="true" :data-index="key" :data-type="'Products'">
-                                                    <td style="vertical-align:middle">
-                                                        <i class="fa fa-list"></i>
-                                                        @{{ Product.product_name }}
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-danger"
+                                            <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
+                                                @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                draggable="true" :data-index="key" :data-type="'Products'">
+                                                <td style="vertical-align:middle">
+                                                    <i class="fa fa-list"></i>
+                                                    @{{ Product.product_name }}
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger"
                                                             @click="Del(Product ,key ,'Products')"
-                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除</button>
-                                                    </td>
-                                                </tr>
+                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
+                                                    </button>
+                                                </td>
+                                            </tr>
 
                                             </tbody>
                                         </table>
                                     </div>
                                     <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
-                                        rows="10">@{{ RelatedProducts }}</textarea>
+                                              rows="10">@{{ RelatedProducts }}</textarea>
 
                                 </div>
                             </div>
@@ -254,7 +259,7 @@
                                             <div class="col-sm-2">
                                                 <label class="radio-inline">
                                                     <input class="product_attributes" type="checkbox"
-                                                        name="product_attributes[]" value="{{ $obj->id }}"
+                                                           name="product_attributes[]" value="{{ $obj->id }}"
                                                         {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}
                                                         {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                                     {{ $obj->description }}
@@ -262,7 +267,7 @@
                                             </div>
                                         @endforeach
                                         <input class="product_attributes_change" type="hidden" value="false"
-                                            name="product_attributes_change">
+                                               name="product_attributes_change">
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -273,7 +278,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no"
-                                                value="{{ $products->product_no }}" readonly>
+                                                   value="{{ $products->product_no }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -287,8 +292,8 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <input class="form-control" name="order_limited_qty"
-                                                {{ $products->edit_readonly == '1' ? 'readonly' : '' }}
-                                                value="{{ $products->order_limited_qty }}">
+                                                   {{ $products->edit_readonly == '1' ? 'readonly' : '' }}
+                                                   value="{{ $products->order_limited_qty }}">
                                         </div>
                                     </div>
                                 </div>
@@ -304,7 +309,7 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <input class="form-control" name="promotion_desc"
-                                                value="{{ $products->promotion_desc }}">
+                                                   value="{{ $products->promotion_desc }}">
                                         </div>
                                     </div>
                                 </div>
@@ -319,8 +324,8 @@
                                         <div class="col-sm-2">
                                             <div class='input-group date'>
                                                 <input type='text' class="form-control" name="promotion_start_at"
-                                                    id="promotion_start_at"
-                                                    value="{{ $products->promotion_start_at }}" />
+                                                       id="promotion_start_at"
+                                                       value="{{ $products->promotion_start_at }}"/>
                                             </div>
                                         </div>
                                         <div class="col-sm-1" style="padding: 0px;width: 2%;">
@@ -329,7 +334,7 @@
                                         <div class="col-sm-2">
                                             <div class='input-group date'>
                                                 <input type='text' class="form-control" name="promotion_end_at"
-                                                    id="promotion_end_at" value="{{ $products->promotion_end_at }}" />
+                                                       id="promotion_end_at" value="{{ $products->promotion_end_at }}"/>
                                             </div>
                                         </div>
 
@@ -345,9 +350,9 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <textarea id="description" name="description"
-                                                placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
+                                                      placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
                                             <span id="description_error_msg" style="display: none"
-                                                class="redtext">必須填寫</span>
+                                                  class="redtext">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -361,9 +366,9 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
-                                                accept=".jpg,.jpeg,.png">{{ $products->specification }}</textarea>
+                                                      accept=".jpg,.jpeg,.png">{{ $products->specification }}</textarea>
                                             <span id="specification_error_msg" style="display: none"
-                                                class="redtext">必須填寫</span>
+                                                  class="redtext">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -380,18 +385,19 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <input type="file" name="google_shop_photo_name" accept="image/*"
-                                                @change="google_shop"
+                                                   @change="google_shop"
                                                 {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                             <input type="hidden" name="google_shop_photo_name_old"
-                                                value="{{ $products->google_shop_photo_name }}">
+                                                   value="{{ $products->google_shop_photo_name }}">
                                         </div>
                                         <div class="col-sm-3">
                                             <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
-                                                src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
-                                                style="max-width:40%;">
+                                                 src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
+                                                 style="max-width:40%;">
                                         </div>
                                         <button v-if="products.google_shop_photo_name" type="button"
-                                            class="btn btn-large btn-danger btn-sm" @click="DelGoogleShop()">刪除</button>
+                                                class="btn btn-large btn-danger btn-sm" @click="DelGoogleShop()">刪除
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -406,49 +412,52 @@
                                         <div class="col-sm-8">
                                             <table class="table table-striped table-bordered table-hover">
                                                 <thead>
-                                                    <tr>
-                                                        <th class="col-sm-1">Item編號</th>
-                                                        <th class="col-sm-1">規格1</th>
-                                                        <th class="col-sm-1">規格2</th>
-                                                        <th class="col-sm-1">Item圖示</th>
-                                                        <th class="col-sm-1">功能</th>
-                                                    </tr>
+                                                <tr>
+                                                    <th class="col-sm-1">Item編號</th>
+                                                    <th class="col-sm-1">規格1</th>
+                                                    <th class="col-sm-1">規格2</th>
+                                                    <th class="col-sm-1">Item圖示</th>
+                                                    <th class="col-sm-1">功能</th>
+                                                </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="(Item , key ) in ProductsItem">
-                                                        <td style="vertical-align:middle">
-                                                            @{{ Item.item_no }}
-                                                        </td>
-                                                        <td style="vertical-align:middle">
-                                                            @{{ Item.spec_1_value }}
-                                                        </td>
-                                                        <td style="vertical-align:middle">
-                                                            @{{ Item.spec_2_value }}
-                                                        </td>
-                                                        <td>
-                                                            <div v-if="Item.photo_name">
-                                                                <img :src="file_cdn + Item.photo_name"
-                                                                    style="max-width:40%;">
-                                                            </div>
-                                                            <input class="photo_name_hidden" type="hidden"
-                                                                :value="Item.photo_name">
-                                                        </td>
-                                                        <td>
-                                                            <button type="button" data-toggle="modal"
+                                                <tr v-for="(Item , key ) in ProductsItem">
+                                                    <td style="vertical-align:middle">
+                                                        @{{ Item.item_no }}
+                                                    </td>
+                                                    <td style="vertical-align:middle">
+                                                        @{{ Item.spec_1_value }}
+                                                    </td>
+                                                    <td style="vertical-align:middle">
+                                                        @{{ Item.spec_2_value }}
+                                                    </td>
+                                                    <td>
+                                                        <div v-if="Item.photo_name">
+                                                            <img :src="file_cdn + Item.photo_name"
+                                                                 style="max-width:40%;">
+                                                        </div>
+                                                        <input class="photo_name_hidden" type="hidden"
+                                                               :value="Item.photo_name">
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" data-toggle="modal"
                                                                 data-target="#item_photo_list"
                                                                 class="btn btn-large btn-warning btn-sm"
                                                                 @click="frombtn(Item,key)"
-                                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>選擇圖片</button>
-                                                            <button type="button" v-if="Item.photo_name"
+                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>選擇圖片
+                                                        </button>
+                                                        <button type="button" v-if="Item.photo_name"
                                                                 class="btn btn-large btn-danger btn-sm"
                                                                 @click="DelItemPhotos(Item,key)"
-                                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除</button>
-                                                        </td>
-                                                    </tr>
+                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
+                                                        </button>
+                                                    </td>
+                                                </tr>
                                                 </tbody>
                                             </table>
-                                            <textarea id="ProductsItem_Json" name="ProductsItem_Json" style="display:none"
-                                                cols="30" rows="10">@{{ ProductsItem }}</textarea>
+                                            <textarea id="ProductsItem_Json" name="ProductsItem_Json"
+                                                      style="display:none"
+                                                      cols="30" rows="10">@{{ ProductsItem }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -464,7 +473,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <input class="form-control" name="meta_title"
-                                                value="{{ $products->meta_title }}">
+                                                   value="{{ $products->meta_title }}">
                                         </div>
                                     </div>
                                 </div>
@@ -477,7 +486,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <input class="form-control" name="mata_description"
-                                                value="{{ $products->mata_description }}">
+                                                   value="{{ $products->mata_description }}">
                                         </div>
                                     </div>
                                 </div>
@@ -490,7 +499,7 @@
                                         </div>
                                         <div class="col-sm-10">
                                             <input class="form-control" name="mata_keywords"
-                                                value="{{ $products->mata_keywords }}">
+                                                   value="{{ $products->mata_keywords }}">
                                         </div>
                                     </div>
                                 </div>
@@ -516,7 +525,7 @@
 @section('js')
     <script>
         // Get all sections that have an ID defined
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#start_created_at').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
@@ -536,42 +545,45 @@
             $('#promotion_end_at').datetimepicker({
                 format: 'YYYY-MM-DD HH:mm:ss',
             });
-            $("#promotion_start_at").on("dp.change", function(e) {
+            $("#promotion_start_at").on("dp.change", function (e) {
                 if (e.oldDate === null) {
                     $(this)
                         .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(00, 00, 00)));
+                        .date(new Date(e.date._d.setHours(0, 0, 0)));
                 }
             });
-            $("#promotion_end_at").on("dp.change", function(e) {
+            $("#promotion_end_at").on("dp.change", function (e) {
                 if (e.oldDate === null) {
                     $(this)
                         .data("DateTimePicker")
                         .date(new Date(e.date._d.setHours(23, 59, 59)));
                 }
             });
-            $('.product_attributes').on('change', function() { // on change of state
+            $('.product_attributes').on('change', function () { // on change of state
                 $('.product_attributes_change').val('true');
             })
 
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
-                    ckfinder: {
-                        uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
-                            document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content'),
-                        }
+                ckfinder: {
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                        document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
+                    }
 
-                    },
-                })
+                },
+                mediaEmbed: {
+                    previewsInData: true
+                }
+            })
                 .then(editor => {
                     ck_description = editor; // Save for later use.
                 }).catch(error => {
-                    console.error(error);
-                });
+                console.error(error);
+            });
 
             ClassicEditor.create(document.querySelector('#specification'), {
                 ckfinder: {
@@ -582,6 +594,9 @@
                             'content'),
                     }
                 },
+                mediaEmbed: {
+                    previewsInData: true
+                }
             }).then(editor => {
                 ck_specification = editor; // Save for later use.
             }).catch(error => {
@@ -589,13 +604,13 @@
             });
 
             $("#new-form").validate({
-                submitHandler: function(form) {
+                submitHandler: function (form) {
                     let ProductsItem_Json = JSON.parse($('#ProductsItem_Json').val());
-                    var status = true ; 
-                    $.each(ProductsItem_Json, function(key, value) {
-                        if(value.photo_name == null){
-                            alert('每個item必須選擇圖示') ;
-                            status = false ;
+                    var status = true;
+                    $.each(ProductsItem_Json, function (key, value) {
+                        if (value.photo_name == null) {
+                            alert('每個item必須選擇圖示');
+                            status = false;
                             return false;
                         }
                     });
@@ -622,11 +637,11 @@
                     } else {
                         $('#CategoryHierarchyProducts_error_msg').hide();
                     }
-                    if(status){
+                    if (status) {
                         $('#save_data').prop('disabled', true);
                         form.submit();
-                    }else{
-                        return false ; 
+                    } else {
+                        return false;
                     }
                 },
                 rules: {
@@ -640,7 +655,7 @@
                 },
                 errorClass: "help-block",
                 errorElement: "span",
-                errorPlacement: function(error, element) {
+                errorPlacement: function (error, element) {
                     if (element.parent('.input-group').length || element.is(':radio')) {
                         error.insertAfter(element.parent());
                         return;
@@ -653,20 +668,20 @@
 
                     error.insertAfter(element);
                 },
-                highlight: function(element, errorClass, validClass) {
+                highlight: function (element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                success: function(label, element) {
+                success: function (label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
-            $(document).on("click", "#save_data", function() {
+            $(document).on("click", "#save_data", function () {
                 $("#new-form").submit()
             })
 
         });
         var CategoryHierarchyContentInput = Vue.extend({
-            data: function() {
+            data: function () {
                 return {
                     CategoryHierarchyProducts: @json($web_category_hierarchy), //該商品原有的分類
                     CategoryHierarchyContent: @json($category_hierarchy_content), //所有分類的List
@@ -716,7 +731,7 @@
             },
             created() {
                 let vm = this;
-                this.CategoryHierarchyProducts.map(function(value, key) {
+                this.CategoryHierarchyProducts.map(function (value, key) {
                     isset = vm.CategoryHierarchyContent.filter(data => data.id === value
                         .web_category_hierarchy_id);
                     value.category_name = isset[0].name;
@@ -730,15 +745,15 @@
                         if (type == 'Category') {
                             if (obj.status == 'old') {
                                 axios.post('/backend/product_small/ajax', {
-                                        product_id: this.products.id,
-                                        category_id: obj.web_category_hierarchy_id,
-                                        _token: '{{ csrf_token() }}',
-                                        type: 'DelCategoryInProduct',
-                                    })
-                                    .then(function(response) {
+                                    product_id: this.products.id,
+                                    category_id: obj.web_category_hierarchy_id,
+                                    _token: '{{ csrf_token() }}',
+                                    type: 'DelCategoryInProduct',
+                                })
+                                    .then(function (response) {
                                         console.log(response);
                                     })
-                                    .catch(function(error) {
+                                    .catch(function (error) {
                                         console.log(error);
                                     });
                             }
@@ -747,14 +762,14 @@
                         } else if (type == 'Products') {
                             if (obj.id !== '') {
                                 axios.post('/backend/product_small/ajax', {
-                                        id: obj.id,
-                                        _token: '{{ csrf_token() }}',
-                                        type: 'DelRelatedProducts',
-                                    })
-                                    .then(function(response) {
+                                    id: obj.id,
+                                    _token: '{{ csrf_token() }}',
+                                    type: 'DelRelatedProducts',
+                                })
+                                    .then(function (response) {
                                         console.log(response);
                                     })
-                                    .catch(function(error) {
+                                    .catch(function (error) {
                                         console.log(error);
                                     });
                             }
@@ -776,7 +791,7 @@
                     let vm = this;
                     let isset = [];
                     let list = [];
-                    this.CategoryHierarchyContent.map(function(value, key) {
+                    this.CategoryHierarchyContent.map(function (value, key) {
                         isset = vm.CategoryHierarchyProducts.filter(data => data
                             .web_category_hierarchy_id === value.id);
                         if (isset.length == 0) {
@@ -786,7 +801,8 @@
                             list = list.filter(data =>
                                 data.name.toLowerCase().includes(vm.SelectCategoryName.toLowerCase())
                             )
-                        };
+                        }
+                        ;
                     })
                     this.CategoryList = list;
                 },
@@ -839,7 +855,7 @@
                             todo.del = 0;
                         }
                     })
-                    let new_array = this.result_products.filter(function(obj) {
+                    let new_array = this.result_products.filter(function (obj) {
                         return obj.del == 0;
                     });
                     this.result_products = new_array;
@@ -916,14 +932,14 @@
                     this.products.google_shop_photo_name = '';
                     if (check) {
                         axios.post('/backend/product_small/ajax', {
-                                id: this.products.id,
-                                _token: '{{ csrf_token() }}',
-                                type: 'DelGoogleShopPhoto',
-                            })
-                            .then(function(response) {
+                            id: this.products.id,
+                            _token: '{{ csrf_token() }}',
+                            type: 'DelGoogleShopPhoto',
+                        })
+                            .then(function (response) {
 
                             })
-                            .catch(function(error) {
+                            .catch(function (error) {
                                 console.log(error);
                             });
                     }
@@ -934,12 +950,13 @@
                         this.ProductsItem[key].photo_name = '';
 
                         axios.post('/backend/product_small/ajax', {
-                                item_id: item.id,
-                                _token: '{{ csrf_token() }}',
-                                type: 'DelItemPhotos',
+                            item_id: item.id,
+                            _token: '{{ csrf_token() }}',
+                            type: 'DelItemPhotos',
+                        })
+                            .then(function (response) {
                             })
-                            .then(function(response) {})
-                            .catch(function(error) {
+                            .catch(function (error) {
                                 console.log(error);
                             });
                     }

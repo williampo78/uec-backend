@@ -205,13 +205,13 @@ class CheckoutController extends Controller
         //dd($data);
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
         */
-
         if ($response['status'] == '404') {
+            $data = [];
             $status = false;
             $err = $response['status'];
-            $data = [];
         } else {
             //Step1, 檢核金額
+            $data = [];
             if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
                 //Stet2, 產生訂單
                 $dataOrder = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);

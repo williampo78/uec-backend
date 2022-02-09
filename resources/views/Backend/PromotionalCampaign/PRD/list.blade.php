@@ -254,7 +254,7 @@
                 }
             });
 
-            $('#table_list tbody').on('click', '.promotional_campaign_detail', function() {
+            $(document).on('click', '.promotional_campaign_detail', function() {
                 let promotional_campaign_id = $(this).attr("data-promotional-campaign-id");
 
                 axios.post('/backend/promotional_campaign/ajax/detail', {
@@ -343,7 +343,7 @@
                                         <td>${product.selling_price}</td>
                                         <td>${product.launched_at}</td>
                                         <td>${product.launched_status}</td>
-                                        <td>${product.gross_margin}</td>
+                                        <td>${product.gross_margin ? product.gross_margin : ''}</td>
                                     </tr>
                                 `);
                             });

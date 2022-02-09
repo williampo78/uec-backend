@@ -135,7 +135,7 @@ class APIWebService
             $webData = [];
             $webData['member_id'] = $member_id;
             $webData['note_type'] = $input['note_type'];
-            $webData['email'] = $input['email'];
+            $webData['email'] = ($input['email']!=''?$input['email']:'');
             $webData['name'] = $input['name'];
             $webData['mobile'] = $input['mobile'];
             $webData['telephone'] = $input['telephone'];

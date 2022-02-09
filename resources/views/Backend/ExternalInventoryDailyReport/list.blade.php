@@ -202,26 +202,26 @@
                     <div class="panel-body">
                         <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
-                                   id="inventory_table">
+                                   id="table_list">
                                 <thead>
                                     <tr>
-                                        <th>庫存日期</th>
-                                        <th>倉庫</th>
-                                        <th>Item編號</th>
-                                        <th>商品名稱</th>
-                                        <th>規格一</th>
-                                        <th>規格二</th>
-                                        <th>POS品號</th>
-                                        <th>庫存類型</th>
-                                        <th>供應商</th>
-                                        <th>到期日</th>
-                                        <th>是否追加</th>
-                                        <th>安全庫存量</th>
-                                        <th>庫存量</th>
-                                        <th>售價(未稅)</th>
-                                        <th>平均成本(未稅)</th>
-                                        <th>毛利率(未稅)</th>
-                                        <th>庫存成本(未稅)</th>
+                                        <th class="text-nowrap">庫存日期</th>
+                                        <th class="text-nowrap">倉庫</th>
+                                        <th class="text-nowrap">Item編號</th>
+                                        <th class="text-nowrap">商品名稱</th>
+                                        <th class="text-nowrap">規格一</th>
+                                        <th class="text-nowrap">規格二</th>
+                                        <th class="text-nowrap">POS品號</th>
+                                        <th class="text-nowrap">庫存類型</th>
+                                        <th class="text-nowrap">供應商</th>
+                                        <th class="text-nowrap">到期日</th>
+                                        <th class="text-nowrap">是否追加</th>
+                                        <th class="text-nowrap">安全庫存量</th>
+                                        <th class="text-nowrap">庫存量</th>
+                                        <th class="text-nowrap">售價(未稅)</th>
+                                        <th class="text-nowrap">平均成本(未稅)</th>
+                                        <th class="text-nowrap">毛利率(未稅)</th>
+                                        <th class="text-nowrap">庫存成本(未稅)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -275,10 +275,6 @@
                 showClear: true,
             });
 
-            $('#inventory_table').dataTable({
-                "aaSorting": []
-            });
-
             // 驗證表單
             $("#search-form").validate({
                 submitHandler: function(form) {
@@ -323,7 +319,6 @@
 
             // 匯出excel
             $('#btn-export-excel').on('click', function() {
-
                 let url = $(this).data('url');
 
                 axios.get(url, {

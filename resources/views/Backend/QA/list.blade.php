@@ -135,7 +135,7 @@
             placeholder: '',
         });
 
-        $('#table_list tbody').on('click', '.qa_detail', function() {
+        $(document).on('click', '.qa_detail', function() {
             let web_content_id = $(this).attr("data-web-content-id");
 
             axios.get(`/backend/qa/${web_content_id}`)

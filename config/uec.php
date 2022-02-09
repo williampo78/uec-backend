@@ -17,6 +17,7 @@ return [
     'isTesting' => env('UEC_TEST', 'true'),
     'mailPrefix' => env('MAIL_PREFIX', '[ 電商測試 ]'),
     'mailFrom'=>env('MAIL_FROM_ADDRESS'),
+    'mailTo' => env('MAIL_TO_ADDRESS') ? array_filter(explode(',', env('MAIL_TO_ADDRESS'))) : [],
 
     // 版位類型
     'ad_slot_type_option' => [

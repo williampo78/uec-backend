@@ -369,7 +369,7 @@
                 },
             });
 
-            $('#table_list tbody').on('click', '.shipment_detail', function() {
+            $(document).on('click', '.shipment_detail', function() {
                 let shipment_id = $(this).attr("data-shipment");
 
                 axios.post('/backend/shipment/ajax/detail', {

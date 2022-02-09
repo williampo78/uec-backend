@@ -34,7 +34,8 @@ class ProductsService
         $now = Carbon::now();
         $products = Products::select(
             'products.*',
-            'supplier.name AS supplier_name'
+            'supplier.name AS supplier_name',
+            DB::raw('get_latest_product_cost(products.id, TRUE) AS item_cost'),
         )
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
@@ -513,40 +514,40 @@ class ProductsService
      */
     public function restructureProducts($products)
     {
-        $products->transform(function ($obj, $key) {
+        $products->transform(function ($product) {
             // 上架日期
-            $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
+            $product->launched_at = ($product->start_launched_at || $product->end_launched_at) ? "{$product->start_launched_at} ~ {$product->end_launched_at}" : '';
+
+            // 毛利
+            $product->gross_margin = (isset($product->item_cost, $product->selling_price) && $product->selling_price != 0) ? round(((1 - ($product->item_cost / $product->selling_price)) * 100), 2) : null;
 
             // 售價
-            $obj->selling_price = number_format($obj->selling_price);
+            $product->selling_price = number_format($product->selling_price);
 
             // 上架狀態
-            switch ($obj->approval_status) {
+            switch ($product->approval_status) {
                 case 'NA':
-                    $obj->launched_status = '未設定';
+                    $product->launched_status = '未設定';
                     break;
 
                 case 'REVIEWING':
-                    $obj->launched_status = '上架申請';
+                    $product->launched_status = '上架申請';
                     break;
 
                 case 'REJECTED':
-                    $obj->launched_status = '上架駁回';
+                    $product->launched_status = '上架駁回';
                     break;
 
                 case 'CANCELLED':
-                    $obj->launched_status = '商品下架';
+                    $product->launched_status = '商品下架';
                     break;
 
                 case 'APPROVED':
-                    $obj->launched_status = Carbon::now()->between($obj->start_launched_at, $obj->end_launched_at) ? '商品上架' : '商品下架';
+                    $product->launched_status = Carbon::now()->between($product->start_launched_at, $product->end_launched_at) ? '商品上架' : '商品下架';
                     break;
             }
 
-            // 毛利
-            $obj->gross_margin = 10;
-
-            return $obj;
+            return $product;
         });
     }
 
@@ -881,15 +882,15 @@ class ProductsService
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
             ->leftJoin(
-            DB::raw("(SELECT 
+                DB::raw("(SELECT
             web_category_products.product_id,
             web_category_hierarchy.category_name
             FROM web_category_products
             LEFT JOIN web_category_hierarchy ON web_category_products.web_category_hierarchy_id = web_category_hierarchy.id ) AS web_category_products"), 'web_category_products.product_id', '=', 'products.id')
             ->leftJoin(
-            DB::raw("(SELECT related_products.related_product_id,
-            products.product_name 
-            FROM related_products LEFT JOIN products ON related_products.related_product_id = products.id) AS related_products") , 'related_products.related_product_id', '=', 'products.id')
+                DB::raw("(SELECT related_products.related_product_id,
+            products.product_name
+            FROM related_products LEFT JOIN products ON related_products.related_product_id = products.id) AS related_products"), 'related_products.related_product_id', '=', 'products.id')
             ->groupBy('product_items.id');
         if (isset($request['web_category_hierarchy_id'])) {
             $web_category_hierarchy_id = $request['web_category_hierarchy_id'];

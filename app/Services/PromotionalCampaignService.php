@@ -106,6 +106,7 @@ class PromotionalCampaignService
             'products.end_launched_at',
             'products.selling_price',
             'products.approval_status',
+            DB::raw('get_latest_product_cost(products.id, TRUE) AS item_cost'),
 
             'supplier.name AS supplier_name',
         )
@@ -127,6 +128,7 @@ class PromotionalCampaignService
             'products.end_launched_at',
             'products.selling_price',
             'products.approval_status',
+            DB::raw('get_latest_product_cost(products.id, TRUE) AS item_cost'),
 
             'supplier.name AS supplier_name',
         )

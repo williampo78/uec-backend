@@ -187,6 +187,7 @@ class OrderService
             'total_amount AS amount',
             'remark',
             'random_no',
+            'cust_gui_number',
         )
             ->whereIn('order_no', $order_nos)
             ->get();
@@ -223,6 +224,7 @@ class OrderService
             'invoice_allowance.allowance_amount AS amount',
             'invoices.remark',
             'invoices.random_no',
+            'invoices.cust_gui_number',
         )
             ->join('invoices', 'invoice_allowance.invoice_id', 'invoices.id')
             ->whereIn('invoice_allowance.order_no', $order_nos)

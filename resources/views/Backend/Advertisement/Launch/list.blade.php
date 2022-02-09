@@ -78,11 +78,11 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <div class='input-group date' id='datetimepicker_start_at'>
+                                            <div class='input-group date' id='datetimepicker_start_at_start'>
                                                 <input type='text' class="form-control datetimepicker-input"
-                                                    data-target="#datetimepicker_start_at" name="start_at" id="start_at"
-                                                    value="{{ request()->input('start_at') }}" autocomplete="off" />
-                                                <span class="input-group-addon" data-target="#datetimepicker_start_at"
+                                                    data-target="#datetimepicker_start_at_start" name="start_at_start" id="start_at_start"
+                                                    value="{{ request()->input('start_at_start') }}" autocomplete="off" />
+                                                <span class="input-group-addon" data-target="#datetimepicker_start_at_start"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -94,11 +94,11 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <div class='input-group date' id='datetimepicker_end_at'>
+                                            <div class='input-group date' id='datetimepicker_start_at_end'>
                                                 <input type='text' class="form-control datetimepicker-input"
-                                                    data-target="#datetimepicker_end_at" name="end_at" id="end_at"
-                                                    value="{{ request()->input('end_at') }}" autocomplete="off" />
-                                                <span class="input-group-addon" data-target="#datetimepicker_end_at"
+                                                    data-target="#datetimepicker_start_at_end" name="start_at_end" id="start_at_end"
+                                                    value="{{ request()->input('start_at_end') }}" autocomplete="off" />
+                                                <span class="input-group-addon" data-target="#datetimepicker_start_at_end"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
                                                 </span>
@@ -226,29 +226,29 @@
                 placeholder: '',
             });
 
-            $('#datetimepicker_start_at').datetimepicker({
+            $('#datetimepicker_start_at_start').datetimepicker({
                 format: 'YYYY-MM-DD',
                 showClear: true,
             });
 
-            $('#datetimepicker_end_at').datetimepicker({
+            $('#datetimepicker_start_at_end').datetimepicker({
                 format: 'YYYY-MM-DD',
                 showClear: true,
             });
 
-            $("#datetimepicker_start_at").on("dp.change", function(e) {
-                if ($('#end_at').val()) {
-                    $('#datetimepicker_end_at').datetimepicker('minDate', e.date);
+            $("#datetimepicker_start_at_start").on("dp.change", function(e) {
+                if ($('#start_at_end').val()) {
+                    $('#datetimepicker_start_at_end').datetimepicker('minDate', e.date);
                 }
             });
 
-            $("#datetimepicker_end_at").on("dp.change", function(e) {
-                if ($('#start_at').val()) {
-                    $('#datetimepicker_start_at').datetimepicker('maxDate', e.date);
+            $("#datetimepicker_start_at_end").on("dp.change", function(e) {
+                if ($('#start_at_start').val()) {
+                    $('#datetimepicker_start_at_start').datetimepicker('maxDate', e.date);
                 }
             });
 
-            $('#table_list tbody').on('click', '.slot_content_detail', function() {
+            $(document).on('click', '.slot_content_detail', function() {
                 let slot_content_id = $(this).attr("data-slot-content-id");
 
                 axios.post('/backend/advertisemsement_launch/ajax/detail', {

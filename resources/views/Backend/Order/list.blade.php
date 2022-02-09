@@ -429,7 +429,7 @@
 
             let invoices = {};
 
-            $('#table_list tbody').on('click', '.order_detail', function() {
+            $(document).on('click', '.order_detail', function() {
                 let order_id = $(this).attr("data-order");
                 invoices = {};
 
@@ -625,7 +625,7 @@
                     $('#invoice-modal-order-no').empty().text(invoices[count].order_no);
                     $('#invoice-modal-selling-price').empty().text(invoices[count].amount);
                     $('#invoice-modal-tax-type').empty().text(invoices[count].tax_type);
-                    $('#invoice-modal-total-tax').empty().text(0);
+                    $('#invoice-modal-total-tax').empty().text(invoices[count].total_tax);
                     $('#invoice-modal-amount').empty().text(invoices[count].amount);
                     $("#invoice-modal-invoice-info-table tbody").empty();
 
