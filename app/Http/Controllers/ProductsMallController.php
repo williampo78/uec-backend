@@ -156,12 +156,19 @@ class ProductsMallController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $result = [] ; 
         $in = $request->input();
         $file = $request->file();
-        $this->productsService->updateProductSmall($in, $file, $id);
-        $act = 'upd';
-        $route_name = 'product_small';
-        return view('Backend.success', compact('route_name', 'act'));
+    
+        $result['status'] =  $this->productsService->updateProductSmall($in, $file, $id);
+        $result['route_name'] = 'product_small';
+        $result['act'] = 'upd';
+        if ($result['status']) {
+            return view('Backend.success', $result);
+        } else {
+            return view('Backend.error', $result);
+        };
+        // return view('Backend.success', compact('route_name', 'act'));
     }
     /**
      * Remove the specified resource from storage.

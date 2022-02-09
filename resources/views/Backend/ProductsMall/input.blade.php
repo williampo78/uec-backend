@@ -396,7 +396,7 @@
                                                  style="max-width:40%;">
                                         </div>
                                         <button v-if="products.google_shop_photo_name" type="button"
-                                                class="btn btn-large btn-danger btn-sm" @click="DelGoogleShop()">刪除
+                                                class="btn btn-large btn-danger btn-sm" @click="DelGoogleShop()" {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
                                         </button>
                                     </div>
                                 </div>

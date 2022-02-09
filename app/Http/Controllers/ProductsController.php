@@ -78,11 +78,15 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
-        // dump($request->input() , $request->file()) ;
-        $this->productsService->addProducts($request->input(), $request->file()) ;
-        $act = 'add';
-        $route_name = 'products';
-        return view('Backend.success', compact('route_name', 'act'));
+        $result = [] ; 
+        $result['status'] = $this->productsService->addProducts($request->input(), $request->file()) ;
+        $result['route_name'] = 'products';
+        $result['act'] = 'add';
+        if ($result['status']) {
+            return view('Backend.success', $result);
+        } else {
+            return view('Backend.error', $result);
+        };
     }
 
     /**
@@ -159,10 +163,15 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = $this->productsService->editProducts($request->input(), $request->file()) ;
-        $act = 'upd';
-        $route_name = 'products';
-        return view('Backend.success', compact('route_name', 'act'));
+        $result = [] ; 
+        $result['status'] = $this->productsService->editProducts($request->input(), $request->file()) ;
+        $result['route_name'] = 'products';
+        $result['act'] = 'upd';
+        if ($result['status']) {
+            return view('Backend.success', $result);
+        } else {
+            return view('Backend.error', $result);
+        };
     }
 
     /**
@@ -251,7 +260,6 @@ class ProductsController extends Controller
             "is_additional_purchase_cn" => "是否追加",
             "status_cn" => "狀態",
         ];
-        // 47。
         $export = new ReportExport($title, $data->toArray());
         return Excel::download($export, '商品主檔'.date('Y-m-d').'.xlsx');
         return true ; 
