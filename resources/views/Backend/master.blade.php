@@ -23,9 +23,6 @@
         href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
-    <link rel="stylesheet" href="{{ asset('asset/css/select2.css') }}" />
-    <link rel="stylesheet" href="{{ asset('asset/css/select2-bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ asset('asset/js/DataTables/datatables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css"
@@ -63,24 +60,15 @@
         @yield('content')
     </div>
 
-    <script src="{{ asset('asset/js/template/bower_components/jquery/dist/jquery.js') }}"></script>
-    <script src="{{ asset('asset/js/DataTables/datatables.js') }}"></script>
-    <script src="{{ asset('asset/js/DataTables/Buttons-1.5.6/js/buttons.bootstrap.min.js') }}"></script>
+    <script src="{{ mix('js/app.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
-    <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}">
-    </script>
+    <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/collapse.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/transition.js') }}"></script>
     <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/moment-develop/moment.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
-    <script src="{{ asset('asset/js/select2.min.js') }}"></script>
     <script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>
-    <!-- jquery validation-->
-    <script src="{{ asset('asset/js/jquery.validate.min.js') }}"></script>
-    <script src="{{ asset('asset/js/additional-methods.min.js') }}"></script>
-    <script src="{{ asset('asset/js/messages_zh_TW.min.js') }}"></script>
-
     <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
     <script src="{{ asset('asset/js/clipboard.min.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
@@ -90,7 +78,6 @@
     <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
-    <script src="{{ mix('js/app.js') }}"></script>
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
 
     <script>
@@ -102,7 +89,7 @@
 
         $(function() {
             $('#table_list').DataTable({
-                "aaSorting": []
+                "aaSorting": [],
             });
         });
     </script>
