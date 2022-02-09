@@ -544,7 +544,7 @@
                                     obj.original_subtotal_tax_price = 0 //原幣稅額
                                     break;
                                 case '2': //應稅內含
-                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(0); //(本幣)稅額
+                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(2); //(本幣)稅額
                                     obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
                                     break;
                                 case '3': //零稅率
@@ -573,7 +573,7 @@
                             //     break;
                         case '2': //應稅內含                     
                             // 單頭金額欄位計算方式
-                            requisitions_purchase.total_tax_price = sum_total_tax_price; //稅額(本幣)
+                            requisitions_purchase.total_tax_price = Number(sum_total_tax_price).toFixed(0); //稅額(本幣)
                             requisitions_purchase.original_total_tax_price = sum_original_total_tax_price; //原幣稅額
 
 

@@ -381,7 +381,7 @@
                                     obj.original_subtotal_tax_price = 0 //原幣稅額
                                     break;
                                 case '2': //應稅內含
-                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(0); //(本幣)稅額
+                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(2); //(本幣)稅額
                                     obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
                                     break;
                                 case '3': //零稅率
@@ -400,7 +400,7 @@
                             vm.order_supplier.total_tax_price = 0; //稅額(本幣)
                             break;
                         case '2': //應稅內含                     
-                            vm.order_supplier.total_tax_price = sum_total_tax_price; //稅額(本幣)
+                            vm.order_supplier.total_tax_price = Number(sum_total_tax_price).toFixed(0); //稅額(本幣)
                             vm.order_supplier.original_total_tax_price = sum_original_total_tax_price; //原幣稅額
                             break;
                         case '3': //零稅率
@@ -562,7 +562,7 @@
                             order_supplier_detail.splice(0);
                         }
                         requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
-
+                        console.log(requisitionsPurchaseDetail) ; 
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
                                 requisitions_purchase_dtl_id: obj.id, // requisitions_purchase_detail
@@ -571,7 +571,7 @@
                                 item_no: obj.item_number, //編號
                                 item_price: obj.item_price, //單價
                                 item_qty: obj.item_qty, //採購
-                                purchase_detail_item_qty: obj.purchase_detail_item_qty, //數量
+                                purchase_detail_item_qty: obj.item_qty, //數量
                                 is_giveaway: obj.is_gift, //贈品
                                 min_purchase_qty: obj.min_purchase_qty, //最小採購量
                                 uom: obj.uom, //單位
