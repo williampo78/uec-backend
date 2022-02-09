@@ -274,14 +274,14 @@
                                                 {{-- 請購量 --}}
                                                 <div class="col-sm-1">
                                                     <input class="form-control" type="number" readonly
-                                                        v-model="detail.item_qty">
+                                                        v-model="detail.purchase_detail_item_qty">
                                                 </div>
                                                 {{-- 採購量 --}}
                                                 <div class="col-sm-1">
                                                     <div class="form-group">
-                                                        <input class="form-control purchase_qty"
-                                                            v-model="detail.purchase_qty" :max="detail.item_qty"
-                                                            :name="'purchase_qty['+detailKey+']'" :min="0" type="number"
+                                                        <input class="form-control item_qty"
+                                                            v-model="detail.item_qty" :max="detail.item_qty"
+                                                            :name="'item_qty['+detailKey+']'" :min="0" type="number"
                                                             @change="detailsCount">
                                                     </div>
                                                 </div>
@@ -356,50 +356,55 @@
                         // console.log('取消');
                     },
                     detailsCount() {
-                        var taxtype = String(this.order_supplier.tax);
-                        var original_total_tax_price = 0; // 原幣稅額
-                        var original_total_price = 0; // 原幣總金額
-                        var total_tax_price = 0; //(本幣)稅額
-                        var total_price = 0; //(本幣)總金額
-                        var sum_price = 0;
-                        $.each(this.order_supplier_detail, function(key, obj) {
-                            if (obj.is_giveaway) { //如果是贈品則不計算單價
-                                obj.subtotal_price = 0;
-                                obj.original_subtotal_price = 0;
-                            } else {
-                                switch (taxtype) {
-                                    case '0': //免稅
-                                        price = obj.purchase_qty * obj.item_price;
-                                        obj.original_subtotal_price = obj.purchase_qty * obj
-                                            .item_price; // 數量 * 金錢
-                                        sum_price += price;
-                                        break;
-                                    case '1': //應稅
-                                        alert('error');
-                                        return false;
-                                        break;
-                                    case '2': //應稅內含
-                                        price = obj.purchase_qty * obj.item_price;
-                                        obj.original_subtotal_price = price; // 數量 * 金錢
-                                        sum_price += price;
-                                        total_tax_price += ((price * 1.05).toFixed(2)) - price; //(本幣)稅額
-                                        original_total_tax_price += ((price * 1.05).toFixed(2)) - price; //原幣稅額
-                                        break;
-                                    case '3': //零稅率
-                                        price = obj.purchase_qty * obj.item_price;
-                                        obj.original_subtotal_price = price; // 數量 * 金錢
-                                        sum_price += price;
-                                        break;
-                                    default:
-                                        break;
-                                }
+                    var vm = this ; 
+                    var taxtype = String(this.order_supplier.tax);
+                    var sum_price = 0; //總計
+                    var sum_original_total_tax_price = 0.00; //原幣稅額加總
+                    var sum_total_tax_price = 0.00; //(本幣)稅額
+                    $.each(this.order_supplier_detail, function(key, obj) {
+                        if (obj.is_giveaway) { //如果是贈品則不計算單價
+                            obj.item_price = 0;
+                            obj.subtotal_tax_price = 0;
+                            obj.original_subtotal_tax_price = 0;
+                            obj.original_subtotal_price = 0;
+                        } else {
+                            obj.original_subtotal_price = obj.item_price * obj.item_qty; // (本幣)小計
+                            obj.subtotal_price = obj.original_subtotal_price; //原幣小計
+                            switch (taxtype) {
+                                case '0': //免稅
+                                    obj.subtotal_tax_price = 0; //(本幣)稅額
+                                    obj.original_subtotal_tax_price = 0 //原幣稅額
+                                    break;
+                                case '2': //應稅內含
+                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(0); //(本幣)稅額
+                                    obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
+                                    break;
+                                case '3': //零稅率
+                                    obj.subtotal_tax_price = 0; //(本幣)稅額
+                                    obj.original_subtotal_tax_price = 0 //原幣稅額
+                                    break;
                             }
-                        });
-                        this.order_supplier.original_total_price = sum_price;
-                        this.order_supplier.original_total_tax_price = original_total_tax_price;
-                        this.order_supplier.total_tax_price = total_tax_price;
-                        this.order_supplier.total_price = sum_price;
-                        this.order_supplier.sum_price = sum_price;
+                        }
+                        sum_price += obj.subtotal_price;
+                        sum_total_tax_price = vm.NumberAdd(sum_total_tax_price,obj.subtotal_tax_price);
+                        sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price,obj.original_subtotal_tax_price);
+                    });
+                    switch (taxtype) {
+                        case '0': //免稅
+                            vm.order_supplier.original_total_tax_price = 0; //原幣稅額
+                            vm.order_supplier.total_tax_price = 0; //稅額(本幣)
+                            break;
+                        case '2': //應稅內含                     
+                            vm.order_supplier.total_tax_price = sum_total_tax_price; //稅額(本幣)
+                            vm.order_supplier.original_total_tax_price = sum_original_total_tax_price; //原幣稅額
+                            break;
+                        case '3': //零稅率
+                            vm.order_supplier.original_total_tax_price = 0; //原幣稅額
+                            vm.order_supplier.total_tax_price = 0; //稅額(本幣)
+                            break;
+                    }
+                    vm.order_supplier.original_total_price = sum_price; //原幣總金額
+                    vm.order_supplier.total_price = sum_price; //總金額
                     },
                 },
 
@@ -460,7 +465,7 @@
                             $(element).closest(".form-group").removeClass("has-error");
                         },
                     });
-                    $(".purchase_qty").each(function() {
+                    $(".item_qty").each(function() {
                         $(this).rules("add", {
                             required: true,
                             digits:true,
