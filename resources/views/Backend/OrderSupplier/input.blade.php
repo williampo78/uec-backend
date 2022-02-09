@@ -51,9 +51,9 @@
                                         <div class="form-group">
                                             <label for="supplier">供應商<span class="redtext">*</span></label>
                                             <input class="form-control" id="supplier"
-                                                v-model="order_supplier.supplier_name" readonly>
+                                                v-model="order_supplier.supplier_name" name="supplier" readonly>
                                             <input type="hidden" id="supplier_id" name="supplier_id"
-                                                v-model="order_supplier.supplier_id">
+                                                v-model="order_supplier.supplier_id" style="display: none;">
                                         </div>
                                     </div>
 
@@ -246,13 +246,13 @@
                                             {{-- 請購量 --}}
                                             <div class="col-sm-1">
                                                 <input class="form-control" type="number" readonly
-                                                    v-model="detail.item_qty">
+                                                    v-model="detail.purchase_detail_item_qty">
                                             </div>
                                             {{-- 採購量 --}}
                                             <div class="col-sm-1">
                                                 <div class="form-group">
-                                                    <input class="form-control purchase_qty" v-model="detail.purchase_qty"
-                                                        :max="detail.item_qty" :name="'purchase_qty['+detailKey+']'"
+                                                    <input class="form-control item_qty" v-model="detail.item_qty"
+                                                        :max="detail.item_qty" :name="'item_qty['+detailKey+']'"
                                                         :min="0" type="number" @change="detailsCount">
                                                 </div>
                                             </div>
@@ -367,14 +367,13 @@
                     var sum_original_total_tax_price = 0.00; //原幣稅額加總
                     var sum_total_tax_price = 0.00; //(本幣)稅額
                     $.each(this.order_supplier_detail, function(key, obj) {
-                        console.log(obj);
                         if (obj.is_giveaway) { //如果是贈品則不計算單價
                             obj.item_price = 0;
                             obj.subtotal_tax_price = 0;
                             obj.original_subtotal_tax_price = 0;
                             obj.original_subtotal_price = 0;
                         } else {
-                            obj.original_subtotal_price = obj.item_price * obj.purchase_qty; // (本幣)小計
+                            obj.original_subtotal_price = obj.item_price * obj.item_qty; // (本幣)小計
                             obj.subtotal_price = obj.original_subtotal_price; //原幣小計
                             switch (taxtype) {
                                 case '0': //免稅
@@ -412,7 +411,6 @@
                     vm.order_supplier.original_total_price = sum_price; //原幣總金額
                     vm.order_supplier.total_price = sum_price; //總金額
 
-                    console.log(sum_price , sum_price ,sum_total_tax_price,sum_original_total_tax_price);
 
                     // return details;
                     // this.order_supplier.original_total_price = sum_price; // 原幣總金額
@@ -443,7 +441,7 @@
                     submitHandler: function(form) {
                         $('#save_data').prop('disabled', true);
 
-                        $(".purchase_qty").each(function() {
+                        $(".item_qty").each(function() {
                             $(this).rules("add", {
                                 required: true,
                                 digits: true,
@@ -461,12 +459,15 @@
                         },
                         requisitions_purchase_id: {
                             required: true,
+                        },
+                        supplier:{
+                            required: true,
                         }
                     },
                     messages: {
-                        // end_launched_at: {
-                        //     greaterThan: "結束時間必須大於開始時間",
-                        // },
+                        supplier: {
+                            required: "請購單供應商遺失 無法建立採購單",
+                        },
                     },
                     errorClass: "help-block",
                     errorElement: "span",
@@ -569,8 +570,8 @@
                                 combination_name: obj.combination_name, //顯示的品項名稱
                                 item_no: obj.item_number, //編號
                                 item_price: obj.item_price, //單價
-                                item_qty: obj.item_qty, //顯示請購數量
-                                purchase_qty: obj.item_qty, //數量
+                                item_qty: obj.item_qty, //採購
+                                purchase_detail_item_qty: obj.purchase_detail_item_qty, //數量
                                 is_giveaway: obj.is_gift, //贈品
                                 min_purchase_qty: obj.min_purchase_qty, //最小採購量
                                 uom: obj.uom, //單位

@@ -102,10 +102,12 @@ class OrderSupplierService
             DB::raw('products.brand_id as brand_id'),
             DB::raw('product_items.item_no as product_items_no'),
             DB::raw('products.min_purchase_qty as min_purchase_qty'),
+            DB::raw('order_supplier_detail.item_qty as purchase_detail_item_qty')
         )
             ->where('order_supplier_detail.order_supplier_id', $order_supplier_id)
             ->leftJoin('product_items', 'product_items.id', 'order_supplier_detail.product_item_id')
             ->leftJoin('products', 'products.id', 'product_items.product_id')
+            ->leftJoin('purchase_detail' , 'purchase_detail.id' ,'order_supplier_detail.requisitions_purchase_dtl_id')
             ->get();
         return $result;
     }
@@ -153,7 +155,6 @@ class OrderSupplierService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ];
-
             if ($act == 'add') {
                 $orderSupplierData['agent_id'] = $agent_id;
                 $orderSupplierData['created_at'] = $now;
@@ -184,7 +185,7 @@ class OrderSupplierService
                     'currency_code' => 'TWD', //目前暫未開放
                     'currency_price' => '1', //目前暫未開放
                     'is_giveaway' => $val['is_giveaway'],
-                    'purchase_qty' => $val['purchase_qty'],
+                    'purchase_qty' => 0,
                     'created_at' => $now,
                     'updated_at' => $now,
                     'created_by' => $user_id,

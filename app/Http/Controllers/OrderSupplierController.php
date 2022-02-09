@@ -82,10 +82,10 @@ class OrderSupplierController extends Controller
         $route_name = 'order_supplier';
         $act = 'add';
         $data = $request->except('_token');
-        if (isset($data['status_code'])) {
-            $act = $data['status_code'];
-        }
-        $this->orderSupplierService->updateOrderSupplier($data, 'add');
+        // if (isset($data['status_code'])) {
+        //     $act = $data['status_code'];
+        // }
+        $result = $this->orderSupplierService->updateOrderSupplier($data, 'add');
         return view('Backend.success', compact('route_name', 'act'));
     }
 
@@ -132,7 +132,6 @@ class OrderSupplierController extends Controller
 
             return $obj;
         });
-
         $result['act'] = 'upd';
         $result['id'] = $id;
         return view('Backend.OrderSupplier.update', $result);
