@@ -25,7 +25,10 @@ use App\Http\Controllers\api\MemberInfoController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
  */
-
+Route::get('/testheaderauthorization', function () { //測試跨域取得header api 
+    return response('testGetHeaderAuthorization', 200)
+                  ->header('Authorization', 'Bearer iamtokenkey');
+});
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -143,3 +146,4 @@ Route::group(['prefix' => 'checkout'], function () {
     Route::get('/donatedInstitution', [CheckoutController::class, 'getDonatedInstitution']);
     Route::post('/tapPayNotify', [CheckoutController::class, 'tapPayNotify']);
 });
+
