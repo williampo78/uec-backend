@@ -31,9 +31,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css"
         crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('asset/css/jquery.fancybox.min.css') }}">
-    <link rel="stylesheet" src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
-    <link rel="stylesheet" href="{{ asset('asset/css/validationEngine.jquery.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/editor.css') }}">
+    <link rel="stylesheet" href="{{ mix('css/app.css') }}">
 
     <style>
         [v-cloak] {
@@ -92,6 +91,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ mix('js/app.js') }}"></script>
+    <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
 
     <script>
         @isset($share_role_auth)
