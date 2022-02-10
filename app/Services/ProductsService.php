@@ -669,7 +669,7 @@ class ProductsService
                     );
                 };
             }
-            if ($in['product_attributes_change'] == 'true') {
+            if (isset($in['product_attributes_change']) && $in['product_attributes_change'] == 'true') {
                 ProductAttributes::where('attribute_type', 'CERTIFICATE')->where('product_id', $id)->delete();
                 $add_product_attributes = [];
                 if (isset($in['product_attributes'])) {

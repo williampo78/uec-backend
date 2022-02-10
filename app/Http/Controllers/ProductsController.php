@@ -79,12 +79,14 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $result = [] ; 
-        $result['status'] = $this->productsService->addProducts($request->input(), $request->file()) ;
+        // $result['status'] = $this->productsService->addProducts($request->input(), $request->file()) ;
+        $result['status'] = false ; 
         $result['route_name'] = 'products';
         $result['act'] = 'add';
         if ($result['status']) {
             return view('Backend.success', $result);
         } else {
+            $result['message']  = '新增時發生未預期的錯誤'; 
             return view('Backend.error', $result);
         };
     }
@@ -170,6 +172,7 @@ class ProductsController extends Controller
         if ($result['status']) {
             return view('Backend.success', $result);
         } else {
+            $result['message']  = '編輯時發生未預期的錯誤'; 
             return view('Backend.error', $result);
         };
     }
