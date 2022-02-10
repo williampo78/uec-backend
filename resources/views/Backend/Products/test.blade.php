@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', '分類階層內容管理')
 @section('content')
     <style>
@@ -24,7 +24,7 @@
                 </form>
 
                 <img style="width: 200px ; height:200px; " src="" alt="">
-{{-- 
+{{--
                 <form class="form-horizontal" role="form" id="new-form" method="POST" action="/upload_img"
                     enctype="multipart/form-data" novalidate="novalidate">
                     @csrf

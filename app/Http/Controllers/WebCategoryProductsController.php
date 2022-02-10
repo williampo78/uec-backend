@@ -16,7 +16,7 @@ class WebCategoryProductsController extends Controller
         ProductsService $productsService) {
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
         $this->supplierService = $supplierService;
-        $this->productsService = $productsService; 
+        $this->productsService = $productsService;
     }
     /**
      * Display a listing of the resource.
@@ -28,7 +28,7 @@ class WebCategoryProductsController extends Controller
         $request = $request->input();
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($request);
         // dd($result) ;
-        return view('Backend.WebCategoryProducts.list', $result);
+        return view('backend.web_category_products.list', $result);
     }
 
     /**
@@ -38,7 +38,7 @@ class WebCategoryProductsController extends Controller
      */
     public function create()
     {
-        return view('Backend.WebCategoryProducts.input');
+        return view('backend.web_category_products.input');
     }
 
     /**
@@ -79,7 +79,7 @@ class WebCategoryProductsController extends Controller
         // dd($result) ;
         $result['supplier'] = $this->supplierService->getSuppliers();
 
-        return view('Backend.WebCategoryProducts.input', $result);
+        return view('backend.web_category_products.input', $result);
     }
 
     /**
@@ -95,7 +95,7 @@ class WebCategoryProductsController extends Controller
         $result = $this->webCategoryHierarchyService->edit_category_hierarchy_content($in, $id);
         $route_name = 'web_category_products';
         $act = 'upd';
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -118,7 +118,7 @@ class WebCategoryProductsController extends Controller
         $result = [];
         switch ($in['type']) {
             case 'getProductsList':
-                $result['data'] = $this->productsService->getProducts($in) ; 
+                $result['data'] = $this->productsService->getProducts($in) ;
                 $this->productsService->restructureProducts($result['data']);
                 foreach ($result['data'] as $key => $val) {
                     $result['data'][$key]->check_use = 0;

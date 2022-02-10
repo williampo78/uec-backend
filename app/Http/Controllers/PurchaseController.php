@@ -32,7 +32,7 @@ class PurchaseController extends Controller
         if (!empty($in)) {
             $result['purchase'] = $this->purchaseService->getPurchase($in);
         }
-        return view('Backend.Purchase.list', $result);
+        return view('backend.purchase.list', $result);
     }
 
     /**
@@ -127,7 +127,7 @@ class PurchaseController extends Controller
 
                     return $obj;
                 });
-                return view('Backend.Purchase.show', $data);
+                return view('backend.purchase.show', $data);
                 break;
             case 'update_invoice':
                 $result = $this->purchaseService->updateInvoice($req) ;

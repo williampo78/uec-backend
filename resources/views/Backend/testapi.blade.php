@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', 'TEST axios')
 @section('content')
     <div>
@@ -15,12 +15,13 @@
 @section('js')
     <script>
         var url = "http://pc.laravel.uec/" ; 
-        // var url = "https://uecbackend.u-ark.com/";
+        var url = "https://uecbackend.u-ark.com/";
 
         $("#req").click(function() {
 
             var token = $('#token').val();
             // console.log(`Bearer ${token}`) ; 
+            console.log(`Bearer ${token}`) ;
 
             const config = {
                 headers: {
@@ -48,8 +49,6 @@
         });
 
         $("#login").click(function() {
-            // var url = "http://pc.laravel.uec/" ; 
-            // var url = "https://uecbackend.u-ark.com/" ; 
             var token = $('#token').val();
             const config = {};
             const bodyParameters = {
@@ -74,8 +73,6 @@
         });
 
         $("#testheader").click(function() {
-            // var url = "http://pc.laravel.uec/" ; 
-            // var url = "https://uecbackend.u-ark.com/" ; 
             var token = $('#token').val();
             const config = {};
             const bodyParameters = {

@@ -60,7 +60,7 @@ class PromotionalCampaignPrdController extends Controller
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
         if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
             return view(
-                'Backend.PromotionalCampaign.PRD.list',
+                'backend.promotional_campaign.prd.list',
                 compact('campaign_types')
             );
         }
@@ -70,7 +70,7 @@ class PromotionalCampaignPrdController extends Controller
         $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns($query_datas);
 
         return view(
-            'Backend.PromotionalCampaign.PRD.list',
+            'backend.promotional_campaign.prd.list',
             compact('promotional_campaigns', 'campaign_types')
         );
     }
@@ -89,7 +89,7 @@ class PromotionalCampaignPrdController extends Controller
         $suppliers = $this->supplier_service->getSuppliers();
 
         return view(
-            'Backend.PromotionalCampaign.PRD.add',
+            'backend.promotional_campaign.prd.add',
             compact('campaign_types', 'suppliers')
         );
     }
@@ -112,7 +112,7 @@ class PromotionalCampaignPrdController extends Controller
         $act = 'add';
 
         return view(
-            'Backend.success',
+            'backend.success',
             compact('route_name', 'act')
         );
     }
@@ -178,7 +178,7 @@ class PromotionalCampaignPrdController extends Controller
         }
 
         return view(
-            'Backend.PromotionalCampaign.PRD.update',
+            'backend.promotional_campaign.prd.update',
             compact('promotional_campaign', 'suppliers')
         );
     }
@@ -203,7 +203,7 @@ class PromotionalCampaignPrdController extends Controller
         $act = 'upd';
 
         return view(
-            'Backend.success',
+            'backend.success',
             compact('route_name', 'act')
         );
     }

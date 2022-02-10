@@ -36,7 +36,7 @@ class UserController extends Controller
         $data['role'] = ($getData ? $this->usersService->getUsers($getData) : []);
         $data['user'] = $this->universalService->getUser();
 
-        return view('Backend.Users.list', compact('data'));
+        return view('backend.users.list', compact('data'));
     }
 
     /**
@@ -48,7 +48,7 @@ class UserController extends Controller
     {
         $data['suppliers'] = $this->supplierService->getSuppliers();
         $data['roles'] = $this->rolePermissionService->getRoles("");
-        return view('Backend.Users.add', compact('data'));
+        return view('backend.users.add', compact('data'));
     }
 
     /**
@@ -64,7 +64,7 @@ class UserController extends Controller
         $act = 'add';
         $route_name = 'users';
         $this->usersService->addUser($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
 
     }
 
@@ -91,7 +91,7 @@ class UserController extends Controller
         $data['roles'] = $this->rolePermissionService->getRoles("");
         $data['user'] = Users::find($id);
         $data['user_roles'] = $this->usersService->getUserRoles($id);
-        return view('Backend.Users.upd', compact('data'));
+        return view('backend.users.upd', compact('data'));
     }
 
     /**
@@ -110,7 +110,7 @@ class UserController extends Controller
         $route_name = 'users';
         $input['id'] = $id;
         $this->usersService->addUser($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -150,7 +150,7 @@ class UserController extends Controller
     {
         $user_id = Auth::user()->id;
         $data = Users::find($user_id);
-        return view('Backend.Users.profile', compact('data'));
+        return view('backend.users.profile', compact('data'));
     }
 
     public function updateProfile(Request $request)
@@ -167,9 +167,9 @@ class UserController extends Controller
         $route_name = 'profile';
         $act = 'upd';
         if ($request->input(['profile']) == 1) {
-            return view('Backend.example');
+            return view('backend.example');
         } else {
-            return view('Backend.success', compact('route_name', 'act'));
+            return view('backend.success', compact('route_name', 'act'));
         }
     }
 

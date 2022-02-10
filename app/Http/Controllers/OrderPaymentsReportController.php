@@ -38,7 +38,7 @@ class OrderPaymentsReportController extends Controller
         $params = [];
         $params['orderPaymentsReports'] = $orderPaymentsReports;
 
-        return view('Backend.OrderPaymentsReport.list', $params);
+        return view('backend.order_payments_report.list', $params);
     }
 
     /**

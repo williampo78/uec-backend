@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', '個人資料編修')
 @section('content')
     <div id="page-wrapper">

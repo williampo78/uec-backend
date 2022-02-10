@@ -32,7 +32,7 @@ class QAController extends Controller
         $data['user'] = $this->universalService->getUser();
         $data['code'] = $this->universalService->getLookupValues('QA_CATEGORY');
 
-        return view('Backend.QA.list', compact('data'));
+        return view('backend.qa.list', compact('data'));
     }
 
     /**
@@ -43,7 +43,7 @@ class QAController extends Controller
     public function create()
     {
         $data['category'] = $this->webContentsService->getCategory('QA_CATEGORY');
-        return view('Backend.QA.add', compact('data'));
+        return view('backend.qa.add', compact('data'));
     }
 
     /**
@@ -60,7 +60,7 @@ class QAController extends Controller
         $route_name = 'qa';
         $input['apply_to'] = 'QA';
         $this->webContentsService->addWebContent($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -98,7 +98,7 @@ class QAController extends Controller
     {
         $data['category'] = $this->webContentsService->getCategory('QA_CATEGORY');
         $data['webcontent'] = WebContents::find($id);
-        return view('Backend.QA.upd', compact('data'));
+        return view('backend.qa.upd', compact('data'));
     }
 
     /**
@@ -117,7 +117,7 @@ class QAController extends Controller
         $input['id'] = $id;
         $input['apply_to'] = 'QA';
         $result = $this->webContentsService->addWebContent($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

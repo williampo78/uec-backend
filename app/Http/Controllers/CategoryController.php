@@ -29,7 +29,7 @@ class CategoryController extends Controller
         $data = Category::all();
         $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
 
-        return view('Backend.Category.list', compact('data','primary_category_list'));
+        return view('backend.category.list', compact('data','primary_category_list'));
     }
 
     /**
@@ -41,7 +41,7 @@ class CategoryController extends Controller
     {
         $agent_id = Auth::user()->agent_id;
         $primary_category = PrimaryCategory::where('agent_id' , $agent_id)->get();
-        return view('Backend.Category.add' , compact('primary_category'));
+        return view('backend.category.add' , compact('primary_category'));
     }
 
     /**
@@ -61,7 +61,7 @@ class CategoryController extends Controller
 
         $rs = Category::insert($data);
 
-        return view('Backend.success' , compact('route_name','act'));
+        return view('backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -86,7 +86,7 @@ class CategoryController extends Controller
         $data = Category::find($id);
         $primary_category_list = $this->categoryService->getPrimaryCategoryForList();
 
-        return view('Backend.Category.upd', compact('data' , 'primary_category_list'));
+        return view('backend.category.upd', compact('data' , 'primary_category_list'));
     }
 
     /**
@@ -105,7 +105,7 @@ class CategoryController extends Controller
         Category::where('id' ,$id)->update($data);
         $route_name = 'category';
         $act = 'upd';
-        return view('Backend.success', compact('route_name' , 'act'));
+        return view('backend.success', compact('route_name' , 'act'));
     }
 
     /**

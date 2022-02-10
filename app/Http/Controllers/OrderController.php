@@ -36,7 +36,7 @@ class OrderController extends Controller
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
         if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
-            return view('Backend.Order.list');
+            return view('backend.order.list');
         }
 
         $query_datas['is_latest'] = 1;
@@ -86,7 +86,7 @@ class OrderController extends Controller
             ->toArray();
 
         return view(
-            'Backend.Order.list',
+            'backend.order.list',
             compact('orders')
         );
     }

@@ -23,7 +23,7 @@ class PrimaryCategoryController extends Controller
     {
         $data = PrimaryCategory::all();
 
-        return view('Backend.PrimaryCategory.list', compact('data'));
+        return view('backend.primary_category.list', compact('data'));
     }
 
     /**
@@ -33,7 +33,7 @@ class PrimaryCategoryController extends Controller
      */
     public function create()
     {
-        return view('Backend.PrimaryCategory.add');
+        return view('backend.primary_category.add');
     }
 
     /**
@@ -53,7 +53,7 @@ class PrimaryCategoryController extends Controller
 
         $rs = PrimaryCategory::insert($data);
 
-        return view('Backend.success' , compact('route_name','act'));
+        return view('backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -77,7 +77,7 @@ class PrimaryCategoryController extends Controller
     {
         $data = PrimaryCategory::find($id);
 
-        return view('Backend.PrimaryCategory.upd', compact('data'));
+        return view('backend.primary_category.upd', compact('data'));
     }
 
     /**
@@ -95,7 +95,7 @@ class PrimaryCategoryController extends Controller
         PrimaryCategory::where('id' ,$id)->update($data);
         $route_name = 'primary_category';
         $act = 'upd';
-        return view('Backend.success', compact('route_name' , 'act'));
+        return view('backend.success', compact('route_name' , 'act'));
     }
 
     /**

@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '常見問題Q&A')
 
@@ -118,7 +118,7 @@
             </div>
         </div>
     </div>
-    @include('Backend.QA.detail')
+    @include('backend.qa.detail')
 @endsection
 
 @section('js')

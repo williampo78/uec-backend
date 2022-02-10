@@ -38,7 +38,7 @@ class ProductReviewRegisterController extends Controller
         }
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content(); //供應商
-        return view('Backend.ProductReviewRegister.list', $result);
+        return view('backend.product_review_register.list', $result);
     }
 
     /**
@@ -72,7 +72,7 @@ class ProductReviewRegisterController extends Controller
     {
         $result['products'] = $this->productsService->showProducts($id);
         $result['product_review_log'] = $this->productsService->getProductReviewLog($id);
-        return view('Backend.ProductReviewRegister.show', $result);
+        return view('backend.product_review_register.show', $result);
     }
 
     /**
@@ -83,10 +83,10 @@ class ProductReviewRegisterController extends Controller
      */
     public function edit($id)
     {
-        
+
         $result['products'] = $this->productsService->showProducts($id);
         $result['product_review_log'] = $this->productsService->getProductReviewLog($id);
-        return view('Backend.ProductReviewRegister.input', $result);
+        return view('backend.product_review_register.input', $result);
     }
 
     /**
@@ -103,7 +103,7 @@ class ProductReviewRegisterController extends Controller
         $result['status'] = $this->productsService->addProductReviewLog($in, $id);
         $act = 'product_reviewing';
         $route_name = 'product_review_register';
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -118,17 +118,17 @@ class ProductReviewRegisterController extends Controller
     }
     public function ajax(Request $request){
         $in = $request->input();
-        $status = true ; 
+        $status = true ;
 
         switch ($in['type']) {
-            case 'offProduct': 
-                    $status = $this->productsService->offProduct($in) ; 
+            case 'offProduct':
+                    $status = $this->productsService->offProduct($in) ;
                 break;
             default:
                 break;
         }
 
-        
+
         return response()->json([
             'status' => $status,
             'in' => $request->input(),

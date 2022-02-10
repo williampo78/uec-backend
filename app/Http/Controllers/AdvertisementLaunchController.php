@@ -49,7 +49,7 @@ class AdvertisementLaunchController extends Controller
             return $obj;
         });
 
-        return view('Backend.Advertisement.Launch.list', compact('ad_slots', 'ad_slot_contents'));
+        return view('backend.advertisement.launch.list', compact('ad_slots', 'ad_slot_contents'));
     }
 
     /**
@@ -65,7 +65,7 @@ class AdvertisementLaunchController extends Controller
             'product_type' => 'N',
         ]);
 
-        return view('Backend.Advertisement.Launch.add', compact('ad_slots', 'product_category', 'products'));
+        return view('backend.advertisement.launch.add', compact('ad_slots', 'product_category', 'products'));
     }
 
     /**
@@ -85,7 +85,7 @@ class AdvertisementLaunchController extends Controller
         $route_name = 'advertisemsement_launch';
         $act = 'add';
 
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -156,7 +156,7 @@ class AdvertisementLaunchController extends Controller
             'product_type' => 'N',
         ]);
 
-        return view('Backend.Advertisement.Launch.update', compact('ad_slot_content', 'product_category', 'products'));
+        return view('backend.advertisement.launch.update', compact('ad_slot_content', 'product_category', 'products'));
     }
 
     /**
@@ -178,7 +178,7 @@ class AdvertisementLaunchController extends Controller
         $route_name = 'advertisemsement_launch';
         $act = 'upd';
 
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

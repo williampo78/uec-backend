@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 <link rel="stylesheet" href="{{ URL::asset('asset/css/login.css') }}">
 @section('title', '諾亞克 uEC - 登入系統')

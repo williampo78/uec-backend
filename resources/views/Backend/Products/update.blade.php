@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', '商品主檔 - 新增基本資訊')
 @section('content')
 <style>
@@ -289,7 +289,7 @@
                                         <input type="radio" name="lgst_method" value="HOME" {{ $products->lgst_method ==
                                         'HOME' ? 'checked' : '' }}> 宅配
                                     </label>
-                                </div>  
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -888,7 +888,7 @@
                 </div>
                 <textarea style="display: none" style="display: none" id="SkuListdata" name="SkuListdata" cols="30"
                     rows="10">@{{ SkuList }}</textarea>
-                    
+
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
@@ -947,7 +947,7 @@
         <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i> 取消</a>
     </form>
     {{-- 修改紀錄 --}}
-    @include('Backend.Products.model_update_log')
+    @include('backend.products.model_update_log')
     </div>
 </div>
 </div>
@@ -1222,8 +1222,8 @@
                 return false  ;
             }
             for (let i = 0; i < selectedFiles.length; i++) {
-                let type = selectedFiles[i].type ; 
-    
+                let type = selectedFiles[i].type ;
+
                 if(selectedFiles[i].size > 1048576){
                     alert('照片名稱:'+selectedFiles[i].name +'已經超出大小') ;
                 }else if(type !== 'image/jpeg' && type!== 'image/png'){
@@ -1252,7 +1252,7 @@
                         type:'products',
                     })
                     .then(function(response) {
-                    
+
                     })
                     .catch(function(error) {
                         console.log(error);
@@ -1261,7 +1261,7 @@
                 }else{
                     this.$delete(this.images, index);
                 }
-            } 
+            }
             this.adjustTheDisplay();
         },
         imagesCheck() {
@@ -1366,7 +1366,7 @@
         }
     }
     $(document).ready(function () {
- 
+
         $('input[type=radio][name=stock_type]').change(function() {
                 if($(this).val() == 'T'){
                     $('.stock_type_list').hide();
@@ -1440,9 +1440,9 @@
                                     dataFilter: function(data) {
                                         data = JSON.parse(data)
                                         if(data.result){
-                                            return true ; 
+                                            return true ;
                                         }else{
-                                            return false ; 
+                                            return false ;
                                         }
                                     },
                                 }

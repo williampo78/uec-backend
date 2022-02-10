@@ -29,7 +29,7 @@ class SupplierController extends Controller
     {
         $result = [];
         $result['supplier'] = $this->supplierService->getSuppliers();
-        return view('Backend.Supplier.list', $result);
+        return view('backend.supplier.list', $result);
     }
 
     /**
@@ -41,7 +41,7 @@ class SupplierController extends Controller
     {
         $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
         $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
-        return view('Backend.Supplier.input', $result);
+        return view('backend.supplier.input', $result);
     }
 
     /**
@@ -56,7 +56,7 @@ class SupplierController extends Controller
         $act = 'add';
         $route_name = 'supplier';
         $result = $this->supplierService->addSupplier($input);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -69,7 +69,7 @@ class SupplierController extends Controller
     {
         // echo $id ;//
         // $supplier = $this->supplierService->showSupplier($id)->first();
-        // return view('Backend.Supplier.input',$supplier);
+        // return view('backend.supplier.input',$supplier);
     }
 
     /**
@@ -86,7 +86,7 @@ class SupplierController extends Controller
         $result['Contact'] = $this->contactService->getContact('Supplier',$id);
         $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
 
-        return view('Backend.Supplier.input', $result);
+        return view('backend.supplier.input', $result);
     }
 
     /**
@@ -105,7 +105,7 @@ class SupplierController extends Controller
         $result = $this->supplierService->updateSupplier($input, $id);
         $act = 'upd';
         $route_name = 'supplier';
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

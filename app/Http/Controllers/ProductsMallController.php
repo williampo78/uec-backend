@@ -49,7 +49,7 @@ class ProductsMallController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content(); //供應商
 
-        return view('Backend.ProductsMall.list', $result);
+        return view('backend.products_mall.list', $result);
     }
 
     /**
@@ -59,7 +59,7 @@ class ProductsMallController extends Controller
      */
     public function create()
     {
-        // return view('Backend.ProductsMall.input');
+        // return view('backend.products_mall.input');
     }
 
     /**
@@ -92,7 +92,7 @@ class ProductsMallController extends Controller
         $result['spac_list'] = $this->productsService->getProductSpac($id);
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
         $result['related_products'] = $this->productsService->getRelatedProducts($id);
-        return view('Backend.ProductsMall.show', $result);
+        return view('backend.products_mall.show', $result);
     }
 
     /**
@@ -105,23 +105,23 @@ class ProductsMallController extends Controller
     {
         $result = [];
         $products = $this->productsService->showProducts($id) ;
-        $products->launched_status = '' ; 
+        $products->launched_status = '' ;
         $products->launched_at = ($products->start_launched_at || $products->end_launched_at) ? "{$products->start_launched_at} ~ {$products->end_launched_at}" : '';
         switch ($products->approval_status) {
             case 'NA':
-                $products->edit_readonly = '0' ; 
+                $products->edit_readonly = '0' ;
                 break;
 
             case 'REVIEWING':
-                $products->edit_readonly = '1' ; 
+                $products->edit_readonly = '1' ;
                 break;
 
             case 'REJECTED':
-                $products->edit_readonly = '0' ; 
+                $products->edit_readonly = '0' ;
                 break;
 
             case 'CANCELLED':
-                $products->edit_readonly = '0' ; 
+                $products->edit_readonly = '0' ;
                 break;
             case 'APPROVED':
                 $products->edit_readonly = Carbon::now()->between($products->start_launched_at, $products->end_launched_at) ? '1' : '0';
@@ -144,7 +144,7 @@ class ProductsMallController extends Controller
             'attribute_type' => 'CERTIFICATE',
         ])->keyBy('product_attribute_lov_id')
         ->toArray();
-        return view('Backend.ProductsMall.input', $result);
+        return view('backend.products_mall.input', $result);
     }
 
     /**
@@ -156,20 +156,20 @@ class ProductsMallController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = [] ; 
+        $result = [] ;
         $in = $request->input();
         $file = $request->file();
-    
+
         $result['status'] =  $this->productsService->updateProductSmall($in, $file, $id);
         
         $result['route_name'] = 'product_small';
         $result['act'] = 'upd';
         if ($result['status']) {
-            return view('Backend.success', $result);
+            return view('backend.success', $result);
         } else {
-            $result['message']  = '編輯時發生未預期的錯誤'; 
-            return view('Backend.error', $result);
+            return view('backend.error', $result);
         };
+        // return view('backend.success', compact('route_name', 'act'));
     }
     /**
      * Remove the specified resource from storage.

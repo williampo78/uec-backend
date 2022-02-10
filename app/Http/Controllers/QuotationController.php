@@ -46,7 +46,7 @@ class QuotationController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers();
         $result['quotation'] = $this->quotationService->getQuotation($in);
         $result['status_code'] = $this->quotationService->getStatusCode();
-        return view('Backend.Quotation.list', $result);
+        return view('backend.quotation.list', $result);
 
     }
 
@@ -65,7 +65,7 @@ class QuotationController extends Controller
         });
         $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'add';
-        return view('Backend.Quotation.add', $result);
+        return view('backend.quotation.add', $result);
     }
 
     /**
@@ -80,11 +80,11 @@ class QuotationController extends Controller
         $result = $this->quotationService->addQuotation($data);
         $result['route_name'] = 'quotation';
         $result['act'] = 'add';
-        
+
         if ($result['status']) {
-            return view('Backend.success', $result);
+            return view('backend.success', $result);
         } else {
-            return view('Backend.error', $result);
+            return view('backend.error', $result);
         };
     }
 
@@ -116,7 +116,7 @@ class QuotationController extends Controller
         $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'upd';
         $result['id'] = $id;
-        return view('Backend.Quotation.add', $result);
+        return view('backend.quotation.add', $result);
     }
 
     /**
@@ -135,7 +135,7 @@ class QuotationController extends Controller
 
         $this->quotationService->updateQuotation($data);
 
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -151,7 +151,7 @@ class QuotationController extends Controller
 
         Quotation::destroy($id);
 
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     public function ajax(Request $request)
@@ -184,14 +184,14 @@ class QuotationController extends Controller
                 $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($in['id']);
 
                 $data['taxlist'] = config('uec.tax_option');
-                return view('Backend.Quotation.show', $data);
+                return view('backend.quotation.show', $data);
                 break;
             //供應商取得商品
             case 'supplierGetProducts':
                $products =  $this->productsService->getItemsAndProduct([
                     'supplier_id' => $in['supplier_id'],
                 ]);
-                
+
                 return response()->json([
                     'requestData'=>$in,
                     'products' =>$products ,

@@ -38,7 +38,7 @@ class TertiaryCategoryController extends Controller
         $params = [];
         $params['parentCategories'] = $this->tertiaryCategoryService->getPrimaryCategoryAndCategory();
 
-        return view('Backend.TertiaryCategory.add', $params);
+        return view('backend.tertiary_category.add', $params);
     }
 
     /**
@@ -67,7 +67,7 @@ class TertiaryCategoryController extends Controller
         $route_name = 'tertiary_category';
         $act = 'add';
 
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -80,7 +80,7 @@ class TertiaryCategoryController extends Controller
         $params = [];
         $params['tertiaryCategories'] = $this->tertiaryCategoryService->getIndex();
 
-        return view('Backend.TertiaryCategory.list', $params);
+        return view('backend.tertiary_category.list', $params);
     }
 
     /**
@@ -102,7 +102,7 @@ class TertiaryCategoryController extends Controller
         $params['tertiaryCategory'] = $tertiaryCategory;
         $params['parentCategories'] = $this->tertiaryCategoryService->getPrimaryCategoryAndCategory();
 
-        return view('Backend.TertiaryCategory.edit', $params);
+        return view('backend.tertiary_category.edit', $params);
     }
 
     /**
@@ -130,6 +130,6 @@ class TertiaryCategoryController extends Controller
 
         $route_name = 'tertiary_category';
         $act = 'upd';
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 }

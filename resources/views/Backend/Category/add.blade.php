@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', '新增中分類管理')
 @section('content')
     <!--新增-->

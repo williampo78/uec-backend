@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', isset($Supplier) ? '編輯供應商資料' : '新建供應商資料')
 

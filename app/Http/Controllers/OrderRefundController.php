@@ -44,7 +44,7 @@ class OrderRefundController extends Controller
         $params = [];
         $params['orderRefunds'] = $orderRefunds;
 
-        return view('Backend.OrderRefund.list', $params);
+        return view('backend.order_refund.list', $params);
     }
 
     /**

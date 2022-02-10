@@ -24,7 +24,7 @@ class DepartmentController extends Controller
 
         $data = [];
         $data['department'] = $this->departmentService->getDepartment();
-        return view('Backend.Department.list', compact('data'), compact('data'));
+        return view('backend.department.list', compact('data'), compact('data'));
 
     }
 
@@ -35,7 +35,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        return view('Backend.Department.input');
+        return view('backend.department.input');
 
     }
 
@@ -54,7 +54,7 @@ class DepartmentController extends Controller
         $this->departmentService->addDepartment($input);
         $act = 'add';
         $route_name = 'department';
-        return view('Backend.success' , compact('route_name','act'));
+        return view('backend.success' , compact('route_name','act'));
 
     }
 
@@ -78,7 +78,7 @@ class DepartmentController extends Controller
     public function edit($id)
     {
         $data['department'] = $this->departmentService->showDepartment($id);
-        return view('Backend.Department.input', $data);
+        return view('backend.department.input', $data);
     }
 
     /**
@@ -97,7 +97,7 @@ class DepartmentController extends Controller
         $this->departmentService->updateDepartment($input, $id);
         $act = 'upd';
         $route_name = 'department';
-        return view('Backend.success' , compact('route_name','act'));
+        return view('backend.success' , compact('route_name','act'));
 
 
     }

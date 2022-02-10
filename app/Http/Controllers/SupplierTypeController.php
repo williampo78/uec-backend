@@ -21,7 +21,7 @@ class SupplierTypeController extends Controller
     {
         $result = [];
         $result['SupplierTypeService'] = $this->SupplierTypeService->getSupplierType($request);
-        return view('Backend.SupplierType.list', $result);
+        return view('backend.supplier_type.list', $result);
     }
 
     /**
@@ -31,7 +31,7 @@ class SupplierTypeController extends Controller
      */
     public function create()
     {
-        return view('Backend.SupplierType.input');
+        return view('backend.supplier_type.input');
     }
 
     /**
@@ -72,7 +72,7 @@ class SupplierTypeController extends Controller
     {
         $result = [];
         $result['ShowData'] = $this->SupplierTypeService->Get($id);
-        return view('Backend.SupplierType.input', $result);
+        return view('backend.supplier_type.input', $result);
     }
 
     /**

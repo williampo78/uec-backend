@@ -34,7 +34,7 @@ class BuyoutProductsReportController extends Controller
             }
         }
 
-        return view('Backend.BuyoutProductsReport.list', $result);
+        return view('backend.buyout_products_report.list', $result);
     }
 
     /**

@@ -24,7 +24,7 @@ class WarehouseController extends Controller
     public function index()
     {
         $data = Warehouse::all();
-        return view('Backend.Warehouse.list', compact('data'));
+        return view('backend.warehouse.list', compact('data'));
     }
 
     /**
@@ -34,7 +34,7 @@ class WarehouseController extends Controller
      */
     public function create()
     {
-        return view('Backend.Warehouse.add');
+        return view('backend.warehouse.add');
     }
 
     /**
@@ -52,7 +52,7 @@ class WarehouseController extends Controller
         unset($data['_token']);
         $rs = Warehouse::insert($data);
 
-        return view('Backend.success' , compact('route_name','act'));
+        return view('backend.success' , compact('route_name','act'));
     }
 
     /**
@@ -76,7 +76,7 @@ class WarehouseController extends Controller
     {
         $data = Warehouse::find($id);
 
-        return view('Backend.Warehouse.upd', compact('data'));
+        return view('backend.warehouse.upd', compact('data'));
     }
 
     /**
@@ -94,7 +94,7 @@ class WarehouseController extends Controller
         Warehouse::where('id' ,$id)->update($data);
         $route_name = 'warehouse';
         $act = 'upd';
-        return view('Backend.success', compact('route_name' , 'act'));
+        return view('backend.success', compact('route_name' , 'act'));
     }
 
     /**

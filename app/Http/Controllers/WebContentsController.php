@@ -32,7 +32,7 @@ class WebContentsController extends Controller
         $data['code'] = $this->universalService->getLookupValues('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
         $data['getData'] = $getData;
-        return view('Backend.WebContents.list', compact('data'));
+        return view('backend.web_contents.list', compact('data'));
     }
 
     /**
@@ -45,7 +45,7 @@ class WebContentsController extends Controller
         //
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
-        return view('Backend.WebContents.add', compact('data'));
+        return view('backend.web_contents.add', compact('data'));
     }
 
     /**
@@ -63,7 +63,7 @@ class WebContentsController extends Controller
         $route_name = 'webcontents';
         $input['apply_to'] = 'FOOTER';
         $this->webContentsService->addWebContent($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -78,7 +78,7 @@ class WebContentsController extends Controller
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
         $data['webcontent'] = WebContents::find($id);
-        return view('Backend.WebContents.view', compact('data'));
+        return view('backend.web_contents.view', compact('data'));
     }
 
     /**
@@ -93,7 +93,7 @@ class WebContentsController extends Controller
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
         $data['webcontent'] = WebContents::find($id);
-        return view('Backend.WebContents.upd', compact('data'));
+        return view('backend.web_contents.upd', compact('data'));
     }
 
     /**
@@ -113,7 +113,7 @@ class WebContentsController extends Controller
         $input['id'] = $id;
         $input['apply_to'] = 'FOOTER';
         $result = $this->webContentsService->addWebContent($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

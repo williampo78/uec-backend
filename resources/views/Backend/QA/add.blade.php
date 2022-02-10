@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '常見問題Q&A')
 

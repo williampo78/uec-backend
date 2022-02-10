@@ -25,7 +25,7 @@ class ProductsController extends Controller
         $this->supplierService = $supplierService;
         $this->brandsService = $brandsService ;
         $this->webCategoryHierarchyService = $webCategoryHierarchyService ;
-        $this->categoriesSerivce = $categoriesSerivce ; 
+        $this->categoriesSerivce = $categoriesSerivce ;
     }
     /**
      * Display a listing of the resource.
@@ -41,9 +41,9 @@ class ProductsController extends Controller
         ] ;
 
         if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ; 
+            $result['products'] = $this->productsService->getProducts($in) ;
             $this->productsService->restructureProducts($result['products']);
-      
+
         }
         $q = empty($in) ? '?' : '&' ;
         $result['excel_url'] = $request->fullUrl() . $q . 'export=true';
@@ -53,7 +53,7 @@ class ProductsController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
 
-        return view('Backend.Products.list',$result);
+        return view('backend.products.list',$result);
     }
 
     /**
@@ -67,7 +67,7 @@ class ProductsController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ;
         $result['pos'] =  $this->categoriesSerivce->getPosCategories();
-        return view('Backend.Products.input',$result);
+        return view('backend.products.input',$result);
     }
 
     /**
@@ -79,15 +79,16 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $result = [] ; 
-        // $result['status'] = $this->productsService->addProducts($request->input(), $request->file()) ;
         $result['status'] = false ; 
+        $result = [] ;
+        $result['status'] = $this->productsService->addProducts($request->input(), $request->file()) ;
         $result['route_name'] = 'products';
         $result['act'] = 'add';
         if ($result['status']) {
-            return view('Backend.success', $result);
+            return view('backend.success', $result);
         } else {
             $result['message']  = '新增時發生未預期的錯誤'; 
-            return view('Backend.error', $result);
+            return view('backend.error', $result);
         };
     }
 
@@ -99,17 +100,17 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        $result = [] ; 
-        $result['products'] = $this->productsService->showProducts($id) ; 
-        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ; 
+        $result = [] ;
+        $result['products'] = $this->productsService->showProducts($id) ;
+        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ;
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
         $result['pos'] =  $this->categoriesSerivce->getPosCategories();
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
-        $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ;
+        $result['spac_list'] = $this->productsService->getProductSpac($id) ;
         // dump($result['spac_list']) ; exit ;
-        return view('Backend.Products.show',$result) ;
+        return view('backend.products.show',$result) ;
     }
 
     /**
@@ -120,40 +121,40 @@ class ProductsController extends Controller
      */
     public function edit($id)
     {
-        $result = [] ; 
+        $result = [] ;
         $products = $this->productsService->showProducts($id) ;
-        $products->launched_status = '' ; 
+        $products->launched_status = '' ;
         $products->launched_at = ($products->start_launched_at || $products->end_launched_at) ? "{$products->start_launched_at} ~ {$products->end_launched_at}" : '';
         switch ($products->approval_status) {
             case 'NA':
-                $products->edit_readonly = '0' ; 
+                $products->edit_readonly = '0' ;
                 break;
 
             case 'REVIEWING':
-                $products->edit_readonly = '1' ; 
+                $products->edit_readonly = '1' ;
                 break;
 
             case 'REJECTED':
-                $products->edit_readonly = '0' ; 
+                $products->edit_readonly = '0' ;
                 break;
 
             case 'CANCELLED':
-                $products->edit_readonly = '0' ; 
+                $products->edit_readonly = '0' ;
                 break;
             case 'APPROVED':
                 $products->edit_readonly = Carbon::now()->between($products->start_launched_at, $products->end_launched_at) ? '1' : '0';
                 break;
         }
         $result['products'] = $products ;
-        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ; 
+        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ;
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
         $result['pos'] =  $this->categoriesSerivce->getPosCategories();
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ; 
-        $result['spac_list'] = $this->productsService->getProductSpac($id) ; 
-        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ; 
-        return view('Backend.Products.update',$result) ;
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ;
+        $result['spac_list'] = $this->productsService->getProductSpac($id) ;
+        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ;
+        return view('backend.products.update',$result) ;
     }
 
     /**
@@ -165,15 +166,14 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = [] ; 
+        $result = [] ;
         $result['status'] = $this->productsService->editProducts($request->input(), $request->file()) ;
         $result['route_name'] = 'products';
         $result['act'] = 'upd';
         if ($result['status']) {
-            return view('Backend.success', $result);
+            return view('backend.success', $result);
         } else {
-            $result['message']  = '編輯時發生未預期的錯誤'; 
-            return view('Backend.error', $result);
+            return view('backend.error', $result);
         };
     }
 
@@ -190,11 +190,11 @@ class ProductsController extends Controller
     public function ajax(Request $request){
         $in = $request->input();
         switch ($in['type']) {
-            case 'checkPosItemNo': 
+            case 'checkPosItemNo':
                 if($in['pos_item_no'] !== ''){
                     $result = $this->productsService->checkPosItemNo($in['pos_item_no'],$in['item_no']);
                 }else{
-                    $result = false ; 
+                    $result = false ;
                 }
                 break;
             default:
@@ -265,7 +265,7 @@ class ProductsController extends Controller
         ];
         $export = new ReportExport($title, $data->toArray());
         return Excel::download($export, '商品主檔'.date('Y-m-d').'.xlsx');
-        return true ; 
+        return true ;
     }
 
 }
