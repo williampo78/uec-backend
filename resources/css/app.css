@@ -1,0 +1,7 @@
+/* select2 */
+@import "~select2/dist/css/select2.css";
+@import "~select2-bootstrap-theme/dist/select2-bootstrap.css";
+
+/* datatables */
+@import "~datatables.net-bs/css/dataTables.bootstrap.css";
+@import "~datatables.net-buttons-bs/css/buttons.bootstrap.css";

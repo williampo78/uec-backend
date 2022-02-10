@@ -1,4 +1,4 @@
-const mix = require('laravel-mix');
+const mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -11,9 +11,18 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.postCss('resources/css/app.css', 'public/css', [
-        //
-    ])
-    .js('resources/js/app.js', 'public/js')
-    .js('resources/js/advertisement/main.js', 'public/js/advertisement')
-    .js('resources/js/advertisement/validate.js', 'public/js/advertisement');
+mix.postCss("resources/css/app.css", "public/css", [
+    //
+]);
+
+mix.js("resources/js/app.js", "public/js")
+    .js("resources/js/advertisement/main.js", "public/js/advertisement")
+    .js("resources/js/advertisement/validate.js", "public/js/advertisement");
+
+mix.copyDirectory(
+    "node_modules/datatables.net-plugins/i18n",
+    "public/datatables.net-plugins/i18n"
+).copy(
+    "node_modules/jquery-validation/dist/localization/*.min.js",
+    "public/jquery-validation/dist/localization"
+);
