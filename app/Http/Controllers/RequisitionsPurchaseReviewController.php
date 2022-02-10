@@ -47,7 +47,7 @@ class RequisitionsPurchaseReviewController extends Controller
         $data['status_code'] = $this->universal_service->getStatusCode();
         $data['requisition_purchase'] = $this->requisition_purchase_service->getRequisitionsPurchaseReview();
 
-        return view('Backend.RequisitionsPurchaseReview.list', compact('data'));
+        return view('backend.requisitions_purchase_review.list', compact('data'));
     }
 
     /**
@@ -119,7 +119,7 @@ class RequisitionsPurchaseReviewController extends Controller
         });
         $data['requisition_purchase_review_log'] = $this->requisition_purchase_service->getRequisitionPurchaseReviewLog($id);
 
-        return view('Backend.RequisitionsPurchaseReview.review', compact('data'));
+        return view('backend.requisitions_purchase_review.review', compact('data'));
     }
 
     /**
@@ -137,7 +137,7 @@ class RequisitionsPurchaseReviewController extends Controller
         $data['id'] = $id;
         $this->review_service->updateReview($data, 'REQUISITION_PUR');
 
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

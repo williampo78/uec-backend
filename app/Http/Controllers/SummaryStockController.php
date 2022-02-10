@@ -33,7 +33,7 @@ class SummaryStockController extends Controller
         if (isset($getData['export'])) { //匯出報表
             return $this->export($data['info']);
         }
-        return view('Backend.SummaryStock.list', $data);
+        return view('backend.summary_stock.list', $data);
     }
 
     /**

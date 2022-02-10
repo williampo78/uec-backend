@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', isset($item) ? '編輯物品':'新增物品')
 

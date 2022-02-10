@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '編輯廣告上架')
 
@@ -52,10 +52,10 @@
                             <div class="row">
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
-                                    @include('Backend.Advertisement.Launch.slot_block')
-                                    @include('Backend.Advertisement.Launch.image_block')
-                                    @include('Backend.Advertisement.Launch.text_block')
-                                    @include('Backend.Advertisement.Launch.product_block')
+                                    @include('backend.advertisement.launch.slot_block')
+                                    @include('backend.advertisement.launch.image_block')
+                                    @include('backend.advertisement.launch.text_block')
+                                    @include('backend.advertisement.launch.product_block')
 
                                     <div class="row">
                                         <div class="col-sm-12">

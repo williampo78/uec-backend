@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '廣告上架管理')
 
@@ -205,7 +205,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Advertisement.Launch.detail')
+        @include('backend.advertisement.launch.detail')
         <!-- /.modal -->
 
     </div>

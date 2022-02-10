@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', '商品主檔 - 新增基本資訊')
 @section('content')
     <style>
@@ -780,7 +780,7 @@
                         {{-- 二維多規格結束 --}}
                         {{-- <button class="btn btn-large btn-primary" type="submit">儲存</button> --}}
                 </form>
-                @include('Backend.Products.model_update_log')
+                @include('backend.products.model_update_log')
             </div>
         </div>
     </div>

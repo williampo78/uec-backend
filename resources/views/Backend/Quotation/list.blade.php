@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', '報價單')
 
 @section('content')
@@ -204,7 +204,7 @@
             </div>
         </div>
     </div>
-    @include('Backend.Quotation.detail')
+    @include('backend.quotation.detail')
     @section('js')
         <script>
             $(function() {

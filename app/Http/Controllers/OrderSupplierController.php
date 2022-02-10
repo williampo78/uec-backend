@@ -50,7 +50,7 @@ class OrderSupplierController extends Controller
         $data['getData'] = $getData;
         $data['user_id'] = Auth::user()->id;
 
-        return view('Backend.OrderSupplier.list', compact('data'));
+        return view('backend.order_supplier.list', compact('data'));
     }
 
     /**
@@ -68,7 +68,7 @@ class OrderSupplierController extends Controller
         }
         $data['tax'] = config('uec.tax_option');
         $data['act'] = 'add';
-        return view('Backend.OrderSupplier.input', compact('data'));
+        return view('backend.order_supplier.input', compact('data'));
     }
 
     /**
@@ -86,7 +86,7 @@ class OrderSupplierController extends Controller
         //     $act = $data['status_code'];
         // }
         $result = $this->orderSupplierService->updateOrderSupplier($data, 'add');
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -134,7 +134,7 @@ class OrderSupplierController extends Controller
         });
         $result['act'] = 'upd';
         $result['id'] = $id;
-        return view('Backend.OrderSupplier.update', $result);
+        return view('backend.order_supplier.update', $result);
 
     }
 
@@ -153,7 +153,7 @@ class OrderSupplierController extends Controller
         $data['id'] = $id;
 
         $this->orderSupplierService->updateOrderSupplier($data, 'upd');
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -169,7 +169,7 @@ class OrderSupplierController extends Controller
 
         OrderSupplier::destroy($id);
 
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     public function ajax(Request $request)

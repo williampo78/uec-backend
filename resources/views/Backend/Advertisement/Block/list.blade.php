@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '廣告版位管理')
 
@@ -178,7 +178,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Advertisement.Block.detail')
+        @include('backend.advertisement.block.detail')
         <!-- /.modal -->
 
     </div>

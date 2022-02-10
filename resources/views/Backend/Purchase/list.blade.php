@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 @section('title', '進貨單')
 @section('content')
     <!--列表-->
@@ -176,8 +176,8 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Purchase.detail')
-        @include('Backend.Purchase.update_invoice')
+        @include('backend.purchase.detail')
+        @include('backend.purchase.update_invoice')
 
     </div>
     </div>

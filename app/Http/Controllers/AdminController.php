@@ -22,7 +22,7 @@ class AdminController extends Controller
     public function index()
     {
 //        $user = Auth::user();
-        return view('Backend.example');
+        return view('backend.example');
     }
 
     /**

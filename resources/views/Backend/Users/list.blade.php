@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '使用者管理')
 
@@ -110,7 +110,7 @@
             </div>
         </div>
     </div>
-    @include('Backend.Users.detail')
+    @include('backend.users.detail')
 @endsection
 
 @section('js')

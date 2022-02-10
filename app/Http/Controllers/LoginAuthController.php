@@ -81,7 +81,7 @@ class LoginAuthController extends Controller
     public function dashboard()
     {
         if (Auth::check()) {
-            return view('Backend.main');
+            return view('backend.main');
         }
 
         return redirect("login")->withSuccess('You are not allowed to access');

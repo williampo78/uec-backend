@@ -21,7 +21,7 @@ class WebCategoryHierarchyController extends Controller
     public function index()
     {
         $result['category_level_1'] = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel();
-        return view('Backend.WebCategoryHierarchy.index', $result);
+        return view('backend.web_category_hierarchy.index', $result);
     }
 
     /**
@@ -96,23 +96,23 @@ class WebCategoryHierarchyController extends Controller
     public function ajax(Request $request)
     {
         $in = $request->input() ;
-        
+
         switch ($in['type']) {
             case 'GetCategory': // 取得子分類
                 $result = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel($in['id']);
                 break;
             case 'AddCategory':
-                $result = $this->webCategoryHierarchyService->add_Category_Hierarchy($in) ;  
+                $result = $this->webCategoryHierarchyService->add_Category_Hierarchy($in) ;
                 break;
             case 'EditCategory':
                 $result = $this->webCategoryHierarchyService->edit_Category_Hierarchy($in) ;
                 break;
-            case 'DelCategory' : 
+            case 'DelCategory' :
                 $result = $this->webCategoryHierarchyService->del_Category_Hierarchy($in) ;
                 break;
             case 'SortCategory':
-                $result = $this->webCategoryHierarchyService->sort_Category_Hierarchy($in) ; 
-                break ; 
+                $result = $this->webCategoryHierarchyService->sort_Category_Hierarchy($in) ;
+                break ;
             default:
                 # code...
                 break;

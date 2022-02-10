@@ -29,7 +29,7 @@ class ItemController extends Controller
     {
         $item = $this->itemService->getItem()->get();
         $data['item'] = $item;
-        return view('Backend.Item.list', $data);
+        return view('backend.item.list', $data);
     }
 
     /**
@@ -43,7 +43,7 @@ class ItemController extends Controller
         $supplier = $this->supplierService->getSuppliers(); //供應商
         $result['category'] = $category;
         $result['supplier'] = $supplier;
-        return view('Backend.Item.input', $result);
+        return view('backend.item.input', $result);
     }
 
     /**
@@ -91,7 +91,7 @@ class ItemController extends Controller
         $supplier = $this->supplierService->getSuppliers(); //供應商
         $item = $this->itemService->getItem(1, $id)->first(); //返回array
         $itemPhoto = $this->itemService->getItemPhoto($id);
-        return view('Backend.Item.input', compact('item', 'category', 'supplier','itemPhoto'));
+        return view('backend.item.input', compact('item', 'category', 'supplier','itemPhoto'));
     }
 
     /**

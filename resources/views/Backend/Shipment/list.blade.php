@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '出貨單管理')
 
@@ -258,7 +258,7 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Shipment.detail')
+        @include('backend.shipment.detail')
         <!-- /.modal -->
 
     </div>

@@ -53,7 +53,7 @@ class ExternalInventoryDailyReportController extends Controller
         $params['supplier'] = $this->supplierService->getSuppliers();
         $params['warehouses'] = $this->warehouseService->getWarehouseList();
 
-        return view('Backend.ExternalInventoryDailyReport.list', $params);
+        return view('backend.external_inventory_daily_report.list', $params);
     }
 
     /**

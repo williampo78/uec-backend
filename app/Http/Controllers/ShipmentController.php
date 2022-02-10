@@ -32,7 +32,7 @@ class ShipmentController extends Controller
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
         if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
-            return view('Backend.Shipment.list');
+            return view('backend.shipment.list');
         }
 
         $shipments = $this->shipment_service->getShipments($query_datas);
@@ -82,7 +82,7 @@ class ShipmentController extends Controller
             ->toArray();
 
         return view(
-            'Backend.Shipment.list',
+            'backend.shipment.list',
             compact('shipments')
         );
     }

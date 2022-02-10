@@ -28,7 +28,7 @@ class RoleController extends Controller
         $data['role'] = ($getData ? $this->rolesPermission->getRoles($getData) : []);
         $data['user'] = $this->universalService->getUser();
 
-        return view('Backend.Roles.list', compact('data'));
+        return view('backend.roles.list', compact('data'));
     }
 
     /**
@@ -40,7 +40,7 @@ class RoleController extends Controller
     {
         $data['permission'] = $this->rolesPermission->getPermission();
         $data['permissionDetail'] = $this->rolesPermission->getPermissionDetail();
-        return view('Backend.Roles.add', compact('data'));
+        return view('backend.roles.add', compact('data'));
     }
 
     /**
@@ -56,7 +56,7 @@ class RoleController extends Controller
         $act = 'add';
         $route_name = 'roles';
         $this->rolesPermission->addRole($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
 
     }
 
@@ -72,7 +72,7 @@ class RoleController extends Controller
         $data['permissionDetail'] = $this->rolesPermission->getPermissionDetail();
         $data['role'] = $this->rolesPermission->showRole($id);
         $data['rolePermission'] = $this->rolesPermission->getRolePermission($id);
-        return view('Backend.Roles.view', compact('data'));
+        return view('backend.roles.view', compact('data'));
     }
 
     /**
@@ -87,7 +87,7 @@ class RoleController extends Controller
         $data['permissionDetail'] = $this->rolesPermission->getPermissionDetail();
         $data['role'] = $this->rolesPermission->showRole($id);
         $data['rolePermission'] = $this->rolesPermission->getRolePermission($id);
-        return view('Backend.Roles.upd', compact('data'));
+        return view('backend.roles.upd', compact('data'));
     }
 
     /**
@@ -105,7 +105,7 @@ class RoleController extends Controller
         $route_name = 'roles';
         $input['id'] = $id;
         $this->rolesPermission->addRole($input, $act);
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

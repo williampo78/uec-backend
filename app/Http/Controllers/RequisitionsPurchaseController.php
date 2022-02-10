@@ -57,7 +57,7 @@ class RequisitionsPurchaseController extends Controller
             $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($input);
         }
 
-        return view('Backend.RequisitionsPurchase.list', $result);
+        return view('backend.requisitions_purchase.list', $result);
     }
 
     /**
@@ -79,7 +79,7 @@ class RequisitionsPurchaseController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers();
         $result['taxList'] = config('uec.tax_option'); //取得稅別列表
 
-        return view('Backend.RequisitionsPurchase.input', $result);
+        return view('backend.requisitions_purchase.input', $result);
     }
 
     /**
@@ -95,14 +95,14 @@ class RequisitionsPurchaseController extends Controller
         $result['act'] = 'add';
 
         if ($result['status']) {
-            return view('Backend.success', $result);
+            return view('backend.success', $result);
         } else {
-            return view('Backend.error', $result);
+            return view('backend.error', $result);
         };
 
         $act = 'add';
         $route_name = 'requisitions_purchase';
-        return view('Backend.success', compact('route_name', 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -168,7 +168,7 @@ class RequisitionsPurchaseController extends Controller
         });
 
         $result['taxList'] = config('uec.tax_option'); //取德稅別列表
-        return view('Backend.RequisitionsPurchase.input', $result);
+        return view('backend.requisitions_purchase.input', $result);
     }
 
     /**
@@ -185,9 +185,9 @@ class RequisitionsPurchaseController extends Controller
         $result['route_name'] = 'requisitions_purchase';
         $result['act'] = 'upd';
         if ($result['status']) {
-            return view('Backend.success', $result);
+            return view('backend.success', $result);
         } else {
-            return view('Backend.error', $result);
+            return view('backend.error', $result);
         };
     }
 

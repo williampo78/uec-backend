@@ -212,5 +212,5 @@ Route::get('/', [LoginAuthController::class, 'index'])->name('login');
 Route::post('custom-login', [LoginAuthController::class, 'customLogin'])->name('login.custom');
 Route::post('custom-registration', [LoginAuthController::class, 'customRegistration'])->name('register.custom');
 Route::get('/axiostest', function () {
-    return view('Backend.testapi');
+    return view('backend.testapi');
 });

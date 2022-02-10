@@ -1,4 +1,4 @@
-@extends('Backend.master')
+@extends('backend.master')
 
 @section('title', '銷售訂單管理')
 
@@ -315,8 +315,8 @@
                 </div>
             </div>
         </div>
-        @include('Backend.Order.detail')
-        @include('Backend.Order.invoice_detail')
+        @include('backend.order.detail')
+        @include('backend.order.invoice_detail')
         <!-- /.modal -->
 
     </div>

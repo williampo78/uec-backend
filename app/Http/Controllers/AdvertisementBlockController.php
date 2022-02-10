@@ -35,7 +35,7 @@ class AdvertisementBlockController extends Controller
             'type_code' => 'APPLICABLE_PAGE',
         ]);
 
-        return view('Backend.Advertisement.Block.list', compact('ad_slots', 'applicable_pages'));
+        return view('backend.advertisement.block.list', compact('ad_slots', 'applicable_pages'));
     }
 
     /**
@@ -80,7 +80,7 @@ class AdvertisementBlockController extends Controller
     {
         $ad_slot = $this->advertisement_service->getSlotById($id);
 
-        return view('Backend.Advertisement.Block.update', compact('ad_slot'));
+        return view('backend.advertisement.block.update', compact('ad_slot'));
     }
 
     /**
@@ -103,7 +103,7 @@ class AdvertisementBlockController extends Controller
         $act = 'upd';
 
         return view(
-            'Backend.success',
+            'backend.success',
             compact('route_name' , 'act')
         );
     }
