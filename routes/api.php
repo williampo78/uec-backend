@@ -26,8 +26,7 @@ use App\Http\Controllers\api\MemberInfoController;
 |
  */
 Route::get('/testheaderauthorization', function () { //測試跨域取得header api 
-    return response('testGetHeaderAuthorization', 200)
-                  ->header('Authorization', 'Bearer iamtokenkey');
+    return response('testGetHeaderAuthorization', 200)->header('Authorization', 'Bearer iamtokenkey');
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -91,6 +90,9 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::get('/members/message-top/', [MessagesController::class, 'messageTop']);
 
     Route::get('/tapPayApp', [CheckoutController::class, 'tapPayApp']);
+    Route::get('/mid/testheaderauthorization', function () { //測試跨域取得header api 
+        return response('middleware jwt.verify', 200)->header('test', 'Bearer iamtokenkey');
+    });
 
 });
 
