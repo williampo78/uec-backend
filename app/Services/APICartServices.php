@@ -96,7 +96,7 @@ class APICartServices
                 $webData['utm_medium'] = $input['utm_medium'];
                 $webData['utm_campaign'] = $input['utm_campaign'];
                 $webData['utm_sales'] = $input['utm_sales'];
-                $webData['utm_time'] = $input['utm_time'];
+                $webData['utm_time'] = Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s');
                 $webData['created_by'] = $member_id;
                 $webData['updated_by'] = -1;
                 $webData['created_at'] = $now;
@@ -710,7 +710,7 @@ class APICartServices
                     "utm_medium" => $input['utm_medium'],
                     "utm_campaign" => $input['utm_campaign'],
                     "utm_sales" => $input['utm_sales'],
-                    "utm_time" => date("Y-m-d H:i:s", $input['utm_time']),
+                    "utm_time" => Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s'),
                     "updated_by" => $member_id,
                     "updated_at" => $now
                 ];
@@ -801,7 +801,7 @@ class APICartServices
                 $webData['utm_medium'] = $input['utm_medium'];
                 $webData['utm_campaign'] = $input['utm_campaign'];
                 $webData['utm_sales'] = $input['utm_sales'];
-                $webData['utm_time'] = date("Y-m-d H:i:s", $input['utm_time']);
+                $webData['utm_time'] = Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s');
                 $webData['created_by'] = $member_id;
                 $webData['updated_by'] = -1;
                 $webData['created_at'] = $now;
@@ -817,7 +817,7 @@ class APICartServices
                 $webData['utm_medium'] = $input['utm_medium'];
                 $webData['utm_campaign'] = $input['utm_campaign'];
                 $webData['utm_sales'] = $input['utm_sales'];
-                $webData['utm_time'] = date("Y-m-d H:i:s", $input['utm_time']);
+                $webData['utm_time'] = Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s');
                 $webData['updated_by'] = $member_id;
                 $webData['updated_at'] = $now;
                 $new_id = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
