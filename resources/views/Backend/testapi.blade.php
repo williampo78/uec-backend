@@ -14,7 +14,7 @@
 @endsection
 @section('js')
     <script>
-        var url = "http://pc.laravel.uec/" ; 
+        // var url = "http://pc.laravel.uec/" ; 
         var url = "https://uecbackend.u-ark.com/";
 
         $("#req").click(function() {
