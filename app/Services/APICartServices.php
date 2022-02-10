@@ -706,6 +706,11 @@ class APICartServices
                     "product_item_id" => $input['item_id'][$key],
                     "qty" => ($input['item_qty'][$key] + $item->qty),
                     "status_code" => $input['status_code'],
+                    "utm_source" => $input['utm_source'],
+                    "utm_medium" => $input['utm_medium'],
+                    "utm_campaign" => $input['utm_campaign'],
+                    "utm_sales" => $input['utm_sales'],
+                    "utm_time" => $input['utm_time'],
                     "updated_by" => $member_id,
                     "updated_at" => $now
                 ];
