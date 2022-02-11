@@ -41,10 +41,10 @@
                                             <select class="form-control js-select2-slot-id" name="slot_id" id="slot_id">
                                                 <option></option>
                                                 @isset($ad_slots)
-                                                    @foreach ($ad_slots as $obj)
-                                                        <option value='{{ $obj->id }}'
-                                                            {{ $obj->id == request()->input('slot_id') ? 'selected' : '' }}>
-                                                            【{{ $obj->slot_code }}】{{ $obj->slot_desc }}</option>
+                                                    @foreach ($ad_slots as $ad_slot)
+                                                        <option value='{{ $ad_slot->id }}'
+                                                            {{ $ad_slot->id == request()->input('slot_id') ? 'selected' : '' }}>
+                                                            【{{ $ad_slot->slot_code }}】{{ $ad_slot->slot_desc }}</option>
                                                     @endforeach
                                                 @endisset
                                             </select>
@@ -61,12 +61,22 @@
                                             <select class="form-control js-select2-launch-status" name="launch_status"
                                                 id="launch_status">
                                                 <option value=''></option>
-                                                <option value='enabled'
-                                                    {{ 'enabled' == request()->input('launch_status') ? 'selected' : '' }}>
-                                                    上架</option>
+                                                <option value='prepare_to_launch'
+                                                    {{ 'prepare_to_launch' == request()->input('launch_status') ? 'selected' : '' }}>
+                                                    待上架
+                                                </option>
+                                                <option value='launched'
+                                                    {{ 'launched' == request()->input('launch_status') ? 'selected' : '' }}>
+                                                    已上架
+                                                </option>
+                                                <option value='not_launch'
+                                                    {{ 'not_launch' == request()->input('launch_status') ? 'selected' : '' }}>
+                                                    下架
+                                                </option>
                                                 <option value='disabled'
                                                     {{ 'disabled' == request()->input('launch_status') ? 'selected' : '' }}>
-                                                    下架</option>
+                                                    關閉
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -80,8 +90,9 @@
                                         <div class="form-group">
                                             <div class='input-group date' id='datetimepicker_start_at_start'>
                                                 <input type='text' class="form-control datetimepicker-input"
-                                                    data-target="#datetimepicker_start_at_start" name="start_at_start" id="start_at_start"
-                                                    value="{{ request()->input('start_at_start') }}" autocomplete="off" />
+                                                    data-target="#datetimepicker_start_at_start" name="start_at_start"
+                                                    id="start_at_start" value="{{ request()->input('start_at_start') }}"
+                                                    autocomplete="off" />
                                                 <span class="input-group-addon" data-target="#datetimepicker_start_at_start"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -96,8 +107,9 @@
                                         <div class="form-group">
                                             <div class='input-group date' id='datetimepicker_start_at_end'>
                                                 <input type='text' class="form-control datetimepicker-input"
-                                                    data-target="#datetimepicker_start_at_end" name="start_at_end" id="start_at_end"
-                                                    value="{{ request()->input('start_at_end') }}" autocomplete="off" />
+                                                    data-target="#datetimepicker_start_at_end" name="start_at_end"
+                                                    id="start_at_end" value="{{ request()->input('start_at_end') }}"
+                                                    autocomplete="off" />
                                                 <span class="input-group-addon" data-target="#datetimepicker_start_at_end"
                                                     data-toggle="datetimepicker">
                                                     <span class="glyphicon glyphicon-calendar"></span>
@@ -153,46 +165,47 @@
                                 </thead>
                                 <tbody>
                                     @isset($ad_slot_contents)
-                                        @foreach ($ad_slot_contents as $obj)
+                                        @foreach ($ad_slot_contents as $ad_slot_content)
                                             <tr>
                                                 <td>
                                                     @if ($share_role_auth['auth_query'])
                                                         <button type="button" class="btn btn-info btn-sm slot_content_detail"
-                                                            data-slot-content-id="{{ $obj->slot_content_id }}" title="檢視">
+                                                            data-slot-content-id="{{ $ad_slot_content->slot_content_id }}"
+                                                            title="檢視">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     @endif
 
                                                     @if ($share_role_auth['auth_update'])
                                                         <a class="btn btn-info btn-sm"
-                                                            href="{{ route('advertisemsement_launch.edit', $obj->slot_content_id) }}">
+                                                            href="{{ route('advertisemsement_launch.edit', $ad_slot_content->slot_content_id) }}">
                                                             編輯
                                                         </a>
                                                     @endif
                                                 </td>
-                                                <td>{{ $obj->description ?? '' }}</td>
-                                                <td>{{ $obj->slot_code ?? '' }}</td>
-                                                <td>{{ $obj->slot_desc ?? '' }}</td>
+                                                <td>{{ $ad_slot_content->description ?? '' }}</td>
+                                                <td>{{ $ad_slot_content->slot_code ?? '' }}</td>
+                                                <td>{{ $ad_slot_content->slot_desc ?? '' }}</td>
                                                 <td>
-                                                    @if ($obj->is_mobile_applicable == 1)
+                                                    @if ($ad_slot_content->is_mobile_applicable == 1)
                                                         <i class="fa fa-check fa-lg"></i>
                                                     @else
                                                         <i class="fa fa-times fa-lg"></i>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if ($obj->is_desktop_applicable == 1)
+                                                    @if ($ad_slot_content->is_desktop_applicable == 1)
                                                         <i class="fa fa-check fa-lg"></i>
                                                     @else
                                                         <i class="fa fa-times fa-lg"></i>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    {{ $obj->launch_status }}
+                                                    {{ $ad_slot_content->launch_status }}
                                                 </td>
                                                 <td>
-                                                    @isset($obj->start_at, $obj->end_at)
-                                                        {{ $obj->start_at }} ~ {{ $obj->end_at }}
+                                                    @isset($ad_slot_content->start_at, $ad_slot_content->end_at)
+                                                        {{ $ad_slot_content->start_at }} ~ {{ $ad_slot_content->end_at }}
                                                     @endisset
                                                 </td>
                                             </tr>

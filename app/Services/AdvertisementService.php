@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\AdSlotContentDetails;
-use App\Models\AdSlotContents;
-use App\Models\AdSlots;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Auth;
+use App\Models\AdSlots;
+use App\Models\AdSlotContents;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\AdSlotContentDetails;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AdvertisementService
 {
@@ -114,12 +115,13 @@ class AdvertisementService
     /**
      * 取得廣告上架全部資料
      *
-     * @param array $query_data
-     * @return object
+     * @param array $query_datas
+     * @return Collection
      */
-    public function getSlotContents($query_data = [])
+    public function getSlotContents($query_datas = []): Collection
     {
         $agent_id = Auth::user()->agent_id;
+        $now = Carbon::now();
 
         $result = AdSlotContents::select(
             'ad_slots.slot_code',
@@ -133,10 +135,6 @@ class AdvertisementService
             'ad_slots.id AS slot_id',
             'ad_slots.active AS slot_active',
             'ad_slots.agent_id AS slot_agent_id',
-            'ad_slots.created_by AS slot_created_by',
-            'ad_slots.updated_by AS slot_updated_by',
-            'ad_slots.created_at AS slot_created_at',
-            'ad_slots.updated_at AS slot_updated_at',
             'ad_slot_contents.start_at',
             'ad_slot_contents.end_at',
             'ad_slot_contents.slot_color_code',
@@ -146,10 +144,6 @@ class AdvertisementService
             'ad_slot_contents.id AS slot_content_id',
             'ad_slot_contents.active AS slot_content_active',
             'ad_slot_contents.agent_id AS slot_content_agent_id',
-            'ad_slot_contents.created_by AS slot_content_created_by',
-            'ad_slot_contents.updated_by AS slot_content_updated_by',
-            'ad_slot_contents.created_at AS slot_content_created_at',
-            'ad_slot_contents.updated_at AS slot_content_updated_at',
             'lookup_values_v.description',
         )
             ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
@@ -160,35 +154,55 @@ class AdvertisementService
             ->where('lookup_values_v.type_code', 'APPLICABLE_PAGE');
 
         // 版位查詢
-        if (!empty($query_data['slot_id'])) {
-            $result = $result->where('ad_slots.id', $query_data['slot_id']);
+        if (!empty($query_datas['slot_id'])) {
+            $result = $result->where('ad_slots.id', $query_datas['slot_id']);
         }
 
         // 上下架狀態查詢
-        if (!empty($query_data['launch_status'])) {
-            if ($query_data['launch_status'] == 'enabled') {
-                $result = $result->where(function ($query) {
-                    $query->where('ad_slot_contents.start_at', '<=', Carbon::now())
-                        ->where('ad_slot_contents.end_at', '>=', Carbon::now())
-                        ->where('ad_slot_contents.active', 1);
-                });
-            } else {
-                $result = $result->where(function ($query) {
-                    $query->where('ad_slot_contents.start_at', '>=', Carbon::now())
-                        ->orWhere('ad_slot_contents.end_at', '<=', Carbon::now())
-                        ->orWhere('ad_slot_contents.active', 0);
-                });
+        if (!empty($query_datas['launch_status'])) {
+            switch ($query_datas['launch_status']) {
+                // 待上架
+                case 'prepare_to_launch':
+                    $result = $result->where(function ($query) use ($now) {
+                        $query->where('ad_slot_contents.active', 1)
+                            ->where('ad_slot_contents.start_at', '>', $now);
+                    });
+                    break;
+
+                // 已上架
+                case 'launched':
+                    $result = $result->where(function ($query) use ($now) {
+                        $query->where('ad_slot_contents.active', 1)
+                            ->where('ad_slot_contents.start_at', '<=', $now)
+                            ->where('ad_slot_contents.end_at', '>=', $now);
+                    });
+                    break;
+
+                // 下架
+                case 'not_launch':
+                    $result = $result->where(function ($query) use ($now) {
+                        $query->where('ad_slot_contents.active', 1)
+                            ->where('ad_slot_contents.end_at', '<', $now);
+                    });
+                    break;
+
+                // 關閉
+                case 'disabled':
+                    $result = $result->where(function ($query) {
+                        $query->where('ad_slot_contents.active', 0);
+                    });
+                    break;
             }
         }
 
         // 上架起始日開始時間
-        if (!empty($query_data['start_at_start'])) {
-            $result = $result->whereDate('ad_slot_contents.start_at', '>=', $query_data['start_at_start']);
+        if (!empty($query_datas['start_at_start'])) {
+            $result = $result->whereDate('ad_slot_contents.start_at', '>=', $query_datas['start_at_start']);
         }
 
         // 上架起始日結束時間
-        if (!empty($query_data['start_at_end'])) {
-            $result = $result->whereDate('ad_slot_contents.start_at', '<=', $query_data['start_at_end']);
+        if (!empty($query_datas['start_at_end'])) {
+            $result = $result->whereDate('ad_slot_contents.start_at', '<=', $query_datas['start_at_end']);
         }
 
         $result = $result->orderBy("ad_slots.applicable_page", "asc")
@@ -221,10 +235,6 @@ class AdvertisementService
             'ad_slots.id AS slot_id',
             'ad_slots.active AS slot_active',
             'ad_slots.agent_id AS slot_agent_id',
-            'ad_slots.created_by AS slot_created_by',
-            'ad_slots.updated_by AS slot_updated_by',
-            'ad_slots.created_at AS slot_created_at',
-            'ad_slots.updated_at AS slot_updated_at',
             'ad_slot_contents.start_at',
             'ad_slot_contents.end_at',
             'ad_slot_contents.slot_color_code',
@@ -234,10 +244,6 @@ class AdvertisementService
             'ad_slot_contents.id AS slot_content_id',
             'ad_slot_contents.active AS slot_content_active',
             'ad_slot_contents.agent_id AS slot_content_agent_id',
-            'ad_slot_contents.created_by AS slot_content_created_by',
-            'ad_slot_contents.updated_by AS slot_content_updated_by',
-            'ad_slot_contents.created_at AS slot_content_created_at',
-            'ad_slot_contents.updated_at AS slot_content_updated_at',
             'lookup_values_v.description',
         )
             ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
@@ -773,5 +779,43 @@ class AdvertisementService
         }
 
         return false;
+    }
+
+    /**
+     * 重組廣告上架內容
+     *
+     * @param Collection $ad_slot_contents
+     * @return void
+     */
+    public function restructureAdSlotContents(Collection $ad_slot_contents): void
+    {
+        $now = Carbon::now();
+
+        $ad_slot_contents->transform(function ($ad_slot_content) use ($now) {
+            $start_at_format = Carbon::parse($ad_slot_content->start_at);
+            $end_at_format = Carbon::parse($ad_slot_content->end_at);
+
+            /*
+             * 上下架狀態
+             *
+             * 待上架：狀態為啟用，且查詢日 小於上架起日
+             * 已上架：狀態為啟用，且查詢日 介於上架起訖日之間
+             * 下架：狀態為啟用，且查詢日 大於 上架迄日
+             * 關閉：狀態為關閉
+             */
+            if ($ad_slot_content->slot_content_active == 1) {
+                if ($now->lessThan($start_at_format)) {
+                    $ad_slot_content->launch_status = '待上架';
+                } elseif ($now->between($start_at_format, $end_at_format)) {
+                    $ad_slot_content->launch_status = '已上架';
+                } else {
+                    $ad_slot_content->launch_status = '下架';
+                }
+            } else {
+                $ad_slot_content->launch_status = '關閉';
+            }
+
+            return $ad_slot_content;
+        });
     }
 }
