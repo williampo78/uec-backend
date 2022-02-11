@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\AdvertisementService;
-use App\Services\ProductsService;
-use App\Services\WebCategoryHierarchyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Services\ProductsService;
+use App\Services\AdvertisementService;
+use App\Services\WebCategoryHierarchyService;
+use App\Http\Resources\AdSlotContentCollection;
 
 class AdvertisementLaunchController extends Controller
 {
@@ -32,22 +33,13 @@ class AdvertisementLaunchController extends Controller
     public function index(Request $request)
     {
         $query_datas = [];
-
         $query_datas = $request->only(['slot_id', 'launch_status', 'start_at_start', 'start_at_end']);
 
         $ad_slots = $this->advertisement_service->getSlots();
         $ad_slot_contents = $this->advertisement_service->getSlotContents($query_datas);
-
-        $ad_slot_contents = $ad_slot_contents->map(function ($obj) {
-            /*
-             * 上下架狀態
-             * 當前時間在上架時間內，且廣告上架內容的狀態為啟用，列為上架
-             * 其他為下架
-             */
-            $obj->launch_status = (Carbon::now()->between($obj->start_at, $obj->end_at) && $obj->slot_content_active == 1) ? '上架' : '下架';
-
-            return $obj;
-        });
+        $this->advertisement_service->restructureAdSlotContents($ad_slot_contents);
+        // 優化用
+        // $ad_slot_contents = (new AdSlotContentCollection($ad_slot_contents))->resolve();
 
         return view('backend.advertisement.launch.list', compact('ad_slots', 'ad_slot_contents'));
     }
