@@ -82,9 +82,6 @@ class OrderSupplierController extends Controller
         $route_name = 'order_supplier';
         $act = 'add';
         $data = $request->except('_token');
-        // if (isset($data['status_code'])) {
-        //     $act = $data['status_code'];
-        // }
         $result = $this->orderSupplierService->updateOrderSupplier($data, 'add');
         return view('backend.success', compact('route_name', 'act'));
     }
