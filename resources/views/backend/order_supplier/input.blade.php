@@ -562,7 +562,7 @@
                             order_supplier_detail.splice(0);
                         }
                         requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
-                        console.log(requisitionsPurchaseDetail) ;
+                        // console.log(requisitionsPurchaseDetail) ;
                         $.each(requisitionsPurchaseDetail, function(key, obj) {
                             order_supplier_detail.push({
                                 requisitions_purchase_dtl_id: obj.id, // requisitions_purchase_detail
