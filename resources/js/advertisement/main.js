@@ -313,7 +313,7 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
         ? datas.id
         : $("#image-block-row-no").val();
     let image_block_id = datas.id ? datas.id : "new";
-    let sort = datas.sort ? datas.sort : "";
+    let sort = datas.sort !== null ? datas.sort : "";
     let image_name_url = datas.image_name_url
         ? `<img src="${datas.image_name_url}" class="img-responsive" width="400" height="400" />`
         : "";
@@ -423,7 +423,7 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
 addTextBlock = function (product_category_select_options, datas = {}) {
     let text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
     let text_block_id = datas.id ? datas.id : "new";
-    let sort = datas.sort ? datas.sort : "";
+    let sort = datas.sort !== null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";
     let target_url = datas.target_url ? datas.target_url : "";
 
@@ -514,7 +514,7 @@ addProductBlockProduct = function (product_select_options, datas = {}) {
         ? datas.id
         : $("#product-block-product-row-no").val();
     let product_block_product_id = datas.id ? datas.id : "new";
-    let sort = datas.sort ? datas.sort : "";
+    let sort = datas.sort !== null ? datas.sort : "";
 
     $("#tab-product table > tbody").append(`
         <tr>
@@ -556,7 +556,7 @@ addProductBlockCategory = function (product_category_select_options, datas = {})
         ? datas.id
         : $("#product-block-category-row-no").val();
     let product_block_category_id = datas.id ? datas.id : "new";
-    let sort = datas.sort ? datas.sort : "";
+    let sort = datas.sort !== null ? datas.sort : "";
 
     $("#tab-category table > tbody").append(`
         <tr>
