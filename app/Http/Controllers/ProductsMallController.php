@@ -159,17 +159,19 @@ class ProductsMallController extends Controller
         $result = [] ;
         $in = $request->input();
         $file = $request->file();
-
-        $result['status'] =  $this->productsService->updateProductSmall($in, $file, $id);
-        
+        $execution =  $this->productsService->updateProductSmall($in, $file, $id);
+        $result['status'] = $execution['status'] ; 
         $result['route_name'] = 'product_small';
         $result['act'] = 'upd';
         if ($result['status']) {
             return view('backend.success', $result);
         } else {
+            $result['message']  = '編輯時發生未預期的錯誤';
+            if(isset($execution['error_code'])){
+                $result['error_code'] = $execution['error_code'] ; 
+            };
             return view('backend.error', $result);
         };
-        // return view('backend.success', compact('route_name', 'act'));
     }
     /**
      * Remove the specified resource from storage.

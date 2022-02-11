@@ -79,15 +79,17 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $result = [] ; 
-        $result['status'] = false ; 
-        $result = [] ;
-        $result['status'] = $this->productsService->addProducts($request->input(), $request->file()) ;
+        $execution = $this->productsService->addProducts($request->input(), $request->file()) ;
+        $result['status'] = $execution['status'] ;
         $result['route_name'] = 'products';
         $result['act'] = 'add';
         if ($result['status']) {
             return view('backend.success', $result);
         } else {
-            $result['message']  = '新增時發生未預期的錯誤'; 
+            $result['message']  = '新增時發生未預期的錯誤';
+            if(isset($execution['error_code'])){
+                $result['error_code'] = $execution['error_code'] ; 
+            };
             return view('backend.error', $result);
         };
     }
@@ -167,12 +169,17 @@ class ProductsController extends Controller
     public function update(Request $request, $id)
     {
         $result = [] ;
-        $result['status'] = $this->productsService->editProducts($request->input(), $request->file()) ;
+        $execution = $this->productsService->editProducts($request->input(), $request->file()) ;
+        $result['status'] = $execution['status'] ;
         $result['route_name'] = 'products';
         $result['act'] = 'upd';
         if ($result['status']) {
             return view('backend.success', $result);
         } else {
+            $result['message']  = '新增時發生未預期的錯誤';
+            if(isset($execution['error_code'])){
+                $result['error_code'] = $execution['error_code'] ; 
+            };
             return view('backend.error', $result);
         };
     }

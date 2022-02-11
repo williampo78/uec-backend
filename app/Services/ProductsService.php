@@ -277,11 +277,12 @@ class ProductsService
             }
 
             DB::commit();
-            $result = true;
+            $result['status'] = true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
-            $result = false;
+            $result['error_code'] = $e->getMessage() ; 
+            $result['status'] = false;
         }
         return $result;
     }
@@ -426,13 +427,13 @@ class ProductsService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ]);
-
             DB::commit();
-            $result = true;
+            $result['status'] = true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
-            $result = false;
+            $result['status'] = false;
+            $result['error_code'] = $e->getMessage() ;
         }
         return $result;
     }
@@ -568,6 +569,7 @@ class ProductsService
     }
     public function updateProductSmall($in, $file = array(), $id)
     {
+        $result = [] ; 
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
@@ -685,13 +687,15 @@ class ProductsService
                     ProductAttributes::insert($add_product_attributes);
                 }
             }
+            $result['status'] = true ; 
             DB::commit();
-            return true;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
-            return false;
+            $result['status'] = false ; 
+            $result['error_code'] = $e->getMessage();
         }
+        return $result ; 
     }
     public function getProductAuditLog($product_id)
     {

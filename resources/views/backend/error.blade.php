@@ -18,7 +18,10 @@
                                 <div class="alert alert-danger"><i class="fa fa-ban"></i>
                                   @if(isset($message))
                                     {{$message}}
-                                  @else
+                                  @endif
+                                  @if(isset($error_code))
+                                  <br>
+                                  {{$error_code}}
                                   @endif
                                 </div>
                                 <a class="btn btn-block btn-warning" href="{{route($route_name)}}"><i class="fa fa-fw fa-book"></i> 返回列表</a>
