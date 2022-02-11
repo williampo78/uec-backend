@@ -357,7 +357,7 @@
                         }
 
                         $.each(details, function(key, value) {
-                            let sort = value.sort ? value.sort :
+                            let sort = value.sort !== null ? value.sort :
                                 '<i class="fa fa-times fa-lg"></i>';
                             let image_name_url = value.image_name_url ?
                                 `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` :
