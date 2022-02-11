@@ -44,13 +44,22 @@ class ImageUploadService
         if (empty($file_name)) {
             return false ;
         } else {
-            $storage_s3 = Storage::disk('s3');
-            return $storage_s3->url($file_name);
+            $exists = Storage::disk('s3')->exists($file_name);
+            if($exists){
+                return Storage::disk('s3')->url($file_name);
+            }else{
+                return false ; 
+            }
         }
     }
     public function getSize($file_name){
         $storage_s3 = Storage::disk('s3');
-        return $storage_s3->size($file_name);
+        $exists = Storage::disk('s3')->exists($file_name);
+        if($exists){
+            return $storage_s3->size($file_name);
+        }else{
+            return false ; 
+        }
     }
     public function DelPhoto($file_name){
         $storage_s3 = Storage::disk('s3');
