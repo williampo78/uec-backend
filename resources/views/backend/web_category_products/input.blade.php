@@ -160,6 +160,8 @@
                     var end_created_at = $('input[name="end_created_at"]').val();
                     var start_launched_at_start = $('input[name="start_launched_at_start"]').val();
                     var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
+                    var selling_price_min = $('input[name="selling_price_min"]').val(); 
+                    var selling_price_max = $('input[name="selling_price_max"]').val();
                     var supplier_id = $('#supplier').val() ;
                     var limit = $('#limit').val();
                     var product_type = $('#product_type').val();
@@ -174,8 +176,8 @@
                             supplier_id:supplier_id,
                             product_no: this.select_req.product_no,
                             product_name: this.select_req.product_name,
-                            selling_price_min: this.select_req.selling_price_min,
-                            selling_price_max: this.select_req.selling_price_max,
+                            selling_price_min: selling_price_min,
+                            selling_price_max: selling_price_max,
                             start_created_at: start_created_at,
                             end_created_at: end_created_at,
                             start_launched_at_start: start_launched_at_start, //上架 - 起

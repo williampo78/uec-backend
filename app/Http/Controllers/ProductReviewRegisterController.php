@@ -116,18 +116,25 @@ class ProductReviewRegisterController extends Controller
     {
         //
     }
-    public function ajax(Request $request){
+    public function ajax(Request $request)
+    {
         $in = $request->input();
-        $status = true ;
+        $status = true;
 
         switch ($in['type']) {
             case 'offProduct':
-                    $status = $this->productsService->offProduct($in) ;
+                $status = $this->productsService->offProduct($in);
+                break;
+            case 'checkProductReady':
+                if($in['stock_type'] == 'N'){
+                    $status = $this->productsService->checkProductReady($in) ;
+                }else{
+                    $status = true ; 
+                }
                 break;
             default:
                 break;
         }
-
 
         return response()->json([
             'status' => $status,

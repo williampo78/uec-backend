@@ -127,9 +127,16 @@ class WebCategoryHierarchyService
         if (isset($input['active']) && $input['active'] !== '') {
             $whereID .= " AND active = " . $input['active'];
         }
-        if (isset($input['keyword']) && $input['keyword'] !== '') {
-            $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%" . $input['keyword'] . "%' ";
+        if($confi_levels == 2){
+            if (isset($input['keyword']) && $input['keyword'] !== '') {
+                $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name )  LIKE '%" . $input['keyword'] . "%' ";
+            }
+        }else{
+            if (isset($input['keyword']) && $input['keyword'] !== '') {
+                $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%" . $input['keyword'] . "%' ";
+            }
         }
+  
 
         if ($confi_levels == 2) {
             $query = "SELECT level_two.id as id, level_two.meta_title , CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,

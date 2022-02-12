@@ -22,6 +22,8 @@
                                     <div class="col-sm-2 ">
                                         <label class="control-label">庫存類型</label>
                                     </div>
+                                    <input type="hidden" id="products_id" value="{{ $products->id }}">
+                                    <input type="hidden" id="stock_type" value="{{ $products->stock_type }}">
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
                                             <input type="radio" name="stock_type" value="A"
@@ -286,13 +288,30 @@
                         .date(new Date(e.date._d.setHours(23, 59, 59)));
                 }
             });
-            //start_launched_at
-            //end_launched_at
             $("#new-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
                     $('#save_data').prop('disabled', true);
-                    form.submit();
+                    axios.post('/backend/product_review_register/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'checkProductReady',
+                            product_id: $('#products_id').val(),
+                            stock_type:$('#stock_type').val(),
+                        })
+                        .then(function(response) {
+                            if(response.data.status){
+                                form.submit();
+                            }else{
+                                alert('該商品未完成「商城資料」維護，不允許執行上架送審') ; 
+                                return false ;
+                            }
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        }).finally(function(error) {
+                            $('#save_data').prop('disabled', false);
+                        });
+                    // form.submit();
                 },
                 rules: {
                     start_launched_at: {
@@ -304,7 +323,7 @@
                         greaterThan: function() {
                             return $('#start_launched_at').val();
                         },
-                    }
+                    },
                 },
                 messages: {
                     end_launched_at: {

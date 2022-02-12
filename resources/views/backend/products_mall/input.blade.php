@@ -392,7 +392,7 @@
                                         </div>
                                         <div class="col-sm-3">
                                             <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
-                                                 src="{{ $products->google_shop_photo_name !== '' ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
+                                                 src="{{ $products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
                                                  style="max-width:40%;">
                                         </div>
                                         <button v-if="products.google_shop_photo_name" type="button"

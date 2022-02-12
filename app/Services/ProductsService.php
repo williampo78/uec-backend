@@ -11,6 +11,7 @@ use App\Models\ProductReviewLog;
 use App\Models\Products;
 use App\Models\Product_spec_info;
 use App\Models\RelatedProducts;
+use App\Models\CategoryHierarchy;
 use App\Services\UniversalService;
 use Batch;
 use Carbon\Carbon;
@@ -784,6 +785,10 @@ class ProductsService
         }
         return $result;
     }
+    /**
+     * 商品上下架商品 
+     * 
+     */
     public function offProduct($in)
     {
         $user_id = Auth::user()->id;
@@ -811,6 +816,22 @@ class ProductsService
             $result = false;
         }
         return $result;
+    }
+    /**
+     * 
+     * 點擊「送審」時，若商品為「一般品 (products.product_type='N')」，
+     * 需檢查該商品是否有存在的前台分類，若無，顯示錯誤訊息：商品未完成「商城資料」維護，不允許執行上架送審
+     */
+    public function checkProductReady($in){
+        $count = CategoryHierarchy::select('web_category_products.*')
+        ->Join('web_category_products', 'web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.id')
+        ->where('web_category_products.product_id',$in['product_id'])
+        ->where('web_category_hierarchy.active','1')->count();
+        if($count == 0){
+            return false ; 
+        }else{
+            return true ;
+        }        
     }
     /**
      * 確認 PosItemNo 是否有重複
