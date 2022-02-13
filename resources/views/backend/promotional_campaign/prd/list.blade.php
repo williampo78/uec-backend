@@ -265,8 +265,7 @@
             // 重置搜尋表單
             $('#btn-reset').on('click', function() {
                 $('#search-form').find(':text, select').val('');
-                $('#active').trigger('change');
-                $('#campaign_type').trigger('change');
+                $('#active, #campaign_type').trigger('change');
             });
 
             $(document).on('click', '.promotional_campaign_detail', function() {

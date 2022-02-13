@@ -25,8 +25,9 @@
                                             <label class="control-label">活動名稱</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" name="campaign_name" id="campaign_name"
-                                                value="{{ request()->input('campaign_name') }}" placeholder="模糊查詢" />
+                                            <input type="text" class="form-control" name="campaign_name"
+                                                id="campaign_name" value="{{ request()->input('campaign_name') }}"
+                                                placeholder="模糊查詢" />
                                         </div>
                                     </div>
                                 </div>
@@ -270,8 +271,7 @@
             // 重置搜尋表單
             $('#btn-reset').on('click', function() {
                 $('#search-form').find(':text, select').val('');
-                $('#active').trigger('change');
-                $('#campaign_type').trigger('change');
+                $('#active, #campaign_type').trigger('change');
             });
 
             $(document).on('click', '.promotional_campaign_detail', function() {
