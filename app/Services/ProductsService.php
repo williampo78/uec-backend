@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CategoryHierarchy;
 use App\Models\CategoryProducts;
 use App\Models\ProductAttributes;
 use App\Models\ProductAuditLog;
@@ -11,7 +12,6 @@ use App\Models\ProductReviewLog;
 use App\Models\Products;
 use App\Models\Product_spec_info;
 use App\Models\RelatedProducts;
-use App\Models\CategoryHierarchy;
 use App\Services\UniversalService;
 use Batch;
 use Carbon\Carbon;
@@ -59,12 +59,12 @@ class ProductsService
             $product_no = explode(',', $input_data['product_no']);
             $product_no = array_unique($product_no);
 
-            foreach ($product_no as $key => $val) {
-                if ($key == 0) {
-                    $products->where('products.product_no', 'like', '%' . $val . '%');
-                } else {
-                    $products->orWhere('products.product_no', 'like', '%' . $val . '%');
-                }
+            if (!empty($product_no)) {
+                $products->where(function ($query) use ($product_no) {
+                    foreach ($product_no as $val) {
+                        $query->orWhere('products.product_no', 'like', '%' . $val . '%');
+                    }
+                });
             }
         }
 
@@ -282,7 +282,7 @@ class ProductsService
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
-            $result['error_code'] = $e->getMessage() ; 
+            $result['error_code'] = $e->getMessage();
             $result['status'] = false;
         }
         return $result;
@@ -434,7 +434,7 @@ class ProductsService
             DB::rollBack();
             Log::warning($e->getMessage());
             $result['status'] = false;
-            $result['error_code'] = $e->getMessage() ;
+            $result['error_code'] = $e->getMessage();
         }
         return $result;
     }
@@ -570,7 +570,7 @@ class ProductsService
     }
     public function updateProductSmall($in, $file = array(), $id)
     {
-        $result = [] ; 
+        $result = [];
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
@@ -688,15 +688,15 @@ class ProductsService
                     ProductAttributes::insert($add_product_attributes);
                 }
             }
-            $result['status'] = true ; 
+            $result['status'] = true;
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());
-            $result['status'] = false ; 
+            $result['status'] = false;
             $result['error_code'] = $e->getMessage();
         }
-        return $result ; 
+        return $result;
     }
     public function getProductAuditLog($product_id)
     {
@@ -786,8 +786,8 @@ class ProductsService
         return $result;
     }
     /**
-     * 商品上下架商品 
-     * 
+     * 商品上下架商品
+     *
      */
     public function offProduct($in)
     {
@@ -818,20 +818,21 @@ class ProductsService
         return $result;
     }
     /**
-     * 
+     *
      * 點擊「送審」時，若商品為「一般品 (products.product_type='N')」，
      * 需檢查該商品是否有存在的前台分類，若無，顯示錯誤訊息：商品未完成「商城資料」維護，不允許執行上架送審
      */
-    public function checkProductReady($in){
+    public function checkProductReady($in)
+    {
         $count = CategoryHierarchy::select('web_category_products.*')
-        ->Join('web_category_products', 'web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.id')
-        ->where('web_category_products.product_id',$in['product_id'])
-        ->where('web_category_hierarchy.active','1')->count();
-        if($count == 0){
-            return false ; 
-        }else{
-            return true ;
-        }        
+            ->Join('web_category_products', 'web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.id')
+            ->where('web_category_products.product_id', $in['product_id'])
+            ->where('web_category_hierarchy.active', '1')->count();
+        if ($count == 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
     /**
      * 確認 PosItemNo 是否有重複
