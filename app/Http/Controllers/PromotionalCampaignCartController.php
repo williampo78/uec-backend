@@ -8,6 +8,7 @@ use App\Services\PromotionalCampaignService;
 use App\Services\RoleService;
 use App\Services\SupplierService;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PromotionalCampaignCartController extends Controller
 {
@@ -217,5 +218,35 @@ class PromotionalCampaignCartController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * 是否可以通過滿額活動的狀態驗證
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function canPassActiveValidation(Request $request): JsonResponse
+    {
+        $active = $request->input('active');
+
+        if ($active == 0) {
+            return response()->json([
+                'status' => true,
+            ]);
+        }
+
+        $results = $this->promotional_campaign_service->canPromotionalCampaignCartActive($request->input());
+
+        if ($results['status']) {
+            return response()->json([
+                'status' => true,
+            ]);
+        }
+
+        return response()->json([
+            'status' => false,
+            'conflict_campaign_names' => isset($results['conflict_campaigns']) ? $results['conflict_campaigns']->implode('campaign_name', '、') : null,
+        ]);
     }
 }

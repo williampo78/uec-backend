@@ -170,6 +170,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'index' => 'promotional_campaign_cart',
         ],
     ]);
+    Route::post('/promotional_campaign_cart/ajax/can-pass-active-validation', [PromotionalCampaignCartController::class, 'canPassActiveValidation']);
 
     // 單品活動
     Route::resource('/promotional_campaign_prd', PromotionalCampaignPrdController::class, [
