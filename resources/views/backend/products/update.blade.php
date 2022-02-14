@@ -1405,6 +1405,7 @@
                     $(this).rules("add", {
                         required: true,
                         digits: true,
+                        messages : { digits : '請輸入正整數' },
                     });
                 })
                 $(".spec_1_va").each(function(){

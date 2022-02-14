@@ -80,7 +80,21 @@ class ProductReviewController extends Controller
      */
     public function edit($id)
     {
-        $result['products'] = $this->productsService->showProducts($id);
+        $products = $this->productsService->showProducts($id);
+        switch ($products->product_type) {
+            case 'N':
+                $products->product_type_cn = '一般品';
+                break;
+
+            case 'G':
+                $products->product_type_cn = '贈品';
+                break;
+
+            case 'A':
+                $products->product_type_cn = '加購品';
+                break;
+        }
+        $result['products']  = $products;                 
         $result['product_review_log'] = $this->productsService->getProductReviewLog($id);
         return view('backend.product_review.input', $result);
     }

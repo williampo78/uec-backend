@@ -123,6 +123,19 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
+                                        <label class="control-label">商品類型</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="product_type"
+                                            value="{{ $products->product_type_cn }}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
                                         <label class="control-label">市價(含稅)</label>
                                     </div>
                                     <div class="col-sm-9">
