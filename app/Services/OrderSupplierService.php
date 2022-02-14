@@ -102,12 +102,12 @@ class OrderSupplierService
             DB::raw('products.brand_id as brand_id'),
             DB::raw('product_items.item_no as product_items_no'),
             DB::raw('products.min_purchase_qty as min_purchase_qty'),
-            DB::raw('purchase_detail.item_qty as purchase_detail_item_qty')
+            DB::raw('requisitions_purchase_detail.item_qty as purchase_detail_item_qty')
         )
             ->where('order_supplier_detail.order_supplier_id', $order_supplier_id)
             ->leftJoin('product_items', 'product_items.id', 'order_supplier_detail.product_item_id')
             ->leftJoin('products', 'products.id', 'product_items.product_id')
-            ->leftJoin('purchase_detail' , 'purchase_detail.id' ,'order_supplier_detail.requisitions_purchase_dtl_id')
+            ->leftJoin('requisitions_purchase_detail' , 'requisitions_purchase_detail.id' ,'order_supplier_detail.requisitions_purchase_dtl_id')
             ->get();
         return $result;
     }
