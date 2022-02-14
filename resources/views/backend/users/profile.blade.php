@@ -28,9 +28,9 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_password">
-                                                <label for="password">更改密碼(不需變更請留空白)</label>
-                                                <input class="form-control" name="password" id="password" type="password">
+                                            <div class="form-group">
+                                                <label for="pwd">更改密碼(不需變更請留空白)</label>
+                                                <input class="form-control" name="pwd" id="pwd" type="password" autocomplete="off">
                                             </div>
                                         </div>
                                     </div>
@@ -87,10 +87,10 @@
                     user_account: {
                         required: true,
                     },
-                    password: {
-                        passwordCheck: {
+                    pwd: {
+                        pwdCheck: {
                             depends: function(element) {
-                                return $('#password').val().length > 0;
+                                return $('#pwd').val().length > 0;
                             },
                         },
                     },
@@ -105,8 +105,8 @@
                     user_email: {
                         required: "信箱不得為空",
                     },
-                    password: {
-                        passwordCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
+                    pwd: {
+                        pwdCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
                 },
                 errorClass: "help-block",

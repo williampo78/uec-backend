@@ -61,7 +61,7 @@ class MemberController extends Controller
         }
 
         $results = $this->api_service->resetPassword($token, [
-            'password' => $request->input('password'),
+            'password' => $request->input('pwd'),
         ]);
 
         // 發生錯誤

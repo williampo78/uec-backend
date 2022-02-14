@@ -27,7 +27,7 @@
 
                     <div class="wrap-input100 validate-input m-b-18" data-validate="Password is required">
                         <span class="label-input100"><i class="fa fa-key fa-fw fa-lg"></i></span>
-                        <input class="input100" type="password" name="password" id="password" placeholder="密碼">
+                        <input class="input100" type="password" name="pwd" id="pwd" placeholder="密碼" autocomplete="off">
                         <span class="focus-input100"></span>
                     </div>
                     <div>

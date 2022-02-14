@@ -167,8 +167,8 @@ class WebCategoryHierarchyService
     {
         $result = CategoryProducts::where('web_category_products.product_id', $id)
             ->leftJoin('web_category_hierarchy' ,'web_category_hierarchy.id','=' ,'web_category_products.web_category_hierarchy_id')
-            ->select('web_category_hierarchy_id' , 'web_category_hierarchy.category_name' , 'web_category_products.sort as sort')
-            ->orderBy('web_category_hierarchy.sort', 'ASC')
+            ->select('web_category_products.web_category_hierarchy_id' , 'web_category_hierarchy.category_name' , 'web_category_products.sort')
+            ->orderBy('web_category_products.sort', 'ASC')
             ->get();
         return $result;
     }

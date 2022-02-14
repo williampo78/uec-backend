@@ -628,7 +628,8 @@ class ProductsService
                         'updated_by' => $user_id,
                     ]);
                 } else { // status old
-                    CategoryProducts::where('web_category_hierarchy_id', $val['web_category_hierarchy_id'])
+                    DB::table('web_category_products')
+                        ->where('web_category_hierarchy_id', $val['web_category_hierarchy_id'])
                         ->where('product_id', $id)
                         ->update([
                             'sort' => $key,
