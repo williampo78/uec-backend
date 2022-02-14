@@ -13,9 +13,9 @@
                         <div class="col-sm-12">
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 請購單號</label></div>
-                                <div class="col-sm-4">@{{ requisitionsPurchase . number }}</div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase.number }}</div>
                                 <div class="col-sm-2"><label> 供應商</label></div>
-                                <div class="col-sm-4">@{{ requisitionsPurchase . supplier_name }}</div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase.supplier_name }}</div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 幣別</label></div>
@@ -31,20 +31,27 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 原幣稅額</label></div>
-                                <div class="col-sm-4">@{{ requisitionsPurchase . original_total_tax_price }}
+                                <div class="col-sm-4">@{{ requisitionsPurchase.original_total_tax_price }}
                                 </div>
                                 <div class="col-sm-2"><label> 原幣總金額</label></div>
-                                <div class="col-sm-4">@{{ requisitionsPurchase . original_total_price }}</div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase.original_total_price }}</div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2"><label> 稅額</label></div>
-                                <div class="col-sm-4">@{{ requisitionsPurchase . total_tax_price }}</div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase.total_tax_price }}</div>
                                 <div class="col-sm-2"><label> 總金額</label></div>
-                                <div class="col-sm-4">@{{ requisitionsPurchase . total_price }}</div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase.total_price }}</div>
                             </div>
                             <div class="row form-group">
+                                <div class="col-sm-2"><label> 稅別</label></div>
+                                <div class="col-sm-4">
+                                    <p v-if="requisitionsPurchase.tax === 1 ">應稅</p>
+                                    <p v-else-if="requisitionsPurchase.tax === 0 ">免稅</p>
+                                    <p v-else-if="requisitionsPurchase.tax === 2 ">應稅內含</p>
+                                    <p v-else-if="requisitionsPurchase.tax === 3 ">零稅率</p>
+                                </div>
                                 <div class="col-sm-2"><label> 備註</label></div>
-                                <div class="col-sm-10">@{{ requisitionsPurchase . remark }}</div>
+                                <div class="col-sm-4">@{{ requisitionsPurchase.remark }}</div>
                             </div>
                         </div>
                     </div>
@@ -67,18 +74,18 @@
                                 </thead>
                                 <tbody v-for="(item, itemKey) in requisitionsPurchaseDetail">
                                     <tr>
-                                        <td>@{{item.item_number}}</td>
-                                        <td>@{{item.combination_name}}</td>
-                                        <td>@{{item.item_price}}</td>
-                                        <td>@{{item.item_qty}}</td>
-                                        <td>@{{item.uom}}</td>
-                                        <td>@{{item.subtotal_price}}</td>
+                                        <td>@{{ item.item_number }}</td>
+                                        <td>@{{ item.combination_name }}</td>
+                                        <td>@{{ item.item_price }}</td>
+                                        <td>@{{ item.item_qty }}</td>
+                                        <td>@{{ item.uom }}</td>
+                                        <td>@{{ item.subtotal_price }}</td>
                                         <td>
                                             <div v-if="item.is_gift">是</div>
                                             <div v-else>否</div>
                                         </td>
                                         {{-- 最小出貨量 --}}
-                                        <td>@{{item.min_purchase_qty}}</td>
+                                        <td>@{{ item.min_purchase_qty }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -99,15 +106,15 @@
                                     </tr>
                                 </thead>
                                 <tbody v-for="(PurchaseReview, PurchaseReviewKey) in getRequisitionPurchaseReviewLog">
-                                    <td>@{{PurchaseReview.seq_no}}</td>
-                                    <td>@{{PurchaseReview.user_name}}</td>
-                                    <td>@{{PurchaseReview.review_at}}</td>
+                                    <td>@{{ PurchaseReview.seq_no }}</td>
+                                    <td>@{{ PurchaseReview.user_name }}</td>
+                                    <td>@{{ PurchaseReview.review_at }}</td>
                                     <td>
                                         <div v-if="PurchaseReview.review_result == 1">核准</div>
                                         <div v-else-if="PurchaseReview.review_result == 0">駁回</div>
                                         <div v-else>簽核中</div>
                                     </td>
-                                    <td>@{{PurchaseReview.review_remark}}</td>
+                                    <td>@{{ PurchaseReview.review_remark }}</td>
                                 </tbody>
                             </table>
                         </div>

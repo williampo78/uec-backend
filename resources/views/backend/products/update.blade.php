@@ -1454,7 +1454,7 @@
 
                     });
                 });
-                // $( "#new-form" ).submit()
+                $( "#new-form" ).submit()
         })
 
       $("#new-form").validate({
