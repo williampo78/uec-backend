@@ -25,7 +25,7 @@
                                             <label class="control-label">活動名稱</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input class="form-control" name="campaign_name" id="campaign_name"
+                                            <input type="text" class="form-control" name="campaign_name" id="campaign_name"
                                                 value="{{ request()->input('campaign_name') }}" placeholder="模糊查詢" />
                                         </div>
                                     </div>
@@ -41,10 +41,12 @@
                                                 <option value=''></option>
                                                 <option value='enabled'
                                                     {{ 'enabled' == request()->input('active') ? 'selected' : '' }}>
-                                                    啟用</option>
+                                                    生效
+                                                </option>
                                                 <option value='disabled'
                                                     {{ 'disabled' == request()->input('active') ? 'selected' : '' }}>
-                                                    關閉</option>
+                                                    失效
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -81,7 +83,7 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <div class='input-group date' id='datetimepicker_start_at_start'>
-                                                    <input type='text' class="form-control datetimepicker-input"
+                                                    <input type="text" class="form-control datetimepicker-input"
                                                         data-target="#datetimepicker_start_at_start" name="start_at_start" id="start_at_start"
                                                         value="{{ request()->input('start_at_start') }}" autocomplete="off" />
                                                     <span class="input-group-addon" data-target="#datetimepicker_start_at_start"
@@ -97,7 +99,7 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <div class='input-group date' id='datetimepicker_start_at_end'>
-                                                    <input type='text' class="form-control datetimepicker-input"
+                                                    <input type="text" class="form-control datetimepicker-input"
                                                         data-target="#datetimepicker_start_at_end" name="start_at_end" id="start_at_end"
                                                         value="{{ request()->input('start_at_end') }}" autocomplete="off" />
                                                     <span class="input-group-addon" data-target="#datetimepicker_start_at_end"
@@ -116,7 +118,7 @@
                                             <label class="control-label">商品序號</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input class="form-control" name="product_no" id="product_no"
+                                            <input type="text" class="form-control" name="product_no" id="product_no"
                                                 value="{{ request()->input('product_no') }}" />
                                         </div>
                                     </div>
@@ -127,7 +129,13 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                                <button class="btn btn-warning">
+                                                    <i class="fa fa-search"></i> 查詢
+                                                </button>
+
+                                                <button type="button" class="btn btn-danger" id="btn-reset">
+                                                    <i class="fa fa-eraser"></i> 清除
+                                                </button>
                                             @endif
                                         </div>
                                     </div>
@@ -252,6 +260,12 @@
                 if ($('#start_at_start').val()) {
                     $('#datetimepicker_start_at_start').datetimepicker('maxDate', e.date);
                 }
+            });
+
+            // 重置搜尋表單
+            $('#btn-reset').on('click', function() {
+                $('#search-form').find(':text, select').val('');
+                $('#active, #campaign_type').trigger('change');
             });
 
             $(document).on('click', '.promotional_campaign_detail', function() {

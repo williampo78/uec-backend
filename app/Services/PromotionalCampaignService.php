@@ -596,4 +596,76 @@ class PromotionalCampaignService
 
         return false;
     }
+
+    /**
+     * 滿額活動的狀態是否可啟用
+     *
+     * @param array $datas
+     * @return array
+     */
+    public function canPromotionalCampaignCartActive(array $datas): array
+    {
+        $agent_id = Auth::user()->agent_id;
+
+        if (empty($datas['campaign_type'])
+            || empty($datas['start_at'])
+            || empty($datas['end_at'])
+            || !isset($datas['n_value'])
+        ) {
+            return [
+                'status' => false,
+            ];
+        }
+
+        $start_at_format = Carbon::parse($datas['start_at']);
+        $end_at_format = Carbon::parse($datas['end_at']);
+
+        /*
+         * 查詢上架開始、結束時間，是否在已存在的上下架時間範圍內，且狀態為啟用
+         * 如果要更新資料，則需排除要更新的該筆資料檢查
+         */
+        $promotional_campaigns = PromotionalCampaigns::where('agent_id', $agent_id)
+            ->where('active', 1)
+            ->where('level_code', 'CART')
+            ->where('n_value', $datas['n_value'])
+            ->where(function ($query) use ($start_at_format, $end_at_format) {
+                $query->whereBetween('start_at', [$start_at_format, $end_at_format])
+                    ->orWhereBetween('end_at', [$start_at_format, $end_at_format])
+                    ->orWhere(function ($query) use ($start_at_format, $end_at_format) {
+                        $query->where('start_at', '<=', $start_at_format)
+                            ->where('end_at', '>=', $end_at_format);
+                    });
+            });
+
+        if (!empty($datas['promotional_campaign_id'])) {
+            $promotional_campaigns = $promotional_campaigns->where('id', '!=', $datas['promotional_campaign_id']);
+        }
+
+        $promotional_campaigns = $promotional_campaigns->get();
+
+        // 只處理﹝購物車滿N元，打X折﹞、﹝購物車滿N元，折X元﹞的行銷活動
+        if (in_array($datas['campaign_type'], ['CART01', 'CART02'])) {
+            $promotional_campaigns = $promotional_campaigns->filter(function ($promotional_campaign) {
+                return in_array($promotional_campaign->campaign_type, ['CART01', 'CART02']);
+            });
+        }
+
+        // 只處理﹝購物車滿N元，送贈品﹞的行銷活動
+        if (in_array($datas['campaign_type'], ['CART03'])) {
+            $promotional_campaigns = $promotional_campaigns->filter(function ($promotional_campaign) {
+                return in_array($promotional_campaign->campaign_type, ['CART03']);
+            });
+        }
+
+        if ($promotional_campaigns->count() <= 0) {
+            return [
+                'status' => true,
+            ];
+        }
+
+        return [
+            'status' => false,
+            'conflict_campaigns' => $promotional_campaigns,
+        ];
+    }
 }

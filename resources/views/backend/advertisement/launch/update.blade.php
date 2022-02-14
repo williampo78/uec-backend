@@ -27,6 +27,11 @@
             padding: 30px;
         }
 
+        .sort {
+            min-width: 80px;
+            width: 100px;
+        }
+
     </style>
 @endsection
 

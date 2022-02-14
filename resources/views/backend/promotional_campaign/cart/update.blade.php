@@ -68,6 +68,10 @@
 
     <script>
         $(function() {
+            let suppliers = @json($suppliers);
+            let product_types = @json(config('uec.product_type_option'));
+            let promotional_campaign = @json($promotional_campaign);
+
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
@@ -80,6 +84,7 @@
                 location.href = "{{ route('promotional_campaign_cart') }}";
             });
 
+            let conflict_campaign_names = '';
             // 驗證表單
             $("#update-form").validate({
                 // debug: true,
@@ -93,6 +98,43 @@
                     },
                     active: {
                         required: true,
+                        remote: {
+                            param: function() {
+                                return {
+                                    url: "/backend/promotional_campaign_cart/ajax/can-pass-active-validation",
+                                    type: "post",
+                                    dataType: "json",
+                                    cache: false,
+                                    data: {
+                                        campaign_type: $("#campaign_type").val(),
+                                        start_at: $('#start_at').val(),
+                                        end_at: $('#end_at').val(),
+                                        n_value: $('#n_value').val(),
+                                        promotional_campaign_id: promotional_campaign.id,
+                                    },
+                                    dataFilter: function(response, type) {
+                                        conflict_campaign_names = '';
+                                        let data = JSON.parse(response);
+
+                                        if (data.status) {
+                                            return true;
+                                        }
+
+                                        if (data.conflict_campaign_names) {
+                                            conflict_campaign_names = data.conflict_campaign_names;
+                                        }
+
+                                        return false;
+                                    },
+                                }
+                            },
+                            depends: function(element) {
+                                return $("#campaign_type").val() &&
+                                    $('#start_at').val() &&
+                                    $('#end_at').val() &&
+                                    $('#n_value').val();
+                            }
+                        },
                     },
                     campaign_type: {
                         required: true,
@@ -151,6 +193,17 @@
                     },
                 },
                 messages: {
+                    active: {
+                        remote: function(element) {
+                            if (['CART01', 'CART02'].includes($("#campaign_type").val())) {
+                                return `同一時間點、同一N值不可存在其他生效的﹝購物車滿N元，打X折﹞、﹝購物車滿N元，折X元﹞的行銷活動<br/>
+                                    衝突的活動名稱: ${conflict_campaign_names}`;
+                            } else if (['CART03'].includes($("#campaign_type").val())) {
+                                return `同一時間點、同一N值不可存在其他生效的﹝購物車滿N元，送贈品﹞的行銷活動<br/>
+                                    衝突的活動名稱: ${conflict_campaign_names}`;
+                            }
+                        },
+                    },
                     end_at: {
                         greaterThan: "結束時間必須大於開始時間",
                     },
@@ -172,6 +225,11 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
+                    if (element.is(':radio[name="active"]')) {
+                        element.parent().parent().parent().append(error);
+                        return;
+                    }
+
                     if (element.parent('.input-group').length || element.is(':radio')) {
                         error.insertAfter(element.parent());
                         return;
@@ -187,19 +245,15 @@
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
 
-            let suppliers = @json($suppliers);
+
             renderPrdModalSupplier(suppliers);
             renderGiftModalSupplier(suppliers);
 
-            let product_types = @json(config('uec.product_type_option'));
             renderPrdModalProductType(product_types);
             renderGiftModalProductType(product_types);
 
@@ -208,8 +262,6 @@
 
             $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
             $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
-
-            let promotional_campaign = @json($promotional_campaign);
 
             $('#campaign_name').val(promotional_campaign.campaign_name);
 

@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use App\Services\ProductsService;
 use App\Services\AdvertisementService;
+use App\Services\ProductsService;
 use App\Services\WebCategoryHierarchyService;
-use App\Http\Resources\AdSlotContentCollection;
+use Illuminate\Http\Request;
 
 class AdvertisementLaunchController extends Controller
 {
@@ -33,7 +31,13 @@ class AdvertisementLaunchController extends Controller
     public function index(Request $request)
     {
         $query_datas = [];
-        $query_datas = $request->only(['slot_id', 'launch_status', 'start_at_start', 'start_at_end']);
+        $query_datas = $request->only([
+            'slot_id',
+            'launch_status',
+            'start_at_start',
+            'start_at_end',
+            'slot_title',
+        ]);
 
         $ad_slots = $this->advertisement_service->getSlots();
         $ad_slot_contents = $this->advertisement_service->getSlotContents($query_datas);

@@ -12,6 +12,11 @@
             color: red;
         }
 
+        #start_at_start,
+        #start_at_end {
+            min-width: 100px;
+        }
+
     </style>
 @endsection
 
@@ -52,12 +57,12 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-4">
+                                <div class="col-sm-3">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-4">
                                             <label class="control-label">上下架狀態</label>
                                         </div>
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-8">
                                             <select class="form-control js-select2-launch-status" name="launch_status"
                                                 id="launch_status">
                                                 <option value=''></option>
@@ -82,7 +87,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-4">
+                                <div class="col-sm-5">
                                     <div class="col-sm-3">
                                         <label class="control-label">上架起日</label>
                                     </div>
@@ -121,8 +126,18 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-sm-8"></div>
                                 <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">版位標題</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="slot_title" id="slot_title"
+                                                value="{{ request()->input('slot_title') }}" placeholder="模糊查詢" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
                                     <div class="form-group">
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
@@ -161,6 +176,7 @@
                                         <th class="text-nowrap">Desktop適用</th>
                                         <th class="text-nowrap">上下架狀態</th>
                                         <th class="text-nowrap">上架時間</th>
+                                        <th class="text-nowrap">版位標題</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -208,6 +224,7 @@
                                                         {{ $ad_slot_content->start_at }} ~ {{ $ad_slot_content->end_at }}
                                                     @endisset
                                                 </td>
+                                                <td>{{ $ad_slot_content->slot_title ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     @endisset

@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use App\Models\AdSlots;
-use App\Models\AdSlotContents;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Models\AdSlotContentDetails;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use App\Models\AdSlotContents;
+use App\Models\AdSlots;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AdvertisementService
 {
@@ -134,7 +134,6 @@ class AdvertisementService
             'ad_slots.is_user_defined',
             'ad_slots.id AS slot_id',
             'ad_slots.active AS slot_active',
-            'ad_slots.agent_id AS slot_agent_id',
             'ad_slot_contents.start_at',
             'ad_slot_contents.end_at',
             'ad_slot_contents.slot_color_code',
@@ -143,7 +142,6 @@ class AdvertisementService
             'ad_slot_contents.product_assigned_type',
             'ad_slot_contents.id AS slot_content_id',
             'ad_slot_contents.active AS slot_content_active',
-            'ad_slot_contents.agent_id AS slot_content_agent_id',
             'lookup_values_v.description',
         )
             ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
@@ -203,6 +201,11 @@ class AdvertisementService
         // 上架起始日結束時間
         if (!empty($query_datas['start_at_end'])) {
             $result = $result->whereDate('ad_slot_contents.start_at', '<=', $query_datas['start_at_end']);
+        }
+
+        // 版位標題
+        if (isset($query_datas['slot_title'])) {
+            $result = $result->where('ad_slot_contents.slot_title', 'like', '%' . $query_datas['slot_title'] . '%');
         }
 
         $result = $result->orderBy("ad_slots.applicable_page", "asc")
