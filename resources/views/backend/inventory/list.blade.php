@@ -244,7 +244,7 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
+    <script src="{{ mix('js/inventory.js') }}"></script>
     <script>
         $(function() {
             // 重置搜尋表單

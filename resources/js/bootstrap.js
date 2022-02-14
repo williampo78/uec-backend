@@ -1,3 +1,4 @@
+import lodash from "lodash";
 import $ from "jquery";
 import Swal from "sweetalert2";
 import "select2";
@@ -5,11 +6,12 @@ import "datatables.net";
 import "datatables.net-bs";
 import "datatables.net-buttons";
 import "datatables.net-buttons-bs";
+import axios from "axios";
 import "jquery-validation";
-import "jquery-validation/dist/additional-methods"
+import "jquery-validation/dist/additional-methods";
 import "jquery-validation/dist/localization/messages_zh_TW";
 
-window._ = require("lodash");
+window._ = lodash;
 
 /**
  * JQuery
@@ -22,6 +24,14 @@ window.$ = window.jQuery = $;
  */
 // 宣告全域物件
 window.Swal = Swal;
+
+/**
+ * select2
+ */
+// 預設值
+$.fn.select2.defaults.set("allowClear", true);
+$.fn.select2.defaults.set("theme", "bootstrap");
+$.fn.select2.defaults.set("placeholder", "請選擇");
 
 /**
  * datatables
@@ -39,7 +49,7 @@ $.extend($.fn.dataTable.defaults, {
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
-window.axios = require("axios");
+window.axios = axios;
 
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 

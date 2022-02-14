@@ -428,6 +428,7 @@ class ProductsService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ]);
+
             DB::commit();
             $result['status'] = true;
         } catch (\Exception $e) {
@@ -476,7 +477,7 @@ class ProductsService
     }
     public function getProductsPhoto($products_id)
     {
-        $ProductPhotos = ProductPhotos::where('product_id', $products_id);
+        $ProductPhotos = ProductPhotos::where('product_id', $products_id)->orderBy('sort','ASC');
         $results = $ProductPhotos->get();
         $results = $results->map(function ($result) {
             $result->photo_size = ImageUpload::getSize($result->photo_name);return $result;
@@ -628,7 +629,8 @@ class ProductsService
                         'updated_by' => $user_id,
                     ]);
                 } else { // status old
-                    CategoryProducts::where('web_category_hierarchy_id', $val['web_category_hierarchy_id'])
+                    DB::table('web_category_products')
+                        ->where('web_category_hierarchy_id', $val['web_category_hierarchy_id'])
                         ->where('product_id', $id)
                         ->update([
                             'sort' => $key,

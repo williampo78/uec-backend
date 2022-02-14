@@ -266,10 +266,9 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
+    <script src="{{ mix('js/external_inventory_daily_report.js') }}"></script>
     <script>
         $(function() {
-
             $('#datetimepicker_counting_date').datetimepicker({
                 format: 'YYYY-MM-DD',
                 showClear: true,

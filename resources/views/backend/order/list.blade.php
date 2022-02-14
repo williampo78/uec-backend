@@ -323,7 +323,7 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
+    <script src="{{ mix('js/order.js') }}"></script>
     <script>
         $(function() {
             $('#datetimepicker_ordered_date_start').datetimepicker({

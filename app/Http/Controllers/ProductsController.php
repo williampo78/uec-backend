@@ -272,7 +272,6 @@ class ProductsController extends Controller
         ];
         $export = new ReportExport($title, $data->toArray());
         return Excel::download($export, '商品主檔'.date('Y-m-d').'.xlsx');
-        return true ;
     }
 
 }
