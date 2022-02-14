@@ -223,7 +223,7 @@ class APIProductServices
             $strSQL .= ")";
         }
 
-        if ($selling_price_min > 0 && $selling_price_max > 0) {//價格區間
+        if ($selling_price_min >= 0 && $selling_price_max >= 0) {//價格區間
             $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
         }
 
