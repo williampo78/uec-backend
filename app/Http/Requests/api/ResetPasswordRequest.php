@@ -28,14 +28,14 @@ class ResetPasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'password' => 'required',
+            'pwd' => 'required',
         ];
     }
 
     public function messages()
     {
         return [
-            'password.required' => '會員密碼不能為空',
+            'pwd.required' => '會員密碼不能為空',
         ];
     }
 
