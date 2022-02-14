@@ -271,7 +271,7 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('asset/js/FileSaver.min.js') }}"></script>
+    <script src="{{ mix('js/order_refund.js') }}"></script>
     <script>
         $(function() {
             let get_detail_url = '{{ route('order_refund.detail') }}';
