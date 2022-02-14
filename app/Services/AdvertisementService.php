@@ -134,7 +134,6 @@ class AdvertisementService
             'ad_slots.is_user_defined',
             'ad_slots.id AS slot_id',
             'ad_slots.active AS slot_active',
-            'ad_slots.agent_id AS slot_agent_id',
             'ad_slot_contents.start_at',
             'ad_slot_contents.end_at',
             'ad_slot_contents.slot_color_code',
@@ -143,7 +142,6 @@ class AdvertisementService
             'ad_slot_contents.product_assigned_type',
             'ad_slot_contents.id AS slot_content_id',
             'ad_slot_contents.active AS slot_content_active',
-            'ad_slot_contents.agent_id AS slot_content_agent_id',
             'lookup_values_v.description',
         )
             ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')

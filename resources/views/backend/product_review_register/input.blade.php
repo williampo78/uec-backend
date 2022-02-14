@@ -23,7 +23,7 @@
                                         <label class="control-label">庫存類型</label>
                                     </div>
                                     <input type="hidden" id="products_id" value="{{ $products->id }}">
-                                    <input type="hidden" id="stock_type" value="{{ $products->stock_type }}">
+                                    <input type="hidden" id="product_type" value="{{ $products->product_type }}">
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
                                             <input type="radio" name="stock_type" value="A"
@@ -296,7 +296,7 @@
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'checkProductReady',
                             product_id: $('#products_id').val(),
-                            stock_type:$('#stock_type').val(),
+                            product_type:$('#product_type').val(),
                         })
                         .then(function(response) {
                             if(response.data.status){

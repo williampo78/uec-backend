@@ -126,7 +126,7 @@ class ProductReviewRegisterController extends Controller
                 $status = $this->productsService->offProduct($in);
                 break;
             case 'checkProductReady':
-                if($in['stock_type'] == 'N'){
+                if($in['product_type'] == 'N'){
                     $status = $this->productsService->checkProductReady($in) ;
                 }else{
                     $status = true ; 
