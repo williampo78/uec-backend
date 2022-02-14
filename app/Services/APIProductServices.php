@@ -207,7 +207,7 @@ class APIProductServices
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N'";
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' ";
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
@@ -223,7 +223,7 @@ class APIProductServices
             $strSQL .= ")";
         }
 
-        if ($selling_price_min >= 0 && $selling_price_max >= 0) {//價格區間
+        if ($selling_price_min && $selling_price_max) {//價格區間
             $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
         }
 
