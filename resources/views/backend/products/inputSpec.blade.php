@@ -170,7 +170,7 @@
                 <td>
                     <div class="form-group">
                         <input class="form-control safty_qty_va" type="number" min="0" v-model="Sku.safty_qty"
-                            :name="'safty_qty_va['+SkuKey+']'">
+                            :name="'safty_qty_va['+SkuKey+']'" @change="saftyqtytoInt(SkuKey)">
                     </div>
                 </td>
                 <td>

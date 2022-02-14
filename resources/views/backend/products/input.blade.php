@@ -613,8 +613,8 @@
                                             <img :ref="'image'">
                                         </div>
                                         <div class="caption" style="pointer-events: none;">
-                                            <p>檔案名稱: @{{ image . name }}</p>
-                                            <p>檔案大小:@{{ image . sizeConvert }}</p>
+                                            <p>檔案名稱: @{{ image.name }}</p>
+                                            <p>檔案大小:@{{ image.sizeConvert }}</p>
                                             <p>
                                                 排序: @{{ key + 1 }}
                                                 <button class="btn btn-danger pull-right btn-events-none" type="button"
@@ -837,6 +837,9 @@
                         }
                     }
                 },
+                saftyqtytoInt(key) {
+                    this.SkuList[key].safty_qty = parseInt(this.SkuList[key].safty_qty)
+                }
 
             },
             computed: {
@@ -1088,7 +1091,8 @@
                     $(this).rules("add", {
                         required: {
                             depends: function(element) {
-                                return $("input[name='stock_type']:checked").val() !== 'T';
+                                return $("input[name='stock_type']:checked").val() !==
+                                    'T';
                             }
                         },
                         remote: {
@@ -1100,22 +1104,24 @@
                                     cache: false,
                                     data: {
                                         pos_item_no: $(element).val(),
-                                        item_no:'',
+                                        item_no: '',
                                         type: 'checkPosItemNo',
                                     },
                                     dataFilter: function(data) {
                                         data = JSON.parse(data)
-                                        if(data.result){
-                                            return true ;
-                                        }else{
-                                            return false ;
+                                        if (data.result) {
+                                            return true;
+                                        } else {
+                                            return false;
                                         }
                                     },
                                 }
                             },
                         },
                         notRepeating: true,
-                        messages : { remote : 'POS品號重複' },
+                        messages: {
+                            remote: 'POS品號重複'
+                        },
 
                     });
                 });
@@ -1127,9 +1133,9 @@
                 // debug: true,
                 submitHandler: function(form) {
                     var item_num = JSON.parse($('#SkuListdata').val()).length;
-                    if(item_num <= 0) {
+                    if (item_num <= 0) {
                         alert('至少輸入一個品項')
-                        return false ;
+                        return false;
                     }
                     $('#save_data').prop('disabled', true);
                     form.submit();

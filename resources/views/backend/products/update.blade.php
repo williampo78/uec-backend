@@ -661,9 +661,7 @@
                                     <label class="control-label">保固範圍</label>
                                 </div>
                                 <div class="col-sm-11">
-                                    <textarea class="form-control" rows="10" cols="10" name="warranty_scope">
-                                                {{ $products->warranty_scope }}
-                                            </textarea>
+                                    <textarea class="form-control" rows="10" cols="10" name="warranty_scope">{{ $products->warranty_scope }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -681,7 +679,7 @@
                                         <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                             multiple>
                                     </div>
-                                    <textarea style="display: none" name="imgJson" id="" cols="30"
+                                    <textarea style="display:none;" name="imgJson" id="" cols="30"
                                         rows="10">@{{images}}</textarea>
                                 </div>
                             </div>
@@ -918,7 +916,7 @@
                             </td>
                             <td>
                                 <div class="form-group" style="margin-right:0px;margin-left:0px;">
-                                    <input class="form-control safty_qty_va" type="number" min="0" v-model="Sku.safty_qty"
+                                    <input class="form-control safty_qty_va" type="number" min="0" v-model="Sku.safty_qty" @change="saftyqtytoInt(SkuKey)"
                                         :name="'safty_qty_va['+SkuKey+']'">
                                 </div>
                             </td>
@@ -1145,6 +1143,9 @@
                     }
                 }
             },
+            saftyqtytoInt(key){
+                this.SkuList[key].safty_qty = parseInt(this.SkuList[key].safty_qty)
+            }
 
      },
         watch: {
@@ -1453,7 +1454,7 @@
 
                     });
                 });
-                $( "#new-form" ).submit()
+                // $( "#new-form" ).submit()
         })
 
       $("#new-form").validate({
