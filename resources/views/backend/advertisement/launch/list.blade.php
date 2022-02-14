@@ -176,6 +176,7 @@
                                         <th class="text-nowrap">Desktop適用</th>
                                         <th class="text-nowrap">上下架狀態</th>
                                         <th class="text-nowrap">上架時間</th>
+                                        <th class="text-nowrap">版位標題</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -223,6 +224,7 @@
                                                         {{ $ad_slot_content->start_at }} ~ {{ $ad_slot_content->end_at }}
                                                     @endisset
                                                 </td>
+                                                <td>{{ $ad_slot_content->slot_title ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     @endisset
