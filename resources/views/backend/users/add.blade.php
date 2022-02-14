@@ -10,7 +10,7 @@
             </div>
         </div>
         <!-- /.row -->
-        <form role="form" id="new-form" method="post" action="{{ route('users.store') }}" enctype="multipart/form-data">
+        <form role="form" id="new-form" method="post" action="{{ route('users.store') }}">
             @csrf
             <div class="row">
                 <div class="col-sm-12">
@@ -56,7 +56,7 @@
                                             <div class="form-group">
                                                 <label for="user_password">密碼 <span style="color: red;">*</span></label>
                                                 <input class="form-control" name="user_password" id="user_password"
-                                                    type="password">
+                                                    type="password" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">

@@ -30,16 +30,16 @@ class AuthController extends Controller
     {
 
         $err = null;
-        $credentials = request(['mobile', 'password']);
+        $credentials = request(['mobile', 'pwd']);
 
         $messages = [
             'mobile.required' => '帳號不能為空',
-            'password.required' => '密碼不能為空',
+            'pwd.required' => '密碼不能為空',
         ];
 
         $v = Validator::make($credentials, [
             'mobile' => 'required',
-            'password' => 'required',
+            'pwd' => 'required',
         ], $messages);
 
         if ($v->fails()) {
@@ -47,6 +47,8 @@ class AuthController extends Controller
         }
 
         $credentials['channel'] = "EC";
+        $credentials['password'] = $credentials['pwd'];
+        unset($credentials['pwd']);
         $fields = json_encode($credentials);
         $response = $this->apiService->memberLogin($fields);
         $result = json_decode($response, true);
@@ -236,12 +238,12 @@ class AuthController extends Controller
 
     public function registration(Request $request)
     {
-        $credentials = request(['mobile', 'name', 'email', 'password', 'birthday', 'sex', 'registeredSource']);
+        $credentials = request(['mobile', 'name', 'email', 'pwd', 'birthday', 'sex', 'registeredSource']);
 
         $messages = [
             'mobile.required' => '帳號不能為空',
             'name.required' => '姓名不能為空',
-            'password.required' => '密碼不能為空',
+            'pwd.required' => '密碼不能為空',
             'birthday.required' => '生日不能為空',
             'sex.required' => '性別不能為空',
             'registeredSource.required' => '註冊來源不能為空',
@@ -250,7 +252,7 @@ class AuthController extends Controller
         $v = Validator::make($credentials, [
             'mobile' => 'required',
             'name' => 'required',
-            'password' => 'required',
+            'pwd' => 'required',
             'birthday' => 'required',
             'sex' => 'required',
             'registeredSource' => 'required',
@@ -265,7 +267,7 @@ class AuthController extends Controller
         $data = [];
         $data['mobile'] = $request['mobile'];
         $data['name'] = $request['name'];
-        $data['password'] = $request['password'];
+        $data['password'] = $request['pwd'];
         $data['email'] = $request['email'];
         $data['birthday'] = $request['birthday'];
         $data['sex'] = $request['sex'];
@@ -276,13 +278,13 @@ class AuthController extends Controller
         try {
             if ($result['status'] == '201') {
                 $login['mobile'] = $data['mobile'];
-                $login['password'] = $data['password'];
+                $login['pwd'] = $data['pwd'];
                 $login['channel'] = "EC";
                 $fields = json_encode($login);
                 $response = $this->apiService->memberLogin($fields);
                 $login_result = json_decode($response, true);
                 unset($login['mobile']);
-                unset($login['password']);
+                unset($login['pwd']);
                 if ($login_result['status'] == '200') {
                     $tmp = Members::where('member_id', '=', $login_result['data']['id'])->first();
                     if (!is_null($tmp)) {

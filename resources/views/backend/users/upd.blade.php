@@ -63,7 +63,7 @@
                                             <div class="form-group">
                                                 <label for="user_password">密碼 <span style="color: red;">*不需變更請留空白</span></label>
                                                 <input class="form-control" name="user_password" id="user_password"
-                                                    type="password">
+                                                    type="password" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
