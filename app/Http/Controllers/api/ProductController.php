@@ -54,7 +54,7 @@ class ProductController extends Controller
         ];
 
         $in = '';
-        if ($request['price_min'] > 0 && $request['price_max'] > 0) {//價格區間
+        if ($request['price_min'] >= 0 && $request['price_max'] >= 0) {//價格區間
             if ($request['price_max'] < $request['price_min']) {
                 $messages = [
                     'price_max.in' => '最高價不得低於最低價',
