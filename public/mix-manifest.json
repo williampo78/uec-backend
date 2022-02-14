@@ -1,7 +1,11 @@
 {
     "/js/app.js": "/js/app.js",
-    "/js/advertisement/main.js": "/js/advertisement/main.js",
-    "/js/advertisement/validate.js": "/js/advertisement/validate.js",
+    "/js/advertisement.js": "/js/advertisement.js",
+    "/js/external_inventory_daily_report.js": "/js/external_inventory_daily_report.js",
+    "/js/inventory.js": "/js/inventory.js",
+    "/js/order.js": "/js/order.js",
+    "/js/order_payments_report.js": "/js/order_payments_report.js",
+    "/js/order_refund.js": "/js/order_refund.js",
     "/css/app.css": "/css/app.css",
     "/datatables.net-plugins/i18n/af.json": "/datatables.net-plugins/i18n/af.json",
     "/datatables.net-plugins/i18n/am.json": "/datatables.net-plugins/i18n/am.json",

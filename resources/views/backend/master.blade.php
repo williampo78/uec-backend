@@ -22,7 +22,6 @@
     <link rel="stylesheet"
         href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('asset/css/init.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.min.css"
@@ -74,7 +73,6 @@
     <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/morrisjs/morris.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
-    <script src="{{ asset('asset/js/init.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/raphael/raphael-min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>

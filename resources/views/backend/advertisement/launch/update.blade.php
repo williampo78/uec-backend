@@ -86,8 +86,7 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/advertisement/main.js') }}"></script>
-    <script src="{{ mix('js/advertisement/validate.js') }}"></script>
+    <script src="{{ mix('js/advertisement.js') }}"></script>
 
     <script>
         $(function() {

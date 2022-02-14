@@ -23,6 +23,7 @@
         "datatables.net-buttons": "^2.2.2",
         "datatables.net-buttons-bs": "^2.2.2",
         "datatables.net-plugins": "^1.11.4",
+        "file-saver": "^2.0.5",
         "jquery": "^3.6.0",
         "jquery-validation": "^1.19.3",
         "select2": "^4.0.3",
