@@ -28,14 +28,14 @@ class LoginAuthController extends Controller
     {
         $request->validate([
             'account' => 'required',
-            'password' => 'required',
+            'pwd' => 'required',
         ], [
             'account.required' => '使用者帳號不能為空',
-            'password.required' => '密碼不能為空',
+            'pwd.required' => '密碼不能為空',
         ]);
         $users = Users::where([
             'user_account' => $request->account,
-            'user_password' => md5($request->password),
+            'user_password' => md5($request->pwd),
         ])->first();
 
         if ($users) {
@@ -55,19 +55,6 @@ class LoginAuthController extends Controller
         return view('auth.registration');
     }
 
-    public function customRegistration(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'account' => 'required|unique:users',
-            'password' => 'required|min:6',
-        ]);
-
-        $data = $request->all();
-        $check = $this->create($data);
-
-        return redirect("dashboard")->withSuccess('You have signed-in');
-    }
 
     public function create(array $data)
     {
