@@ -477,7 +477,7 @@ class ProductsService
     }
     public function getProductsPhoto($products_id)
     {
-        $ProductPhotos = ProductPhotos::where('product_id', $products_id)->orderBy('sort','ASC');
+        $ProductPhotos = ProductPhotos::where('product_id', $products_id)->orderBy('sort', 'ASC');
         $results = $ProductPhotos->get();
         $results = $results->map(function ($result) {
             $result->photo_size = ImageUpload::getSize($result->photo_name);return $result;
