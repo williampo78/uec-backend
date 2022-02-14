@@ -73,7 +73,7 @@ class RequisitionsPurchaseController extends Controller
             'total_price' => 0,
             'original_total_tax_price' => 0,
             'original_total_price' => 0,
-            'tax' => 0,
+            'tax' => 2,
         ];
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
         $result['supplier'] = $this->supplierService->getSuppliers();

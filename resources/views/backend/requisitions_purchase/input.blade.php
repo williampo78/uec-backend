@@ -162,9 +162,9 @@
                             <div id="ItemDiv">
                                 <div class="add_row">
                                     <div class="row">
-                                        <div class="col-sm-3 text-left">品項<span class="redtext">*</span></div>
+                                        <div class="col-sm-5 text-left">品項<span class="redtext">*</span></div>
                                         <div class="col-sm-1 text-left">贈品</div>
-                                        <div class="col-sm-2 text-left">單價<span class="redtext">*</span></div>
+                                        <div class="col-sm-1 text-left">單價<span class="redtext">*</span></div>
                                         <div class="col-sm-1 text-left">數量<span class="redtext">*</span></div>
                                         <div class="col-sm-1 text-left">單位</div>
                                         <div class="col-sm-1 text-left">最小採購量</div>
@@ -174,7 +174,7 @@
                                 </div>
                                 <div class="add_row detailsdata" v-for="(detail, detailKey) in details">
                                     <div class="row">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-5">
                                             <select2 :selectkey="detailKey" :item_options="itemOptions" :details="details"
                                                 :requisitions_purchase="requisitions_purchase"
                                                 v-model="details[detailKey].product_item_id"> </select2>
@@ -185,7 +185,7 @@
                                                 v-model="details[detailKey].is_gift" :true-value="1" :false-value="0">
                                         </div>
                                         {{-- 單價 --}}
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-1">
                                             <div class="form-group">
                                                 <input class="form-control qty item_price" type="number" readonly
                                                     v-model="details[detailKey].item_price"
@@ -366,8 +366,10 @@
                         $(this).rules("add", {
                             required: true,
                             digits:true,
+                            min:1,
                             messages:{
-                                digits: '請輸入正整數'
+                                digits: '請輸入正整數',
+                                min:'數量不能為0'
                             },
                         });
                     })
