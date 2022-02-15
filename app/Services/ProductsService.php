@@ -226,6 +226,7 @@ class ProductsService
             Products::where('id', $products_id)->update(['product_no' => $product_no]);
             $add_item_no = 1;
             foreach ($skuList as $key => $val) {
+                $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'],'0');
                 $skuInsert = [
                     'agent_id' => $agent_id,
                     'product_id' => $products_id,
@@ -236,7 +237,7 @@ class ProductsService
                     'supplier_item_no' => $val['supplier_item_no'],
                     'ean' => $val['ean'],
                     'pos_item_no' => $val['pos_item_no'],
-                    'safty_qty' => (int)$val['safty_qty'],
+                    'safty_qty' => $skuList[$key]['safty_qty'],
                     'is_additional_purchase' => $val['is_additional_purchase'],
                     'status' => $val['status'],
                     'created_by' => $user_id,
@@ -377,6 +378,7 @@ class ProductsService
             }
             $add_item_no = ProductItems::where('product_id', $products_id)->count();
             foreach ($skuList as $key => $val) {
+                $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'],'0');
                 if ($val['id'] == '') {
                     $add_item_no += 1;
                     $skuInsert = [
@@ -389,7 +391,7 @@ class ProductsService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' => (int)$val['safty_qty'],
+                        'safty_qty' =>  $skuList[$key]['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'edi_exported_status' => null,
@@ -410,7 +412,7 @@ class ProductsService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' => (int)$val['safty_qty'],
+                        'safty_qty' =>  $skuList[$key]['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'updated_by' => $user_id,
@@ -427,7 +429,6 @@ class ProductsService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ]);
-
             DB::commit();
             $result['status'] = true;
         } catch (\Exception $e) {
