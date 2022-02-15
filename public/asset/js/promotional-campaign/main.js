@@ -1,20 +1,8 @@
 // 初始化資料
 function init() {
-    $("#campaign_type").select2({
-        allowClear: true,
-        theme: "bootstrap",
-        placeholder: "",
-    });
-
-    $(".select2-supplier-id").select2({
-        allowClear: true,
-        theme: "bootstrap",
-        placeholder: "",
-    });
-
-    $(".select2-product-type").select2({
-        theme: "bootstrap",
-    });
+    $("#campaign_type").select2();
+    $(".select2-supplier-id").select2();
+    $(".select2-product-type").select2();
 
     $("#datetimepicker_start_at").datetimepicker({
         format: "YYYY-MM-DD HH:mm",

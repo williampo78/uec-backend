@@ -123,17 +123,8 @@
 
 @section('js')
     <script>
-        $('.js-select2').select2({
-            allowClear: true,
-            theme: "bootstrap",
-            placeholder: '請選擇',
-        });
-
-        $('.js-select2-active').select2({
-            allowClear: true,
-            theme: "bootstrap",
-            placeholder: '',
-        });
+        $('.js-select2').select2();
+        $('.js-select2-active').select2();
 
         $(document).on('click', '.qa_detail', function() {
             let web_content_id = $(this).attr("data-web-content-id");

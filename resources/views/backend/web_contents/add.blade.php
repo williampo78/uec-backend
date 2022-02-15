@@ -138,11 +138,7 @@
         })
 
         $(function() {
-            $('.js-select2').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '請選擇',
-            });
+            $('.js-select2').select2();
 
             $("#btn-save").on('click', function() {
                 $("#new-form").submit();

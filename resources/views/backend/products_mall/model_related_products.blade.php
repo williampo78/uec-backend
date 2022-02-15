@@ -128,17 +128,31 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="col-sm-3">
+                                            <h5>商品類型</h5>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control js-select2-department" name="product_type"
+                                                id="product_type" disabled>
+                                                <option value="N" selected >一般品</option>
+                                                <option value="G">贈品</option>
+                                                <option value="A">加購品</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-3">
                                             <h5>筆數限制</h5>
                                         </div>
                                         <div class="col-sm-4">
                                             <input class="form-control" name="limit" id="limit"
                                                 type="number" value="100" max="100" min="0" readonly>
                                         </div>
+                                        <div class="col-sm-5 text-right">
+                                            <button type="button" class="btn btn-success text-right"
+                                                style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" class="btn btn-success text-right"
-                                            style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>

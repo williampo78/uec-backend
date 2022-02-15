@@ -812,6 +812,7 @@
                     var start_launched_at_start = $('input[name="start_launched_at_start"]').val();
                     var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
                     var supplier_id = $('#supplier').val();
+                    var product_type = $('#product_type').val();
                     var limit = $('#limit').val();
                     var filter_product_id = [];
                     this.RelatedProducts.find((todo, index) => {
@@ -826,6 +827,7 @@
                             product_name: this.select_req.product_name,
                             selling_price_min: this.select_req.selling_price_min,
                             selling_price_max: this.select_req.selling_price_max,
+                            product_type:product_type,
                             start_created_at: start_created_at,
                             end_created_at: end_created_at,
                             start_launched_at_start: start_launched_at_start,

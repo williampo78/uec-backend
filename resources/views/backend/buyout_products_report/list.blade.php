@@ -216,11 +216,7 @@
     <script>
         $(document).ready(function () {
 
-            $('#supplier').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
+            $('#supplier').select2();
             $('#trade_date_start_box').datetimepicker({
                 format: 'YYYY-MM-DD',
             });

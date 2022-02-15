@@ -47,9 +47,15 @@ class SupplierTypeController extends Controller
             'code' => 'required',
             'name' => 'required',
         ]);
-        $this->SupplierTypeService->Add($inputData);
-
-        return redirect(route('supplier_type'));
+        $result = $this->SupplierTypeService->Add($inputData);
+        $result['route_name'] = 'supplier_type';
+        if($result['status']){
+            $result['act'] = 'add';
+            return view('backend.success', $result);
+        }else{
+            $result['message']  = '新增時發生未預期的錯誤';
+            return view('backend.error', $result);
+        }
     }
 
     /**
@@ -90,8 +96,14 @@ class SupplierTypeController extends Controller
         ]);
 
         $result = $this->SupplierTypeService->Update($inputData, $id);
-
-        return redirect(route('supplier_type'));
+        $result['route_name'] = 'supplier_type';
+        if($result['status']){
+            $result['act'] = 'upd';
+            return view('backend.success', $result);
+        }else{
+            $result['message']  = '新增時發生未預期的錯誤';
+            return view('backend.error', $result);
+        }
     }
 
     /**

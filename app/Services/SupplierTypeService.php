@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use App\Models\SupplierType;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class SupplierTypeService
 {
@@ -32,24 +34,45 @@ class SupplierTypeService
     }
     public function Add($inputData)
     {
+        $result = [];
+        $now = Carbon::now();
         try {
-            return $user = SupplierType::create(
-                ['name' => $inputData['name'], 'code' => $inputData['code'], 'agent_id' => '1'],
+            SupplierType::insert(
+                [
+                    'name' => $inputData['name'],
+                    'code' => $inputData['code'],
+                    'agent_id' => Auth::user()->agent_id,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ],
             );
+            $result['status'] = true;
         } catch (\Exception $e) {
+            $result['status'] = false;
+            $result['error_code'] = $e;
             Log::info($e);
         }
-
+        return $result;
     }
     public function Update($inputData, $id)
     {
-        $SupplierType = SupplierType::find($id);
-        $SupplierType->name = $inputData['name'];
-        $SupplierType->code = $inputData['code'];
+        $result = [];
+        $now = Carbon::now();
         try {
-            return $SupplierType->save();
+            $SupplierType = SupplierType::find($id);
+            $SupplierType->name = $inputData['name'];
+            $SupplierType->code = $inputData['code'];
+            $SupplierType->updated_at =  $now; 
+            $SupplierType->updated_by = Auth::user()->id ; 
+            $SupplierType->save();
+            $result['status'] = true;
         } catch (\Exception $e) {
+            $result['status'] = false;
+            $result['error_code'] = $e;
             Log::info($e);
         }
+        return $result ;
     }
 }
