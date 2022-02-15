@@ -1251,6 +1251,7 @@ class ProductsService
 
             }
             $web_category_products_ids = explode(',',$obj->web_category_products_id) ;
+            $web_category_products_ids = array_unique($web_category_products_ids) ;
             $web_category_products_ids_ary = [] ; 
             foreach($web_category_products_ids as $val){
                 if(isset($CategoryHierarchy[$val]->name)){
