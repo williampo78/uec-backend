@@ -244,17 +244,8 @@
 @section('js')
     <script>
         $(function() {
-            $('.js-select2-slot-id').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
-
-            $('.js-select2-launch-status').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
+            $('.js-select2-slot-id').select2();
+            $('.js-select2-launch-status').select2();
 
             $('#datetimepicker_start_at_start').datetimepicker({
                 format: 'YYYY-MM-DD',

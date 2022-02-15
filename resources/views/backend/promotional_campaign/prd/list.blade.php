@@ -228,17 +228,8 @@
 @section('js')
     <script>
         $(function() {
-            $('.js-select2-active').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
-
-            $('.js-select2-campaign-type').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
+            $('.js-select2-active').select2();
+            $('.js-select2-campaign-type').select2();
 
             $('#datetimepicker_start_at_start').datetimepicker({
                 format: 'YYYY-MM-DD',

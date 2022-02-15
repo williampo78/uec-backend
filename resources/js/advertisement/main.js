@@ -16,11 +16,7 @@ init = function (datas = {}) {
         $("#slot_id").prev("label").find("span").remove();
     }
 
-    $(".js-select2-slot-id").select2({
-        allowClear: true,
-        theme: "bootstrap",
-        placeholder: "",
-    });
+    $(".js-select2-slot-id").select2();
 
     $("#datetimepicker_start_at").datetimepicker({
         format: "YYYY-MM-DD HH:mm",
@@ -411,11 +407,7 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
         </tr>
     `);
 
-    $(".js-select2-image-block-product-category").select2({
-        allowClear: true,
-        theme: "bootstrap",
-        placeholder: "",
-    });
+    $(".js-select2-image-block-product-category").select2();
 
     $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
 
@@ -502,11 +494,7 @@ addTextBlock = function (product_category_select_options, datas = {}) {
         </tr>
     `);
 
-    $(".js-select2-text-block-product-category").select2({
-        allowClear: true,
-        theme: "bootstrap",
-        placeholder: "",
-    });
+    $(".js-select2-text-block-product-category").select2();
 
     $("#text-block-row-no").val(parseInt(text_block_row_no) + 1);
 
@@ -544,11 +532,7 @@ addProductBlockProduct = function (product_select_options, datas = {}) {
         </tr>
     `);
 
-    $(".js-select2-product-block-product").select2({
-        allowClear: true,
-        theme: "bootstrap",
-        placeholder: "",
-    });
+    $(".js-select2-product-block-product").select2();
 
     $("#product-block-product-row-no").val(
         parseInt(product_block_product_row_no) + 1
@@ -588,11 +572,7 @@ addProductBlockCategory = function (product_category_select_options, datas = {})
         </tr>
     `);
 
-    $(".js-select2-product-block-category").select2({
-        allowClear: true,
-        theme: "bootstrap",
-        placeholder: "",
-    });
+    $(".js-select2-product-block-category").select2();
 
     $("#product-block-category-row-no").val(
         parseInt(product_block_category_row_no) + 1

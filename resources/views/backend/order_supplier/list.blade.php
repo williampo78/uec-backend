@@ -280,16 +280,8 @@
 
         new showRequisitions().$mount('#page-wrapper');
         $(document).ready(function() {
-            $('#supplier').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
-            $('#status').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
+            $('#supplier').select2();
+            $('#status').select2();
 
             $('#datetimepicker').datetimepicker({
                 format: 'YYYY-MM-DD',

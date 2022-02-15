@@ -138,14 +138,7 @@
 
 @section('js')
     <script>
-        $('.js-select2').select2({
-            allowClear: true,
-            theme: "bootstrap",
-            placeholder: '請選擇',
-        });
-
-        $('.js-select2-active').select2({
-            theme: "bootstrap",
-        });
+        $('.js-select2').select2();
+        $('.js-select2-active').select2();
     </script>
 @endsection
