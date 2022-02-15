@@ -429,7 +429,7 @@
                                     <label class="control-label">建檔人員</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control"  id="keyword" value="{{$products->updated_by_name}}" readonly>
+                                    <input class="form-control"  id="keyword" value="{{$products->created_name}}" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -447,7 +447,7 @@
                                     <label class="control-label">修改人員</label>
                                 </div>
                                 <div class="col-sm-7">
-                                    <input class="form-control"  id="keyword" value="{{$products->updated_by_name}}"readonly>
+                                    <input class="form-control"  id="keyword" value="{{$products->updated_name}}"readonly>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="control-label">
