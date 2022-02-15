@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TertiaryCategories;
-use App\Services\RoleService;
-use App\Services\TertiaryCategoryService;
 use Illuminate\Http\Request;
+use App\Services\RoleService;
+use App\Models\TertiaryCategories;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Services\TertiaryCategoryService;
 
 class TertiaryCategoryController extends Controller
 {
@@ -17,8 +18,7 @@ class TertiaryCategoryController extends Controller
     public function __construct(
         TertiaryCategoryService $tertiaryCategoryService,
         RoleService $role_service
-    )
-    {
+    ) {
         $this->tertiaryCategoryService = $tertiaryCategoryService;
         $this->role_service = $role_service;
     }
@@ -54,15 +54,21 @@ class TertiaryCategoryController extends Controller
             App::abort(403);
         }
 
-        TertiaryCategories::create([
-            'agent_id' => Auth::user()->agent_id,
-            'category_id' => $request->category_id,
-            'number' => $request->number,
-            'name' => $request->name,
-            'active' => 1,
-            'created_by' => Auth::user()->id,
-            'updated_by' => Auth::user()->id,
-        ]);
+        try {
+            TertiaryCategories::create([
+                'agent_id' => Auth::user()->agent_id,
+                'category_id' => $request->category_id,
+                'number' => $request->number,
+                'name' => $request->name,
+                'active' => 1,
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
 
         $route_name = 'tertiary_category';
         $act = 'add';
@@ -118,15 +124,21 @@ class TertiaryCategoryController extends Controller
             App::abort(403);
         }
 
-        $tertiaryCategory = TertiaryCategories::findOrFail($id);
+        try {
+            $tertiaryCategory = TertiaryCategories::findOrFail($id);
 
-        $tertiaryCategory->update([
-            'category_id' => $request->category_id,
-            'number' => $request->number,
-            'name' => $request->name,
-            'active' => 1,
-            'updated_by' => Auth::user()->id,
-        ]);
+            $tertiaryCategory->update([
+                'category_id' => $request->category_id,
+                'number' => $request->number,
+                'name' => $request->name,
+                'active' => 1,
+                'updated_by' => Auth::user()->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
 
         $route_name = 'tertiary_category';
         $act = 'upd';
