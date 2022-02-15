@@ -223,7 +223,7 @@ class APIProductServices
             $strSQL .= ")";
         }
 
-        if (!is_null($selling_price_min) && !is_null($selling_price_max)) {
+        if ($selling_price_min != '' && $selling_price_max != '') {
             if (($selling_price_min >= 0) && ($selling_price_max >= 0)) {//價格區間
                 $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
             }
@@ -529,7 +529,7 @@ class APIProductServices
         $product = self::getProducts($id);
 
         if (sizeof($product) > 0) {
-            $product_categorys = self::getWebCategoryProducts('', '', '', '', $id);
+            $product_categorys = self::getWebCategoryProducts('', '', '', '', $id, '', '');
 
             $rel_category = [];
             if (sizeof($product_categorys) > 0) {
@@ -934,14 +934,14 @@ class APIProductServices
                 $data['level2']["name"] = $category->L2_NAME;
                 $data['level3']['id'] = $category->id;
                 $data['level3']['name'] = $category->category_name;
-                $data['level3']['meta_title'] = ($category->meta_title?$category->meta_title:$category->category_name);
+                $data['level3']['meta_title'] = ($category->meta_title ? $category->meta_title : $category->category_name);
                 $data['level3']['meta_description'] = $category->meta_description;
                 $data['level3'][$category->id]['meta_keywords'] = $category->meta_keywords;
 
             } else if ($config_levels == '2') {
                 $data['level2']['id'] = $category->id;
                 $data['level2']['name'] = $category->category_name;
-                $data['level2']['meta_title'] = ($category->meta_title?$category->meta_title:$category->category_name);
+                $data['level2']['meta_title'] = ($category->meta_title ? $category->meta_title : $category->category_name);
                 $data['level2']['meta_description'] = $category->meta_description;
                 $data['level2']['meta_keywords'] = $category->meta_keywords;
             }
