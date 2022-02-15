@@ -137,11 +137,7 @@
 @section('js')
     <script>
         $(function() {
-            $('.js-select2').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '請選擇',
-            });
+            $('.js-select2').select2();
 
             $("#btn-save").on('click', function() {
                 $("#update-form").submit();

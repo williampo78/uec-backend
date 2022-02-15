@@ -289,17 +289,8 @@
                 }
             });
 
-            $('.select2-shipment-status-code').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
-
-            $('.select2-shipment-payment-method').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
+            $('.select2-shipment-status-code').select2();
+            $('.select2-shipment-payment-method').select2();
 
             // 驗證表單
             $("#search-form").validate({

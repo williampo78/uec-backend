@@ -187,23 +187,9 @@
 @section('js')
     <script>
         $(function() {
-            $('.js-select2-applicable-page').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
-
-            $('.js-select2-device').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
-
-            $('.js-select2-active').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '',
-            });
+            $('.js-select2-applicable-page').select2();
+            $('.js-select2-device').select2();
+            $('.js-select2-active').select2();
 
             let slot_type_option_json = @json(config('uec.ad_slot_type_option'));
 
