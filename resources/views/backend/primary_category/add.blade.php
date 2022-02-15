@@ -21,8 +21,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form role="form" id="new-form" method="post" action="{{ route('primary_category.store') }}"
-                            enctype="multipart/form-data">
+                        <form role="form" id="new-form" method="post" action="{{ route('primary_category.store') }}">
                             @csrf
                             <div class="row">
 
@@ -30,7 +29,7 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_number">
+                                            <div class="form-group">
                                                 <label for="number">編號 <span style="color:red;">*</span></label>
                                                 <input class="form-control" type="text" name="number" id="number">
                                             </div>

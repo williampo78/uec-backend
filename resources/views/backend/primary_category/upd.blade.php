@@ -28,7 +28,7 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_number">
+                                            <div class="form-group">
                                                 <label for="number">編號 <span style="color:red;">*</span></label>
                                                 <input class="form-control" type="text" name="number" id="number"
                                                     value="{{ $data['number'] }}">

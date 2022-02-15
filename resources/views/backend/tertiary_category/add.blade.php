@@ -23,8 +23,7 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form role="form" id="new-form" method="post" action="{{ route('tertiary_category.store') }}"
-                            enctype="multipart/form-data">
+                        <form role="form" id="new-form" method="post" action="{{ route('tertiary_category.store') }}">
                             @csrf
                             <div class="row">
 
@@ -32,7 +31,7 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-12">
-                                            <div class="form-group" id="div_category">
+                                            <div class="form-group">
                                                 <label for="category">上層分類 <span style="color:red;">*</span></label>
                                                 <select class="form-control js-select2" name="category_id">
                                                     <option value=""></option>
@@ -47,15 +46,15 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_category_number">
+                                            <div class="form-group">
                                                 <label for="category_number">編號 <span style="color:red;">*</span></label>
-                                                <input class="form-control" name="number" id="number">
+                                                <input class="form-control" type="text" name="number" id="number">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_category_name">
+                                            <div class="form-group">
                                                 <label for="category_name">分類名稱 <span style="color:red;">*</span></label>
-                                                <input class="form-control" name="name" id="name">
+                                                <input class="form-control" type="text" name="name" id="name">
                                             </div>
                                         </div>
                                     </div>
