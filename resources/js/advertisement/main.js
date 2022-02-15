@@ -322,7 +322,7 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
     let image_abstract = datas.image_abstract ? datas.image_abstract : "";
     let target_url = datas.target_url ? datas.target_url : "";
 
-    image_block_row_no = sanitize(image_block_row_no);
+    image_block_row_no = sanitize(String(image_block_row_no));
 
     $("#image-block table > tbody").append(`
         <tr>
@@ -429,7 +429,7 @@ addTextBlock = function (product_category_select_options, datas = {}) {
     let texts = datas.texts ? datas.texts : "";
     let target_url = datas.target_url ? datas.target_url : "";
 
-    text_block_row_no = sanitize(text_block_row_no);
+    text_block_row_no = sanitize(String(text_block_row_no));
 
     $("#text-block table > tbody").append(`
         <tr>
@@ -520,7 +520,7 @@ addProductBlockProduct = function (product_select_options, datas = {}) {
     let product_block_product_id = datas.id ? datas.id : "new";
     let sort = datas.sort != null ? datas.sort : "";
 
-    product_block_product_row_no = sanitize(product_block_product_row_no);
+    product_block_product_row_no = sanitize(String(product_block_product_row_no));
 
     $("#tab-product table > tbody").append(`
         <tr>
@@ -564,7 +564,7 @@ addProductBlockCategory = function (product_category_select_options, datas = {})
     let product_block_category_id = datas.id ? datas.id : "new";
     let sort = datas.sort != null ? datas.sort : "";
 
-    product_block_category_row_no = sanitize(product_block_category_row_no);
+    product_block_category_row_no = sanitize(String(product_block_category_row_no));
 
     $("#tab-category table > tbody").append(`
         <tr>

@@ -1,6 +1,12 @@
 @extends('backend.master')
 @section('title', '編輯子分類管理')
 @section('content')
+    @if ($errors->any())
+        <div id="error-message" style="display: none;">
+            {{ $errors->first('message') }}
+        </div>
+    @endif
+
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
@@ -8,7 +14,8 @@
             </div>
         </div>
         <!-- /.row -->
-        <form method="POST" id="edit-form" action="{{ route('tertiary_category.update', ['id' => $tertiaryCategory->id]) }}">
+        <form method="POST" id="edit-form"
+            action="{{ route('tertiary_category.update', ['id' => $tertiaryCategory->id]) }}">
             @method('put')
             @csrf
             <div class="row">
@@ -23,8 +30,11 @@
                                         <label for="category">上層分類 <span style="color:red;">*</span></label>
                                         <select class="form-control js-select2" name="category_id" id="category_id">
                                             <option value=""></option>
-                                            @foreach($parentCategories as $parentCategory)
-                                                <option value='{{ $parentCategory->c_id }}' {{ $tertiaryCategory->category_id == $parentCategory->c_id ? 'selected' : null }}>{{ $parentCategory->pc_name }} > {{ $parentCategory->c_name }}</option>
+                                            @foreach ($parentCategories as $parentCategory)
+                                                <option value='{{ $parentCategory->c_id }}'
+                                                    {{ $tertiaryCategory->category_id == $parentCategory->c_id ? 'selected' : null }}>
+                                                    {{ $parentCategory->pc_name }} > {{ $parentCategory->c_name }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -37,13 +47,15 @@
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_number">
                                                 <label for="number">編號 <span style="color:red;">*</span></label>
-                                                <input class="form-control" name="number" id="number" value="{{ $tertiaryCategory->number }}">
+                                                <input class="form-control" name="number" id="number"
+                                                    value="{{ $tertiaryCategory->number }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="name">名稱 <span style="color:red;">*</span></label>
-                                                <input class="form-control" name="name" id="name" value="{{ $tertiaryCategory->name }}">
+                                                <input class="form-control" name="name" id="name"
+                                                    value="{{ $tertiaryCategory->name }}">
                                             </div>
                                         </div>
                                     </div>
@@ -54,8 +66,14 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <button id="btn-save" class="btn btn-success" type="submit"><i class="fa fa-check"></i> 儲存 </button>
-                                        <a class="btn btn-danger" href=""><i class="fa fa-ban"></i> 取消</a>
+                                        @if ($share_role_auth['auth_update'])
+                                            <button id="btn-save" class="btn btn-success" type="submit">
+                                                <i class="fa fa-check"></i> 儲存
+                                            </button>
+                                        @endif
+
+                                        <a class="btn btn-danger" href="{{ route('tertiary_category') }}"><i
+                                                class="fa fa-ban"></i> 取消</a>
                                     </div>
                                 </div>
                             </div>
@@ -68,12 +86,12 @@
 @endsection
 @section('js')
     <script>
-        $(function () {
-            $('.js-select2').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '請選擇',
-            });
+        $(function() {
+            if ($('#error-message').length) {
+                alert($('#error-message').text().trim());
+            }
+
+            $('.js-select2').select2();
 
             // 驗證表單
             $("#edit-form").validate({

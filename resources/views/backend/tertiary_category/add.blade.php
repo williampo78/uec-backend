@@ -1,6 +1,12 @@
 @extends('backend.master')
 @section('title', '新增小分類管理')
 @section('content')
+    @if ($errors->any())
+        <div id="error-message" style="display: none;">
+            {{ $errors->first('message') }}
+        </div>
+    @endif
+
     <!--新增-->
     <div id="page-wrapper">
 
@@ -17,7 +23,8 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form role="form" id="new-form" method="post" action="{{route('tertiary_category.store')}}" enctype="multipart/form-data">
+                        <form role="form" id="new-form" method="post" action="{{ route('tertiary_category.store') }}"
+                            enctype="multipart/form-data">
                             @csrf
                             <div class="row">
 
@@ -29,8 +36,10 @@
                                                 <label for="category">上層分類 <span style="color:red;">*</span></label>
                                                 <select class="form-control js-select2" name="category_id">
                                                     <option value=""></option>
-                                                    @foreach($parentCategories as $parentCategory)
-                                                        <option value='{{ $parentCategory->c_id }}'>{{ $parentCategory->pc_name }} > {{ $parentCategory->c_name }}</option>
+                                                    @foreach ($parentCategories as $parentCategory)
+                                                        <option value='{{ $parentCategory->c_id }}'>
+                                                            {{ $parentCategory->pc_name }} >
+                                                            {{ $parentCategory->c_name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -54,8 +63,14 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button class="btn btn-success" type="submit" id="btn-save"><i class="fa fa-save"></i> 儲存</button>
-                                                <a class="btn btn-danger" href="{{ route('tertiary_category') }}"><i class="fa fa-ban"></i> 取消</a>
+                                                @if ($share_role_auth['auth_create'])
+                                                    <button class="btn btn-success" type="submit" id="btn-save">
+                                                        <i class="fa fa-save"></i> 儲存
+                                                    </button>
+                                                @endif
+
+                                                <a class="btn btn-danger" href="{{ route('tertiary_category') }}"><i
+                                                        class="fa fa-ban"></i> 取消</a>
                                             </div>
                                         </div>
                                     </div>
@@ -70,12 +85,12 @@
 @endsection
 @section('js')
     <script>
-        $(function () {
-            $('.js-select2').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '請選擇',
-            });
+        $(function() {
+            if ($('#error-message').length) {
+                alert($('#error-message').text().trim());
+            }
+
+            $('.js-select2').select2();
 
             // 驗證表單
             $("#new-form").validate({
