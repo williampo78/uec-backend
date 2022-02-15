@@ -82,7 +82,7 @@ class ProductsMallController extends Controller
     public function show($id)
     {
         $result = [];
-        $result['products'] = $this->productsService->showProducts($id);
+        $result['products'] =  $this->arrangeProduct($this->productsService->showProducts($id));
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
@@ -224,21 +224,21 @@ class ProductsMallController extends Controller
                 $products->edit_readonly = Carbon::now()->between($products->start_launched_at, $products->end_launched_at) ? '1' : '0';
                 break;
         }
+
         if($products->meta_title == null){
             $products->meta_title = $products->product_name ; 
         }
-        if($products->meta_description == null){
-            $products->meta_description = $products->product_brief_1 . $products->product_brief_2 . $products->product_brief_3; 
+        if($products->mata_description == null){
+            $products->mata_description = $products->product_brief_1 . $products->product_brief_2 . $products->product_brief_3; 
         }
-        if($products->meta_keywords == null){
-            $cp = $this->webCategoryHierarchyService->categoryProductsId($products->id) ; 
+        if($products->mata_keywords == null){
+            $cp = $this->webCategoryHierarchyService->categoryProductsId($products->id) ;
             if($cp->count() > 0){
                 $cpName = $this->webCategoryHierarchyService->category_hierarchy_content(['id' => $cp[0]->web_category_hierarchy_id]);
                 if(count($cpName) > 0){
-                    $products->meta_keywords = $cpName[0]->name ; 
+                    $products->mata_keywords = $cpName[0]->name ; 
                 }
             }
-            $products->meta_keywords = $this->webCategoryHierarchyService->categoryProductsId($products->id); 
         }
         return $products ;
     }
