@@ -48,7 +48,10 @@ class ProductsService
                     ->on('web_category_products.product_id', '=', 'products.id');
             });
         }
-
+//庫存類型
+        if (isset($input_data['id'])) {
+            $products->where('products.id', '=', $input_data['id']);
+        }
         //庫存類型
         if (isset($input_data['stock_type'])) {
             $products->where('products.stock_type', '=', $input_data['stock_type']);
@@ -226,7 +229,7 @@ class ProductsService
             Products::where('id', $products_id)->update(['product_no' => $product_no]);
             $add_item_no = 1;
             foreach ($skuList as $key => $val) {
-                $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'],'0');
+                $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'], '0');
                 $skuInsert = [
                     'agent_id' => $agent_id,
                     'product_id' => $products_id,
@@ -378,7 +381,7 @@ class ProductsService
             }
             $add_item_no = ProductItems::where('product_id', $products_id)->count();
             foreach ($skuList as $key => $val) {
-                $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'],'0');
+                $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'], '0');
                 if ($val['id'] == '') {
                     $add_item_no += 1;
                     $skuInsert = [
@@ -391,7 +394,7 @@ class ProductsService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' =>  $skuList[$key]['safty_qty'],
+                        'safty_qty' => $skuList[$key]['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'edi_exported_status' => null,
@@ -412,7 +415,7 @@ class ProductsService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' =>  $skuList[$key]['safty_qty'],
+                        'safty_qty' => $skuList[$key]['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'updated_by' => $user_id,
@@ -443,15 +446,18 @@ class ProductsService
     {
         $agent_id = Auth::user()->agent_id;
         $products = Products::select(
-            'products.*', 
+            'products.*',
             'updated_by_name.user_name AS updated_name',
             'created_by_name.user_name AS created_name',
             'created_by_name.id as created_by_name_id',
             'updated_by_name.id as updated_by_name_id',
-            'supplier.name AS supplier_name'
-            )
+            'supplier.name AS supplier_name',
+            'products_v.gross_margin',
+            'products_v.item_cost'
+        )
             ->leftJoin('users as created_by_name', 'products.created_by', '=', 'created_by_name.id')
             ->leftJoin('users as updated_by_name', 'products.updated_by', '=', 'updated_by_name.id')
+            ->leftJoin('products_v', 'products_v.id', '=', 'products.id')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id)->where('products.id', $id);
         $result = $products->first();
@@ -1061,9 +1067,9 @@ class ProductsService
     public function restructureItemsProducts($products, $pos)
     {
         $wch = new \App\Services\WebCategoryHierarchyService; //取得分類
-        $CategoryHierarchy = collect($wch->category_hierarchy_content())->keyBy('id')->toArray() ; // 所有分類
+        $CategoryHierarchy = collect($wch->category_hierarchy_content())->keyBy('id')->toArray(); // 所有分類
         // dd($CategoryHierarchy) ;
-        $products->transform(function ($obj, $key) use ($pos ,$CategoryHierarchy) {
+        $products->transform(function ($obj, $key) use ($pos, $CategoryHierarchy) {
 
             // 上架日期
             $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
@@ -1250,15 +1256,15 @@ class ProductsService
                 $obj->status_cn = '否';
 
             }
-            $web_category_products_ids = explode(',',$obj->web_category_products_id) ;
-            $web_category_products_ids = array_unique($web_category_products_ids) ;
-            $web_category_products_ids_ary = [] ; 
-            foreach($web_category_products_ids as $val){
-                if(isset($CategoryHierarchy[$val]->name)){
-                    array_push($web_category_products_ids_ary,$CategoryHierarchy[$val]->name) ; 
+            $web_category_products_ids = explode(',', $obj->web_category_products_id);
+            $web_category_products_ids = array_unique($web_category_products_ids);
+            $web_category_products_ids_ary = [];
+            foreach ($web_category_products_ids as $val) {
+                if (isset($CategoryHierarchy[$val]->name)) {
+                    array_push($web_category_products_ids_ary, $CategoryHierarchy[$val]->name);
                 }
             }
-            $obj->web_category_products_category_name = implode(',',$web_category_products_ids_ary) ; 
+            $obj->web_category_products_category_name = implode(',', $web_category_products_ids_ary);
             return $obj;
         });
     }
