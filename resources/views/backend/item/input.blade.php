@@ -119,7 +119,7 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_category">
+                                            <div class="form-group">
                                                 <label for="category">分類</label>
                                                 <select class="form-control js-select2" name="category_id" id="category">
                                                     @foreach ($category as $val)

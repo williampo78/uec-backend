@@ -26,7 +26,7 @@
 
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <div class="form-group" id="div_category">
+                                    <div class="form-group">
                                         <label for="category">上層分類 <span style="color:red;">*</span></label>
                                         <select class="form-control js-select2" name="category_id" id="category_id">
                                             <option value=""></option>
@@ -45,16 +45,16 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <div class="form-group" id="div_number">
+                                            <div class="form-group">
                                                 <label for="number">編號 <span style="color:red;">*</span></label>
-                                                <input class="form-control" name="number" id="number"
+                                                <input class="form-control" type="text" name="number" id="number"
                                                     value="{{ $tertiaryCategory->number }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="name">名稱 <span style="color:red;">*</span></label>
-                                                <input class="form-control" name="name" id="name"
+                                                <input class="form-control" type="text" name="name" id="name"
                                                     value="{{ $tertiaryCategory->name }}">
                                             </div>
                                         </div>
