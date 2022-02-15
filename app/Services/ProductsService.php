@@ -909,6 +909,7 @@ class ProductsService
             DB::raw('products_v.item_cost as item_cost'),
             DB::raw('products_v.gross_margin as gross_margin'),
             DB::raw('(group_concat(web_category_products.category_name) ) as web_category_products_category_name'),
+            DB::raw('(group_concat(web_category_products.id) ) as web_category_products_id'),
             DB::raw('(group_concat(related_products.product_name) ) as related_product_name'),
         )
             ->leftJoin('products', 'products.id', 'product_items.product_id')
@@ -917,6 +918,7 @@ class ProductsService
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
             ->leftJoin(
                 DB::raw("(SELECT
+            web_category_hierarchy.id,
             web_category_products.product_id,
             web_category_hierarchy.category_name
             FROM web_category_products
@@ -1058,7 +1060,11 @@ class ProductsService
      */
     public function restructureItemsProducts($products, $pos)
     {
-        $products->transform(function ($obj, $key) use ($pos) {
+        $wch = new \App\Services\WebCategoryHierarchyService; //取得分類
+        $CategoryHierarchy = collect($wch->category_hierarchy_content())->keyBy('id')->toArray() ; // 所有分類
+        // dd($CategoryHierarchy) ;
+        $products->transform(function ($obj, $key) use ($pos ,$CategoryHierarchy) {
+
             // 上架日期
             $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
 
@@ -1244,9 +1250,14 @@ class ProductsService
                 $obj->status_cn = '否';
 
             }
-
-            // $obj->gross_margin = 10;
-
+            $web_category_products_ids = explode(',',$obj->web_category_products_id) ;
+            $web_category_products_ids_ary = [] ; 
+            foreach($web_category_products_ids as $val){
+                if(isset($CategoryHierarchy[$val]->name)){
+                    array_push($web_category_products_ids_ary,$CategoryHierarchy[$val]->name) ; 
+                }
+            }
+            $obj->web_category_products_category_name = implode(',',$web_category_products_ids_ary) ; 
             return $obj;
         });
     }
