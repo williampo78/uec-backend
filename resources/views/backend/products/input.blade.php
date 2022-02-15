@@ -837,9 +837,6 @@
                         }
                     }
                 },
-                saftyqtytoInt(key) {
-                    this.SkuList[key].safty_qty = parseInt(this.SkuList[key].safty_qty)
-                }
 
             },
             computed: {

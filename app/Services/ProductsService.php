@@ -236,7 +236,7 @@ class ProductsService
                     'supplier_item_no' => $val['supplier_item_no'],
                     'ean' => $val['ean'],
                     'pos_item_no' => $val['pos_item_no'],
-                    'safty_qty' => $val['safty_qty'],
+                    'safty_qty' => (int)$val['safty_qty'],
                     'is_additional_purchase' => $val['is_additional_purchase'],
                     'status' => $val['status'],
                     'created_by' => $user_id,
@@ -276,7 +276,6 @@ class ProductsService
                     ProductPhotos::create($insertImg);
                 }
             }
-
             DB::commit();
             $result['status'] = true;
         } catch (\Exception $e) {
@@ -390,7 +389,7 @@ class ProductsService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' => $val['safty_qty'],
+                        'safty_qty' => (int)$val['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'edi_exported_status' => null,
@@ -411,7 +410,7 @@ class ProductsService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' => $val['safty_qty'],
+                        'safty_qty' => (int)$val['safty_qty'],
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'updated_by' => $user_id,
