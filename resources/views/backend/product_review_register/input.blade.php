@@ -24,6 +24,7 @@
                                     </div>
                                     <input type="hidden" id="products_id" value="{{ $products->id }}">
                                     <input type="hidden" id="product_type" value="{{ $products->product_type }}">
+                                    <input type="hidden" id="description" value="{{ $products->description }}">
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
                                             <input type="radio" name="stock_type" value="A"
@@ -292,6 +293,10 @@
                 // debug: true,
                 submitHandler: function(form) {
                     $('#save_data').prop('disabled', true);
+                    if($('#description').val() == ''){
+                        alert('該商品未完成「商城資料」維護，不允許執行上架送審') ;
+                        return false ; 
+                    };
                     axios.post('/backend/product_review_register/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'checkProductReady',
@@ -311,7 +316,6 @@
                         }).finally(function(error) {
                             $('#save_data').prop('disabled', false);
                         });
-                    // form.submit();
                 },
                 rules: {
                     start_launched_at: {
