@@ -142,7 +142,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-5">
+                                    <div class="col-sm-6">
                                         <div class="col-sm-3">
                                             <h5>筆數限制</h5>
                                         </div>
@@ -150,10 +150,11 @@
                                             <input class="form-control" name="limit" id="limit" type="number"
                                                 value="100" max="100" min="0" readonly>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <button type="button" class="btn btn-success text-right"
-                                            style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
+                                        <div class="col-sm-5 text-right">
+                                            <button type="button" class="btn btn-warning" @click="productsGetAjax">
+                                                <i class="fa fa-search"></i> 查詢
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -210,8 +211,8 @@
                                         </td>
                                         <td>@{{ product.product_no }}</td>
                                         <td>@{{ product.product_name }}</td>
-                                        <td>@{{ product.product_name }}</td>
-                                        <td>@{{ product.start_launched_at }}</td>
+                                        <td>@{{ product.selling_price }}</td>
+                                        <td>@{{ product.start_launched_at }} ~ @{{ product.end_launched_at }}</td>
                                         <td>@{{ product.launched_status }}</td>
                                         <td>@{{ product.gross_margin }}</td>
                                         <td>@{{ product.supplier_name }}</td>
