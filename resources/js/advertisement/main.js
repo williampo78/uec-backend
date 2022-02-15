@@ -313,7 +313,7 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
         ? datas.id
         : $("#image-block-row-no").val();
     let image_block_id = datas.id ? datas.id : "new";
-    let sort = datas.sort !== null ? datas.sort : "";
+    let sort = datas.sort != null ? datas.sort : "";
     let image_name_url = datas.image_name_url
         ? `<img src="${datas.image_name_url}" class="img-responsive" width="400" height="400" />`
         : "";
@@ -321,6 +321,8 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
     let image_title = datas.image_title ? datas.image_title : "";
     let image_abstract = datas.image_abstract ? datas.image_abstract : "";
     let target_url = datas.target_url ? datas.target_url : "";
+
+    image_block_row_no = sanitize(image_block_row_no);
 
     $("#image-block table > tbody").append(`
         <tr>
@@ -423,9 +425,11 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
 addTextBlock = function (product_category_select_options, datas = {}) {
     let text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
     let text_block_id = datas.id ? datas.id : "new";
-    let sort = datas.sort !== null ? datas.sort : "";
+    let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";
     let target_url = datas.target_url ? datas.target_url : "";
+
+    text_block_row_no = sanitize(text_block_row_no);
 
     $("#text-block table > tbody").append(`
         <tr>
@@ -514,7 +518,9 @@ addProductBlockProduct = function (product_select_options, datas = {}) {
         ? datas.id
         : $("#product-block-product-row-no").val();
     let product_block_product_id = datas.id ? datas.id : "new";
-    let sort = datas.sort !== null ? datas.sort : "";
+    let sort = datas.sort != null ? datas.sort : "";
+
+    product_block_product_row_no = sanitize(product_block_product_row_no);
 
     $("#tab-product table > tbody").append(`
         <tr>
@@ -556,7 +562,9 @@ addProductBlockCategory = function (product_category_select_options, datas = {})
         ? datas.id
         : $("#product-block-category-row-no").val();
     let product_block_category_id = datas.id ? datas.id : "new";
-    let sort = datas.sort !== null ? datas.sort : "";
+    let sort = datas.sort != null ? datas.sort : "";
+
+    product_block_category_row_no = sanitize(product_block_category_row_no);
 
     $("#tab-category table > tbody").append(`
         <tr>
@@ -656,3 +664,6 @@ disableSlotTitle = function () {
 
     removeSlotTitleValidation();
 }
+
+// 輸入值消毒
+const sanitize = (val) => val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
