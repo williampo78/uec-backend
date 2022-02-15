@@ -278,7 +278,7 @@ class AuthController extends Controller
         try {
             if ($result['status'] == '201') {
                 $login['mobile'] = $data['mobile'];
-                $login['pwd'] = $data['pwd'];
+                $login['password'] = $data['pwd'];
                 $login['channel'] = "EC";
                 $fields = json_encode($login);
                 $response = $this->apiService->memberLogin($fields);
