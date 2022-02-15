@@ -28,7 +28,7 @@ class APIIndexServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->apiProductService->getProducts();
-        $categoryProducts = $this->apiProductService->getWebCategoryProducts();
+        $categoryProducts = $this->apiProductService->getWebCategoryProducts('', '', '', '', '', '', '');
         $strSQL = "select ad1.`slot_code`, ad1.`slot_desc`, ad1.`slot_type`, ad1.`is_mobile_applicable`, ad1.`is_desktop_applicable`
                 , ad2.`slot_color_code`, ad2.`slot_icon_name`, ad2.`slot_title`, ad2.`product_assigned_type`
                 , ad3.*

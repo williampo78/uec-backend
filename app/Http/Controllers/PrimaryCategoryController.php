@@ -6,6 +6,7 @@ use App\Models\PrimaryCategory;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PrimaryCategoryController extends Controller
 {
@@ -16,7 +17,6 @@ class PrimaryCategoryController extends Controller
      */
     public function __construct()
     {
-
 
     }
     public function index()
@@ -51,9 +51,15 @@ class PrimaryCategoryController extends Controller
         $data['created_by'] = Auth::user()->id;
         $data['created_at'] = Carbon::now();
 
-        $rs = PrimaryCategory::insert($data);
+        try {
+            $rs = PrimaryCategory::insert($data);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
 
-        return view('backend.success' , compact('route_name','act'));
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -89,13 +95,20 @@ class PrimaryCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token' , '_method');
+        $data = $request->except('_token', '_method');
         $data['updated_by'] = Auth::user()->id;
 
-        PrimaryCategory::where('id' ,$id)->update($data);
+        try {
+            PrimaryCategory::findOrFail($id)->update($data);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
         $route_name = 'primary_category';
         $act = 'upd';
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
