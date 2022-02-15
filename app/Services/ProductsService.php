@@ -1062,6 +1062,9 @@ class ProductsService
             // 上架日期
             $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
 
+            // 毛利
+            $obj->gross_margin = (isset($obj->item_cost, $obj->selling_price) && $obj->selling_price != 0) ? round(((1 - ($obj->item_cost / $obj->selling_price)) * 100), 2) : null;
+
             // 售價
             $obj->selling_price = number_format($obj->selling_price);
 
@@ -1242,7 +1245,7 @@ class ProductsService
 
             }
 
-            $obj->gross_margin = 10;
+            // $obj->gross_margin = 10;
 
             return $obj;
         });
