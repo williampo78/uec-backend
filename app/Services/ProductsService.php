@@ -37,7 +37,7 @@ class ProductsService
             'products.*',
             'supplier.name AS supplier_name',
             DB::raw('get_latest_product_cost(products.id, TRUE) AS item_cost'),
-        )
+            )
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
 
@@ -108,7 +108,7 @@ class ProductsService
                 case 'APPROVED_STATUS_ON':
                     $products = $products->where(function ($query) use ($now) {
                         $query->where('products.approval_status', '=', 'APPROVED')
-                        // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
+                            // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
                             ->where('products.start_launched_at', '<=', $now)
                             ->where('products.end_launched_at', '>=', $now);
                     });
@@ -290,6 +290,7 @@ class ProductsService
         }
         return $result;
     }
+
     public function editProducts($in, $file)
     {
         $products_id = $in['id'];
@@ -442,6 +443,7 @@ class ProductsService
         }
         return $result;
     }
+
     public function showProducts($id)
     {
         $agent_id = Auth::user()->agent_id;
@@ -471,15 +473,15 @@ class ProductsService
         $result = $ProductItems->get();
         return $result;
     }
+
     public function getItemsAndProduct($in = [])
     {
         $agent_id = Auth::user()->agent_id;
         $ProductItems = ProductItems::
-            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
+        select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
             ->where('product_items.agent_id', $agent_id)
             ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
-            ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
-        ;
+            ->leftJoin('brands', 'brands.id', '=', 'products.brand_id');
         if (isset($in['supplier_id']) && $in['supplier_id'] !== '') {
             $ProductItems->where('products.supplier_id', $in['supplier_id']);
         }
@@ -487,15 +489,18 @@ class ProductsService
         $result = $ProductItems->get();
         return $result;
     }
+
     public function getProductsPhoto($products_id)
     {
         $ProductPhotos = ProductPhotos::where('product_id', $products_id)->orderBy('sort', 'ASC');
         $results = $ProductPhotos->get();
         $results = $results->map(function ($result) {
-            $result->photo_size = ImageUpload::getSize($result->photo_name);return $result;
+            $result->photo_size = ImageUpload::getSize($result->photo_name);
+            return $result;
         });
         return $results;
     }
+
     public function getProductSpac($products_id)
     {
         $agent_id = Auth::user()->agent_id;
@@ -571,6 +576,7 @@ class ProductsService
         $result = Product_spec_info::where('product_id', $product_id)->first();
         return $result;
     }
+
     public function getRelatedProducts($product_id)
     {
         $result = RelatedProducts::select('related_products.*', 'products.product_name')
@@ -581,6 +587,7 @@ class ProductsService
         // dd($result) ;
         return $result;
     }
+
     public function updateProductSmall($in, $file = array(), $id)
     {
         $result = [];
@@ -622,15 +629,16 @@ class ProductsService
                 'updated_by' => $user_id,
             ];
             ProductAuditLog::create($logCreateIn);
-            $ProductItemsInstance = new ProductItems();
-            foreach ($ProductsItem as $key => $val) {
-                $ProductsItemUpdate[$key] = [
-                    'id' => $val['id'],
-                    'photo_name' => $val['photo_name'],
-                ];
+            if (count($ProductsItem) > 0) {
+                $ProductItemsInstance = new ProductItems();
+                foreach ($ProductsItem as $key => $val) {
+                    $ProductsItemUpdate[$key] = [
+                        'id' => $val['id'],
+                        'photo_name' => $val['photo_name'],
+                    ];
+                }
+                $upd = Batch::update($ProductItemsInstance, $ProductsItemUpdate, 'id');
             }
-            $upd = Batch::update($ProductItemsInstance, $ProductsItemUpdate, 'id');
-
             foreach ($CategoryHierarchyProducts as $key => $val) {
                 if ($val['status'] == 'new') {
                     CategoryProducts::create([
@@ -712,6 +720,7 @@ class ProductsService
         }
         return $result;
     }
+
     public function getProductAuditLog($product_id)
     {
         $ProductAuditLog = ProductAuditLog::select('product_audit_log.*', 'users.user_name AS user_name')
@@ -721,6 +730,7 @@ class ProductsService
             ->get();
         return $ProductAuditLog;
     }
+
     public function getProductReviewLog($id)
     {
         $getProductReviewLog = ProductReviewLog::select('product_review_log.*', 'discontinued_user.user_name AS discontinued_user_name')
@@ -730,6 +740,7 @@ class ProductsService
             ->get();
         return $getProductReviewLog;
     }
+
     //申請審核
     public function addProductReviewLog($in, $product_id)
     {
@@ -765,6 +776,7 @@ class ProductsService
         }
         return $result;
     }
+
     //審核
     public function addProductReview($in, $id)
     {
@@ -799,6 +811,7 @@ class ProductsService
         }
         return $result;
     }
+
     /**
      * 商品上下架商品
      *
@@ -831,6 +844,7 @@ class ProductsService
         }
         return $result;
     }
+
     /**
      *
      * 點擊「送審」時，若商品為「一般品 (products.product_type='N')」，
@@ -848,6 +862,7 @@ class ProductsService
             return true;
         }
     }
+
     /**
      * 確認 PosItemNo 是否有重複
      *
@@ -869,6 +884,7 @@ class ProductsService
         }
 
     }
+
     /**
      * 由products id 刪除 google_shop_photo_name
      */
@@ -883,6 +899,7 @@ class ProductsService
         ]);
         return true;
     }
+
     /**
      * 由products id 刪除 google_shop_photo_name
      */
@@ -899,6 +916,7 @@ class ProductsService
 
         return true;
     }
+
     /**
      * 取得商品 items
      *
@@ -917,7 +935,7 @@ class ProductsService
             DB::raw('(group_concat(web_category_products.category_name) ) as web_category_products_category_name'),
             DB::raw('(group_concat(web_category_products.id) ) as web_category_products_id'),
             DB::raw('(group_concat(related_products.product_name) ) as related_product_name'),
-        )
+            )
             ->leftJoin('products', 'products.id', 'product_items.product_id')
             ->leftJoin('products_v', 'products_v.id', 'product_items.product_id')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
@@ -1059,6 +1077,7 @@ class ProductsService
         return $query;
 
     }
+
     /**
      * 商品items整理
      *

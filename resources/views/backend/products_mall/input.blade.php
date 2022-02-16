@@ -396,7 +396,9 @@
                                                  style="max-width:40%;">
                                         </div>
                                         <button v-if="products.google_shop_photo_name" type="button"
-                                                class="btn btn-large btn-danger btn-sm" @click="DelGoogleShop()" {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
+                                                class="btn btn-large btn-danger btn-sm"
+                                                @click="DelGoogleShop()" {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
+                                            刪除
                                         </button>
                                     </div>
                                 </div>
@@ -577,6 +579,16 @@
                 },
                 mediaEmbed: {
                     previewsInData: true
+                },
+                htmlSupport: {
+                    allow: [
+                        {
+                            name: /.*/,
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        }
+                    ]
                 }
             })
                 .then(editor => {
@@ -596,6 +608,16 @@
                 },
                 mediaEmbed: {
                     previewsInData: true
+                },
+                htmlSupport: {
+                    allow: [
+                        {
+                            name: /.*/,
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        }
+                    ]
                 }
             }).then(editor => {
                 ck_specification = editor; // Save for later use.
@@ -827,7 +849,7 @@
                             product_name: this.select_req.product_name,
                             selling_price_min: this.select_req.selling_price_min,
                             selling_price_max: this.select_req.selling_price_max,
-                            product_type:product_type,
+                            product_type: product_type,
                             start_created_at: start_created_at,
                             end_created_at: end_created_at,
                             start_launched_at_start: start_launched_at_start,

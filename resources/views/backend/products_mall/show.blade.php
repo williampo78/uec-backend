@@ -463,22 +463,35 @@
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
-                    ckfinder: {
-                        uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
-                            document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content'),
-                        }
+                ckfinder: {
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                        document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
+                    }
 
-                    },
-                })
+                },
+                mediaEmbed: {
+                    previewsInData: true
+                },
+                htmlSupport: {
+                    allow: [
+                        {
+                            name: /.*/,
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        }
+                    ]
+                }
+            })
                 .then(editor => {
                     editor.isReadOnly = true;
                     ck_description = editor; // Save for later use.
                 }).catch(error => {
-                    console.error(error);
-                });
+                console.error(error);
+            });
 
             ClassicEditor.create(document.querySelector('#specification'), {
                 ckfinder: {
@@ -489,6 +502,19 @@
                             'content'),
                     }
                 },
+                mediaEmbed: {
+                    previewsInData: true
+                },
+                htmlSupport: {
+                    allow: [
+                        {
+                            name: /.*/,
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        }
+                    ]
+                }
             }).then(editor => {
                 editor.isReadOnly = true;
                 ck_specification = editor; // Save for later use.

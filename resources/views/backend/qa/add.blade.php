@@ -46,7 +46,7 @@
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="active" id="active1" checked
-                                                                value="1">啟用
+                                                                   value="1">啟用
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-3">
@@ -61,7 +61,8 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label for="content_name">問題描述 <span style="color: red;">*</span></label>
+                                                <label for="content_name">問題描述 <span
+                                                        style="color: red;">*</span></label>
                                                 <input class="form-control" name="content_name" id="content_name">
                                             </div>
                                         </div>
@@ -71,7 +72,7 @@
                                             <div class="form-group">
                                                 <label for="editor">問題解答 <span style="color: red;">*</span></label>
                                                 <textarea class="form-control" rows="5" id="editor"
-                                                    name="content_text"></textarea>
+                                                          name="content_text"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -110,37 +111,40 @@
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 }
             },
+            mediaEmbed: {
+                previewsInData: true
+            },
+            htmlSupport: {
+                allow: [
+                    {
+                        name: /.*/,
+                        attributes: true,
+                        classes: true,
+                        styles: true
+                    }
+                ]
+            }
         })
 
-        $(function() {
+        $(function () {
             $('.js-select2').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: '請選擇',
             });
 
-            $("#btn-save").on('click', function() {
+            $("#btn-save").on('click', function () {
                 $("#new-form").submit();
             });
 
-            $("#btn-cancel").on('click', function() {
+            $("#btn-cancel").on('click', function () {
                 window.location.href = '{{ route('qa') }}';
             });
-
-            //文字編輯器
-            /*
-            var editor = CKEDITOR.replace('content_text', {
-                filebrowserBrowseUrl: 'ckfinder/ckfinder.html',
-                filebrowserImageBrowseUrl: 'ckfinder/ckfinder.html?Type=Images',
-                //filebrowserUploadUrl : 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files', //可上傳一般檔案
-                filebrowserImageUploadUrl: 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images' //可上傳圖檔
-            });
-            */
 
             // 驗證表單
             $("#new-form").validate({
                 // debug: true,
-                submitHandler: function(form) {
+                submitHandler: function (form) {
                     $('#btn-save').prop('disabled', true);
                     form.submit();
                 },
@@ -171,7 +175,7 @@
                 },
                 errorClass: "help-block",
                 errorElement: "span",
-                errorPlacement: function(error, element) {
+                errorPlacement: function (error, element) {
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -184,13 +188,13 @@
 
                     error.insertAfter(element);
                 },
-                highlight: function(element, errorClass, validClass) {
+                highlight: function (element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function(element, errorClass, validClass) {
+                unhighlight: function (element, errorClass, validClass) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
-                success: function(label, element) {
+                success: function (label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });

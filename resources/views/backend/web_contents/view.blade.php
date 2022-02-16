@@ -114,38 +114,55 @@
                                 <button type="button" class="btn btn-warning" id="btn-cancel"><i
                                         class="fa fa-reply"></i> 返回列表
                                 </button>
-                                </div>
                             </div>
-
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 
 @section('js')
     <script>
         $(function () {
+            $('.js-select2').select2();
 
             $("#btn-cancel").on('click', function () {
                 window.location.href = '{{ route('webcontents') }}';
             });
-            ClassicEditor.create(document.querySelector('#editor'), {
 
+            ClassicEditor.create(document.querySelector('#editor'), {
                 ckfinder: {
-                    // Upload the images to the server using the CKFinder QuickUpload command.
                     uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
+                    },
+                    mediaEmbed: {
+                        previewsInData: true
+                    },
+                    htmlSupport: {
+                        allow: [
+                            {
+                                name: /.*/,
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            }
+                        ]
                     }
-
                 },
             })
-
-        })
+                .then(editor => {
+                    editor.isReadOnly = true;
+                    //ck_description = editor; // Save for later use.
+                }).catch(error => {
+                console.error(error);
+            });
+        });
     </script>
 @endsection
