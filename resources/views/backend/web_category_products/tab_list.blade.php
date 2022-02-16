@@ -5,7 +5,7 @@
 <div class="tab-content">
     <div id="content_type_p" class="tab-pane fade in active ">
         <div class="panel-body col-sm-12">
-            
+
             <div class="row">
                 <div class="col-sm-2">
                     <button type="button" class="btn btn-block btn-warning btn-sm" data-toggle="modal"
@@ -36,7 +36,7 @@
                         <td>@{{category_products_list.launched_status_desc}}</td>
                         <td>@{{category_products_list.gross_margin}}</td>
                         <td>
-                            <button class="btn btn-danger btn-sm" type="button" @click="del_category_products_list(category_products_list_key)">刪除</button>
+                            <button class="btn btn-danger btn-sm" type="button" @click="del_category_products_list(category_products_list_key)"><i class='fa fa-trash-o'></i> 刪除</button>
                         </td>
                     </tr>
                 </tbody>

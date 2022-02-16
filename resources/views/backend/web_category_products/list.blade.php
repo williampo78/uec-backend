@@ -84,7 +84,7 @@
                                             {{-- @endif --}}
                                             {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
                                             <a class="btn btn-info btn-sm"
-                                                href="{{ route('web_category_products.edit', $val->id) }}">修改</a>
+                                                href="{{ route('web_category_products.edit', $val->id) }}">編輯</a>
                                             {{-- @endif --}}
 
                                             {{-- @if ($share_role_auth['auth_delete'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}
