@@ -267,7 +267,7 @@ class AuthController extends Controller
         $data = [];
         $data['mobile'] = $request['mobile'];
         $data['name'] = $request['name'];
-        $data['password'] = $request['pwd'];
+        $data['pwd'] = $request['pwd'];
         $data['email'] = $request['email'];
         $data['birthday'] = $request['birthday'];
         $data['sex'] = $request['sex'];
