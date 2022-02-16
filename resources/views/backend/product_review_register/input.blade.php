@@ -117,8 +117,8 @@
                                         <label class="control-label">成本</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="supplier_name"
-                                            value="{{ $products->supplier_name }}" readonly>
+                                        <input class="form-control" name="item_cost"
+                                            value="{{ $products->item_cost }}" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -128,8 +128,8 @@
                                         <label class="control-label">毛利(%)</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="product_name"
-                                            value="{{ $products->product_name }}" readonly>
+                                        <input class="form-control" name="gross_margin"
+                                            value="{{ $products->gross_margin }}" readonly>
                                     </div>
                                 </div>
                             </div>
