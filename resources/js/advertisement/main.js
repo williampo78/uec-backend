@@ -1,5 +1,18 @@
+import * as validate from "./validate";
+import Uppy from "@uppy/core";
+import Dashboard from "@uppy/dashboard";
+import Taiwan from "@uppy/locales/lib/zh_TW";
+import Form from "@uppy/form";
+import FileInput from "@uppy/file-input";
+
+window.Uppy = Uppy;
+Uppy.Locale = Taiwan;
+Uppy.Dashboard = Dashboard;
+Uppy.Form = Form;
+Uppy.FileInput = FileInput;
+
 // 初始化資料
-init = function (datas = {}) {
+window.init = (datas = {}) => {
     let ad_slot_select_options = datas.ad_slot_select_options
         ? datas.ad_slot_select_options
         : "";
@@ -263,10 +276,10 @@ init = function (datas = {}) {
                 break;
         }
     });
-}
+};
 
 // 取得版位下拉選項
-getAdSlotSelectOptions = function (datas = []) {
+window.getAdSlotSelectOptions = (datas = []) => {
     let options = "";
 
     $.each(datas, function (key, value) {
@@ -276,10 +289,10 @@ getAdSlotSelectOptions = function (datas = []) {
     });
 
     return options;
-}
+};
 
 // 取得商品分類下拉選項
-getProductCategorySelectOptions = function (datas = []) {
+window.getProductCategorySelectOptions = (datas = []) => {
     let options = "";
 
     $.each(datas, function (key, value) {
@@ -289,10 +302,10 @@ getProductCategorySelectOptions = function (datas = []) {
     });
 
     return options;
-}
+};
 
 // 取得商品下拉選項
-getProductSelectOptions = function (datas = []) {
+window.getProductSelectOptions = (datas = []) => {
     let options = "";
 
     $.each(datas, function (key, value) {
@@ -302,9 +315,9 @@ getProductSelectOptions = function (datas = []) {
     });
 
     return options;
-}
+};
 
-addImageBlock = function (product_category_select_options = "", datas = {}) {
+window.addImageBlock = (product_category_select_options = "", datas = {}) => {
     let image_block_row_no = datas.id
         ? datas.id
         : $("#image-block-row-no").val();
@@ -411,10 +424,10 @@ addImageBlock = function (product_category_select_options = "", datas = {}) {
 
     $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
 
-    validateImageBlock(image_block_row_no);
-}
+    validate.validateImageBlock(image_block_row_no);
+};
 
-addTextBlock = function (product_category_select_options, datas = {}) {
+window.addTextBlock = (product_category_select_options, datas = {}) => {
     let text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
     let text_block_id = datas.id ? datas.id : "new";
     let sort = datas.sort != null ? datas.sort : "";
@@ -498,17 +511,19 @@ addTextBlock = function (product_category_select_options, datas = {}) {
 
     $("#text-block-row-no").val(parseInt(text_block_row_no) + 1);
 
-    validateTextBlock(text_block_row_no);
-}
+    validate.validateTextBlock(text_block_row_no);
+};
 
-addProductBlockProduct = function (product_select_options, datas = {}) {
+window.addProductBlockProduct = (product_select_options, datas = {}) => {
     let product_block_product_row_no = datas.id
         ? datas.id
         : $("#product-block-product-row-no").val();
     let product_block_product_id = datas.id ? datas.id : "new";
     let sort = datas.sort != null ? datas.sort : "";
 
-    product_block_product_row_no = sanitize(String(product_block_product_row_no));
+    product_block_product_row_no = sanitize(
+        String(product_block_product_row_no)
+    );
 
     $("#tab-product table > tbody").append(`
         <tr>
@@ -538,17 +553,22 @@ addProductBlockProduct = function (product_select_options, datas = {}) {
         parseInt(product_block_product_row_no) + 1
     );
 
-    validateProductBlockProduct(product_block_product_row_no);
-}
+    validate.validateProductBlockProduct(product_block_product_row_no);
+};
 
-addProductBlockCategory = function (product_category_select_options, datas = {}) {
+window.addProductBlockCategory = (
+    product_category_select_options,
+    datas = {}
+) => {
     let product_block_category_row_no = datas.id
         ? datas.id
         : $("#product-block-category-row-no").val();
     let product_block_category_id = datas.id ? datas.id : "new";
     let sort = datas.sort != null ? datas.sort : "";
 
-    product_block_category_row_no = sanitize(String(product_block_category_row_no));
+    product_block_category_row_no = sanitize(
+        String(product_block_category_row_no)
+    );
 
     $("#tab-category table > tbody").append(`
         <tr>
@@ -578,11 +598,11 @@ addProductBlockCategory = function (product_category_select_options, datas = {})
         parseInt(product_block_category_row_no) + 1
     );
 
-    validateProductBlockCategory(product_block_category_row_no);
-}
+    validate.validateProductBlockCategory(product_block_category_row_no);
+};
 
 // 啟用版位主色
-enableSlotColorCode = function () {
+window.enableSlotColorCode = () => {
     $("#slot_color_code").prop("disabled", false);
 
     if ($("#slot_color_code").prev("label").find("span").length < 1) {
@@ -591,11 +611,11 @@ enableSlotColorCode = function () {
             .append(' <span style="color:red;">*</span>');
     }
 
-    validateSlotColorCode();
-}
+    validate.validateSlotColorCode();
+};
 
 // 啟用版位icon
-enableSlotIconName = function () {
+window.enableSlotIconName = () => {
     $("#slot_icon_name").prop("disabled", false);
 
     if (
@@ -608,11 +628,11 @@ enableSlotIconName = function () {
             .append(' <span style="color:red;">*</span>');
     }
 
-    validateSlotIconName();
-}
+    validate.validateSlotIconName();
+};
 
 // 啟用版位標題
-enableSlotTitle = function () {
+window.enableSlotTitle = () => {
     $("#slot_title").prop("disabled", false);
 
     if ($("#slot_title").prev("label").find("span").length < 1) {
@@ -621,29 +641,44 @@ enableSlotTitle = function () {
             .append(' <span style="color:red;">*</span>');
     }
 
-    validateSlotTitle();
-}
+    validate.validateSlotTitle();
+};
 
 // 停用版位主色
-disableSlotColorCode = function () {
-    $("#slot_color_code").prop("disabled", true).val('').prev("label").find("span").remove();
+window.disableSlotColorCode = () => {
+    $("#slot_color_code")
+        .prop("disabled", true)
+        .val("")
+        .prev("label")
+        .find("span")
+        .remove();
 
-    removeSlotColorCodeValidation();
-}
+    validate.removeSlotColorCodeValidation();
+};
 
 // 停用版位icon
-disableSlotIconName = function () {
-    $("#slot_icon_name").prop("disabled", true).val('').prev("label").find("span").remove();
+window.disableSlotIconName = () => {
+    $("#slot_icon_name")
+        .prop("disabled", true)
+        .val("")
+        .prev("label")
+        .find("span")
+        .remove();
 
-    removeSlotIconNameValidation();
-}
+    validate.removeSlotIconNameValidation();
+};
 
 // 停用版位標題
-disableSlotTitle = function () {
-    $("#slot_title").prop("disabled", true).val('').prev("label").find("span").remove();
+window.disableSlotTitle = () => {
+    $("#slot_title")
+        .prop("disabled", true)
+        .val("")
+        .prev("label")
+        .find("span")
+        .remove();
 
-    removeSlotTitleValidation();
-}
+    validate.removeSlotTitleValidation();
+};
 
 // 輸入值消毒
-const sanitize = (val) => val.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const sanitize = (val) => val.replace(/</g, "&lt;").replace(/>/g, "&gt;");

@@ -1,5 +1,5 @@
 // 加入圖檔區塊欄位驗證
-validateImageBlock = function (row_no) {
+export let validateImageBlock = (row_no) => {
     $(`#image-block table > tbody [name="image_block_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
@@ -47,7 +47,7 @@ validateImageBlock = function (row_no) {
 }
 
 // 加入文字區塊欄位驗證
-validateTextBlock = function (row_no) {
+export let validateTextBlock = (row_no) => {
     $(`#text-block table > tbody [name="text_block_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
@@ -85,7 +85,7 @@ validateTextBlock = function (row_no) {
 }
 
 // 加入商品區塊的指定商品欄位驗證
-validateProductBlockProduct = function (row_no) {
+export let validateProductBlockProduct = (row_no) => {
     $(`#tab-product table > tbody [name="product_block_product_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
@@ -99,7 +99,7 @@ validateProductBlockProduct = function (row_no) {
 }
 
 // 加入商品區塊的指定分類欄位驗證
-validateProductBlockCategory = function (row_no) {
+export let validateProductBlockCategory = (row_no) => {
     $(`#tab-category table > tbody [name="product_block_category_sort[${row_no}]"]`).rules("add", {
         required: true,
         digits: true,
@@ -113,14 +113,14 @@ validateProductBlockCategory = function (row_no) {
 }
 
 // 加入版位主色欄位驗證
-validateSlotColorCode = function () {
+export let validateSlotColorCode = () => {
     $("#slot_color_code").rules("add", {
         required: true,
     });
 }
 
 // 加入版位icon欄位驗證
-validateSlotIconName = function () {
+export let validateSlotIconName = () => {
     $("#slot_icon_name").rules("add", {
         required: {
             depends: function (element) {
@@ -137,26 +137,26 @@ validateSlotIconName = function () {
 }
 
 // 加入版位標題欄位驗證
-validateSlotTitle = function () {
+export let validateSlotTitle = () => {
     $("#slot_title").rules("add", {
         required: true,
     });
 }
 
 // 移除版位主色欄位驗證
-removeSlotColorCodeValidation = function () {
+export let removeSlotColorCodeValidation = () => {
     $("#slot_color_code").rules("remove");
     $("#slot_color_code").closest(".form-group").removeClass("has-error").find('.help-block').hide();
 }
 
 // 移除版位icon欄位驗證
-removeSlotIconNameValidation = function () {
+export let removeSlotIconNameValidation = () => {
     $("#slot_icon_name").rules("remove");
     $("#slot_icon_name").closest(".form-group").removeClass("has-error").find('.help-block').hide();
 }
 
 // 移除版位標題欄位驗證
-removeSlotTitleValidation = function () {
+export let removeSlotTitleValidation = () => {
     $("#slot_title").rules("remove");
     $("#slot_title").closest(".form-group").removeClass("has-error").find('.help-block').hide();
 }

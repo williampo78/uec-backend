@@ -3,6 +3,7 @@
 @section('title', '新增廣告上架')
 
 @section('style')
+    <link rel="stylesheet" href="{{ mix('css/advertisement.css') }}">
     <style>
         .colorpicker-2x .colorpicker-saturation {
             width: 200px;
@@ -87,6 +88,43 @@
 
     <script>
         $(function() {
+            // const slot_icon_uploader = new Uppy({
+            //         id: 'slot_icon',
+            //         // debug: true,
+            //         locale: Uppy.Locale,
+            //         restrictions: {
+            //             maxFileSize: 2 * 1024 * 1024,
+            //             minFileSize: null,
+            //             maxTotalFileSize: null,
+            //             maxNumberOfFiles: 1,
+            //             minNumberOfFiles: 1,
+            //             allowedFileTypes: ['image/*'],
+            //             requiredMetaFields: [],
+            //         },
+            //     })
+            //     .use(Uppy.Dashboard, {
+            //         id: 'Dashboard',
+            //         target: '#slot_icon_name',
+            //         inline: true,
+            //         width: '100%',
+            //         // height: 300,//'100%',
+            //         hideUploadButton: true,
+            //         proudlyDisplayPoweredByUppy: false,
+            //     })
+            //     .use(Uppy.Form, {
+            //         target: '#create-form',
+            //         resultName: 'uppyResult',
+            //         getMetaFromForm: true,
+            //         addResultToForm: true,
+            //         submitOnSuccess: true,
+            //         triggerUploadOnSubmit: true,
+            //     })
+            //     .use(Uppy.FileInput, {
+            //         target: '#slot_icon_name',
+            //         pretty: true,
+            //         inputName: 'slot_icon_name',
+            //     });
+
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
