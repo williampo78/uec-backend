@@ -276,6 +276,7 @@ class AuthController extends Controller
         $response = $this->apiService->memberRegistration($data, $token);
         $result = json_decode($response, true);
         try {
+            $login = [];
             if ($result['status'] == '201') {
                 $login['mobile'] = $data['mobile'];
                 $login['password'] = $data['pwd'];
