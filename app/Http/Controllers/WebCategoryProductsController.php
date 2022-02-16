@@ -27,7 +27,10 @@ class WebCategoryProductsController extends Controller
     {
         $request = $request->input();
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($request);
-        // dd($result) ;
+        foreach ($result['category_hierarchy_content'] as $content) {
+            $content->product_counts = $this->webCategoryHierarchyService->categoryProductsHierarchyId($content->id)->count();
+        }
+
         return view('backend.web_category_products.list', $result);
     }
 
