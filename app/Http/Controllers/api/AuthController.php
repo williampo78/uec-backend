@@ -267,7 +267,7 @@ class AuthController extends Controller
         $data = [];
         $data['mobile'] = $request['mobile'];
         $data['name'] = $request['name'];
-        $data['password'] = $request['pwd'];
+        $data['pwd'] = $request['pwd'];
         $data['email'] = $request['email'];
         $data['birthday'] = $request['birthday'];
         $data['sex'] = $request['sex'];
@@ -276,6 +276,7 @@ class AuthController extends Controller
         $response = $this->apiService->memberRegistration($data, $token);
         $result = json_decode($response, true);
         try {
+            $login = [];
             if ($result['status'] == '201') {
                 $login['mobile'] = $data['mobile'];
                 $login['password'] = $data['pwd'];
@@ -284,7 +285,8 @@ class AuthController extends Controller
                 $response = $this->apiService->memberLogin($fields);
                 $login_result = json_decode($response, true);
                 unset($login['mobile']);
-                unset($login['pwd']);
+                unset($login['password']);
+                unset($login['channel']);
                 if ($login_result['status'] == '200') {
                     $tmp = Members::where('member_id', '=', $login_result['data']['id'])->first();
                     if (!is_null($tmp)) {

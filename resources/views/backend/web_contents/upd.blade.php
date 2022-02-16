@@ -216,7 +216,6 @@
         })
 
         ClassicEditor.create(document.querySelector('#editor'), {
-
             ckfinder: {
                 // Upload the images to the server using the CKFinder QuickUpload command.
                 uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
@@ -225,8 +224,20 @@
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                 }
-
             },
+            mediaEmbed: {
+                previewsInData: true
+            },
+            htmlSupport: {
+                allow: [
+                    {
+                        name: /.*/,
+                        attributes: true,
+                        classes: true,
+                        styles: true
+                    }
+                ]
+            }
         })
     </script>
 @endsection

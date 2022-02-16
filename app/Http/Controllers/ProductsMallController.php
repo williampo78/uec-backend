@@ -104,7 +104,7 @@ class ProductsMallController extends Controller
     public function edit($id)
     {
         $result = [];
-        $result['products'] = $this->arrangeProduct($this->productsService->showProducts($id)) ; 
+        $result['products'] = $this->arrangeProduct($this->productsService->showProducts($id)) ;
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
@@ -136,7 +136,7 @@ class ProductsMallController extends Controller
         $in = $request->input();
         $file = $request->file();
         $execution =  $this->productsService->updateProductSmall($in, $file, $id);
-        $result['status'] = $execution['status'] ; 
+        $result['status'] = $execution['status'] ;
         $result['route_name'] = 'product_small';
         $result['act'] = 'upd';
         if ($result['status']) {
@@ -144,7 +144,7 @@ class ProductsMallController extends Controller
         } else {
             $result['message']  = '編輯時發生未預期的錯誤';
             if(isset($execution['error_code'])){
-                $result['error_code'] = $execution['error_code'] ; 
+                $result['error_code'] = $execution['error_code'] ;
             };
             return view('backend.error', $result);
         };
@@ -226,17 +226,17 @@ class ProductsMallController extends Controller
         }
 
         if($products->meta_title == null){
-            $products->meta_title = $products->product_name ; 
+            $products->meta_title = $products->product_name ;
         }
         if($products->mata_description == null){
-            $products->mata_description = $products->product_brief_1 . $products->product_brief_2 . $products->product_brief_3; 
+            $products->mata_description = $products->product_brief_1 . $products->product_brief_2 . $products->product_brief_3;
         }
         if($products->mata_keywords == null){
             $cp = $this->webCategoryHierarchyService->categoryProductsId($products->id) ;
             if($cp->count() > 0){
                 $cpName = $this->webCategoryHierarchyService->category_hierarchy_content(['id' => $cp[0]->web_category_hierarchy_id]);
                 if(count($cpName) > 0){
-                    $products->mata_keywords = $cpName[0]->name ; 
+                    $products->mata_keywords = $cpName[0]->name ;
                 }
             }
         }

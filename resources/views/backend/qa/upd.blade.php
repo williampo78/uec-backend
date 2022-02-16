@@ -11,7 +11,7 @@
         </div>
         <!-- /.row -->
         <form role="form" id="update-form" method="post" action="{{ route('qa.update', $data['webcontent']->id) }}"
-            enctype="multipart/form-data">
+              enctype="multipart/form-data">
             @method('PUT')
             @csrf
             <div class="row">
@@ -39,7 +39,7 @@
                                             <div class="form-group" id="div_sort">
                                                 <label for="sort">排序 <span style="color: red;">*</span></label>
                                                 <input class="form-control" type="number" name="sort" id="sort"
-                                                    value="{{ $data['webcontent']['sort'] }}">
+                                                       value="{{ $data['webcontent']['sort'] }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -49,15 +49,15 @@
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="active" id="active1"
-                                                                {{ $data['webcontent']['active'] == 1 ? 'checked' : '' }}
-                                                                value="1">啟用
+                                                                   {{ $data['webcontent']['active'] == 1 ? 'checked' : '' }}
+                                                                   value="1">啟用
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="active" id="active0"
-                                                                {{ $data['webcontent']['active'] == 0 ? 'checked' : '' }}
-                                                                value="0">關閉
+                                                                   {{ $data['webcontent']['active'] == 0 ? 'checked' : '' }}
+                                                                   value="0">關閉
                                                         </label>
                                                     </div>
                                                 </div>
@@ -67,9 +67,10 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label for="content_name">問題描述 <span style="color: red;">*</span></label>
+                                                <label for="content_name">問題描述 <span
+                                                        style="color: red;">*</span></label>
                                                 <input class="form-control" name="content_name" id="content_name"
-                                                    value="{{ $data['webcontent']['content_name'] }}">
+                                                       value="{{ $data['webcontent']['content_name'] }}">
                                             </div>
                                         </div>
                                     </div>
@@ -78,7 +79,7 @@
                                             <div class="form-group">
                                                 <label for="editor">問題解答 <span style="color: red;">*</span></label>
                                                 <textarea id="editor" name="content_text"
-                                                    placeholder="請在這裡填寫內容">{{ $data['webcontent']['content_text'] }}</textarea>
+                                                          placeholder="請在這裡填寫內容">{{ $data['webcontent']['content_text'] }}</textarea>
 
                                             </div>
                                         </div>
@@ -109,16 +110,29 @@
 @section('js')
     <script>
         ClassicEditor.create(document.querySelector('#editor'), {
-                ckfinder: {
-                    // Upload the images to the server using the CKFinder QuickUpload command.
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
-                        document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            ckfinder: {
+                // Upload the images to the server using the CKFinder QuickUpload command.
+                uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                    document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                //uploadUrl:"/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json",
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                }
+            },
+            mediaEmbed: {
+                previewsInData: true
+            },
+            htmlSupport: {
+                allow: [
+                    {
+                        name: /.*/,
+                        attributes: true,
+                        classes: true,
+                        styles: true
                     }
-                },
-            })
+                ]
+            }
+        })
             .then(editor => {
                 console.log('Editor was initialized', editor);
             })
@@ -126,41 +140,25 @@
                 console.error(err.stack);
             });
 
-        $(function() {
+        $(function () {
             $('.js-select2').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: '請選擇',
             });
 
-            $("#btn-save").on('click', function() {
+            $("#btn-save").on('click', function () {
                 $("#update-form").submit();
             });
 
-            $("#btn-cancel").on('click', function() {
+            $("#btn-cancel").on('click', function () {
                 window.location.href = '{{ route('qa') }}';
             });
-
-            //文字編輯器
-            /*
-            var editor = CKEDITOR.replace('content_text', {
-                filebrowserBrowseUrl: 'ckfinder/ckfinder.html',
-                filebrowserImageBrowseUrl: 'ckfinder/ckfinder.html?Type=Images',
-                //filebrowserUploadUrl : 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files', //可上傳一般檔案
-                //filebrowserImageUploadUrl: 'ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images' //可上傳圖檔
-                filebrowserImageUploadUrl:'http://uec.backend.localhost/ckfinder/connector'
-            });
-
-
-            CKEDITOR.replace( 'content_text', {
-                filebrowserUploadUrl: "{{-- route('ckfinder_browser', ['_token' => csrf_token() ]) --}}",
-                filebrowserUploadMethod: 'form'
-            }); */
 
             // 驗證表單
             $("#update-form").validate({
                 // debug: true,
-                submitHandler: function(form) {
+                submitHandler: function (form) {
                     $('#btn-save').prop('disabled', true);
                     form.submit();
                 },
@@ -191,7 +189,7 @@
                 },
                 errorClass: "help-block",
                 errorElement: "span",
-                errorPlacement: function(error, element) {
+                errorPlacement: function (error, element) {
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -204,13 +202,13 @@
 
                     error.insertAfter(element);
                 },
-                highlight: function(element, errorClass, validClass) {
+                highlight: function (element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function(element, errorClass, validClass) {
+                unhighlight: function (element, errorClass, validClass) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
-                success: function(label, element) {
+                success: function (label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
