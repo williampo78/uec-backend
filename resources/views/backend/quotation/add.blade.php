@@ -198,7 +198,27 @@
             $('#new-form').validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    form.submit();
+                    /**
+                    *報價單送審時，需先檢查明細裡面的每個item都不可存在未結案的報價單，若有，不允許送審
+                    */
+                    var product_items = $(".product_item_va").map(function(){
+                        return $(this).val();
+                    }).get()
+                    axios.post('/backend/quotation/ajax', {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                get_type: 'check_quotation_items',
+                                product_items:product_items,
+                            })
+                            .then(function(response) {
+                                if(!response.data.status){
+                                    alert('「下列品項仍有未結案報價單，不允許送審！'+response.data.error_msg+'」') ; 
+                                }else{
+                                    form.submit();
+                                }
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                            });
                 },
                 rules: {
                     trade_date: {

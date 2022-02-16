@@ -77,6 +77,7 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('_token');
+        dd($data);
         $result = $this->quotationService->addQuotation($data);
         $result['route_name'] = 'quotation';
         $result['act'] = 'add';
@@ -112,7 +113,7 @@ class QuotationController extends Controller
         $result['quotation'] = $this->quotationService->getQuotationById($id);
         $result['quotation_details'] = $this->quotationService->getQuotationDetail($id);
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productsService->getItemsAndProduct(['supplier_id'=>$result['quotation']->supplier_id]);
+        $result['products_item'] = $this->productsService->getItemsAndProduct(['supplier_id' => $result['quotation']->supplier_id]);
         $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'upd';
         $result['id'] = $id;
@@ -197,6 +198,16 @@ class QuotationController extends Controller
                     'products' =>$products ,
                 ]);
 
+                break;
+
+            case 'check_quotation_items':
+                $product_items =  array_unique($in['product_items']) ; 
+                $result = $this->quotationService->checkQuotationItems($product_items);
+                return response()->json([
+                    'status' => $result['status'], 
+                    'in' => $in,
+                    'error_msg' => $result['error_msg'],
+                ]);
                 break;
             default:
                 # code...

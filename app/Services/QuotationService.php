@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use App\Models\Quotation;
 use App\Models\QuotationDetails;
 use App\Models\QuotationReviewLog;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
 class QuotationService
 {
     private $universalService;
@@ -86,9 +87,9 @@ class QuotationService
     public function addQuotation($data)
     {
         $result = [
-            'message' => '' ,
-            'status'  => true ,
-        ] ;
+            'message' => '',
+            'status' => true,
+        ];
 
         $user_id = Auth::user()->id;
         $now = Carbon::now();
@@ -96,8 +97,8 @@ class QuotationService
         $hierarchy = $this->hierarchyService->getHierarchyCode('QUOTATION');
         if (!$hierarchy) {
             $result['message'] = '您未被設定於單據簽核流程中，請聯繫系統管理員';
-            $result['status']  = false ; 
-            return $result ;
+            $result['status'] = false;
+            return $result;
         }
         DB::beginTransaction();
         try {
@@ -193,8 +194,8 @@ class QuotationService
             DB::raw('product_items.id as product_items_id'),
             DB::raw('product_items.item_no as product_items_no'),
             DB::raw('product_items.pos_item_no as pos_item_no'),
-            DB::raw('product_items.spec_1_value') ,
-            DB::raw('product_items.spec_2_value') , 
+            DB::raw('product_items.spec_1_value'),
+            DB::raw('product_items.spec_2_value'),
             DB::raw('quotation_details.original_unit_price as original_unit_price'),
             DB::raw('products.min_purchase_qty as min_purchase_qty'),
         )
@@ -236,7 +237,7 @@ class QuotationService
         }
         Quotation::where('id', $quotation_id)->update($quotationData);
         // round
-         //unit_price unit_nontax_price  unit_tax_price
+        //unit_price unit_nontax_price  unit_tax_price
         foreach ($data['item'] as $k => $item_id) {
             if ($data['tax'] == 2) { //應稅內含
                 if ($data['is_tax_included'] == '1') { // 報價含稅
@@ -267,11 +268,11 @@ class QuotationService
                 'original_unit_price' => $data['price'][$k],
                 'updated_at' => $now,
                 'updated_by' => $user_id,
-                'unit_nontax_price' => $unit_nontax_price ,
-                'unit_tax_price' => $unit_tax_price ,
-                'original_unit_price' => $original_unit_price , 
-                'original_unit_nontax_price' => $original_unit_nontax_price , 
-                'original_unit_tax_price' => $original_unit_tax_price ,
+                'unit_nontax_price' => $unit_nontax_price,
+                'unit_tax_price' => $unit_tax_price,
+                'original_unit_price' => $original_unit_price,
+                'original_unit_nontax_price' => $original_unit_nontax_price,
+                'original_unit_tax_price' => $original_unit_tax_price,
             ];
 
             if (isset($data['quotation_details_id'][$k])) {
@@ -298,9 +299,38 @@ class QuotationService
             ->where('quotation.tax', $in['tax'])
             ->where('quotation.status_code', 'APPROVED')
             ->where('quotation_details.product_item_id', $in['product_item_id'])
-            ->orderBy('quotation.closed_at','desc')
+            ->orderBy('quotation.closed_at', 'desc')
             ->limit(1)
             ->get();
+        return $result;
+    }
+    /**
+     * 確認報價單送出的品項是否有在報價程序裡
+     * 如果有則回傳失敗報價單號以及品項號碼
+     * 如果沒有則回傳成功
+     */
+    public function checkQuotationItems($itemsId = array())
+    {
+        $result['status'] = true;
+        $result['error_msg'] = '';
+        $repeat_ary = [] ; 
+        foreach ($itemsId as $id) {
+            $check = Quotation::select(
+                'quotation.doc_number',
+                'product_items.item_no'
+            )
+            ->join('quotation_details', 'quotation.id', 'quotation_details.quotation_id')
+            ->leftJoin('product_items' , 'quotation_details.product_item_id','product_items.id')
+            ->where('quotation_details.product_item_id', $id)
+            ->whereNull('quotation.closed_at')
+            ->first();
+            if(!is_null($check)){
+               array_push($repeat_ary,$check->item_no.'('.$check->doc_number.')');
+               $result['status']  = false ; 
+            }
+        }
+        $result['error_msg'] = implode('、',$repeat_ary) ; 
+
         return $result;
     }
 }
