@@ -284,7 +284,8 @@ class AuthController extends Controller
                 $response = $this->apiService->memberLogin($fields);
                 $login_result = json_decode($response, true);
                 unset($login['mobile']);
-                unset($login['pwd']);
+                unset($login['password']);
+                unset($login['channel']);
                 if ($login_result['status'] == '200') {
                     $tmp = Members::where('member_id', '=', $login_result['data']['id'])->first();
                     if (!is_null($tmp)) {
