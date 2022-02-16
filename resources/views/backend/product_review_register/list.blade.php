@@ -277,8 +277,8 @@
                                         <td>{{ $val->product_no }}</td>
                                         <td>{{ $val->product_name }}</td>
                                         <td>{{ $val->selling_price }}</td>
-                                        <td>等待確認</td>
-                                        <td>等待確認</td>
+                                        <td>{{ $val->item_cost }}</td>
+                                        <td>{{ $val->gross_margin }}</td>
                                         <td>
                                             @switch($val->product_type)
                                                 @case('N')
@@ -318,11 +318,10 @@
         $(document).ready(function() {
             $(document).ready(function() {
                 $('#table_data').DataTable({
-                        "order": [
-                            [1, "asc"]
-                        ]
-                    }
-                );
+                    "order": [
+                        [1, "asc"]
+                    ]
+                });
             });
             $("#stock_type").select2({
                 allowClear: true,

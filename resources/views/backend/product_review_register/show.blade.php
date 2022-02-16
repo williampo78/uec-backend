@@ -113,7 +113,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="supplier_name"
-                                            value="{{ $products->supplier_name }}" readonly>
+                                            value="{{ $products->item_cost }}" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="product_name"
-                                            value="{{ $products->product_name }}" readonly>
+                                            value="{{ $products->gross_margin }}" readonly>
                                     </div>
                                 </div>
                             </div>
