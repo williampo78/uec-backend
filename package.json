@@ -18,6 +18,10 @@
     "dependencies": {
         "@ckeditor/ckeditor5-indent": "^31.0.0",
         "@uppy/core": "^2.1.4",
+        "@uppy/dashboard": "^2.1.4",
+        "@uppy/file-input": "^2.0.5",
+        "@uppy/form": "^2.0.4",
+        "@uppy/locales": "^2.0.6",
         "datatables.net": "^1.11.4",
         "datatables.net-bs": "^1.11.4",
         "datatables.net-buttons": "^2.2.2",
@@ -26,7 +30,7 @@
         "file-saver": "^2.0.5",
         "jquery": "^3.6.0",
         "jquery-validation": "^1.19.3",
-        "select2": "^4.0.3",
+        "select2": "^4.0.13",
         "select2-bootstrap-theme": "^0.1.0-beta.10",
         "sweetalert2": "^11.4.0"
     }

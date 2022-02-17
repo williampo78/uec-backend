@@ -23,7 +23,9 @@
 $config = array();
 $config['loadRoutes'] = true;
 
-$config['authentication'] = '\CKSource\CKFinderBridge\CKFinderMiddleware';
+$config['authentication'] = function () {
+     return Auth::check();
+};
 
 /*============================ License Key ============================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_licenseKey
@@ -192,7 +194,7 @@ $config['sessionWriteClose'] = true;
 /*================================= CSRF protection ===================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_csrfProtection
 
-$config['csrfProtection'] = true;
+$config['csrfProtection'] = false;
 
 /*============================== End of Configuration =================================*/
 

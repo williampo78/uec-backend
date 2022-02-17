@@ -27,7 +27,10 @@ class WebCategoryProductsController extends Controller
     {
         $request = $request->input();
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($request);
-        // dd($result) ;
+        foreach ($result['category_hierarchy_content'] as $content) {
+            $content->product_counts = $this->webCategoryHierarchyService->categoryProductsHierarchyId($content->id)->count();
+        }
+
         return view('backend.web_category_products.list', $result);
     }
 
@@ -75,6 +78,13 @@ class WebCategoryProductsController extends Controller
         $in = [];
         $in['id'] = $id;
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
+
+        // 網頁標題為空值時，預設為分類名稱的最小階層名稱
+        if (empty($result['category_hierarchy_content']->meta_title)) {
+            $split_names = explode('>', $result['category_hierarchy_content']->name);
+            $result['category_hierarchy_content']->meta_title = trim(end($split_names));
+        }
+
         $result['category_products_list'] = $this->webCategoryHierarchyService->categoryProductsHierarchyId($id);
         // dd($result) ;
         $result['supplier'] = $this->supplierService->getSuppliers();

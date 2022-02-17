@@ -11,12 +11,11 @@ const mix = require("laravel-mix");
  |
  */
 
-mix.postCss("resources/css/app.css", "public/css", [
-    //
-]);
+mix.postCss("resources/css/app.css", "public/css")
+    .postCss("resources/css/advertisement.css", "public/css");
 
 mix.js("resources/js/app.js", "public/js")
-    .js("resources/js/advertisement/*.js", "public/js/advertisement.js")
+    .js("resources/js/advertisement/main.js", "public/js/advertisement.js")
     .js("resources/js/external_inventory_daily_report/*.js", "public/js/external_inventory_daily_report.js")
     .js("resources/js/inventory/*.js", "public/js/inventory.js")
     .js("resources/js/order/*.js", "public/js/order.js")

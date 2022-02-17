@@ -239,7 +239,6 @@ class AuthController extends Controller
     public function registration(Request $request)
     {
         $credentials = request(['mobile', 'name', 'email', 'pwd', 'birthday', 'sex', 'registeredSource']);
-
         $messages = [
             'mobile.required' => '帳號不能為空',
             'name.required' => '姓名不能為空',
@@ -267,7 +266,7 @@ class AuthController extends Controller
         $data = [];
         $data['mobile'] = $request['mobile'];
         $data['name'] = $request['name'];
-        $data['pwd'] = $request['pwd'];
+        $data['password'] = $request['pwd'];
         $data['email'] = $request['email'];
         $data['birthday'] = $request['birthday'];
         $data['sex'] = $request['sex'];
@@ -279,7 +278,7 @@ class AuthController extends Controller
             $login = [];
             if ($result['status'] == '201') {
                 $login['mobile'] = $data['mobile'];
-                $login['password'] = $data['pwd'];
+                $login['password'] = $data['password'];
                 $login['channel'] = "EC";
                 $fields = json_encode($login);
                 $response = $this->apiService->memberLogin($fields);

@@ -121,9 +121,9 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <button type="button" class="btn btn-success" @click="submit"
-                                                    id="btn-save">儲存</button>
+                                                    id="btn-save"><i class="fa fa-save"></i> 儲存</button>
                                                 <a class="btn btn-danger" type="button"
-                                                    href="{{ route('web_category_products') }}">取消</a>
+                                                    href="{{ route('web_category_products') }}"><i class="fa fa-ban"></i> 取消</a>
                                             </div>
                                         </div>
                                     </div>
@@ -160,7 +160,7 @@
                     var end_created_at = $('input[name="end_created_at"]').val();
                     var start_launched_at_start = $('input[name="start_launched_at_start"]').val();
                     var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
-                    var selling_price_min = $('input[name="selling_price_min"]').val(); 
+                    var selling_price_min = $('input[name="selling_price_min"]').val();
                     var selling_price_max = $('input[name="selling_price_max"]').val();
                     var supplier_id = $('#supplier').val() ;
                     var limit = $('#limit').val();
