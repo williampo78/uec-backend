@@ -172,4 +172,17 @@ jQuery.validator.addMethod(
         return `只能輸入英文以及數字`;
     }
 );
-// ^[A-Za-z0-9]+$
+jQuery.validator.addMethod(
+    "notChinese",
+    function (value, element, obj) {
+        var regexp =/.*[\u4e00-\u9fa5]+.*$/;
+        if (regexp.test(obj.text)) {//中文不給過
+            return false
+          } else {
+            return true
+          }
+    },
+    function (params, element) {
+        return `不能輸入中文`;
+    }
+);

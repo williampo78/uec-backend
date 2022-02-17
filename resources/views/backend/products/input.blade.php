@@ -1066,6 +1066,22 @@
             // 驗證表單
             // product_name
             $(document).on("click", "#save_data", function() {
+                $(".ean_va").each(function(){
+                    var text =  $(this).val() ; 
+                    $(this).rules("add", {
+                        notChinese:{
+                            param: function() {
+                                let obj = {
+                                    text: text,
+                                }
+                                return obj;
+                            },
+                            depends: function(element) {
+                                return true;
+                            },
+                        },
+                    });
+                })
                 $(".safty_qty_va").each(function() {
                     $(this).rules("add", {
                         required: true,

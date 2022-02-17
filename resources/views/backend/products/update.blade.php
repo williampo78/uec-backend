@@ -907,7 +907,11 @@
                             <td v-if="products.spec_dimension == 2">@{{ Sku . spec_2_value }}</td>
                             <td><input class="form-control" v-model="Sku.item_no" readonly></td>
                             <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
-                            <td><input class="form-control" v-model="Sku.ean"></td>
+                            <td>
+                                <div class="form-group" style="margin-right:0px;margin-left:0px;">
+                                    <input class="form-control ean_va" v-model="Sku.ean" :name="'ean_va['+SkuKey+']'">
+                                </div>
+                            </td>
                             <td>
                                 <div class="form-group" style="margin-right:0px;margin-left:0px;">
                                     <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
@@ -1398,6 +1402,23 @@
             $(".product_brief").attr("readonly",false);
         }
         $(document).on("click", "#save_data", function() {
+                $(".ean_va").each(function(){
+                    var text =  $(this).val() ; 
+                    $(this).rules("add", {
+                        notChinese:{
+                            param: function() {
+                                let obj = {
+                                    text: text,
+                                }
+                                return obj;
+                            },
+                            depends: function(element) {
+                                return true;
+                            },
+                        },
+                    });
+                })
+                
                 $(".safty_qty_va").each(function(){
                     $(this).rules("add", {
                         required: true,
