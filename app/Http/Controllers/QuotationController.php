@@ -77,7 +77,6 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('_token');
-        dd($data);
         $result = $this->quotationService->addQuotation($data);
         $result['route_name'] = 'quotation';
         $result['act'] = 'add';
@@ -86,7 +85,7 @@ class QuotationController extends Controller
             return view('backend.success', $result);
         } else {
             return view('backend.error', $result);
-        };
+        }
     }
 
     /**
@@ -201,10 +200,10 @@ class QuotationController extends Controller
                 break;
 
             case 'check_quotation_items':
-                $product_items =  array_unique($in['product_items']) ; 
+                $product_items =  array_unique($in['product_items']) ;
                 $result = $this->quotationService->checkQuotationItems($product_items);
                 return response()->json([
-                    'status' => $result['status'], 
+                    'status' => $result['status'],
                     'in' => $in,
                     'error_msg' => $result['error_msg'],
                 ]);
