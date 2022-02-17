@@ -322,6 +322,7 @@ class QuotationService
             ->join('quotation_details', 'quotation.id', 'quotation_details.quotation_id')
             ->leftJoin('product_items' , 'quotation_details.product_item_id','product_items.id')
             ->where('quotation_details.product_item_id', $id)
+            ->where('quotation.status_code','REVIEWING')
             ->whereNull('quotation.closed_at')
             ->first();
             if(!is_null($check)){

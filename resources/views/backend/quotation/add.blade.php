@@ -204,26 +204,26 @@
                     var product_items = $(".product_item_va").map(function(){
                         return $(this).val();
                     }).get()
-
-                    axios.post('/backend/quotation/ajax', {
+                    if($('#status_code').val() == 'REVIEWING'){
+                        axios.post('/backend/quotation/ajax', {
                                 _token: $('meta[name="csrf-token"]').attr('content'),
                                 get_type: 'check_quotation_items',
                                 product_items:product_items,
                             })
                             .then(function(response) {
-                                form.submit();
-                                /*
                                 if(!response.data.status){
-                                    alert('「下列品項仍有未結案報價單，不允許送審！'+response.data.error_msg+'」') ;
+                                    alert('下列品項仍有未結案報價單，不允許送審！'+response.data.error_msg) ;
                                 }else{
                                     form.submit();
                                 }
-
-                                 */
                             })
                             .catch(function(error) {
                                 console.log(error);
                             });
+                    }else{
+                        form.submit();
+                    }
+                 
                 },
                 rules: {
                     trade_date: {
@@ -265,7 +265,7 @@
             function AddItemRow(get_type, position) {
                 $("#btn-addNewRow").prop('disabled', true);
                 var supplier_id = $('#supplier_id').val();
-                if (supplier_id == '') {
+                if (supplier_id == '' || supplier_id == null) {
                     alert('請先選擇供應商才能新增品項');
                     $("#btn-addNewRow").prop('disabled', false);
                     return false;
@@ -295,7 +295,7 @@
                             "<div class='input-group'>" +
                             "<select class='form-control js-select2-item product_item_va' name='item[" +
                             newRow +
-                            "]' id='" + position + "item-" + newRow + "' data-key='" + newRow + "'>" +
+                            "]' id='" + position + "item-" + newRow + "' data-key='" + newRow + "' data-va='product_item_va'>" +
                             "<option value=''></option>" +
                             "</select>" +
                             "<span class='input-group-btn'>" +
@@ -391,7 +391,7 @@
                         "<div class='col-sm-6' >" +
                         "<div class='input-group'>" +
                         "<select class='form-control js-select2-item product_item_va' name='item[]' id='" +
-                        position + "item-" + newRow + "' data-key='" + newRow + "'>" +
+                        position + "item-" + newRow + "' data-key='" + newRow + "' data-va='product_item_va'>" +
                         itemOption +
                         "</select>" +
                         "<span class='input-group-btn'>" +
@@ -452,6 +452,10 @@
                     $(".product_item_va").each(function() {
                         $(this).rules("add", {
                             required: true,
+                            notRepeating:true,
+                            messages:{
+                                notRepeating:'重複已選取的品項'
+                            }
                         });
                     })
                     $(".price_va").each(function() {

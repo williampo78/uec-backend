@@ -932,25 +932,21 @@ class ProductsService
             DB::raw('brands.brand_name as brand_name'),
             DB::raw('products_v.item_cost as item_cost'),
             DB::raw('products_v.gross_margin as gross_margin'),
-            DB::raw('(group_concat(web_category_products.category_name) ) as web_category_products_category_name'),
-            DB::raw('(group_concat(web_category_products.id) ) as web_category_products_id'),
-            DB::raw('(group_concat(related_products.product_name) ) as related_product_name'),
+            DB::raw('(select group_concat(wch.category_name)
+            from web_category_products wcp
+            join web_category_hierarchy wch on wch.id = wcp.web_category_hierarchy_id
+           where wcp.product_id = products.id
+           order by wcp.sort) as web_category_products_category_name'),
+            DB::raw('(select group_concat(p.product_name)
+            from related_products rp
+            join products p on p.id = rp.related_product_id
+           where rp.product_id = products.id
+           order by rp.sort) as related_product_name'),
             )
             ->leftJoin('products', 'products.id', 'product_items.product_id')
             ->leftJoin('products_v', 'products_v.id', 'product_items.product_id')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id')
-            ->leftJoin(
-                DB::raw("(SELECT
-            web_category_hierarchy.id,
-            web_category_products.product_id,
-            web_category_hierarchy.category_name
-            FROM web_category_products
-            LEFT JOIN web_category_hierarchy ON web_category_products.web_category_hierarchy_id = web_category_hierarchy.id ) AS web_category_products"), 'web_category_products.product_id', '=', 'products.id')
-            ->leftJoin(
-                DB::raw("(SELECT related_products.related_product_id,
-            products.product_name
-            FROM related_products LEFT JOIN products ON related_products.related_product_id = products.id) AS related_products"), 'related_products.related_product_id', '=', 'products.id')
             ->groupBy('product_items.id');
         if (isset($request['web_category_hierarchy_id'])) {
             $web_category_hierarchy_id = $request['web_category_hierarchy_id'];
@@ -1085,10 +1081,7 @@ class ProductsService
      */
     public function restructureItemsProducts($products, $pos)
     {
-        $wch = new \App\Services\WebCategoryHierarchyService; //取得分類
-        $CategoryHierarchy = collect($wch->category_hierarchy_content())->keyBy('id')->toArray(); // 所有分類
-        // dd($CategoryHierarchy) ;
-        $products->transform(function ($obj, $key) use ($pos, $CategoryHierarchy) {
+        $products->transform(function ($obj, $key) use ($pos) {
 
             // 上架日期
             $obj->launched_at = ($obj->start_launched_at || $obj->end_launched_at) ? "{$obj->start_launched_at} ~ {$obj->end_launched_at}" : '';
@@ -1275,18 +1268,6 @@ class ProductsService
                 $obj->status_cn = '否';
 
             }
-            $related_product_names = explode(',',$obj->related_product_name ); 
-            $related_product_names = array_unique($related_product_names); 
-            $obj->related_product_name = implode(',', $related_product_names);
-            $web_category_products_ids = explode(',', $obj->web_category_products_id);
-            $web_category_products_ids = array_unique($web_category_products_ids);
-            $web_category_products_ids_ary = [];
-            foreach ($web_category_products_ids as $val) {
-                if (isset($CategoryHierarchy[$val]->name)) {
-                    array_push($web_category_products_ids_ary, $CategoryHierarchy[$val]->name);
-                }
-            }
-            $obj->web_category_products_category_name = implode(',', $web_category_products_ids_ary);
             return $obj;
         });
     }
