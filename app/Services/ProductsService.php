@@ -1275,6 +1275,9 @@ class ProductsService
                 $obj->status_cn = '否';
 
             }
+            $related_product_names = explode(',',$obj->related_product_name ); 
+            $related_product_names = array_unique($related_product_names); 
+            $obj->related_product_name = implode(',', $related_product_names);
             $web_category_products_ids = explode(',', $obj->web_category_products_id);
             $web_category_products_ids = array_unique($web_category_products_ids);
             $web_category_products_ids_ary = [];
