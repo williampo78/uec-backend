@@ -1528,14 +1528,31 @@
                 digits: true,
               },
               warranty_days:{
-                    required:function() {
-                        return $("input[name=is_with_warranty]:checked").val() == '1';
-                    },
-                    digits: function() {
-                        return $("input[name=is_with_warranty]:checked").val() == '1';
-                    },
+                required:function() {
+                    return $("input[name=is_with_warranty]:checked").val() == '1';
                 },
+                digits: function() {
+                    return $("input[name=is_with_warranty]:checked").val() == '1';
+                },
+                min: function() {
+                    if ($("input[name=is_with_warranty]:checked").val() == '1') {
+                        return 0.01;
+                    }else{
+                        return 0 ;
+                    }
+                },
+            },
           },
+          messages:{
+            warranty_days: {
+                digits: "只可輸入正整數",
+                min: function() {
+                    if ($("input[name=has_expiry_date]:checked").val() == '1') {
+                        return '只可輸入正整數';
+                    }
+                },
+            },
+        },
           errorClass: "help-block",
           errorElement: "span",
           errorPlacement: function(error, element) {

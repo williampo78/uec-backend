@@ -568,7 +568,7 @@
                                         </label>
                                     </div>
                                     <div class="col-sm-1 ">
-                                        <input class="form-control" name="warranty_days" min="0" value="0">
+                                        <input class="form-control" name="warranty_days" value="0">
                                     </div>
                                 </div>
                             </div>
@@ -1207,6 +1207,13 @@
                         digits: function() {
                             return $("input[name=has_expiry_date]:checked").val() == '1';
                         },
+                        min: function() {
+                            if ($("input[name=has_expiry_date]:checked").val() == '1') {
+                                return 0.01;
+                            }else{
+                                return 0 ;
+                            }
+                        },
                     },
                     warranty_days:{
                         required:function() {
@@ -1215,8 +1222,34 @@
                         digits: function() {
                             return $("input[name=is_with_warranty]:checked").val() == '1';
                         },
+                        min: function() {
+                            if ($("input[name=is_with_warranty]:checked").val() == '1') {
+                                return 0.01;
+                            }else{
+                                return 0 ;
+                            }
+                        },
                     }
                 },
+                messages:{
+                    warranty_days: {
+                        digits: "只可輸入正整數",
+                        min: function() {
+                            if ($("input[name=has_expiry_date]:checked").val() == '1') {
+                                return '只可輸入正整數';
+                            }
+                        },
+                    },
+                    expiry_days: {
+                        digits: "只可輸入正整數",
+                        min: function() {
+                            if ($("input[name=is_with_warranty]:checked").val() == '1') {
+                                return '只可輸入正整數';
+                            }
+                        },
+                    },
+                },
+                
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
