@@ -352,7 +352,8 @@ class SummaryStockService
         $webDataUpd = [];
         foreach ($data as $key => $value) {
             $end_qty = ($value->begin_qty + $value->rcv_qty + $value->rtv_qty + $value->sales_qty + $value->sales_return_qty);//推算期末數
-            $item_cost = round(($value->begin_amount + $value->rcv_amount + $value->rtv_amount) / ($end_qty == 0 ? 1 : $end_qty), 2);//推算單位成本
+            $net_qty = ($value->begin_qty + $value->rcv_qty + $value->rtv_qty );//本期進貨淨量
+            $item_cost = round(($value->begin_amount + $value->rcv_amount + $value->rtv_amount) / ($net_qty == 0 ? 1 : $net_qty), 2);//推算單位成本
             $sales_amount = round($value->sales_qty * $item_cost, 2);//推算銷貨金額
             $sales_return_amount = round($value->sales_return_qty * $item_cost, 2);//推算銷退金額
             $end_amount = $end_qty * $item_cost;
