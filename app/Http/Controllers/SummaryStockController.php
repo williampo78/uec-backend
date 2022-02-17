@@ -28,7 +28,7 @@ class SummaryStockController extends Controller
         $data['info'] = ($getData ? $this->summaryStock->getSummaryStock($getData) : []);
         $data['sum'] = ($getData ? $this->summaryStock->getSummarySum($getData) : []);
         if (count($getData) > 0) {
-            $data['excel_url'] = $request->fullUrl() . '&export=true';
+            $data['excel_url'] = url("/").$request->getRequestUri() . '&export=true';
         }
         if (isset($getData['export'])) { //匯出報表
             return $this->export($data['info']);

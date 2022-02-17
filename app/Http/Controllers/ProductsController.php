@@ -35,7 +35,7 @@ class ProductsController extends Controller
     public function index(Request $request)
     {
         $in = $request->input() ;
-
+        // dd(URL::current() ,  ,) ; 
         $result = [
             'products' => [],
         ] ;
@@ -46,7 +46,7 @@ class ProductsController extends Controller
 
         }
         $q = empty($in) ? '?' : '&' ;
-        $result['excel_url'] = $request->fullUrl() . $q . 'export=true';
+        $result['excel_url'] = url("/").$request->getRequestUri() . $q . 'export=true';
         if (isset($in['export'])) { //匯出報表
             return $this->export($in);
          }

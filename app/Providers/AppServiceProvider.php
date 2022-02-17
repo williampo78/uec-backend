@@ -2,9 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 use App\Services\ImageUploadService;
-use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Support\ServiceProvider;
+// use Illuminate\Contracts\Routing\UrlGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,13 +25,10 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(UrlGenerator $url)
+    public function boot()
     {
-        //
         if (env('ENFORCE_SSL', false)) {
-
-            $url->forceScheme('https');
-
+            URL::forceScheme('https');
         }
     }
 }

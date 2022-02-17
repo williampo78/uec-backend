@@ -27,7 +27,7 @@ class BuyoutProductsReportController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         if (count($in) > 0) { //是否開始搜尋
             $result['buy_out_products'] = $this->purchaseService->getBuyOutProducts($in)->get();
-            $result['excel_url'] = $request->fullUrl() . '&export=true';
+            $result['excel_url'] = url("/").$request->getRequestUri() . '&export=true';
 
             if (isset($in['export'])) { //匯出報表
                return $this->export($result['buy_out_products']);
