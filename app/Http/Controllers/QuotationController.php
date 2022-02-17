@@ -77,7 +77,6 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('_token');
-        dd($data);
         $result = $this->quotationService->addQuotation($data);
         $result['route_name'] = 'quotation';
         $result['act'] = 'add';
