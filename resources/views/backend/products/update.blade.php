@@ -337,21 +337,17 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="has_expiry_date" value="0" {{ $products->has_expiry_date
-                                        == '0' ? 'checked' : 'disabled' }}> 無
+                                        <input type="radio" name="has_expiry_date" value="0" {{ $products->has_expiry_date == '0' ? 'checked' : 'disabled' }}> 無
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="has_expiry_date" value="1" {{ $products->has_expiry_date
-                                        == '1' ? 'checked' : 'disabled' }}>
-                                        有，天數
+                                        <input type="radio" name="has_expiry_date" value="1" {{ $products->has_expiry_date == '1' ? 'checked' : 'disabled' }}>有，天數
                                     </label>
                                 </div>
                                 {{-- 效期控管的天數 --}}
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="expiry_days" value=" {{ $products->expiry_days }}" {{
-                                        $products->has_expiry_date == '1' ? 'checked' : 'readonly' }}>
+                                    <input class="form-control" name="expiry_days" value=" {{ $products->expiry_days }}" {{$products->has_expiry_date == '1' ? 'checked' : 'readonly' }}>
                                 </div>
                             </div>
                         </div>
@@ -1527,10 +1523,18 @@
                   required: true,
                   digits: true,
               }, //重量
-                    weight:{
-                    required: true,
-                    digits: true,
-              }
+              weight:{
+                required: true,
+                digits: true,
+              },
+              warranty_days:{
+                    required:function() {
+                        return $("input[name=is_with_warranty]:checked").val() == '1';
+                    },
+                    digits: function() {
+                        return $("input[name=is_with_warranty]:checked").val() == '1';
+                    },
+                },
           },
           errorClass: "help-block",
           errorElement: "span",

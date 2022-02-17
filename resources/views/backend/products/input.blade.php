@@ -1066,10 +1066,10 @@
             // 驗證表單
             // product_name
             $(document).on("click", "#save_data", function() {
-                $(".ean_va").each(function(){
-                    var text =  $(this).val() ; 
+                $(".ean_va").each(function() {
+                    var text = $(this).val();
                     $(this).rules("add", {
-                        notChinese:{
+                        notChinese: {
                             param: function() {
                                 let obj = {
                                     text: text,
@@ -1086,7 +1086,9 @@
                     $(this).rules("add", {
                         required: true,
                         digits: true,
-                        messages : { digits : '請輸入正整數' },
+                        messages: {
+                            digits: '請輸入正整數'
+                        },
                     });
                 })
                 $(".spec_1_va").each(function() {
@@ -1197,6 +1199,22 @@
                     weight: {
                         required: true,
                         digits: true,
+                    },
+                    expiry_days: {
+                        required:function() {
+                            return $("input[name=has_expiry_date]:checked").val() == '1';
+                        },
+                        digits: function() {
+                            return $("input[name=has_expiry_date]:checked").val() == '1';
+                        },
+                    },
+                    warranty_days:{
+                        required:function() {
+                            return $("input[name=is_with_warranty]:checked").val() == '1';
+                        },
+                        digits: function() {
+                            return $("input[name=is_with_warranty]:checked").val() == '1';
+                        },
                     }
                 },
                 errorClass: "help-block",
