@@ -255,6 +255,8 @@ class CheckoutController extends Controller
         $data['ip'] = $request->getClientIp();
 
         $result = $this->apiTapPay->tapPayNotifyLog($data);
+
+        return response()->json(['status' => $result]);
     }
 
     /*
