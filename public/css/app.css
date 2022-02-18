@@ -1844,7 +1844,7 @@ div.dt-button-collection span.dt-button-spacer {
 
 body {
     font-family: Segoe UI Light, 微軟正黑體;
-    font-weight: bold;
+    /* font-weight: bold; */
     /*background-color: #eee;*/
 }
 
