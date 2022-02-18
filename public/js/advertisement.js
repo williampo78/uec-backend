@@ -7177,7 +7177,6 @@ if (typeof window !== 'undefined' && typeof window.Uppy !== 'undefined') {
 
 module.exports = zh_TW;
 
-
 /***/ }),
 
 /***/ "./node_modules/@uppy/status-bar/lib/Components.js":

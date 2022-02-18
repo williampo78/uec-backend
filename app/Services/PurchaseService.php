@@ -109,7 +109,7 @@ class PurchaseService
             ->leftJoin('order_supplier', 'order_supplier.id', '=', 'purchase.order_supplier_id'); //採購單
 
         if (isset($in['trade_date_start']) && $in['trade_date_start'] && isset($in['trade_date_end']) && $in['trade_date_end']) { //進貨日期
-            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'], $in['trade_date_end']]);
+            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'] .' 00:00:00', $in['trade_date_end'] .' 23:59:59']);
         }
         if (isset($in['supplier']) && $in['supplier']) { //供應商
             $purchase->where('purchase.supplier_id', $in['supplier']);

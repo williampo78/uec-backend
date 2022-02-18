@@ -80,7 +80,11 @@
                                             <select class="form-control js-select2-department" name="tax" id="tax">
                                                 @foreach ($taxList as $key => $tax)
                                                     <option value="{{ $key }}"
-                                                        {{ isset($quotation['tax']) && $quotation['tax'] == $key ? 'selected' : '' }}>
+                                                    @if(isset($quotation['tax']))
+                                                    {{ $quotation['tax'] == $key ? 'selected' : '' }}
+                                                    @else
+                                                    {{$key == 2 ? 'selected' : '' }}
+                                                    @endif>
                                                         {{ $tax }}</option>
                                                 @endforeach
                                             </select>
@@ -125,7 +129,7 @@
                                     <div class='add_row'>
                                         <div class='row'>
                                             <div class='col-sm-6 text-left'>品項<span class='redtext'>*</span></div>
-                                            <div class='col-sm-2 text-left'>單價<span class='redtext'>*</span></div>
+                                            <div class='col-sm-2 text-left'>進貨成本<span class='redtext'>*</span></div>
                                             <div class='col-sm-3 text-left'>最小採購量</div>
                                             <div class='col-sm-1 text-left'>功能</div>
                                         </div>

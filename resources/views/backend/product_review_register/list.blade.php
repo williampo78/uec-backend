@@ -261,7 +261,7 @@
                                             @if ($share_role_auth['auth_update'])
                                                 @if ($val->launched_status == '未設定' || $val->launched_status == '上架駁回' || $val->launched_status == '商品下架')
                                                     <a class="btn btn-info btn-sm"
-                                                        href="{{ route('product_review_register.edit', $val->id) }}">編輯
+                                                        href="{{ route('product_review_register.edit', $val->id) }}">提案
                                                     </a>
                                                 @endif
                                             @endif

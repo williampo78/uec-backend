@@ -21,7 +21,19 @@ jQuery.validator.addMethod(
     },
     "必須大於 {0}"
 );
-
+// 比較輸入的兩個日期或兩個數字
+jQuery.validator.addMethod(
+    "greaterSameThan",
+    function (value, element, params) {
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) >= new Date(params);
+        }
+        return (
+            (isNaN(value) && isNaN(params)) || Number(value) > Number(params)
+        );
+    },
+    "必須大於 {0}"
+);
 // 比較輸入的日期和當前時間
 jQuery.validator.addMethod(
     "dateGreaterThanNow",
@@ -119,12 +131,14 @@ jQuery.validator.addMethod(
 jQuery.validator.addMethod(
     "dateGreaterEqualThan",
     function (value, element, params) {
-        if (!/Invalid|NaN/.test(new Date(value))) {
-            return new Date(value) >= new Date(params);
+        if(!params.depends){
+            return true ;
         }
-
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) >= new Date(params.date);
+        }
         return (
-            (isNaN(value) && isNaN(params)) || Number(value) > Number(params)
+            (isNaN(value) && isNaN(params.date)) || Number(value) > Number(params.date)
         );
     },
     "必須大於 {0}"
@@ -172,4 +186,17 @@ jQuery.validator.addMethod(
         return `只能輸入英文以及數字`;
     }
 );
-// ^[A-Za-z0-9]+$
+jQuery.validator.addMethod(
+    "notChinese",
+    function (value, element, obj) {
+        var regexp =/.*[\u4e00-\u9fa5]+.*$/;
+        if (regexp.test(obj.text)) {//中文不給過
+            return false
+          } else {
+            return true
+          }
+    },
+    function (params, element) {
+        return `不能輸入中文`;
+    }
+);

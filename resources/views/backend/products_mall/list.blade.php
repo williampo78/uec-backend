@@ -329,13 +329,41 @@
 @section('js')
     <script>
         $(document).ready(function() {
-            $("#stock_type").select2();
-            $("#selling_channel").select2();
-            $("#lgst_method").select2();
-            $("#product_type").select2();
-            $("#supplier_id").select2();
-            $("#category_id").select2();
-            $('#approval_status').select2();
+            $("#stock_type").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#selling_channel").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#lgst_method").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#product_type").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#supplier_id").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $("#category_id").select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
+            $('#approval_status').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
             $('#datetimepicker').datetimepicker({
                 format: 'YYYY-MM-DD',
             });

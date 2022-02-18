@@ -337,21 +337,17 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="has_expiry_date" value="0" {{ $products->has_expiry_date
-                                        == '0' ? 'checked' : 'disabled' }}> 無
+                                        <input type="radio" name="has_expiry_date" value="0" {{ $products->has_expiry_date == '0' ? 'checked' : 'disabled' }}> 無
                                     </label>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="radio-inline">
-                                        <input type="radio" name="has_expiry_date" value="1" {{ $products->has_expiry_date
-                                        == '1' ? 'checked' : 'disabled' }}>
-                                        有，天數
+                                        <input type="radio" name="has_expiry_date" value="1" {{ $products->has_expiry_date == '1' ? 'checked' : 'disabled' }}>有，天數
                                     </label>
                                 </div>
                                 {{-- 效期控管的天數 --}}
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="expiry_days" value=" {{ $products->expiry_days }}" {{
-                                        $products->has_expiry_date == '1' ? 'checked' : 'readonly' }}>
+                                    <input class="form-control" name="expiry_days" value=" {{ $products->expiry_days }}" {{$products->has_expiry_date == '1' ? 'checked' : 'readonly' }}>
                                 </div>
                             </div>
                         </div>
@@ -907,7 +903,11 @@
                             <td v-if="products.spec_dimension == 2">@{{ Sku . spec_2_value }}</td>
                             <td><input class="form-control" v-model="Sku.item_no" readonly></td>
                             <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
-                            <td><input class="form-control" v-model="Sku.ean"></td>
+                            <td>
+                                <div class="form-group" style="margin-right:0px;margin-left:0px;">
+                                    <input class="form-control ean_va" v-model="Sku.ean" :name="'ean_va['+SkuKey+']'">
+                                </div>
+                            </td>
                             <td>
                                 <div class="form-group" style="margin-right:0px;margin-left:0px;">
                                     <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
@@ -1398,6 +1398,23 @@
             $(".product_brief").attr("readonly",false);
         }
         $(document).on("click", "#save_data", function() {
+                $(".ean_va").each(function(){
+                    var text =  $(this).val() ; 
+                    $(this).rules("add", {
+                        notChinese:{
+                            param: function() {
+                                let obj = {
+                                    text: text,
+                                }
+                                return obj;
+                            },
+                            depends: function(element) {
+                                return true;
+                            },
+                        },
+                    });
+                })
+                
                 $(".safty_qty_va").each(function(){
                     $(this).rules("add", {
                         required: true,
@@ -1506,11 +1523,36 @@
                   required: true,
                   digits: true,
               }, //重量
-                    weight:{
-                    required: true,
-                    digits: true,
-              }
+              weight:{
+                required: true,
+                digits: true,
+              },
+              warranty_days:{
+                required:function() {
+                    return $("input[name=is_with_warranty]:checked").val() == '1';
+                },
+                digits: function() {
+                    return $("input[name=is_with_warranty]:checked").val() == '1';
+                },
+                min: function() {
+                    if ($("input[name=is_with_warranty]:checked").val() == '1') {
+                        return 0.01;
+                    }else{
+                        return 0 ;
+                    }
+                },
+            },
           },
+          messages:{
+            warranty_days: {
+                digits: "只可輸入正整數",
+                min: function() {
+                    if ($("input[name=has_expiry_date]:checked").val() == '1') {
+                        return '只可輸入正整數';
+                    }
+                },
+            },
+        },
           errorClass: "help-block",
           errorElement: "span",
           errorPlacement: function(error, element) {

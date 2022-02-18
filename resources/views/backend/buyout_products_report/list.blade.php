@@ -1,5 +1,5 @@
 @extends('backend.master')
-@section('title', '進貨單')
+@section('title', '買斷商品對帳單')
 @section('content')
     <!--列表-->
     <div id="page-wrapper">
@@ -195,9 +195,9 @@
                                         <td>{{ $obj->spec_2_value }}</td>
                                         <td>{{ $obj->item_price }}</td>
                                         <td>{{ $obj->item_qty }}</td>
-                                        <td>{{ $obj->detail_original_subtotal_price }}</td>
-                                        <td>{{ $obj->detail_subtotal_tax_price }}</td>
                                         <td>{{ $obj->detail_subtotal_nontax_price }}</td>
+                                        <td>{{ $obj->detail_subtotal_tax_price }}</td>
+                                        <td>{{ $obj->detail_original_subtotal_price }}</td>
                                     </tr>
                                 @endforeach
 
@@ -250,7 +250,7 @@
                     },
                     trade_date_end: {
                         required: true,
-                        greaterThan: function () {
+                        greaterSameThan: function () {
                             return $('#trade_date_start').val();
                         },
                     },
@@ -258,11 +258,8 @@
                 },
                 messages: {
                     trade_date_end: {
-                        greaterThan: "進貨結束時間必須大於開始時間",
+                        greaterSameThan: "進貨結束時間必須大於等於進貨開始時間",
                     },
-                    // trade_date_start: {
-                    //     monthIntervalVerify: '進貨日期範圍最多不可超過3個月',
-                    // }
                 },
                 errorClass: "help-block",
                 errorElement: "span",

@@ -309,7 +309,7 @@
                             if (response.data.status) {
                                 form.submit();
                             } else {
-                                alert('該商品未完成「商城資料」維護，不允許執行上架送審');
+                                alert('該商品未完成「商城資料」維護，不允許執行上架送審 (至少須有一組狀態為開啟的前台分類)');
                                 return false;
                             }
                         })
@@ -322,6 +322,7 @@
                 rules: {
                     start_launched_at: {
                         required: true,
+                        dateGreaterThanNow: true,
                     },
                     end_launched_at: {
                         required: true,
