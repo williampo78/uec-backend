@@ -108,6 +108,7 @@ class APITapPayService
                         }
                     }
                     $status = true;
+                    DB::commit();
                 } else {
                     //等排程檢查出貨
                 }
