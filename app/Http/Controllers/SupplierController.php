@@ -67,9 +67,14 @@ class SupplierController extends Controller
      */
     public function show($id)
     {
-        // echo $id ;//
-        // $supplier = $this->supplierService->showSupplier($id)->first();
-        // return view('backend.supplier.input',$supplier);
+        $result = [];
+        $result['Supplier'] = $this->supplierService->showSupplier($id);
+        $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
+        $result['Contact'] = $this->contactService->getContact('Supplier',$id);
+        $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
+        $result['readonly'] = 1 ; 
+
+        return view('backend.supplier.input', $result);
     }
 
     /**

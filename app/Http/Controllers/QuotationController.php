@@ -190,6 +190,7 @@ class QuotationController extends Controller
             case 'supplierGetProducts':
                $products =  $this->productsService->getItemsAndProduct([
                     'supplier_id' => $in['supplier_id'],
+                    'stock_type'=> 'A'
                 ]);
 
                 return response()->json([

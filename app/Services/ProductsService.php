@@ -485,7 +485,9 @@ class ProductsService
         if (isset($in['supplier_id']) && $in['supplier_id'] !== '') {
             $ProductItems->where('products.supplier_id', $in['supplier_id']);
         }
-
+        if (isset($in['stock_type']) && $in['stock_type'] !== '') {
+            $ProductItems->where('products.stock_type', $in['stock_type']);
+        }
         $result = $ProductItems->get();
         return $result;
     }

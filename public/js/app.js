@@ -2194,6 +2194,14 @@ jQuery.validator.addMethod("greaterThan", function (value, element, params) {
   }
 
   return isNaN(value) && isNaN(params) || Number(value) > Number(params);
+}, "必須大於 {0}"); // 比較輸入的兩個日期或兩個數字
+
+jQuery.validator.addMethod("greaterSameThan", function (value, element, params) {
+  if (!/Invalid|NaN/.test(new Date(value))) {
+    return new Date(value) >= new Date(params);
+  }
+
+  return isNaN(value) && isNaN(params) || Number(value) > Number(params);
 }, "必須大於 {0}"); // 比較輸入的日期和當前時間
 
 jQuery.validator.addMethod("dateGreaterThanNow", function (value, element, params) {
