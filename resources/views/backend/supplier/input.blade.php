@@ -33,6 +33,7 @@
                             <!-- 欄位 -->
                             <div class="col-sm-12">
                                 <div class="row">
+                                    <input type="hidden" id="readonly" value="{{$readonly ?? ''}}">
                                     <input type="hidden" id="supplier_id"
                                         value="{{ isset($Supplier) ? $Supplier->id : '' }}">
                                     <div class="col-sm-4">
@@ -552,6 +553,11 @@
                 $(element).closest(".form-group").removeClass("has-error");
             },
         });
+        if($("#readonly").val() !== ''){
+            $('#formData').find('input, textarea, button, select').attr('disabled','disabled');
+
+            console.log('唯讀模式')
+        }
     </script>
 @endsection
 @endsection
