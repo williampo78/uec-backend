@@ -1003,5 +1003,10 @@
             },
         })
         new CategoryHierarchyContentInput().$mount('#CategoryHierarchyContentInput');
+        $('#supplier').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
     </script>
 @endsection
