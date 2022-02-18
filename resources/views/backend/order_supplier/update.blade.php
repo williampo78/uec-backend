@@ -295,7 +295,7 @@
                                                 {{-- 最小採購量 --}}
                                                 <div class="col-sm-1">
                                                     <input class="form-control " readonly
-                                                        v-model="detail.min_purchase_qty">
+                                                        v-model="detail.item_qty">
                                                 </div>
                                                 {{-- 原幣小計 --}}
                                                 <div class="col-sm-1">
