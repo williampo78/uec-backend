@@ -267,7 +267,11 @@
                             }
                         },
                         dateGreaterEqualThan: function () {
-                            return $('#trade_date_start').val();
+                            let obj = {
+                                date: $('#trade_date_start').val() , 
+                                depends:true ,
+                            }
+                            return obj;
                         },
                     },
 
@@ -276,6 +280,9 @@
                     end_launched_at: {
                         dateGreaterEqualThan: "結束時間必須大於等於開始時間",
                     },
+                    trade_date_end:{
+                        dateGreaterEqualThan:"進貨日期結束時間必須大於開始時間"
+                    }
                 },
                 errorClass: "help-block",
                 errorElement: "span",

@@ -117,6 +117,9 @@
                                     <div class="col-sm-12">
                                         @if ($share_role_auth['auth_query'])
                                             <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                            <button type="button" class="btn btn-danger" id="btn-reset">
+                                                <i class="fa fa-eraser"></i> 清除
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -222,6 +225,10 @@
                 }
                 return false;
             };
+            $('#btn-reset').on('click', function() {
+                $('#select-form').find(':text:not("#limit"), select').val('');
+                $('#supplier, #status').trigger('change');
+            });
         </script>
     @endsection
 @endsection

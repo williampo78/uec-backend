@@ -21,6 +21,7 @@
                                         <div class="col-sm-9">
                                             <select class="form-control js-select2-department" name="supplier"
                                                 id="supplier">
+                                                <option value=""></option>
                                                 @foreach ($supplier as $val)
                                                     <option value='{{ $val['id'] }}'>{{ $val['name'] }}</option>
                                                 @endforeach

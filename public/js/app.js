@@ -2275,11 +2275,15 @@ jQuery.validator.addMethod("monthIntervalVerify", function (value, element, obj)
 }); // 比較大於等於時間
 
 jQuery.validator.addMethod("dateGreaterEqualThan", function (value, element, params) {
-  if (!/Invalid|NaN/.test(new Date(value))) {
-    return new Date(value) >= new Date(params);
+  if (!params.depends) {
+    return true;
   }
 
-  return isNaN(value) && isNaN(params) || Number(value) > Number(params);
+  if (!/Invalid|NaN/.test(new Date(value))) {
+    return new Date(value) >= new Date(params.date);
+  }
+
+  return isNaN(value) && isNaN(params.date) || Number(value) > Number(params.date);
 }, "必須大於 {0}");
 jQuery.validator.addMethod("notRepeating", function (value, element, params) {
   var fund = $(element).data("va");

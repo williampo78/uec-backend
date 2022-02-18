@@ -131,12 +131,14 @@ jQuery.validator.addMethod(
 jQuery.validator.addMethod(
     "dateGreaterEqualThan",
     function (value, element, params) {
-        if (!/Invalid|NaN/.test(new Date(value))) {
-            return new Date(value) >= new Date(params);
+        if(!params.depends){
+            return true ;
         }
-
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) >= new Date(params.date);
+        }
         return (
-            (isNaN(value) && isNaN(params)) || Number(value) > Number(params)
+            (isNaN(value) && isNaN(params.date)) || Number(value) > Number(params.date)
         );
     },
     "必須大於 {0}"

@@ -22,14 +22,17 @@
                                                 <input class="form-control" id="requisitions_purchase_number"
                                                     value="{{ $order_supplier['requisitions_purchase_number'] ?? '' }}"
                                                     readonly>
-                                                    <input type="hidden" name="requisitions_purchase_id"  value="{{$order_supplier['requisitions_purchase_id']}}">
+                                                <input type="hidden" name="requisitions_purchase_id"
+                                                    value="{{ $order_supplier['requisitions_purchase_id'] }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_trade_date">
                                                 <label for="trade_date">採購日期<span class="redtext">*</span></label>
                                                 <div class='input-group date' id='datetimepicker'>
-                                                    <input type='text' class="form-control" name="trade_date" id="trade_date" value="{{ $order_supplier['trade_date'] ?? '' }}"/>
+                                                    <input type='text' class="form-control" name="trade_date"
+                                                        id="trade_date"
+                                                        value="{{ $order_supplier['trade_date'] ?? '' }}" />
                                                     <span class="input-group-addon">
                                                         <span class="glyphicon glyphicon-calendar"></span>
                                                     </span>
@@ -235,10 +238,10 @@
                                     <div id="ItemDiv">
                                         <div class="add_row">
                                             <div class="row">
-                                                <div class="col-sm-3 text-left">品項<span class="redtext">*</span>
+                                                <div class="col-sm-5 text-left">品項<span class="redtext">*</span>
                                                 </div>
                                                 <div class="col-sm-1 text-left">贈品</div>
-                                                <div class="col-sm-2 text-left">單價<span class="redtext">*</span>
+                                                <div class="col-sm-1 text-left">單價<span class="redtext">*</span>
                                                 </div>
                                                 <div class="col-sm-1 text-left">請購量<span class="redtext">*</span>
                                                 </div>
@@ -246,14 +249,14 @@
                                                 </div>
                                                 <div class="col-sm-1 text-left">單位</div>
                                                 <div class="col-sm-1 text-left">最小採購量</div>
-                                                <div class="col-sm-2 text-left">原幣小計<span class="redtext">*</span>
+                                                <div class="col-sm-1 text-left">原幣小計<span class="redtext">*</span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="add_row" v-for="(detail, detailKey) in order_supplier_detail">
                                             <div class="row">
                                                 {{-- 品項 --}}
-                                                <div class="col-sm-3">
+                                                <div class="col-sm-5">
                                                     <input class="form-control" v-model="detail.combination_name"
                                                         readonly>
                                                 </div>
@@ -268,7 +271,7 @@
                                                     </div>
                                                 </div>
                                                 {{-- 單價 --}}
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-1">
                                                     <input class="form-control" type="number" readonly
                                                         v-model="detail.item_price">
                                                 </div>
@@ -280,10 +283,9 @@
                                                 {{-- 採購量 --}}
                                                 <div class="col-sm-1">
                                                     <div class="form-group">
-                                                        <input class="form-control item_qty"
-                                                            v-model="detail.item_qty" :max="detail.item_qty"
-                                                            :name="'item_qty['+detailKey+']'" :min="0" type="number"
-                                                            @change="detailsCount">
+                                                        <input class="form-control item_qty" v-model="detail.item_qty"
+                                                            :max="detail.item_qty" :name="'item_qty['+detailKey+']'"
+                                                            :min="0" type="number" @change="detailsCount">
                                                     </div>
                                                 </div>
                                                 {{-- 單位 --}}
@@ -296,7 +298,7 @@
                                                         v-model="detail.min_purchase_qty">
                                                 </div>
                                                 {{-- 原幣小計 --}}
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-1">
                                                     <input class="form-control " readonly
                                                         v-model="detail.original_subtotal_price">
                                                 </div>
@@ -357,55 +359,58 @@
                         // console.log('取消');
                     },
                     detailsCount() {
-                    var vm = this ;
-                    var taxtype = String(this.order_supplier.tax);
-                    var sum_price = 0; //總計
-                    var sum_original_total_tax_price = 0.00; //原幣稅額加總
-                    var sum_total_tax_price = 0.00; //(本幣)稅額
-                    $.each(this.order_supplier_detail, function(key, obj) {
-                        if (obj.is_giveaway) { //如果是贈品則不計算單價
-                            obj.item_price = 0;
-                            obj.subtotal_tax_price = 0;
-                            obj.original_subtotal_tax_price = 0;
-                            obj.original_subtotal_price = 0;
-                        } else {
-                            obj.original_subtotal_price = obj.item_price * obj.item_qty; // (本幣)小計
-                            obj.subtotal_price = obj.original_subtotal_price; //原幣小計
-                            switch (taxtype) {
-                                case '0': //免稅
-                                    obj.subtotal_tax_price = 0; //(本幣)稅額
-                                    obj.original_subtotal_tax_price = 0 //原幣稅額
-                                    break;
-                                case '2': //應稅內含
-                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(2); //(本幣)稅額
-                                    obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
-                                    break;
-                                case '3': //零稅率
-                                    obj.subtotal_tax_price = 0; //(本幣)稅額
-                                    obj.original_subtotal_tax_price = 0 //原幣稅額
-                                    break;
+                        var vm = this;
+                        var taxtype = String(this.order_supplier.tax);
+                        var sum_price = 0; //總計
+                        var sum_original_total_tax_price = 0.00; //原幣稅額加總
+                        var sum_total_tax_price = 0.00; //(本幣)稅額
+                        $.each(this.order_supplier_detail, function(key, obj) {
+                            if (obj.is_giveaway) { //如果是贈品則不計算單價
+                                obj.item_price = 0;
+                                obj.subtotal_tax_price = 0;
+                                obj.original_subtotal_tax_price = 0;
+                                obj.original_subtotal_price = 0;
+                            } else {
+                                obj.original_subtotal_price = obj.item_price * obj.item_qty; // (本幣)小計
+                                obj.subtotal_price = obj.original_subtotal_price; //原幣小計
+                                switch (taxtype) {
+                                    case '0': //免稅
+                                        obj.subtotal_tax_price = 0; //(本幣)稅額
+                                        obj.original_subtotal_tax_price = 0 //原幣稅額
+                                        break;
+                                    case '2': //應稅內含
+                                        obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price /
+                                            1.05)).toFixed(2); //(本幣)稅額
+                                        obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj
+                                            .original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
+                                        break;
+                                    case '3': //零稅率
+                                        obj.subtotal_tax_price = 0; //(本幣)稅額
+                                        obj.original_subtotal_tax_price = 0 //原幣稅額
+                                        break;
+                                }
                             }
+                            sum_price += obj.subtotal_price;
+                            sum_total_tax_price = vm.NumberAdd(sum_total_tax_price, obj.subtotal_tax_price);
+                            sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price, obj
+                                .original_subtotal_tax_price);
+                        });
+                        switch (taxtype) {
+                            case '0': //免稅
+                                vm.order_supplier.original_total_tax_price = 0; //原幣稅額
+                                vm.order_supplier.total_tax_price = 0; //稅額(本幣)
+                                break;
+                            case '2': //應稅內含
+                                vm.order_supplier.total_tax_price = Number(sum_total_tax_price).toFixed(0); //稅額(本幣)
+                                vm.order_supplier.original_total_tax_price = sum_original_total_tax_price; //原幣稅額
+                                break;
+                            case '3': //零稅率
+                                vm.order_supplier.original_total_tax_price = 0; //原幣稅額
+                                vm.order_supplier.total_tax_price = 0; //稅額(本幣)
+                                break;
                         }
-                        sum_price += obj.subtotal_price;
-                        sum_total_tax_price = vm.NumberAdd(sum_total_tax_price,obj.subtotal_tax_price);
-                        sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price,obj.original_subtotal_tax_price);
-                    });
-                    switch (taxtype) {
-                        case '0': //免稅
-                            vm.order_supplier.original_total_tax_price = 0; //原幣稅額
-                            vm.order_supplier.total_tax_price = 0; //稅額(本幣)
-                            break;
-                        case '2': //應稅內含
-                            vm.order_supplier.total_tax_price = Number(sum_total_tax_price).toFixed(0); //稅額(本幣)
-                            vm.order_supplier.original_total_tax_price = sum_original_total_tax_price; //原幣稅額
-                            break;
-                        case '3': //零稅率
-                            vm.order_supplier.original_total_tax_price = 0; //原幣稅額
-                            vm.order_supplier.total_tax_price = 0; //稅額(本幣)
-                            break;
-                    }
-                    vm.order_supplier.original_total_price = sum_price; //原幣總金額
-                    vm.order_supplier.total_price = sum_price; //總金額
+                        vm.order_supplier.original_total_price = sum_price; //原幣總金額
+                        vm.order_supplier.total_price = sum_price; //總金額
                     },
                 },
 
@@ -437,12 +442,44 @@
                             },
                             requisitions_purchase_id: {
                                 required: true,
-                            }
+                            },
+                            supplier_deliver_date: {
+                                dateGreaterEqualThan: function() {
+                                    let obj = {
+                                        date: $('#trade_date').val(),
+                                        depends: true,
+                                    }
+                                    if ($('#supplier_deliver_date').val() !== '') {
+                                        obj.depends = true;
+                                    } else {
+                                        obj.depends = false;
+                                    }
+                                    return obj;
+                                },
+                            },
+                            //預計進貨日
+                            expect_deliver_date: {
+                                dateGreaterEqualThan: function() {
+                                    let obj = {
+                                        date: $('#expect_deliver_date').val(),
+                                        depends: true,
+                                    }
+                                    if ($('#supplier_deliver_date').val() !== '') {
+                                        obj.depends = true;
+                                    } else {
+                                        obj.depends = false;
+                                    }
+                                    return obj;
+                                },
+                            },
                         },
                         messages: {
-                            // end_launched_at: {
-                            //     greaterThan: "結束時間必須大於開始時間",
-                            // },
+                            supplier_deliver_date: {
+                                dateGreaterEqualThan: "不可小於採購日期"
+                            },
+                            expect_deliver_date: {
+                                dateGreaterEqualThan: "不可小於廠商交貨日"
+                            },
                         },
                         errorClass: "help-block",
                         errorElement: "span",
@@ -469,10 +506,10 @@
                     $(".item_qty").each(function() {
                         $(this).rules("add", {
                             required: true,
-                            digits:true,
-                            messages:{
+                            digits: true,
+                            messages: {
                                 digits: '請輸入正整數',
-                                max:'採購量不能大於請購量',
+                                max: '採購量不能大於請購量',
                             },
                         });
                     })
