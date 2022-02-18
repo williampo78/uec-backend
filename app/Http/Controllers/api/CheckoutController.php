@@ -202,7 +202,6 @@ class CheckoutController extends Controller
 
         /* test
         $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
-        //dd($data);
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
         */
         if ($response['status'] == '404') {
