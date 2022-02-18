@@ -284,7 +284,7 @@
                                                 <div class="col-sm-1">
                                                     <div class="form-group">
                                                         <input class="form-control item_qty" v-model="detail.item_qty"
-                                                            :max="detail.item_qty" :name="'item_qty['+detailKey+']'"
+                                                            :max="detail.purchase_detail_item_qty" :name="'item_qty['+detailKey+']'"
                                                             :min="0" type="number" @change="detailsCount">
                                                     </div>
                                                 </div>
@@ -353,6 +353,22 @@
                         this.$nextTick(() => {
                             $('#new-form').submit();
                         });
+                    },
+                    NumberAdd(arg1, arg2) {
+                        var r1, r2, m, n;
+                        try {
+                            r1 = arg1.toString().split(".")[1].length
+                        } catch (e) {
+                            r1 = 0
+                        }
+                        try {
+                            r2 = arg2.toString().split(".")[1].length
+                        } catch (e) {
+                            r2 = 0
+                        }
+                        m = Math.pow(10, Math.max(r1, r2))
+                        n = (r1 >= r2) ? r1 : r2;
+                        return ((arg1 * m + arg2 * m) / m).toFixed(n);
                     },
                     cancel() {
                         return history.go(-1);
@@ -492,8 +508,6 @@
                                 element.parent().append(error);
                                 return;
                             }
-                            console.log(element);
-
                             error.insertAfter(element);
                         },
                         highlight: function(element, errorClass, validClass) {
