@@ -322,6 +322,7 @@
                 rules: {
                     start_launched_at: {
                         required: true,
+                        dateGreaterThanNow: true,
                     },
                     end_launched_at: {
                         required: true,
