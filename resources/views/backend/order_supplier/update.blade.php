@@ -477,10 +477,10 @@
                             expect_deliver_date: {
                                 dateGreaterEqualThan: function() {
                                     let obj = {
-                                        date: $('#expect_deliver_date').val(),
+                                        date: $('#supplier_deliver_date').val(),
                                         depends: true,
                                     }
-                                    if ($('#supplier_deliver_date').val() !== '') {
+                                    if ($('#expect_deliver_date').val() !== '') {
                                         obj.depends = true;
                                     } else {
                                         obj.depends = false;
