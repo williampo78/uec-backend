@@ -117,9 +117,9 @@ class BuyoutProductsReportController extends Controller
             "spec_2_value" => "規格二",
             "item_price" => "單價",
             "item_qty" => "數量",
-            "detail_original_subtotal_price" => "未稅金額",
+            "detail_subtotal_nontax_price" => "未稅金額",
             "detail_subtotal_tax_price" => "稅額",
-            "detail_subtotal_nontax_price" => "含稅金額",
+            "detail_original_subtotal_price" => "含稅金額",
         ];
         $data = $data->toArray();
         $export = new ReportExport($title, $data);
