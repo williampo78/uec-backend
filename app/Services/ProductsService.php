@@ -586,7 +586,6 @@ class ProductsService
             ->leftJoin('products', 'products.id', '=', 'related_products.related_product_id')
             ->orderBy('related_products.sort', 'ASC')
             ->get();
-        // dd($result) ;
         return $result;
     }
 

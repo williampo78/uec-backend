@@ -46,7 +46,6 @@ class ContactService
                 Log::info($e);
             }
         }
-        // dd($update) ;
         if (count($update) !== 0) {
             try {
                 foreach ($update as $val) {

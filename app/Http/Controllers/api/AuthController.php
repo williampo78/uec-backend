@@ -111,7 +111,6 @@ class AuthController extends Controller
 
         /*
         $token = JWTAuth::getToken();
-        //dd($token);
         $member = Members::where('api_token', '=', $token)->get();
         if (JWTAuth::parseToken()->invalidate()) {
             $message = 'token已失效';

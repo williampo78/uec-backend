@@ -301,6 +301,11 @@
                     vm.details = addArray;
                     this.switch_computed = 1;
                 });
+                if(vm.requisitions_purchase.tax == ''){
+                    vm.requisitions_purchase.tax =  '2'  ;
+                }else{
+                    vm.requisitions_purchase.tax = String(vm.requisitions_purchase.tax)
+                }
             },
             methods: {
                 //新增品項
