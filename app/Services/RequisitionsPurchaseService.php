@@ -210,7 +210,6 @@ class RequisitionsPurchaseService
 
             $result['status'] = false;
         }
-
         return $result;
     }
     public function updateRequisitionsPurchase($input)
