@@ -18,12 +18,27 @@
                                 <div class="col-sm-9 show_number"></div>
                             </div>
                         </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-3"><label class="control-label"> 採購日期</label></div>
+                                <div class="col-sm-9">
+                                    <div class='input-group date' id='trade_date_dp'>
+                                        <label></label>
+                                        <input type='text' class="form-control" name="trade_date"
+                                            id="trade_date" value="" readonly/>
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                     <br>
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
-
                                 <div class="col-sm-3"><label class="control-label"> 廠商交貨日</label></div>
                                 <div class="col-sm-9">
                                     <div class='input-group date' id='supplier_deliver_date_dp'>
