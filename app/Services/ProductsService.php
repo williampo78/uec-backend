@@ -866,7 +866,7 @@ class ProductsService
         $count = CategoryHierarchy::select('web_category_products.*')
             ->Join('web_category_products', 'web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.id')
             ->where('web_category_products.product_id', $in['product_id'])
-            ->where('web_category_hierarchy.active', '1')->count();
+            ->count();
         if ($count == 0) {
             return false;
         } else {
