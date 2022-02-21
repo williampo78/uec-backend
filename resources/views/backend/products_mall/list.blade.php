@@ -146,7 +146,7 @@
                                         <select class="form-control js-select2" name="product_type" id="product_type">
                                             <option value="">全部</option>
                                             <option value="N"
-                                                {{ request()->input('product_type') == 'N' ? 'selected' : '' }}>一般品
+                                                {{ request()->input('product_type') == 'N' || request()->input('product_type') == null ? 'selected' : '' }}>一般品
                                             </option>
                                             <option value="G"
                                                 {{ request()->input('product_type') == 'G' ? 'selected' : '' }}>贈品
@@ -315,11 +315,16 @@
                                 @foreach ($products as $key => $val)
                                     <tr>
                                         <td>
+                                            @if ($share_role_auth['auth_query'])
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('product_small.show', $val->id) }}">
                                                 <i class="fa fa-search"></i></a>
+                                            @endif
+                                            @if ($share_role_auth['auth_update'] && $val->product_type !== 'G')
+
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('product_small.edit', $val->id) }}">編輯</a>
+                                            @endif
                                         </td>
                                         <td>{{ $key += 1 }}</td>
                                         <td>{{ $val->supplier_name }}</td>

@@ -301,8 +301,11 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-2">
+                                @if ($share_role_auth['auth_create'])
+
                                 <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}"><i
                                         class="fa fa-plus"></i> 新增</a>
+                                @endif
                             </div>
                         </div>
                         <hr>
