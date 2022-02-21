@@ -142,7 +142,15 @@ class ProductsService
         if (!empty($input_data['start_launched_at_end'])) {
             $products->whereDate('products.start_launched_at', '<=', $input_data['start_launched_at_end']);
         }
-
+        //建檔開始時間
+        if (!empty($input_data['create_at_start'])) {
+            $products->whereDate('products.created_at', '>=', $input_data['create_at_start']);
+        }
+        //建檔起結束時間
+        if (!empty($input_data['create_at_start_end'])) {
+            $products->whereDate('products.created_at', '<=', $input_data['create_at_start_end']);
+        }
+        
         // 最低售價
         if (isset($input_data['selling_price_min'])) {
             $products->where('products.selling_price', '>=', $input_data['selling_price_min']);

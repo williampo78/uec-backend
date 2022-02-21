@@ -233,8 +233,44 @@
                                             value="500">
                                     </div>
                                 </div>
-
                                 <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <label class="control-label">建檔時間</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div class='input-group date' id='datetimepicker-create_at_start'>
+                                                <input type="text" class="form-control" name="create_at_start"
+                                                    id="create_at_start"
+                                                    value="{{ request()->input('create_at_start') }}"
+                                                    autocomplete="off" />
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1 text-center">
+                                        <label class="control-label">～</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div class='input-group date' id='datetimepicker-create_at_start_end'>
+                                                <input type="text" class="form-control" name="create_at_start_end"
+                                                    id="create_at_start_end"
+                                                    value="{{ request()->input('create_at_start_end') }}"
+                                                    autocomplete="off" />
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                              
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
                                     <div class="col-sm-3"></div>
                                     <div class="col-sm-9 text-right">
                                         @if ($share_role_auth['auth_query'])
@@ -370,7 +406,12 @@
             $('#datetimepicker2').datetimepicker({
                 format: 'YYYY-MM-DD',
             });
-
+            $('#datetimepicker-create_at_start').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
+            $('#datetimepicker-create_at_start_end').datetimepicker({
+                format: 'YYYY-MM-DD',
+            });
             // 重置搜尋表單
             $('#btn-reset').on('click', function() {
                 $('#search-form').find(':text:not("#limit"), select').val('');
