@@ -37,10 +37,12 @@ class ProductsService
             'products.*',
             'supplier.name AS supplier_name',
             DB::raw('get_latest_product_cost(products.id, TRUE) AS item_cost'),
-            )
+        )
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id);
-
+        if (isset($input_data['filter_product_id']) && $input_data['filter_product_id'] !== '') {
+            $products = $products->whereNotIn('products.id', $input_data['filter_product_id']);
+        }
         if (isset($input_data['web_category_hierarchy_id'])) {
             $web_category_hierarchy_id = $input_data['web_category_hierarchy_id'];
             $products->join('web_category_products', function ($join) use ($web_category_hierarchy_id) {
@@ -108,7 +110,7 @@ class ProductsService
                 case 'APPROVED_STATUS_ON':
                     $products = $products->where(function ($query) use ($now) {
                         $query->where('products.approval_status', '=', 'APPROVED')
-                            // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
+                        // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
                             ->where('products.start_launched_at', '<=', $now)
                             ->where('products.end_launched_at', '>=', $now);
                     });
@@ -150,7 +152,7 @@ class ProductsService
         if (!empty($input_data['create_at_start_end'])) {
             $products->whereDate('products.created_at', '<=', $input_data['create_at_start_end']);
         }
-        
+
         // 最低售價
         if (isset($input_data['selling_price_min'])) {
             $products->where('products.selling_price', '>=', $input_data['selling_price_min']);
@@ -486,7 +488,7 @@ class ProductsService
     {
         $agent_id = Auth::user()->agent_id;
         $ProductItems = ProductItems::
-        select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
+            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
             ->where('product_items.agent_id', $agent_id)
             ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id');
@@ -589,7 +591,7 @@ class ProductsService
 
     public function getRelatedProducts($product_id)
     {
-        $result = RelatedProducts::select('related_products.*', 'products.product_name')
+        $result = RelatedProducts::select('related_products.*', 'products.product_name', 'products.product_no')
             ->where('related_products.product_id', $product_id)
             ->leftJoin('products', 'products.id', '=', 'related_products.related_product_id')
             ->orderBy('related_products.sort', 'ASC')
@@ -811,7 +813,7 @@ class ProductsService
             $Products_update = Products::where('id', $id)->first();
             Products::where('id', $id)->update([
                 'approval_status' => $approval_status,
-                'updated_at' => $Products_update->updated_at , 
+                'updated_at' => $Products_update->updated_at,
             ]);
             DB::commit();
             $result = true;
@@ -953,7 +955,7 @@ class ProductsService
             join products p on p.id = rp.related_product_id
            where rp.product_id = products.id
            order by rp.sort) as related_product_name'),
-            )
+        )
             ->leftJoin('products', 'products.id', 'product_items.product_id')
             ->leftJoin('products_v', 'products_v.id', 'product_items.product_id')
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
