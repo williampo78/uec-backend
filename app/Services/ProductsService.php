@@ -799,9 +799,11 @@ class ProductsService
                 'review_at' => $now,
                 'updated_by' => $user_id,
             ]);
+            // 客戶要求：審核完成後，不要更新產品修改人員 => 不要修改products.updated_by、products.updated_at
+            $Products_update = Products::where('id', $id)->first();
             Products::where('id', $id)->update([
                 'approval_status' => $approval_status,
-                'updated_by' => $user_id,
+                'updated_at' => $Products_update->updated_at , 
             ]);
             DB::commit();
             $result = true;
