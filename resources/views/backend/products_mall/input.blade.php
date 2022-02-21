@@ -221,7 +221,8 @@
                                         <table class="table table-striped table-bordered table-hover">
                                             <thead>
                                             <tr>
-                                                <th class="col-sm-11">名稱</th>
+                                                <th class="col-sm-8">名稱</th>
+                                                <th class="col-sm-3">商品編號</th>
                                                 <th class="col-sm-1">功能</th>
                                             </tr>
                                             </thead>
@@ -232,6 +233,9 @@
                                                 <td style="vertical-align:middle">
                                                     <i class="fa fa-list"></i>
                                                     @{{ Product.product_name }}
+                                                </td>
+                                                <td>
+                                                    @{{ Product.product_no }}
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger"

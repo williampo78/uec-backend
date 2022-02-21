@@ -163,7 +163,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <button style="display:none;" class="btn btn-info btn-sm toggle-show-model"
+                                <button style="display:none;" class="btn btn-info btn-sm"
                                     data-toggle="modal" data-target="#row_detail">SHOW
                                 </button>
                                 @foreach ($data['order_supplier'] as $k => $v)
@@ -267,10 +267,10 @@
                 },
                 supplier_deliver(obj) {
                     $('#supplier_deliver_date').val(obj.supplier_deliver_date);
+                    $('#trade_date').val(obj.trade_date);
                     $('#expect_deliver_date').val(obj.expect_deliver_date);
                     $('#get_order_supplier_id').val(obj.id)
                     $('.show_number').html(obj.number);
-
                 },
 
             },
@@ -322,15 +322,43 @@
                 },
                 rules: {
                     supplier_deliver_date: {
-                        required: true,
+                        dateGreaterEqualThan: function() {
+                                let obj = {
+                                    date: $('#trade_date').val(),
+                                    depends: true,
+                                }
+                                if ($('#supplier_deliver_date').val() !== '') {
+                                    obj.depends = true;
+                                } else {
+                                    obj.depends = false;
+                                }
+                                return obj;
+                            },
                     },
                     expect_deliver_date: {
-                        required: true,
+                        dateGreaterEqualThan: function() {
+                                let obj = {
+                                    date: $('#supplier_deliver_date').val(),
+                                    depends: true,
+                                }
+                                if ($('#expect_deliver_date').val() !== '') {
+                                    obj.depends = true;
+                                } else {
+                                    obj.depends = false;
+                                }
+                                return obj;
+                            },
                     }
                 },
                 messages: {
                     end_launched_at: {
                         greaterThan: "結束時間必須大於開始時間",
+                    },
+                    supplier_deliver_date: {
+                        dateGreaterEqualThan: "不可小於採購日期"
+                    },
+                    expect_deliver_date: {
+                        dateGreaterEqualThan: "不可小於廠商交貨日"
                     },
                 },
                 errorClass: "help-block",

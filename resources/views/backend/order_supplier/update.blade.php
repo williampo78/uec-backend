@@ -284,8 +284,9 @@
                                                 <div class="col-sm-1">
                                                     <div class="form-group">
                                                         <input class="form-control item_qty" v-model="detail.item_qty"
-                                                            :max="detail.purchase_detail_item_qty" :name="'item_qty['+detailKey+']'"
-                                                            :min="0" type="number" @change="detailsCount">
+                                                            :max="detail.purchase_detail_item_qty"
+                                                            :name="'item_qty['+detailKey+']'" type="number"
+                                                            @change="detailsCount">
                                                     </div>
                                                 </div>
                                                 {{-- 單位 --}}
@@ -294,8 +295,7 @@
                                                 </div>
                                                 {{-- 最小採購量 --}}
                                                 <div class="col-sm-1">
-                                                    <input class="form-control " readonly
-                                                        v-model="detail.item_qty">
+                                                    <input class="form-control " readonly v-model="detail.min_purchase_qty">
                                                 </div>
                                                 {{-- 原幣小計 --}}
                                                 <div class="col-sm-1">
@@ -518,12 +518,15 @@
                         },
                     });
                     $(".item_qty").each(function() {
+                        var qty = $(this).val()  ; 
                         $(this).rules("add", {
                             required: true,
                             digits: true,
+                            min: 0.01,
                             messages: {
                                 digits: '請輸入正整數',
                                 max: '採購量不能大於請購量',
+                                min: '請輸入正整數',
                             },
                         });
                     })

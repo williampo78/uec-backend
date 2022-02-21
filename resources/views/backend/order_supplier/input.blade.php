@@ -261,8 +261,9 @@
                                             <div class="col-sm-1">
                                                 <div class="form-group">
                                                     <input class="form-control item_qty" v-model="detail.item_qty"
-                                                        :max="detail.item_qty" :name="'item_qty['+detailKey+']'" :min="0"
-                                                        type="number" @change="detailsCount">
+                                                        :max="detail.purchase_detail_item_qty"
+                                                        :name="'item_qty['+detailKey+']'" type="number"
+                                                        @change="detailsCount">
                                                 </div>
                                             </div>
                                             {{-- 單位 --}}
@@ -365,13 +366,20 @@
                     return history.go(-1);
                 },
                 detailsCount() {
+                    $(".item_qty").each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                            digits: true,
+                            min: 0.01,
+                            messages: {
+                                digits: '請輸入正整數',
+                                max: '採購量不能大於請購量',
+                                min:'請輸入正整數',
+                            },
+                        });
+                    })
                     var vm = this;
                     var taxtype = String(this.order_supplier.tax);
-                    // console.log(taxtype) ;
-                    // var original_total_tax_price = 0; // 原幣稅額
-                    // var original_total_price = 0; // 原幣總金額
-                    // var total_tax_price = 0; //(本幣)稅額
-                    // var total_price = 0; //(本幣)總金額
                     var sum_price = 0; //總計
                     var sum_original_total_tax_price = 0.00; //原幣稅額加總
                     var sum_total_tax_price = 0.00; //(本幣)稅額
@@ -422,14 +430,6 @@
                     }
                     vm.order_supplier.original_total_price = sum_price; //原幣總金額
                     vm.order_supplier.total_price = sum_price; //總金額
-
-
-                    // return details;
-                    // this.order_supplier.original_total_price = sum_price; // 原幣總金額
-                    // this.order_supplier.original_total_tax_price = original_total_tax_price; //原幣稅額
-                    // this.order_supplier.total_tax_price = total_tax_price; //(本幣)稅額
-                    // this.order_supplier.total_price = sum_price; //(本幣)稅額
-                    // this.order_supplier.sum_price = sum_price; //
 
                 },
             },
