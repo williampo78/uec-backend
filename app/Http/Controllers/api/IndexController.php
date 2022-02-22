@@ -29,6 +29,7 @@ class IndexController extends Controller
     public function index()
     {
         $level1 = $this->universalService->getLookupValues('FOOTER_CATEGORY');
+        $lookup = $this->universalService->getLookUp('FOOTER_CATEGORY');
         $data = [];
         $items = [];
         foreach ($level1 as $code => $name) {
@@ -45,7 +46,8 @@ class IndexController extends Controller
             $data[] = array(
                 "field_id" => $code, //ABOUT_US
                 "field_value" => $name, //關於我們
-                "field_items" => $items[$v['parent_code']]
+                "field_type"=>$lookup[$code]['udf_01'],
+                "field_items" => $items[$v['parent_code']],
             );
         }
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data]);
