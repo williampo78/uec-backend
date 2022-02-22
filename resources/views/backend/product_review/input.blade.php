@@ -48,7 +48,8 @@
                             <i class="fa fa-save"></i>
                             儲存
                         </button>
-                        <a class="btn btn-danger" type="button" href="{{ url()->previous() }}"><i class="fa fa-ban"></i>
+                        <a class="btn btn-danger" type="button" href="{{ url()->previous() }}"><i
+                                class="fa fa-ban"></i>
                             取消</a>
                         <hr>
 
@@ -163,8 +164,8 @@
                                         <label class="control-label">成本</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="item_cost"
-                                            value="{{ $products->item_cost }}" readonly>
+                                        <input class="form-control" name="item_cost" value="{{ $products->item_cost }}"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -275,9 +276,11 @@
                                                         @case('APPROVE')
                                                             核准
                                                         @break
+
                                                         @case('REJECT')
                                                             駁回
                                                         @break
+
                                                         @default
                                                             尚未審核
                                                     @endswitch
@@ -314,7 +317,6 @@
                 $("#new-form").submit();
             })
             $("#new-form").validate({
-                // debug: true,
                 submitHandler: function(form) {
                     $('#save_data').prop('disabled', true);
                     form.submit();
@@ -323,7 +325,19 @@
                     review_result: {
                         required: true,
                     },
+                    gross_margin: {
+                        digits: {
+                            depends: function(element) {
+                                return $("[name='review_result']:checked").val() == '1';
+                            },
+                        },
+                    }
 
+                },
+                messages: {
+                    gross_margin: {
+                        digits: "商品毛利為負，不允許上架！",
+                    }
                 },
                 errorClass: "help-block",
                 errorElement: "span",
