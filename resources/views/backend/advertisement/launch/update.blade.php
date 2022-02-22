@@ -3,36 +3,7 @@
 @section('title', '編輯廣告上架')
 
 @section('style')
-    <style>
-        .colorpicker-2x .colorpicker-saturation {
-            width: 200px;
-            height: 200px;
-        }
-
-        .colorpicker-2x .colorpicker-hue,
-        .colorpicker-2x .colorpicker-alpha {
-            width: 30px;
-            height: 200px;
-        }
-
-        .colorpicker-2x .colorpicker-color,
-        .colorpicker-2x .colorpicker-color div {
-            height: 30px;
-        }
-
-        .tab-content {
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            padding: 30px;
-        }
-
-        .sort {
-            min-width: 80px;
-            width: 100px;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ mix('css/advertisement.css') }}">
 @endsection
 
 @section('content')
@@ -47,8 +18,8 @@
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
-                    <div class="panel-body" id="requisitions_vue_app">
-                        <form role="form" id="update-form" method="post"
+                    <div class="panel-body">
+                        <form id="update-form" method="post"
                             action="{{ route('advertisemsement_launch.update', $ad_slot_content['content']['slot_content_id']) }}"
                             enctype="multipart/form-data">
                             @method('PUT')
@@ -90,6 +61,13 @@
 
     <script>
         $(function() {
+            // 商品分類下拉選項
+            let product_category = @json($product_category);
+            // 商品下拉選項
+            let products = @json($products);
+            let content = @json($ad_slot_content['content']);
+            let details = @json($ad_slot_content['details']);
+
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
@@ -102,16 +80,8 @@
                 location.href = "{{ route('advertisemsement_launch') }}";
             });
 
-            // 商品分類下拉選項
-            let product_category = @json($product_category);
             let product_category_select_options = getProductCategorySelectOptions(product_category);
-
-            // 商品下拉選項
-            let products = @json($products);
             let product_select_options = getProductSelectOptions(products);
-
-            let content = @json($ad_slot_content['content']);
-            let details = @json($ad_slot_content['details']);
 
             // 驗證表單
             $("#update-form").validate({
@@ -233,6 +203,11 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
+                    if (element.is(':file')) {
+                        error.insertAfter(element);
+                        return;
+                    }
+
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -271,6 +246,7 @@
                 $('#active_disabled').prop('checked', true);
             }
 
+            $('#img_slot_icon_name, #btn-delete-slot-icon-name').hide();
             // 開放編輯 版位主色、版位icon、版位標題
             if (content.is_user_defined == 1) {
                 enableSlotColorCode();
@@ -278,8 +254,9 @@
                 enableSlotTitle();
 
                 $('#slot_color_code').val(content.slot_color_code);
-                $(`<img src="${content.slot_icon_name_url}" class="img-responsive" width="50" height="50" />`)
-                    .insertBefore('#slot_icon_name');
+                $('#img_slot_icon_name').attr('src', content.slot_icon_name_url);
+                $("#slot_icon_name").hide();
+                $('#img_slot_icon_name, #btn-delete-slot-icon-name').show();
                 $('#slot_title').val(content.slot_title);
             }
             // 開放編輯 版位主色

@@ -74,8 +74,9 @@
         <div class="col-sm-4">
             <div class="form-group">
                 <label for="slot_icon_name">版位icon</label>
-                <input type="file" id="slot_icon_name" name="slot_icon_name" disabled />
-                {{-- <div id="slot_icon_name"></div> --}}
+                <input type="file" id="slot_icon_name" name="slot_icon_name" disabled /><br />
+                <img src="" id="img_slot_icon_name" class="img-responsive" width="70" height="70" /><br />
+                <button type="button" class="btn btn-danger" id="btn-delete-slot-icon-name" title="刪除"><i class='fa fa-trash-o'></i></button>
             </div>
         </div>
         <div class="col-sm-4">

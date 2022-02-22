@@ -368,7 +368,7 @@
                             let sort = value.sort !== null ? value.sort :
                                 '<i class="fa fa-times fa-lg"></i>';
                             let image_name_url = value.image_name_url ?
-                                `<img src="${value.image_name_url}" class="img-responsive" width="400" height="400" />` :
+                                `<img src="${value.image_name_url}" class="img-responsive" width="300" height="300" />` :
                                 '<i class="fa fa-times fa-lg"></i>';
                             let image_alt = value.image_alt ? value.image_alt :
                                 '<i class="fa fa-times fa-lg"></i>';

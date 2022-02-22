@@ -1,2 +1,31 @@
-@import "~@uppy/core/dist/style.css";
-@import "~@uppy/dashboard/dist/style.css";
+.colorpicker-2x .colorpicker-saturation {
+    width: 200px;
+    height: 200px;
+}
+
+.colorpicker-2x .colorpicker-hue,
+.colorpicker-2x .colorpicker-alpha {
+    width: 30px;
+    height: 200px;
+}
+
+.colorpicker-2x .colorpicker-color,
+.colorpicker-2x .colorpicker-color div {
+    height: 30px;
+}
+
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 30px;
+}
+
+.sort {
+    min-width: 80px;
+    width: 100px;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu {
+    z-index: 9999;
+}

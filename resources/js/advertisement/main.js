@@ -1,15 +1,4 @@
 import * as validate from "./validate";
-import Uppy from "@uppy/core";
-import Dashboard from "@uppy/dashboard";
-import Taiwan from "@uppy/locales/lib/zh_TW";
-import Form from "@uppy/form";
-import FileInput from "@uppy/file-input";
-
-window.Uppy = Uppy;
-Uppy.Locale = Taiwan;
-Uppy.Dashboard = Dashboard;
-Uppy.Form = Form;
-Uppy.FileInput = FileInput;
 
 // 初始化資料
 window.init = (datas = {}) => {
@@ -276,6 +265,40 @@ window.init = (datas = {}) => {
                 break;
         }
     });
+
+    // 選擇版位icon檔案
+    $("#slot_icon_name").on("change", function () {
+        const file = this.files[0];
+
+        if (file) {
+            $("#img_slot_icon_name").attr("src", URL.createObjectURL(file));
+            $("#img_slot_icon_name, #btn-delete-slot-icon-name").show();
+        }
+    });
+
+    // 刪除版位icon
+    $("#btn-delete-slot-icon-name").on("click", function () {
+        $("#img_slot_icon_name").attr("src", "");
+        $("#img_slot_icon_name, #btn-delete-slot-icon-name").hide();
+        $("#slot_icon_name").val("").show();
+    });
+
+    // 選擇圖片區的圖片檔案
+    $(document).on("change", ".image_block_image_name", function () {
+        const file = this.files[0];
+
+        if (file) {
+            $(this).siblings('.img_image_block_image_name').attr("src", URL.createObjectURL(file));
+            $(this).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").show();
+        }
+    });
+
+    // 刪除圖片區的圖片
+    $(document).on("click", ".btn-delete-image-block-image-name", function () {
+        $(this).siblings(".img_image_block_image_name").attr("src", "").hide();
+        $(this).hide();
+        $(this).siblings(".image_block_image_name").val("").show();
+    });
 };
 
 // 取得版位下拉選項
@@ -324,7 +347,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
     let image_block_id = datas.id ? datas.id : "new";
     let sort = datas.sort != null ? datas.sort : "";
     let image_name_url = datas.image_name_url
-        ? `<img src="${datas.image_name_url}" class="img-responsive" width="400" height="400" />`
+        ? datas.image_name_url
         : "";
     let image_alt = datas.image_alt ? datas.image_alt : "";
     let image_title = datas.image_title ? datas.image_title : "";
@@ -343,8 +366,9 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
             </td>
             <td>
                 <div class="form-group">
-                    ${image_name_url}
-                    <input type="file" name="image_block_image_name[${image_block_row_no}]" value="" />
+                    <input type="file" name="image_block_image_name[${image_block_row_no}]" class="image_block_image_name" value="" /><br />
+                    <img src="${image_name_url}" class="img-responsive img_image_block_image_name" width="300" height="300" /><br />
+                    <button type="button" class="btn btn-danger btn-delete-image-block-image-name" title="刪除"><i class='fa fa-trash-o'></i></button>
                 </div>
             </td>
             <td>
@@ -421,6 +445,12 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
     `);
 
     $(".js-select2-image-block-product-category").select2();
+
+    if (image_block_id == 'new') {
+        $(`#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`).siblings('.img_image_block_image_name, .btn-delete-image-block-image-name').hide();
+    } else {
+        $(`#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`).hide();
+    }
 
     $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
 
