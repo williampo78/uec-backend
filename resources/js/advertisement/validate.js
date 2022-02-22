@@ -9,7 +9,7 @@ export let validateImageBlock = (row_no) => {
     $(`#image-block table > tbody [name="image_block_image_name[${row_no}]"]`).rules("add", {
         required: {
             depends: function (element) {
-                return $(`#image-block table > tbody [name="image_block_image_name[${row_no}]"]`).closest('.form-group').find('img').length <= 0;
+                return !$(`#image-block table > tbody [name="image_block_image_name[${row_no}]"]`).prop("disabled");
             }
         },
         accept: "image/*",
@@ -124,7 +124,7 @@ export let validateSlotIconName = () => {
     $("#slot_icon_name").rules("add", {
         required: {
             depends: function (element) {
-                return $("#slot_icon_name").closest('.form-group').find('img').length <= 0;
+                return !$("#slot_icon_name").prop("disabled");
             }
         },
         accept: "image/*",

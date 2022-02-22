@@ -58,6 +58,12 @@
 
     <script>
         $(function() {
+            let ad_slots = @json($ad_slots);
+            // 商品分類下拉選項
+            let product_category = @json($product_category);
+            // 商品下拉選項
+            let products = @json($products);
+
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
@@ -140,6 +146,11 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
+                    if (element.is(':file')) {
+                        error.insertAfter(element);
+                        return;
+                    }
+
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -160,15 +171,9 @@
                 },
             });
 
-            let ad_slots = @json($ad_slots);
+
             let ad_slot_select_options = getAdSlotSelectOptions(ad_slots);
-
-            // 商品分類下拉選項
-            let product_category = @json($product_category);
             let product_category_select_options = getProductCategorySelectOptions(product_category);
-
-            // 商品下拉選項
-            let products = @json($products);
             let product_select_options = getProductSelectOptions(products);
 
             init({
@@ -176,6 +181,8 @@
                 'product_category_select_options': product_category_select_options,
                 'product_select_options': product_select_options,
             });
+
+            $('#img_slot_icon_name, #btn-delete-slot-icon-name').hide();
 
             // 選擇版位
             $('#slot_id').on('change', function() {

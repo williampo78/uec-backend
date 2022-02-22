@@ -203,6 +203,11 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
+                    if (element.is(':file')) {
+                        error.insertAfter(element);
+                        return;
+                    }
+
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -241,6 +246,7 @@
                 $('#active_disabled').prop('checked', true);
             }
 
+            $('#img_slot_icon_name, #btn-delete-slot-icon-name').hide();
             // 開放編輯 版位主色、版位icon、版位標題
             if (content.is_user_defined == 1) {
                 enableSlotColorCode();
@@ -248,8 +254,9 @@
                 enableSlotTitle();
 
                 $('#slot_color_code').val(content.slot_color_code);
-                $(`<img src="${content.slot_icon_name_url}" class="img-responsive" width="50" height="50" />`)
-                    .insertBefore('#slot_icon_name');
+                $('#img_slot_icon_name').attr('src', content.slot_icon_name_url);
+                $("#slot_icon_name").hide();
+                $('#img_slot_icon_name, #btn-delete-slot-icon-name').show();
                 $('#slot_title').val(content.slot_title);
             }
             // 開放編輯 版位主色
