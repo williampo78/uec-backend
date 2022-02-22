@@ -4,36 +4,6 @@
 
 @section('style')
     <link rel="stylesheet" href="{{ mix('css/advertisement.css') }}">
-    <style>
-        .colorpicker-2x .colorpicker-saturation {
-            width: 200px;
-            height: 200px;
-        }
-
-        .colorpicker-2x .colorpicker-hue,
-        .colorpicker-2x .colorpicker-alpha {
-            width: 30px;
-            height: 200px;
-        }
-
-        .colorpicker-2x .colorpicker-color,
-        .colorpicker-2x .colorpicker-color div {
-            height: 30px;
-        }
-
-        .tab-content {
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            padding: 30px;
-        }
-
-        .sort {
-            min-width: 80px;
-            width: 100px;
-        }
-
-    </style>
 @endsection
 
 @section('content')
@@ -49,8 +19,8 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form role="form" id="create-form" method="post"
-                            action="{{ route('advertisemsement_launch.store') }}" enctype="multipart/form-data">
+                        <form id="create-form" method="post" action="{{ route('advertisemsement_launch.store') }}"
+                            enctype="multipart/form-data">
                             @csrf
 
                             <div class="row">
@@ -88,43 +58,6 @@
 
     <script>
         $(function() {
-            // const slot_icon_uploader = new Uppy({
-            //         id: 'slot_icon',
-            //         // debug: true,
-            //         locale: Uppy.Locale,
-            //         restrictions: {
-            //             maxFileSize: 2 * 1024 * 1024,
-            //             minFileSize: null,
-            //             maxTotalFileSize: null,
-            //             maxNumberOfFiles: 1,
-            //             minNumberOfFiles: 1,
-            //             allowedFileTypes: ['image/*'],
-            //             requiredMetaFields: [],
-            //         },
-            //     })
-            //     .use(Uppy.Dashboard, {
-            //         id: 'Dashboard',
-            //         target: '#slot_icon_name',
-            //         inline: true,
-            //         width: '100%',
-            //         // height: 300,//'100%',
-            //         hideUploadButton: true,
-            //         proudlyDisplayPoweredByUppy: false,
-            //     })
-            //     .use(Uppy.Form, {
-            //         target: '#create-form',
-            //         resultName: 'uppyResult',
-            //         getMetaFromForm: true,
-            //         addResultToForm: true,
-            //         submitOnSuccess: true,
-            //         triggerUploadOnSubmit: true,
-            //     })
-            //     .use(Uppy.FileInput, {
-            //         target: '#slot_icon_name',
-            //         pretty: true,
-            //         inputName: 'slot_icon_name',
-            //     });
-
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
@@ -221,9 +154,6 @@
                 },
                 highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");

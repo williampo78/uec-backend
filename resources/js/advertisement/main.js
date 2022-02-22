@@ -1,15 +1,4 @@
 import * as validate from "./validate";
-import Uppy from "@uppy/core";
-import Dashboard from "@uppy/dashboard";
-import Taiwan from "@uppy/locales/lib/zh_TW";
-import Form from "@uppy/form";
-import FileInput from "@uppy/file-input";
-
-window.Uppy = Uppy;
-Uppy.Locale = Taiwan;
-Uppy.Dashboard = Dashboard;
-Uppy.Form = Form;
-Uppy.FileInput = FileInput;
 
 // 初始化資料
 window.init = (datas = {}) => {

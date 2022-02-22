@@ -75,7 +75,6 @@
             <div class="form-group">
                 <label for="slot_icon_name">版位icon</label>
                 <input type="file" id="slot_icon_name" name="slot_icon_name" disabled />
-                {{-- <div id="slot_icon_name"></div> --}}
             </div>
         </div>
         <div class="col-sm-4">
