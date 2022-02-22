@@ -98,6 +98,7 @@
                 rules: {
                     campaign_name: {
                         required: true,
+                        maxlength: 80,
                     },
                     active: {
                         required: true,
