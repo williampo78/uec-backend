@@ -245,7 +245,9 @@ class APIProductServices
         $data = [];
         $product_id = 0;
         foreach ($products as $product) {
-            if ($product->id == $product_id) continue;
+            if (!$id) {//依產品編號找相關分類不進此判斷
+                if ($product->id == $product_id) continue;
+            }
             $data[$product->web_category_hierarchy_id][] = $product;
             $product_id = $product->id;
         }
@@ -528,7 +530,6 @@ class APIProductServices
 
         if (sizeof($product) > 0) {
             $product_categorys = self::getWebCategoryProducts('', '', '', '', $id, '', '');
-
             $rel_category = [];
             if (sizeof($product_categorys) > 0) {
                 foreach ($product_categorys as $key => $category) {
