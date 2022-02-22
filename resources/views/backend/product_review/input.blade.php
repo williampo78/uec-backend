@@ -326,7 +326,8 @@
                         required: true,
                     },
                     gross_margin: {
-                        digits: {
+                        min: {
+                            param: 0,
                             depends: function(element) {
                                 return $("[name='review_result']:checked").val() == '1';
                             },
@@ -336,7 +337,7 @@
                 },
                 messages: {
                     gross_margin: {
-                        digits: "商品毛利為負，不允許上架！",
+                        min: "商品毛利為負，不允許上架！",
                     }
                 },
                 errorClass: "help-block",
