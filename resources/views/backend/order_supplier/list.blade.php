@@ -163,7 +163,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <button style="display:none;" class="btn btn-info btn-sm"
+                                <button style="display:none;" class="btn btn-info btn-sm toggle-show-model"
                                     data-toggle="modal" data-target="#row_detail">SHOW
                                 </button>
                                 @foreach ($data['order_supplier'] as $k => $v)
