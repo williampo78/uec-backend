@@ -1208,6 +1208,15 @@
                         required: true,
                         maxlength:4,
                     },
+                    product_brief_1:{
+                        maxlength:60,
+                    },
+                    product_brief_2:{
+                        maxlength:60,
+                    },
+                    product_brief_3:{
+                        maxlength:60,
+                    },
                     expiry_days: {
                         required:function() {
                             return $("input[name=has_expiry_date]:checked").val() == '1';
