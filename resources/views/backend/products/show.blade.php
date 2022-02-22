@@ -619,14 +619,8 @@
                                                         class="redtext">*</span></label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select class="form-control js-select2" name="spec_1" id="spec_1" disabled>
-                                                    <option value="顏色" {{ $products->spec_1 == '顏色' ? 'selected' : '' }}>
-                                                        顏色</option>
-                                                    <option value="尺寸" {{ $products->spec_1 == '尺寸' ? 'selected' : '' }}>
-                                                        尺寸</option>
-                                                    <option value="容量" {{ $products->spec_1 == '容量' ? 'selected' : '' }}>
-                                                        容量</option>
-                                                </select>
+                                                <input class="form-control" type="text" name="spec_1" id="spec_1"
+                                                value="{{ $products->spec_1 }}" disabled>
                                             </div>
                                         </div>
                                     @endif
@@ -637,14 +631,8 @@
                                                         class="redtext">*</span></label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select class="form-control js-select2" name="spec_2" id="spec_2" disabled>
-                                                    <option value="顏色" {{ $products->spec_2 == '顏色' ? 'selected' : '' }}>
-                                                        顏色</option>
-                                                    <option value="尺寸" {{ $products->spec_2 == '尺寸' ? 'selected' : '' }}>
-                                                        尺寸</option>
-                                                    <option value="容量" {{ $products->spec_2 == '容量' ? 'selected' : '' }}>
-                                                        容量</option>
-                                                </select>
+                                                <input class="form-control" type="text" name="spec_1" id="spec_1"
+                                                value="{{ $products->spec_2 }}" disabled>
                                             </div>
                                         </div>
                                     @endif
