@@ -1200,6 +1200,14 @@
                         required: true,
                         digits: true,
                     },
+                    spec_1:{
+                        required: true,
+                        maxlength:4,
+                    },
+                    spec_2:{
+                        required: true,
+                        maxlength:4,
+                    },
                     expiry_days: {
                         required:function() {
                             return $("input[name=has_expiry_date]:checked").val() == '1';
