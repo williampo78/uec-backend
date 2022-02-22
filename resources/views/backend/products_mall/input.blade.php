@@ -532,6 +532,11 @@
     <script>
         // Get all sections that have an ID defined
         $(document).ready(function () {
+            let product_photos_count = @json($product_photos_count) ;
+            if(product_photos_count == 0){
+                alert('尚無商品圖檔，請先到「商品基本資料維護」上傳圖檔！') ; 
+            }
+            console.log(product_photos_count) ; 
             $('#start_created_at').datetimepicker({
                 format: 'YYYY-MM-DD',
             });

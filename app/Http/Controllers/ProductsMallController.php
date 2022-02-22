@@ -111,6 +111,7 @@ class ProductsMallController extends Controller
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
         $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id); //前台分類
         $result['product_photos'] = $this->productsService->getProductsPhoto($id);
+        $result['product_photos_count'] =  $result['product_photos']->count();
         $result['spac_list'] = $this->productsService->getProductSpac($id);
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
         $result['related_products'] = $this->productsService->getRelatedProducts($id);
