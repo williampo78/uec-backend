@@ -175,8 +175,10 @@
                                         <label class="control-label">毛利(%)</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="gross_margin"
-                                            value="{{ $products->gross_margin }}" readonly>
+                                        <div class='input-group' data-gross-margin="true">
+                                            <input class="form-control" name="gross_margin"
+                                                value="{{ $products->gross_margin }}" readonly>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -343,6 +345,9 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
+                    if(element.parent('.input-group').data('gross-margin')){
+                        alert('商品毛利為負，不允許上架！');
+                    }
                     if (element.parent('.input-group').length || element.is(':radio')) {
                         error.insertAfter(element.parent());
                         return;
