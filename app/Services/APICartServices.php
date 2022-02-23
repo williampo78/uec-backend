@@ -578,13 +578,16 @@ class APICartServices
             }
             //全車滿額贈
             $cartDiscount = 0;
+            $compare_n_value = 0;
             foreach ($campaign_discount as $items => $item) {
+                if ($compare_n_value > $item->n_value) continue;
                 if ($cartTotal >= $item->n_value) {
                     if ($item->campaign_type == 'CART01') { //﹝滿額﹞購物車滿N元，打X折
-                        $cartDiscount += $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
+                        $cartDiscount = $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
                     } elseif ($item->campaign_type == 'CART02') { //﹝滿額﹞購物車滿N元，折X元
-                        $cartDiscount += $item->x_value; //打折後10000-1000
+                        $cartDiscount = $item->x_value; //打折後10000-1000
                     }
+                    $compare_n_value = $item->n_value;
                 }
             }
             $total_amount = ($cartTotal - $cartDiscount);
