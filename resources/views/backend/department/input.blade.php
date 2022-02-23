@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增部門</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i> 新增部門</h1>
             </div>
         </div>
 
@@ -57,13 +57,11 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="form-group">
-                                                    <button class="btn btn-success" id="btn-save" type="button"><i
-                                                            class="fa fa-save"></i>
-                                                        儲存
+                                                    <button class="btn btn-success" id="btn-save" type="button">
+                                                        <i class="fa-solid fa-floppy-disk"></i> 儲存
                                                     </button>
-                                                    <button class="btn btn-danger" id="btn-cancel" type="button"><i
-                                                            class="fa fa-ban"></i>
-                                                        取消
+                                                    <button class="btn btn-danger" id="btn-cancel" type="button">
+                                                        <i class="fa-solid fa-ban"></i> 取消
                                                     </button>
                                                 </div>
                                             </div>

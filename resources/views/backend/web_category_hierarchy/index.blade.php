@@ -24,7 +24,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-bank"></i>分類階層管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-building-columns"></i>分類階層管理</h1>
             </div>
         </div>
         <div class="row" id="web_category_hierarchy" v-cloak>
@@ -63,7 +63,7 @@
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
                                             :data-index="level_1_key" :data-level="'1'" >
                                             <td style="vertical-align:middle">
-                                                <i class="fa fa-list"></i>
+                                                <i class="fa-solid fa-list"></i>
                                                 @{{ level_1_obj . category_name }}
                                             </td>
                                             <td>
@@ -121,7 +121,7 @@
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop"
                                             :data-index="level_2_key" :data-level="'2'">
                                             <td style="vertical-align:middle" :data-index="level_2_key" :data-level="'2'" draggable="true">
-                                                <i class="fa fa-list"></i>
+                                                <i class="fa-solid fa-list"></i>
                                                 @{{ level_2_obj . category_name }}
                                             </td>
                                             <td>
@@ -184,7 +184,7 @@
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
                                             :data-index="level_3_key" :data-level="'3'">
                                             <td style="vertical-align:middle">
-                                                <i class="fa fa-list" ></i>
+                                                <i class="fa-solid fa-list"></i>
                                                 @{{ level_3_obj . category_name }}
                                             </td>
                                             <td>

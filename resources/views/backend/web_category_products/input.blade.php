@@ -18,7 +18,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>分類階層內容編輯</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i>分類階層內容編輯</h1>
             </div>
         </div>
         <div class="row">
@@ -121,9 +121,9 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <button type="button" class="btn btn-success" @click="submit"
-                                                    id="btn-save"><i class="fa fa-save"></i> 儲存</button>
+                                                    id="btn-save"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
                                                 <a class="btn btn-danger" type="button"
-                                                    href="{{ route('web_category_products') }}"><i class="fa fa-ban"></i> 取消</a>
+                                                    href="{{ route('web_category_products') }}"><i class="fa-solid fa-ban"></i> 取消</a>
                                             </div>
                                         </div>
                                     </div>

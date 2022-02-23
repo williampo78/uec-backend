@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i>{{ isset($Supplier) ? '編輯資料' : '新增資料' }}</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i>{{ isset($Supplier) ? '編輯資料' : '新增資料' }}</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -315,7 +315,7 @@
                                 <div id="contact_table">
                                     <textarea name="contact_json" style="display: none">@{{ contactData }}</textarea>
                                     @if (isset($Supplier))
-                                        <h4><i class="fa fa-th-large"></i> 其他聯絡人 </h4>
+                                        <h4><i class="fa-solid fa-table-cells-large"></i> 其他聯絡人 </h4>
                                         <div id="">
                                             <div class="well" v-for="(contact, contactkey) in contactData"
                                                 style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
@@ -347,7 +347,7 @@
                                                 <br>
                                                 <button type="button" class="btn btn-danger"
                                                     @click="delContact(contact.id,contactkey)">
-                                                    <i class="fa fa-ban"></i>
+                                                    <i class="fa-solid fa-ban"></i>
                                                     刪除聯絡人
                                                 </button>
 
@@ -355,9 +355,9 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <button type="button" class="btn btn-warning" @click="addContact"><i
-                                                        class="fa fa-plus"></i>
-                                                    新增聯絡人</button>
+                                                <button type="button" class="btn btn-warning" @click="addContact">
+                                                    <i class="fa-solid fa-plus"></i> 新增聯絡人
+                                                </button>
                                             </div>
                                         </div>
                                         <hr>
@@ -366,9 +366,11 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <button class="btn btn-success" type="button" @click="submitBtn"
-                                                    id="btn-save"><i class="fa fa-check"></i> 儲存</button>
+                                                    id="btn-save">
+                                                    <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                                </button>
                                                 <a href="{{ route('supplier') }}" class="btn btn-danger"
-                                                    id="btn-cancel"><i class="fa fa-ban"></i> 取消</a>
+                                                    id="btn-cancel"><i class="fa-solid fa-ban"></i> 取消</a>
                                             </div>
                                         </div>
                                     </div>

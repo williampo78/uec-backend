@@ -7,7 +7,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-sign-in"></i> 買斷商品對帳單</h1>
+                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 買斷商品對帳單</h1>
             </div>
         </div>
 
@@ -134,11 +134,11 @@
                                     <div class="col-sm-9">
                                         <a class="btn btn-info" target="_blank" href='{{ $excel_url  ?? ''}} '
                                             {{ $excel_url ?? 'disabled' }}>
-                                            <i class="fa fa-file-excel-o"></i>
+                                            <i class="fa-solid fa-file-excel"></i>
                                             匯出EXCEL</a>
                                     </div>
                                     <div class="col-sm-3">
-                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
                                     </div>
                                 </div>
                                 {{-- row 2 end --}}

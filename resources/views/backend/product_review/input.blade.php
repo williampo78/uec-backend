@@ -45,12 +45,11 @@
                         </div>
                         <br>
                         <button class="btn btn-large btn-success" type="button" id="save_data">
-                            <i class="fa fa-save"></i>
-                            儲存
+                            <i class="fa-solid fa-floppy-disk"></i> 儲存
                         </button>
-                        <a class="btn btn-danger" type="button" href="{{ url()->previous() }}"><i
-                                class="fa fa-ban"></i>
-                            取消</a>
+                        <a class="btn btn-danger" type="button" href="{{ url()->previous() }}">
+                            <i class="fa-solid fa-ban"></i> 取消
+                        </a>
                         <hr>
 
                         <div class="row">

@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-cube"></i> 商品主檔 - 商品上架審核</h1>
+                <h1 class="page-header"><i class="fa-solid fa-cube"></i> 商品主檔 - 商品上架審核</h1>
             </div>
         </div>
         <div class="row">
@@ -40,7 +40,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="text-right">
-                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
                                     </div>
                                 </div>
                             </div>

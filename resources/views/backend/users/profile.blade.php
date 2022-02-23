@@ -4,7 +4,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-pencil"></i> 編輯資料</h1>
+                <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 編輯資料</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -56,7 +56,7 @@
                             <div class="row">
                                 <div class="col-xs-6 text-left">
                                     <div class="form-group">
-                                        <button class="btn btn-success" id="btn-save"><i class="fa fa-check"></i> 完成
+                                        <button class="btn btn-success" id="btn-save"><i class="fa-solid fa-check"></i> 完成
                                         </button>
                                     </div>
                                 </div>

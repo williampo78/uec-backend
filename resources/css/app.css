@@ -6,6 +6,9 @@
 @import "~datatables.net-bs/css/dataTables.bootstrap.css";
 @import "~datatables.net-buttons-bs/css/buttons.bootstrap.css";
 
+/* fontawesome */
+@import "~@fortawesome/fontawesome-free/css/all.css";
+
 body {
     font-family: Segoe UI Light, 微軟正黑體;
     /* font-weight: bold; */

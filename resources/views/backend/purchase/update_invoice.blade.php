@@ -5,7 +5,7 @@
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-gear"></i> 補登發票</h4>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa-solid fa-gear"></i> 補登發票</h4>
                 <input type='hidden' id="purchase_id" value="" />
             </div>
             <form id="update_invoice_form" class="form-horizontal">
@@ -30,9 +30,9 @@
                             <div class="form-group">
 
                                 <div class="col-sm-3"><label class="control-label"> 發票號碼</label> <span class="redtext">*</span></div>
-                                <div class="col-sm-9">                                     
+                                <div class="col-sm-9">
                                         <input type='text' class="form-control" name="invoice_number" id="invoice_number" onkeyup="value=value.replace(/[^\w=@#]|_/ig,'')" value="" />
-                                       
+
                                 </div>
 
                             </div>
@@ -59,9 +59,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success"><i class="fa fa-fw fa-save"></i> 更新</button>
-                    <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
-                        關閉視窗</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa-solid fa-floppy-disk"></i> 更新
+                    </button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i> 關閉視窗
+                    </button>
                 </div>
             </form>
         </div>

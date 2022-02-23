@@ -40,12 +40,12 @@ $menus = App\Services\PermissionService::GetUserMenu();
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                       aria-haspopup="true" aria-expanded="false"><i class="fa fa-bars fa-fw"></i> 設定</a>
+                       aria-haspopup="true" aria-expanded="false"><i class="fa-solid fa-bars fa-fw"></i> 設定</a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="{{url('/backend/user_profile')}}"><i class="fa fa-user fa-fw"></i> 個人資料</a></li>
+                        <li><a href="{{url('/backend/user_profile')}}"><i class="fa-solid fa-user fa-fw"></i> 個人資料</a></li>
 
                         <li class="divider"></li>
-                        <li><a href="{{ route('signOut') }}"><i class="fa fa-sign-out fa-fw"></i> 登出</a>
+                        <li><a href="{{ route('signOut') }}"><i class="fa-solid fa-arrow-right-from-bracket fa-fw"></i> 登出</a>
                         </li>
                     </ul>
                 </li>

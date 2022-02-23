@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-cube"></i> 商品主檔 - 上下架申請</h1>
+                <h1 class="page-header"><i class="fa-solid fa-cube"></i> 商品主檔 - 上下架申請</h1>
             </div>
         </div>
         <div class="row">
@@ -276,7 +276,7 @@
                                 <div class="col-sm-12">
                                     <div class="col-sm-10"></div>
                                     <div class="col-sm-2 text-right">
-                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
                                     </div>
                                 </div>
                             </div>
@@ -310,7 +310,7 @@
                                         <td>
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('product_review_register.show', $val->id) }}">
-                                                <i class="fa fa-search"></i></a>
+                                                <i class="fa-solid fa-magnifying-glass"></i></a>
                                             @if ($share_role_auth['auth_update'])
                                                 @if ($val->launched_status == '未設定' || $val->launched_status == '上架駁回' || $val->launched_status == '商品下架')
                                                     <a class="btn btn-info btn-sm"

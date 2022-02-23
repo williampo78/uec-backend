@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-cube"></i> 商品主檔 - 基本資訊管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-cube"></i> 商品主檔 - 基本資訊管理</h1>
             </div>
         </div>
         <div class="row">
@@ -278,17 +278,17 @@
                                         @if ($share_role_auth['auth_export'])
                                             <a class="btn btn-primary" target="_blank" href='{{ $excel_url ?? '' }} '
                                                 {{ $excel_url ?? 'disabled' }}>
-                                                <i class="fa fa-file-excel-o"></i> 匯出EXCEL
+                                                <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
                                             </a>
                                         @endif
 
                                         @if ($share_role_auth['auth_query'])
                                             <button class="btn btn-warning">
-                                                <i class="fa fa-search"></i> 查詢
+                                                <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                             </button>
 
                                             <button type="button" class="btn btn-danger" id="btn-reset">
-                                                <i class="fa fa-eraser"></i> 清除
+                                                <i class="fa-solid fa-eraser"></i> 清除
                                             </button>
                                         @endif
                                     </div>
@@ -303,8 +303,9 @@
                             <div class="col-sm-2">
                                 @if ($share_role_auth['auth_create'])
 
-                                <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}"><i
-                                        class="fa fa-plus"></i> 新增</a>
+                                <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}">
+                                    <i class="fa-solid fa-plus"></i> 新增
+                                </a>
                                 @endif
                             </div>
                         </div>
@@ -333,7 +334,7 @@
                                         <td>
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('products.show', $val->id) }}">
-                                                <i class="fa fa-search"></i></a>
+                                                <i class="fa-solid fa-magnifying-glass"></i></a>
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('products.edit', $val->id) }}">編輯</a>
                                         </td>

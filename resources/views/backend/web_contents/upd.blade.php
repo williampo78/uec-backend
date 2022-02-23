@@ -6,7 +6,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-pencil"></i> 商城頁面內容管理 編輯資料</h1>
+                <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 商城頁面內容管理 編輯資料</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -116,11 +116,11 @@
                             <div class="row">
                                 <div class="col-xs-12 text-center">
                                     <div class="form-group">
-                                        <button class="btn btn-success" id="btn-save" type="button"><i
-                                                class="fa fa-check"></i> 完成
+                                        <button class="btn btn-success" id="btn-save" type="button">
+                                            <i class="fa-solid fa-check"></i> 完成
                                         </button>
-                                        <button type="button" class="btn btn-danger" id="btn-cancel"><i
-                                                class="fa fa-ban"></i> 取消
+                                        <button type="button" class="btn btn-danger" id="btn-cancel">
+                                            <i class="fa-solid fa-ban"></i> 取消
                                         </button>
                                     </div>
                                 </div>

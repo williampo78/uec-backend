@@ -5,11 +5,13 @@
 @section('style')
     <style>
 
-        .fa.fa-check {
+        td .fa-solid.fa-check,
+        .form-group .fa-solid.fa-check {
             color: green;
         }
 
-        .fa.fa-times {
+        td .fa-solid.fa-xmark,
+        .form-group .fa-solid.fa-xmark {
             color: red;
         }
 
@@ -22,7 +24,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 廣告版位管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i> 廣告版位管理</h1>
             </div>
         </div>
 
@@ -95,7 +97,7 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                                <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
                                             @endif
                                         </div>
                                     </div>
@@ -129,7 +131,7 @@
                                                 @if ($share_role_auth['auth_query'])
                                                     <button type="button" class="btn btn-info btn-sm slot_detail"
                                                         data-slot="{{ $obj->id }}" title="檢視">
-                                                        <i class="fa fa-search"></i>
+                                                        <i class="fa-solid fa-magnifying-glass"></i>
                                                     </button>
                                                 @endif
 
@@ -145,16 +147,16 @@
                                             <td>{{ $obj->slot_desc }}</td>
                                             <td>
                                                 @if ($obj->is_mobile_applicable == 1)
-                                                    <i class="fa fa-check fa-lg"></i>
+                                                    <i class="fa-solid fa-check fa-lg"></i>
                                                 @else
-                                                    <i class="fa fa-times fa-lg"></i>
+                                                    <i class="fa-solid fa-xmark fa-lg"></i>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($obj->is_desktop_applicable == 1)
-                                                    <i class="fa fa-check fa-lg"></i>
+                                                    <i class="fa-solid fa-check fa-lg"></i>
                                                 @else
-                                                    <i class="fa fa-times fa-lg"></i>
+                                                    <i class="fa-solid fa-xmark fa-lg"></i>
                                                 @endif
                                             </td>
                                             <td>
@@ -208,18 +210,18 @@
 
                         if (ad_slot.is_mobile_applicable == 1) {
                             $('#modal_is_mobile_applicable').empty().append(
-                                '<i class="fa fa-check fa-lg"></i>');
+                                '<i class="fa-solid fa-check fa-lg"></i>');
                         } else {
                             $('#modal_is_mobile_applicable').empty().append(
-                                '<i class="fa fa-times fa-lg"></i>');
+                                '<i class="fa-solid fa-xmark fa-lg"></i>');
                         }
 
                         if (ad_slot.is_desktop_applicable == 1) {
                             $('#modal_is_desktop_applicable').empty().append(
-                                '<i class="fa fa-check fa-lg"></i>');
+                                '<i class="fa-solid fa-check fa-lg"></i>');
                         } else {
                             $('#modal_is_desktop_applicable').empty().append(
-                                '<i class="fa fa-times fa-lg"></i>');
+                                '<i class="fa-solid fa-xmark fa-lg"></i>');
                         }
 
                         $('#modal_slot_type').empty().append(slot_type_option_json[ad_slot.slot_type]);

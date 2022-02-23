@@ -6,7 +6,7 @@
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-gear"></i> 採購單明細</h4>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa-solid fa-gear"></i> 採購單明細</h4>
                 <input type='hidden' name="get_modal_id" id="get_modal_id" value="" />
             </div>
             <form id="productModal">
@@ -131,7 +131,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa-solid fa-xmark"></i>
                         關閉視窗</button>
                 </div>
             </form>

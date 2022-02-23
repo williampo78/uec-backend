@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-users"></i> 部門管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-users"></i> 部門管理</h1>
             </div>
         </div>
 
@@ -22,7 +22,7 @@
                         <div class="row">
                             @if($share_role_auth['auth_create'])
                             <div class="col-sm-2">
-                                <a class="btn btn-block btn-warning btn-sm" id="btn-new" href="{{route('department.create')}}"><i class="fa fa-plus"></i> 新增</a>
+                                <a class="btn btn-block btn-warning btn-sm" id="btn-new" href="{{route('department.create')}}"><i class="fa-solid fa-plus"></i> 新增</a>
                             </div>
                             @endif
                         </div>

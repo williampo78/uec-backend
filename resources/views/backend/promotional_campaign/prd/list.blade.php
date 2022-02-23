@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-table"></i> 單品活動管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-table"></i> 單品活動管理</h1>
             </div>
         </div>
 
@@ -130,11 +130,11 @@
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_query'])
                                                 <button class="btn btn-warning">
-                                                    <i class="fa fa-search"></i> 查詢
+                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                                 </button>
 
                                                 <button type="button" class="btn btn-danger" id="btn-reset">
-                                                    <i class="fa fa-eraser"></i> 清除
+                                                    <i class="fa-solid fa-eraser"></i> 清除
                                                 </button>
                                             @endif
                                         </div>
@@ -150,9 +150,9 @@
                             @if ($share_role_auth['auth_create'])
                                 <div class="col-sm-2">
                                     <a href="{{ route('promotional_campaign_prd.create') }}"
-                                        class="btn btn-block btn-warning btn-sm" id="btn-create"><i
-                                            class="fa fa-plus"></i>
-                                        新增</a>
+                                        class="btn btn-block btn-warning btn-sm" id="btn-create">
+                                        <i class="fa-solid fa-plus"></i> 新增
+                                    </a>
                                 </div>
                             @endif
                         </div>
@@ -184,7 +184,7 @@
                                                         <button type="button"
                                                             class="btn btn-info btn-sm promotional_campaign_detail"
                                                             data-promotional-campaign-id="{{ $obj->id }}" title="檢視">
-                                                            <i class="fa fa-search"></i>
+                                                            <i class="fa-solid fa-magnifying-glass"></i>
                                                         </button>
                                                     @endif
 

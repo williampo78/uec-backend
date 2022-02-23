@@ -16,7 +16,7 @@
 
                     <!-- Table list -->
                     <div class="panel-body">
-         
+
                         {{-- <br> --}}
                         <table class="table table-striped table-bordered table-hover" style="width:100%"
                             id="products_model_list" data-page-length='100'>
@@ -40,8 +40,9 @@
                         </table>
                     </div>
                     <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                                    class="fa fa-fw fa-close"></i>關閉</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            <i class="fa-solid fa-xmark"></i> 關閉
+                        </button>
                     </div>
                 </div>
             </div>

@@ -6,7 +6,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>分類階層內容管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i>分類階層內容管理</h1>
             </div>
         </div>
         <div class="row">
@@ -43,9 +43,11 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-3 text-right">
-                                    <div class="col-sm-12"><button class="btn btn-warning"><i
-                                                class="fa fa-search  "></i>
-                                            查詢</button></div>
+                                    <div class="col-sm-12">
+                                        <button class="btn btn-warning">
+                                            <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -78,8 +80,8 @@
                                         <td>
                                             {{-- @if ($share_role_auth['auth_query']) --}}
                                             <button class="btn btn-info btn-sm toggle-show-model" data-toggle="modal"
-                                                data-target="#row_detail" @click="show({{ $val->id }})"><i
-                                                    class="fa fa-search"></i>
+                                                data-target="#row_detail" @click="show({{ $val->id }})">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
                                             </button>
                                             {{-- @endif --}}
                                             {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == $data['user_id']) --}}

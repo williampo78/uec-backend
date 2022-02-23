@@ -105,7 +105,7 @@
 <div id="page-wrapper">
     <div class="row">
         <div class="col-sm-12">
-            <h1 class="page-header"><i class="fa fa-list"></i>商品主檔 - 新增基本資訊</h1>
+            <h1 class="page-header"><i class="fa-solid fa-list"></i>商品主檔 - 新增基本資訊</h1>
         </div>
     </div>
     <div class="panel panel-default">
@@ -698,7 +698,7 @@
                                             排序: @{{ key + 1 }}
                                             <button class="btn btn-danger pull-right btn-events-none" type="button"
                                                 @click="delImages(key)" style="pointer-events: auto;" {{$products->edit_readonly == '1' ? 'disabled' : '' ; }}>
-                                                <i class="fa fa-trash"></i>
+                                                <i class="fa-solid fa-trash-can"></i>
                                             </button>
                                         </p>
                                     </div>
@@ -780,8 +780,9 @@
                                     :data-index="spec_1_key" :data-type="'spec_1'">
                                     <td>
                                         <div class="col-sm-1">
-                                            <label class="control-label"><i style="font-size: 20px;"
-                                                    class="fa fa-list"></i></label>
+                                            <label class="control-label">
+                                                <i class="fa-solid fa-list fa-lg"></i>
+                                            </label>
                                         </div>
                                         <div class="col-sm-9">
                                             <div v-if="spec_1.old_spec">
@@ -827,8 +828,9 @@
                                     :data-index="spec_2_key" :data-type="'spec_2'">
                                     <td>
                                         <div class="col-sm-1">
-                                            <label class="control-label"><i style="font-size: 20px;"
-                                                    class="fa fa-list"></i></label>
+                                            <label class="control-label">
+                                                <i class="fa-solid fa-list fa-lg"></i>
+                                            </label>
                                         </div>
                                         <div class="col-sm-9">
                                             <div v-if="spec_2.old_spec">
@@ -929,10 +931,10 @@
         </div>
         {{-- 二維多規格結束 --}}
         <button class="btn btn-large btn-success" type="button" id="save_data">
-            <i class="fa fa-save"></i>
+            <i class="fa-solid fa-floppy-disk"></i>
                 儲存
             </button>
-        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i> 取消</a>
+        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i> 取消</a>
     </form>
     {{-- 修改紀錄 --}}
     @include('backend.products.model_update_log')
@@ -1389,7 +1391,7 @@
         }
         $(document).on("click", "#save_data", function() {
                 $(".ean_va").each(function(){
-                    var text =  $(this).val() ; 
+                    var text =  $(this).val() ;
                     $(this).rules("add", {
                         notChinese:{
                             param: function() {
@@ -1404,7 +1406,7 @@
                         },
                     });
                 })
-                
+
                 $(".safty_qty_va").each(function(){
                     $(this).rules("add", {
                         required: true,

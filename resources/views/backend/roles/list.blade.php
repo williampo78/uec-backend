@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-book"></i> 角色管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-book"></i> 角色管理</h1>
             </div>
         </div>
 
@@ -46,7 +46,7 @@
 
                                 @if ($share_role_auth['auth_query'])
                                     <div class="col-sm-4 text-right">
-                                        <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
                                     </div>
                                 @endif
                             </div>
@@ -59,7 +59,7 @@
                             @if ($share_role_auth['auth_create'])
                                 <div class="col-sm-2">
                                     <a class="btn btn-block btn-warning btn-sm" id="btn-new"
-                                        href="{{ route('roles.create') }}"><i class="fa fa-plus"></i> 新增</a>
+                                        href="{{ route('roles.create') }}"><i class="fa-solid fa-plus"></i> 新增</a>
                                 </div>
                             @endif
                         </div>
@@ -81,8 +81,9 @@
                                         <td>
                                             @if ($share_role_auth['auth_query'])
                                                 <a class="btn btn-info btn-sm"
-                                                    href="{{ route('roles.show', $item->id) }}"><i
-                                                        class="fa fa-search"></i></a>
+                                                    href="{{ route('roles.show', $item->id) }}">
+                                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                                </a>
                                             @endif
 
                                             @if ($share_role_auth['auth_update'])

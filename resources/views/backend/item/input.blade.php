@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> {{isset($item) ? '編輯物品':'新增物品'}}</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i> {{isset($item) ? '編輯物品':'新增物品'}}</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -39,7 +39,7 @@
                                     <div class="col-sm-2">
                                         <div class="form-group">
                                             <fieldset style="width:100%; text-align:center;">
-                                                <legend><i class="fa fa-photo"></i> 主要產品照片</legend>
+                                                <legend><i class="fa-solid fa-image"></i> 主要產品照片</legend>
                                                 <div>
                                                     @if (isset($item) && $item->photo_name !== '')
                                                         <img id="itempic-1"
@@ -69,7 +69,7 @@
                                             <div class="form-group">
                                                 <fieldset style="width:100%; text-align:center;">
                                                     <legend>
-                                                        <i class="fa fa-photo"></i> 產品照片 {{ $i }}
+                                                        <i class="fa-solid fa-image"></i> 產品照片 {{ $i }}
                                                     </legend>
                                                     @if (isset($itemPhoto))
                                                         @foreach ($itemPhoto as $photo)
@@ -423,7 +423,7 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-6">
-                                <h4><i class="fa fa-th-large"></i> 商品簡介(描述)</h4>
+                                <h4><i class="fa-solid fa-table-cells-large"></i> 商品簡介(描述)</h4>
                                 <span class="error">
                                     {{ $errors->first('description') }}
                                 </span>
@@ -431,7 +431,7 @@
                                     placeholder="請簡單描述商品介紹">{{ old('description') ?? (isset($item) ? $item->specification : '') }}</textarea>
                             </div>
                             <div class="col-sm-6">
-                                <h4><i class="fa fa-th-large"></i> 商品規格</h4>
+                                <h4><i class="fa-solid fa-table-cells-large"></i> 商品規格</h4>
                                 <span class="error">
                                     {{ $errors->first('specification') }}
                                 </span>
@@ -443,7 +443,7 @@
                             </div>
                         </div>
 
-                        <h4><i class="fa fa-th-large"></i> 商品特色(圖文)</h4>
+                        <h4><i class="fa-solid fa-table-cells-large"></i> 商品特色(圖文)</h4>
                         <span class="error">
                             {{ $errors->first('features') }}
                         </span>
@@ -453,9 +453,9 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <button class="btn btn-success" id="btn-save"><i class="fa fa-save"></i>
+                                    <button class="btn btn-success" id="btn-save"><i class="fa-solid fa-floppy-disk"></i>
                                         儲存</button>
-                                    <button class="btn btn-danger" type="button" id="btn-cancel"><i class="fa fa-ban"></i>
+                                    <button class="btn btn-danger" type="button" id="btn-cancel"><i class="fa-solid fa-ban"></i>
                                         取消</button>
                                 </div>
                             </div>

@@ -158,7 +158,7 @@
                                 name="requisitions_purchase_detail">@{{ details }}</textarea>
                             <textarea style="display:none"> @{{ detailsCount }}</textarea>
                             <hr>
-                            <h4><i class="fa fa-th-large"></i> 品項 </h4>
+                            <h4><i class="fa-solid fa-table-cells-large"></i> 品項 </h4>
                             <div id="ItemDiv">
                                 <div class="add_row">
                                     <div class="row">
@@ -215,7 +215,7 @@
                                         <div class="col-sm-1">
                                             <button type="button" class="btn btn-danger"
                                                 @click="ItemListDel(details[detailKey].id,detailKey)">
-                                                <i class="fa fa-ban"></i>刪除
+                                                <i class="fa-solid fa-ban"></i>刪除
                                             </button>
                                         </div>
                                     </div>
@@ -223,9 +223,9 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-12">
-                                    <a class="btn btn-warning" id="btn-addNewRow" @click="ItemListAdd"><i
-                                            class="fa fa-plus"></i>
-                                        新增品項</a>
+                                    <a class="btn btn-warning" id="btn-addNewRow" @click="ItemListAdd">
+                                        <i class="fa-solid fa-plus"></i> 新增品項
+                                    </a>
                                 </div>
                             </div>
                             <div class="row">
@@ -237,14 +237,16 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <button class="btn btn-success" type="button" @click="submitBtn('DRAFTED')"> <i
-                                                class="fa fa-save"></i>儲存草稿</button>
-                                        <button class="btn btn-success" type="button" @click="submitBtn('REVIEWING')"><i
-                                                class="fa fa-save"></i>
-                                            儲存並核單</button>
+                                        <button class="btn btn-success" type="button" @click="submitBtn('DRAFTED')">
+                                            <i class="fa-solid fa-floppy-disk"></i>儲存草稿
+                                        </button>
+                                        <button class="btn btn-success" type="button" @click="submitBtn('REVIEWING')">
+                                            <i class="fa-solid fa-floppy-disk"></i> 儲存並核單
+                                        </button>
                                         <a href="{{ route('requisitions_purchase') }}" class="btn btn-danger"
-                                            type="button"><i class="fa fa-ban"></i>
-                                            取消</a>
+                                            type="button">
+                                            <i class="fa-solid fa-ban"></i> 取消
+                                        </a>
                                     </div>
                                 </div>
                             </div>

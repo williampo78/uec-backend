@@ -234,7 +234,7 @@
                                     <textarea style="display: none;"
                                         name="order_supplier_detail_json">@{{ order_supplier_detail }}</textarea>
                                     <hr>
-                                    <h4><i class="fa fa-th-large"></i> 品項</h4>
+                                    <h4><i class="fa-solid fa-table-cells-large"></i> 品項</h4>
                                     <div id="ItemDiv">
                                         <div class="add_row">
                                             <div class="row">
@@ -313,13 +313,16 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <button class="btn btn-success" type="button"
-                                                    @click="submitBtn('DRAFTED')"><i class="fa fa-save"></i>
-                                                    儲存草稿</button>
+                                                    @click="submitBtn('DRAFTED')">
+                                                    <i class="fa-solid fa-floppy-disk"></i> 儲存草稿
+                                                </button>
                                                 <button class="btn btn-success" type="button"
-                                                    @click="submitBtn('APPROVED')"><i class="fa fa-save"></i>
-                                                    儲存並核單</button>
-                                                <button class="btn btn-danger" type="button" @click="cancel()"><i
-                                                        class="fa fa-ban"></i> 取消</button>
+                                                    @click="submitBtn('APPROVED')">
+                                                    <i class="fa-solid fa-floppy-disk"></i> 儲存並核單
+                                                </button>
+                                                <button class="btn btn-danger" type="button" @click="cancel()">
+                                                    <i class="fa-solid fa-ban"></i> 取消
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -518,7 +521,7 @@
                         },
                     });
                     $(".item_qty").each(function() {
-                        var qty = $(this).val()  ; 
+                        var qty = $(this).val()  ;
                         $(this).rules("add", {
                             required: true,
                             digits: true,

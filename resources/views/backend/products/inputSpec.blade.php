@@ -67,8 +67,9 @@
                             :data-type="'spec_1'">
                             <td>
                                 <div class="col-sm-1">
-                                    <label class="control-label"><i style="font-size: 20px;"
-                                            class="fa fa-list"></i></label>
+                                    <label class="control-label">
+                                        <i class="fa-solid fa-list fa-lg"></i>
+                                    </label>
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="form-group">
@@ -102,8 +103,9 @@
                             :data-type="'spec_2'">
                             <td>
                                 <div class="col-sm-1">
-                                    <label class="control-label"><i style="font-size: 20px;"
-                                            class="fa fa-list"></i></label>
+                                    <label class="control-label">
+                                        <i class="fa-solid fa-list fa-lg"></i>
+                                    </label>
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="form-group">

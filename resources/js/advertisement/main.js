@@ -368,7 +368,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
                 <div class="form-group">
                     <input type="file" name="image_block_image_name[${image_block_row_no}]" class="image_block_image_name" value="" /><br />
                     <img src="${image_name_url}" class="img-responsive img_image_block_image_name" width="300" height="300" /><br />
-                    <button type="button" class="btn btn-danger btn-delete-image-block-image-name" title="刪除"><i class='fa fa-trash-o'></i></button>
+                    <button type="button" class="btn btn-danger btn-delete-image-block-image-name" title="刪除"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
             </td>
             <td>
@@ -439,7 +439,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-image"><i class='fa fa-trash-o'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-image"><i class="fa-solid fa-trash-can"></i> 刪除</button>
             </td>
         </tr>
     `);
@@ -532,7 +532,7 @@ window.addTextBlock = (product_category_select_options, datas = {}) => {
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-text"><i class='fa fa-trash-o'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-text"><i class="fa-solid fa-trash-can"></i> 刪除</button>
             </td>
         </tr>
     `);
@@ -572,7 +572,7 @@ window.addProductBlockProduct = (product_select_options, datas = {}) => {
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-product-product"><i class='fa fa-trash-o'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-product-product"><i class="fa-solid fa-trash-can"></i> 刪除</button>
             </td>
         </tr>
     `);
@@ -617,7 +617,7 @@ window.addProductBlockCategory = (
                 </div>
             </td>
             <td>
-                <button type="button" class="btn btn-danger btn-delete-product-category"><i class='fa fa-trash-o'></i> 刪除</button>
+                <button type="button" class="btn btn-danger btn-delete-product-category"><i class="fa-solid fa-trash-can"></i> 刪除</button>
             </td>
         </tr>
     `);

@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-sign-in"></i> 報價單簽核</h1>
+                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 報價單簽核</h1>
             </div>
         </div>
 
@@ -31,7 +31,7 @@
                                 <div class="col-sm-7 text-right">
                                     <div class="col-sm-12">
                                         @if ($share_role_auth['auth_query'])
-                                            <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                            <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
                                         @endif
                                     </div>
                                 </div>

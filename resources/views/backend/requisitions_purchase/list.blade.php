@@ -7,7 +7,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-sign-in"></i> 請購單</h1>
+                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 請購單</h1>
             </div>
         </div>
         <div class="row" id="requisitions_vue_app">
@@ -122,7 +122,7 @@
                                 <div class="col-sm-3 text-right">
                                     <div class="col-sm-12">
                                         @if ($share_role_auth['auth_query'])
-                                            <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                            <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
                                         @endif
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@
                             <div class="col-sm-2">
                                 @if ($share_role_auth['auth_create'])
                                     <a class="btn btn-block btn-warning btn-sm"
-                                        href="{{ route('requisitions_purchase.create') }}"><i class="fa fa-plus"></i>
+                                        href="{{ route('requisitions_purchase.create') }}"><i class="fa-solid fa-plus"></i>
                                         新增</a>
                                 @endif
                             </div>
@@ -164,8 +164,9 @@
                                             <td>
                                                 @if ($share_role_auth['auth_query'])
                                                 <button class="btn btn-info btn-sm"
-                                                    @click="showBtn({{ $obj->id }})"><i
-                                                        class="fa fa-search"></i></button>
+                                                    @click="showBtn({{ $obj->id }})">
+                                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                                </button>
                                                 @endif
 
                                                 @if ($share_role_auth['auth_update'] && $obj->status == 'DRAFTED' && $obj->created_by == Auth::user()->id)

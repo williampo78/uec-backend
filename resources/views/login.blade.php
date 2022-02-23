@@ -20,13 +20,13 @@
                 <form class="login100-form validate-form" method="POST" action="{{ route('login.custom') }}">
                     @csrf
                     <div class="wrap-input100 validate-input m-b-26" data-validate="使用者帳號未填寫">
-                        <span class="label-input100"><i class="fa fa-user fa-fw fa-lg"></i></span>
+                        <span class="label-input100"><i class="fa-solid fa-user fa-fw fa-lg"></i></span>
                         <input class="input100" type="text" name="account" id="account" placeholder="使用者帳號">
                         <span class="focus-input100"></span>
                     </div>
 
                     <div class="wrap-input100 validate-input m-b-18" data-validate="Password is required">
-                        <span class="label-input100"><i class="fa fa-key fa-fw fa-lg"></i></span>
+                        <span class="label-input100"><i class="fa-solid fa-key fa-fw fa-lg"></i></span>
                         <input class="input100" type="password" name="pwd" id="pwd" placeholder="密碼" autocomplete="off">
                         <span class="focus-input100"></span>
                     </div>
@@ -39,8 +39,7 @@
                     </div>
                     <p>&nbsp;</p>
                     <div class="container-login100-form-btn">
-                        <button type="submit" class="btn btn-lg btn-primary btn-block" id="loginBtn"><i
-                                class="fa fa-sign-in"></i> 登入</button>
+                        <button type="submit" class="btn btn-lg btn-primary btn-block" id="loginBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i> 登入</button>
                     </div>
 
                 </form>

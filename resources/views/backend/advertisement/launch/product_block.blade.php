@@ -40,9 +40,9 @@
                             </tbody>
                         </table>
                     </div>
-                    <button type="button" class="btn btn-warning" id="btn-new-product-product"><i
-                            class="fa fa-plus"></i>
-                        新增商品</button>
+                    <button type="button" class="btn btn-warning" id="btn-new-product-product">
+                        <i class="fa-solid fa-plus"></i> 新增商品
+                    </button>
                 </div>
                 <div class="tab-pane fade" id="tab-category">
                     <div class="table-responsive">
@@ -59,9 +59,9 @@
                             </tbody>
                         </table>
                     </div>
-                    <button type="button" class="btn btn-warning" id="btn-new-product-category"><i
-                            class="fa fa-plus"></i>
-                        新增分類</button>
+                    <button type="button" class="btn btn-warning" id="btn-new-product-category">
+                        <i class="fa-solid fa-plus"></i> 新增分類
+                    </button>
                 </div>
             </div>
         </div>

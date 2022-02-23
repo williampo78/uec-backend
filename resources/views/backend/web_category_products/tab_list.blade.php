@@ -9,7 +9,7 @@
             <div class="row">
                 <div class="col-sm-2">
                     <button type="button" class="btn btn-block btn-warning btn-sm" data-toggle="modal"
-                    data-target="#row_detail" ><i class="fa fa-plus"></i> 新增商品</button>
+                    data-target="#row_detail" ><i class="fa-solid fa-plus"></i> 新增商品</button>
                 </div>
             </div>
             <hr>
@@ -36,7 +36,7 @@
                         <td>@{{category_products_list.launched_status_desc}}</td>
                         <td>@{{category_products_list.gross_margin}}</td>
                         <td>
-                            <button class="btn btn-danger btn-sm" type="button" @click="del_category_products_list(category_products_list_key)"><i class='fa fa-trash-o'></i> 刪除</button>
+                            <button class="btn btn-danger btn-sm" type="button" @click="del_category_products_list(category_products_list_key)"><i class="fa-solid fa-trash-can"></i> 刪除</button>
                         </td>
                     </tr>
                 </tbody>

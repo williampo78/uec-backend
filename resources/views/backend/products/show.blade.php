@@ -61,7 +61,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>商品主檔 - 新增基本資訊</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i>商品主檔 - 新增基本資訊</h1>
             </div>
         </div>
         <div class="panel panel-default">
@@ -574,7 +574,7 @@
                                                     排序: {{ $key + 1 }}
                                                     {{-- <button class="btn btn-danger pull-right btn-events-none" type="button"
                                                         @click="delImages(key)" style="pointer-events: auto;">
-                                                        <i class="fa fa-trash"></i>
+                                                        <i class="fa-solid fa-trash-can"></i>
                                                     </button> --}}
                                                 </p>
                                             </div>
@@ -671,9 +671,9 @@
                                                             :data-type="'spec_1'">
                                                             <td>
                                                                 <div class="col-sm-1">
-                                                                    <label class="control-label"><i
-                                                                            style="font-size: 20px;"
-                                                                            class="fa fa-list"></i></label>
+                                                                    <label class="control-label">
+                                                                        <i class="fa-solid fa-list fa-lg"></i>
+                                                                    </label>
                                                                 </div>
                                                                 <div class="col-sm-9">
                                                                     <input class="form-control"
@@ -705,9 +705,9 @@
                                                             :data-type="'spec_2'">
                                                             <td>
                                                                 <div class="col-sm-1">
-                                                                    <label class="control-label"><i
-                                                                            style="font-size: 20px;"
-                                                                            class="fa fa-list"></i></label>
+                                                                    <label class="control-label">
+                                                                        <i class="fa-solid fa-list fa-lg"></i>
+                                                                    </label>
                                                                 </div>
                                                                 <div class="col-sm-9">
                                                                     <input class="form-control"

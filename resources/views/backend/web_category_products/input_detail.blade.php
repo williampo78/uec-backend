@@ -152,7 +152,7 @@
                                         </div>
                                         <div class="col-sm-5 text-right">
                                             <button type="button" class="btn btn-warning" @click="productsGetAjax">
-                                                <i class="fa fa-search"></i> 查詢
+                                                <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                             </button>
                                         </div>
                                     </div>
@@ -165,10 +165,10 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <button type="button" class="btn btn-success"
-                                        @click="productsForCategory"><i class="fa fa-save"></i> 儲存</button>
+                                        @click="productsForCategory"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
                                     <button type="button" class="btn btn-success" @click="productsForCategory"
-                                        data-dismiss="modal"><i class="fa fa-save"></i> 儲存並關閉</button>
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-ban"></i> 取消</button>
+                                        data-dismiss="modal"><i class="fa-solid fa-floppy-disk"></i> 儲存並關閉</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa-solid fa-ban"></i> 取消</button>
                                     {{-- <button type="button" @click="TESTFUNCTION">測試按鈕</button> --}}
                                 </div>
                                 <div class="col-sm-12">
@@ -176,9 +176,9 @@
                                 </div>
                                 <div class="col-sm-12">
                                     <button type="button" class="btn btn-primary"
-                                        @click="check_all('allon')"><i class="fa fa-check"></i> 全勾選</button>
+                                        @click="check_all('allon')"><i class="fa-solid fa-check"></i> 全勾選</button>
                                     <button type="button" class="btn btn-primary"
-                                        @click="check_all('alloff')"><i class="fa fa-close"></i> 全取消</button>
+                                        @click="check_all('alloff')"><i class="fa-solid fa-xmark"></i> 全取消</button>
                                 </div>
                             </div>
                             <br>

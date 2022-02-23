@@ -6,7 +6,7 @@
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel"><i class="fa fa-fw fa-gear"></i> 補登預進日</h4>
+                <h4 class="modal-title" id="myModalLabel"><i class="fa-solid fa-gear"></i> 補登預進日</h4>
                 <input type='hidden' id="get_order_supplier_id" value="" />
             </div>
             <form id="supplier_deliver_form" class="form-horizontal">
@@ -76,10 +76,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success"><i
-                            class="fa fa-fw fa-save"></i> 儲存並關閉</button>
-                    <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-fw fa-close"></i>
-                        關閉視窗</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa-solid fa-floppy-disk"></i> 儲存並關閉
+                    </button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">
+                        <i class="fa-solid fa-xmark"></i> 關閉視窗
+                    </button>
                 </div>
             </form>
         </div>

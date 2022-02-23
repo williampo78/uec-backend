@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-cubes"></i> 進銷存彙總表</h1>
+                <h1 class="page-header"><i class="fa-solid fa-cubes"></i> 進銷存彙總表</h1>
             </div>
         </div>
         <div class="row">
@@ -66,7 +66,7 @@
                                         <button data-url=""
                                                 class="btn btn-danger" id="btn-excute"
                                                 type="button" {{ $excel_url ?? 'disabled' }}>
-                                            <i class="fa fa-bar-chart"></i>
+                                            <i class="fa-solid fa-chart-bar"></i>
                                             資料滾算
                                         </button>
                                     </div>
@@ -75,15 +75,15 @@
                                     <div class="col-sm-1">
                                         <a class="btn btn-primary" target="_blank" href='{{ $excel_url  ?? ''}} '
                                             {{ $excel_url ?? 'disabled' }}>
-                                            <i class="fa fa-file-excel-o"></i>
+                                            <i class="fa-solid fa-file-excel"></i>
                                             匯出EXCEL
                                         </a>
                                     </div>
                                 @endif
                                 @if ($share_role_auth['auth_query'])
                                     <div class="col-sm-1">
-                                        <button class="btn btn-warning" id="btn-search" type="submit"><i
-                                                class="fa fa-search "></i> 查詢
+                                        <button class="btn btn-warning" id="btn-search" type="submit">
+                                            <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                         </button>
                                     </div>
                                 @endif

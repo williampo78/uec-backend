@@ -12,7 +12,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增中分類</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i> 新增中分類</h1>
             </div>
         </div>
 
@@ -62,12 +62,12 @@
                                             <div class="form-group">
                                                 @if ($share_role_auth['auth_create'])
                                                     <button class="btn btn-success" type="submit" id="btn-save">
-                                                        <i class="fa fa-save"></i> 儲存
+                                                        <i class="fa-solid fa-floppy-disk"></i> 儲存
                                                     </button>
                                                 @endif
 
                                                 <a class="btn btn-danger" href="{{ route('category') }}">
-                                                    <i class="fa fa-ban"></i> 取消
+                                                    <i class="fa-solid fa-ban"></i> 取消
                                                 </a>
                                             </div>
                                         </div>

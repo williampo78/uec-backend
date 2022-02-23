@@ -123,7 +123,7 @@
                                     </div>
                                 </div>
 
-                                <h4><i class="fa fa-th-large"></i> 品項</h4>
+                                <h4><i class="fa-solid fa-table-cells-large"></i> 品項</h4>
                                 <div id="ItemDiv">
                                     <input type="hidden" name="rowNo" id="rowNo" value="0">
                                     <div class='add_row'>
@@ -137,7 +137,7 @@
                                 </div>
                                 <div class="row form-group">
                                     <div class="col-sm-12">
-                                        <a class="btn btn-warning" id="btn-addNewRow"><i class="fa fa-plus"></i>
+                                        <a class="btn btn-warning" id="btn-addNewRow"><i class="fa-solid fa-plus"></i>
                                             新增品項</a>
                                     </div>
                                 </div>
@@ -150,12 +150,16 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <button class="btn btn-success save_data" type="button" data-type="saveDraft"><i
-                                                    class="fa fa-save"></i> 儲存草稿</button>
+                                            <button class="btn btn-success save_data" type="button" data-type="saveDraft">
+                                                <i class="fa-solid fa-floppy-disk"></i> 儲存草稿
+                                            </button>
                                             <button class="btn btn-success save_data" type="button"
-                                                data-type="saveReview"><i class="fa fa-save"></i> 儲存並送審</button>
-                                            <button class="btn btn-danger save_data" type="button" data-type="cancel"><i
-                                                    class="fa fa-ban"></i> 取消</button>
+                                                data-type="saveReview">
+                                                <i class="fa-solid fa-floppy-disk"></i> 儲存並送審
+                                            </button>
+                                            <button class="btn btn-danger save_data" type="button" data-type="cancel">
+                                                <i class="fa-solid fa-ban"></i> 取消
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -227,7 +231,7 @@
                     }else{
                         form.submit();
                     }
-                 
+
                 },
                 rules: {
                     trade_date: {
@@ -304,7 +308,7 @@
                             "</select>" +
                             "<span class='input-group-btn'>" +
                             "<button class='btn copy_btn' type='button' data-key='" + newRow +
-                            "'><i class='fa fa-copy'></i></button>" +
+                            "'><i class='fa-solid fa-copy'></i></button>" +
                             "</span>" +
                             "</div>" +
                             "</div>" +
@@ -320,7 +324,7 @@
                             "</div>" +
                             "<div class='col-sm-1'>" +
                             "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
-                            "' value='" + newRow + "'><i class='fa fa-trash-o'></i> 刪除</button>" +
+                            "' value='" + newRow + "'><i class="fa-solid fa-trash-can"></i> 刪除</button>" +
                             "</div>" +
                             "</div>" +
                             "</div>"
@@ -400,7 +404,7 @@
                         "</select>" +
                         "<span class='input-group-btn'>" +
                         "<button class='btn copy_btn' type='button' data-key='" + newRow +
-                        "'><i class='fa fa-copy'></i></button>" +
+                        "'><i class='fa-solid fa-copy'></i></button>" +
                         "</span>" +
                         "</div>" +
                         "</div>" +
@@ -417,7 +421,7 @@
                         "<div class='col-sm-1'>" +
                         "<button type='button' data-details='" + value.quotation_details_id +
                         "' class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
-                        "' value='" + newRow + "'><i class='fa fa-trash-o'></i> 刪除</button>" +
+                        "' value='" + newRow + "'><i class="fa-solid fa-trash-can"></i> 刪除</button>" +
                         "</div>" +
                         "</div>" +
                         "</div>"

@@ -27,8 +27,9 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                                        class="fa fa-fw fa-close"></i>關閉</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                    <i class="fa-solid fa-xmark"></i> 關閉
+                                </button>
                             </div>
                             <hr>
                         </div>

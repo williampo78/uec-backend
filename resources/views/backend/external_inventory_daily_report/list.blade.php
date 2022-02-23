@@ -12,7 +12,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 外倉(秋雨)庫存日報表</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i> 外倉(秋雨)庫存日報表</h1>
             </div>
         </div>
 
@@ -181,15 +181,15 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_export'])
-                                                <button data-url="{{ route('external_inventory_daily_report.export_excel') }}" class="btn btn-primary" id="btn-export-excel" type="button"><i
-                                                        class="fa fa-file-excel-o"></i>
-                                                    匯出EXCEL</button>
+                                                <button data-url="{{ route('external_inventory_daily_report.export_excel') }}" class="btn btn-primary" id="btn-export-excel" type="button">
+                                                    <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                                                </button>
                                             @endif
 
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning" id="btn-search"><i
-                                                        class="fa fa-search"></i>
-                                                    查詢</button>
+                                                <button class="btn btn-warning" id="btn-search">
+                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                                </button>
                                             @endif
                                         </div>
                                     </div>
@@ -242,7 +242,7 @@
                                             <td>
                                                 @if($dailyReport->is_dangerous == 1)
                                                 <span class="label-danger text-white" style="color: #fff;">
-                                                    <i class="fa fa-exclamation-triangle"></i>
+                                                    <i class="fa-solid fa-triangle-exclamation"></i>
                                                     {{ $dailyReport->stock_qty }}
                                                 </span>
                                                 @else

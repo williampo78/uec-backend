@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i> 新增倉庫</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i> 新增倉庫</h1>
             </div>
         </div>
 
@@ -43,10 +43,11 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <button class="btn btn-success" type="submit" id="btn-save"><i class="fa fa-save"></i>
+                                                <button class="btn btn-success" type="submit" id="btn-save"><i class="fa-solid fa-floppy-disk"></i>
                                                     儲存</button>
-                                                <a class="btn btn-danger" href="{{ route('warehouse') }}"><i
-                                                        class="fa fa-ban"></i> 取消</a>
+                                                <a class="btn btn-danger" href="{{ route('warehouse') }}">
+                                                    <i class="fa-solid fa-ban"></i> 取消
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

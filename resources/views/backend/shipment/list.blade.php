@@ -17,7 +17,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 出貨單管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i> 出貨單管理</h1>
             </div>
         </div>
 
@@ -186,9 +186,9 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning" id="btn-search"><i
-                                                        class="fa fa-search"></i>
-                                                    查詢</button>
+                                                <button class="btn btn-warning" id="btn-search">
+                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                                </button>
                                             @endif
                                         </div>
                                     </div>
@@ -231,7 +231,7 @@
                                                     @if ($share_role_auth['auth_query'])
                                                         <button type="button" class="btn btn-info btn-sm shipment_detail"
                                                             data-shipment="{{ $shipment['shipments_id'] }}" title="檢視">
-                                                            <i class="fa fa-search"></i>
+                                                            <i class="fa-solid fa-magnifying-glass"></i>
                                                         </button>
                                                     @endif
                                                 </td>

@@ -58,7 +58,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>商品主檔 - 新增基本資訊</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i>商品主檔 - 新增基本資訊</h1>
             </div>
         </div>
         <div class="panel panel-default">
@@ -619,7 +619,7 @@
                                                 排序: @{{ key + 1 }}
                                                 <button class="btn btn-danger pull-right btn-events-none" type="button"
                                                     @click="delImages(key)" style="pointer-events: auto;">
-                                                    <i class="fa fa-trash"></i>
+                                                    <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </p>
                                         </div>
@@ -635,10 +635,10 @@
                     </div>
                     {{-- 二維多規格結束 --}}
                     <button class="btn btn-large btn-success" type="button" id="save_data">
-                        <i class="fa fa-save"></i>
+                        <i class="fa-solid fa-floppy-disk"></i>
                         儲存
                     </button>
-                    <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i> 取消</a>
+                    <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i> 取消</a>
                 </form>
             </div>
         </div>
@@ -1257,7 +1257,7 @@
                         },
                     },
                 },
-                
+
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {

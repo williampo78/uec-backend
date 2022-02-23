@@ -18,6 +18,6 @@
             </tbody>
         </table>
     </div>
-    <button type="button" class="btn btn-warning" id="btn-new-image"><i class="fa fa-plus"></i> 新增圖檔</button>
+    <button type="button" class="btn btn-warning" id="btn-new-image"><i class="fa-solid fa-plus"></i> 新增圖檔</button>
     <hr style="border-top: 1px solid gray;" />
 </div>

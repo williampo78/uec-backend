@@ -12,7 +12,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 金流對帳單</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i> 金流對帳單</h1>
             </div>
         </div>
 
@@ -125,14 +125,14 @@
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_export'])
                                                 <button data-url="{{ route('order_payments_report.export_excel') }}" class="btn btn-primary" id="btn-export-excel" type="button">
-                                                    <i class="fa fa-file-excel-o"></i>
+                                                    <i class="fa-solid fa-file-excel"></i>
                                                     匯出EXCEL
                                                 </button>
                                             @endif
 
                                             @if ($share_role_auth['auth_query'])
                                                 <button class="btn btn-warning" id="btn-search">
-                                                    <i class="fa fa-search"></i>
+                                                    <i class="fa-solid fa-magnifying-glass"></i>
                                                     查詢
                                                 </button>
                                             @endif

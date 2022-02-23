@@ -35,11 +35,13 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 @if ($share_role_auth['auth_create'])
-                                                    <button class="btn btn-success" type="button" id="btn-save"><i
-                                                            class="fa fa-save"></i> 儲存</button>
+                                                    <button class="btn btn-success" type="button" id="btn-save">
+                                                        <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                                    </button>
                                                 @endif
-                                                <button class="btn btn-danger" type="button" id="btn-cancel"><i
-                                                        class="fa fa-ban"></i> 取消</button>
+                                                <button class="btn btn-danger" type="button" id="btn-cancel">
+                                                    <i class="fa-solid fa-ban"></i> 取消
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

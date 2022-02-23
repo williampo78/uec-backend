@@ -6,7 +6,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-pencil"></i> 商城頁面內容管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 商城頁面內容管理</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -111,8 +111,8 @@
                         </div>
                         <div class="row">
                             <div class="col-xs-12 text-center">
-                                <button type="button" class="btn btn-warning" id="btn-cancel"><i
-                                        class="fa fa-reply"></i> 返回列表
+                                <button type="button" class="btn btn-warning" id="btn-cancel">
+                                    <i class="fa-solid fa-reply"></i> 返回列表
                                 </button>
                             </div>
                         </div>

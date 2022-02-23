@@ -6,7 +6,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-pencil"></i> 編輯倉庫</h1>
+                <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 編輯倉庫</h1>
             </div>
             <!-- /.col-sm-12 -->
         </div>
@@ -42,8 +42,10 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <button class="btn btn-success" type="submit" id="btn-save"><i class="fa fa-check"></i> 儲存</button>
-                                        <a class="btn btn-danger" href="{{route('warehouse')}}"><i class="fa fa-ban"></i> 取消</a>
+                                        <button class="btn btn-success" type="submit" id="btn-save">
+                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                        </button>
+                                        <a class="btn btn-danger" href="{{route('warehouse')}}"><i class="fa-solid fa-ban"></i> 取消</a>
                                     </div>
                                 </div>
                             </div>

@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-cube"></i> 商品主檔 - 商城資訊管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-cube"></i> 商品主檔 - 商城資訊管理</h1>
             </div>
         </div>
         <div class="row">
@@ -267,7 +267,7 @@
                                         </div>
                                     </div>
                                 </div>
-                              
+
                             </div>
                             <div class="row">
                                 <div class="col-sm-12">
@@ -275,11 +275,11 @@
                                     <div class="col-sm-9 text-right">
                                         @if ($share_role_auth['auth_query'])
                                             <button class="btn btn-warning">
-                                                <i class="fa fa-search"></i> 查詢
+                                                <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                             </button>
 
                                             <button type="button" class="btn btn-danger" id="btn-reset">
-                                                <i class="fa fa-eraser"></i> 清除
+                                                <i class="fa-solid fa-eraser"></i> 清除
                                             </button>
                                         @endif
                                     </div>
@@ -318,7 +318,7 @@
                                             @if ($share_role_auth['auth_query'])
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('product_small.show', $val->id) }}">
-                                                <i class="fa fa-search"></i></a>
+                                                <i class="fa-solid fa-magnifying-glass"></i></a>
                                             @endif
                                             @if ($share_role_auth['auth_update'] && $val->product_type !== 'G')
 

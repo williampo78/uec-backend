@@ -4,11 +4,13 @@
 
 @section('style')
     <style>
-        .fa.fa-check {
+        td .fa-solid.fa-check,
+        .form-group .fa-solid.fa-check {
             color: green;
         }
 
-        .fa.fa-times {
+        td .fa-solid.fa-xmark,
+        .form-group .fa-solid.fa-xmark {
             color: red;
         }
 
@@ -26,7 +28,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 廣告上架管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i> 廣告上架管理</h1>
             </div>
         </div>
 
@@ -142,7 +144,7 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                                <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
                                             @endif
                                         </div>
                                     </div>
@@ -157,8 +159,9 @@
                             @if ($share_role_auth['auth_create'])
                                 <div class="col-sm-2">
                                     <a href="{{ route('advertisemsement_launch.create') }}"
-                                        class="btn btn-block btn-warning btn-sm" id="btn-create"><i
-                                            class="fa fa-plus"></i> 新增</a>
+                                        class="btn btn-block btn-warning btn-sm" id="btn-create">
+                                        <i class="fa-solid fa-plus"></i> 新增
+                                    </a>
                                 </div>
                             @endif
                         </div>
@@ -188,7 +191,7 @@
                                                         <button type="button" class="btn btn-info btn-sm slot_content_detail"
                                                             data-slot-content-id="{{ $ad_slot_content->slot_content_id }}"
                                                             title="檢視">
-                                                            <i class="fa fa-search"></i>
+                                                            <i class="fa-solid fa-magnifying-glass"></i>
                                                         </button>
                                                     @endif
 
@@ -204,16 +207,16 @@
                                                 <td>{{ $ad_slot_content->slot_desc ?? '' }}</td>
                                                 <td>
                                                     @if ($ad_slot_content->is_mobile_applicable == 1)
-                                                        <i class="fa fa-check fa-lg"></i>
+                                                        <i class="fa-solid fa-check fa-lg"></i>
                                                     @else
-                                                        <i class="fa fa-times fa-lg"></i>
+                                                        <i class="fa-solid fa-xmark fa-lg"></i>
                                                     @endif
                                                 </td>
                                                 <td>
                                                     @if ($ad_slot_content->is_desktop_applicable == 1)
-                                                        <i class="fa fa-check fa-lg"></i>
+                                                        <i class="fa-solid fa-check fa-lg"></i>
                                                     @else
-                                                        <i class="fa fa-times fa-lg"></i>
+                                                        <i class="fa-solid fa-xmark fa-lg"></i>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -293,7 +296,7 @@
                             $('#modal-slot-color-code').empty().append(`${content.slot_color_code}`);
                         } else {
                             $('#modal-slot-color-code').empty().append(
-                                `<i class="fa fa-times fa-lg"></i>`);
+                                `<i class="fa-solid fa-xmark fa-lg"></i>`);
                         }
 
                         if (content.slot_icon_name_url) {
@@ -302,13 +305,13 @@
                             );
                         } else {
                             $('#modal-slot-icon-name').empty().append(
-                                `<i class="fa fa-times fa-lg"></i>`);
+                                `<i class="fa-solid fa-xmark fa-lg"></i>`);
                         }
 
                         if (content.slot_title) {
                             $('#modal-slot-title').empty().append(`${content.slot_title}`);
                         } else {
-                            $('#modal-slot-title').empty().append(`<i class="fa fa-times fa-lg"></i>`);
+                            $('#modal-slot-title').empty().append(`<i class="fa-solid fa-xmark fa-lg"></i>`);
                         }
 
                         // 選擇顯示的區塊
@@ -366,17 +369,17 @@
 
                         $.each(details, function(key, value) {
                             let sort = value.sort !== null ? value.sort :
-                                '<i class="fa fa-times fa-lg"></i>';
+                                '<i class="fa-solid fa-xmark fa-lg"></i>';
                             let image_name_url = value.image_name_url ?
                                 `<img src="${value.image_name_url}" class="img-responsive" width="300" height="300" />` :
-                                '<i class="fa fa-times fa-lg"></i>';
+                                '<i class="fa-solid fa-xmark fa-lg"></i>';
                             let image_alt = value.image_alt ? value.image_alt :
-                                '<i class="fa fa-times fa-lg"></i>';
+                                '<i class="fa-solid fa-xmark fa-lg"></i>';
                             let image_title = value.image_title ? value.image_title :
-                                '<i class="fa fa-times fa-lg"></i>';
+                                '<i class="fa-solid fa-xmark fa-lg"></i>';
                             let image_abstract = value.image_abstract ? value.image_abstract :
-                                '<i class="fa fa-times fa-lg"></i>';
-                            let link_content = '<i class="fa fa-times fa-lg"></i>';
+                                '<i class="fa-solid fa-xmark fa-lg"></i>';
+                            let link_content = '<i class="fa-solid fa-xmark fa-lg"></i>';
 
                             switch (value.image_action) {
                                 // URL
@@ -395,10 +398,10 @@
                             }
 
                             let is_target_blank = value.is_target_blank == 1 ?
-                                '<i class="fa fa-check fa-lg"></i>' :
-                                '<i class="fa fa-times fa-lg"></i>';
+                                '<i class="fa-solid fa-check fa-lg"></i>' :
+                                '<i class="fa-solid fa-xmark fa-lg"></i>';
                             let texts = value.texts ? value.texts :
-                                '<i class="fa fa-times fa-lg"></i>';
+                                '<i class="fa-solid fa-xmark fa-lg"></i>';
 
                             switch (value.data_type) {
                                 case 'IMG':

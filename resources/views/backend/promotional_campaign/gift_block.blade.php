@@ -5,7 +5,7 @@
         </div>
         <div class="col-sm-2">
             <button type="button" id="btn-new-gift" class="btn btn-warning btn-sm">
-                <i class="fa fa-plus"></i> 新增贈品
+                <i class="fa-solid fa-plus"></i> 新增贈品
             </button>
         </div>
     </div>

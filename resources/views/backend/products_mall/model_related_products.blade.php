@@ -153,7 +153,7 @@
                                                 style="position:absolute; right:20px;" @click="productsGetAjax">搜尋</button>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -166,8 +166,9 @@
                                         @click="productsForCategory">儲存</button>
                                     <button type="button" class="btn btn-success" @click="productsForCategory"
                                         data-dismiss="modal">儲存並關閉</button>
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i
-                                            class="fa fa-fw fa-close"></i>關閉</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa-solid fa-xmark"></i> 關閉
+                                    </button>
                                     {{-- <button type="button" @click="TESTFUNCTION">測試按鈕</button> --}}
                                 </div>
                                 <div class="col-sm-12">
@@ -214,9 +215,9 @@
                                         <td>@{{ product . launched_status_desc }}</td>
                                         <td>@{{ product . gross_margin }}</td>
                                         <td>@{{ product . supplier_name }}</td>
-                                        
+
                                     </tr>
-                                    
+
                                 </tbody>
                             </table>
                         </div>

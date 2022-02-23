@@ -15,7 +15,7 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-sm-12">
-                                <div class="alert alert-success"><i class="fa fa-check"></i>
+                                <div class="alert alert-success"><i class="fa-solid fa-check"></i>
                                     @if($act==='add')
                                         已經成功新增資料！
                                     @elseif($act==='upd')
@@ -34,7 +34,9 @@
                                         審核成功！
                                     @endif
                                 </div>
-                                <a class="btn btn-block btn-success" href="{{route($route_name)}}"><i class="fa fa-fw fa-book"></i> 返回列表</a>
+                                <a class="btn btn-block btn-success" href="{{route($route_name)}}">
+                                    <i class="fa-solid fa-book"></i> 返回列表
+                                </a>
                             </div>
                         </div>
                     </div>

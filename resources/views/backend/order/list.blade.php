@@ -45,7 +45,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 銷售訂單管理</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i> 銷售訂單管理</h1>
             </div>
         </div>
 
@@ -239,15 +239,15 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_export'])
-                                                <button class="btn btn-primary" id="btn-export-excel" type="button"><i
-                                                        class="fa fa-file-excel-o"></i>
-                                                    匯出EXCEL</button>
+                                                <button class="btn btn-primary" id="btn-export-excel" type="button">
+                                                    <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                                                </button>
                                             @endif
 
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning" id="btn-search"><i
-                                                        class="fa fa-search"></i>
-                                                    查詢</button>
+                                                <button class="btn btn-warning" id="btn-search">
+                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                                </button>
                                             @endif
                                         </div>
                                     </div>
@@ -287,7 +287,7 @@
                                                     @if ($share_role_auth['auth_query'])
                                                         <button type="button" class="btn btn-info btn-sm order_detail"
                                                             data-order="{{ $order['id'] }}" title="檢視">
-                                                            <i class="fa fa-search"></i>
+                                                            <i class="fa-solid fa-magnifying-glass"></i>
                                                         </button>
                                                     @endif
                                                 </td>

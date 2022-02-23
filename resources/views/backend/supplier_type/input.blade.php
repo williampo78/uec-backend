@@ -10,7 +10,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-plus"></i>{{ isset($ShowData) ? '編輯' : '新增' }}供應商類別</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i>{{ isset($ShowData) ? '編輯' : '新增' }}供應商類別</h1>
             </div>
         </div>
         <!-- /.row -->
@@ -53,9 +53,9 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <button class="btn btn-success" id="btn-save"><i class="fa fa-save"></i>
+                                            <button class="btn btn-success" id="btn-save"><i class="fa-solid fa-floppy-disk"></i>
                                                 儲存</button>
-                                            <a href="{{route('supplier_type')}}" class="btn btn-danger" id="btn-cancel"><i class="fa fa-ban"></i>
+                                            <a href="{{route('supplier_type')}}" class="btn btn-danger" id="btn-cancel"><i class="fa-solid fa-ban"></i>
                                                 取消</a>
                                         </div>
                                     </div>

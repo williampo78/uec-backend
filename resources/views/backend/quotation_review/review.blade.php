@@ -124,9 +124,10 @@
                             <hr>
                             <div class="col-sm-12">
                                 <div class="row form-group">
-                                    <button class="btn btn-success btn"><i class="fa fa-save"></i>儲存</button>
-                                    <a class="btn btn-danger btn" href="{{ route('quotation_review') }}"><i
-                                            class="fa fa-ban"></i>取消</a>
+                                    <button class="btn btn-success btn"><i class="fa-solid fa-floppy-disk"></i>儲存</button>
+                                    <a class="btn btn-danger btn" href="{{ route('quotation_review') }}">
+                                        <i class="fa-solid fa-ban"></i> 取消
+                                    </a>
                                 </div>
                             </div>
                         </div>

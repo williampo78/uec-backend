@@ -7,7 +7,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-sign-in"></i> 進貨單</h1>
+                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 進貨單</h1>
             </div>
         </div>
 
@@ -120,7 +120,7 @@
                                 </div>
                                 <div class="col-sm-4 text-right">
                                     <div class="col-sm-12">
-                                        <button class="btn btn-warning"><i class="fa fa-search"></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
                                     </div>
                                 </div>
                                 {{-- row 2 end --}}
@@ -152,8 +152,9 @@
                                         <td>
                                             {{-- @if ($share_role_auth['auth_query']) --}}
                                             <button type="button" class="btn btn-info btn-sm show-btn" data-toggle="modal"
-                                                data-target="#show_data" data-id="{{ $obj->id }}"><i
-                                                    class="fa fa-search"></i></button>
+                                                data-target="#show_data" data-id="{{ $obj->id }}">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </button>
                                             {{-- @endif --}}
 
                                             {{-- @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == Auth::user()->id) --}}
@@ -268,7 +269,7 @@
                         },
                         dateGreaterEqualThan: function () {
                             let obj = {
-                                date: $('#trade_date_start').val() , 
+                                date: $('#trade_date_start').val() ,
                                 depends:true ,
                             }
                             return obj;

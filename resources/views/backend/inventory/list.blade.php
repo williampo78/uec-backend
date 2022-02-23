@@ -12,7 +12,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i> 庫存彙總表</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i> 庫存彙總表</h1>
             </div>
         </div>
 
@@ -164,17 +164,17 @@
                                             @if ($share_role_auth['auth_export'])
                                                 <button data-url="{{ route('inventory.export_excel') }}"
                                                     class="btn btn-primary" id="btn-export-excel" type="button">
-                                                    <i class="fa fa-file-excel-o"></i> 匯出EXCEL
+                                                    <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
                                                 </button>
                                             @endif
 
                                             @if ($share_role_auth['auth_query'])
                                                 <button class="btn btn-warning" id="btn-search">
-                                                    <i class="fa fa-search"></i> 查詢
+                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                                 </button>
 
                                                 <button type="button" class="btn btn-danger" id="btn-reset">
-                                                    <i class="fa fa-eraser"></i> 清除
+                                                    <i class="fa-solid fa-eraser"></i> 清除
                                                 </button>
                                             @endif
                                         </div>
@@ -220,7 +220,7 @@
                                             <td class="text-right">
                                                 @if ($inventory->is_dangerous == 1)
                                                     <span class="label-danger text-white" style="color: #fff;">
-                                                        <i class="fa fa-exclamation-triangle"></i>
+                                                        <i class="fa-solid fa-triangle-exclamation"></i>
                                                         {{ $inventory->stock_qty }}
                                                     </span>
                                                 @else

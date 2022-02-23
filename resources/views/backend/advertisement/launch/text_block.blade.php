@@ -15,6 +15,6 @@
             </tbody>
         </table>
     </div>
-    <button type="button" class="btn btn-warning" id="btn-new-text"><i class="fa fa-plus"></i> 新增文字</button>
+    <button type="button" class="btn btn-warning" id="btn-new-text"><i class="fa-solid fa-plus"></i> 新增文字</button>
     <hr style="border-top: 1px solid gray;" />
 </div>

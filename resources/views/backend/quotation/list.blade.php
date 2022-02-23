@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-sign-in"></i> 報價單</h1>
+                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 報價單</h1>
             </div>
         </div>
 
@@ -116,9 +116,9 @@
                                 <div class="col-sm-3 text-right">
                                     <div class="col-sm-12">
                                         @if ($share_role_auth['auth_query'])
-                                            <button class="btn btn-warning"><i class="fa fa-search  "></i> 查詢</button>
+                                            <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
                                             <button type="button" class="btn btn-danger" id="btn-reset">
-                                                <i class="fa fa-eraser"></i> 清除
+                                                <i class="fa-solid fa-eraser"></i> 清除
                                             </button>
                                         @endif
                                     </div>
@@ -132,8 +132,9 @@
                         <div class="row">
                             @if ($share_role_auth['auth_create'])
                                 <div class="col-sm-2">
-                                    <a class="btn btn-block btn-warning btn-sm" href="{{ route('quotation.create') }}"><i
-                                            class="fa fa-plus"></i> 新增</a>
+                                    <a class="btn btn-block btn-warning btn-sm" href="{{ route('quotation.create') }}">
+                                        <i class="fa-solid fa-plus"></i> 新增
+                                    </a>
                                 </div>
                             @endif
                         </div>
@@ -162,8 +163,9 @@
                                             @if ($share_role_auth['auth_query'])
                                                 <button class="btn btn-info btn-sm" data-toggle="modal"
                                                     data-target="#row_detail" data-id="{{ $v['id'] }}"
-                                                    onclick="row_detail({{ $v['id'] }});"><i
-                                                        class="fa fa-search"></i></button>
+                                                    onclick="row_detail({{ $v['id'] }});">
+                                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                                </button>
                                             @endif
 
                                             @if ($share_role_auth['auth_update'] && $v['status_code'] == 'DRAFTED' && $v['created_by'] == Auth::user()->id)

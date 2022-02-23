@@ -49,7 +49,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>商品主檔 - 新增商城資訊</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i>商品主檔 - 新增商城資訊</h1>
             </div>
         </div>
         <div class="panel panel-default">
@@ -164,7 +164,7 @@
                                                     @drop="drop" draggable="true" :data-index="CategoryKey"
                                                     :data-type="'Category'">
                                                     <td style="vertical-align:middle">
-                                                        <i class="fa fa-list"></i>
+                                                        <i class="fa-solid fa-list"></i>
                                                         @{{ Category . category_name }}
                                                     </td>
                                                     <td>
@@ -220,7 +220,7 @@
                                                     @dragover='dragover' @dragleave='dragleave' @drop="drop"
                                                     draggable="true" :data-index="key" :data-type="'Products'">
                                                     <td style="vertical-align:middle">
-                                                        <i class="fa fa-list"></i>
+                                                        <i class="fa-solid fa-list"></i>
                                                         @{{ Product . product_name }}
                                                     </td>
                                                     <td>
@@ -434,10 +434,10 @@
                             </div>
                         </section>
                         {{-- <button class="btn btn-large btn-success" type="button" id="save_data">
-                            <i class="fa fa-save"></i>
+                            <i class="fa-solid fa-floppy-disk"></i>
                             儲存
                         </button> --}}
-                        <a class="btn btn-success" href="{{ route('product_small') }}"><i class="fa fa-ban"></i>
+                        <a class="btn btn-success" href="{{ route('product_small') }}"><i class="fa-solid fa-ban"></i>
                             返回</a>
                 </form>
                 {{-- @include('backend.products_mall.model_category')

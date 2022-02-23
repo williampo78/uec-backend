@@ -4,7 +4,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa fa-list"></i>商品主檔 - 商品上下架申請</h1>
+                <h1 class="page-header"><i class="fa-solid fa-list"></i>商品主檔 - 商品上下架申請</h1>
             </div>
         </div>
         <div class="panel panel-default">
@@ -246,10 +246,10 @@
                             </div>
                         </div>
                         <button class="btn btn-large btn-success" type="button" id="save_data">
-                            <i class="fa fa-save"></i>
+                            <i class="fa-solid fa-floppy-disk"></i>
                             送審
                         </button>
-                        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa fa-ban"></i>
+                        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
                             取消</a>
                     </div>
                 </form>
