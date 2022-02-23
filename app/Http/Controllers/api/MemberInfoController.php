@@ -128,9 +128,6 @@ class MemberInfoController extends Controller
         $data['districtId'] = $request['districtId'];
         $data['address'] = $request['address'];
         $data['registeredSource'] = "EC";
-        if ($request['pwd'] != '') {
-            $data['password'] = $request['pwd'];
-        }
 
         $err = null;
         $error_code = $this->apiService->getErrorCode();
