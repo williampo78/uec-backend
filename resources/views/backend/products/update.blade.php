@@ -735,28 +735,25 @@
                 <hr>
                 <div id="page-2">
                     <div id="SkuComponent">
-                        <textarea style="display: none" name="SpecListJson" id="" cols="30"
+                        <textarea name="SpecListJson" id="" cols="30"
                             rows="10">@{{ SpecList }}</textarea>
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <div class="col-sm-2 ">
                                     <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="0"
-                                            {{ $products->spec_dimension == '0' ? 'checked' : 'disabled' }}>
+                                        <input type="radio" name="spec_dimension" value="0" v-model="products.spec_dimension" >
                                         單規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="1"
-                                            {{ $products->spec_dimension == '1' ? 'checked' : 'disabled' }}>
+                                        <input type="radio" name="spec_dimension" value="1" v-model="products.spec_dimension">
                                         一維多規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="2"
-                                            {{ $products->spec_dimension == '2' ? 'checked' : 'disabled' }}>
+                                        <input type="radio" name="spec_dimension" value="2" v-model="products.spec_dimension" >
                                         二維多規格
                                     </label>
                                 </div>
@@ -909,7 +906,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea style="display: none" style="display: none" id="SkuListdata" name="SkuListdata" cols="30"
+                        <textarea id="SkuListdata" name="SkuListdata" cols="30"
                             rows="10">@{{ SkuList }}</textarea>
 
                         <table class="table table-striped table-bordered table-hover">
@@ -997,6 +994,7 @@
                     SpecList: [],
                     SkuList: @json($products_item),
                     products: @json($products),
+                    old_spec_dimension:0 , // 0 單規 1一規 2 二規
                     product_spec_info: @json($product_spec_info),
                     safty_qty_all: 0,
                 }
@@ -1012,6 +1010,7 @@
                 spec_value_list.spec_2.map(function(value, key) {
                     value.old_spec = 1;
                 });
+                this.old_spec_dimension = this.products.spec_dimension ; 
 
                 this.SpecList = spec_value_list;
                 this.SkuList = item_list;
@@ -1190,28 +1189,98 @@
                 },
                 "products.spec_dimension": {
                     handler(val) {
-                        this.Spec = { // 選擇的規格
-                            spec_1: '',
-                            spec_2: '',
-                        };
-                        this.SpecList = {
-                            spec_1: [],
-                            spec_2: [],
-                        }
-                        switch (val) {
-                            case '0': //單規格
-                                this.SkuList = [{}];
-                                break;
-                            case '1': //一維多規格
-                                this.SkuList = [];
-                                break;
-                            case '2': //二維多規格
-                                this.SkuList = [];
-                                break;
-                            default:
-                                break;
+                        console.log('Old val : '+this.old_spec_dimension,'chung new val :'+val);
+                        if(this.old_spec_dimension == 0){
+                            [
+                                //   {
+                                //     "id": 336,
+                                //     "sort_key": 0,
+                                //     "sort": 0,
+                                //     "spec_1_value": "",
+                                //     "spec_1_only_key": 0,
+                                //     "item_no": "A0001590001",
+                                //     "supplier_item_no": "",
+                                //     "ean": "",
+                                //     "pos_item_no": "POS-TEST-3388",
+                                //     "safty_qty": "1",
+                                //     "is_additional_purchase": 1,
+                                //     "status": 1
+                                //   }
+                                // ]
+                                
+                                //{
+                                //   "spec_1": [
+                                //     {
+                                //       "name": "AAA",
+                                //       "sort": 0,
+                                //       "only_key": "3ncrnl",
+                                //       "old_spec": 1
+                                //     },
+                                //     {
+                                //       "name": "BBBB",
+                                //       "sort": 1,
+                                //       "only_key": "4bvdm",
+                                //       "old_spec": 1
+                                //     }
+                                //   ],
+                                //   "spec_2": []
+                                // }
+                                // [
+                                //   {
+                                //     "id": 417,
+                                //     "sort_key": 0,
+                                //     "sort": 0,
+                                //     "spec_1_value": "AAA",
+                                //     "spec_1_only_key": "3ncrnl",
+                                //     "item_no": "A0002560001",
+                                //     "supplier_item_no": "",
+                                //     "ean": "",
+                                //     "pos_item_no": "POS-TEST-5001",
+                                //     "safty_qty": "20",
+                                //     "is_additional_purchase": 1,
+                                //     "status": 1
+                                //   },
+                                //   {
+                                //     "id": 418,
+                                //     "sort_key": 1,
+                                //     "sort": 1,
+                                //     "spec_1_value": "BBBB",
+                                //     "spec_1_only_key": "4bvdm",
+                                //     "item_no": "A0002560002",
+                                //     "supplier_item_no": "",
+                                //     "ean": "",
+                                //     "pos_item_no": "POS-TEST-5002",
+                                //     "safty_qty": "20",
+                                //     "is_additional_purchase": 1,
+                                //     "status": 1
+                                //   }
+                                // ]
                         }
 
+                        if(this.old_spec_dimension == 1){
+
+                        }
+                        // this.Spec = { // 選擇的規格
+                        //     spec_1: '',
+                        //     spec_2: '',
+                        // };
+                        // this.SpecList = {
+                        //     spec_1: [],
+                        //     spec_2: [],
+                        // }
+                        // switch (val) {
+                        //     case '0': //單規格
+                        //         // this.SkuList = [{}];
+                        //         break;
+                        //     case '1': //一維多規格
+                        //         // this.SkuList = [];
+                        //         break;
+                        //     case '2': //二維多規格
+                        //         // this.SkuList = [];
+                        //         break;
+                        //     default:
+                        //         break;
+                        // }
                     },
                     deep: true
                 }
