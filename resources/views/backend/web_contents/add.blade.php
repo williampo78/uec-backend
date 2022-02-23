@@ -101,11 +101,13 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-xs-12 text-center">
+                                <div class="col-xs-12">
                                     <div class="form-group">
-                                        <button class="btn btn-success" id="btn-save" type="button">
-                                            <i class="fa-solid fa-check"></i> 完成
-                                        </button>
+                                        @if ($share_role_auth['auth_create'])
+                                            <button class="btn btn-success" type="button" id="btn-save">
+                                                <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                            </button>
+                                        @endif
                                         <button type="button" class="btn btn-danger" id="btn-cancel">
                                             <i class="fa-solid fa-ban"></i> 取消
                                         </button>
@@ -160,15 +162,25 @@
             });
 
             $("#content_target").on('change', function() {
-                if ($(this).val() == 'S') {
-                    $("#div_content_url").show();
-                    $("#div_editor").hide();
-                } else if ($(this).val() == 'H') {
-                    $("#div_content_url").hide();
-                    $("#div_editor").show();
-                } else {
-                    $("#div_content_url").hide();
-                    $("#div_editor").hide();
+                switch ($(this).val()) {
+                    // 站內連結
+                    case 'S':
+                    // 另開視窗
+                    case 'B':
+                        $("#div_content_url").show();
+                        $("#div_editor").hide();
+                        break;
+
+                    // 單一圖文
+                    case 'H':
+                        $("#div_content_url").hide();
+                        $("#div_editor").show();
+                        break;
+
+                    default:
+                        $("#div_content_url").hide();
+                        $("#div_editor").hide();
+                        break;
                 }
             });
 

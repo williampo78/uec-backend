@@ -63,7 +63,7 @@ class WebContentsService
             $webData['content_url'] = isset($inputdata['content_url']) ? $inputdata['content_url'] : null;
             $webData['content_text'] = $inputdata['content_text'];
             if ($inputdata['apply_to'] == 'FOOTER') {
-                if ($webData['content_target'] == 'S') {
+                if ($webData['content_target'] == 'S' || $webData['content_target'] == 'B') {
                     $webData['content_text'] = null;
                 } else if ($webData['content_target'] == 'H') {
                     $webData['content_url'] = null;
