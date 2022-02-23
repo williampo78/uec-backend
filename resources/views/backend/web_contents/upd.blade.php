@@ -89,8 +89,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row" id="div_content_url"
-                                        style="display: {{ $data['webcontent']['content_target'] == 'S' ? '' : 'none;' }};">
+                                    <div class="row" style="display: none;" id="div_content_url">
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <label for="content_url">URL </label>
@@ -99,8 +98,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row" id="div_editor"
-                                        style="display: {{ $data['webcontent']['content_target'] == 'H' ? '' : 'none;' }};">
+                                    <div class="row" style="display: none;" id="div_editor">
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <label for="editor">單一圖文</label>
@@ -114,11 +112,13 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-xs-12 text-center">
+                                <div class="col-xs-12">
                                     <div class="form-group">
-                                        <button class="btn btn-success" id="btn-save" type="button">
-                                            <i class="fa-solid fa-check"></i> 完成
-                                        </button>
+                                        @if ($share_role_auth['auth_update'])
+                                            <button class="btn btn-success" type="button" id="btn-save">
+                                                <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                            </button>
+                                        @endif
                                         <button type="button" class="btn btn-danger" id="btn-cancel">
                                             <i class="fa-solid fa-ban"></i> 取消
                                         </button>
@@ -147,16 +147,47 @@
                 window.location.href = '{{ route('webcontents') }}';
             });
 
-            $("#content_target").on('change', function() {
-                if ($(this).val() == 'S') {
+            switch ($("#content_target").val()) {
+                // 站內連結
+                case 'S':
+                // 另開視窗
+                case 'B':
                     $("#div_content_url").show();
                     $("#div_editor").hide();
-                } else if ($(this).val() == 'H') {
+                    break;
+
+                // 單一圖文
+                case 'H':
                     $("#div_content_url").hide();
                     $("#div_editor").show();
-                } else {
+                    break;
+
+                default:
                     $("#div_content_url").hide();
                     $("#div_editor").hide();
+                    break;
+            }
+
+            $("#content_target").on('change', function() {
+                switch ($(this).val()) {
+                    // 站內連結
+                    case 'S':
+                    // 另開視窗
+                    case 'B':
+                        $("#div_content_url").show();
+                        $("#div_editor").hide();
+                        break;
+
+                    // 單一圖文
+                    case 'H':
+                        $("#div_content_url").hide();
+                        $("#div_editor").show();
+                        break;
+
+                    default:
+                        $("#div_content_url").hide();
+                        $("#div_editor").hide();
+                        break;
                 }
             });
 

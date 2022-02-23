@@ -54,6 +54,7 @@
                                     </select>
                                 </div>
                             </div>
+                            <br/>
                             <div class="row">
                                 <div class="col-sm-1 text-right">
                                     <h5>狀態</h5>
@@ -113,7 +114,7 @@
                                             @endif
                                             @if ($share_role_auth['auth_update'])
                                                 <a class="btn btn-info btn-sm"
-                                                   href="{{ route('webcontents.edit', $item->id) }}">修改</a>
+                                                   href="{{ route('webcontents.edit', $item->id) }}">編輯</a>
                                             @endif
                                         </td>
                                         <td>{{ $data['code'][$item->parent_code] }}</td>
