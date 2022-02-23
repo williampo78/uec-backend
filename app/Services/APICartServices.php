@@ -559,9 +559,9 @@ class APICartServices
                             "itemStock" => $stock,
                             "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
                             "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                            "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->Name,
+                            "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                             "campaignDiscountStatus" => false,
-                            "campaignGiftAway7" => []
+                            "campaignGiftAway" => []
                         );
                         $cartTotal += 0;
                     }
