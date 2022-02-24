@@ -85,6 +85,7 @@ class APITapPayService
      */
     public function tapPayNotifyLog($input)
     {
+        $pay_log_id = TapPayPayLog::insertGetId($input);
         $status = false;
         DB::beginTransaction();
         try {
