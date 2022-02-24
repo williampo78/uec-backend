@@ -38,10 +38,10 @@ class APICartServices
             ->where('shopping_cart_details.status_code', 0)//購物車
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
             ->join('products', 'products.id', '=', 'product_items.product_id')
-            ->where('products.approval_status', '=', 'APPROVED')//核準上架
             ->orderBy('product_items.sort', 'asc')
             ->get();
 
+        //->where('products.approval_status', '=', 'APPROVED')//核準上架
         $data = [];
         foreach ($result as $datas) {
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
@@ -558,12 +558,13 @@ class APICartServices
                             "amount" => intval($item_info->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
-                            "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                            "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                            "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id)?$campaign['PRD']['DISCOUNT'][$product_id]->id:null),
+                            "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name)?$campaign['PRD']['DISCOUNT'][$product_id]->campaign_name:null),
                             "campaignDiscountStatus" => false,
                             "campaignGiftAway" => []
                         );
                         $cartTotal += 0;
+                        $productRow++;
                     }
                 }
                 $productDetail[] = array(
