@@ -85,7 +85,31 @@ class APITapPayService
      */
     public function tapPayNotifyLog($input)
     {
+        //先把TapPay回傳的資料都寫入
         $pay_log_id = TapPayPayLog::insertGetId($input);
+        $info = TapPayPayLog::where('id', '=', $pay_log_id)->first();
+        //交易代碼status成功時才檢查回傳交易資料跟訂單是否符合
+        if ($input['status'] == 0) {
+            $orderPayment = $this->getOrderPayment($info);
+            if ($orderPayment) { //符合資料後，查詢tappay的交易紀錄
+                $data['partner_key'] = config('tappay.partner_key');
+                $data['filters'] = array('rec_trade_id' => $info->rec_trade_id);
+                $record = $this->tradeRecords($data);
+                $record = json_decode($record, true);
+                if ($record['status'] == 2) { //tappay打回來的最後資料
+                    //檢查該筆資料的交易紀錄的狀態
+                    foreach ($record['trade_records'] as $trade) {
+                        if ($trade['record_status'] == 1 || $trade['record_status'] == 0) { //交易完成..更新金流狀態...準備出貨單
+                            $orderStatus = $this->setShipment($orderPayment);
+                        }
+                    }
+                }
+                $status = true;
+                DB::commit();
+            } else {
+                //等排程檢查出貨
+            }
+        }
         $status = false;
         DB::beginTransaction();
         try {
