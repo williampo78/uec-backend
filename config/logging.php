@@ -100,6 +100,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'changepoint'=>[
+            'driver' => 'daily',
+            'path' => storage_path('logs/api/changepoint/changepoint.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 365,
+        ],
     ],
 
 ];

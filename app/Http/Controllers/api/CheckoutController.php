@@ -221,7 +221,7 @@ class CheckoutController extends Controller
                 } else {
                     $status = false;
                     $err = '401';
-                    $data['message'] = $dataOrder['message'] ; 
+                    $data['message'] = '會員點數扣點異常，無法成立訂單' ; 
                 }
             } else {
                 $status = false;
