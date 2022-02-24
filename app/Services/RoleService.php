@@ -56,6 +56,9 @@ class RoleService
             $act = explode('@' , $route->action['controller']);
             if (isset($roles[$code]) && ($code != 'admin' && $code != '' && $code != 'signOut')) {
                 switch ($act[1]) {
+                    case 'show':
+                        $auth = $roles[$code]['auth_query'];
+                        break;
                     case 'index':
                         $auth = $roles[$code]['auth_query'];
                         break;
