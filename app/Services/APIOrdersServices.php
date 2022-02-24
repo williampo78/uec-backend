@@ -495,13 +495,6 @@ class APIOrdersServices
                     $isTapPay = 1;
                 } else {
                     $isTapPay = 0;
-                    /**扣點失敗 */
-                    $result['status']  = $pointStatus['status'] ; 
-                    $result['message'] = $pointStatus['message'];
-                    $result['payment_url'] = null;
-                    Log::channel('changepoint')->info('扣點異常 ! webdata :'.json_encode($webData).'req:'.json_encode($pointData).'rep:'.json_decode($pointStatus));
-                    DB::rollBack();
-                    return $result ; 
                 }
             } else {
                 $isTapPay = 1;
