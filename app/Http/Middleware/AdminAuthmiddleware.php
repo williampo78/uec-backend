@@ -26,12 +26,15 @@ class AdminAuthmiddleware
         view()->share('share_role_auth', $other_role_auth);
 
         if(Auth::check()){
-            //DB role_permission_details 資料尚未建齊, 暫時先註解此功能
-//            if ($role_auth ==1){
+        //    DB role_permission_details 資料尚未建齊, 暫時先註解此功能
+           if ($role_auth == 1){
                 return $next($request);
-//            }else{
-//                return redirect()->route('admin.index');
-//            }
+           }else{
+            $result = [] ; 
+            $result['message'] = '你沒有權限執行這個操作！' ; 
+            $result['error_code'] = '' ; 
+            return response()->view('backend.error', $result);
+           }
         }else{
             return Redirect('/');
         }

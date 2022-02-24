@@ -36,9 +36,7 @@ class RoleService
         $code = explode('.' , \Request::route()->getName())[0];
         $route = \Route::current();
         $roles = Session::get('roles');
-
         $auth = 0;
-        //laravel route回傳格式不同 先判別回傳類型
         if (isset($route->paramters[$code])){
             if (isset($roles[$code])){
                 switch($route->paramters[$code]){
@@ -55,25 +53,34 @@ class RoleService
                 }
             }
         }else{
-            //index,create 回傳無 parameters , 用action判別
             $act = explode('@' , $route->action['controller']);
-
             if (isset($roles[$code]) && ($code != 'admin' && $code != '' && $code != 'signOut')) {
                 switch ($act[1]) {
                     case 'index':
                         $auth = $roles[$code]['auth_query'];
                         break;
+                    case 'edit':
+                        $auth = $roles[$code]['auth_update'];
+                        break;
                     case 'create':
                         $auth = $roles[$code]['auth_create'];
+                        break;
+                    case 'store':
+                        $auth = $roles[$code]['auth_create'];
+                        break;
+                    case 'update':
+                        $auth = $roles[$code]['auth_update'];
+                        break;
+                    case 'destroy':
+                        $auth = $roles[$code]['auth_delete'];
                         break;
                 }
 
                 //在admin及登出頁面必須回傳1 , 否則會一直無限導向
-            }elseif($code=='admin' || $code == '' || $code =='signOut'){
+            }elseif($code=='admin' || $code == '' || $code =='signOut' || $code =='backend-home'){
                 $auth = 1;
             }
         }
-
         return $auth;
     }
 

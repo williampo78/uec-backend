@@ -24,7 +24,7 @@
                                   {{$error_code}}
                                   @endif
                                 </div>
-                                <a class="btn btn-block btn-warning" href="{{route($route_name)}}"><i class="fa-solid fa-book"></i> 返回列表</a>
+                                <a class="btn btn-block btn-warning" href="{{isset($route_name) ? route($route_name) : '/'}}"><i class="fa-solid fa-book"></i> {{isset($route_name) ? '返回列表' : '返回首頁'}}</a>
                             </div>
                         </div>
                     </div>
