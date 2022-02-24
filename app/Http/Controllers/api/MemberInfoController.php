@@ -128,6 +128,9 @@ class MemberInfoController extends Controller
         $data['districtId'] = $request['districtId'];
         $data['address'] = $request['address'];
         $data['registeredSource'] = "EC";
+        if ($request['pwd'] !=''){ //for 未手機驗證會員使用-可更新此欄位
+            $data['password'] = $request['pwd'];
+        }
 
         $err = null;
         $error_code = $this->apiService->getErrorCode();

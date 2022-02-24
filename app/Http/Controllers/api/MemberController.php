@@ -441,6 +441,11 @@ class MemberController extends Controller
             $shipment = $order->shipments->first();
 
             $order->package_no = $shipment->package_no;
+
+            // 待出貨時間
+            if (isset($shipment->edi_exported_at)) {
+                $order->prepared_shipment_at = Carbon::parse($shipment->edi_exported_at)->format('Y-m-d H:i:s');
+            }
         }
 
         // 退貨申請單
@@ -459,6 +464,7 @@ class MemberController extends Controller
         $order = $order->only([
             'ordered_date',
             'paid_at',
+            'prepared_shipment_at',
             'shipped_at',
             'delivered_at',
             'order_status',

@@ -34,14 +34,15 @@ class APICartServices
         $result = ShoppingCartDetails::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
             , "product_items.item_no")
-            ->where('shopping_cart_details.member_id', $member_id)
-            ->where('shopping_cart_details.status_code', 0)//購物車
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
             ->join('products', 'products.id', '=', 'product_items.product_id')
-            ->where('products.approval_status', '=', 'APPROVED')//核準上架
-            ->orderBy('product_items.sort', 'asc')
-            ->get();
-
+            ->where('shopping_cart_details.status_code', 0)//購物車
+            ->where('shopping_cart_details.member_id', $member_id);
+        $result = $result->where(function ($query) {
+            $query->where('products.approval_status', '=', 'APPROVED');//核準上架
+            $query->orWhere('products.approval_status', '=', 'CANCELLED');//被下架
+        });
+        $result = $result->orderBy('product_items.sort', 'asc')->get();
         $data = [];
         foreach ($result as $datas) {
             $ProductPhotos = ProductPhotos::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
@@ -558,12 +559,13 @@ class APICartServices
                             "amount" => intval($item_info->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
-                            "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                            "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                            "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
+                            "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                             "campaignDiscountStatus" => false,
                             "campaignGiftAway" => []
                         );
                         $cartTotal += 0;
+                        $productRow++;
                     }
                 }
                 $productDetail[] = array(
