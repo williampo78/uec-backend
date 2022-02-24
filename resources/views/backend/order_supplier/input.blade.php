@@ -19,8 +19,8 @@
                                         <div class="form-group">
                                             <label for="supplier">請購單<span class="redtext">*</span></label>
                                             <select2 :options="requisitions_purchase_options"
-                                                :order_supplier_detail="order_supplier_detail"
-                                                :order_supplier="order_supplier" v-model="requisitions_purchase_id">
+                                                :order_supplier_detail_select="order_supplier_detail"
+                                                :order_supplier_select="order_supplier" v-model="requisitions_purchase_id">
                                             </select2>
                                         </div>
                                     </div>
@@ -545,7 +545,7 @@
         })
 
         Vue.component("select2", {
-            props: ["options", "value", "order_supplier", "order_supplier_detail"],
+            props: ["options", "value", "order_supplier_select", "order_supplier_detail_select"],
             template: "#select2-template",
             mixins: [requisitions],
             mounted: function() {
@@ -583,39 +583,39 @@
                             id: requisitions_purchase_id,
                         });
                         requisitionsPurchase = response.data.requisitionsPurchase;
-                        order_supplier.supplier_name = requisitionsPurchase.supplier_name;
-                        order_supplier.supplier_id = requisitionsPurchase.supplier_id;
-                        order_supplier.original_total_tax_price = requisitionsPurchase
+                        this.order_supplier_select.supplier_name = requisitionsPurchase.supplier_name;
+                        this.order_supplier_select.supplier_id = requisitionsPurchase.supplier_id;
+                        this.order_supplier_select.original_total_tax_price = requisitionsPurchase
                             .original_total_tax_price; // 原幣稅額
-                        order_supplier.original_total_price = requisitionsPurchase
+                        this.order_supplier_select.original_total_price = requisitionsPurchase
                             .original_total_price; // 原幣總金額
-                        order_supplier.total_tax_price = requisitionsPurchase.total_tax_price; //(本幣)稅額
-                        order_supplier.total_price = requisitionsPurchase.total_price; //(本幣)總金額
-                        order_supplier.tax = requisitionsPurchase.tax;
+                        this.order_supplier_select.total_tax_price = requisitionsPurchase.total_tax_price; //(本幣)稅額
+                        this.order_supplier_select.total_price = requisitionsPurchase.total_price; //(本幣)總金額
+                        this.order_supplier_select.tax = requisitionsPurchase.tax;
                         switch (requisitionsPurchase.tax) {
                             case 0:
-                                order_supplier.tax_name = '免稅';
+                                this.order_supplier_select.tax_name = '免稅';
                                 break;
                             case 1:
-                                order_supplier.tax_name = '應稅';
+                                this.order_supplier_select.tax_name = '應稅';
                                 break;
                             case 2:
-                                order_supplier.tax_name = '應稅內含';
+                                this.order_supplier_select.tax_name = '應稅內含';
                                 break;
                             case 3:
-                                order_supplier.tax_name = '零稅率';
+                                this.order_supplier_select.tax_name = '零稅率';
                                 break;
                         }
-                        order_supplier.tex = requisitionsPurchase.tax;
-                        order_supplier.warehouse_name = requisitionsPurchase.warehouse_name;
-                        order_supplier.warehouse_id = requisitionsPurchase.warehouse_id;
-                        if (order_supplier_detail.length !== 0) {
-                            order_supplier_detail.splice(0);
+                        this.order_supplier_select.tex = requisitionsPurchase.tax;
+                        this.order_supplier_select.warehouse_name = requisitionsPurchase.warehouse_name;
+                        this.order_supplier_select.warehouse_id = requisitionsPurchase.warehouse_id;
+                        if (this.order_supplier_detail_select.length !== 0) {
+                            this.order_supplier_detail_select.splice(0);
                         }
                         requisitionsPurchaseDetail = response.data.requisitionsPurchaseDetail;
-                        // console.log(requisitionsPurchaseDetail) ;
-                        $.each(requisitionsPurchaseDetail, function(key, obj) {
-                            order_supplier_detail.push({
+
+                        requisitionsPurchaseDetail.forEach((obj, key) => {
+                            this.order_supplier_detail_select.push({
                                 requisitions_purchase_dtl_id: obj
                                     .id, // requisitions_purchase_detail
                                 product_item_id: obj.product_item_id, //  品項ID

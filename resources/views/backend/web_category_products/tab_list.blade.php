@@ -51,4 +51,3 @@
 
 </div>
 
-<input type="hidden" id="status" v-model="status" name="status">

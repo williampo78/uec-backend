@@ -182,7 +182,7 @@
                                             @endif
                                             @if ($share_role_auth['auth_update'] && $v['status'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
                                                 <a class="btn btn-info btn-sm"
-                                                    href="{{ route('order_supplier.edit', $v['id']) }}">修改</a>
+                                                    href="{{ route('order_supplier.edit', $v['id']) }}">編輯</a>
                                             @endif
                                             @if ($share_role_auth['auth_update'] && $v['status'] == 'APPROVED' && $v['created_by'] == $data['user_id'])
 

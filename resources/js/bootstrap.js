@@ -10,6 +10,8 @@ import axios from "axios";
 import "jquery-validation";
 import "jquery-validation/dist/additional-methods";
 import "jquery-validation/dist/localization/messages_zh_TW";
+import Vue from 'vue';
+import flatpickr from "flatpickr";
 
 window._ = lodash;
 
@@ -52,6 +54,16 @@ $.extend($.fn.dataTable.defaults, {
 window.axios = axios;
 
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+
+/**
+ * vue
+ */
+window.Vue = Vue;
+
+/**
+ * flatpickr
+ */
+window.flatpickr = flatpickr;
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

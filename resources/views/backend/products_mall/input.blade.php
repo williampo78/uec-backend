@@ -732,6 +732,7 @@
                     file_cdn: @json(config('filesystems.disks.s3.url')),
                     product_photos: @json($product_photos),
                     ready_photo: [],
+                    RoleAuthJson: RoleAuthJson,
                 }
             },
             mounted() {

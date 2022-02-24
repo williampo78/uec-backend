@@ -10,24 +10,29 @@
         "production": "mix --production"
     },
     "devDependencies": {
-        "axios": "^0.21",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "postcss": "^8.1.14"
+        "postcss": "^8.1.14",
+        "vue-loader": "^15.9.7",
+        "vue-template-compiler": "^2.6.14"
     },
     "dependencies": {
         "@ckeditor/ckeditor5-indent": "^31.0.0",
         "@fortawesome/fontawesome-free": "^6.0.0",
+        "axios": "^0.26.0",
+        "bootstrap": "^4.6.0",
         "datatables.net": "^1.11.4",
         "datatables.net-bs": "^1.11.4",
         "datatables.net-buttons": "^2.2.2",
         "datatables.net-buttons-bs": "^2.2.2",
         "datatables.net-plugins": "^1.11.4",
         "file-saver": "^2.0.5",
+        "flatpickr": "^4.6.9",
         "jquery": "^3.6.0",
         "jquery-validation": "^1.19.3",
         "select2": "^4.0.13",
         "select2-bootstrap-theme": "^0.1.0-beta.10",
-        "sweetalert2": "^11.4.0"
+        "sweetalert2": "^11.4.0",
+        "vue": "^2.6.14"
     }
 }

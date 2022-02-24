@@ -942,7 +942,6 @@
                     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                 },
                 drag(eve) {
-                    console.log('eve.index:' + eve.target.dataset.index);
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
                     eve.dataTransfer.setData("text/type", eve.target.dataset.type);
                     $('.btn-events-none').css('pointer-events', 'none');

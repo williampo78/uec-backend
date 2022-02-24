@@ -67,7 +67,6 @@
     <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
 

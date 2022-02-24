@@ -226,7 +226,7 @@
 
                 },
                 check_all(act) {
-                    var status = '';
+                    let status = '';
                     if (act == 'allon') {
                         status = 1;
                     } else if (act == 'alloff') {

@@ -20,7 +20,8 @@ mix.js("resources/js/app.js", "public/js")
     .js("resources/js/inventory/*.js", "public/js/inventory.js")
     .js("resources/js/order/*.js", "public/js/order.js")
     .js("resources/js/order_payments_report/*.js", "public/js/order_payments_report.js")
-    .js("resources/js/order_refund/*.js", "public/js/order_refund.js");
+    .js("resources/js/order_refund/*.js", "public/js/order_refund.js")
+    .vue();
 
 mix.copyDirectory(
     "node_modules/datatables.net-plugins/i18n",
