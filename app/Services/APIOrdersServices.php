@@ -495,6 +495,12 @@ class APIOrdersServices
                     $isTapPay = 1;
                 } else {
                     $isTapPay = 0;
+                    /**扣點失敗 */
+                    $result['status']  = $pointStatus['status'] ; 
+                    $result['message'] = $pointStatus['message'];
+                    $result['payment_url'] = null;
+                    DB::rollBack();
+                    return $result ; 
                 }
             } else {
                 $isTapPay = 1;

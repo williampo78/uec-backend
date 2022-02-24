@@ -220,8 +220,8 @@ class CheckoutController extends Controller
                     $data = $dataOrder['payment_url'];
                 } else {
                     $status = false;
-                    $err = $dataOrder['status'];
-                    $data = $dataOrder['payment_url'];
+                    $err = '401';
+                    $data['message'] = $dataOrder['message'] ; 
                 }
             } else {
                 $status = false;
@@ -235,6 +235,7 @@ class CheckoutController extends Controller
                 if ($response['result']['shippingFee'] != $request->shipping_fee) {
                     $data['shipping_fee'] = "運費有誤";
                 }
+                $data['message'] = '' ;
             }
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
