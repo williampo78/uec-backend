@@ -253,12 +253,11 @@ class CheckoutController extends Controller
     {
         $data['order_no'] = $request['order_number'];
         $data['rec_trade_id'] = $request['rec_trade_id'];
-        $data['amount'] = $request['amount'];
+        $data['amount'] = ($request['amount']?$request['amount']:0);
         $data['status'] = $request['status'];
         $data['payment_type'] = 'PAY';
         $data['response_info'] = $request->getContent();
         $data['ip'] = $request->getClientIp();
-
         $result = $this->apiTapPay->tapPayNotifyLog($data);
 
         return response()->json(['status' => $result]);
