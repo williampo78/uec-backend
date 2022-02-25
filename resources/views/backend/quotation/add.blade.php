@@ -324,7 +324,7 @@
                             "</div>" +
                             "<div class='col-sm-1'>" +
                             "<button class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
-                            "' value='" + newRow + "'><i class="fa-solid fa-trash-can"></i> 刪除</button>" +
+                            "' value='" + newRow + "'><i class='fa-solid fa-trash-can'></i> 刪除</button>" +
                             "</div>" +
                             "</div>" +
                             "</div>"
@@ -421,7 +421,7 @@
                         "<div class='col-sm-1'>" +
                         "<button type='button' data-details='" + value.quotation_details_id +
                         "' class='btn btn-danger btn_close' id='btn-delete-" + position + newRow +
-                        "' value='" + newRow + "'><i class="fa-solid fa-trash-can"></i> 刪除</button>" +
+                        "' value='" + newRow + "'><i class='fa-solid fa-trash-can'></i> 刪除</button>" +
                         "</div>" +
                         "</div>" +
                         "</div>"
