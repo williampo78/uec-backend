@@ -2205,8 +2205,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery_validation_dist_additional_methods__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(jquery_validation_dist_additional_methods__WEBPACK_IMPORTED_MODULE_10__);
 /* harmony import */ var jquery_validation_dist_localization_messages_zh_TW__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! jquery-validation/dist/localization/messages_zh_TW */ "./node_modules/jquery-validation/dist/localization/messages_zh_TW.js");
 /* harmony import */ var jquery_validation_dist_localization_messages_zh_TW__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(jquery_validation_dist_localization_messages_zh_TW__WEBPACK_IMPORTED_MODULE_11__);
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
 /* harmony import */ var flatpickr__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! flatpickr */ "./node_modules/flatpickr/dist/esm/index.js");
+/* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! flatpickr/dist/l10n/zh-tw.js */ "./node_modules/flatpickr/dist/l10n/zh-tw.js");
+/* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_13__);
+
 
 
 
@@ -2261,15 +2264,24 @@ jquery__WEBPACK_IMPORTED_MODULE_1___default().extend((jquery__WEBPACK_IMPORTED_M
 window.axios = (axios__WEBPACK_IMPORTED_MODULE_8___default());
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 /**
+ * jquery validation
+ */
+// 預設值
+
+jQuery.validator.setDefaults({
+  ignore: ":hidden, .ck"
+});
+/**
  * vue
  */
 
-window.Vue = vue__WEBPACK_IMPORTED_MODULE_13__["default"];
+window.Vue = vue__WEBPACK_IMPORTED_MODULE_14__["default"];
 /**
  * flatpickr
  */
 
 window.flatpickr = flatpickr__WEBPACK_IMPORTED_MODULE_12__["default"];
+flatpickr__WEBPACK_IMPORTED_MODULE_12__["default"].localize(flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_13__.MandarinTraditional);
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
@@ -23097,6 +23109,83 @@ if (typeof Object.assign !== "function") {
         return target;
     };
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/flatpickr/dist/l10n/zh-tw.js":
+/*!***************************************************!*\
+  !*** ./node_modules/flatpickr/dist/l10n/zh-tw.js ***!
+  \***************************************************/
+/***/ (function(__unused_webpack_module, exports) {
+
+(function (global, factory) {
+   true ? factory(exports) :
+  0;
+}(this, (function (exports) { 'use strict';
+
+  var fp = typeof window !== "undefined" && window.flatpickr !== undefined
+      ? window.flatpickr
+      : {
+          l10ns: {},
+      };
+  var MandarinTraditional = {
+      weekdays: {
+          shorthand: ["週日", "週一", "週二", "週三", "週四", "週五", "週六"],
+          longhand: [
+              "星期日",
+              "星期一",
+              "星期二",
+              "星期三",
+              "星期四",
+              "星期五",
+              "星期六",
+          ],
+      },
+      months: {
+          shorthand: [
+              "一月",
+              "二月",
+              "三月",
+              "四月",
+              "五月",
+              "六月",
+              "七月",
+              "八月",
+              "九月",
+              "十月",
+              "十一月",
+              "十二月",
+          ],
+          longhand: [
+              "一月",
+              "二月",
+              "三月",
+              "四月",
+              "五月",
+              "六月",
+              "七月",
+              "八月",
+              "九月",
+              "十月",
+              "十一月",
+              "十二月",
+          ],
+      },
+      rangeSeparator: " 至 ",
+      weekAbbreviation: "週",
+      scrollTitle: "滾動切換",
+      toggleTitle: "點擊切換 12/24 小時時制",
+  };
+  fp.l10ns.zh_tw = MandarinTraditional;
+  var zhTw = fp.l10ns;
+
+  exports.MandarinTraditional = MandarinTraditional;
+  exports.default = zhTw;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
 
 
 /***/ }),

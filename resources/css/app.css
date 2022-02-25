@@ -9,6 +9,9 @@
 /* fontawesome */
 @import "~@fortawesome/fontawesome-free/css/all.css";
 
+/* flatpickr */
+@import "~flatpickr/dist/flatpickr.css";
+
 body {
     font-family: Segoe UI Light, 微軟正黑體;
     /* font-weight: bold; */

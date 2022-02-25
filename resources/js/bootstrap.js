@@ -10,8 +10,9 @@ import axios from "axios";
 import "jquery-validation";
 import "jquery-validation/dist/additional-methods";
 import "jquery-validation/dist/localization/messages_zh_TW";
-import Vue from 'vue';
+import Vue from "vue";
 import flatpickr from "flatpickr";
+import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
 
 window._ = lodash;
 
@@ -56,6 +57,14 @@ window.axios = axios;
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 /**
+ * jquery validation
+ */
+// 預設值
+jQuery.validator.setDefaults({
+    ignore: ":hidden, .ck",
+});
+
+/**
  * vue
  */
 window.Vue = Vue;
@@ -64,6 +73,7 @@ window.Vue = Vue;
  * flatpickr
  */
 window.flatpickr = flatpickr;
+flatpickr.localize(MandarinTraditional);
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
