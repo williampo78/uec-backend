@@ -46,7 +46,7 @@ class MessagesController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $input->errors()]);
         }
         $input = $input->safe()->only(['page', 'size']);
-        $input['channels'] = 'EC,AIDRADVICE';
+        $input['channels'] = 'EC';
         $response = $this->apiService->getMessages($input, $url);
         $result = json_decode($response, true);
 
@@ -190,7 +190,7 @@ class MessagesController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $input->errors()]);
         }
         $input = $input->safe()->only(['page', 'size']);
-        $input['channels'] = 'EC,AIDRADVICE';
+        $input['channels'] = 'EC';
         $response = $this->apiService->getTopMessages($input, $url);
         $result = json_decode($response, true);
 
