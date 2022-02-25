@@ -38,55 +38,55 @@ class RoleService
         $route = \Route::current();
         $roles = Session::get('roles');
         $auth = 0;
-        if (isset($route->paramters[$code])) {
-            if (isset($roles[$code])) {
-                switch ($route->paramters[$code]) {
-                    case 'edit':
-                    case 'update':
-                        $auth = $roles[$code]['auth_update'];
-                        break;
-                    case 'destroy':
-                        $auth = $roles[$code]['auth_delete'];
-                        break;
-                    case 'store':
-                        $auth = $roles[$code]['auth_create'];
-                        break;
-                }
+        // if (isset($route->paramters[$code])) {
+        //     if (isset($roles[$code])) {
+        //         switch ($route->paramters[$code]) {
+        //             case 'edit':
+        //             case 'update':
+        //                 $auth = $roles[$code]['auth_update'];
+        //                 break;
+        //             case 'destroy':
+        //                 $auth = $roles[$code]['auth_delete'];
+        //                 break;
+        //             case 'store':
+        //                 $auth = $roles[$code]['auth_create'];
+        //                 break;
+        //         }
+        //     }
+        // } else {
+        $act = explode('@', $route->action['controller']);
+        if (isset($roles[$code]) && ($code != 'admin' && $code != '' && $code != 'signOut')) {
+            switch ($act[1]) {
+                case 'show':
+                    $auth = $roles[$code]['auth_query'];
+                    break;
+                case 'index':
+                    $auth = $roles[$code]['auth_query'];
+                    break;
+                case 'edit':
+                    $auth = $roles[$code]['auth_update'];
+                    break;
+                case 'create':
+                    $auth = $roles[$code]['auth_create'];
+                    break;
+                case 'store':
+                    $auth = $roles[$code]['auth_create'];
+                    break;
+                case 'update':
+                    $auth = $roles[$code]['auth_update'];
+                    break;
+                case 'destroy':
+                    $auth = $roles[$code]['auth_delete'];
+                    break;
+                default: //拍謝 不歸我管
+                    $auth = 1;
+                    break;
             }
-        } else {
-            $act = explode('@', $route->action['controller']);
-            if (isset($roles[$code]) && ($code != 'admin' && $code != '' && $code != 'signOut')) {
-                switch ($act[1]) {
-                    case 'show':
-                        $auth = $roles[$code]['auth_query'];
-                        break;
-                    case 'index':
-                        $auth = $roles[$code]['auth_query'];
-                        break;
-                    case 'edit':
-                        $auth = $roles[$code]['auth_update'];
-                        break;
-                    case 'create':
-                        $auth = $roles[$code]['auth_create'];
-                        break;
-                    case 'store':
-                        $auth = $roles[$code]['auth_create'];
-                        break;
-                    case 'update':
-                        $auth = $roles[$code]['auth_update'];
-                        break;
-                    case 'destroy':
-                        $auth = $roles[$code]['auth_delete'];
-                        break;
-                    default: //拍謝 不歸我管
-                        $auth = 1;
-                        break;
-                }
-                //在admin及登出頁面必須回傳1 , 否則會一直無限導向
-            } elseif ($code == 'admin' || $code == '' || $code == 'signOut' || $code == 'backend-home') {
-                $auth = 1;
-            }
+            //在admin及登出頁面必須回傳1 , 否則會一直無限導向
+        } elseif ($code == 'admin' || $code == '' || $code == 'signOut' || $code == 'backend-home') {
+            $auth = 1;
         }
+        // }
         return $auth;
     }
 
