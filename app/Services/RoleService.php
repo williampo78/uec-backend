@@ -6,7 +6,7 @@ use App\Models\Users;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Str;
 class RoleService
 {
     public function putUserRolesSession()
@@ -38,22 +38,6 @@ class RoleService
         $route = \Route::current();
         $roles = Session::get('roles');
         $auth = 0;
-        // if (isset($route->paramters[$code])) {
-        //     if (isset($roles[$code])) {
-        //         switch ($route->paramters[$code]) {
-        //             case 'edit':
-        //             case 'update':
-        //                 $auth = $roles[$code]['auth_update'];
-        //                 break;
-        //             case 'destroy':
-        //                 $auth = $roles[$code]['auth_delete'];
-        //                 break;
-        //             case 'store':
-        //                 $auth = $roles[$code]['auth_create'];
-        //                 break;
-        //         }
-        //     }
-        // } else {
         $act = explode('@', $route->action['controller']);
         if (isset($roles[$code]) && ($code != 'admin' && $code != '' && $code != 'signOut')) {
             switch ($act[1]) {
@@ -83,7 +67,7 @@ class RoleService
                     break;
             }
             //在admin及登出頁面必須回傳1 , 否則會一直無限導向
-        } elseif ($code == 'admin' || $code == '' || $code == 'signOut' || $code == 'backend-home' || is_null($code)) {
+        } elseif ($code == 'admin' || $code == '' || $code == 'signOut' || $code == 'backend-home' || Str::is('generated*', $code)) {
             $auth = 1;
         }
         // }
