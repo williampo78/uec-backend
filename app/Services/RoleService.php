@@ -83,7 +83,7 @@ class RoleService
                     break;
             }
             //在admin及登出頁面必須回傳1 , 否則會一直無限導向
-        } elseif ($code == 'admin' || $code == '' || $code == 'signOut' || $code == 'backend-home') {
+        } elseif ($code == 'admin' || $code == '' || $code == 'signOut' || $code == 'backend-home' || is_null($code)) {
             $auth = 1;
         }
         // }
