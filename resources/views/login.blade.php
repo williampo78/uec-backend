@@ -14,7 +14,7 @@
                 </div>
                 <div class="login100-form-title" style="background-image: url('/asset/img/bg-01.jpg'); color:#ffffff;">
                     <span class="login100-form-title-1">
-                        諾亞克 uEC 電商後台管理系統
+                        綠杏健康力EC電商後台管理系統
                     </span>
                 </div>
                 <form class="login100-form validate-form" method="POST" action="{{ route('login.custom') }}">
