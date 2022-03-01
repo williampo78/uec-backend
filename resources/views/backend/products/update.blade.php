@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* .no-pa {
-                                            padding: 0px;
-                                        } */
+                                                    padding: 0px;
+                                                } */
 
         .ondragover {
             background: #b7e0fb !important;
@@ -735,7 +735,7 @@
                 <hr>
                 <div id="page-2">
                     <div id="SkuComponent">
-                        <textarea name="SpecListJson" id="" cols="30" rows="10">@{{ SpecList }}</textarea>
+                        <textarea style="display: none;" name="SpecListJson" id="" cols="30" rows="10">@{{ SpecList }}</textarea>
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <div class="col-sm-2 ">
@@ -769,7 +769,7 @@
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                            value="{{ $products->spec_1 }}" >
+                                            value="{{ $products->spec_1 }}">
                                     </div>
                                 </div>
                             </div>
@@ -828,7 +828,8 @@
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <div v-if="spec_1.old_spec">
-
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)" disabled>刪除</button>
                                                     </div>
                                                     <div v-else>
                                                         <button class="btn btn-danger btn-sm" type="button"
@@ -883,7 +884,8 @@
                                                 <div class="col-sm-2">
                                                     <div v-if="spec_2.old_spec">
                                                         <button class="btn btn-danger btn-sm" type="button"
-                                                        @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)" disabled>刪除</button>
+                                                            @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)"
+                                                            disabled>刪除</button>
                                                     </div>
                                                     <div v-else>
                                                         <button class="btn btn-danger btn-sm" type="button"
@@ -911,7 +913,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea id="SkuListdata" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
+                        <textarea style="display: none;" id="SkuListdata" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
 
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
@@ -1184,25 +1186,44 @@
                 },
                 change_spec_dimension(changeVal) {
                     if (this.old_spec_dimension == 0) {
-                        if (changeVal == 1) {
-                            let add_spec_1_only_key = Math.random().toString(36).substring(8);
-                            this.SkuList[0].spec_1_only_key = add_spec_1_only_key;
-                            this.SpecList.spec_1.push({
+                        let add_spec_1_only_key = Math.random().toString(36).substring(8);
+                        let add_spec_2_only_key = Math.random().toString(36).substring(8);
+                        this.old_spec_dimension = changeVal;
+                        this.SkuList.forEach((person, i, array) => {
+                            this.SkuList[i].spec_1_only_key = add_spec_1_only_key;
+                            if (changeVal == 2) {
+                                this.SkuList[i].spec_2_only_key = add_spec_2_only_key;
+                            }
+                        })
+                        this.SpecList.spec_1.push({
+                            name: '',
+                            sort: 0,
+                            only_key: add_spec_1_only_key,
+                            old_spec: 1,
+                        });
+                        if (changeVal == 2) {
+                            this.SpecList.spec_2.push({
                                 name: '',
                                 sort: 0,
-                                only_key: add_spec_1_only_key,
-                                old_spec:1 ,
+                                only_key: add_spec_2_only_key,
+                                old_spec: 1,
                             });
-                        } else if (changeVal == 2) {
-                            console.log('0->2');
                         }
                     }
                     if (this.old_spec_dimension == 1) {
                         if (changeVal == 2) {
-                            console.log('1 -> 2');
+                            let add_spec_2_only_key = Math.random().toString(36).substring(8);
+                            this.SkuList.forEach((person, i, array) => {
+                                this.SkuList[i].spec_2_only_key = add_spec_2_only_key;
+                            })
+                            this.SpecList.spec_2.push({
+                                name: '',
+                                sort: 0,
+                                only_key: add_spec_2_only_key,
+                                old_spec: 1,
+                            });
                         }
                     }
-                    console.log('change_spec_dimension');
                 },
 
             },
