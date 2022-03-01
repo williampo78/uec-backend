@@ -2,7 +2,7 @@
 <html lang="zh-tw">
 
 <head>
-    <title>綠杏健康力 - @yield('title')</title>
+    <title>@yield('title')</title>
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
