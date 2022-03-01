@@ -169,8 +169,7 @@
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
-                                                            @click="Del(Category,CategoryKey,'Category')"
-                                                            v-show="RoleAuthJson.auth_delete" disabled>刪除</button>
+                                                            @click="Del(Category,CategoryKey,'Category')" disabled>刪除</button>
                                                     </td>
                                                 </tr>
 
