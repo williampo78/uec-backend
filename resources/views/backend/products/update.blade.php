@@ -780,7 +780,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="form-group">
-                                        <input class="form-control" type="text" name="spec_1" id="spec_1"
+                                        <input class="form-control" type="text" name="spec_2" id="spec_2"
                                             value="{{ $products->spec_2 }}">
                                     </div>
                                 </div>
@@ -1595,6 +1595,14 @@
                     },
                     product_brief_1: {
                         maxlength: 60,
+                    },
+                    spec_1:{
+                        required: true,
+                        maxlength:4,
+                    },
+                    spec_2:{
+                        required: true,
+                        maxlength:4,
                     },
                     product_brief_2: {
                         maxlength: 60,
