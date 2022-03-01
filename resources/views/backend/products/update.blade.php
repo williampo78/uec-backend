@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* .no-pa {
-                        padding: 0px;
-                    } */
+                                            padding: 0px;
+                                        } */
 
         .ondragover {
             background: #b7e0fb !important;
@@ -735,25 +735,27 @@
                 <hr>
                 <div id="page-2">
                     <div id="SkuComponent">
-                        <textarea name="SpecListJson" id="" cols="30"
-                            rows="10">@{{ SpecList }}</textarea>
+                        <textarea name="SpecListJson" id="" cols="30" rows="10">@{{ SpecList }}</textarea>
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <div class="col-sm-2 ">
                                     <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="0" v-model="products.spec_dimension" >
+                                        <input type="radio" name="spec_dimension" value="0"
+                                            v-model="products.spec_dimension" :disabled="products.spec_dimension !== 0">
                                         單規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="1" v-model="products.spec_dimension">
+                                        <input type="radio" name="spec_dimension" value="1"
+                                            v-model="products.spec_dimension" :disabled="products.spec_dimension == 2">
                                         一維多規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="2" v-model="products.spec_dimension" >
+                                        <input type="radio" name="spec_dimension" value="2"
+                                            v-model="products.spec_dimension">
                                         二維多規格
                                     </label>
                                 </div>
@@ -906,8 +908,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea id="SkuListdata" name="SkuListdata" cols="30"
-                            rows="10">@{{ SkuList }}</textarea>
+                        <textarea id="SkuListdata" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
 
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
@@ -994,7 +995,7 @@
                     SpecList: [],
                     SkuList: @json($products_item),
                     products: @json($products),
-                    old_spec_dimension:0 , // 0 單規 1一規 2 二規
+                    old_spec_dimension: 0, // 0 單規 1一規 2 二規
                     product_spec_info: @json($product_spec_info),
                     safty_qty_all: 0,
                 }
@@ -1010,7 +1011,7 @@
                 spec_value_list.spec_2.map(function(value, key) {
                     value.old_spec = 1;
                 });
-                this.old_spec_dimension = this.products.spec_dimension ; 
+                this.old_spec_dimension = this.products.spec_dimension;
 
                 this.SpecList = spec_value_list;
                 this.SkuList = item_list;
@@ -1041,6 +1042,7 @@
                 },
                 DelSpecList(obj, type, index) { //刪除規格
                     if (type == 'spec_1') {
+                        //這邊要檢查對應到要刪除的 sku list 是否包含item編號
                         this.SpecList.spec_1.splice(index, 1);
                         let new_SkuList = this.SkuList.filter(data => data.spec_1_only_key !== obj.only_key);
                         this.SkuList = new_SkuList;
@@ -1177,6 +1179,33 @@
                         }
                     }
                 },
+                change_spec_dimension(changeVal) {
+                    console.log(this.SkuList);
+                    console.log(this.product_spec_info);
+                    if (this.old_spec_dimension == 0) {
+                        if (changeVal == 1) {
+                            let add_spec_1_only_key = Math.random().toString(36).substring(8);
+                            // this.SkuList.forEach((person, i, array) => {
+                            //     array.spec_1_only_key = Math.random().toString(36).substring(8) ;
+                            // })
+                            this.SkuList[0].spec_1_only_key = add_spec_1_only_key;
+                            this.SpecList.spec_1.push({
+                                name: '',
+                                sort: 0,
+                                only_key: add_spec_1_only_key,
+                            });
+                            this.product_spec_info
+                        } else if (changeVal == 2) {
+                            console.log('0->2');
+                        }
+                    }
+                    if (this.old_spec_dimension == 1) {
+                        if (changeVal == 2) {
+                            console.log('1 -> 2');
+                        }
+                    }
+                    console.log('change_spec_dimension');
+                },
 
             },
             watch: {
@@ -1189,98 +1218,7 @@
                 },
                 "products.spec_dimension": {
                     handler(val) {
-                        console.log('Old val : '+this.old_spec_dimension,'chung new val :'+val);
-                        if(this.old_spec_dimension == 0){
-                            [
-                                //   {
-                                //     "id": 336,
-                                //     "sort_key": 0,
-                                //     "sort": 0,
-                                //     "spec_1_value": "",
-                                //     "spec_1_only_key": 0,
-                                //     "item_no": "A0001590001",
-                                //     "supplier_item_no": "",
-                                //     "ean": "",
-                                //     "pos_item_no": "POS-TEST-3388",
-                                //     "safty_qty": "1",
-                                //     "is_additional_purchase": 1,
-                                //     "status": 1
-                                //   }
-                                // ]
-                                
-                                //{
-                                //   "spec_1": [
-                                //     {
-                                //       "name": "AAA",
-                                //       "sort": 0,
-                                //       "only_key": "3ncrnl",
-                                //       "old_spec": 1
-                                //     },
-                                //     {
-                                //       "name": "BBBB",
-                                //       "sort": 1,
-                                //       "only_key": "4bvdm",
-                                //       "old_spec": 1
-                                //     }
-                                //   ],
-                                //   "spec_2": []
-                                // }
-                                // [
-                                //   {
-                                //     "id": 417,
-                                //     "sort_key": 0,
-                                //     "sort": 0,
-                                //     "spec_1_value": "AAA",
-                                //     "spec_1_only_key": "3ncrnl",
-                                //     "item_no": "A0002560001",
-                                //     "supplier_item_no": "",
-                                //     "ean": "",
-                                //     "pos_item_no": "POS-TEST-5001",
-                                //     "safty_qty": "20",
-                                //     "is_additional_purchase": 1,
-                                //     "status": 1
-                                //   },
-                                //   {
-                                //     "id": 418,
-                                //     "sort_key": 1,
-                                //     "sort": 1,
-                                //     "spec_1_value": "BBBB",
-                                //     "spec_1_only_key": "4bvdm",
-                                //     "item_no": "A0002560002",
-                                //     "supplier_item_no": "",
-                                //     "ean": "",
-                                //     "pos_item_no": "POS-TEST-5002",
-                                //     "safty_qty": "20",
-                                //     "is_additional_purchase": 1,
-                                //     "status": 1
-                                //   }
-                                // ]
-                        }
-
-                        if(this.old_spec_dimension == 1){
-
-                        }
-                        // this.Spec = { // 選擇的規格
-                        //     spec_1: '',
-                        //     spec_2: '',
-                        // };
-                        // this.SpecList = {
-                        //     spec_1: [],
-                        //     spec_2: [],
-                        // }
-                        // switch (val) {
-                        //     case '0': //單規格
-                        //         // this.SkuList = [{}];
-                        //         break;
-                        //     case '1': //一維多規格
-                        //         // this.SkuList = [];
-                        //         break;
-                        //     case '2': //二維多規格
-                        //         // this.SkuList = [];
-                        //         break;
-                        //     default:
-                        //         break;
-                        // }
+                        return this.change_spec_dimension(val);
                     },
                     deep: true
                 }
