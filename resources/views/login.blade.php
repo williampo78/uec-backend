@@ -1,7 +1,7 @@
 @extends('backend.master')
 
 <link rel="stylesheet" href="{{ URL::asset('asset/css/login.css') }}">
-@section('title', '諾亞克 uEC - 登入系統')
+@section('title', '綠杏健康力EC電商後台管理系統')
 
 @section('content')
     <div class="limiter">
