@@ -769,7 +769,7 @@
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                            value="{{ $products->spec_1 }}" disabled>
+                                            value="{{ $products->spec_1 }}" >
                                     </div>
                                 </div>
                             </div>
@@ -781,7 +781,7 @@
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                            value="{{ $products->spec_2 }}" disabled>
+                                            value="{{ $products->spec_2 }}">
                                     </div>
                                 </div>
                             </div>
@@ -815,7 +815,7 @@
                                                         <div class="form-group">
                                                             <input class="form-control spec_1_va"
                                                                 :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name"
-                                                                data-va="spec_1_va" readonly>
+                                                                data-va="spec_1_va">
                                                         </div>
                                                     </div>
                                                     <div v-else>
@@ -868,7 +868,7 @@
                                                         <div class="form-group">
                                                             <input class="form-control spec_2_va"
                                                                 :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name"
-                                                                data-va="spec_2_va" disabled>
+                                                                data-va="spec_2_va">
                                                         </div>
                                                     </div>
                                                     <div v-else>
@@ -881,7 +881,10 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-2">
-                                                    <div v-if="spec_2.old_spec"></div>
+                                                    <div v-if="spec_2.old_spec">
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                        @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)" disabled>刪除</button>
+                                                    </div>
                                                     <div v-else>
                                                         <button class="btn btn-danger btn-sm" type="button"
                                                             @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button>
@@ -1180,21 +1183,16 @@
                     }
                 },
                 change_spec_dimension(changeVal) {
-                    console.log(this.SkuList);
-                    console.log(this.product_spec_info);
                     if (this.old_spec_dimension == 0) {
                         if (changeVal == 1) {
                             let add_spec_1_only_key = Math.random().toString(36).substring(8);
-                            // this.SkuList.forEach((person, i, array) => {
-                            //     array.spec_1_only_key = Math.random().toString(36).substring(8) ;
-                            // })
                             this.SkuList[0].spec_1_only_key = add_spec_1_only_key;
                             this.SpecList.spec_1.push({
                                 name: '',
                                 sort: 0,
                                 only_key: add_spec_1_only_key,
+                                old_spec:1 ,
                             });
-                            this.product_spec_info
                         } else if (changeVal == 2) {
                             console.log('0->2');
                         }
