@@ -287,4 +287,24 @@ class APIWebService
 
         return $result;
     }
+
+    /**
+     * 取得會員收藏商品 for 愛心顯示使用
+     * @param
+     * @return string
+     */
+    public function getMemberCollectiontoArray()
+    {
+        $collection = [];
+        $member_id = Auth::guard('api')->user()->member_id;
+        $collects = DB::table('member_collections')->select('products.id', 'products.product_no', 'products.product_name', 'products.selling_price', 'products.list_price')
+            ->Join('products', 'member_collections.product_id', '=', 'products.id')
+            ->where('member_collections.member_id', '=', $member_id)
+            ->where('member_collections.status', '=', 0)->get();
+        foreach ($collects as $collect) {
+            $collection[] = $collect->id;
+        }
+
+        return json_encode($collection);
+    }
 }

@@ -50,6 +50,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     //UTM
     Route::get('/utm', [IndexController::class, 'getUTM']);
+
 });
 
 // jwt驗證
@@ -71,6 +72,8 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::get('/membership/collections', [MemberInfoController::class, 'collections']);
     Route::post('/membership/collections', [MemberInfoController::class, 'setCollections']);
     Route::post('/membership/collections/batchDelete', [MemberInfoController::class, 'batchDeleteCollections']);
+    //取得收藏商品
+    Route::post('/membership/displayCollection', [MemberInfoController::class, 'displayCollection']);
 
     Route::group(['prefix' => 'shopping'], function () {
         Route::post('/setMemberCart', [ShoppingController::class, 'setCart']);

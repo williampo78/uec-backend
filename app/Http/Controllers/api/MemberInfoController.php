@@ -425,5 +425,27 @@ class MemberInfoController extends Controller
 
     }
 
+    /*
+     * 查詢會員商品收藏資料 for 愛心顯示使用
+     * @param
+     */
+    public function displayCollection()
+    {
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiWebService->getMemberCollectiontoArray();
+        $result = json_decode($response, true);
+        if (count($result) > 0) {
+            $status = true;
+            $list = $result;
+        } else {
+            $status = false;
+            $err = '404';
+            $list = [];
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+
+    }
+
 }
 
