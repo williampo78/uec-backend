@@ -79,13 +79,13 @@
                                         <h5>日期：</h5>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class="form-group" id="div_select_start_date">
-                                            <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="select_start_date"
-                                                    id="select_start_date"
-                                                    value="{{ request()->input('select_start_date') }}" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="form-group">
+                                            <div class="input-group" id="select_start_date_flatpickr">
+                                                <input type="text" class="form-control" name="select_start_date" id="select_start_date" value="{{ request()->input('select_start_date') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -94,13 +94,13 @@
                                         <h5>～</h5>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class="form-group" id="div_select_end_date">
-                                            <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="select_end_date"
-                                                    id="select_end_date"
-                                                    value="{{ request()->input('select_end_date') }} == '' ??  date('Y-m-d')" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="form-group">
+                                            <div class="input-group" id="select_end_date_flatpickr">
+                                                <input type="text" class="form-control" name="select_end_date" id="select_end_date" value="{{ request()->input('select_end_date') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -272,23 +272,24 @@
             new showRequisitions().$mount('#requisitions_vue_app');
 
             $(function() {
-                $('#datetimepicker').datetimepicker({
-                    format: 'YYYY-MM-DD',
-                });
-                $('#datetimepicker2').datetimepicker({
-                    format: 'YYYY-MM-DD',
-                });
-                $("#supplier_id").select2({
-                    allowClear: true,
-                    theme: "bootstrap",
-                    placeholder: "請選擇"
-                });
-                $("#status").select2({
-                    allowClear: true,
-                    theme: "bootstrap",
-                    placeholder: "請選擇"
+                let select_start_date_flatpickr = flatpickr("#select_start_date_flatpickr", {
+                    dateFormat: "Y-m-d",
+                    maxDate: $("#select_end_date").val(),
+                    onChange: function(selectedDates, dateStr, instance) {
+                        select_end_date_flatpickr.set('minDate', dateStr);
+                    },
                 });
 
+                let select_end_date_flatpickr = flatpickr("#select_end_date_flatpickr", {
+                    dateFormat: "Y-m-d",
+                    minDate: $("#select_start_date").val(),
+                    onChange: function(selectedDates, dateStr, instance) {
+                        select_start_date_flatpickr.set('maxDate', dateStr);
+                    },
+                });
+
+                $("#supplier_id").select2();
+                $("#status").select2();
             });
 
             function del(id, doc_number) {

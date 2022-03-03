@@ -73,10 +73,12 @@
                                         <label class="control-label">建檔日</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-start-created-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-start-created-at" id="prd-modal-start-created-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-start-created-at" data-toggle="datetimepicker">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="prd-modal-start-created-at-flatpickr">
+                                            <input type="text" class="form-control" id="prd-modal-start-created-at" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -84,10 +86,12 @@
                                         <label class="control-label">~</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-end-created-at'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-end-created-at" id="prd-modal-end-created-at" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-end-created-at" data-toggle="datetimepicker">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="prd-modal-end-created-at-flatpickr">
+                                            <input type="text" class="form-control" id="prd-modal-end-created-at" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -99,10 +103,12 @@
                                         <label class="control-label">上架日期</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-start-launched-at-start'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-start-launched-at-start" id="prd-modal-start-launched-at-start" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-start-launched-at-start" data-toggle="datetimepicker">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="prd-modal-start-launched-at-start-flatpickr">
+                                            <input type="text" class="form-control" id="prd-modal-start-launched-at-start" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -110,10 +116,12 @@
                                         <label class="control-label">~</label>
                                     </div>
                                     <div class="col-sm-4">
-                                        <div class='input-group date' id='datetimepicker-prd-modal-start-launched-at-end'>
-                                            <input type='text' class="form-control datetimepicker-input" data-target="#datetimepicker-prd-modal-start-launched-at-end" id="prd-modal-start-launched-at-end" autocomplete="off" />
-                                            <span class="input-group-addon" data-target="#datetimepicker-prd-modal-start-launched-at-end" data-toggle="datetimepicker">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="prd-modal-start-launched-at-end-flatpickr">
+                                            <input type="text" class="form-control" id="prd-modal-start-launched-at-end" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>

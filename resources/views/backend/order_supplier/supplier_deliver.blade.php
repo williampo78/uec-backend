@@ -22,16 +22,8 @@
                             <div class="form-group">
                                 <div class="col-sm-3"><label class="control-label"> 採購日期</label></div>
                                 <div class="col-sm-9">
-                                    <div class='input-group date' id='trade_date_dp'>
-                                        <label></label>
-                                        <input type='text' class="form-control" name="trade_date"
-                                            id="trade_date" value="" readonly/>
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
+                                    <p class="form-control-static" id="trade_date"></p>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -41,16 +33,15 @@
                             <div class="form-group">
                                 <div class="col-sm-3"><label class="control-label"> 廠商交貨日</label></div>
                                 <div class="col-sm-9">
-                                    <div class='input-group date' id='supplier_deliver_date_dp'>
-                                        <label></label>
-                                        <input type='text' class="form-control" name="supplier_deliver_date"
-                                            id="supplier_deliver_date" value="" />
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
+                                    <div class="input-group" id="supplier_deliver_date_flatpickr">
+                                        <input type="text" class="form-control" name="supplier_deliver_date" id="supplier_deliver_date" value="" autocomplete="off" data-input />
+                                        <span class="input-group-btn" data-toggle>
+                                            <button class="btn btn-default" type="button">
+                                                <i class="fa-solid fa-calendar-days"></i>
+                                            </button>
                                         </span>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
@@ -62,11 +53,12 @@
                                     <label class="control-label"> 預計進貨日</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <div class='input-group date' id='expect_deliver_date_dp'>
-                                        <input type='text' class="form-control" name="expect_deliver_date"
-                                            id="expect_deliver_date" value="" />
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
+                                    <div class="input-group" id="expect_deliver_date_flatpickr">
+                                        <input type="text" class="form-control" name="expect_deliver_date" id="expect_deliver_date" value="" autocomplete="off" data-input />
+                                        <span class="input-group-btn" data-toggle>
+                                            <button class="btn btn-default" type="button">
+                                                <i class="fa-solid fa-calendar-days"></i>
+                                            </button>
                                         </span>
                                     </div>
                                 </div>

@@ -46,10 +46,12 @@
                                     <label class="control-label"> 發票日期 </label><span class="redtext">*</span>
                                 </div>
                                 <div class="col-sm-9">
-                                    <div class='input-group date' id='invoice_date_box'>
-                                        <input type='text' class="form-control" name="invoice_date" id="invoice_date" value="" />
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
+                                    <div class="input-group" id="invoice_date_flatpickr">
+                                        <input type="text" class="form-control" name="invoice_date" id="invoice_date" value="" autocomplete="off" data-input />
+                                        <span class="input-group-btn" data-toggle>
+                                            <button class="btn btn-default" type="button">
+                                                <i class="fa-solid fa-calendar-days"></i>
+                                            </button>
                                         </span>
                                     </div>
                                 </div>

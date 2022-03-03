@@ -27,11 +27,12 @@
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">採購日期<span class="redtext">*</span></label>
-                                            <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="trade_date"
-                                                    id="trade_date" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="trade_date_flatpickr">
+                                                <input type="text" class="form-control" name="trade_date" id="trade_date" value="" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -182,11 +183,12 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="supplier_deliver_date">廠商交貨日</label>
-                                            <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="supplier_deliver_date"
-                                                    id="supplier_deliver_date" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="supplier_deliver_date_flatpickr">
+                                                <input type="text" class="form-control" name="supplier_deliver_date" id="supplier_deliver_date" value="" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -195,11 +197,12 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label for="expect_deliver_date">預計進貨日</label>
-                                            <div class='input-group date' id='datetimepicker3'>
-                                                <input type='text' class="form-control" name="expect_deliver_date"
-                                                    id="expect_deliver_date" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="expect_deliver_date_flatpickr">
+                                                <input type="text" class="form-control" name="expect_deliver_date" id="expect_deliver_date" value="" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -442,15 +445,19 @@
                     theme: "bootstrap",
                     placeholder: "請選擇"
                 });
-                $('#datetimepicker').datetimepicker({
-                    format: 'YYYY-MM-DD',
+
+                flatpickr("#trade_date_flatpickr", {
+                    dateFormat: "Y-m-d",
                 });
-                $('#datetimepicker2').datetimepicker({
-                    format: 'YYYY-MM-DD',
+
+                flatpickr("#supplier_deliver_date_flatpickr", {
+                    dateFormat: "Y-m-d",
                 });
-                $('#datetimepicker3').datetimepicker({
-                    format: 'YYYY-MM-DD',
+
+                flatpickr("#expect_deliver_date_flatpickr", {
+                    dateFormat: "Y-m-d",
                 });
+
                 $("#new-form").validate({
                     // debug: true,
                     submitHandler: function(form) {

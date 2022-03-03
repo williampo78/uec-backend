@@ -238,23 +238,23 @@ window.init = function () {
   }
 
   $(".js-select2-slot-id").select2();
-  $("#datetimepicker_start_at").datetimepicker({
-    format: "YYYY-MM-DD HH:mm",
-    showClear: true
+  var start_at_flatpickr = flatpickr("#start_at_flatpickr", {
+    dateFormat: "Y-m-d H:i:S",
+    maxDate: $("#end_at").val(),
+    enableTime: true,
+    enableSeconds: true,
+    defaultHour: 0,
+    defaultMinute: 0,
+    defaultSeconds: 0
   });
-  $("#datetimepicker_start_at").on("dp.change", function (e) {
-    if (e.oldDate === null) {
-      $(this).data("DateTimePicker").date(new Date(e.date._d.setHours(0, 0, 0)));
-    }
-  });
-  $("#datetimepicker_end_at").datetimepicker({
-    format: "YYYY-MM-DD HH:mm",
-    showClear: true
-  });
-  $("#datetimepicker_end_at").on("dp.change", function (e) {
-    if (e.oldDate === null) {
-      $(this).data("DateTimePicker").date(new Date(e.date._d.setHours(23, 59, 59)));
-    }
+  var end_at_flatpickr = flatpickr("#end_at_flatpickr", {
+    dateFormat: "Y-m-d H:i:S",
+    minDate: $("#start_at").val(),
+    enableTime: true,
+    enableSeconds: true,
+    defaultHour: 23,
+    defaultMinute: 59,
+    defaultSeconds: 59
   });
   $(".colorpicker").colorpicker({
     format: "hex",

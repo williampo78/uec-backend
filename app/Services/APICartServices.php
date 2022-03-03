@@ -167,9 +167,12 @@ class APICartServices
                 $cartAmount[$items] = intval($item->selling_price); //商品售價
                 //$cartDetail[$items][$item['item_id']] = $item; //購物車內容
             }
+            $prodQty = [];
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
+                    //echo $item['item_qty'];
+                    $prodQty[$prdouct_id][$item_id]=$item['item_qty'];
                 }
             }
             //行銷活動
@@ -191,8 +194,7 @@ class APICartServices
                 $prod_gift = [];
                 if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
                     $product_type = "effective";
-                    $qty = array_sum($item); //合併不同規格但同一商品的數量
-
+                    $qty = array_sum($prodQty[$product_id]); //合併不同規格但同一商品的數量
                     //商品贈品
                     $giftAway = [];
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
@@ -360,7 +362,7 @@ class APICartServices
 
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD03') { //﹝單品﹞滿N件，每件打X折
                                 $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000*0.85
-                                //找符合的item放##7
+                                //找符合的item放
                                 if (isset($campaign['PRD']['GIFT'][$product_id])) {
                                     $prod_gift = array(
                                         "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,

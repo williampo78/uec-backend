@@ -26,13 +26,12 @@
                                         <div class="col-sm-3"><label class="control-label">進貨日期</label></div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-
-                                                <div class="input-group date" id="trade_date_start_box">
-                                                    <input type="text" class="form-control" name="trade_date_start"
-                                                           id="trade_date_start"
-                                                           value="{{ request()->input('trade_date_start') }}">
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="trade_date_start_flatpickr">
+                                                    <input type="text" class="form-control" name="trade_date_start" id="trade_date_start" value="{{ request()->input('trade_date_start') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -44,14 +43,13 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class="input-group date" id="trade_date_end_box">
-                                                    <input type="text" class="form-control" name="trade_date_end"
-                                                           id="trade_date_end"
-                                                           value="{{ request()->input('trade_date_end') }}">
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="trade_date_end_flatpickr">
+                                                    <input type="text" class="form-control" name="trade_date_end" id="trade_date_end" value="{{ request()->input('trade_date_end') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -215,17 +213,24 @@
 @section('js')
     <script>
         $(document).ready(function () {
-
             $('#supplier').select2();
-            $('#trade_date_start_box').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let trade_date_start_flatpickr = flatpickr("#trade_date_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#trade_date_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    trade_date_end_flatpickr.set('minDate', dateStr);
+                },
             });
-            $('#trade_date_end_box').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let trade_date_end_flatpickr = flatpickr("#trade_date_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#trade_date_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    trade_date_start_flatpickr.set('maxDate', dateStr);
+                },
             });
-            $('#invoice_date_box').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
+
             $("#select-form").validate({
                 // debug: true,
                 submitHandler: function (form) {

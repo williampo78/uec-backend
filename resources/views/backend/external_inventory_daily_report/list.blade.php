@@ -29,16 +29,15 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="form-group">
-                                            <div class='input-group date' id='datetimepicker_counting_date'>
-                                                <input type='text' class="form-control" name="counting_date"
-                                                       id="counting_date"
-                                                       value="{{ empty(request()->input('counting_date')) ? date('Y-m-d', strtotime('-1 day')) : request()->input('counting_date') }}" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="counting_date_flatpickr">
+                                                <input type="text" class="form-control" name="counting_date" id="counting_date" value="{{ empty(request()->input('counting_date')) ? date('Y-m-d', strtotime('-1 day')) : request()->input('counting_date') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
@@ -269,9 +268,8 @@
     <script src="{{ mix('js/external_inventory_daily_report.js') }}"></script>
     <script>
         $(function() {
-            $('#datetimepicker_counting_date').datetimepicker({
-                format: 'YYYY-MM-DD',
-                showClear: true,
+            flatpickr("#counting_date_flatpickr", {
+                dateFormat: "Y-m-d",
             });
 
             // 驗證表單

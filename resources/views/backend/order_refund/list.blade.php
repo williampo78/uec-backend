@@ -68,17 +68,12 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_order_refund_date_start'>
-                                                    <input type='text'
-                                                        class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_order_refund_date_start"
-                                                        name="order_refund_date_start" id="order_refund_date_start"
-                                                        value="{{ request()->input('order_refund_date_start') }}"
-                                                        autocomplete="off" />
-                                                    <span class="input-group-addon"
-                                                        data-target="#datetimepicker_order_refund_date_start"
-                                                        data-toggle="datetimepicker">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="order_refund_date_start_flatpickr">
+                                                    <input type="text" class="form-control search-limit-group" name="order_refund_date_start" id="order_refund_date_start" value="{{ request()->input('order_refund_date_start') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -88,17 +83,12 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_order_refund_date_end'>
-                                                    <input type='text'
-                                                        class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_order_refund_date_end"
-                                                        name="order_refund_date_end" id="order_refund_date_end"
-                                                        value="{{ request()->input('order_refund_date_end') }}"
-                                                        autocomplete="off" />
-                                                    <span class="input-group-addon"
-                                                        data-target="#datetimepicker_order_refund_date_end"
-                                                        data-toggle="datetimepicker">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="order_refund_date_end_flatpickr">
+                                                    <input type="text" class="form-control search-limit-group" name="order_refund_date_end" id="order_refund_date_end" value="{{ request()->input('order_refund_date_end') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -277,26 +267,20 @@
             let get_detail_url = '{{ route('order_refund.detail') }}';
             const required_message = '須指定﹝退貨申請時間﹞起訖、或﹝退貨申請單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！';
 
-            $('#datetimepicker_order_refund_date_start').datetimepicker({
-                format: 'YYYY-MM-DD',
-                showClear: true,
+            let order_refund_date_start_flatpickr = flatpickr("#order_refund_date_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#order_refund_date_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    order_refund_date_end_flatpickr.set('minDate', dateStr);
+                },
             });
 
-            $('#datetimepicker_order_refund_date_end').datetimepicker({
-                format: 'YYYY-MM-DD',
-                showClear: true,
-            });
-
-            $("#datetimepicker_order_refund_date_start").on("dp.change", function(e) {
-                if ($('#order_refund_date_end').val()) {
-                    $('#datetimepicker_order_refund_date_end').datetimepicker('minDate', e.date);
-                }
-            });
-
-            $("#datetimepicker_order_refund_date_end").on("dp.change", function(e) {
-                if ($('#order_refund_date_start').val()) {
-                    $('#datetimepicker_order_refund_date_start').datetimepicker('maxDate', e.date);
-                }
+            let order_refund_date_end_flatpickr = flatpickr("#order_refund_date_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#order_refund_date_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    order_refund_date_start_flatpickr.set('maxDate', dateStr);
+                },
             });
 
             // 驗證表單
