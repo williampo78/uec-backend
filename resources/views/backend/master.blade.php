@@ -16,10 +16,6 @@
     <link rel="stylesheet"
         href="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/timeline.css') }}" />
-    <link rel="stylesheet"
-        href="{{ asset('asset/js/template/bower_components/bootstrap-datetimepicker-master/build/css/bootstrap-datetimepicker.css') }}" />
-    <link rel="stylesheet"
-        href="{{ asset('asset/js/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
@@ -61,18 +57,15 @@
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/collapse.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/transition.js') }}"></script>
     <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
-    <script src="{{ asset('asset/js/template/bower_components/moment-develop/moment.js') }}"></script>
-    <script src="{{ asset('asset/js/template/bower_components/moment-develop/locale/zh-tw.js') }}"></script>
     <script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
-    <script src="{{ asset('asset/js/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
 
     <script>
         @isset($share_role_auth)
-            var RoleAuthJson = @json($share_role_auth) ;
+            var RoleAuthJson = @json($share_role_auth);
         @endisset
 
         var UecConfig = @json(Config('uec'));

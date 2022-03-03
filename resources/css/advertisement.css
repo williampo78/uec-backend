@@ -25,7 +25,3 @@
     min-width: 80px;
     width: 100px;
 }
-
-.bootstrap-datetimepicker-widget.dropdown-menu {
-    z-index: 9999;
-}

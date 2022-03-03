@@ -22,18 +22,13 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <div class="form-group">
-                                        <div class='input-group date' id='datetimepicker_date'>
-                                            <input type='text'
-                                                   class="form-control datetimepicker-input search-limit-group"
-                                                   data-target="#datetimepicker_date"
-                                                   name="smonth" id="smonth"
-                                                   value="{{ request()->input('smonth') }}"
-                                                   autocomplete="off"/>
-                                            <span class="input-group-addon"
-                                                  data-target="#datetimepicker_date"
-                                                  data-toggle="datetimepicker">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
-                                                    </span>
+                                        <div class="input-group" id="smonth_flatpickr">
+                                            <input type="text" class="form-control" name="smonth" id="smonth" value="{{ request()->input('smonth') }}" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -196,10 +191,14 @@
 @section('js')
     <script>
         $(function () {
-            $('#datetimepicker_date').datetimepicker({
-                format: 'YYYY-MM',
-                showClear: true,
+            flatpickr("#smonth_flatpickr", {
+                plugins: [
+                    new flatpickr.monthSelectPlugin({
+                        dateFormat: "Y-m",
+                    });
+                ],
             });
+
             // 驗證表單
             $("#search-form").validate({
                 // debug: true,

@@ -141,11 +141,12 @@
                                         <label class="control-label">上架時間起<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <div class='input-group date' id='datetimepicker'>
-                                            <input type='text' class="form-control" name="start_launched_at"
-                                                id="start_launched_at" value="" />
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="start_launched_at_flatpickr">
+                                            <input type="text" class="form-control" name="start_launched_at" id="start_launched_at" value="" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -157,11 +158,12 @@
                                         <label class="control-label">上架時間訖<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <div class='input-group date' id='datetimepicker2'>
-                                            <input type='text' class="form-control" name="end_launched_at"
-                                                id="end_launched_at" value="" />
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="end_launched_at_flatpickr">
+                                            <input type="text" class="form-control" name="end_launched_at" id="end_launched_at" value="" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -262,33 +264,30 @@
 @section('js')
     <script>
         $(document).ready(function() {
-
-
-            $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+            let start_launched_at_flatpickr = flatpickr("#start_launched_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                maxDate: $("#end_launched_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 0,
+                defaultMinute: 0,
+                defaultSeconds: 0,
             });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+
+            let end_launched_at_flatpickr = flatpickr("#end_launched_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                minDate: $("#start_launched_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 23,
+                defaultMinute: 59,
+                defaultSeconds: 59,
             });
+
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
 
-            $("#datetimepicker").on("dp.change", function(e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(0, 0, 0)));
-                }
-            });
-
-            $("#datetimepicker2").on("dp.change", function(e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(23, 59, 59)));
-                }
-            });
             $("#new-form").validate({
                 // debug: true,
                 submitHandler: function(form) {

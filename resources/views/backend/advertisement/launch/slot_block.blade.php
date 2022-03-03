@@ -14,13 +14,12 @@
             <div class="row">
                 <div class="col-sm-5">
                     <div class="form-group">
-                        <div class='input-group date' id='datetimepicker_start_at'>
-                            <input type='text' class="form-control datetimepicker-input"
-                                data-target="#datetimepicker_start_at" name="start_at" id="start_at" value=""
-                                autocomplete="off" />
-                            <span class="input-group-addon" data-target="#datetimepicker_start_at"
-                                data-toggle="datetimepicker">
-                                <span class="glyphicon glyphicon-calendar"></span>
+                        <div class="input-group" id="start_at_flatpickr">
+                            <input type="text" class="form-control" name="start_at" id="start_at" value="" autocomplete="off" data-input />
+                            <span class="input-group-btn" data-toggle>
+                                <button class="btn btn-default" type="button">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                </button>
                             </span>
                         </div>
                     </div>
@@ -30,13 +29,12 @@
                 </div>
                 <div class="col-sm-5">
                     <div class="form-group">
-                        <div class='input-group date' id='datetimepicker_end_at'>
-                            <input type='text' class="form-control datetimepicker-input"
-                                data-target="#datetimepicker_end_at" name="end_at" id="end_at" value=""
-                                autocomplete="off" />
-                            <span class="input-group-addon" data-target="#datetimepicker_end_at"
-                                data-toggle="datetimepicker">
-                                <span class="glyphicon glyphicon-calendar"></span>
+                        <div class="input-group" id="end_at_flatpickr">
+                            <input type="text" class="form-control" name="end_at" id="end_at" value="" autocomplete="off" data-input />
+                            <span class="input-group-btn" data-toggle>
+                                <button class="btn btn-default" type="button">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                </button>
                             </span>
                         </div>
                     </div>

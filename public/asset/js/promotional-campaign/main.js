@@ -4,70 +4,88 @@ function init() {
     $(".select2-supplier-id").select2();
     $(".select2-product-type").select2();
 
-    $("#datetimepicker_start_at").datetimepicker({
-        format: "YYYY-MM-DD HH:mm",
-        showClear: true,
+    let start_at_flatpickr = flatpickr("#start_at_flatpickr", {
+        dateFormat: "Y-m-d H:i:S",
+        maxDate: $("#end_at").val(),
+        enableTime: true,
+        enableSeconds: true,
+        defaultHour: 0,
+        defaultMinute: 0,
+        defaultSeconds: 0,
     });
 
-    $("#datetimepicker_start_at").on("dp.change", function (e) {
-        if (e.oldDate === null) {
-            $(this)
-                .data("DateTimePicker")
-                .date(new Date(e.date._d.setHours(0, 0, 0)));
-        }
+    let end_at_flatpickr = flatpickr("#end_at_flatpickr", {
+        dateFormat: "Y-m-d H:i:S",
+        minDate: $("#start_at").val(),
+        enableTime: true,
+        enableSeconds: true,
+        defaultHour: 23,
+        defaultMinute: 59,
+        defaultSeconds: 59,
     });
 
-    $("#datetimepicker_end_at").datetimepicker({
-        format: "YYYY-MM-DD HH:mm",
-        showClear: true,
+    let prd_modal_start_created_at_flatpickr = flatpickr("#prd-modal-start-created-at-flatpickr", {
+        dateFormat: "Y-m-d",
+        maxDate: $("#prd-modal-end-created-at").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            prd_modal_end_created_at_flatpickr.set('minDate', dateStr);
+        },
     });
 
-    $("#datetimepicker_end_at").on("dp.change", function (e) {
-        if (e.oldDate === null) {
-            $(this)
-                .data("DateTimePicker")
-                .date(new Date(e.date._d.setHours(23, 59, 59)));
-        }
+    let prd_modal_end_created_at_flatpickr = flatpickr("#prd-modal-end-created-at-flatpickr", {
+        dateFormat: "Y-m-d",
+        minDate: $("#prd-modal-start-created-at").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            prd_modal_start_created_at_flatpickr.set('maxDate', dateStr);
+        },
     });
 
-    $("#datetimepicker-prd-modal-start-created-at").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
+    let prd_modal_start_launched_at_start_flatpickr = flatpickr("#prd-modal-start-launched-at-start-flatpickr", {
+        dateFormat: "Y-m-d",
+        maxDate: $("#prd-modal-start-launched-at-end").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            prd_modal_start_launched_at_end_flatpickr.set('minDate', dateStr);
+        },
     });
 
-    $("#datetimepicker-prd-modal-end-created-at").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
+    let prd_modal_start_launched_at_end_flatpickr = flatpickr("#prd-modal-start-launched-at-end-flatpickr", {
+        dateFormat: "Y-m-d",
+        minDate: $("#prd-modal-start-launched-at-start").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            prd_modal_start_launched_at_start_flatpickr.set('maxDate', dateStr);
+        },
     });
 
-    $("#datetimepicker-prd-modal-start-launched-at-start").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
+    let gift_modal_start_created_at_flatpickr = flatpickr("#gift-modal-start-created-at-flatpickr", {
+        dateFormat: "Y-m-d",
+        maxDate: $("#gift-modal-end-created-at").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            gift_modal_end_created_at_flatpickr.set('minDate', dateStr);
+        },
     });
 
-    $("#datetimepicker-prd-modal-start-launched-at-end").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
+    let gift_modal_end_created_at_flatpickr = flatpickr("#gift-modal-end-created-at-flatpickr", {
+        dateFormat: "Y-m-d",
+        minDate: $("#gift-modal-start-created-at").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            gift_modal_start_created_at_flatpickr.set('maxDate', dateStr);
+        },
     });
 
-    $("#datetimepicker-gift-modal-start-created-at").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
+    let gift_modal_start_launched_at_start_flatpickr = flatpickr("#gift-modal-start-launched-at-start-flatpickr", {
+        dateFormat: "Y-m-d",
+        maxDate: $("#gift-modal-start-launched-at-end").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            gift_modal_start_launched_at_end_flatpickr.set('minDate', dateStr);
+        },
     });
 
-    $("#datetimepicker-gift-modal-end-created-at").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
-    });
-
-    $("#datetimepicker-gift-modal-start-launched-at-start").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
-    });
-
-    $("#datetimepicker-gift-modal-start-launched-at-end").datetimepicker({
-        format: "YYYY-MM-DD",
-        showClear: true,
+    let gift_modal_start_launched_at_end_flatpickr = flatpickr("#gift-modal-start-launched-at-end-flatpickr", {
+        dateFormat: "Y-m-d",
+        minDate: $("#gift-modal-start-launched-at-start").val(),
+        onChange: function(selectedDates, dateStr, instance) {
+            gift_modal_start_launched_at_start_flatpickr.set('maxDate', dateStr);
+        },
     });
 }
 

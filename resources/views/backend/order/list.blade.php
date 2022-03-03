@@ -63,17 +63,12 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_ordered_date_start'>
-                                                    <input type='text'
-                                                        class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_ordered_date_start"
-                                                        name="ordered_date_start" id="ordered_date_start"
-                                                        value="{{ request()->input('ordered_date_start') }}"
-                                                        autocomplete="off" />
-                                                    <span class="input-group-addon"
-                                                        data-target="#datetimepicker_ordered_date_start"
-                                                        data-toggle="datetimepicker">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="ordered_date_start_flatpickr">
+                                                    <input type="text" class="form-control search-limit-group" name="ordered_date_start" id="ordered_date_start" value="{{ request()->input('ordered_date_start') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -83,17 +78,12 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_ordered_date_end'>
-                                                    <input type='text'
-                                                        class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_ordered_date_end"
-                                                        name="ordered_date_end" id="ordered_date_end"
-                                                        value="{{ request()->input('ordered_date_end') }}"
-                                                        autocomplete="off" />
-                                                    <span class="input-group-addon"
-                                                        data-target="#datetimepicker_ordered_date_end"
-                                                        data-toggle="datetimepicker">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="ordered_date_end_flatpickr">
+                                                    <input type="text" class="form-control search-limit-group" name="ordered_date_end" id="ordered_date_end" value="{{ request()->input('ordered_date_end') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -326,26 +316,20 @@
     <script src="{{ mix('js/order.js') }}"></script>
     <script>
         $(function() {
-            $('#datetimepicker_ordered_date_start').datetimepicker({
-                format: 'YYYY-MM-DD',
-                showClear: true,
+            let ordered_date_start_flatpickr = flatpickr("#ordered_date_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#ordered_date_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    ordered_date_end_flatpickr.set('minDate', dateStr);
+                },
             });
 
-            $('#datetimepicker_ordered_date_end').datetimepicker({
-                format: 'YYYY-MM-DD',
-                showClear: true,
-            });
-
-            $("#datetimepicker_ordered_date_start").on("dp.change", function(e) {
-                if ($('#ordered_date_end').val()) {
-                    $('#datetimepicker_ordered_date_end').datetimepicker('minDate', e.date);
-                }
-            });
-
-            $("#datetimepicker_ordered_date_end").on("dp.change", function(e) {
-                if ($('#ordered_date_start').val()) {
-                    $('#datetimepicker_ordered_date_start').datetimepicker('maxDate', e.date);
-                }
+            let ordered_date_end_flatpickr = flatpickr("#ordered_date_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#ordered_date_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    ordered_date_start_flatpickr.set('maxDate', dateStr);
+                },
             });
 
             $('.select2-order-status-code').select2();

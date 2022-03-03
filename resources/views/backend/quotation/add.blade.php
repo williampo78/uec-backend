@@ -39,11 +39,12 @@
                                     <div class="col-sm-3">
                                         <div class="form-group" id="div_trade_date">
                                             <label for="trade_date">報價日期<span class="redtext">*</span></label>
-                                            <div class='input-group date' id='datetimepickera'>
-                                                <input type='text' class="form-control" name="trade_date" id="trade_date"
-                                                    value="{{ $quotation['trade_date'] ?? '' }}" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="trade_date_flatpickr">
+                                                <input type="text" class="form-control" name="trade_date" id="trade_date" value="{{ $quotation['trade_date'] ?? date('Y-m-d') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -200,9 +201,11 @@
             if (quotation_id != '') {
                 getItem(quotation_id);
             }
-            $('#datetimepickera').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            flatpickr("#trade_date_flatpickr", {
+                dateFormat: "Y-m-d",
             });
+
             $('#new-form').validate({
                 // debug: true,
                 submitHandler: function(form) {

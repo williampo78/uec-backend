@@ -326,22 +326,28 @@
                                             </label>
                                         </div>
                                         <div class="col-sm-2">
-                                            <div class='input-group date'>
-                                                <input type='text' class="form-control" name="promotion_start_at"
-                                                       id="promotion_start_at"
-                                                       value="{{ $products->promotion_start_at }}"/>
+                                            <div class="input-group" id="promotion_start_at_flatpickr">
+                                                <input type="text" class="form-control" name="promotion_start_at" id="promotion_start_at" value="{{ $products->promotion_start_at }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="col-sm-1" style="padding: 0px;width: 2%;">
                                             <label class="control-label">~</label>
                                         </div>
                                         <div class="col-sm-2">
-                                            <div class='input-group date'>
-                                                <input type='text' class="form-control" name="promotion_end_at"
-                                                       id="promotion_end_at" value="{{ $products->promotion_end_at }}"/>
+                                            <div class="input-group" id="promotion_end_at_flatpickr">
+                                                <input type="text" class="form-control" name="promotion_end_at" id="promotion_end_at" value="{{ $products->promotion_end_at }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
+                                                </span>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -536,40 +542,59 @@
             if(product_photos_count == 0){
                 alert('尚無商品圖檔，請先到「商品基本資料維護」上傳圖檔！') ;
             }
-            console.log(product_photos_count) ;
-            $('#start_created_at').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#end_created_at').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#start_launched_at_start').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#start_launched_at_end').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let start_created_at_flatpickr = flatpickr("#start_created_at_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#end_created_at").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    end_created_at_flatpickr.set('minDate', dateStr);
+                },
             });
 
-            $('#promotion_start_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+            let end_created_at_flatpickr = flatpickr("#end_created_at_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#start_created_at").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_created_at_flatpickr.set('maxDate', dateStr);
+                },
             });
-            $('#promotion_end_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+
+            let start_launched_at_start_flatpickr = flatpickr("#start_launched_at_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#start_launched_at_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_end_flatpickr.set('minDate', dateStr);
+                },
             });
-            $("#promotion_start_at").on("dp.change", function (e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(0, 0, 0)));
-                }
+
+            let start_launched_at_end_flatpickr = flatpickr("#start_launched_at_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#start_launched_at_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_start_flatpickr.set('maxDate', dateStr);
+                },
             });
-            $("#promotion_end_at").on("dp.change", function (e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(23, 59, 59)));
-                }
+
+            let promotion_start_at_flatpickr = flatpickr("#promotion_start_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                maxDate: $("#promotion_end_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 0,
+                defaultMinute: 0,
+                defaultSeconds: 0,
             });
+
+            let promotion_end_at_flatpickr = flatpickr("#promotion_end_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                minDate: $("#promotion_start_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 23,
+                defaultMinute: 59,
+                defaultSeconds: 59,
+            });
+
             $('.product_attributes').on('change', function () { // on change of state
                 $('.product_attributes_change').val('true');
             })

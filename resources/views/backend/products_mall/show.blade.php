@@ -453,12 +453,6 @@
     <script>
         // Get all sections that have an ID defined
         $(document).ready(function() {
-            $('#promotion_start_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
-            });
-            $('#promotion_end_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
-            });
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
