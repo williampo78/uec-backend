@@ -73,6 +73,7 @@ class OrderController extends Controller
             return $order->only([
                 'id',
                 'ordered_date',
+                'order_status_desc',
                 'order_no',
                 'status_code',
                 'payment_method',
