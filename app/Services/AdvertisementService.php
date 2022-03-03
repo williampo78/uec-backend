@@ -543,9 +543,9 @@ class AdvertisementService
 
                         if (isset($input_data['image_block_image_name'][$key])) {
                             if ($slot->photo_width > 0 || $slot->photo_height > 0) { //如果有設置寬高 直接裁切圖片
-                                $detail_data['image_name'] = $this->cropImageBlockUpload($input_data['image_block_image_name'][$key], $slot_contents_id, $slot);
+                                $create_detail_data['image_name'] = $this->cropImageBlockUpload($input_data['image_block_image_name'][$key], $input_data['slot_content_id'], $slot);
                             } else {
-                                $detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id, 's3');
+                                $create_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $input_data['slot_content_id'], 's3');
                             }
                         }
 
@@ -573,14 +573,11 @@ class AdvertisementService
                                 Storage::disk('s3')->delete($details_image_name[$key]);
                             }
                             if ($slot->photo_width > 0 || $slot->photo_height > 0) { //如果有設置寬高 直接裁切圖片
-                                $detail_data['image_name'] = $this->cropImageBlockUpload($input_data['image_block_image_name'][$key], $slot_contents_id, $slot);
+                                $update_detail_data['image_name'] = $this->cropImageBlockUpload($input_data['image_block_image_name'][$key], $input_data['slot_content_id'], $slot);
                             } else {
-                                $detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id, 's3');
+                                $update_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $input_data['slot_content_id'], 's3');
                             }
-                            // 上傳圖片
-                            $update_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
                         }
-
                         AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
                     }
                 }
@@ -727,7 +724,6 @@ class AdvertisementService
                     }
                 }
             }
-
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -839,11 +835,11 @@ class AdvertisementService
         $imageName = $slot->photo_width . 'x' . $slot->photo_height . '_' . uniqid(date('YmdHis')) . $file->getClientOriginalName();
         $path = self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id . '/' . $imageName;
         $img = Image::make($file);
-        $img->resize($slot->photo_width, $slot->photo_height, function ($constraint) {
+        $img->resize(20, 20, function ($constraint) {
             $constraint->aspectRatio();
         });
         $resource = $img->stream()->detach();
-        $storagePath = Storage::disk('s3')->put($path, $file->getClientOriginalName(), $resource, 'public');
+        $storagePath = Storage::disk('s3')->put('/'.$path , $resource, 'public');
         if ($storagePath) {
             return $path;
         } else {
