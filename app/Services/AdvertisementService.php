@@ -835,7 +835,7 @@ class AdvertisementService
         $imageName = $slot->photo_width . 'x' . $slot->photo_height . '_' . uniqid(date('YmdHis')) . $file->getClientOriginalName();
         $path = self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id . '/' . $imageName;
         $img = Image::make($file);
-        $img->resize(20, 20, function ($constraint) {
+        $img->resize($slot->photo_width, $slot->photo_height, function ($constraint) {
             $constraint->aspectRatio();
         });
         $resource = $img->stream()->detach();
