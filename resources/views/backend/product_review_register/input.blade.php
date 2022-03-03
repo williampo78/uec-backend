@@ -269,6 +269,7 @@
                 maxDate: $("#end_launched_at").val(),
                 enableTime: true,
                 enableSeconds: true,
+                defaultDate: new Date(new Date().getTime() + 15*60*1000),
                 defaultHour: 0,
                 defaultMinute: 0,
                 defaultSeconds: 0,
@@ -283,7 +284,6 @@
                 defaultMinute: 59,
                 defaultSeconds: 59,
             });
-
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
