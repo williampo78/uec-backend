@@ -109,7 +109,6 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class=" form-group">
-
                                     <div class="col-sm-2 ">
                                         <label class="control-label">供應商<span class="redtext">*</span></label>
                                     </div>
@@ -275,7 +274,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
-                                            <input type="radio" name="has_expiry_date" value="0" checked> 無
+                                            <input type="radio" name="has_expiry_date" value="0"> 無
                                         </label>
                                     </div>
                                     <div class="col-sm-3">
@@ -286,7 +285,9 @@
                                     </div>
                                     {{-- 效期控管的天數 --}}
                                     <div class="col-sm-3">
-                                        <input class="form-control" name="expiry_days" value="0">
+                                        <div class="form-group">
+                                            <input class="form-control" name="expiry_days" value="0">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -558,7 +559,7 @@
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="radio-inline">
-                                            <input type="radio" name="is_with_warranty" value="0" checked> 無
+                                            <input type="radio" name="is_with_warranty" value="0"> 無
                                         </label>
                                     </div>
                                     <div class="col-sm-2">
@@ -567,8 +568,10 @@
                                             有保固，天數
                                         </label>
                                     </div>
-                                    <div class="col-sm-1 ">
-                                        <input class="form-control" name="warranty_days" value="0">
+                                    <div class="col-sm-1">
+                                        <div class="form-group">
+                                            <input class="form-control" name="expiry_days" value="0">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1156,6 +1159,12 @@
                     form.submit();
                 },
                 rules: {
+                    is_with_warranty: {
+                        required: true,
+                    },
+                    has_expiry_date: {
+                        required: true,
+                    },
                     product_name: {
                         required: true,
                     },
@@ -1199,25 +1208,25 @@
                         required: true,
                         digits: true,
                     },
-                    spec_1:{
+                    spec_1: {
                         required: true,
-                        maxlength:4,
+                        maxlength: 4,
                     },
-                    spec_2:{
+                    spec_2: {
                         required: true,
-                        maxlength:4,
+                        maxlength: 4,
                     },
-                    product_brief_1:{
-                        maxlength:60,
+                    product_brief_1: {
+                        maxlength: 60,
                     },
-                    product_brief_2:{
-                        maxlength:60,
+                    product_brief_2: {
+                        maxlength: 60,
                     },
-                    product_brief_3:{
-                        maxlength:60,
+                    product_brief_3: {
+                        maxlength: 60,
                     },
                     expiry_days: {
-                        required:function() {
+                        required: function() {
                             return $("input[name=has_expiry_date]:checked").val() == '1';
                         },
                         digits: function() {
@@ -1226,13 +1235,13 @@
                         min: function() {
                             if ($("input[name=has_expiry_date]:checked").val() == '1') {
                                 return 0.01;
-                            }else{
-                                return 0 ;
+                            } else {
+                                return 0;
                             }
                         },
                     },
-                    warranty_days:{
-                        required:function() {
+                    warranty_days: {
+                        required: function() {
                             return $("input[name=is_with_warranty]:checked").val() == '1';
                         },
                         digits: function() {
@@ -1241,13 +1250,14 @@
                         min: function() {
                             if ($("input[name=is_with_warranty]:checked").val() == '1') {
                                 return 0.01;
-                            }else{
-                                return 0 ;
+                            } else {
+                                return 0;
                             }
                         },
-                    }
+                    },
+
                 },
-                messages:{
+                messages: {
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
