@@ -117,8 +117,8 @@
                                         <label class="control-label">成本</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="item_cost"
-                                            value="{{ $products->item_cost }}" readonly>
+                                        <input class="form-control" name="item_cost" value="{{ $products->item_cost }}"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -142,7 +142,8 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group" id="start_launched_at_flatpickr">
-                                            <input type="text" class="form-control" name="start_launched_at" id="start_launched_at" value="" autocomplete="off" data-input />
+                                            <input type="text" class="form-control" name="start_launched_at"
+                                                id="start_launched_at" value="" autocomplete="off" data-input />
                                             <span class="input-group-btn" data-toggle>
                                                 <button class="btn btn-default" type="button">
                                                     <i class="fa-solid fa-calendar-days"></i>
@@ -159,7 +160,8 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group" id="end_launched_at_flatpickr">
-                                            <input type="text" class="form-control" name="end_launched_at" id="end_launched_at" value="" autocomplete="off" data-input />
+                                            <input type="text" class="form-control" name="end_launched_at"
+                                                id="end_launched_at" value="" autocomplete="off" data-input />
                                             <span class="input-group-btn" data-toggle>
                                                 <button class="btn btn-default" type="button">
                                                     <i class="fa-solid fa-calendar-days"></i>
@@ -193,6 +195,13 @@
                                 </div>
                             </div>
                         </div>
+                        <button class="btn btn-large btn-success" type="button" id="save_data">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            送審
+                        </button>
+                        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
+                            取消</a>
+                            <hr>
                         <div class="row">
                             <div class="col-sm-2">
                                 <div class="form-group">
@@ -204,7 +213,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <table class="table table-striped table-bordered table-hover">
@@ -230,9 +238,11 @@
                                                         @case('APPROVE')
                                                             核准
                                                         @break
+
                                                         @case('REJECT')
                                                             駁回
                                                         @break
+
                                                         @default
                                                             尚未審核
                                                     @endswitch
@@ -247,12 +257,7 @@
                                 </table>
                             </div>
                         </div>
-                        <button class="btn btn-large btn-success" type="button" id="save_data">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            送審
-                        </button>
-                        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
-                            取消</a>
+
                     </div>
                 </form>
             </div>
@@ -269,7 +274,7 @@
                 maxDate: $("#end_launched_at").val(),
                 enableTime: true,
                 enableSeconds: true,
-                defaultDate: new Date(new Date().getTime() + 15*60*1000),
+                defaultDate: new Date(new Date().getTime() + 15 * 60 * 1000),
                 defaultHour: 0,
                 defaultMinute: 0,
                 defaultSeconds: 0,
