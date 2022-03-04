@@ -221,7 +221,7 @@ class ProductsService
                 'product_brief_3' => $in['product_brief_3'],
                 'patent_no' => $in['patent_no'],
                 'is_with_warranty' => $in['is_with_warranty'],
-                'warranty_days' => $in['warranty_days'],
+                'warranty_days' => $in['warranty_days'] ?? 0,
                 'warranty_scope' => $in['warranty_scope'],
                 'spec_dimension' => $in['spec_dimension'],
                 'spec_1' => $in['spec_1'] ?? '',
