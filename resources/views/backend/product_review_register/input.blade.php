@@ -151,6 +151,8 @@
                                             </span>
                                         </div>
                                     </div>
+                                    <input type="hidden" value="0" id="old_date_is_today" readonly>
+                                    <input type="hidden" value="" id="old_date" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -201,7 +203,7 @@
                         </button>
                         <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
                             取消</a>
-                            <hr>
+                        <hr>
                         <div class="row">
                             <div class="col-sm-2">
                                 <div class="form-group">
@@ -269,15 +271,60 @@
 @section('js')
     <script>
         $(document).ready(function() {
+            function isToday(getDate) {
+                let today = new Date();
+                let compareDate = getDate;
+                return (today.setHours(0, 0, 0, 0) == compareDate.setHours(0, 0, 0, 0))
+            }
+
+            function getDateStr(time) {
+                month = '' + (time.getMonth() + 1),
+                    day = '' + time.getDate(),
+                    year = time.getFullYear();
+
+                if (month.length < 2)
+                    month = '0' + month;
+                if (day.length < 2)
+                    day = '0' + day;
+
+                return [year, month, day].join('-');
+            }
+
+            function isSameDay(compareDateA, compareDateB) {
+                let DateA = compareDateA;
+                let DateB = compareDateB;
+                return (DateA.setHours(0, 0, 0, 0) == DateB.setHours(0, 0, 0, 0))
+            }
             let start_launched_at_flatpickr = flatpickr("#start_launched_at_flatpickr", {
                 dateFormat: "Y-m-d H:i:S",
                 maxDate: $("#end_launched_at").val(),
                 enableTime: true,
                 enableSeconds: true,
-                defaultDate: new Date(new Date().getTime() + 15 * 60 * 1000),
                 defaultHour: 0,
                 defaultMinute: 0,
                 defaultSeconds: 0,
+                onChange: function(selectedDates, dateStr, instance) {
+                    let old_date_is_today = $('#old_date_is_today').val();
+                    let old_date = $('#old_date').val() !== '' ? new Date(Date.parse($('#old_date')
+                        .val())) : '';
+                    let is_today = isToday(selectedDates[0]);
+                    if (is_today && old_date_is_today == '0') {
+                        start_launched_at_flatpickr.setDate(new Date(new Date().getTime() + 15 * 60 *
+                            1000));
+                        $('#old_date_is_today').val('1');
+                    }
+                    if (old_date !== '') {
+                        let is_same_day = isSameDay(selectedDates[0], old_date);
+                        if (!is_today) {
+                            old_date_is_today = '0';
+                            $('#old_date_is_today').val('0');
+                        }
+                        if (!is_today && !is_same_day) {
+                            start_launched_at_flatpickr.setDate(selectedDates[0].setHours(0, 0, 0, 0));
+                        }
+                    }
+                    $('#old_date').val(getDateStr(selectedDates[0]));
+                },
             });
 
             let end_launched_at_flatpickr = flatpickr("#end_launched_at_flatpickr", {
