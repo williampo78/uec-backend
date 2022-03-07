@@ -37,8 +37,9 @@ class APIOrdersServices
      * @param 購物車清單, 前端的訂單資料
      * @return string
      */
-    public function setOrders($cart, $order, $campaigns, $campaign_gift)
+    public function setOrders($cart, $order, $campaigns, $campaign_gift, $campaign_discount)
     {
+
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         $random = Str::random(6);
@@ -437,6 +438,47 @@ class APIOrdersServices
                     ];
                     OrderCampaignDiscount::insert($campaign_details[$seq]);
                 }
+            }
+
+            $cartTotal = $cart['totalPrice'];
+            $cartDiscount = 0;
+            $campaignID = '';
+            $compare_n_value = 0;
+            foreach ($campaign_discount as $items => $item) {
+                if ($compare_n_value > $item->n_value) continue;
+                if ($cart['totalPrice'] >= $item->n_value) {
+                    if ($item->campaign_type == 'CART01') { //﹝滿額﹞購物車滿N元，打X折
+                        $cartDiscount = $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
+                        $campaignID = $item->id;
+                    } elseif ($item->campaign_type == 'CART02') { //﹝滿額﹞購物車滿N元，折X元
+                        $cartDiscount = $item->x_value; //打折後10000-1000
+                        $campaignID = $item->id;
+                    }
+                    $compare_n_value = $item->n_value;
+                }
+            }
+            //購物車滿額活動
+            if ($cartDiscount != 0) {
+                $discount_group++;
+                $seq ++;
+                //寫入折扣資訊
+                $campaign_details[$seq] = [
+                    "order_id" => $order_id,
+                    "level_code" => 'CART',
+                    "group_seq" => $discount_group,
+                    "order_detail_id" => null,
+                    "promotion_campaign_id" => $campaignID,
+                    "product_id" => null,
+                    "product_item_id" => null,
+                    "item_no" => null,
+                    "discount" => ($cartDiscount*-1),
+                    "record_identity" => null,
+                    "created_by" => $member_id,
+                    "updated_by" => $member_id,
+                    "created_at" => $now,
+                    "updated_at" => $now,
+                ];
+                OrderCampaignDiscount::insert($campaign_details[$seq]);
             }
 
             $pointData = [];

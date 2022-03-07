@@ -219,7 +219,7 @@ class CheckoutController extends Controller
             $data = [];
             if ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount && $response['result']['shippingFee'] == $request->shipping_fee) {
                 //Stet2, 產生訂單
-                $dataOrder = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
+                $dataOrder = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift, $campaign_discount);
                 if ($dataOrder['status'] == 200) {
                     $status = true;
                     $err = '200';
