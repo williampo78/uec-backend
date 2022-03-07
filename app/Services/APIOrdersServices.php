@@ -39,7 +39,6 @@ class APIOrdersServices
      */
     public function setOrders($cart, $order, $campaigns, $campaign_gift, $campaign_discount)
     {
-
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         $random = Str::random(6);
@@ -122,6 +121,12 @@ class APIOrdersServices
             $prod_info[$product_item->product_id] = $product_item;
         }
 
+        //行銷活動
+        foreach ($campaigns as $product_id => $item) {
+            foreach ($item as $k => $v) {
+                $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+            }
+        }
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -241,6 +246,27 @@ class APIOrdersServices
                         "returned_points" => 0
                     ];
                     $order_detail_id = OrderDetail::insertGetId($details[$seq]);
+
+                    if (isset($campaign['PRD']['GIFT'][$products['productID']])){//有單品滿額贈時，正貨也寫入discount
+                        $discount_group ++;
+                        $campaign_details[$seq] = [
+                            "order_id" => $order_id,
+                            "level_code" => 'PRD',
+                            "group_seq" => $discount_group,
+                            "order_detail_id" => $order_detail_id,
+                            "promotion_campaign_id" => $campaign['PRD']['GIFT'][$products['productID']]->id,
+                            "product_id" => $products['productID'],
+                            "product_item_id" => $prod_info[$products['productID']]['id'],
+                            "item_no" => $prod_info[$products['productID']]['item_no'],
+                            "discount" => 0,
+                            "record_identity" => "M",
+                            "created_by" => $member_id,
+                            "updated_by" => $member_id,
+                            "created_at" => $now,
+                            "updated_at" => $now,
+                        ];
+                        OrderCampaignDiscount::insert($campaign_details[$seq]);
+                    }
                     if ($order_detail_id > 0) {
                         $detail_count++;
                     }
