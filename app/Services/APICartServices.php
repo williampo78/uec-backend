@@ -669,7 +669,7 @@ class APICartServices
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
-                "discount" => intval($cartDiscount),
+                "discount" => intval(round($cartDiscount)),
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
                 "shippingFee" => $fee,
