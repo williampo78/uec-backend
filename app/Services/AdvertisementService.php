@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\AdSlotContentDetails;
-use App\Models\AdSlotContents;
-use App\Models\AdSlots;
+use App\Models\AdSlot;
+use App\Models\AdSlotContent;
+use App\Models\AdSlotContentDetail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -27,7 +27,7 @@ class AdvertisementService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = AdSlots::select('ad_slots.*', 'lookup_values_v.description')
+        $result = AdSlot::select('ad_slots.*', 'lookup_values_v.description')
             ->leftJoin('lookup_values_v', 'ad_slots.applicable_page', '=', 'lookup_values_v.code')
             ->where('ad_slots.agent_id', $agent_id)
             ->where('lookup_values_v.agent_id', $agent_id)
@@ -70,7 +70,7 @@ class AdvertisementService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $result = AdSlots::select('ad_slots.*', 'lookup_values_v.description')
+        $result = AdSlot::select('ad_slots.*', 'lookup_values_v.description')
             ->leftJoin('lookup_values_v', 'ad_slots.applicable_page', '=', 'lookup_values_v.code')
             ->where('ad_slots.agent_id', $agent_id)
             ->where('lookup_values_v.agent_id', $agent_id)
@@ -102,7 +102,7 @@ class AdvertisementService
         $update_data['updated_at'] = $now;
 
         try {
-            AdSlots::findOrFail($input_data['id'])->update($update_data);
+            AdSlot::findOrFail($input_data['id'])->update($update_data);
         } catch (ModelNotFoundException $e) {
             Log::warning($e->getMessage());
 
@@ -123,7 +123,7 @@ class AdvertisementService
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
 
-        $result = AdSlotContents::select(
+        $result = AdSlotContent::select(
             'ad_slots.slot_code',
             'ad_slots.slot_desc',
             'ad_slots.applicable_page',
@@ -226,7 +226,7 @@ class AdvertisementService
         $agent_id = Auth::user()->agent_id;
         $result = [];
 
-        $result['content'] = AdSlotContents::select(
+        $result['content'] = AdSlotContent::select(
             'ad_slots.slot_code',
             'ad_slots.slot_desc',
             'ad_slots.applicable_page',
@@ -257,7 +257,7 @@ class AdvertisementService
             ->where('lookup_values_v.type_code', 'APPLICABLE_PAGE')
             ->find($id);
 
-        $result['details'] = AdSlotContentDetails::where('ad_slot_content_id', $id)
+        $result['details'] = AdSlotContentDetail::where('ad_slot_content_id', $id)
             ->orderBy('sort', 'ASC')
             ->get();
 
@@ -311,7 +311,7 @@ class AdvertisementService
                 $content_data['product_assigned_type'] = $input_data['product_assigned_type'] ?? null;
             }
 
-            $slot_contents_id = AdSlotContents::insertGetId($content_data);
+            $slot_contents_id = AdSlotContent::insertGetId($content_data);
 
             // 使用者自定義版位，新增icon
             if ($slot['is_user_defined'] == 1) {
@@ -322,7 +322,7 @@ class AdvertisementService
                     $update_content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id, 's3');
                 }
 
-                AdSlotContents::findOrFail($slot_contents_id)->update($update_content_data);
+                AdSlotContent::findOrFail($slot_contents_id)->update($update_content_data);
             }
 
             // 新增圖檔資料 (圖檔 or 圖檔+商品)
@@ -350,7 +350,7 @@ class AdvertisementService
                             $detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_contents_id, 's3');
                         }
 
-                        AdSlotContentDetails::insert($detail_data);
+                        AdSlotContentDetail::insert($detail_data);
                     }
                 }
             }
@@ -373,7 +373,7 @@ class AdvertisementService
                         $detail_data['created_at'] = $now;
                         $detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::insert($detail_data);
+                        AdSlotContentDetail::insert($detail_data);
                     }
                 }
             }
@@ -395,7 +395,7 @@ class AdvertisementService
                                 $detail_data['created_at'] = $now;
                                 $detail_data['updated_at'] = $now;
 
-                                AdSlotContentDetails::insert($detail_data);
+                                AdSlotContentDetail::insert($detail_data);
                             }
                         }
                         break;
@@ -413,7 +413,7 @@ class AdvertisementService
                                 $detail_data['created_at'] = $now;
                                 $detail_data['updated_at'] = $now;
 
-                                AdSlotContentDetails::insert($detail_data);
+                                AdSlotContentDetail::insert($detail_data);
                             }
                         }
                         break;
@@ -487,7 +487,7 @@ class AdvertisementService
                 $update_content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
             }
 
-            AdSlotContents::findOrFail($slot_content['content']->slot_content_id)->update($update_content_data);
+            AdSlotContent::findOrFail($slot_content['content']->slot_content_id)->update($update_content_data);
 
             $details_image_name = $slot_content['details']->pluck('image_name', 'id')->all();
 
@@ -514,7 +514,7 @@ class AdvertisementService
                                 Storage::disk('s3')->delete($obj->image_name);
                             }
 
-                            AdSlotContentDetails::destroy($obj->id);
+                            AdSlotContentDetail::destroy($obj->id);
                         }
                     }
                 }
@@ -543,7 +543,7 @@ class AdvertisementService
                             $create_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
                         }
 
-                        AdSlotContentDetails::insert($create_detail_data);
+                        AdSlotContentDetail::insert($create_detail_data);
                     }
                     // 更新資料
                     else {
@@ -571,7 +571,7 @@ class AdvertisementService
                             $update_detail_data['image_name'] = $input_data['image_block_image_name'][$key]->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
                         }
 
-                        AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                        AdSlotContentDetail::findOrFail($key)->update($update_detail_data);
                     }
                 }
             }
@@ -592,7 +592,7 @@ class AdvertisementService
                 if (!empty($delete_ids)) {
                     foreach ($slot_content['details'] as $obj) {
                         if (in_array($obj->id, $delete_ids)) {
-                            AdSlotContentDetails::destroy($obj->id);
+                            AdSlotContentDetail::destroy($obj->id);
                         }
                     }
                 }
@@ -615,7 +615,7 @@ class AdvertisementService
                         $create_detail_data['created_at'] = $now;
                         $create_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::insert($create_detail_data);
+                        AdSlotContentDetail::insert($create_detail_data);
                     }
                     // 更新資料
                     else {
@@ -629,7 +629,7 @@ class AdvertisementService
                         $update_detail_data['updated_by'] = $user_id;
                         $update_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                        AdSlotContentDetail::findOrFail($key)->update($update_detail_data);
                     }
                 }
             }
@@ -656,7 +656,7 @@ class AdvertisementService
                 if (!empty($delete_ids)) {
                     foreach ($slot_content['details'] as $obj) {
                         if (in_array($obj->id, $delete_ids)) {
-                            AdSlotContentDetails::destroy($obj->id);
+                            AdSlotContentDetail::destroy($obj->id);
                         }
                     }
                 }
@@ -675,7 +675,7 @@ class AdvertisementService
                         $create_detail_data['created_at'] = $now;
                         $create_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::insert($create_detail_data);
+                        AdSlotContentDetail::insert($create_detail_data);
                     }
                     // 更新資料 (指定商品)
                     else {
@@ -685,7 +685,7 @@ class AdvertisementService
                         $update_detail_data['updated_by'] = $user_id;
                         $update_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                        AdSlotContentDetail::findOrFail($key)->update($update_detail_data);
                     }
                 }
 
@@ -703,7 +703,7 @@ class AdvertisementService
                         $create_detail_data['created_at'] = $now;
                         $create_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::insert($create_detail_data);
+                        AdSlotContentDetail::insert($create_detail_data);
                     }
                     // 更新資料 (指定分類)
                     else {
@@ -713,7 +713,7 @@ class AdvertisementService
                         $update_detail_data['updated_by'] = $user_id;
                         $update_detail_data['updated_at'] = $now;
 
-                        AdSlotContentDetails::findOrFail($key)->update($update_detail_data);
+                        AdSlotContentDetail::findOrFail($key)->update($update_detail_data);
                     }
                 }
             }
@@ -751,7 +751,7 @@ class AdvertisementService
                 $start_at_format = Carbon::parse($start_at)->format('Y-m-d H:i:s');
                 $end_at_format = Carbon::parse($end_at)->format('Y-m-d H:i:s');
 
-                $result = AdSlotContents::where('agent_id', $agent_id)
+                $result = AdSlotContent::where('agent_id', $agent_id)
                     ->where('slot_id', $slot_id)
                     ->where('active', 1)
                     ->where(function ($query) use ($start_at_format, $end_at_format) {
