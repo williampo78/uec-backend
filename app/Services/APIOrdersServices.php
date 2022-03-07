@@ -249,27 +249,25 @@ class APIOrdersServices
                     ShoppingCartDetails::where('member_id', '=', $member_id)->where('product_item_id', '=', $item['itemId'])->update($updData);
 
                     //有折扣則寫入折扣資訊
-                    if ($item['campaignDiscountId']) {
-                        if ($campaigns[$products['productID']][0]->id == $item['campaignDiscountId'] && $campaigns[$products['productID']][0]->category_code == 'DISCOUNT') {
-                            $discount_group++;
-                            $campaign_details[$seq] = [
-                                "order_id" => $order_id,
-                                "level_code" => $campaigns[$products['productID']][0]->level_code,
-                                "group_seq" => $discount_group,
-                                "order_detail_id" => $order_detail_id,
-                                "promotion_campaign_id" => $item['campaignDiscountId'],
-                                "product_id" => $products['productID'],
-                                "product_item_id" => $item['itemId'],
-                                "item_no" => $item['itemNo'],
-                                "discount" => $discount,
-                                "record_identity" => "M",
-                                "created_by" => $member_id,
-                                "updated_by" => $member_id,
-                                "created_at" => $now,
-                                "updated_at" => $now,
-                            ];
-                            OrderCampaignDiscount::insert($campaign_details[$seq]);
-                        }
+                    if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
+                        $discount_group++;
+                        $campaign_details[$seq] = [
+                            "order_id" => $order_id,
+                            "level_code" => $campaigns[$products['productID']][0]->level_code,
+                            "group_seq" => $discount_group,
+                            "order_detail_id" => $order_detail_id,
+                            "promotion_campaign_id" => $item['campaignDiscountId'],
+                            "product_id" => $products['productID'],
+                            "product_item_id" => $item['itemId'],
+                            "item_no" => $item['itemNo'],
+                            "discount" => $discount,
+                            "record_identity" => "M",
+                            "created_by" => $member_id,
+                            "updated_by" => $member_id,
+                            "created_at" => $now,
+                            "updated_at" => $now,
+                        ];
+                        OrderCampaignDiscount::insert($campaign_details[$seq]);
                     }
 
                     //有單品滿額贈品時先新增單身
@@ -494,11 +492,11 @@ class APIOrdersServices
                 if ($order_payment && $pointStatus['status'] == '200') {
                     $isTapPay = 1;
                 } else {
-                    $result['status']  = 401 ; 
+                    $result['status'] = 401;
                     $result['payment_url'] = null;
-                    Log::channel('changepoint')->info('扣點異常 ! webdata :'.json_encode($webData).'req:'.json_encode($pointData).'rep:'.json_encode($pointStatus));
+                    Log::channel('changepoint')->info('扣點異常 ! webdata :' . json_encode($webData) . 'req:' . json_encode($pointData) . 'rep:' . json_encode($pointStatus));
                     DB::rollBack();
-                    return $result ; 
+                    return $result;
                     $isTapPay = 0;
                 }
             } else {
