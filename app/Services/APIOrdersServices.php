@@ -204,6 +204,7 @@ class APIOrdersServices
             foreach ($cart['list'] as $products) {
                 foreach ($products['itemList'] as $item) {
                     $seq++;
+                    $discount_group ++;
                     if ($item['campaignDiscountStatus']) { //有活動折扣
                         $discount = -($products['sellingPrice'] * $item['itemQty'] - $item['amount']);
                     } else {
@@ -248,7 +249,6 @@ class APIOrdersServices
                     $order_detail_id = OrderDetail::insertGetId($details[$seq]);
 
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])){//有單品滿額贈時，正貨也寫入discount
-                        $discount_group ++;
                         $campaign_details[$seq] = [
                             "order_id" => $order_id,
                             "level_code" => 'PRD',
@@ -277,7 +277,6 @@ class APIOrdersServices
 
                     //有折扣則寫入折扣資訊
                     if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
-                        $discount_group++;
                         $campaign_details[$seq] = [
                             "order_id" => $order_id,
                             "level_code" => $campaigns[$products['productID']][0]->level_code,
@@ -332,7 +331,6 @@ class APIOrdersServices
                                     "returned_points" => 0
                                 ];
                                 $order_detail_id = OrderDetail::insertGetId($details[$seq]);
-                                $discount_group++;
                                 //寫入折扣資訊
                                 $campaign_details[$seq] = [
                                     "order_id" => $order_id,
@@ -386,7 +384,6 @@ class APIOrdersServices
                                 "returned_points" => 0
                             ];
                             $order_detail_id = OrderDetail::insertGetId($details[$seq]);
-                            $discount_group++;
                             //寫入折扣資訊
                             $campaign_details[$seq] = [
                                 "order_id" => $order_id,
