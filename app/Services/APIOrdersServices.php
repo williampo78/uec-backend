@@ -250,7 +250,6 @@ class APIOrdersServices
 
                     $campaign_id = 0;
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])){//有單品滿額贈時，正貨也寫入discount
-                        $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
                         $campaign_details[$seq] = [
                             "order_id" => $order_id,
                             "level_code" => 'PRD',
@@ -268,6 +267,7 @@ class APIOrdersServices
                             "updated_at" => $now,
                         ];
                         OrderCampaignDiscount::insert($campaign_details[$seq]);
+                        $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
                     }
                     if ($order_detail_id > 0) {
                         $detail_count++;
@@ -277,29 +277,6 @@ class APIOrdersServices
                     $updData['status_code'] = 1;
                     ShoppingCartDetails::where('member_id', '=', $member_id)->where('product_item_id', '=', $item['itemId'])->update($updData);
 
-                    //有折扣則寫入折扣資訊
-                    if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
-                        if ($campaign_id != $item['campaignDiscountId']){
-                            $discount_group ++;
-                        }
-                        $campaign_details[$seq] = [
-                            "order_id" => $order_id,
-                            "level_code" => $campaigns[$products['productID']][0]->level_code,
-                            "group_seq" => $discount_group,
-                            "order_detail_id" => $order_detail_id,
-                            "promotion_campaign_id" => $item['campaignDiscountId'],
-                            "product_id" => $products['productID'],
-                            "product_item_id" => $item['itemId'],
-                            "item_no" => $item['itemNo'],
-                            "discount" => $discount,
-                            "record_identity" => "M",
-                            "created_by" => $member_id,
-                            "updated_by" => $member_id,
-                            "created_at" => $now,
-                            "updated_at" => $now,
-                        ];
-                        OrderCampaignDiscount::insert($campaign_details[$seq]);
-                    }
 
                     //有單品滿額贈品時先新增單身
                     if (isset($item['campaignGiftAway']['campaignProdList'])) {
@@ -414,6 +391,30 @@ class APIOrdersServices
                             ];
                             OrderCampaignDiscount::insert($campaign_details[$seq]);
                         }
+                    }
+
+                    //有折扣則寫入折扣資訊
+                    if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
+                        if ($campaign_id != $item['campaignDiscountId']){
+                            $discount_group ++;
+                        }
+                        $campaign_details[$seq] = [
+                            "order_id" => $order_id,
+                            "level_code" => $campaigns[$products['productID']][0]->level_code,
+                            "group_seq" => $discount_group,
+                            "order_detail_id" => $order_detail_id,
+                            "promotion_campaign_id" => $item['campaignDiscountId'],
+                            "product_id" => $products['productID'],
+                            "product_item_id" => $item['itemId'],
+                            "item_no" => $item['itemNo'],
+                            "discount" => $discount,
+                            "record_identity" => "M",
+                            "created_by" => $member_id,
+                            "updated_by" => $member_id,
+                            "created_at" => $now,
+                            "updated_at" => $now,
+                        ];
+                        OrderCampaignDiscount::insert($campaign_details[$seq]);
                     }
                 }
             }
