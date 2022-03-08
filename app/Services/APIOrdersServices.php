@@ -248,7 +248,9 @@ class APIOrdersServices
                     ];
                     $order_detail_id = OrderDetail::insertGetId($details[$seq]);
 
+                    $campaign_id = 0;
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])){//有單品滿額贈時，正貨也寫入discount
+                        $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
                         $campaign_details[$seq] = [
                             "order_id" => $order_id,
                             "level_code" => 'PRD',
@@ -277,6 +279,9 @@ class APIOrdersServices
 
                     //有折扣則寫入折扣資訊
                     if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
+                        if ($campaign_id != $item['campaignDiscountId']){
+                            $discount_group ++;
+                        }
                         $campaign_details[$seq] = [
                             "order_id" => $order_id,
                             "level_code" => $campaigns[$products['productID']][0]->level_code,
@@ -332,6 +337,9 @@ class APIOrdersServices
                                 ];
                                 $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                 //寫入折扣資訊
+                                if ($campaign_id != $item['campaignGiftAway']['campaignGiftId']){
+                                    $discount_group ++;
+                                }
                                 $campaign_details[$seq] = [
                                     "order_id" => $order_id,
                                     "level_code" => $campaign_gift['PROD'][$item['campaignGiftAway']['campaignGiftId']][$gift['productId']]['level_code'],
@@ -385,6 +393,9 @@ class APIOrdersServices
                             ];
                             $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                             //寫入折扣資訊
+                            if ($campaign_id != $item['campaignGiftAway']['campaignGiftId']){
+                                $discount_group ++;
+                            }
                             $campaign_details[$seq] = [
                                 "order_id" => $order_id,
                                 "level_code" => $campaign_gift['PROD'][$item['campaignGiftAway']['campaignGiftId']][$gift['productId']]['level_code'],
