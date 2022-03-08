@@ -2,30 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Exports\ReportExport;
-use Illuminate\Support\Carbon;
-use App\Services\BrandsService ;
+use App\Services\BrandsService;
+use App\Services\CategoriesSerivce;
 use App\Services\ProductsService;
-use App\Services\SupplierService ;
-use App\Services\CategoriesSerivce ;
+use App\Services\SupplierService;
+use App\Services\WebCategoryHierarchyService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Services\WebCategoryHierarchyService ;
 
 class ProductsController extends Controller
 {
     private $productsService;
     public function __construct(ProductsService $productsService,
-    SupplierService $supplierService ,
-    BrandsService $brandsService,
-    WebCategoryHierarchyService $webCategoryHierarchyService,
-    CategoriesSerivce $categoriesSerivce)
-    {
+        SupplierService $supplierService,
+        BrandsService $brandsService,
+        WebCategoryHierarchyService $webCategoryHierarchyService,
+        CategoriesSerivce $categoriesSerivce) {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
-        $this->brandsService = $brandsService ;
-        $this->webCategoryHierarchyService = $webCategoryHierarchyService ;
-        $this->categoriesSerivce = $categoriesSerivce ;
+        $this->brandsService = $brandsService;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
+        $this->categoriesSerivce = $categoriesSerivce;
     }
     /**
      * Display a listing of the resource.
@@ -34,26 +33,26 @@ class ProductsController extends Controller
      */
     public function index(Request $request)
     {
-        $in = $request->input() ;
-        // dd(URL::current() ,  ,) ; 
+        $in = $request->input();
+        // dd(URL::current() ,  ,) ;
         $result = [
             'products' => [],
-        ] ;
+        ];
 
-        if(count($in) !== 0 ){
-            $result['products'] = $this->productsService->getProducts($in) ;
+        if (count($in) !== 0) {
+            $result['products'] = $this->productsService->getProducts($in);
             $this->productsService->restructureProducts($result['products']);
 
         }
-        $q = empty($in) ? '?' : '&' ;
-        $result['excel_url'] = url("/").$request->getRequestUri() . $q . 'export=true';
+        $q = empty($in) ? '?' : '&';
+        $result['excel_url'] = url("/") . $request->getRequestUri() . $q . 'export=true';
         if (isset($in['export'])) { //匯出報表
             return $this->export($in);
-         }
+        }
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
+        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content(); //供應商
 
-        return view('backend.products.list',$result);
+        return view('backend.products.list', $result);
     }
 
     /**
@@ -63,11 +62,11 @@ class ProductsController extends Controller
      */
     public function create()
     {
-        $result = [] ;
+        $result = [];
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['brands'] = $this->brandsService->getBrands() ;
-        $result['pos'] =  $this->categoriesSerivce->getPosCategories();
-        return view('backend.products.input',$result);
+        $result['brands'] = $this->brandsService->getBrands();
+        $result['pos'] = $this->categoriesSerivce->getPosCategories();
+        return view('backend.products.input', $result);
     }
 
     /**
@@ -78,17 +77,17 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
-        $result = [] ; 
-        $execution = $this->productsService->addProducts($request->input(), $request->file()) ;
-        $result['status'] = $execution['status'] ;
+        $result = [];
+        $execution = $this->productsService->addProducts($request->input(), $request->file());
+        $result['status'] = $execution['status'];
         $result['route_name'] = 'products';
         $result['act'] = 'add';
         if ($result['status']) {
             return view('backend.success', $result);
         } else {
-            $result['message']  = '新增時發生未預期的錯誤';
-            if(isset($execution['error_code'])){
-                $result['error_code'] = $execution['error_code'] ; 
+            $result['message'] = '新增時發生未預期的錯誤';
+            if (isset($execution['error_code'])) {
+                $result['error_code'] = $execution['error_code'];
             };
             return view('backend.error', $result);
         };
@@ -102,17 +101,17 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        $result = [] ;
-        $result['products'] = $this->productsService->showProducts($id) ;
-        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ;
+        $result = [];
+        $result['products'] = $this->productsService->showProducts($id);
+        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id);
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
-        $result['pos'] =  $this->categoriesSerivce->getPosCategories();
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ;
-        $result['spac_list'] = $this->productsService->getProductSpac($id) ;
+        $result['brands'] = $this->brandsService->getBrands(); // 廠牌
+        $result['pos'] = $this->categoriesSerivce->getPosCategories();
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
+        $result['spac_list'] = $this->productsService->getProductSpac($id);
         // dump($result['spac_list']) ; exit ;
-        return view('backend.products.show',$result) ;
+        return view('backend.products.show', $result);
     }
 
     /**
@@ -123,40 +122,46 @@ class ProductsController extends Controller
      */
     public function edit($id)
     {
-        $result = [] ;
-        $products = $this->productsService->showProducts($id) ;
-        $products->launched_status = '' ;
+        $result = [];
+        $products = $this->productsService->showProducts($id);
+        $products->launched_status = '';
         $products->launched_at = ($products->start_launched_at || $products->end_launched_at) ? "{$products->start_launched_at} ~ {$products->end_launched_at}" : '';
         switch ($products->approval_status) {
+            // 未設定
             case 'NA':
-                $products->edit_readonly = '0' ;
+                $products->edit_readonly = '0';
                 break;
 
+            // 上架申請
             case 'REVIEWING':
-                $products->edit_readonly = '1' ;
+                $products->edit_readonly = '1';
                 break;
 
+            // 上架駁回
             case 'REJECTED':
-                $products->edit_readonly = '0' ;
+                $products->edit_readonly = '0';
                 break;
 
+            // 商品下架
             case 'CANCELLED':
-                $products->edit_readonly = '0' ;
+                $products->edit_readonly = '0';
                 break;
+
             case 'APPROVED':
+                // 在時間範圍內: 商品上架，其他: 商品下架
                 $products->edit_readonly = Carbon::now()->between($products->start_launched_at, $products->end_launched_at) ? '1' : '0';
                 break;
         }
-        $result['products'] = $products ;
-        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id) ;
+        $result['products'] = $products;
+        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id);
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['brands'] = $this->brandsService->getBrands() ; // 廠牌
-        $result['pos'] =  $this->categoriesSerivce->getPosCategories();
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id) ;
-        $result['spac_list'] = $this->productsService->getProductSpac($id) ;
-        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id) ;
-        return view('backend.products.update',$result) ;
+        $result['brands'] = $this->brandsService->getBrands(); // 廠牌
+        $result['pos'] = $this->categoriesSerivce->getPosCategories();
+        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
+        $result['spac_list'] = $this->productsService->getProductSpac($id);
+        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
+        return view('backend.products.update', $result);
     }
 
     /**
@@ -168,17 +173,17 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $result = [] ;
-        $execution = $this->productsService->editProducts($request->input(), $request->file()) ;
-        $result['status'] = $execution['status'] ;
+        $result = [];
+        $execution = $this->productsService->editProducts($request->input(), $request->file());
+        $result['status'] = $execution['status'];
         $result['route_name'] = 'products';
         $result['act'] = 'upd';
         if ($result['status']) {
             return view('backend.success', $result);
         } else {
-            $result['message']  = '新增時發生未預期的錯誤';
-            if(isset($execution['error_code'])){
-                $result['error_code'] = $execution['error_code'] ; 
+            $result['message'] = '新增時發生未預期的錯誤';
+            if (isset($execution['error_code'])) {
+                $result['error_code'] = $execution['error_code'];
             };
             return view('backend.error', $result);
         };
@@ -194,14 +199,15 @@ class ProductsController extends Controller
     {
         //
     }
-    public function ajax(Request $request){
+    public function ajax(Request $request)
+    {
         $in = $request->input();
         switch ($in['type']) {
             case 'checkPosItemNo':
-                if($in['pos_item_no'] !== ''){
-                    $result = $this->productsService->checkPosItemNo($in['pos_item_no'],$in['item_no']);
-                }else{
-                    $result = false ;
+                if ($in['pos_item_no'] !== '') {
+                    $result = $this->productsService->checkPosItemNo($in['pos_item_no'], $in['item_no']);
+                } else {
+                    $result = false;
                 }
                 break;
             default:
@@ -209,15 +215,15 @@ class ProductsController extends Controller
         }
 
         return response()->json([
-            'requestData'=> $in,
+            'requestData' => $in,
             'result' => $result,
         ]);
     }
     public function export($in)
     {
         $data = $this->productsService->getItemsJoinProducts($in);
-        $pos =  $this->categoriesSerivce->getPosCategories()->keyBy('id');
-        $this->productsService->restructureItemsProducts($data , $pos);
+        $pos = $this->categoriesSerivce->getPosCategories()->keyBy('id');
+        $this->productsService->restructureItemsProducts($data, $pos);
         $title = [
             "stock_type_cn" => "庫存類型",
             "product_no" => "商品序號",
@@ -229,7 +235,7 @@ class ProductsController extends Controller
             "tertiary_categories_name" => "POS小分類",
             "brand_name" => "品牌",
             "model" => "商品型號",
-            "selling_channel_cn" => "商品通路",//商品通路
+            "selling_channel_cn" => "商品通路", //商品通路
             "lgst_temperature_cn" => "溫層",
             "lgst_method_cn" => "配送方式",
             "delivery_type_cn" => "商品交期",
@@ -252,7 +258,7 @@ class ProductsController extends Controller
             "web_category_products_category_name" => "前台分類", //需要對多拿單欄位逗號分隔
             "keywords" => "關聯關鍵字",
             "related_product_name" => "關聯性商品", //需要對多拿單欄位逗號分隔
-            "order_limited_qty" => "每單限購數量",//每單限購數量
+            "order_limited_qty" => "每單限購數量", //每單限購數量
             "promotion_desc" => "促銷小標",
             "promotion_start_at" => "促銷小標生效時間起",
             "promotion_end_at" => "促銷小標生效時間訖",
@@ -271,7 +277,7 @@ class ProductsController extends Controller
             "status_cn" => "狀態",
         ];
         $export = new ReportExport($title, $data->toArray());
-        return Excel::download($export, '商品主檔'.date('Y-m-d').'.xlsx');
+        return Excel::download($export, '商品主檔' . date('Y-m-d') . '.xlsx');
     }
 
 }

@@ -1183,6 +1183,10 @@
                     uom: {
                         required: true,
                     },
+                    min_purchase_qty: {
+                        digits: true,
+                        min: 1,
+                    },
                     //長
                     length: {
                         required: true,
@@ -1258,6 +1262,10 @@
 
                 },
                 messages: {
+                    min_purchase_qty: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
