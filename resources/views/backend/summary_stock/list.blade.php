@@ -102,7 +102,7 @@
                                     <h5>期初金額</h5>
                                 </div>
                                 <div class="col-sm-2">
-                                    <h4>{{ number_format($sum[0]['begin_amount']) }}</h4>
+                                    <h4>{{ $sum[0]['begin_amount'] }}</h4>
                                 </div>
                                 <div class="col-sm-1 text-right">
                                     <h5>期末數量</h5>
@@ -114,7 +114,7 @@
                                     <h5>期末金額</h5>
                                 </div>
                                 <div class="col-sm-2">
-                                    <h4>{{ number_format($sum[0]['end_amount']) }}</h4>
+                                    <h4>{{ $sum[0]['end_amount'] }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -158,22 +158,22 @@
                                             <td nowrap="nowrap">{{ $item->spec_1_value }}</td>
                                             <td nowrap="nowrap">{{ $item->spec_2_value }}</td>
                                             <td align="right">{{ $item->begin_qty }}</td>
-                                            <td align="right">{{ number_format($item->begin_amount) }}</td>
-                                            <td align="right">{{ $item->item_cost }}</td>
+                                            <td align="right">{{ $item->begin_amount_display }}</td>
+                                            <td align="right">{{ $item->item_cost_display }}</td>
                                             <td align="right">{{ $item->rcv_qty }}</td>
                                             <td align="right">{{ number_format($item->rcv_amount) }}</td>
                                             <td align="right">{{ $item->rtv_qty }}</td>
                                             <td align="right">{{ number_format($item->rtv_amount) }}</td>
                                             <td align="right">{{ $item->sales_qty }}</td>
-                                            <td align="right">{{ number_format($item->sales_amount) }}</td>
+                                            <td align="right">{{ $item->sales_amount_display }}</td>
                                             <td align="right">{{ $item->sales_return_qty }}</td>
-                                            <td align="right">{{ number_format($item->sales_return_amount) }}</td>
+                                            <td align="right">{{ $item->sales_return_amount_display }}</td>
                                             <td align="right">{{ $item->adj_qty }}</td>
                                             <td align="right">{{ $item->adj_amount }}</td>
                                             <td align="right">{{ $item->shift_qty }}</td>
                                             <td align="right">{{ $item->shift_amount }}</td>
                                             <td align="right">{{ $item->end_qty }}</td>
-                                            <td align="right">{{ number_format($item->end_amount) }}</td>
+                                            <td align="right">{{ $item->end_amount_display }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
