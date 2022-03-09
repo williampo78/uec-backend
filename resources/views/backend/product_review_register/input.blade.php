@@ -201,7 +201,7 @@
                         </button>
                         <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
                             取消</a>
-                            <hr>
+                        <hr>
                         <div class="row">
                             <div class="col-sm-2">
                                 <div class="form-group">

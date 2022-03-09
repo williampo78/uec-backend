@@ -450,7 +450,7 @@ window.getAdSlotSelectOptions = function () {
   var datas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
   var options = "";
   $.each(datas, function (key, value) {
-    options += "\n            <option value='".concat(value["id"], "' \n                data-is-user-defined=\"").concat(value["is_user_defined"], "\" \n                data-slot-type=\"").concat(value["slot_type"], "\"\n                data-photo-width=\"").concat(value["photo_width"], "\"\n                data-photo-height=\"").concat(value["photo_height"], "\"\n                >\u3010").concat(value["slot_code"], "\u3011").concat(value["slot_desc"], "\n             </option>\n        ");
+    options += "\n            <option value='".concat(value["id"], "' data-is-user-defined=\"").concat(value["is_user_defined"], "\" data-slot-type=\"").concat(value["slot_type"], "\">\u3010").concat(value["slot_code"], "\u3011").concat(value["slot_desc"], "</option>\n        ");
   });
   return options;
 }; // 取得商品分類下拉選項
