@@ -307,7 +307,13 @@ window.getAdSlotSelectOptions = (datas = []) => {
 
     $.each(datas, function (key, value) {
         options += `
-            <option value='${value["id"]}' data-is-user-defined="${value["is_user_defined"]}" data-slot-type="${value["slot_type"]}">【${value["slot_code"]}】${value["slot_desc"]}</option>
+            <option value='${value["id"]}' 
+            data-is-user-defined="${value["is_user_defined"]}" 
+            data-slot-type="${value["slot_type"]}"
+            data-photo-width="${value["photo_width"]}"
+            data-photo-height="${value["photo_height"]}"
+            >【${value["slot_code"]}】${value["slot_desc"]}
+            </option>
         `;
     });
 
