@@ -61,7 +61,6 @@
     <script>
         $(function() {
             let ad_slots = @json($ad_slots);
-            console.log(ad_slots);
             // 商品分類下拉選項
             let product_category = @json($product_category);
             // 商品下拉選項
@@ -192,13 +191,7 @@
                 let element = $(this).find('option:selected');
                 let is_user_defined = element.attr('data-is-user-defined');
                 let slot_type = element.attr('data-slot-type');
-                let photo_width = element.attr('data-photo-width');
-                let photo_height = element.attr('data-photo-height');
-                if(photo_width >0 || photo_height >0){
-                    $('.show_size').text('尺寸：'+photo_width +'*'+photo_height);
-                }else{
-                    $('.show_size').text('');
-                }
+
                 // 開放編輯 版位主色、版位icon、版位標題
                 if (is_user_defined == 1) {
                     enableSlotColorCode();
