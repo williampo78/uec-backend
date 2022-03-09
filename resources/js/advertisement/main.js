@@ -86,7 +86,11 @@ window.init = (datas = {}) => {
 
     // 新增圖檔
     $("#btn-new-image").on("click", function () {
-        addImageBlock(product_category_select_options);
+        let datas = {
+            id: $("#image-block-row-no").val(),
+        };
+
+        addImageBlock(product_category_select_options, datas);
     });
 
     // 刪除圖檔
@@ -98,8 +102,11 @@ window.init = (datas = {}) => {
 
     // 新增文字
     $("#btn-new-text").on("click", function () {
-        let datas = {id:$("#text-block-row-no").val()};
-        addTextBlock(product_category_select_options,datas);
+        let datas = {
+            id: $("#text-block-row-no").val(),
+        };
+
+        addTextBlock(product_category_select_options, datas);
     });
 
     // 刪除文字
@@ -111,7 +118,11 @@ window.init = (datas = {}) => {
 
     // 新增商品的指定商品
     $("#btn-new-product-product").on("click", function () {
-        addProductBlockProduct(product_select_options);
+        let datas = {
+            id: $("#product-block-product-row-no").val(),
+        };
+
+        addProductBlockProduct(product_select_options, datas);
 
         // 編輯才做
         if (!ad_slot_select_options) {
@@ -156,7 +167,11 @@ window.init = (datas = {}) => {
 
     // 新增商品的指定分類
     $("#btn-new-product-category").on("click", function () {
-        addProductBlockCategory(product_category_select_options);
+        let datas = {
+            id: $("#product-block-category-row-no").val(),
+        };
+
+        addProductBlockCategory(product_category_select_options, datas);
 
         // 編輯才做
         if (!ad_slot_select_options) {
@@ -283,8 +298,14 @@ window.init = (datas = {}) => {
         const file = this.files[0];
 
         if (file) {
-            $(this).siblings('.img_image_block_image_name').attr("src", URL.createObjectURL(file));
-            $(this).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").show();
+            $(this)
+                .siblings(".img_image_block_image_name")
+                .attr("src", URL.createObjectURL(file));
+            $(this)
+                .siblings(
+                    ".img_image_block_image_name, .btn-delete-image-block-image-name"
+                )
+                .show();
         }
     });
 
@@ -336,24 +357,17 @@ window.getProductSelectOptions = (datas = []) => {
 };
 
 window.addImageBlock = (product_category_select_options = "", datas = {}) => {
-    let image_block_row_no = datas.id
-        ? datas.id
-        : $("#image-block-row-no").val();
-    let image_block_id = datas.id ? datas.id : "new";
+    let image_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
-    let image_name_url = datas.image_name_url
-        ? datas.image_name_url
-        : "";
+    let image_name_url = datas.image_name_url ? datas.image_name_url : "";
     let image_alt = datas.image_alt ? datas.image_alt : "";
     let image_title = datas.image_title ? datas.image_title : "";
     let image_abstract = datas.image_abstract ? datas.image_abstract : "";
     let target_url = datas.target_url ? datas.target_url : "";
 
-    image_block_row_no = sanitize(String(image_block_row_no));
-
     $("#image-block table > tbody").append(`
         <tr>
-            <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_id}">
+            <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_image_block_sort" name="image_block_sort[${image_block_row_no}]" value="${sort}" />
@@ -441,10 +455,18 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
 
     $(".js-select2-image-block-product-category").select2();
 
-    if (image_block_id == 'new') {
-        $(`#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`).siblings('.img_image_block_image_name, .btn-delete-image-block-image-name').hide();
+    if (image_name_url) {
+        $(
+            `#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`
+        ).hide();
     } else {
-        $(`#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`).hide();
+        $(
+            `#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`
+        )
+            .siblings(
+                ".img_image_block_image_name, .btn-delete-image-block-image-name"
+            )
+            .hide();
     }
 
     $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
@@ -453,17 +475,14 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
 };
 
 window.addTextBlock = (product_category_select_options, datas = {}) => {
-    let text_block_row_no = datas.id ? datas.id : '';
-    let text_block_id = datas.id ? datas.id : "new";
+    let text_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";
     let target_url = datas.target_url ? datas.target_url : "";
 
-    text_block_row_no = sanitize(String(text_block_row_no));
-
     $("#text-block table > tbody").append(`
         <tr>
-            <input type="hidden" name="text_block_id[${text_block_row_no}]" value="${text_block_id}">
+            <input type="hidden" name="text_block_id[${text_block_row_no}]" value="${text_block_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_text_block_sort" name="text_block_sort[${text_block_row_no}]" value="${sort}" />
@@ -540,19 +559,12 @@ window.addTextBlock = (product_category_select_options, datas = {}) => {
 };
 
 window.addProductBlockProduct = (product_select_options, datas = {}) => {
-    let product_block_product_row_no = datas.id
-        ? datas.id
-        : $("#product-block-product-row-no").val();
-    let product_block_product_id = datas.id ? datas.id : "new";
+    let product_block_product_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
-
-    product_block_product_row_no = sanitize(
-        String(product_block_product_row_no)
-    );
 
     $("#tab-product table > tbody").append(`
         <tr>
-            <input type="hidden" name="product_block_product_id[${product_block_product_row_no}]" value="${product_block_product_id}">
+            <input type="hidden" name="product_block_product_id[${product_block_product_row_no}]" value="${product_block_product_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_product_block_product_sort" name="product_block_product_sort[${product_block_product_row_no}]" value="${sort}" />
@@ -585,19 +597,12 @@ window.addProductBlockCategory = (
     product_category_select_options,
     datas = {}
 ) => {
-    let product_block_category_row_no = datas.id
-        ? datas.id
-        : $("#product-block-category-row-no").val();
-    let product_block_category_id = datas.id ? datas.id : "new";
+    let product_block_category_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
-
-    product_block_category_row_no = sanitize(
-        String(product_block_category_row_no)
-    );
 
     $("#tab-category table > tbody").append(`
         <tr>
-            <input type="hidden" name="product_block_category_id[${product_block_category_row_no}]" value="${product_block_category_id}">
+            <input type="hidden" name="product_block_category_id[${product_block_category_row_no}]" value="${product_block_category_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_product_block_category_sort" name="product_block_category_sort[${product_block_category_row_no}]" value="${sort}" />
@@ -704,6 +709,3 @@ window.disableSlotTitle = () => {
 
     validate.removeSlotTitleValidation();
 };
-
-// 輸入值消毒
-const sanitize = (val) => val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
