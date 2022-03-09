@@ -11,4 +11,9 @@ class AdSlotContent extends Model
 
     protected $table = 'ad_slot_contents';
     protected $guarded = [];
+
+    public function adSlot()
+    {
+        return $this->belongsTo(AdSlot::class);
+    }
 }

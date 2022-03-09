@@ -11,4 +11,9 @@ class AdSlot extends Model
 
     protected $table = 'ad_slots';
     protected $guarded = [];
+
+    public function adSlotContents()
+    {
+        return $this->hasMany(AdSlotContent::class, 'slot_id');
+    }
 }
