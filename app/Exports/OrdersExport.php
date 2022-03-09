@@ -17,6 +17,29 @@ class OrdersExport implements FromArray, WithHeadings, WithColumnWidths, WithSty
     private $total_rows = 0;
     private $merge_cell_rows = [];
 
+    /**
+     * 欄位
+     */
+    private const COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO'];
+
+    /**
+     * 欄位寬度
+     */
+    private const WIDTHS = [10, 20, 20, 10, 20, 10, 10, 20, 10, 20, 20, 20, 20, 20, 20, 10, 20, 20, 10, 20, 20, 20, 30, 10, 10, 10, 15, 10, 10, 10, 10, 10, 10, 15, 10, 15, 10, 15, 10, 15, 15];
+
+    /**
+     * 水平對齊方式
+     * left: l
+     * center: c
+     * right: r
+     */
+    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'l'];
+
+    /**
+     * 需合併儲存格的欄位
+     */
+    private const MERGE_CELL_COLUMNS = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
+
     public function __construct($orders)
     {
         $this->orders = $orders;
@@ -94,6 +117,7 @@ class OrdersExport implements FromArray, WithHeadings, WithColumnWidths, WithSty
                 $order->lgst_method,
                 $order->shipping_fee,
                 $order->is_shipping_free,
+                $order->cart_campaign_discount,
                 $order->cancelled_voided_at,
                 $order->shipped_at,
                 $order->arrived_store_at,
@@ -146,7 +170,7 @@ class OrdersExport implements FromArray, WithHeadings, WithColumnWidths, WithSty
                         $row = array_merge($row, $order_columns, $order_detail_columns);
                         $is_first = false;
                     } else {
-                        $emtpy_columns = array_fill(0, 17, '');
+                        $emtpy_columns = array_fill(0, count(self::MERGE_CELL_COLUMNS), '');
                         $row = array_merge($row, $emtpy_columns, $order_detail_columns);
                         $this->merge_cell_rows[$merge_cell_first_row] = $count + 1;
                     }
@@ -179,6 +203,7 @@ class OrdersExport implements FromArray, WithHeadings, WithColumnWidths, WithSty
             '物流方式',
             '運費',
             '訂單成立時免運',
+            '滿額折抵',
             '取消/作廢時間',
             '出貨時間',
             '到店時間',
@@ -216,93 +241,48 @@ class OrdersExport implements FromArray, WithHeadings, WithColumnWidths, WithSty
 
     public function columnWidths(): array
     {
-        return [
-            'A' => 10,
-            'B' => 20,
-            'C' => 20,
-            'D' => 10,
-            'E' => 20,
-            'F' => 10,
-            'G' => 10,
-            'H' => 20,
-            'I' => 20,
-            'J' => 20,
-            'K' => 20,
-            'L' => 20,
-            'M' => 20,
-            'N' => 20,
-            'O' => 10,
-            'P' => 20,
-            'Q' => 20,
-            'R' => 10,
-            'S' => 20,
-            'T' => 20,
-            'U' => 20,
-            'V' => 30,
-            'W' => 10,
-            'X' => 10,
-            'Y' => 10,
-            'Z' => 15,
-            'AA' => 10,
-            'AB' => 10,
-            'AC' => 10,
-            'AD' => 10,
-            'AE' => 10,
-            'AF' => 10,
-            'AG' => 15,
-            'AH' => 10,
-            'AI' => 15,
-            'AJ' => 10,
-            'AK' => 15,
-            'AL' => 10,
-            'AM' => 15,
-            'AN' => 15,
-        ];
+        $columnWidths = [];
+
+        foreach (self::COLUMNS as $key => $column) {
+            $columnWidths[$column] = self::WIDTHS[$key] ?? 10;
+        }
+
+        return $columnWidths;
     }
 
     public function styles(Worksheet $sheet)
     {
-        // 對齊方式
-        $alignment_datas = [
-            'left' => ['D', 'F', 'N', 'T', 'U', 'V', 'W', 'X', 'AN'],
-            'center' => ['A', 'B', 'C', 'E', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'P', 'Q', 'S'],
-            'right' => ['O', 'R', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'],
-        ];
+        $last_column = self::COLUMNS[array_key_last(self::COLUMNS)];
 
-        foreach ($alignment_datas as $method => $columns) {
-            switch ($method) {
-                case 'left':
-                    foreach ($columns as $column) {
+        foreach (self::COLUMNS as $key => $column) {
+            if (isset(self::ALIGNMENTS[$key])) {
+                switch (self::ALIGNMENTS[$key]) {
+                    case 'l':
                         $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
-                    }
-                    break;
+                        break;
 
-                case 'center':
-                    foreach ($columns as $column) {
+                    case 'c':
                         $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                    }
-                    break;
+                        break;
 
-                case 'right':
-                    foreach ($columns as $column) {
+                    case 'r':
                         $sheet->getStyle("{$column}2:{$column}{$this->total_rows}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-                    }
-                    break;
+                        break;
+                }
             }
-        }
 
-        // 合併儲存格
-        if (!empty($this->merge_cell_rows)) {
-            $merge_cell_columns = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
-            foreach ($this->merge_cell_rows as $first_row => $end_row) {
-                foreach ($merge_cell_columns as $column) {
-                    $sheet->mergeCells("{$column}{$first_row}:{$column}{$end_row}");
+            // 合併儲存格
+            if (in_array($column, self::MERGE_CELL_COLUMNS)) {
+                if (!empty($this->merge_cell_rows)) {
+                    foreach ($this->merge_cell_rows as $first_row => $end_row) {
+                        $sheet->mergeCells("{$column}{$first_row}:{$column}{$end_row}");
+                    }
                 }
             }
         }
 
         return [
-            'A1:AN1' => [
+            "A1:{$last_column}1" => [
                 'alignment' => [
                     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                 ],
@@ -310,7 +290,7 @@ class OrdersExport implements FromArray, WithHeadings, WithColumnWidths, WithSty
                     'bold' => true,
                 ],
             ],
-            "A1:AN{$this->total_rows}" => [
+            "A1:{$last_column}{$this->total_rows}" => [
                 'alignment' => [
                     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 ],
