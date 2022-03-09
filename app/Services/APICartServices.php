@@ -172,7 +172,7 @@ class APICartServices
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                     //echo $item['item_qty'];
-                    $prodQty[$prdouct_id][$item_id]=$item['item_qty'];
+                    $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
                 }
             }
             //行銷活動
@@ -266,6 +266,14 @@ class APICartServices
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
+                                    //處理給前端的可下訂庫存
+                                    if ($stock == 0) { //可訂購數 =0
+                                        $outOfStock = true;
+                                    } else if ($return_qty > $stock && $stock > 0) { //訂購數大於庫存數 & 可訂購數 >0
+                                        $outOfStock = false;
+                                    } else {
+                                        $outOfStock = false;
+                                    }
                                     $product[] = array(
                                         "itemId" => $item_info->item_id,
                                         "itemNo" => $item_info->item_no,
@@ -275,7 +283,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
@@ -338,6 +346,14 @@ class APICartServices
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
+                                    //處理給前端的可下訂庫存
+                                    if ($stock == 0) { //可訂購數 =0
+                                        $outOfStock = true;
+                                    } else if ($return_qty > $stock && $stock > 0) { //訂購數大於庫存數 & 可訂購數 >0
+                                        $outOfStock = false;
+                                    } else {
+                                        $outOfStock = false;
+                                    }
                                     $product[] = array(
                                         "itemId" => $item_info->item_id,
                                         "itemNo" => $item_info->item_no,
@@ -347,7 +363,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
@@ -386,6 +402,14 @@ class APICartServices
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
+                                    //處理給前端的可下訂庫存
+                                    if ($stock == 0) { //可訂購數 =0
+                                        $outOfStock = true;
+                                    } else if ($return_qty > $stock && $stock > 0) { //訂購數大於庫存數 & 可訂購數 >0
+                                        $outOfStock = false;
+                                    } else {
+                                        $outOfStock = false;
+                                    }
                                     $product[] = array(
                                         "itemId" => $item_info->item_id,
                                         "itemNo" => $item_info->item_no,
@@ -395,7 +419,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
@@ -432,6 +456,14 @@ class APICartServices
                                     if ($stock_info) {
                                         $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                     }
+                                    //處理給前端的可下訂庫存
+                                    if ($stock == 0) { //可訂購數 =0
+                                        $outOfStock = true;
+                                    } else if ($return_qty > $stock && $stock > 0) { //訂購數大於庫存數 & 可訂購數 >0
+                                        $outOfStock = false;
+                                    } else {
+                                        $outOfStock = false;
+                                    }
                                     $product[] = array(
                                         "itemId" => $item_info->item_id,
                                         "itemNo" => $item_info->item_no,
@@ -441,7 +473,7 @@ class APICartServices
                                         "itemQty" => $return_qty,
                                         "amount" => intval($amount),
                                         "itemStock" => $stock,
-                                        "outOfStock" => (($stock - $return_qty) < 0 ? true : false),
+                                        "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
@@ -471,6 +503,14 @@ class APICartServices
                                 if ($stock_info) {
                                     $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                                 }
+                                //處理給前端的可下訂庫存
+                                if ($stock == 0) { //可訂購數 =0
+                                    $outOfStock = true;
+                                } else if ($detail_qty > $stock && $stock > 0) { //訂購數大於庫存數 & 可訂購數 >0
+                                    $outOfStock = false;
+                                } else {
+                                    $outOfStock = false;
+                                }
                                 $product[] = array(
                                     "itemId" => $item_info->item_id,
                                     "itemNo" => $item_info->item_no,
@@ -480,7 +520,7 @@ class APICartServices
                                     "itemQty" => $detail_qty,
                                     "amount" => intval($item_info->selling_price * $detail_qty),
                                     "itemStock" => $stock,
-                                    "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                    "outOfStock" => $outOfStock,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                     "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                                     "campaignDiscountStatus" => false,
@@ -511,6 +551,14 @@ class APICartServices
                             if ($stock_info) {
                                 $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                             }
+                            //處理給前端的可下訂庫存
+                            if ($stock == 0) { //可訂購數 =0
+                                $outOfStock = true;
+                            } else if ($detail_qty > $stock && $stock > 0) { //訂購數大於庫存數 & 可訂購數 >0
+                                $outOfStock = false;
+                            } else {
+                                $outOfStock = false;
+                            }
                             $product[] = array(
                                 "itemId" => $item_info->item_id,
                                 "itemNo" => $item_info->item_no,
@@ -520,7 +568,7 @@ class APICartServices
                                 "itemQty" => $detail_qty,
                                 "amount" => intval($item_info->selling_price * $detail_qty),
                                 "itemStock" => $stock,
-                                "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                                "outOfStock" => $outOfStock,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                 "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
                                 "campaignDiscountStatus" => false,
@@ -551,6 +599,14 @@ class APICartServices
                         if ($stock_info) {
                             $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
                         }
+                        //處理給前端的可下訂庫存
+                        if ($stock == 0) { //可訂購數 =0
+                            $outOfStock = true;
+                        } else if ($detail_qty > $stock && $stock > 0) { //訂購數大於庫存數 & 可訂購數 >0
+                            $outOfStock = false;
+                        } else {
+                            $outOfStock = false;
+                        }
                         $product[] = array(
                             "itemId" => $item_info->item_id,
                             "itemNo" => $item_info->item_no,
@@ -560,7 +616,7 @@ class APICartServices
                             "itemQty" => $detail_qty,
                             "amount" => intval($item_info->selling_price * $detail_qty),
                             "itemStock" => $stock,
-                            "outOfStock" => (($stock - $detail_qty) < 0 ? true : false),
+                            "outOfStock" => $outOfStock,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                             "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                             "campaignDiscountStatus" => false,
@@ -669,7 +725,7 @@ class APICartServices
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
-                "discount" => $cartDiscount,
+                "discount" => intval(round($cartDiscount)),
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
                 "shippingFee" => $fee,

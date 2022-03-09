@@ -110,22 +110,22 @@ class SummaryStockController extends Controller
             "spec_1_value" => "規格1",
             "spec_2_value" => "規格2",
             "begin_qty" => "期初數量",
-            "begin_amount" => "期初金額",
-            "item_cost" => "單位成本",
+            "begin_amount_display" => "期初金額",
+            "item_cost_display" => "單位成本",
             "rcv_qty" => "進貨數量",
             "rcv_amount" => "進貨金額",
             "rtv_qty" => "退貨數量",
             "rtv_amount" => "退貨金額",
             "sales_qty" => "銷貨數量",
-            "sales_amount" => "銷貨金額",
+            "sales_amount_display" => "銷貨金額",
             "sales_return_qty" => "銷退數量",
-            "sales_return_amount" => "銷退金額",
+            "sales_return_amount_display" => "銷退金額",
             "adj_qty" => "盤差數量",
             "adj_amount" => "盤差金額",
             "shift_qty" => "調撥數量",
             "shift_amount" => "調撥金額",
             "end_qty" => "期末數量",
-            "end_amount" => "期末金額"
+            "end_amount_display" => "期末金額"
         ];
         $data = $data->toArray();
         $export = new ReportExport($title, $data);

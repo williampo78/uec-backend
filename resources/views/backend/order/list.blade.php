@@ -64,7 +64,10 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <div class="input-group" id="ordered_date_start_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group" name="ordered_date_start" id="ordered_date_start" value="{{ request()->input('ordered_date_start') }}" autocomplete="off" data-input />
+                                                    <input type="text" class="form-control search-limit-group"
+                                                        name="ordered_date_start" id="ordered_date_start"
+                                                        value="{{ request()->input('ordered_date_start') }}"
+                                                        autocomplete="off" data-input />
                                                     <span class="input-group-btn" data-toggle>
                                                         <button class="btn btn-default" type="button">
                                                             <i class="fa-solid fa-calendar-days"></i>
@@ -79,7 +82,10 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <div class="input-group" id="ordered_date_end_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group" name="ordered_date_end" id="ordered_date_end" value="{{ request()->input('ordered_date_end') }}" autocomplete="off" data-input />
+                                                    <input type="text" class="form-control search-limit-group"
+                                                        name="ordered_date_end" id="ordered_date_end"
+                                                        value="{{ request()->input('ordered_date_end') }}"
+                                                        autocomplete="off" data-input />
                                                     <span class="input-group-btn" data-toggle>
                                                         <button class="btn btn-default" type="button">
                                                             <i class="fa-solid fa-calendar-days"></i>
@@ -548,6 +554,8 @@
                                 order_campaign_discount) {
                                 let item_no = order_campaign_discount.item_no ?
                                     order_campaign_discount.item_no : '';
+                                let product_name = order_campaign_discount.product_name !=
+                                    null ? order_campaign_discount.product_name : "";
                                 let spec_1_value = order_campaign_discount.spec_1_value ?
                                     order_campaign_discount.spec_1_value : '';
                                 let spec_2_value = order_campaign_discount.spec_2_value ?
@@ -561,7 +569,7 @@
                                         <td>${order_campaign_discount.level_code}</td>
                                         <td>${order_campaign_discount.campaign_name}</td>
                                         <td>${item_no}</td>
-                                        <td>${order_campaign_discount.product_name}</td>
+                                        <td>${product_name}</td>
                                         <td>${spec_1_value}</td>
                                         <td>${spec_2_value}</td>
                                         <td>${record_identity}</td>

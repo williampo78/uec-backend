@@ -727,7 +727,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{-- </div> --}}
                             </div>
                         </div>
                     </div>
@@ -741,21 +740,21 @@
                                 <div class="col-sm-2 ">
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="0"
-                                            v-model="products.spec_dimension" :disabled="products.spec_dimension !== 0">
+                                            v-model="products.spec_dimension" :disabled="products.spec_dimension !== 0 || edit_readonly == 1">
                                         單規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="1"
-                                            v-model="products.spec_dimension" :disabled="products.spec_dimension == 2">
+                                            v-model="products.spec_dimension" :disabled="products.spec_dimension == 2 || edit_readonly == 1">
                                         一維多規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="2"
-                                            v-model="products.spec_dimension">
+                                            v-model="products.spec_dimension" :disabled="edit_readonly == 1">
                                         二維多規格
                                     </label>
                                 </div>
@@ -1003,9 +1002,12 @@
                     old_spec_dimension: 0, // 0 單規 1一規 2 二規
                     product_spec_info: @json($product_spec_info),
                     safty_qty_all: 0,
+                    edit_readonly: null,
                 }
             },
-            mounted() {},
+            mounted() {
+                this.edit_readonly = document.querySelector('#edit_readonly').value;
+            },
             created() {
                 let spec_value_list = JSON.parse(this.product_spec_info.spec_value_list);
                 let item_list = JSON.parse(this.product_spec_info.item_list);
@@ -1568,6 +1570,10 @@
                     uom: {
                         required: true,
                     },
+                    min_purchase_qty: {
+                        digits: true,
+                        min: 1,
+                    },
                     //長
                     length: {
                         required: true,
@@ -1627,6 +1633,10 @@
                     },
                 },
                 messages: {
+                    min_purchase_qty: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
