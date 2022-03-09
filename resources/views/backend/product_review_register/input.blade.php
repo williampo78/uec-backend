@@ -269,15 +269,28 @@
 @section('js')
     <script>
         $(document).ready(function() {
+            let startLaunchedAtLastSelectedDates;
+
             let start_launched_at_flatpickr = flatpickr("#start_launched_at_flatpickr", {
                 dateFormat: "Y-m-d H:i:S",
                 maxDate: $("#end_launched_at").val(),
                 enableTime: true,
                 enableSeconds: true,
-                defaultDate: new Date(new Date().getTime() + 15 * 60 * 1000),
                 defaultHour: 0,
                 defaultMinute: 0,
                 defaultSeconds: 0,
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (!startLaunchedAtLastSelectedDates || !isSameDay(startLaunchedAtLastSelectedDates[0], selectedDates[0])) {
+                        if (isToday(selectedDates[0])) {
+                            let newDate = new Date(new Date().getTime() + 10 * 60 * 1000).setSeconds(0);
+                            this.setDate(newDate);
+                        } else {
+                            this.setDate(selectedDates[0].setHours(0,0,0));
+                        }
+                    }
+
+                    startLaunchedAtLastSelectedDates = selectedDates;
+                },
             });
 
             let end_launched_at_flatpickr = flatpickr("#end_launched_at_flatpickr", {
@@ -289,6 +302,7 @@
                 defaultMinute: 59,
                 defaultSeconds: 59,
             });
+
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
@@ -364,5 +378,19 @@
                 },
             });
         });
+
+        const isToday = (date) => {
+            const today = new Date();
+
+            return date.getDate() == today.getDate() &&
+                date.getMonth() == today.getMonth() &&
+                date.getFullYear() == today.getFullYear();
+        }
+
+        const isSameDay = (date1, date2) => {
+            return date1.getDate() == date2.getDate() &&
+                date1.getMonth() == date2.getMonth() &&
+                date1.getFullYear() == date2.getFullYear();
+        }
     </script>
 @endsection
