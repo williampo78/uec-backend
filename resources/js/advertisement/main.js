@@ -98,7 +98,8 @@ window.init = (datas = {}) => {
 
     // 新增文字
     $("#btn-new-text").on("click", function () {
-        addTextBlock(product_category_select_options);
+        let datas = {id:$("#text-block-row-no").val()};
+        addTextBlock(product_category_select_options,datas);
     });
 
     // 刪除文字
@@ -452,7 +453,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
 };
 
 window.addTextBlock = (product_category_select_options, datas = {}) => {
-    let text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
+    let text_block_row_no = datas.id ? datas.id : '';
     let text_block_id = datas.id ? datas.id : "new";
     let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";

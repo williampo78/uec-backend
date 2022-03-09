@@ -301,7 +301,10 @@ window.init = function () {
   }); // 新增文字
 
   $("#btn-new-text").on("click", function () {
-    addTextBlock(product_category_select_options);
+    var datas = {
+      id: $("#text-block-row-no").val()
+    };
+    addTextBlock(product_category_select_options, datas);
   }); // 刪除文字
 
   $(document).on("click", ".btn-delete-text", function () {
@@ -502,7 +505,7 @@ window.addImageBlock = function () {
 
 window.addTextBlock = function (product_category_select_options) {
   var datas = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
+  var text_block_row_no = datas.id ? datas.id : '';
   var text_block_id = datas.id ? datas.id : "new";
   var sort = datas.sort != null ? datas.sort : "";
   var texts = datas.texts ? datas.texts : "";
