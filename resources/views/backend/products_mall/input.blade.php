@@ -583,6 +583,15 @@
                 defaultHour: 0,
                 defaultMinute: 0,
                 defaultSeconds: 0,
+                onChange: function(selectedDates, dateStr, instance) {
+                    promotion_end_at_flatpickr.set('minDate', dateStr);
+
+                    if (!promotion_end_at_flatpickr.input.value) {
+                        promotion_end_at_flatpickr.hourElement.value = 23;
+                        promotion_end_at_flatpickr.minuteElement.value = 59;
+                        promotion_end_at_flatpickr.secondElement.value = 59;
+                    }
+                },
             });
 
             let promotion_end_at_flatpickr = flatpickr("#promotion_end_at_flatpickr", {
@@ -593,6 +602,9 @@
                 defaultHour: 23,
                 defaultMinute: 59,
                 defaultSeconds: 59,
+                onChange: function(selectedDates, dateStr, instance) {
+                    promotion_start_at_flatpickr.set('maxDate', dateStr);
+                },
             });
 
             $('.product_attributes').on('change', function () { // on change of state
