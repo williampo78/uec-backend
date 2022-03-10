@@ -245,7 +245,16 @@ window.init = function () {
     enableSeconds: true,
     defaultHour: 0,
     defaultMinute: 0,
-    defaultSeconds: 0
+    defaultSeconds: 0,
+    onChange: function onChange(selectedDates, dateStr, instance) {
+      end_at_flatpickr.set('minDate', dateStr);
+
+      if (!end_at_flatpickr.input.value) {
+        end_at_flatpickr.hourElement.value = 23;
+        end_at_flatpickr.minuteElement.value = 59;
+        end_at_flatpickr.secondElement.value = 59;
+      }
+    }
   });
   var end_at_flatpickr = flatpickr("#end_at_flatpickr", {
     dateFormat: "Y-m-d H:i:S",
@@ -254,7 +263,10 @@ window.init = function () {
     enableSeconds: true,
     defaultHour: 23,
     defaultMinute: 59,
-    defaultSeconds: 59
+    defaultSeconds: 59,
+    onChange: function onChange(selectedDates, dateStr, instance) {
+      start_at_flatpickr.set('maxDate', dateStr);
+    }
   });
   $(".colorpicker").colorpicker({
     format: "hex",

@@ -280,13 +280,24 @@
                 defaultMinute: 0,
                 defaultSeconds: 0,
                 onChange: function(selectedDates, dateStr, instance) {
+                    let selectedDate = selectedDates[0];
+
                     if (!startLaunchedAtLastSelectedDates || !isSameDay(startLaunchedAtLastSelectedDates[0], selectedDates[0])) {
                         if (isToday(selectedDates[0])) {
-                            let newDate = new Date(new Date().getTime() + 10 * 60 * 1000).setSeconds(0);
-                            this.setDate(newDate);
+                            selectedDate = new Date(new Date().getTime() + 10 * 60 * 1000).setSeconds(0);
+                            this.setDate(selectedDate);
                         } else {
-                            this.setDate(selectedDates[0].setHours(0,0,0));
+                            selectedDate = selectedDate.setHours(0,0,0);
+                            this.setDate(selectedDate);
                         }
+                    }
+
+                    end_launched_at_flatpickr.set('minDate', selectedDate);
+
+                    if (!end_launched_at_flatpickr.input.value) {
+                        end_launched_at_flatpickr.hourElement.value = 23;
+                        end_launched_at_flatpickr.minuteElement.value = 59;
+                        end_launched_at_flatpickr.secondElement.value = 59;
                     }
 
                     startLaunchedAtLastSelectedDates = selectedDates;
@@ -301,6 +312,9 @@
                 defaultHour: 23,
                 defaultMinute: 59,
                 defaultSeconds: 59,
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_flatpickr.set('maxDate', dateStr);
+                },
             });
 
             $(document).on("click", "#save_data", function() {
