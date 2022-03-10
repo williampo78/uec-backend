@@ -30,7 +30,8 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="pwd">更改密碼(不需變更請留空白)</label>
-                                                <input class="form-control" name="pwd" id="pwd" type="password" autocomplete="off">
+                                                <input class="form-control" name="pwd" id="pwd" type="password"
+                                                    autocomplete="off">
                                             </div>
                                         </div>
                                     </div>
@@ -88,9 +89,17 @@
                         required: true,
                     },
                     pwd: {
-                        pwdCheck: {
+                        required: true,
+                        minlength: 8,
+                        isEnglishNumber: {
+                            param: function() {
+                                let obj = {
+                                    number: $('#pwd').val(),
+                                }
+                                return obj;
+                            },
                             depends: function(element) {
-                                return $('#pwd').val().length > 0;
+                                return true;
                             },
                         },
                     },
@@ -106,8 +115,11 @@
                         required: "信箱不得為空",
                     },
                     pwd: {
-                        pwdCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
+                        required: "請輸入密碼",
+                        minlength:"請輸入大小寫英文加數字，且密碼字元不得小於8位",
+                        isEnglishNumber:"請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
+
                 },
                 errorClass: "help-block",
                 errorElement: "span",
