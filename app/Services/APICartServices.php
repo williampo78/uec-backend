@@ -729,7 +729,7 @@ class APICartServices
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
                 "shippingFee" => $fee,
-                "checkout" => round($total_amount),
+                "checkout" => round($cartTotal-$cartDiscount),
             );
             return json_encode(array("status" => 200, "result" => $cart));
         }
