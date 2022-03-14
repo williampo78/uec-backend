@@ -187,7 +187,7 @@
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <label class="control-label">
-                                            <a href="{{ route('product_small.show', $products->id) }}"
+                                            <a href="{{ route('products_mall.show', $products->id) }}"
                                                 target="_blank">查看商城資訊
                                             </a>
                                         </label>

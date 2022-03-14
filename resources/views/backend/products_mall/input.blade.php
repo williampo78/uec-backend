@@ -56,7 +56,7 @@
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
                 <form role="form" id="new-form" method="POST"
-                      action="{{ route('product_small.update', $products->id) }}"
+                      action="{{ route('products_mall.update', $products->id) }}"
                       enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
@@ -813,7 +813,7 @@
                     if (confirm('確定要刪除嗎?')) {
                         if (type == 'Category') {
                             if (obj.status == 'old') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                     product_id: this.products.id,
                                     category_id: obj.web_category_hierarchy_id,
                                     _token: '{{ csrf_token() }}',
@@ -830,7 +830,7 @@
                             this.CategoryListFilter();
                         } else if (type == 'Products') {
                             if (obj.id !== '') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                     id: obj.id,
                                     _token: '{{ csrf_token() }}',
                                     type: 'DelRelatedProducts',
@@ -1002,7 +1002,7 @@
                     $('input[name="google_shop_photo_name"]').val('');
                     this.products.google_shop_photo_name = '';
                     if (check) {
-                        axios.post('/backend/product_small/ajax', {
+                        axios.post('/backend/products_mall/ajax', {
                             id: this.products.id,
                             _token: '{{ csrf_token() }}',
                             type: 'DelGoogleShopPhoto',
@@ -1020,7 +1020,7 @@
                     if (check) {
                         this.ProductsItem[key].photo_name = '';
 
-                        axios.post('/backend/product_small/ajax', {
+                        axios.post('/backend/products_mall/ajax', {
                             item_id: item.id,
                             _token: '{{ csrf_token() }}',
                             type: 'DelItemPhotos',

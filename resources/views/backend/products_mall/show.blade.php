@@ -55,7 +55,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
-                <form role="form" id="new-form" method="GET" action="{{ route('product_small.show', $products->id) }}"
+                <form role="form" id="new-form" method="GET" action="{{ route('products_mall.show', $products->id) }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     <div class="form-horizontal">
@@ -436,7 +436,7 @@
                             <i class="fa-solid fa-floppy-disk"></i>
                             儲存
                         </button> --}}
-                        <a class="btn btn-success" href="{{ route('product_small') }}"><i class="fa-solid fa-ban"></i>
+                        <a class="btn btn-success" href="{{ route('products_mall') }}"><i class="fa-solid fa-ban"></i>
                             返回</a>
                 </form>
                 {{-- @include('backend.products_mall.model_category')
@@ -643,7 +643,7 @@
                     if (confirm('確定要刪除嗎?')) {
                         if (type == 'Category') {
                             if (obj.status == 'old') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                         product_id: this.products.id,
                                         category_id: obj.web_category_hierarchy_id,
                                         _token: '{{ csrf_token() }}',
@@ -660,7 +660,7 @@
                             this.CategoryListFilter();
                         } else if (type == 'Products') {
                             if (obj.id !== '') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                         id: obj.id,
                                         _token: '{{ csrf_token() }}',
                                         type: 'DelRelatedProducts',

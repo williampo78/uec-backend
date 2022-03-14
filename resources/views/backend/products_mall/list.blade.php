@@ -17,7 +17,7 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form id="search-form" class="form-horizontal" method="GET" action="{{ route('product_small') }}">
+                        <form id="search-form" class="form-horizontal" method="GET" action="{{ route('products_mall') }}">
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="col-sm-3">
@@ -315,13 +315,13 @@
                                         <td>
                                             @if ($share_role_auth['auth_query'])
                                             <a class="btn btn-info btn-sm"
-                                                href="{{ route('product_small.show', $val->id) }}">
+                                                href="{{ route('products_mall.show', $val->id) }}">
                                                 <i class="fa-solid fa-magnifying-glass"></i></a>
                                             @endif
                                             @if ($share_role_auth['auth_update'] && $val->product_type !== 'G')
 
                                             <a class="btn btn-info btn-sm"
-                                                href="{{ route('product_small.edit', $val->id) }}">編輯</a>
+                                                href="{{ route('products_mall.edit', $val->id) }}">編輯</a>
                                             @endif
                                         </td>
                                         <td>{{ $key += 1 }}</td>

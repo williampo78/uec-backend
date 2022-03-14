@@ -138,7 +138,7 @@ class ProductsMallController extends Controller
         $file = $request->file();
         $execution =  $this->productsService->updateProductSmall($in, $file, $id);
         $result['status'] = $execution['status'] ;
-        $result['route_name'] = 'product_small';
+        $result['route_name'] = 'products_mall';
         $result['act'] = 'upd';
         if ($result['status']) {
             return view('backend.success', $result);
