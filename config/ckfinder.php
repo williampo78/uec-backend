@@ -107,7 +107,7 @@ $config['defaultResourceTypes'] = 'Images';
 
 $config['resourceTypes'][] = array(
     'name' => 'Images',
-    'directory' => 'ckfinder/',
+    'directory' => 'webimg/',
     'maxSize' => '1M',
     'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',
     'deniedExtensions' => '',
