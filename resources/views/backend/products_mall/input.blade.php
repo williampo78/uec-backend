@@ -615,7 +615,7 @@
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
                 ckfinder: {
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&currentFolder=mall_description/&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
@@ -645,7 +645,7 @@
 
             ClassicEditor.create(document.querySelector('#specification'), {
                 ckfinder: {
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&currentFolder=mall_specification/&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(

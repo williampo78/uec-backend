@@ -136,7 +136,7 @@
 
             ClassicEditor.create(document.querySelector('#editor'), {
                 ckfinder: {
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&currentFolder=web_contents/&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
