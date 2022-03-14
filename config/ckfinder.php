@@ -98,6 +98,7 @@ $config['backends']['awss3'] = array(
     'key' => env('AWS_ACCESS_KEY_ID'),
     'secret' => env('AWS_SECRET_ACCESS_KEY'),
     'visibility' => 'public',
+    'baseUrl' => env('AWS_URL'),
 );
 
 /*================================ Resource Types =====================================*/
