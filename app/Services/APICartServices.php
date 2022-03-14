@@ -164,7 +164,7 @@ class APICartServices
                 if ($items == 'item_photo') continue;
                 if ($items == 'items') continue;
                 $cartQty[$items][$item['item_id']] = $item->item_qty; //購物車數量
-                $cartAmount[$items] = intval($item->selling_price); //商品售價
+                $cartAmount[$items] = round($item->selling_price); //商品售價
                 //$cartDetail[$items][$item['item_id']] = $item; //購物車內容
             }
             $prodQty = [];
@@ -279,9 +279,9 @@ class APICartServices
                                         "itemNo" => $item_info->item_no,
                                         "itemSpec1" => $item_info->item_spec1,
                                         "itemSpec2" => $item_info->item_spec2,
-                                        "itemPrice" => intval($unit_price),
+                                        "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
-                                        "amount" => intval($amount),
+                                        "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -289,7 +289,7 @@ class APICartServices
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
                                     );
-                                    $cartTotal += intval($amount);
+                                    $cartTotal += round($amount);
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -359,9 +359,9 @@ class APICartServices
                                         "itemNo" => $item_info->item_no,
                                         "itemSpec1" => $item_info->item_spec1,
                                         "itemSpec2" => $item_info->item_spec2,
-                                        "itemPrice" => intval($unit_price),
+                                        "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
-                                        "amount" => intval($amount),
+                                        "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -369,7 +369,7 @@ class APICartServices
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignGiftAway" => $prod_gift
                                     );
-                                    $cartTotal += intval($amount);
+                                    $cartTotal += round($amount);
 
                                     if ($product_type == 'effective') {
                                         $productRow++;
@@ -415,9 +415,9 @@ class APICartServices
                                         "itemNo" => $item_info->item_no,
                                         "itemSpec1" => $item_info->item_spec1,
                                         "itemSpec2" => $item_info->item_spec2,
-                                        "itemPrice" => intval($unit_price),
+                                        "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
-                                        "amount" => intval($amount),
+                                        "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -425,7 +425,7 @@ class APICartServices
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
                                     );
-                                    $cartTotal += intval($amount);
+                                    $cartTotal += round($amount);
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -469,9 +469,9 @@ class APICartServices
                                         "itemNo" => $item_info->item_no,
                                         "itemSpec1" => $item_info->item_spec1,
                                         "itemSpec2" => $item_info->item_spec2,
-                                        "itemPrice" => intval($unit_price),
+                                        "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
-                                        "amount" => intval($amount),
+                                        "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -479,7 +479,7 @@ class APICartServices
                                         "campaignDiscountStatus" => true,
                                         "campaignGiftAway" => $prod_gift
                                     );
-                                    $cartTotal += intval($amount);
+                                    $cartTotal += round($amount);
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -516,9 +516,9 @@ class APICartServices
                                     "itemNo" => $item_info->item_no,
                                     "itemSpec1" => $item_info->item_spec1,
                                     "itemSpec2" => $item_info->item_spec2,
-                                    "itemPrice" => intval($item_info->selling_price),
+                                    "itemPrice" => round($item_info->selling_price),
                                     "itemQty" => $detail_qty,
-                                    "amount" => intval($item_info->selling_price * $detail_qty),
+                                    "amount" => round($item_info->selling_price * $detail_qty),
                                     "itemStock" => $stock,
                                     "outOfStock" => $outOfStock,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
@@ -526,7 +526,7 @@ class APICartServices
                                     "campaignDiscountStatus" => false,
                                     "campaignGiftAway" => $prod_gift
                                 );
-                                $cartTotal += intval($item_info->selling_price * $detail_qty);
+                                $cartTotal += round($item_info->selling_price * $detail_qty);
                                 if ($product_type == 'effective') {
                                     $productRow++;
                                 }
@@ -564,9 +564,9 @@ class APICartServices
                                 "itemNo" => $item_info->item_no,
                                 "itemSpec1" => $item_info->item_spec1,
                                 "itemSpec2" => $item_info->item_spec2,
-                                "itemPrice" => intval($item_info->selling_price),
+                                "itemPrice" => round($item_info->selling_price),
                                 "itemQty" => $detail_qty,
-                                "amount" => intval($item_info->selling_price * $detail_qty),
+                                "amount" => round($item_info->selling_price * $detail_qty),
                                 "itemStock" => $stock,
                                 "outOfStock" => $outOfStock,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
@@ -574,7 +574,7 @@ class APICartServices
                                 "campaignDiscountStatus" => false,
                                 "campaignGiftAway" => $prod_gift
                             );
-                            $cartTotal += intval($item_info->selling_price * $detail_qty);
+                            $cartTotal += round($item_info->selling_price * $detail_qty);
                             if ($product_type == 'effective') {
                                 $productRow++;
                             }
@@ -585,7 +585,7 @@ class APICartServices
                     foreach ($CART04 as $campaign_id => $prod) { //同系列只送一次
                         if (key_exists($product_id, $prod)) {
                             foreach ($item as $item_id => $detail_qty) { //取得item規格數量
-                                $assigned[$campaign_id][$item_id] = intval($detail_qty);
+                                $assigned[$campaign_id][$item_id] = round($detail_qty);
                             }
                         }
                     }
@@ -612,9 +612,9 @@ class APICartServices
                             "itemNo" => $item_info->item_no,
                             "itemSpec1" => $item_info->item_spec1,
                             "itemSpec2" => $item_info->item_spec2,
-                            "itemPrice" => intval($item_info->selling_price),
+                            "itemPrice" => round($item_info->selling_price),
                             "itemQty" => $detail_qty,
-                            "amount" => intval($item_info->selling_price * $detail_qty),
+                            "amount" => round($item_info->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => $outOfStock,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
@@ -725,11 +725,11 @@ class APICartServices
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
-                "discount" => intval(round($cartDiscount)),
+                "discount" => round($cartDiscount),
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
                 "shippingFee" => $fee,
-                "checkout" => $total_amount,
+                "checkout" => $cartTotal - round($cartDiscount),
             );
             return json_encode(array("status" => 200, "result" => $cart));
         }
