@@ -172,7 +172,11 @@ $config['debug'] = false;
 /*==================================== Plugins ========================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_plugins
 
-$config['plugins'] = array();
+$config['plugins'] = array(
+    array(
+    'name' => 'RandomRenameService',
+    'path' => app_path().'/Services/RandomRenameService.php'
+));
 
 /*================================ Cache settings =====================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_cache
