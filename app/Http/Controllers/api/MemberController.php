@@ -456,6 +456,7 @@ class MemberController extends Controller
             'payment_method',
             'receiver_name',
             'receiver_mobile',
+            'receiver_zip_code',
             'receiver_city',
             'receiver_district',
             'receiver_address',
