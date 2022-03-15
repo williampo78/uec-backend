@@ -32,7 +32,7 @@
                         @csrf
                                 <div class="row">
                                     <input type="hidden" name="agent_id"
-                                           value="{{session('users')['agent_id']}}">
+                                           value="{{ Auth::user()->agent_id }}">
                                     <!-- 欄位 -->
                                     <div class="col-sm-12">
                                         <div class="row">

@@ -162,7 +162,7 @@ class UserController extends Controller
         if ($request->input('password') != '') {
             $parameter['user_password'] = md5($request->input('password'));
         }
-        $parameter['updated_by'] = session('users')['user_id'];
+        $parameter['updated_by'] = $user_id;
         Users::where('id', $user_id)->update($parameter);
         $route_name = 'profile';
         $act = 'upd';

@@ -2333,7 +2333,7 @@ flatpickr__WEBPACK_IMPORTED_MODULE_12__["default"].setDefaults({
 /***/ (() => {
 
 // 驗證密碼格式
-jQuery.validator.addMethod("passwordCheck", function (value, element, params) {
+jQuery.validator.addMethod("drowssapCheck", function (value, element, params) {
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(value);
 }, "密碼格式錯誤"); // 比較輸入的兩個日期或兩個數字
 

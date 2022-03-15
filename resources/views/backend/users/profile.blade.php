@@ -54,14 +54,15 @@
 
                                 </div>
                             </div>
+
                             <div class="row">
-                                <div class="col-xs-6 text-left">
+                                <div class="col-sm-12">
                                     <div class="form-group">
-                                        <button class="btn btn-success" id="btn-save"><i class="fa-solid fa-check"></i> 完成
+                                        <button type="button" class="btn btn-success" id="btn-save">
+                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
                                         </button>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -89,17 +90,9 @@
                         required: true,
                     },
                     pwd: {
-                        required: true,
-                        minlength: 8,
-                        isEnglishNumber: {
-                            param: function() {
-                                let obj = {
-                                    number: $('#pwd').val(),
-                                }
-                                return obj;
-                            },
+                        drowssapCheck: {
                             depends: function(element) {
-                                return true;
+                                return $('#pwd').val().length > 0;
                             },
                         },
                     },
@@ -115,9 +108,7 @@
                         required: "信箱不得為空",
                     },
                     pwd: {
-                        required: "請輸入密碼",
-                        minlength:"請輸入大小寫英文加數字，且密碼字元不得小於8位",
-                        isEnglishNumber:"請輸入大小寫英文加數字，且密碼字元不得小於8位",
+                        drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
 
                 },

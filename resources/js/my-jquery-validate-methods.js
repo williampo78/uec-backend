@@ -1,6 +1,6 @@
 // 驗證密碼格式
 jQuery.validator.addMethod(
-    "passwordCheck",
+    "drowssapCheck",
     function (value, element, params) {
         return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(value);
     },
