@@ -323,23 +323,6 @@ class MemberController extends Controller
         // 付款方式
         $order->payment_method = config('uec.payment_method_options')[$order->payment_method] ?? null;
 
-        // 收件者姓名
-        if (isset($order->receiver_name)) {
-            $order->receiver_name = (string) Str::of($order->receiver_name)->myMask('*', 0, 1)->myMask('*', -1, 1);
-        }
-
-        // 收件者手機
-        if (isset($order->receiver_mobile)) {
-            $order->receiver_mobile = (string) Str::of($order->receiver_mobile)->myMask('*', -3);
-        }
-
-        // 收件者地址
-        $address = '';
-        $address .= $order->receiver_city ?? '';
-        $address .= $order->receiver_district ?? '';
-        $address .= $order->receiver_address ?? '';
-        $order->receiver_address = $address;
-
         // 物流方式
         $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
 
@@ -473,6 +456,8 @@ class MemberController extends Controller
             'payment_method',
             'receiver_name',
             'receiver_mobile',
+            'receiver_city',
+            'receiver_district',
             'receiver_address',
             'return_no',
             'return_date',
