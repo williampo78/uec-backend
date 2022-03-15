@@ -272,10 +272,10 @@ class ProductsService
                 'updated_at' => $now,
             ]);
             $fileList = [];
-            $uploadPath = '/products/' . $products_id;
+            $uploadPath = 'products/' . $products_id;
             if (isset($file['filedata'])) {
                 foreach ($file['filedata'] as $key => $val) {
-                    $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath);
+                    $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath,'product');
                 }
                 foreach ($fileList as $key => $val) {
                     $insertImg = [
@@ -367,7 +367,7 @@ class ProductsService
                 'updated_by' => $user_id,
             ];
             ProductAuditLog::create($logCreateIn);
-            $uploadPath = '/products/' . $products_id;
+            $uploadPath = 'products/' . $products_id;
             foreach ($imgJson as $key => $val) {
                 if (isset($val['id'])) {
                     $updateImg = [
@@ -377,7 +377,7 @@ class ProductsService
                     ];
                     ProductPhotos::where('id', $val['id'])->update($updateImg);
                 } else {
-                    $ImageUpload = ImageUpload::uploadImage($file['filedata'][$key], $uploadPath);
+                    $ImageUpload = ImageUpload::uploadImage($file['filedata'][$key], $uploadPath,'product');
                     $insertImg = [
                         'product_id' => $products_id,
                         'photo_name' => $ImageUpload['image'],
