@@ -295,7 +295,7 @@ window.init = (datas = {}) => {
                 img = new Image();
                 var objectUrl = URL.createObjectURL(file);
                 img.onload = function () {
-                    if(this.width !== photo_width || this.height !== photo_height){
+                    if(this.width !== parseInt(photo_width) || this.height !== parseInt(photo_height)){
                         let show_text = '尺寸非預期！' + this.width +'*' + this.height ;
                         vm.siblings('.select-img-size-box').css("background-color", "red");
                         vm.siblings('.select-img-size-box').find('.select-img-size-text').text(show_text) ; 
