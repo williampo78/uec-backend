@@ -286,8 +286,29 @@ window.init = (datas = {}) => {
     // 選擇圖片區的圖片檔案
     $(document).on("change", ".image_block_image_name", function () {
         const file = this.files[0];
-
+        let photo_width  = $('#slot_id').find('option:selected').attr('data-photo-width');
+        let photo_height = $('#slot_id').find('option:selected').attr('data-photo-height');
+        let vm = $(this) ;
         if (file) {
+            if(photo_width && photo_height){ //顯示選擇照片的尺寸提醒
+                var img;
+                img = new Image();
+                var objectUrl = URL.createObjectURL(file);
+                img.onload = function () {
+                    if(this.width !== photo_width || this.height !== photo_height){
+                        let show_text = '尺寸非預期！' + this.width +'*' + this.height ;
+                        vm.siblings('.select-img-size-box').css("background-color", "red");
+                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text(show_text) ; 
+                    }else{
+                        vm.siblings('.select-img-size-box').css("background-color", "");
+                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text('') ; 
+                    }
+                    URL.revokeObjectURL(objectUrl);
+                };
+                
+                img.src = objectUrl;
+            }
+         
             $(this).siblings('.img_image_block_image_name').attr("src", URL.createObjectURL(file));
             $(this).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").show();
         }
@@ -296,6 +317,8 @@ window.init = (datas = {}) => {
     // 刪除圖片區的圖片
     $(document).on("click", ".btn-delete-image-block-image-name", function () {
         $(this).siblings(".img_image_block_image_name").attr("src", "").hide();
+        $(this).siblings(".select-img-size-box").css("background-color", "");
+        $(this).siblings(".select-img-size-box").find('.select-img-size-text').text('') ; 
         $(this).hide();
         $(this).siblings(".image_block_image_name").val("").show();
     });
@@ -372,7 +395,14 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
             </td>
             <td>
                 <div class="form-group">
-                    <input type="file" name="image_block_image_name[${image_block_row_no}]" class="image_block_image_name" value="" /><br />
+                    <input type="file" name="image_block_image_name[${image_block_row_no}]" class="image_block_image_name" value="" />
+                    <div class="select-img-size-box" style="
+                        width: 100%;
+                        height: 20px;
+                        text-align: center;">
+                        <span class="select-img-size-text" style="color:#FFFFFF;font-weight:bold; width: 100%; text-align: center; ">
+                        </span>
+                    </div>
                     <img src="${image_name_url}" class="img-responsive img_image_block_image_name" width="300" height="300" /><br />
                     <button type="button" class="btn btn-danger btn-delete-image-block-image-name" title="刪除"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
