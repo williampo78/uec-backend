@@ -106,7 +106,6 @@ class AdvertisementLaunchController extends Controller
         $ad_slot_content = $this->advertisement_service->getSlotContentById($id);
 
         $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $ad_slot_content['content']->slot_icon_name : null;
-
         // 整理給前端的資料
         $ad_slot_content['content'] = $ad_slot_content['content']->only([
             'slot_code',
@@ -123,6 +122,8 @@ class AdvertisementLaunchController extends Controller
             'product_assigned_type',
             'slot_content_id',
             'slot_id',
+            'photo_width',
+            'photo_height',
         ]);
 
         foreach ($ad_slot_content['details'] as $key => $obj) {

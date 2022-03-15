@@ -229,14 +229,19 @@
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
-
-
+                let photo_width = content.photo_width;
+                let photo_height = content.photo_height;
+                if(photo_width >0 || photo_height >0){
+                    $('.show_size').text('尺寸：'+photo_width +'*'+photo_height);
+                }else{
+                    $('.show_size').text('');
+                }
             $('#slot_id').empty().append(
-                `<option value="${content.slot_id}">【${content.slot_code}】${content.slot_desc}</option>`).prop(
+                `<option data-photo-width="${content.photo_width}" data-photo-height="${content.photo_height}" value="${content.slot_id}">【${content.slot_code}】${content.slot_desc}</option>`).prop(
                 'disabled', true);
             $('#start_at').val(content.start_at);
             $('#end_at').val(content.end_at);
-
+            
             // 唯有「當前時間」小於﹝上架開始時間﹞時，﹝上架開始時間﹞、﹝上架結束時間﹞、﹝狀態﹞才都開放修改；否則﹝上架開始時間﹞與﹝狀態﹞都不開放修改
             if (new Date() >= new Date($('#start_at').val())) {
                 $('#start_at, #active_enabled, #active_disabled').prop('disabled', true);

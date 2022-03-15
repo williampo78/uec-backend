@@ -239,6 +239,8 @@ class AdvertisementService
             'ad_slots.id AS slot_id',
             'ad_slots.active AS slot_active',
             'ad_slots.agent_id AS slot_agent_id',
+            'ad_slots.photo_width',
+            'ad_slots.photo_height',
             'ad_slot_contents.start_at',
             'ad_slot_contents.end_at',
             'ad_slot_contents.slot_color_code',
