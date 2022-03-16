@@ -9,7 +9,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa-solid fa-plus"></i> 新增角色</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i> 編輯角色</h1>
             </div>
         </div>
 
@@ -19,8 +19,9 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">請輸入下列欄位資料</div>
                     <div class="panel-body">
-                        <form id="new-form" method="post" action="{{ route('roles.store') }}"
+                        <form id="update-form" method="post" action="{{ route('roles.update', $data['role']->id) }}"
                             enctype="multipart/form-data">
+                            @method('PUT')
                             @csrf
                             <div class="row">
 
@@ -30,23 +31,27 @@
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="role_name" class="control-label">名稱 <span style="color: red;">*</span></label>
-                                                <input class="form-control" name="role_name" id="role_name">
+                                                <label for="name">名稱 <span style="color: red;">*</span></label>
+                                                <input class="form-control" name="role_name" id="role_name"
+                                                    value="{{ $data['role']->role_name }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label class="control-label">狀態 <span style="color: red;">*</span></label>
+                                                <label for="name">狀態 <span style="color: red;">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
-                                                            <input type="radio" name="active" id="active1" checked
+                                                            <input type="radio" name="active" id="active1"
+                                                                {{ $data['role']->active == 1 ? 'checked' : '' }}
                                                                 value="1">啟用
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
-                                                            <input type="radio" name="active" id="active0" value="0">關閉
+                                                            <input type="radio" name="active" id="active0"
+                                                                {{ $data['role']->active == 0 ? 'checked' : '' }}
+                                                                value="0">關閉
                                                         </label>
                                                     </div>
                                                 </div>
@@ -54,18 +59,27 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label class="control-label">供應商專用 <span style="color: red;">*</span></label>
+                                                <label for="name">供應商專用 <span style="color: red;">*</span></label>
                                                 <div class="row">
-                                                    <div class="col-sm-2">
+                                                    <div class="col-sm-3">
                                                         <label class="radio-inline">
-                                                            <input type="radio" name="is_for_supplier" id="is_for_supplier1"
-                                                                value="1">是
+                                                            <input type="radio" name="is_for_supplier" id="is_for_supplier2"
+                                                                {{ $data['role']->is_for_supplier == 2 ? 'checked' : '' }}
+                                                                value="2">全部供應商
                                                         </label>
                                                     </div>
-                                                    <div class="col-sm-2">
+                                                    <div class="col-sm-3">
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="is_for_supplier" id="is_for_supplier1"
+                                                                {{ $data['role']->is_for_supplier == 1 ? 'checked' : '' }}
+                                                                value="1">單一供應商
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-sm-3">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="is_for_supplier" id="is_for_supplier0"
-                                                                checked value="0">否
+                                                                {{ $data['role']->is_for_supplier == 0 ? 'checked' : '' }}
+                                                                value="0">否
                                                         </label>
                                                     </div>
                                                 </div>
@@ -95,9 +109,11 @@
                                                                         <label class="checkbox-inline">
                                                                             <input type="checkbox"
                                                                                 id="auth_index_{{ $sub }}"
+                                                                                {{ isset($data['rolePermission'][$sub]) ? 'checked' : '' }}
                                                                                 name="auth_index[]"
                                                                                 value="{{ $sub }}"><i
-                                                                                class="fa {{ $data['permissionDetail'][$main['id']]['icon'][$k] }} fa-fw"></i>{{ $data['permissionDetail'][$main['id']]['name'][$k] }}
+                                                                                class="fa {{ $data['permissionDetail'][$main['id']]['icon'][$k] }} fa-fw"></i>
+                                                                            {{ $data['permissionDetail'][$main['id']]['name'][$k] }}
                                                                         </label>
                                                                     </div>
                                                                     <div class="col-sm-9">
@@ -107,6 +123,7 @@
                                                                                     <label class="checkbox-inline">
                                                                                         <input type="checkbox"
                                                                                             id="auth_query_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_query']) && $data['rolePermission'][$sub]['auth_query'] == 1? 'checked': '' }}
                                                                                             name="auth_query_{{ $sub }}"
                                                                                             value="1">查詢
                                                                                     </label>
@@ -115,6 +132,7 @@
                                                                                     <label class="checkbox-inline">
                                                                                         <input type="checkbox"
                                                                                             id="auth_create_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_create']) && $data['rolePermission'][$sub]['auth_create'] == 1? 'checked': '' }}
                                                                                             name="auth_create_{{ $sub }}"
                                                                                             value="1">新增
                                                                                     </label>
@@ -123,6 +141,7 @@
                                                                                     <label class="checkbox-inline">
                                                                                         <input type="checkbox"
                                                                                             id="auth_update_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_update']) && $data['rolePermission'][$sub]['auth_update'] == 1? 'checked': '' }}
                                                                                             name="auth_update_{{ $sub }}"
                                                                                             value="1">修改
                                                                                     </label>
@@ -131,6 +150,7 @@
                                                                                     <label class="checkbox-inline">
                                                                                         <input type="checkbox"
                                                                                             id="auth_delete_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_delete']) && $data['rolePermission'][$sub]['auth_delete'] == 1? 'checked': '' }}
                                                                                             name="auth_delete_{{ $sub }}"
                                                                                             value="1">刪除
                                                                                     </label>
@@ -139,6 +159,7 @@
                                                                                     <label class="checkbox-inline">
                                                                                         <input type="checkbox"
                                                                                             id="auth_void_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_void']) && $data['rolePermission'][$sub]['auth_void'] == 1? 'checked': '' }}
                                                                                             name="auth_void_{{ $sub }}"
                                                                                             value="1">作廢
                                                                                     </label>
@@ -147,6 +168,7 @@
                                                                                     <label class="checkbox-inline">
                                                                                         <input type="checkbox"
                                                                                             id="auth_export_{{ $sub }}"
+                                                                                            {{ isset($data['rolePermission'][$sub]['auth_export']) && $data['rolePermission'][$sub]['auth_export'] == 1? 'checked': '' }}
                                                                                             name="auth_export_{{ $sub }}"
                                                                                             value="1">批次匯出
                                                                                     </label>
@@ -191,7 +213,7 @@
     <script>
         $(function() {
             $("#btn-save").on('click', function() {
-                $("#new-form").submit();
+                $("#update-form").submit();
             });
 
             $("#btn-cancel").on('click', function() {
@@ -199,7 +221,7 @@
             });
 
             // 驗證表單
-            $("#new-form").validate({
+            $("#update-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
                     $('#btn-save').prop('disabled', true);

@@ -76,26 +76,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($data['role'] as $item)
+                                @foreach ($data['roles'] as $role)
                                     <tr>
                                         <td>
                                             @if ($share_role_auth['auth_query'])
                                                 <a class="btn btn-info btn-sm"
-                                                    href="{{ route('roles.show', $item->id) }}">
+                                                    href="{{ route('roles.show', $role->id) }}">
                                                     <i class="fa-solid fa-magnifying-glass"></i>
                                                 </a>
                                             @endif
 
                                             @if ($share_role_auth['auth_update'])
                                                 <a class="btn btn-info btn-sm"
-                                                    href="{{ route('roles.edit', $item->id) }}">編輯</a>
+                                                    href="{{ route('roles.edit', $role->id) }}">編輯</a>
                                             @endif
                                         </td>
-                                        <td>{{ $item->role_name }}</td>
-                                        <td>{{ $item->active == 1 ? '啟用' : '關閉' }}</td>
-                                        <td>{{ $item->is_for_supplier == 1 ? 'V' : '' }}</td>
-                                        <td>{{ $item->updated_at }}</td>
-                                        <td>{{ $item->updated_by > 0 ? $data['user'][$item->updated_by]['user_name'] : $data['user'][$item->created_by]['user_name'] }}
+                                        <td>{{ $role->role_name }}</td>
+                                        <td>{{ $role->active == 1 ? '啟用' : '關閉' }}</td>
+                                        <td>
+                                            @switch($role->is_for_supplier)
+                                                @case(1)
+                                                    單一供應商
+                                                    @break
+
+                                                @case(2)
+                                                    全部供應商
+                                                    @break
+
+                                                @default
+
+                                            @endswitch
+                                        </td>
+                                        <td>{{ $role->updated_at }}</td>
+                                        <td>{{ $role->updated_by > 0 ? $data['user'][$role->updated_by]['user_name'] : $data['user'][$role->created_by]['user_name'] }}
                                         </td>
                                     </tr>
                                 @endforeach
