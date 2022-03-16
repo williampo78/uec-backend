@@ -342,7 +342,6 @@ class ProductsService
                 'is_with_warranty' => $in['is_with_warranty'],
                 'warranty_days' => $in['warranty_days'],
                 'warranty_scope' => $in['warranty_scope'],
-                'spec_dimension' => $in['spec_dimension'],
                 'spec_1' => $in['spec_1'] ?? null,
                 'spec_2' => $in['spec_2'] ?? null,
                 'selling_channel' => $in['selling_channel'],
@@ -350,6 +349,9 @@ class ProductsService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ];
+            if (isset($in['spec_dimension']) && $in['spec_dimension'] !== '') {
+                $update['spec_dimension'] = $in['spec_dimension'];
+            }
             if (isset($in['supplier_id']) && $in['supplier_id'] !== '') {
                 $update['supplier_id'] = $in['supplier_id'];
             }
@@ -359,7 +361,6 @@ class ProductsService
             if (isset($in['brand_id']) && $in['brand_id'] !== '') {
                 $update['brand_id'] = $in['brand_id'];
             }
-
             Products::where('id', $products_id)->update($update);
             $logCreateIn = [
                 'product_id' => $products_id,
