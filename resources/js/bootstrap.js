@@ -13,6 +13,7 @@ import "jquery-validation/dist/localization/messages_zh_TW";
 import Vue from "vue";
 import flatpickr from "flatpickr";
 import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
+import Croppie from "Croppie";
 
 window._ = lodash;
 
@@ -91,3 +92,8 @@ flatpickr.localize(MandarinTraditional);
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+/**
+ * 裁切圖片
+ */
+ window.Croppie = Croppie;
+ 

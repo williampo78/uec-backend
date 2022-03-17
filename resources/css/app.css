@@ -12,6 +12,7 @@
 /* flatpickr */
 @import "~flatpickr/dist/flatpickr.css";
 
+@import "~croppie/croppie.css" ;
 body {
     font-family: Segoe UI Light, 微軟正黑體;
     /* font-weight: bold; */
