@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* .no-pa {
-                        padding: 0px;
-                    } */
+                                padding: 0px;
+                            } */
 
         .ondragover {
             background: #b7e0fb !important;
@@ -695,6 +695,7 @@
                                         </div>
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
+                                            <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
                                             <input type="file" @change="fileSelected" multiple
                                                 {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                             <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
@@ -1255,25 +1256,46 @@
                         return false;
                     }
                     for (let i = 0; i < selectedFiles.length; i++) {
-                        let type = selectedFiles[i].type;
-
+                        var img;
+                        var file = selectedFiles[i];
+                        var setStr = 0;
+                        var objectUrl = URL.createObjectURL(selectedFiles[i]);
                         if (selectedFiles[i].size > 1048576) {
-                            alert('照片名稱:' + selectedFiles[i].name + '已經超出大小');
-                        } else if (type !== 'image/jpeg' && type !== 'image/png') {
-                            alert('照片名稱:' + selectedFiles[i].name + '格式錯誤');
-                        } else {
-                            this.images.push(selectedFiles[i]);
+                            alert('照片名稱:' + file.name + '已經超出大小');
+                        } else if (selectedFiles[i].type !== 'image/jpeg' && selectedFiles[i].type !==
+                            'image/png') {
+                            alert('照片名稱:' + file.name + '格式錯誤');
                         }
-                    }
-                    this.adjustTheDisplay();
-                    this.images.map(function(value, key) {
-                        if (value.id) {
+                        this.getImage(objectUrl, file, function(callback) {
+                            if (callback.width < 480 && callback.height < 480) {
+                                alert('照片名稱:' + callback.file.name + '照片尺寸必須為480*480以上');
+                            } else if (callback.width !== callback.height) {
+                                console.log(callback.width, callback.height);
+                                alert('照片名稱:' + callback.file.name + '照片比例必須為1:1');
+                            } else {
+                                vm.images.push(callback.file);
+                                vm.adjustTheDisplay();
+                                vm.images.map(function(value, key) {
+                                    value.sizeConvert = vm.formatBytes(value.size);
+                                });
+                            }
+                        });
 
-                        } else {
-                            value.sizeConvert = vm.formatBytes(value.size);
-                        }
-                    });
+                    }
                     e.target.value = '';
+                },
+                getImage(fileurl, file, callback) {
+                    vm = this;
+                    img = new Image();
+                    img.src = fileurl;
+                    img.onload = function() {
+                        result = {
+                            width: this.width,
+                            height: this.height,
+                            file: file
+                        };
+                        callback(result);
+                    };
                 },
                 delImages(index) {
                     var yes = confirm('你確定要刪除嗎？');

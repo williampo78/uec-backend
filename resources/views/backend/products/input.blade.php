@@ -597,6 +597,7 @@
                                         </div>
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
+                                            <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
                                             <input type="file" @change="fileSelected" multiple accept=".jpg,.jpeg,.png">
                                             <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                                 multiple>
@@ -627,6 +628,8 @@
                                 </div>
                                 {{-- </div> --}}
                             </div>
+                            <button @click="imagesCheck" type="button">測試</button>
+
                         </div>
                     </div>
                     <hr>
@@ -897,33 +900,66 @@
             data: function() {
                 return {
                     images: [],
+                    images_size: [],
                 }
             },
             methods: {
+
                 fileSelected(e) {
-                    let vm = this;
+                    var vm = this;
                     var selectedFiles = e.target.files;
+                    // img.src = objectUrl;
+                    //判斷照片是否是一比一
+                    //判斷照片是否有 480 吋以上
                     if (selectedFiles.length + this.images.length > 15) {
                         alert('不能超過15張照片');
                         e.target.value = '';
                         return false;
                     }
                     for (let i = 0; i < selectedFiles.length; i++) {
-                        let type = selectedFiles[i].type;
-
+                        var img;
+                        var file = selectedFiles[i];
+                        var setStr = 0;
+                        var objectUrl = URL.createObjectURL(selectedFiles[i]);
                         if (selectedFiles[i].size > 1048576) {
-                            alert('照片名稱:' + selectedFiles[i].name + '已經超出大小');
-                        } else if (type !== 'image/jpeg' && type !== 'image/png') {
-                            alert('照片名稱:' + selectedFiles[i].name + '格式錯誤');
-                        } else {
-                            this.images.push(selectedFiles[i]);
+                            alert('照片名稱:' + file.name + '已經超出大小');
+                        } else if (selectedFiles[i].type !== 'image/jpeg' && selectedFiles[i].type !==
+                            'image/png') {
+                            alert('照片名稱:' + file.name + '格式錯誤');
                         }
+                        this.getImage(objectUrl, file, function(callback) {
+                            if (callback.width < 480 && callback.height < 480) {
+                                alert('照片名稱:' + callback.file.name + '照片尺寸必須為480*480以上');
+                            } else if (callback.width !== callback.height) {
+                                console.log(callback.width, callback.height);
+                                alert('照片名稱:' + callback.file.name + '照片比例必須為1:1');
+                            } else {
+                                vm.images.push(callback.file);
+                                vm.adjustTheDisplay();
+                                vm.images.map(function(value, key) {
+                                    value.sizeConvert = vm.formatBytes(value.size);
+                                });
+                            }
+                        });
+
                     }
-                    this.adjustTheDisplay();
-                    this.images.map(function(value, key) {
-                        value.sizeConvert = vm.formatBytes(value.size);
-                    });
+                    // this.images.map(function(value, key) {
+                    //     value.sizeConvert = vm.formatBytes(value.size);
+                    // });
                     e.target.value = '';
+                },
+                getImage(fileurl, file, callback) {
+                    vm = this;
+                    img = new Image();
+                    img.src = fileurl;
+                    img.onload = function() {
+                        result = {
+                            width: this.width,
+                            height: this.height,
+                            file: file
+                        };
+                        callback(result);
+                    };
                 },
                 delImages(index) {
                     this.$delete(this.images, index);
@@ -931,7 +967,9 @@
                 },
                 imagesCheck() {
                     console.log('-----------------------');
-                    console.log(this.images);
+                    console.log(vm.images_size);
+                    console.log('-----------------------');
+
                 },
                 formatBytes(bytes, decimals = 2) {
                     if (bytes === 0) return '0 Bytes';
@@ -1199,25 +1237,25 @@
                         required: true,
                         digits: true,
                     },
-                    spec_1:{
+                    spec_1: {
                         required: true,
-                        maxlength:4,
+                        maxlength: 4,
                     },
-                    spec_2:{
+                    spec_2: {
                         required: true,
-                        maxlength:4,
+                        maxlength: 4,
                     },
-                    product_brief_1:{
-                        maxlength:60,
+                    product_brief_1: {
+                        maxlength: 60,
                     },
-                    product_brief_2:{
-                        maxlength:60,
+                    product_brief_2: {
+                        maxlength: 60,
                     },
-                    product_brief_3:{
-                        maxlength:60,
+                    product_brief_3: {
+                        maxlength: 60,
                     },
                     expiry_days: {
-                        required:function() {
+                        required: function() {
                             return $("input[name=has_expiry_date]:checked").val() == '1';
                         },
                         digits: function() {
@@ -1226,13 +1264,13 @@
                         min: function() {
                             if ($("input[name=has_expiry_date]:checked").val() == '1') {
                                 return 0.01;
-                            }else{
-                                return 0 ;
+                            } else {
+                                return 0;
                             }
                         },
                     },
-                    warranty_days:{
-                        required:function() {
+                    warranty_days: {
+                        required: function() {
                             return $("input[name=is_with_warranty]:checked").val() == '1';
                         },
                         digits: function() {
@@ -1241,13 +1279,13 @@
                         min: function() {
                             if ($("input[name=is_with_warranty]:checked").val() == '1') {
                                 return 0.01;
-                            }else{
-                                return 0 ;
+                            } else {
+                                return 0;
                             }
                         },
                     }
                 },
-                messages:{
+                messages: {
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
