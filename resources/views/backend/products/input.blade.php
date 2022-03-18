@@ -628,8 +628,6 @@
                                 </div>
                                 {{-- </div> --}}
                             </div>
-                            <button @click="imagesCheck" type="button">測試</button>
-
                         </div>
                     </div>
                     <hr>
