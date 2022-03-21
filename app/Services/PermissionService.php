@@ -3,17 +3,19 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Users;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 
 class PermissionService
 {
     public static function GetUserMenu()
     {
+        $data = [
+            'mainMenu' => [],
+            'subMenu' => [],
+        ];
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
-        $menus = Users::select("permission.id as mainID", "permission.name as mainMenu", "permission.icon as mainIcon"
+        $menus = User::select("permission.id as mainID", "permission.name as mainMenu", "permission.icon as mainIcon"
             , "permission_detail.id as subID", "permission_detail.name as subMenu", "permission_detail.icon", "permission_detail.code")
             ->where('users.id', $user_id)
             ->where('users.agent_id', $agent_id)

@@ -136,8 +136,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/users', UserController::class, ['names' => ['index' => 'users']]);
     Route::post('/users/ajax/is-user-account-repeat', [UserController::class, 'isUserAccountRepeat']); //驗證使用者帳號是否重複
     Route::get('/user_profile', [UserController::class, 'profile']);
-    Route::post('/user_profile', [UserController::class, 'updateProfile']);
-    Route::post('/users/ajax', [UserController::class, 'ajaxDetail']);
+    Route::put('/user_profile', [UserController::class, 'updateProfile'])->name('user_profile.update');
 
     // 常見問題Q&A
     Route::resource('/qa', QAController::class, ['names' => ['index' => 'qa']]);

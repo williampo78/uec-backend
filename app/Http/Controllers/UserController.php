@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Services\RolesPermissionService;
+use App\Services\SupplierService;
+use App\Services\UniversalService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Users;
-use App\Services\UsersService;
-use App\Services\UniversalService;
-use App\Services\SupplierService;
-use App\Services\RolesPermissionService;
+
 class UserController extends Controller
 {
-
-    private $usersService;
-    private $universalService;
+    private $userService;
     private $supplierService;
     private $rolePermissionService;
 
-    public function __construct(UsersService $usersService, UniversalService $universalService, SupplierService $supplierService, RolesPermissionService $rolePermissionService)
-    {
-        $this->usersService = $usersService;
-        $this->universalService = $universalService;
+    public function __construct(
+        UserService $userService,
+        SupplierService $supplierService,
+        RolesPermissionService $rolePermissionService
+    ) {
+        $this->userService = $userService;
         $this->supplierService = $supplierService;
         $this->rolePermissionService = $rolePermissionService;
     }
@@ -33,10 +34,9 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $getData = $request->all();
-        $data['role'] = ($getData ? $this->usersService->getUsers($getData) : []);
-        $data['user'] = $this->universalService->getUser();
+        $data['users'] = ($getData ? $this->userService->getUsers($getData) : []);
 
-        return view('backend.users.list', compact('data'));
+        return view('backend.user.index', $data);
     }
 
     /**
@@ -47,8 +47,9 @@ class UserController extends Controller
     public function create()
     {
         $data['suppliers'] = $this->supplierService->getSuppliers();
-        $data['roles'] = $this->rolePermissionService->getRoles("");
-        return view('backend.users.add', compact('data'));
+        $data['roles'] = $this->rolePermissionService->getRoles();
+
+        return view('backend.user.create', $data);
     }
 
     /**
@@ -60,12 +61,12 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $input = $request->input();
-        unset($input['_token']);
+        $this->userService->addUser($input);
+
         $act = 'add';
         $route_name = 'users';
-        $this->usersService->addUser($input, $act);
-        return view('backend.success', compact('route_name', 'act'));
 
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -74,9 +75,20 @@ class UserController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request)
+    public function show($id)
     {
-        //
+        $user = $this->userService->getUserById($id);
+
+        $payloads = [
+            'user_account' => $user->user_account,
+            'user_name' => $user->user_name,
+            'user_active' => $user->active == 1 ? '啟用' : '關閉',
+            'user_email' => $user->user_email,
+            'supplier' => isset($user->supplier) ? $user->supplier->name : null,
+            'roles' => isset($user->roles) ? $user->roles->implode('role_name', '、') : null,
+        ];
+
+        return response()->json($payloads);
     }
 
     /**
@@ -88,10 +100,14 @@ class UserController extends Controller
     public function edit($id)
     {
         $data['suppliers'] = $this->supplierService->getSuppliers();
-        $data['roles'] = $this->rolePermissionService->getRoles("");
-        $data['user'] = Users::find($id);
-        $data['user_roles'] = $this->usersService->getUserRoles($id);
-        return view('backend.users.upd', compact('data'));
+        $data['roles'] = $this->rolePermissionService->getRoles();
+        $data['user'] = $this->userService->getUserById($id);
+
+        if (!isset($data['user'])) {
+            abort(404);
+        }
+
+        return view('backend.user.edit', $data);
     }
 
     /**
@@ -104,12 +120,12 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $input = $request->input();
-        $input = $request->except('_token' , '_method');
-        unset($input['_token']);
+        $input['id'] = $id;
+        $this->userService->updateUser($input);
+
         $act = 'upd';
         $route_name = 'users';
-        $input['id'] = $id;
-        $this->usersService->addUser($input, $act);
+
         return view('backend.success', compact('route_name', 'act'));
     }
 
@@ -132,78 +148,33 @@ class UserController extends Controller
      */
     public function isUserAccountRepeat(Request $request)
     {
-        $user_account = $request->input('user_account');
+        $user_account = $request->user_account;
         $status = false;
 
-        $user_count = Users::where('user_account', '=', $user_account)->count();
+        $user_count = User::where('user_account', '=', $user_account)->count();
 
         if ($user_count < 1) {
             $status = true;
         }
 
-        return response()->json(
-            ['status' => $status]
-        );
+        return response()->json([
+            'status' => $status,
+        ]);
     }
 
-    public function profile ()
+    public function profile()
     {
-        $user_id = Auth::user()->id;
-        $data = Users::find($user_id);
-        return view('backend.users.profile', compact('data'));
+        $authUser = Auth::user();
+        $data['user'] = $this->userService->getUserById($authUser->id);
+
+        return view('backend.user.profile', $data);
     }
 
     public function updateProfile(Request $request)
     {
-        $user_id = Auth::user()->id;
+        $input = $request->input();
+        $this->userService->updateProfile($input);
 
-        $parameter['user_name'] = $request->input('user_name');
-        $parameter['user_email'] = $request->input('user_email');
-        if ($request->input('password') != '') {
-            $parameter['user_password'] = md5($request->input('password'));
-        }
-        $parameter['updated_by'] = $user_id;
-        Users::where('id', $user_id)->update($parameter);
-        $route_name = 'profile';
-        $act = 'upd';
-        if ($request->input(['profile']) == 1) {
-            return view('backend.example');
-        } else {
-            return view('backend.success', compact('route_name', 'act'));
-        }
-    }
-
-    public function ajaxDetail(Request $request){
-        $rs = $request->all();
-        $user = Users::find($rs['id']);
-        $data['user_account'] = $user['user_account'];
-        $data['user_name'] = $user['user_name'];
-        $data['user_active'] = $user['active']==1?'啟用':'關閉';
-        $data['user_email'] = $user['user_email'];
-
-        $suppliers = $this->supplierService->getSuppliers();
-        $data['supplier'] = '';
-        foreach ($suppliers as $item) {
-            if ($user['supplier_id']== $item['id']) {
-                $data['supplier'] = $item['name'];
-            }
-        }
-
-        $data['user_roles'] = '';
-        $roles = $this->rolePermissionService->getRoles("");
-        $roles_array = [];
-        foreach ($roles as $role){
-            $roles_array[$role['id']] = $role['role_name'];
-        }
-
-        $user_roles = $this->usersService->getUserRoles($rs['id']);
-        $user_roles_str = '';
-        foreach ($user_roles as $role=>$value) {
-            if ($user_roles_str !='') {$user_roles_str .='、';}
-            $user_roles_str .= $roles_array[$role];
-        }
-        $data['roles'] = $user_roles_str;
-
-        echo "OK@@".json_encode($data);
+        return view('backend.example');
     }
 }

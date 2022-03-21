@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Users;
-use Illuminate\Support\Str;
-use Illuminate\Http\Client\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class RoleService
 {
@@ -15,7 +14,7 @@ class RoleService
     {
         $user_id = Auth::user()->id;
 
-        $roles = Users::select(
+        $roles = User::select(
             'users.user_name',
             'role_permission_details.permission_detail_id',
             'permission_detail.code',
@@ -103,7 +102,7 @@ class RoleService
                     break;
             }
             //在admin及登出頁面必須回傳1 , 否則會一直無限導向
-        } elseif ($code == 'admin' || $code == '' || $code == 'signOut' || $code == 'backend-home' || Str::is('generated*', $code)) {
+        } elseif (in_array($code, ['admin', '', 'signOut', 'backend-home', 'user_profile']) || Str::is('generated*', $code)) {
             $auth = 1;
         }
 

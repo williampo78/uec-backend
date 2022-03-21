@@ -5,11 +5,11 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\LookupValuesV;
+use App\Services\APIWebService;
 use Illuminate\Support\Facades\DB;
 use App\Services\APIProductServices;
-use App\Services\APIWebService;
-use App\Models\Lookup_values_v;
+use Illuminate\Support\Facades\Auth;
 
 class APIIndexServices
 {
@@ -284,7 +284,7 @@ class APIIndexServices
 
     public function getUTM($params = null)
     {
-        $result = Lookup_values_v::select('udf_01 as url')
+        $result = LookupValuesV::select('udf_01 as url')
             ->where('type_code', 'UTM_PAGE')
             ->where('code', $params)
             ->where('active', 1)->get();

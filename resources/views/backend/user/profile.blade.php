@@ -8,10 +8,9 @@
             </div>
         </div>
         <!-- /.row -->
-        <form role="form" id="update-form" method="post" action="{{ url('/backend/user_profile') }}"
-            enctype="multipart/form-data">
+        <form id="update-form" method="post" action="{{ route('user_profile.update') }}">
+            @method('PUT')
             @csrf
-            <input type="hidden" name="profile" value="1">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-primary">
@@ -22,9 +21,9 @@
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="account">帳號</label>
+                                                <label for="user_account">帳號</label>
                                                 <input class="form-control" name="user_account" id="user_account"
-                                                    value="{{ $data['user_account'] }}" readonly>
+                                                    value="{{ $user->user_account }}" readonly>
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
@@ -38,16 +37,16 @@
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="name">姓名 <span style="color:red;">*</span></label>
+                                                <label for="user_name">姓名 <span style="color:red;">*</span></label>
                                                 <input class="form-control" name="user_name" id="user_name"
-                                                    value="{{ $data['user_name'] }}">
+                                                    value="{{ $user->user_name }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="email">信箱 <span style="color:red;">*</span></label>
+                                                <label for="user_email">信箱 <span style="color:red;">*</span></label>
                                                 <input class="form-control" name="user_email" id="user_email"
-                                                    value="{{ $data['user_email'] }}">
+                                                    value="{{ $user->user_email }}">
                                             </div>
                                         </div>
                                     </div>
@@ -71,6 +70,7 @@
         </form>
     </div>
 @endsection
+
 @section('js')
     <script>
         $(function() {
@@ -110,7 +110,6 @@
                     pwd: {
                         drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
-
                 },
                 errorClass: "help-block",
                 errorElement: "span",
