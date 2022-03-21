@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Permission;
 use App\Models\PermissionDetail;
+use App\Models\Role;
 use App\Models\RolePermissionDetails;
-use App\Models\Roles;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Log;
 
 class RolesPermissionService
 {
-    public function getRoles($data)
+    public function getRoles($data = [])
     {
         $agent_id = Auth::user()->agent_id;
-        $roles = Roles::where('agent_id', $agent_id);
+        $roles = Role::where('agent_id', $agent_id);
 
         if (isset($data['active'])) {
             $roles->where('active', $data['active']);
@@ -26,7 +26,7 @@ class RolesPermissionService
             $roles->where('role_name', 'like', '%' . $data['role_name'] . '%');
         }
 
-        $roles = $roles->orderBy('role_name', 'ASC')->get();
+        $roles = $roles->orderBy('role_name', 'asc')->get();
 
         return $roles;
     }
@@ -79,9 +79,9 @@ class RolesPermissionService
             $roleData['updated_at'] = $now;
 
             if ($act == 'add') {
-                $role_id = Roles::insertGetId($roleData);
+                $role_id = Role::insertGetId($roleData);
             } else if ($act == 'upd') {
-                Roles::where('id', $inputdata['id'])->update($roleData);
+                Role::where('id', $inputdata['id'])->update($roleData);
                 $role_id = $inputdata['id'];
             }
 
@@ -134,6 +134,6 @@ class RolesPermissionService
 
     public function showRole($id)
     {
-        return Roles::where('id', $id)->get()->first();
+        return Role::where('id', $id)->get()->first();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Users;
+use App\Models\User;
 use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +34,7 @@ class LoginAuthController extends Controller
             'pwd.required' => '密碼不能為空',
         ]);
 
-        $users = Users::where([
+        $users = User::where([
             'user_account' => $request->account,
             'user_password' => md5($request->pwd),
         ])

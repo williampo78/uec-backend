@@ -10,7 +10,7 @@
             </div>
         </div>
         <!-- /.row -->
-        <form role="form" id="new-form" method="post" action="{{ route('users.store') }}">
+        <form id="new-form" method="post" action="{{ route('users.store') }}">
             @csrf
             <div class="row">
                 <div class="col-sm-12">
@@ -69,10 +69,12 @@
                                             <div class="form-group">
                                                 <label for="supplier_id">供應商 <span
                                                         class="text-primary">*供應商專用的帳號才指定供應商</span></label>
-                                                <select name="supplier_id" id="supplier_id" class="js-select2">
+                                                <select name="supplier_id" id="supplier_id" class="select2-default">
                                                     <option value=""></option>
-                                                    @foreach ($data['suppliers'] as $item)
-                                                        <option value="{{ $item['id'] }}">{{ $item['name'] }}</option>
+                                                    @foreach ($suppliers as $supplier)
+                                                        <option value="{{ $supplier->id }}">
+                                                            {{ $supplier->name }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -85,17 +87,17 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading">授權角色</div>
                                         <div class="panel-body">
-                                            @foreach ($data['roles'] as $item)
+                                            @foreach ($roles as $role)
                                                 <div class="row">
                                                     <div class="col-sm-10">
                                                         <label class="checkbox-inline">
-                                                            <input type="checkbox" name="role[]" value="{{ $item['id'] }}"
-                                                                id="role_{{ $item['id'] }}"
-                                                                data-is-for-supplier="{{ $item['is_for_supplier'] }}">{{ $item['role_name'] }}
+                                                            <input type="checkbox" name="roles[]"
+                                                                value="{{ $role->id }}" id="role_{{ $role->id }}"
+                                                                data-is-for-supplier="{{ $role->is_for_supplier }}">{{ $role->role_name }}
                                                         </label>
                                                     </div>
                                                     <div class="col-sm-2">
-                                                        @if ($item['is_for_supplier'] == 1)
+                                                        @if ($role->is_for_supplier == 1)
                                                             <span style="color: red;">供應商專用</span>
                                                         @endif
                                                     </div>
@@ -130,12 +132,6 @@
 @section('js')
     <script>
         $(function() {
-            $('.js-select2').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: '請選擇',
-            });
-
             $("#btn-save").on('click', function() {
                 $("#new-form").submit();
             });
@@ -144,8 +140,10 @@
                 window.location.href = '{{ route('users') }}';
             });
 
-            // 關閉供應商select
-            $('#supplier_id').prop('disabled', true);
+            // 有選取供應商專用
+            if ($('input[name^="role"][data-is-for-supplier="1"]:checked').length < 1) {
+                $("#supplier_id").prop('disabled', true);
+            }
 
             // 點選授權角色
             $('input[name^="role"]').on('click', function() {
@@ -199,7 +197,7 @@
                         required: true,
                     },
                     user_password: {
-                        required: true,
+                        drowssapCheck: true,
                     },
                     user_email: {
                         required: true,
@@ -216,6 +214,9 @@
                 messages: {
                     user_account: {
                         remote: "此帳號名稱已經被其他人使用",
+                    },
+                    user_password: {
+                        drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
                 },
                 errorClass: "help-block",
