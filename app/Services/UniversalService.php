@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Lookup_values_v;
+use App\Models\LookupValuesV;
 use App\Models\Quotation;
 use App\Models\User;
 use Carbon\Carbon;
@@ -120,7 +120,7 @@ class UniversalService
      */
     public function getLookupValues($category)
     {
-        $lookup = Lookup_values_v::where('type_code', '=', $category)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
+        $lookup = LookupValuesV::where('type_code', '=', $category)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
         $data = [];
         foreach ($lookup as $k => $v) {
             $data[$v['code']] = $v['description'];
@@ -182,7 +182,7 @@ class UniversalService
      */
     public function getLookUp($params = null)
     {
-        $result = Lookup_values_v::select('*')
+        $result = LookupValuesV::select('*')
             ->where('type_code', $params)
             ->where('active', 1)->get();
         $data = [];
@@ -191,5 +191,4 @@ class UniversalService
         }
         return $data;
     }
-
 }

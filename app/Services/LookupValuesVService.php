@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Lookup_values_v;
+use App\Models\LookupValuesV;
 use Illuminate\Support\Facades\Auth;
 
 class LookupValuesVService
@@ -15,7 +15,7 @@ class LookupValuesVService
      */
     public function getLookupValuesVs($query_datas = [])
     {
-        $results = Lookup_values_v::where('active', 1);
+        $results = LookupValuesV::where('active', 1);
 
         if (!isset($query_datas['disable_agent_id_auth'])) {
             $agent_id = Auth::user()->agent_id;
