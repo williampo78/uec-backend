@@ -129,7 +129,7 @@ class APIIndexServices
                         }
 
 
-                        $data[$ad_slot->slot_code][] = array(
+                        $data[$ad_slot->slot_code] = array(
                             'slot_color_code' => $ad_slot->slot_color_code,
                             'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
                             'slot_title' => $ad_slot->slot_title,
