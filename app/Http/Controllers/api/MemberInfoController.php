@@ -3,19 +3,20 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Members;
 use App\Services\APIService;
-use Illuminate\Http\Request;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Support\Facades\Auth;
 use App\Services\APIWebService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Validator;
 
 class MemberInfoController extends Controller
 {
 
-    public function __construct(APIService $apiService, APIWebService $apiWebService)
-    {
+    public function __construct(
+        APIService $apiService,
+        APIWebService $apiWebService
+    ) {
         $this->apiService = $apiService;
         $this->apiWebService = $apiWebService;
     }
@@ -128,7 +129,7 @@ class MemberInfoController extends Controller
         $data['districtId'] = $request['districtId'];
         $data['address'] = $request['address'];
         $data['registeredSource'] = "EC";
-        if ($request['pwd'] !=''){ //for 未手機驗證會員使用-可更新此欄位
+        if ($request['pwd'] != '') { //for 未手機驗證會員使用-可更新此欄位
             $data['password'] = $request['pwd'];
         }
 
@@ -276,7 +277,6 @@ class MemberInfoController extends Controller
 
     }
 
-
     /*
      * 新增會員收件人資料 (會員編號)
      * @param  int  $id
@@ -287,6 +287,11 @@ class MemberInfoController extends Controller
         $error_code = $this->apiService->getErrorCode();
 
         $messages = [
+            'string' => ':attribute 資料型態必須為string',
+            'integer' => ':attribute 資料型態必須為integer',
+            'in' => ':attribute 必須存在列表中的值: :values',
+            'boolean' => ':attribute 資料型態必須為boolean',
+            'note_type.required' => '類型不能為空',
             'name.required' => '姓名不能為空',
             'mobile.required' => '手機不能為空',
             'zip_code.required' => '郵遞區號不能為空',
@@ -295,24 +300,30 @@ class MemberInfoController extends Controller
             'district_name.required' => '行政區不能為空',
             'district_id.required' => '行政區編號不能為空',
             'address.required' => '地址不能為空',
+            'is_default.required' => '是否為預設收件地址不能為空',
         ];
 
         $v = Validator::make($request->all(), [
-            'name' => 'required',
-            'mobile' => 'required',
-            'zip_code' => 'required',
-            'city_name' => 'required',
-            'city_id' => 'required',
-            'district_name' => 'required',
-            'district_id' => 'required',
-            'address' => 'required',
+            'note_type' => 'required|string|in:HOME,FAMILY',
+            'name' => 'required|string',
+            'mobile' => 'required|string',
+            'zip_code' => 'required|string',
+            'city_name' => 'required|string',
+            'city_id' => 'required|integer',
+            'district_name' => 'required|string',
+            'district_id' => 'required|integer',
+            'address' => 'required|string',
+            'cvs_type' => 'string|nullable',
+            'cvs_store_no' => 'string|nullable',
+            'is_default' => 'required|boolean',
         ], $messages);
 
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
-        $response = $this->apiWebService->createMemberNotes($request);
+        $response = $this->apiWebService->createMemberNote($request);
+
         if ($response) {
             $status = true;
             $data = '新增成功';
@@ -321,10 +332,9 @@ class MemberInfoController extends Controller
             $err = '401';
             $data = '';
         }
+
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
-
     }
-
 
     /*
      * 查詢會員商品收藏資料
@@ -347,7 +357,6 @@ class MemberInfoController extends Controller
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
 
     }
-
 
     /*
      * 新增刪除會員商品收藏資料 (商品編號)
@@ -397,11 +406,11 @@ class MemberInfoController extends Controller
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $messages = [
-            'product_id.required' => '商品編號不能為空'
+            'product_id.required' => '商品編號不能為空',
         ];
 
         $v = Validator::make($request->all(), [
-            'product_id' => 'required'
+            'product_id' => 'required',
         ], $messages);
 
         if ($v->fails()) {
@@ -448,4 +457,3 @@ class MemberInfoController extends Controller
     }
 
 }
-
