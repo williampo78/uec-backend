@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\api;
+namespace App\Http\Requests\Api;
 
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class GetOrderDetailRequest extends FormRequest
+class GetOrdersRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,20 +18,6 @@ class GetOrderDetailRequest extends FormRequest
         return true;
     }
 
-    public function validationData(): array
-    {
-        // Retrieve the route parameters
-        $route_parameters = $this
-            ->route()
-            ->parameters();
-
-        // Retrieve the request data
-        $request_data = $this->all();
-
-        // Return both as data for the validation
-        return array_merge($request_data, $route_parameters);
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -40,15 +26,15 @@ class GetOrderDetailRequest extends FormRequest
     public function rules()
     {
         return [
-            'order_no' => 'required|regex:/^OD[0-9]{6}[0-9a-zA-Z]{6}$/',
+            'date' => 'required|date',
         ];
     }
 
     public function messages()
     {
         return [
-            'order_no.required' => '訂單編號不能為空',
-            'order_no.regex' => '訂單編號格式錯誤',
+            'date.required' => '日期不能為空',
+            'date.date' => '日期格式錯誤',
         ];
     }
 

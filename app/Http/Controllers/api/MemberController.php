@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\api\CancelOrderRequest;
-use App\Http\Requests\api\GetOrderDetailRequest;
-use App\Http\Requests\api\GetOrdersRequest;
-use App\Http\Requests\api\ResetPasswordRequest;
-use App\Http\Requests\api\ReturnOrderRequest;
+use App\Http\Requests\Api\CancelOrderRequest;
+use App\Http\Requests\Api\GetOrderDetailRequest;
+use App\Http\Requests\Api\GetOrdersRequest;
+use App\Http\Requests\Api\ResetPasswordRequest;
+use App\Http\Requests\Api\ReturnOrderRequest;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\ReturnRequest;
@@ -26,7 +26,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {

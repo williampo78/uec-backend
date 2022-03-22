@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\api;
+namespace App\Http\Requests\Api;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CancelOrderRequest extends FormRequest
+class GetOrderDetailRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -41,8 +41,6 @@ class CancelOrderRequest extends FormRequest
     {
         return [
             'order_no' => 'required|regex:/^OD[0-9]{6}[0-9a-zA-Z]{6}$/',
-            'code' => 'required',
-            'remark' => 'max:300',
         ];
     }
 
@@ -51,8 +49,6 @@ class CancelOrderRequest extends FormRequest
         return [
             'order_no.required' => '訂單編號不能為空',
             'order_no.regex' => '訂單編號格式錯誤',
-            'code.required' => '取消原因代碼不能為空',
-            'remark.max' => '取消說明不能超過:max個字',
         ];
     }
 
