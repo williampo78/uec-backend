@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Brands extends Model
+class WebContent extends Model
 {
     use HasFactory;
-    
-    protected $table = 'brands';
+
+    protected $table = 'web_contents';
     protected $guarded = [];
 }

@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Item extends Model
+class CategoryProduct extends Model
 {
     use HasFactory;
-    protected $table = 'item';
-    protected $guarded = []; 
+
+    protected $table = 'web_category_products';
+    public $timestamps = true;
+    protected $guarded = [];
 }

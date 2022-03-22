@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WebContents;
-use App\Services\UniversalService;
-use App\Services\WebContentsService;
+use App\Models\WebContent;
 use Illuminate\Http\Request;
+use App\Services\UniversalService;
 use Illuminate\Support\Facades\Log;
+use App\Services\WebContentsService;
 
 class QAController extends Controller
 {
@@ -97,7 +97,7 @@ class QAController extends Controller
     public function edit($id)
     {
         $data['category'] = $this->webContentsService->getCategory('QA_CATEGORY');
-        $data['webcontent'] = WebContents::find($id);
+        $data['webcontent'] = WebContent::find($id);
         return view('backend.qa.upd', compact('data'));
     }
 

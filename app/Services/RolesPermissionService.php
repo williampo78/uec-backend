@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
+use App\Models\Role;
 use App\Models\Permission;
 use App\Models\PermissionDetail;
-use App\Models\Role;
-use App\Models\RolePermissionDetails;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\RolePermissionDetail;
+use Illuminate\Support\Facades\Auth;
 
 class RolesPermissionService
 {
@@ -88,7 +88,7 @@ class RolesPermissionService
             $detailData = [];
 
             //不管新增或編輯先把原有的權限都刪除
-            RolePermissionDetails::where('role_id', '=', $role_id)->delete();
+            RolePermissionDetail::where('role_id', '=', $role_id)->delete();
 
             foreach ($inputdata['auth_index'] as $k1 => $v1) { //有勾選才會寫入細項權限
                 $detailData['role_id'] = $role_id;
@@ -103,7 +103,7 @@ class RolesPermissionService
                 $detailData['updated_by'] = -1;
                 $detailData['updated_at'] = $now;
 
-                RolePermissionDetails::insert($detailData);
+                RolePermissionDetail::insert($detailData);
             }
 
             DB::commit();
@@ -121,7 +121,7 @@ class RolesPermissionService
     {
         $auth = ['auth_query', 'auth_create', 'auth_update', 'auth_delete', 'auth_void', 'auth_export'];
         $permission_detail_array = [];
-        $permission = RolePermissionDetails::where('role_id', '=', $id)->get()->toArray();
+        $permission = RolePermissionDetail::where('role_id', '=', $id)->get()->toArray();
 
         foreach ($permission as $data) {
             foreach ($auth as $k => $v) {

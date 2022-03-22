@@ -5,11 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product_spec_info extends Model
+class MemberCollection extends Model
 {
     use HasFactory;
 
-    protected $table = 'product_spec_info';
-    protected $guarded = [];  
-
+    protected $table = 'member_collections';
 }

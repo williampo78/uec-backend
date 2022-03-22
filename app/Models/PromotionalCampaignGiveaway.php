@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryProducts extends Model
+class PromotionalCampaignGiveaway extends Model
 {
     use HasFactory;
-    protected $table = 'web_category_products';
-    public $timestamps = true;
-    protected $guarded = []; 
+
+    protected $table = 'promotional_campaign_giveaways';
+    protected $guarded = [];
 }

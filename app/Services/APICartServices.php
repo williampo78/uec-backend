@@ -3,17 +3,17 @@
 
 namespace App\Services;
 
-use App\Models\ProductPhotos;
-use Illuminate\Support\Facades\Auth;
+use Batch;
 use Carbon\Carbon;
-use App\Models\ShoppingCartDetails;
+use App\Models\Products;
+use App\Models\ProductItems;
+use App\Services\APIService;
+use App\Models\ProductPhotos;
+use App\Services\StockService;
+use App\Models\ShoppingCartDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\ProductItems;
-use App\Models\Products;
-use App\Services\APIService;
-use App\Services\StockService;
-use Batch;
+use Illuminate\Support\Facades\Auth;
 
 class APICartServices
 {
@@ -31,7 +31,7 @@ class APICartServices
     public function getCartInfo($member_id)
     {
         $s3 = config('filesystems.disks.s3.url');
-        $result = ShoppingCartDetails::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
+        $result = ShoppingCartDetail::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
             , "product_items.item_no")
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
@@ -59,7 +59,7 @@ class APICartServices
      */
     public function getCartCount($member_id)
     {
-        $wordCount = ShoppingCartDetails::where('member_id', '=', $member_id)
+        $wordCount = ShoppingCartDetail::where('member_id', '=', $member_id)
             ->where('status_code', '=', 0)->count();
         return $wordCount;
     }
@@ -76,7 +76,7 @@ class APICartServices
         //確認是否有該品項
         $item = ProductItems::where('id', $input['item_id'])->get()->toArray();
         if (count($item) > 0) {
-            $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
+            $data = ShoppingCartDetail::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
                 $act = 'upd';
             } else {
@@ -105,13 +105,13 @@ class APICartServices
                 if ($input['status_code'] != 0) {
                     return '203';
                 }
-                $new_id = ShoppingCartDetails::insertGetId($webData);
+                $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
                 $webData['qty'] = ($input['status_code'] == 0 ? $input['item_qty'] : 0);
                 $webData['status_code'] = $input['status_code'];
                 $webData['updated_by'] = $member_id;
                 $webData['updated_at'] = $now;
-                $new_id = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
+                $new_id = ShoppingCartDetail::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
             }
             DB::commit();
             if ($new_id > 0) {
@@ -762,7 +762,7 @@ class APICartServices
         $webDataUpd = [];
         foreach ($input['item_id'] as $key => $value) {
             //確認是否有該品項
-            $item = ShoppingCartDetails::where('member_id', '=', $member_id)->where('product_item_id', '=', $value)->first();
+            $item = ShoppingCartDetail::where('member_id', '=', $member_id)->where('product_item_id', '=', $value)->first();
             if ($item) {
                 $webDataUpd[$key] = [
                     "id" => $item->id,
@@ -805,12 +805,12 @@ class APICartServices
         try {
 
             if ($webDataUpd) {
-                $cartInstance = new ShoppingCartDetails();
+                $cartInstance = new ShoppingCartDetail();
                 $upd = Batch::update($cartInstance, $webDataUpd, 'id');
             }
 
             if ($webDataAdd) {
-                $cartInstance = new ShoppingCartDetails();
+                $cartInstance = new ShoppingCartDetail();
                 $batchSize = 50;
                 $add = Batch::insert($cartInstance, $addColumn, $webDataAdd, $batchSize);
             }
@@ -838,7 +838,7 @@ class APICartServices
         //確認是否有該品項
         $item = ProductItems::where('id', $input['item_id'])->get()->toArray();
         if (count($item) > 0) {
-            $data = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
+            $data = ShoppingCartDetail::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
                 $act = 'upd';
                 if ($data[0]['status_code'] == 0) {
@@ -872,7 +872,7 @@ class APICartServices
                 if ($input['status_code'] != 0) {
                     return '203';
                 }
-                $new_id = ShoppingCartDetails::insertGetId($webData);
+                $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
                 $webData['qty'] = $qty;
                 $webData['status_code'] = $input['status_code'];
@@ -883,7 +883,7 @@ class APICartServices
                 $webData['utm_time'] = Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s');
                 $webData['updated_by'] = $member_id;
                 $webData['updated_at'] = $now;
-                $new_id = ShoppingCartDetails::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
+                $new_id = ShoppingCartDetail::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->update($webData);
             }
             DB::commit();
             if ($new_id > 0) {

@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use App\Models\WebContents;
+use App\Models\WebContent;
 use App\Models\LookupValuesV;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +26,7 @@ class WebContentsService
      */
     public function getFooter($data, $apply_to)
     {
-        $webcontents = WebContents::where('apply_to', '=', $apply_to);
+        $webcontents = WebContent::where('apply_to', '=', $apply_to);
         if (isset($data['code'])) {
             $webcontents->where('parent_code', '=', $data['code']);
         }
@@ -77,9 +77,9 @@ class WebContentsService
             $webData['updated_by'] = $user_id;
             $webData['updated_at'] = $now;
             if ($act == 'add') {
-                $new_id = WebContents::insertGetId($webData);
+                $new_id = WebContent::insertGetId($webData);
             } else if ($act == 'upd') {
-                WebContents::where('id', $inputdata['id'])->update($webData);
+                WebContent::where('id', $inputdata['id'])->update($webData);
                 $new_id = $inputdata['id'];
             }
             DB::commit();
@@ -107,7 +107,7 @@ class WebContentsService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $web_contents = WebContents::select(
+        $web_contents = WebContent::select(
             'web_contents.*',
             'lookup_values_v.description'
         )

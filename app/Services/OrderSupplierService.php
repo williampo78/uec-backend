@@ -14,11 +14,10 @@ use Illuminate\Support\Facades\Log;
 class OrderSupplierService
 {
     private $universalService;
-    private $itemService;
-    public function __construct(UniversalService $universalService, ItemService $itemService)
+
+    public function __construct(UniversalService $universalService)
     {
         $this->universalService = $universalService;
-        $this->itemService = $itemService;
     }
 
     public function getOrderSupplier($data)

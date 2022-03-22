@@ -3,21 +3,21 @@
 
 namespace App\Services;
 
-use App\Models\ProductPhotos;
-use App\Models\ProductItems;
-use App\Models\PromotionalCampaigns;
-use App\Services\APIWebService;
-use App\Services\WebCategoryHierarchyService;
-use GuzzleHttp\Psr7\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Services\APICartServices;
+use App\Models\ProductItems;
+use GuzzleHttp\Psr7\Request;
+use App\Models\ProductPhotos;
+use App\Models\RelatedProduct;
+use App\Services\APIWebService;
 use App\Services\BrandsService;
-use App\Services\ShippingFeeRulesService;
+use App\Services\APICartServices;
 use App\Services\UniversalService;
+use Illuminate\Support\Facades\DB;
+use App\Models\PromotionalCampaign;
+use Illuminate\Support\Facades\Auth;
 use App\Services\WebShippingInfoService;
-use App\Models\RelatedProducts;
+use App\Services\ShippingFeeRulesService;
+use App\Services\WebCategoryHierarchyService;
 
 class APIProductServices
 {
@@ -720,7 +720,7 @@ class APIProductServices
 
 
             //相關推薦
-            $rel_prod = RelatedProducts::getRelated($id);
+            $rel_prod = RelatedProduct::getRelated($id);
             $promotion = self::getPromotion('product_card');
             $rel_data = [];
             $products = $this->getProducts();
@@ -791,7 +791,7 @@ class APIProductServices
         $now = Carbon::now();
         $data = [];
         $s3 = config('filesystems.disks.s3.url');
-        $promotional = PromotionalCampaigns::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
+        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
             ->where("promotional_campaigns.start_at", "<=", $now)
             ->where("promotional_campaigns.end_at", ">=", $now)
             ->where("promotional_campaigns.active", "=", "1")
@@ -817,7 +817,7 @@ class APIProductServices
     {
         //已審核上架與活動期間內
         $now = Carbon::now();
-        $promotional = PromotionalCampaigns::where('active', '=', '1')
+        $promotional = PromotionalCampaign::where('active', '=', '1')
             ->where("start_at", "<=", $now)
             ->where("end_at", ">=", $now)
             ->where("level_code", '=', 'CART')->get();
@@ -846,7 +846,7 @@ class APIProductServices
      */
     public function getRelated($product_id)
     {
-        $rel_prod = RelatedProducts::select('related_products.*', 'porducts.product_no')
+        $rel_prod = RelatedProduct::select('related_products.*', 'porducts.product_no')
             ->join('porducts', 'products.id', '=', 'related_products.product_id')
             ->where('related_products.product_id', '=', $product_id)->get();
         return $rel_prod;

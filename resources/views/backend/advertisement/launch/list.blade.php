@@ -265,9 +265,7 @@
             $(document).on('click', '.slot_content_detail', function() {
                 let slot_content_id = $(this).attr("data-slot-content-id");
 
-                axios.post('/backend/advertisemsement_launch/ajax/detail', {
-                        slot_content_id: slot_content_id
-                    })
+                axios.get(`/backend/advertisemsement_launch/${slot_content_id}`)
                     .then(function(response) {
                         let content = response.data.content;
                         let details = response.data.details;

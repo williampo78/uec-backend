@@ -411,9 +411,7 @@
                 let order_id = $(this).attr("data-order");
                 invoices = {};
 
-                axios.post('/backend/order/ajax/detail', {
-                        order_id: order_id
-                    })
+                axios.get(`/backend/order/${order_id}`)
                     .then(function(response) {
                         let order = response.data;
 

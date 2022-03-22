@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\MemberCollections;
-use App\Models\MemberNote;
-use App\Models\ProductPhotos;
 use Batch;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use App\Models\MemberNote;
+use App\Models\ProductPhotos;
+use App\Models\MemberCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 
 class APIWebService
 {
@@ -205,7 +205,7 @@ class APIWebService
     {
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
-        $data = MemberCollections::where('product_id', $input['product_id'])->where('member_id', $member_id)->get()->toArray();
+        $data = MemberCollection::where('product_id', $input['product_id'])->where('member_id', $member_id)->get()->toArray();
         if (count($data) > 0) {
             $act = 'upd';
         } else {
@@ -225,9 +225,9 @@ class APIWebService
                 if ($input['status'] == '-1') {
                     return '203';
                 }
-                $new_id = MemberCollections::insertGetId($webData);
+                $new_id = MemberCollection::insertGetId($webData);
             } else if ($act == 'upd') {
-                MemberCollections::where('product_id', $input['product_id'])->where('member_id', $member_id)->update($webData);
+                MemberCollection::where('product_id', $input['product_id'])->where('member_id', $member_id)->update($webData);
                 $new_id = $input['product_id'];
             }
 
@@ -259,7 +259,7 @@ class APIWebService
         try {
             $webData = [];
             foreach ($input['product_id'] as $key => $value) {
-                $data = MemberCollections::where('product_id', $value)->where('member_id', $member_id)->get()->toArray();
+                $data = MemberCollection::where('product_id', $value)->where('member_id', $member_id)->get()->toArray();
                 $webData[$key] = [
                     'id' => $data[0]['id'],
                     'member_id' => $member_id,
@@ -271,7 +271,7 @@ class APIWebService
                     'updated_at' => $now,
                 ];
             }
-            $collectionInstance = new MemberCollections();
+            $collectionInstance = new MemberCollection();
             $upd = Batch::update($collectionInstance, $webData, 'id');
             DB::commit();
             if ($upd > 0) {

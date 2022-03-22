@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use App\Models\Quotation;
-use App\Models\QuotationDetails;
+use App\Models\QuotationDetail;
 use App\Models\QuotationReviewLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -157,7 +157,7 @@ class QuotationService
                         $detailData[$k]['original_unit_tax_price'] = 0; //稅額
                     }
                 }
-                QuotationDetails::insert($detailData);
+                QuotationDetail::insert($detailData);
             }
 
             //簽核log
@@ -185,7 +185,7 @@ class QuotationService
 
     public function getQuotationDetail($quotation_id)
     {
-        $result = QuotationDetails::select(
+        $result = QuotationDetail::select(
             DB::raw('quotation_details.id as quotation_details_id'),
             DB::raw('product_items.product_id as product_id'),
             DB::raw('product_items.ean as ean'),
@@ -277,12 +277,12 @@ class QuotationService
 
             if (isset($data['quotation_details_id'][$k])) {
                 $quotation_details_id = $data['quotation_details_id'][$k];
-                QuotationDetails::where('id', $quotation_details_id)->update($quotationDetailData);
+                QuotationDetail::where('id', $quotation_details_id)->update($quotationDetailData);
             } else {
                 $quotationDetailData['quotation_id'] = $quotation_id;
                 $quotationDetailData['created_at'] = $now;
                 $quotationDetailData['created_by'] = $user_id;
-                QuotationDetails::insert($quotationDetailData);
+                QuotationDetail::insert($quotationDetailData);
             }
             $quotationDetailData = [];
         }
@@ -313,7 +313,7 @@ class QuotationService
     {
         $result['status'] = true;
         $result['error_msg'] = '';
-        $repeat_ary = [] ; 
+        $repeat_ary = [] ;
         foreach ($itemsId as $id) {
             $check = Quotation::select(
                 'quotation.doc_number',
@@ -327,10 +327,10 @@ class QuotationService
             ->first();
             if(!is_null($check)){
                array_push($repeat_ary,$check->item_no.'('.$check->doc_number.')');
-               $result['status']  = false ; 
+               $result['status']  = false ;
             }
         }
-        $result['error_msg'] = implode('、',$repeat_ary) ; 
+        $result['error_msg'] = implode('、',$repeat_ary) ;
 
         return $result;
     }

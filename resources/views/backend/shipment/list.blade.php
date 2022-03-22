@@ -346,9 +346,7 @@
             $(document).on('click', '.shipment_detail', function() {
                 let shipment_id = $(this).attr("data-shipment");
 
-                axios.post('/backend/shipment/ajax/detail', {
-                        shipment_id: shipment_id
-                    })
+                axios.get(`/backend/shipment/${shipment_id}`)
                     .then(function(response) {
                         let shipment = response.data;
                         let package_no = shipment.package_no ?

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Http\Controllers\Controller;
-use App\Models\ShoppingCartDetails;
-use App\Services\APIService;
-use App\Services\StockService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Validator;
+use App\Services\APIService;
+use Illuminate\Http\Request;
+use App\Services\StockService;
+use App\Models\ShoppingCartDetail;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class StockController extends Controller
 {
@@ -45,7 +45,7 @@ class StockController extends Controller
         if ($login) {
             $member_id = Auth::guard('api')->user()->member_id;
             if ($member_id > 0) {
-                $shoppingCart = ShoppingCartDetails::where('status_code', 0)->where('product_item_id', $request['item_id'])->where('member_id', $member_id)->get()->toArray();
+                $shoppingCart = ShoppingCartDetail::where('status_code', 0)->where('product_item_id', $request['item_id'])->where('member_id', $member_id)->get()->toArray();
                 if (count($shoppingCart) > 0) {
                     $shopCartQty = $shoppingCart[0]['qty'];
                 }

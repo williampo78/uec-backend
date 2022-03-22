@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\BrandsService;
-use App\Services\ItemService;
 use App\Services\ProductsService;
 use App\Services\QuotationService;
 use App\Services\RequisitionsPurchaseService;
@@ -23,7 +22,6 @@ class RequisitionsPurchaseController extends Controller
     private $requisitionsPurchaseService;
     private $warehouseService;
     private $supplierService;
-    private $itemService;
     private $universalService;
     private $quotationService;
     private $productsService;
@@ -32,7 +30,6 @@ class RequisitionsPurchaseController extends Controller
         RequisitionsPurchaseService $requisitionsPurchaseService,
         WarehouseService $warehouseService,
         SupplierService $supplierService,
-        ItemService $itemService,
         ProductsService $productsService,
         UniversalService $universalService,
         QuotationService $quotationService,
@@ -41,7 +38,6 @@ class RequisitionsPurchaseController extends Controller
         $this->requisitionsPurchaseService = $requisitionsPurchaseService; //請購單
         $this->warehouseService = $warehouseService; // 倉庫
         $this->supplierService = $supplierService; //供應商
-        $this->itemService = $itemService; //品項
         $this->universalService = $universalService; // 共用服務
         $this->quotationService = $quotationService; //報價單服務
         $this->productsService = $productsService;

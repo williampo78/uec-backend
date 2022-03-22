@@ -2,23 +2,23 @@
 
 namespace App\Services;
 
-use App\Models\CategoryHierarchy;
-use App\Models\CategoryProducts;
-use App\Models\ProductAttributes;
-use App\Models\ProductAuditLog;
+use Batch;
+use ImageUpload;
+use Carbon\Carbon;
+use App\Models\Products;
 use App\Models\ProductItems;
 use App\Models\ProductPhotos;
+use App\Models\RelatedProduct;
+use App\Models\CategoryProduct;
+use App\Models\ProductAuditLog;
+use App\Models\ProductSpecInfo;
 use App\Models\ProductReviewLog;
-use App\Models\Products;
-use App\Models\Product_spec_info;
-use App\Models\RelatedProducts;
+use App\Models\CategoryHierarchy;
+use App\Models\ProductAttributes;
 use App\Services\UniversalService;
-use Batch;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use ImageUpload;
+use Illuminate\Support\Facades\Auth;
 
 class ProductsService
 {
@@ -262,7 +262,7 @@ class ProductsService
                 $skuList[$key]['item_no'] = $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
                 $add_item_no += 1;
             }
-            Product_spec_info::create([
+            ProductSpecInfo::create([
                 'product_id' => $products_id,
                 'spec_value_list' => json_encode($specListJson),
                 'item_list' => json_encode($skuList),
@@ -438,7 +438,7 @@ class ProductsService
                 }
 
             }
-            Product_spec_info::where('product_id', $products_id)->update([
+            ProductSpecInfo::where('product_id', $products_id)->update([
                 'spec_value_list' => json_encode($specListJson),
                 'item_list' => json_encode($skuList),
                 'updated_by' => $user_id,
@@ -586,13 +586,13 @@ class ProductsService
 
     public function getProduct_spec_info($product_id)
     {
-        $result = Product_spec_info::where('product_id', $product_id)->first();
+        $result = ProductSpecInfo::where('product_id', $product_id)->first();
         return $result;
     }
 
     public function getRelatedProducts($product_id)
     {
-        $result = RelatedProducts::select('related_products.*', 'products.product_name', 'products.product_no')
+        $result = RelatedProduct::select('related_products.*', 'products.product_name', 'products.product_no')
             ->where('related_products.product_id', $product_id)
             ->leftJoin('products', 'products.id', '=', 'related_products.related_product_id')
             ->orderBy('related_products.sort', 'ASC')
@@ -653,7 +653,7 @@ class ProductsService
             }
             foreach ($CategoryHierarchyProducts as $key => $val) {
                 if ($val['status'] == 'new') {
-                    CategoryProducts::create([
+                    CategoryProduct::create([
                         'web_category_hierarchy_id' => $val['web_category_hierarchy_id'],
                         'product_id' => $id,
                         'sort' => $key,
@@ -679,9 +679,9 @@ class ProductsService
                         'created_by' => $user_id,
                         'updated_by' => $user_id,
                     ];
-                    RelatedProducts::create($in);
+                    RelatedProduct::create($in);
                 } else {
-                    RelatedProducts::where('product_id', $val['product_id'])
+                    RelatedProduct::where('product_id', $val['product_id'])
                         ->where('related_product_id', $val['related_product_id'])
                         ->update([
                             'sort' => $key,

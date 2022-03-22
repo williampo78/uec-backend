@@ -3,23 +3,23 @@
 
 namespace App\Services;
 
-use App\Models\StockTransactionLog;
-use App\Models\WarehouseStock;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
 use Batch;
+use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\OrderDetail;
-use App\Models\OrderCampaignDiscount;
-use App\Models\ShoppingCartDetails;
-use App\Models\ProductItems;
+use Illuminate\Support\Str;
 use App\Models\OrderPayment;
-use App\Services\APITapPayService;
-use App\Services\StockService;
+use App\Models\ProductItems;
 use App\Services\APIService;
+use App\Models\WarehouseStock;
+use App\Services\StockService;
+use App\Models\ShoppingCartDetail;
+use App\Services\APITapPayService;
+use Illuminate\Support\Facades\DB;
+use App\Models\StockTransactionLog;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\OrderCampaignDiscount;
 
 class APIOrdersServices
 {
@@ -109,7 +109,7 @@ class APIOrdersServices
         return $result;
         */
 
-        $utms = ShoppingCartDetails::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
+        $utms = ShoppingCartDetail::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
         foreach ($utms as $utm) {
             $utm_info[$utm->product_item_id] = $utm;
@@ -275,7 +275,7 @@ class APIOrdersServices
 
                     //訂單明細建立後，更新購物車中的商品狀態為 - 已轉為訂單
                     $updData['status_code'] = 1;
-                    ShoppingCartDetails::where('member_id', '=', $member_id)->where('product_item_id', '=', $item['itemId'])->update($updData);
+                    ShoppingCartDetail::where('member_id', '=', $member_id)->where('product_item_id', '=', $item['itemId'])->update($updData);
 
 
                     //有單品滿額贈品時先新增單身

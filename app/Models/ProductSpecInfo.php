@@ -5,8 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RolePermissionDetails extends Model
+class ProductSpecInfo extends Model
 {
     use HasFactory;
-    protected $table = 'role_permission_details';
+
+    protected $table = 'product_spec_info';
+    protected $guarded = [];
+
 }

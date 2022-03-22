@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Models\WebContents;
-use App\Services\UniversalService;
-use Illuminate\Http\Request;
-use App\Services\WebContentsService;
-use App\Services\APIService;
-use App\Services\APIIndexServices;
 use Mail;
 use Validator;
+use App\Models\WebContent;
+use App\Services\APIService;
+use Illuminate\Http\Request;
+use App\Services\APIIndexServices;
+use App\Services\UniversalService;
+use App\Services\WebContentsService;
 
 class IndexController extends Controller
 {
@@ -58,7 +58,7 @@ class IndexController extends Controller
         $status = false;
         $err = null;
         $error_code = $this->apiService->getErrorCode();
-        $content = WebContents::where('id', '=', $id)->where('content_target', '=', 'H')->get()->toArray();
+        $content = WebContent::where('id', '=', $id)->where('content_target', '=', 'H')->get()->toArray();
         if (sizeof($content) > 0) {
             $data[] = array(
                 "content_id" => $content[0]['id'], //9

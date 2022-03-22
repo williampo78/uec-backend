@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AgentConfig extends Model
+class RolePermissionDetail extends Model
 {
     use HasFactory;
-    protected $table = 'agent_config';
+    protected $table = 'role_permission_details';
 }
