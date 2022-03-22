@@ -2,21 +2,20 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use App\Models\Order;
 use App\Models\Invoice;
-use App\Models\Shipment;
+use App\Models\InvoiceAllowance;
+use App\Models\InvoiceAllowanceDetail;
+use App\Models\InvoiceDetail;
+use App\Models\Order;
+use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
-use App\Models\InvoiceDetail;
-use App\Models\ProductPhotos;
+use App\Models\ProductPhoto;
 use App\Models\ReturnRequest;
+use App\Models\Shipment;
 use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
 
 class OrderService
 {
@@ -115,7 +114,7 @@ class OrderService
         $order_detail_product_ids = $order_details->pluck('product_id')->unique();
 
         // 商品圖片
-        $product_photos = ProductPhotos::whereIn('product_id', $order_detail_product_ids)
+        $product_photos = ProductPhoto::whereIn('product_id', $order_detail_product_ids)
             ->orderBy('product_id', 'asc')
             ->orderBy('sort', 'asc')
             ->get();

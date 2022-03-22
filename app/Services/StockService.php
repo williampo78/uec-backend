@@ -3,11 +3,11 @@
 
 namespace App\Services;
 
-use App\Models\ProductItems;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use App\Models\WarehouseStock;
 use App\Models\SysConfig;
+use App\Models\ProductItem;
+use App\Models\WarehouseStock;
+use Illuminate\Support\Facades\Auth;
 
 class StockService
 {
@@ -59,7 +59,7 @@ class StockService
      */
     public function getStockByProd($number = null, $prod_id = null)
     {
-        $stock = ProductItems::selectRaw("sum(warehouse_stock.stock_qty) as stock_qty")
+        $stock = ProductItem::selectRaw("sum(warehouse_stock.stock_qty) as stock_qty")
             ->join("warehouse_stock", "warehouse_stock.product_item_id","=","product_items.id")
             ->join("warehouse","warehouse.id","=","warehouse_stock.warehouse_id")
             ->where("warehouse.number", "=", $number)

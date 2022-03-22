@@ -12,6 +12,11 @@ class Order extends Model
     protected $table = 'orders';
     protected $guarded = [];
 
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class, 'order_id');
+    }
+
     /**
      * 取得 訂單
      *

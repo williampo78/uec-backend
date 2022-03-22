@@ -4,9 +4,9 @@
 namespace App\Services;
 
 use Carbon\Carbon;
-use App\Models\ProductItems;
+use App\Models\ProductItem;
+use App\Models\ProductPhoto;
 use GuzzleHttp\Psr7\Request;
-use App\Models\ProductPhotos;
 use App\Models\RelatedProduct;
 use App\Services\APIWebService;
 use App\Services\BrandsService;
@@ -607,9 +607,9 @@ class APIProductServices
 
             //產品圖檔
             $photos = [];
-            $ProductPhotos = ProductPhotos::where('product_id', $id)->orderBy('sort', 'asc')->get();
-            if (isset($ProductPhotos)) {
-                foreach ($ProductPhotos as $photo) {
+            $productPhotos = ProductPhoto::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            if (isset($productPhotos)) {
+                foreach ($productPhotos as $photo) {
                     $photos[] = $s3 . $photo->photo_name;
                 }
             }
@@ -658,7 +658,7 @@ class APIProductServices
 
             //產品規格
             $item_spec = [];
-            $ProductSpec = ProductItems::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            $ProductSpec = ProductItem::where('product_id', $id)->orderBy('sort', 'asc')->get();
             $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
             $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
             $spec_info = [];
@@ -799,9 +799,9 @@ class APIProductServices
             ->join('products', 'products.id', '=', 'promotional_campaign_giveaways.product_id')
             ->where('products.approval_status', '=', 'APPROVED')->get();
         foreach ($promotional as $promotion) {
-            $ProductPhotos = ProductPhotos::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
+            $productPhotos = ProductPhoto::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
             $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id] = $promotion; //取單品的贈品
-            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($ProductPhotos->photo_name) ? $s3 . $ProductPhotos->photo_name : null);
+            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($productPhotos->photo_name) ? $s3 . $productPhotos->photo_name : null);
             if ($promotion->level_code == 'CART') {
                 $data['CART'][] = $promotion; //取全站贈品
             }

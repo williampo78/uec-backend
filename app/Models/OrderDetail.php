@@ -12,6 +12,20 @@ class OrderDetail extends Model
     protected $table = 'order_details';
     protected $guarded = [];
 
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    public function productItem()
+    {
+        return $this->belongsTo(ProductItem::class, 'product_item_id');
+    }
 
     /**
      * 取得 訂單單身

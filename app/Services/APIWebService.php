@@ -5,7 +5,7 @@ namespace App\Services;
 use Batch;
 use Carbon\Carbon;
 use App\Models\MemberNote;
-use App\Models\ProductPhotos;
+use App\Models\ProductPhoto;
 use App\Models\MemberCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -186,7 +186,7 @@ class APIWebService
             ->where('member_collections.member_id', '=', $member_id)
             ->where('member_collections.status', '=', 0)->get();
         foreach ($collects as $collect) {
-            $photo = ProductPhotos::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first();
+            $photo = ProductPhoto::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first();
 
             $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));
             //echo $discount;

@@ -2,21 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-use App\Models\Invoice;
-use App\Models\Shipment;
-use App\Models\OrderDetail;
-use App\Models\OrderPayment;
-use App\Models\InvoiceDetail;
-use App\Models\ProductPhotos;
-use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
 use App\Models\SysConfig;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
 
 class InventoryService
 {
@@ -170,20 +159,20 @@ class InventoryService
             $inventory->is_dangerous = $inventory->is_dangerous == 1 ? '是' : '否';
 
             return [
-                (string)$inventory->name,
-                (string)$inventory->item_no,
-                (string)$inventory->product_name,
-                (string)$inventory->spec_1_value,
-                (string)$inventory->spec_2_value,
-                (string)$inventory->pos_item_no,
-                (string)$inventory->stock_type,
-                (string)$inventory->safty_qty,
-                (string)$inventory->stock_qty,
+                (string) $inventory->name,
+                (string) $inventory->item_no,
+                (string) $inventory->product_name,
+                (string) $inventory->spec_1_value,
+                (string) $inventory->spec_2_value,
+                (string) $inventory->pos_item_no,
+                (string) $inventory->stock_type,
+                (string) $inventory->safty_qty,
+                (string) $inventory->stock_qty,
                 $inventory->selling_price,
                 $inventory->item_cost,
-                (string)$inventory->gross_margin,
+                (string) $inventory->gross_margin,
                 $inventory->stock_amount,
-                (string)$inventory->is_dangerous
+                (string) $inventory->is_dangerous,
             ];
         });
     }

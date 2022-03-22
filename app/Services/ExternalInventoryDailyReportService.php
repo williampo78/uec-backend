@@ -2,21 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-use App\Models\Invoice;
-use App\Models\Shipment;
-use App\Models\OrderDetail;
-use App\Models\OrderPayment;
-use App\Models\InvoiceDetail;
-use App\Models\ProductPhotos;
-use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
-use App\Models\SysConfig;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
 
 class ExternalInventoryDailyReportService
 {
@@ -104,7 +92,6 @@ class ExternalInventoryDailyReportService
                 return $this->handleBuilder($builder, $request);
             }, 'i')
             ->leftJoinSub($sub_query, 'goods_summary', 'goods_summary.product_item_id', '=', 'i.product_item_id');
-
 
         //庫存狀態
         if (isset($request['is_dangerous'])) {
@@ -206,24 +193,24 @@ class ExternalInventoryDailyReportService
             $item->is_dangerous = $item->is_dangerous == 1 ? '是' : '否';
 
             return [
-                (string)$item->counting_date,
-                (string)$item->warehouse_name,
-                (string)$item->item_no,
-                (string)$item->product_name,
-                (string)$item->spec_1_value,
-                (string)$item->spec_2_value,
-                (string)$item->pos_item_no,
-                (string)$item->stock_type,
-                (string)$item->supplier_name,
-                (string)$item->expiry_date,
-                (string)$item->is_additional_purchase,
-                (string)$item->safty_qty,
-                (string)$item->stock_qty,
-                (string)$item->selling_price,
-                (string)$item->item_cost,
-                (string)$item->gross_margin,
-                (string)$item->stock_amount,
-                (string)$item->is_dangerous
+                (string) $item->counting_date,
+                (string) $item->warehouse_name,
+                (string) $item->item_no,
+                (string) $item->product_name,
+                (string) $item->spec_1_value,
+                (string) $item->spec_2_value,
+                (string) $item->pos_item_no,
+                (string) $item->stock_type,
+                (string) $item->supplier_name,
+                (string) $item->expiry_date,
+                (string) $item->is_additional_purchase,
+                (string) $item->safty_qty,
+                (string) $item->stock_qty,
+                (string) $item->selling_price,
+                (string) $item->item_cost,
+                (string) $item->gross_margin,
+                (string) $item->stock_amount,
+                (string) $item->is_dangerous,
             ];
         });
     }

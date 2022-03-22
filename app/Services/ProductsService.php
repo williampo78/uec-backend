@@ -2,23 +2,24 @@
 
 namespace App\Services;
 
-use Batch;
-use ImageUpload;
-use Carbon\Carbon;
-use App\Models\Products;
-use App\Models\ProductItems;
-use App\Models\ProductPhotos;
-use App\Models\RelatedProduct;
-use App\Models\CategoryProduct;
-use App\Models\ProductAuditLog;
-use App\Models\ProductSpecInfo;
-use App\Models\ProductReviewLog;
 use App\Models\CategoryHierarchy;
-use App\Models\ProductAttributes;
+use App\Models\CategoryProduct;
+use App\Models\Product;
+use App\Models\ProductAttribute;
+use App\Models\ProductAuditLog;
+use App\Models\ProductItem;
+use App\Models\ProductPhoto;
+use App\Models\ProductReviewLog;
+use App\Models\Products;
+use App\Models\ProductSpecInfo;
+use App\Models\RelatedProduct;
 use App\Services\UniversalService;
+use Batch;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
+use ImageUpload;
 
 class ProductsService
 {
@@ -33,7 +34,7 @@ class ProductsService
     {
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
-        $products = Products::select(
+        $products = Product::select(
             'products.*',
             'supplier.name AS supplier_name',
             DB::raw('get_latest_product_cost(products.id, TRUE) AS item_cost'),
@@ -234,9 +235,9 @@ class ProductsService
                 'updated_at' => $now,
                 'agent_id' => $agent_id,
             ];
-            $products_id = Products::create($insert)->id;
+            $products_id = Product::create($insert)->id;
             $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'], 'id' => $products_id]);
-            Products::where('id', $products_id)->update(['product_no' => $product_no]);
+            Product::where('id', $products_id)->update(['product_no' => $product_no]);
             $add_item_no = 1;
             foreach ($skuList as $key => $val) {
                 $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'], '0');
@@ -258,7 +259,7 @@ class ProductsService
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
-                $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
+                $skuList[$key]['id'] = ProductItem::create($skuInsert)->id;
                 $skuList[$key]['item_no'] = $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
                 $add_item_no += 1;
             }
@@ -287,7 +288,7 @@ class ProductsService
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
-                    ProductPhotos::create($insertImg);
+                    ProductPhoto::create($insertImg);
                 }
             }
             DB::commit();
@@ -361,7 +362,7 @@ class ProductsService
             if (isset($in['brand_id']) && $in['brand_id'] !== '') {
                 $update['brand_id'] = $in['brand_id'];
             }
-            Products::where('id', $products_id)->update($update);
+            Product::where('id', $products_id)->update($update);
             $logCreateIn = [
                 'product_id' => $products_id,
                 'created_by' => $user_id,
@@ -376,7 +377,7 @@ class ProductsService
                         'updated_by' => $user_id,
                         'updated_at' => $now,
                     ];
-                    ProductPhotos::where('id', $val['id'])->update($updateImg);
+                    ProductPhoto::where('id', $val['id'])->update($updateImg);
                 } else {
                     $ImageUpload = ImageUpload::uploadImage($file['filedata'][$key], $uploadPath);
                     $insertImg = [
@@ -388,10 +389,10 @@ class ProductsService
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
-                    ProductPhotos::create($insertImg);
+                    ProductPhoto::create($insertImg);
                 }
             }
-            $add_item_no = ProductItems::where('product_id', $products_id)->count();
+            $add_item_no = ProductItem::where('product_id', $products_id)->count();
             foreach ($skuList as $key => $val) {
                 $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'], '0');
                 if ($val['id'] == '') {
@@ -415,7 +416,7 @@ class ProductsService
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
-                    $skuList[$key]['id'] = ProductItems::create($skuInsert)->id;
+                    $skuList[$key]['id'] = ProductItem::create($skuInsert)->id;
                     $skuList[$key]['item_no'] = $in['product_no'] . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
                 } else {
                     $skuUpdate = [
@@ -434,7 +435,7 @@ class ProductsService
                         'updated_at' => $now,
                         'edi_exported_status' => null,
                     ];
-                    ProductItems::where('id', $val['id'])->update($skuUpdate);
+                    ProductItem::where('id', $val['id'])->update($skuUpdate);
                 }
 
             }
@@ -458,7 +459,7 @@ class ProductsService
     public function showProducts($id)
     {
         $agent_id = Auth::user()->agent_id;
-        $products = Products::select(
+        $products = Product::select(
             'products.*',
             'updated_by_name.user_name AS updated_name',
             'created_by_name.user_name AS created_name',
@@ -480,33 +481,33 @@ class ProductsService
     public function getProductItems($products_id)
     {
         $agent_id = Auth::user()->agent_id;
-        $ProductItems = ProductItems::where('agent_id', $agent_id)->where('product_id', $products_id);
-        $result = $ProductItems->get();
+        $productItems = ProductItem::where('agent_id', $agent_id)->where('product_id', $products_id);
+        $result = $productItems->get();
         return $result;
     }
 
     public function getItemsAndProduct($in = [])
     {
         $agent_id = Auth::user()->agent_id;
-        $ProductItems = ProductItems::
+        $productItems = ProductItem::
             select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
             ->where('product_items.agent_id', $agent_id)
             ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id');
         if (isset($in['supplier_id']) && $in['supplier_id'] !== '') {
-            $ProductItems->where('products.supplier_id', $in['supplier_id']);
+            $productItems->where('products.supplier_id', $in['supplier_id']);
         }
         if (isset($in['stock_type']) && $in['stock_type'] !== '') {
-            $ProductItems->where('products.stock_type', $in['stock_type']);
+            $productItems->where('products.stock_type', $in['stock_type']);
         }
-        $result = $ProductItems->get();
+        $result = $productItems->get();
         return $result;
     }
 
     public function getProductsPhoto($products_id)
     {
-        $ProductPhotos = ProductPhotos::where('product_id', $products_id)->orderBy('sort', 'ASC');
-        $results = $ProductPhotos->get();
+        $productPhotos = ProductPhoto::where('product_id', $products_id)->orderBy('sort', 'ASC');
+        $results = $productPhotos->get();
         $results = $results->map(function ($result) {
             $result->photo_size = ImageUpload::getSize($result->photo_name);
             return $result;
@@ -634,7 +635,7 @@ class ProductsService
                 $uploadImage = ImageUpload::uploadImage($file['google_shop_photo_name'], $uploadPath);
                 $updateIn['google_shop_photo_name'] = $uploadImage['image'];
             }
-            Products::where('id', $id)->update($updateIn);
+            Product::where('id', $id)->update($updateIn);
             $logCreateIn = [
                 'product_id' => $id,
                 'created_by' => $user_id,
@@ -642,14 +643,14 @@ class ProductsService
             ];
             ProductAuditLog::create($logCreateIn);
             if (count($ProductsItem) > 0) {
-                $ProductItemsInstance = new ProductItems();
+                $productItemsInstance = new ProductItem();
                 foreach ($ProductsItem as $key => $val) {
                     $ProductsItemUpdate[$key] = [
                         'id' => $val['id'],
                         'photo_name' => $val['photo_name'],
                     ];
                 }
-                $upd = Batch::update($ProductItemsInstance, $ProductsItemUpdate, 'id');
+                $upd = Batch::update($productItemsInstance, $ProductsItemUpdate, 'id');
             }
             foreach ($CategoryHierarchyProducts as $key => $val) {
                 if ($val['status'] == 'new') {
@@ -698,7 +699,7 @@ class ProductsService
                     }
                     $uploadImage = ImageUpload::uploadImage($val, $uploadPath);
 
-                    ProductItems::where('id', $ProductsItem[$key]['id'])->update(
+                    ProductItem::where('id', $ProductsItem[$key]['id'])->update(
                         [
                             'photo_name' => $uploadImage['image'],
                             'updated_by' => $user_id,
@@ -707,7 +708,7 @@ class ProductsService
                 };
             }
             if (isset($in['product_attributes_change']) && $in['product_attributes_change'] == 'true') {
-                ProductAttributes::where('attribute_type', 'CERTIFICATE')->where('product_id', $id)->delete();
+                ProductAttribute::where('attribute_type', 'CERTIFICATE')->where('product_id', $id)->delete();
                 $add_product_attributes = [];
                 if (isset($in['product_attributes'])) {
                     foreach ($in['product_attributes'] as $key => $val) {
@@ -719,7 +720,7 @@ class ProductsService
                         $add_product_attributes[$key]['created_at'] = $now;
                         $add_product_attributes[$key]['updated_at'] = $now;
                     }
-                    ProductAttributes::insert($add_product_attributes);
+                    ProductAttribute::insert($add_product_attributes);
                 }
             }
             $result['status'] = true;
@@ -759,13 +760,13 @@ class ProductsService
         $user_id = Auth::user()->id;
         DB::beginTransaction();
         try {
-            ProductItems::where('product_id', $product_id)->update(['edi_exported_status' => null]);
+            ProductItem::where('product_id', $product_id)->update(['edi_exported_status' => null]);
             ProductAuditLog::create([
                 'product_id' => $product_id,
                 'created_by' => $user_id,
                 'updated_by' => $user_id,
             ]);
-            Products::where('id', $product_id)->update([
+            Product::where('id', $product_id)->update([
                 'start_launched_at' => $in['start_launched_at'],
                 'end_launched_at' => $in['end_launched_at'],
                 'approval_status' => 'REVIEWING',
@@ -811,8 +812,8 @@ class ProductsService
                 'updated_by' => $user_id,
             ]);
             // 客戶要求：審核完成後，不要更新產品修改人員 => 不要修改products.updated_by、products.updated_at
-            $Products_update = Products::where('id', $id)->first();
-            Products::where('id', $id)->update([
+            $Products_update = Product::where('id', $id)->first();
+            Product::where('id', $id)->update([
                 'approval_status' => $approval_status,
                 'updated_at' => $Products_update->updated_at,
             ]);
@@ -844,7 +845,7 @@ class ProductsService
                     'updated_by' => $user_id,
                 ]);
             }
-            Products::where('id', $in['product_id'])->update([
+            Product::where('id', $in['product_id'])->update([
                 'approval_status' => 'CANCELLED',
                 'updated_by' => $user_id,
                 'end_launched_at' => $now,
@@ -884,14 +885,14 @@ class ProductsService
     public function checkPosItemNo($PosItemNo, $ItemNo)
     {
         if ($ItemNo !== '') { //編輯才會進來這裡檢查是否是自己的 pos_item_no
-            $updateCheck = ProductItems::where('pos_item_no', $PosItemNo)->where('item_no', $ItemNo);
+            $updateCheck = ProductItem::where('pos_item_no', $PosItemNo)->where('item_no', $ItemNo);
             if ($updateCheck->count() > 0) {
                 return true;
             }
         }
 
-        $ProductItems = ProductItems::where('pos_item_no', $PosItemNo);
-        if ($ProductItems->count() > 0) { //已存在
+        $productItems = ProductItem::where('pos_item_no', $PosItemNo);
+        if ($productItems->count() > 0) { //已存在
             return false;
         } else {
             return true;
@@ -904,10 +905,10 @@ class ProductsService
      */
     public function delGoogleShopPhoto($products_id)
     {
-        $Products = Products::where('id', $products_id)->first();
-        ImageUpload::DelPhoto($Products->google_shop_photo_name);
+        $products = Product::where('id', $products_id)->first();
+        ImageUpload::DelPhoto($products->google_shop_photo_name);
         $user_id = Auth::user()->id;
-        $Products->update([
+        $products->update([
             'google_shop_photo_name' => '',
             'updated_by' => $user_id,
         ]);
@@ -921,9 +922,9 @@ class ProductsService
     {
         $user_id = Auth::user()->id;
 
-        $Products = Products::where('id', $item_id)->first();
+        $Products = Product::where('id', $item_id)->first();
 
-        ProductItems::where('id', $item_id)->update([
+        ProductItem::where('id', $item_id)->update([
             'photo_name' => '',
             'updated_by' => $user_id,
         ]);
@@ -939,7 +940,7 @@ class ProductsService
     {
         $agent_id = Auth::user()->agent_id;
         $now = Carbon::now();
-        $query = ProductItems::select(
+        $query = ProductItem::select(
             DB::raw('product_items.*'),
             DB::raw('products.*'),
             DB::raw('supplier.name as supplier_name'), //供應商

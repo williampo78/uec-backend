@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\ProductPhotos;
 use ImageUpload ;
+use App\Models\ProductPhoto;
+use Illuminate\Http\Request;
+
 class PhotosController extends Controller
 {
     /**
@@ -82,14 +83,14 @@ class PhotosController extends Controller
     {
     }
     public function delPhoto(Request $request){
-        $in = $request->input() ; 
+        $in = $request->input() ;
 
         switch ($in['type']) {
             case 'products':
-                $photo = ProductPhotos::where('id',$in['id'])->get() ;
+                $photo = ProductPhoto::where('id',$in['id'])->get() ;
                 ImageUpload::DelPhoto($photo[0]->photo_name);
-                ProductPhotos::where('id',$in['id'])->delete() ;
-                return true ; 
+                ProductPhoto::where('id',$in['id'])->delete() ;
+                return true ;
                 break;
             default:
                 # code...
@@ -98,7 +99,7 @@ class PhotosController extends Controller
 
 
         // var_dump($request->input()) ;
-        
-        
+
+
     }
 }

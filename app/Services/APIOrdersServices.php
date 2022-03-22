@@ -7,9 +7,9 @@ use Batch;
 use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\ProductItem;
 use Illuminate\Support\Str;
 use App\Models\OrderPayment;
-use App\Models\ProductItems;
 use App\Services\APIService;
 use App\Models\WarehouseStock;
 use App\Services\StockService;
@@ -115,7 +115,7 @@ class APIOrdersServices
             $utm_info[$utm->product_item_id] = $utm;
         }
 
-        $product_items = ProductItems::all();
+        $product_items = ProductItem::all();
         $prod_info = [];
         foreach ($product_items as $product_item) {
             $prod_info[$product_item->product_id] = $product_item;
