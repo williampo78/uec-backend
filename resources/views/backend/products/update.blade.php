@@ -522,7 +522,7 @@
                                         <label class="control-label">採購人員</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value="{{$finallyOrderSupplier}}" readonly>
                                     </div>
                                 </div>
                             </div>

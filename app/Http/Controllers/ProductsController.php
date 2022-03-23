@@ -7,6 +7,7 @@ use App\Services\BrandsService;
 use App\Services\CategoriesSerivce;
 use App\Services\ProductsService;
 use App\Services\SupplierService;
+use App\Services\OrderSupplierService ;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,12 +20,14 @@ class ProductsController extends Controller
         SupplierService $supplierService,
         BrandsService $brandsService,
         WebCategoryHierarchyService $webCategoryHierarchyService,
-        CategoriesSerivce $categoriesSerivce) {
+        CategoriesSerivce $categoriesSerivce ,
+        OrderSupplierService $orderSupplierService) {
         $this->productsService = $productsService;
         $this->supplierService = $supplierService;
         $this->brandsService = $brandsService;
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
         $this->categoriesSerivce = $categoriesSerivce;
+        $this->orderSupplierService = $orderSupplierService ;
     }
     /**
      * Display a listing of the resource.
@@ -110,6 +113,7 @@ class ProductsController extends Controller
         $result['pos'] = $this->categoriesSerivce->getPosCategories();
         $result['product_photos'] = $this->productsService->getProductsPhoto($id);
         $result['spac_list'] = $this->productsService->getProductSpac($id);
+        $result['finallyOrderSupplier'] = $this->orderSupplierService->getFinallyOrderSupplier($id);
         // dump($result['spac_list']) ; exit ;
         return view('backend.products.show', $result);
     }
@@ -161,6 +165,8 @@ class ProductsController extends Controller
         $result['product_photos'] = $this->productsService->getProductsPhoto($id);
         $result['spac_list'] = $this->productsService->getProductSpac($id);
         $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
+        $result['finallyOrderSupplier'] = $this->orderSupplierService->getFinallyOrderSupplier($id);
+
         return view('backend.products.update', $result);
     }
 
