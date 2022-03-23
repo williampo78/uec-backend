@@ -542,7 +542,7 @@ class APIProductServices
                     }
                 }
             }
-            if (!$rel_category) return 201;
+            if (!$rel_category) return 901;
             $discount = ($product[$id]->list_price == 0 ? 0 : ceil(($product[$id]->selling_price / $product[$id]->list_price) * 100));
             $brand = $this->brandsService->getBrand($product[$id]->brand_id);
             $shipping_fee = $this->shippingFeeService->getShippingFee($product[$id]->lgst_method);

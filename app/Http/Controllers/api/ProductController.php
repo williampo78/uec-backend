@@ -148,6 +148,10 @@ class ProductController extends Controller
             $status = false;
             $err = '201';
             $list = [];
+        } else if ($result == '901'){
+            $status = false;
+            $err = '901';
+            $list = [];
         } else {
             $status = true;
             $err = '';
