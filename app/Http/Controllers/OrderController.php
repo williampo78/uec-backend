@@ -2,26 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\OrdersExport;
-use App\Services\LookupValuesVService;
-use App\Services\MoneyAmountService;
-use App\Services\OrderService;
-use App\Services\RoleService;
 use Carbon\Carbon;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Exports\OrdersExport;
+use App\Models\OrderDetail;
+use App\Services\RoleService;
+use App\Services\OrderService;
+use App\Services\MoneyAmountService;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\LookupValuesVService;
 
 class OrderController extends Controller
 {
-    private $order_service;
-    private $role_service;
+    private $orderService;
+    private $roleService;
 
     public function __construct(
-        OrderService $order_service,
-        RoleService $role_service
+        OrderService $orderService,
+        RoleService $roleService
     ) {
-        $this->order_service = $order_service;
-        $this->role_service = $role_service;
+        $this->orderService = $orderService;
+        $this->roleService = $roleService;
     }
 
     /**
@@ -31,17 +33,14 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query_datas = [];
-        $query_datas = $request->query();
+        $payload = $request->query();
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
-        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
+        if (!$this->roleService->getOtherRoles()['auth_query'] || count($payload) < 1) {
             return view('backend.order.list');
         }
 
-        $query_datas['is_latest'] = 1;
-
-        $orders = $this->order_service->getOrders($query_datas);
+        $orders = $this->orderService->getTableList($payload);
 
         // 整理給前端的資料
         $orders = $orders->map(function ($order) {
@@ -58,7 +57,8 @@ class OrderController extends Controller
             $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
 
             // 出貨單明細
-            if (isset($order->shipments)) {
+            if ($order->shipments->isNotEmpty()) {
+                // 第一階段，一筆訂單只會有一筆出貨單
                 $order->shipments = $order->shipments->take(1)->map(function ($shipment) {
                     // 出貨單狀態
                     $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code] ?? null;
@@ -66,8 +66,7 @@ class OrderController extends Controller
                     return $shipment->only([
                         'status_code',
                     ]);
-                })
-                    ->toArray();
+                });
             }
 
             return $order->only([
@@ -83,13 +82,9 @@ class OrderController extends Controller
                 'buyer_name',
                 'shipments',
             ]);
-        })
-            ->toArray();
+        });
 
-        return view(
-            'backend.order.list',
-            compact('orders')
-        );
+        return view('backend.order.list', compact('orders'));
     }
 
     /**
@@ -124,7 +119,7 @@ class OrderController extends Controller
         $lookup_values_v_service = new LookupValuesVService;
         $money_amount_service = new MoneyAmountService;
 
-        $order = $this->order_service->getOrders([
+        $order = $this->orderService->getOrders([
             'id' => $id,
         ])->first();
 
@@ -492,7 +487,7 @@ class OrderController extends Controller
         $input_datas = $request->input();
         $input_datas['is_latest'] = 1;
 
-        $orders = $this->order_service->getOrders($input_datas);
+        $orders = $this->orderService->getOrders($input_datas);
 
         return Excel::download(new OrdersExport($orders), 'orders.xlsx');
     }

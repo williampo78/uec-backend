@@ -17,6 +17,16 @@ class Order extends Model
         return $this->hasMany(OrderDetail::class, 'order_id');
     }
 
+    public function shipments()
+    {
+        return $this->hasMany(Shipment::class, 'order_no', 'order_no');
+    }
+
+    public function orderCampaignDiscounts()
+    {
+        return $this->hasMany(OrderCampaignDiscount::class, 'order_id');
+    }
+
     /**
      * 取得 訂單
      *
