@@ -28,7 +28,9 @@ class APIIndexServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->apiProductService->getProducts();
+
         $categoryProducts = $this->apiProductService->getWebCategoryProducts('', '', '', '', '', '', '');
+
         $strSQL = "select ad1.`slot_code`, ad1.`slot_desc`, ad1.`slot_type`, ad1.`is_mobile_applicable`, ad1.`is_desktop_applicable`
                 , ad2.`slot_color_code`, ad2.`slot_icon_name`, ad2.`slot_title`, ad2.`product_assigned_type`
                 , ad3.*
@@ -68,6 +70,7 @@ class APIIndexServices
             }
         }
         foreach ($ads as $ad_slot) {
+            $product_check = $this->apiProductService->getWebCategoryProducts('', '', '', '', $ad_slot->product_id, '', '');
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
                     'name' => $ad_slot->texts,
@@ -155,18 +158,21 @@ class APIIndexServices
                             }
                         }
 
-                        $product_info[$ad_slot->slot_code][] = array(
-                            'product_id' => $ad_slot->product_id,
-                            'product_no' => $products[$ad_slot->product_id]->product_no,
-                            'product_name' => $products[$ad_slot->product_id]->product_name,
-                            'product_unit' => $products[$ad_slot->product_id]->uom,
-                            'list_price' => $products[$ad_slot->product_id]->list_price,
-                            'selling_price' => $products[$ad_slot->product_id]->selling_price,
-                            'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
-                            'promotion_desc' => $promotion_desc,
-                            'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
-                            "collection" => $collection,
-                        );
+                        if (count($product_check) > 0) {
+                            $product_info[$ad_slot->slot_code][] = array(
+                                'prod_test2' => count($product_check),
+                                'product_id' => $ad_slot->product_id,
+                                'product_no' => $products[$ad_slot->product_id]->product_no,
+                                'product_name' => $products[$ad_slot->product_id]->product_name,
+                                'product_unit' => $products[$ad_slot->product_id]->uom,
+                                'list_price' => $products[$ad_slot->product_id]->list_price,
+                                'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                                'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                                'promotion_desc' => $promotion_desc,
+                                'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
+                                "collection" => $collection,
+                            );
+                        }
 
                         $data[$ad_slot->slot_code] = array(
                             'slot_color_code' => $ad_slot->slot_color_code,
@@ -195,69 +201,77 @@ class APIIndexServices
                         }
                     }
                     if ($ad_slot->slot_code == 'H080A') {
-                        $prd_H080A[] = array(
-                            'product_id' => $products[$ad_slot->product_id]->id,
-                            'product_no' => $products[$ad_slot->product_id]->product_no,
-                            'product_name' => $products[$ad_slot->product_id]->product_name,
-                            'product_unit' => $products[$ad_slot->product_id]->uom,
-                            'list_price' => $products[$ad_slot->product_id]->list_price,
-                            'selling_price' => $products[$ad_slot->product_id]->selling_price,
-                            'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
-                            'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                            'desktop_applicable' => $ad_slot->is_desktop_applicable,
-                            'promotion_desc' => $promotion_desc,
-                            'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
-                            "collection" => $collection,
-                        );
+                        if (count($product_check) > 0) {
+                            $prd_H080A[] = array(
+                                'product_id' => $products[$ad_slot->product_id]->id,
+                                'product_no' => $products[$ad_slot->product_id]->product_no,
+                                'product_name' => $products[$ad_slot->product_id]->product_name,
+                                'product_unit' => $products[$ad_slot->product_id]->uom,
+                                'list_price' => $products[$ad_slot->product_id]->list_price,
+                                'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                                'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                                'mobile_applicable' => $ad_slot->is_mobile_applicable,
+                                'desktop_applicable' => $ad_slot->is_desktop_applicable,
+                                'promotion_desc' => $promotion_desc,
+                                'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
+                                "collection" => $collection,
+                            );
+                        }
                     }
                     if ($ad_slot->slot_code == 'H080B') {
-                        $prd_H080B[] = array(
-                            'product_id' => $products[$ad_slot->product_id]->id,
-                            'product_no' => $products[$ad_slot->product_id]->product_no,
-                            'product_name' => $products[$ad_slot->product_id]->product_name,
-                            'product_unit' => $products[$ad_slot->product_id]->uom,
-                            'list_price' => $products[$ad_slot->product_id]->list_price,
-                            'selling_price' => $products[$ad_slot->product_id]->selling_price,
-                            'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
-                            'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                            'desktop_applicable' => $ad_slot->is_desktop_applicable,
-                            'promotion_desc' => $promotion_desc,
-                            'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
-                            "collection" => $collection,
-                        );
+                        if (count($product_check) > 0) {
+                            $prd_H080B[] = array(
+                                'product_id' => $products[$ad_slot->product_id]->id,
+                                'product_no' => $products[$ad_slot->product_id]->product_no,
+                                'product_name' => $products[$ad_slot->product_id]->product_name,
+                                'product_unit' => $products[$ad_slot->product_id]->uom,
+                                'list_price' => $products[$ad_slot->product_id]->list_price,
+                                'selling_price' => $products[$ad_slot->product_id]->selling_price,
+                                'product_photo' => ($products[$ad_slot->product_id]->displayPhoto ? $s3 . $products[$ad_slot->product_id]->displayPhoto : null),
+                                'mobile_applicable' => $ad_slot->is_mobile_applicable,
+                                'desktop_applicable' => $ad_slot->is_desktop_applicable,
+                                'promotion_desc' => $promotion_desc,
+                                'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
+                                "collection" => $collection,
+                            );
+                        }
                     }
                 }
 
                 if ($ad_slot->data_type == 'IMG') {
                     if ($ad_slot->slot_code == 'H080A') {
-                        $img_H080A[] = array(
-                            'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
-                            'img_alt' => $ad_slot->image_alt,
-                            'img_title' => $ad_slot->image_title,
-                            'img_abstract' => $ad_slot->image_abstract,
-                            'img_action' => $ad_slot->image_action,
-                            'url' => $ad_slot->target_url,
-                            'target_blank' => $ad_slot->is_target_blank,
-                            'target_campaign' => $ad_slot->target_campaign_id,
-                            'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
-                            'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                            'desktop_applicable' => $ad_slot->is_desktop_applicable
-                        );
+                        if (count($product_check) > 0) {
+                            $img_H080A[] = array(
+                                'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
+                                'img_alt' => $ad_slot->image_alt,
+                                'img_title' => $ad_slot->image_title,
+                                'img_abstract' => $ad_slot->image_abstract,
+                                'img_action' => $ad_slot->image_action,
+                                'url' => $ad_slot->target_url,
+                                'target_blank' => $ad_slot->is_target_blank,
+                                'target_campaign' => $ad_slot->target_campaign_id,
+                                'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
+                                'mobile_applicable' => $ad_slot->is_mobile_applicable,
+                                'desktop_applicable' => $ad_slot->is_desktop_applicable
+                            );
+                        }
                     }
                     if ($ad_slot->slot_code == 'H080B') {
-                        $img_H080B[] = array(
-                            'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
-                            'img_alt' => $ad_slot->image_alt,
-                            'img_title' => $ad_slot->image_title,
-                            'img_abstract' => $ad_slot->image_abstract,
-                            'img_action' => $ad_slot->image_action,
-                            'url' => $ad_slot->target_url,
-                            'target_blank' => $ad_slot->is_target_blank,
-                            'target_campaign' => $ad_slot->target_campaign_id,
-                            'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
-                            'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                            'desktop_applicable' => $ad_slot->is_desktop_applicable
-                        );
+                        if (count($product_check) > 0) {
+                            $img_H080B[] = array(
+                                'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
+                                'img_alt' => $ad_slot->image_alt,
+                                'img_title' => $ad_slot->image_title,
+                                'img_abstract' => $ad_slot->image_abstract,
+                                'img_action' => $ad_slot->image_action,
+                                'url' => $ad_slot->target_url,
+                                'target_blank' => $ad_slot->is_target_blank,
+                                'target_campaign' => $ad_slot->target_campaign_id,
+                                'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
+                                'mobile_applicable' => $ad_slot->is_mobile_applicable,
+                                'desktop_applicable' => $ad_slot->is_desktop_applicable
+                            );
+                        }
                     }
                 }
             }
