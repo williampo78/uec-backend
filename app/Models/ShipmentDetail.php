@@ -11,4 +11,9 @@ class ShipmentDetail extends Model
 
     protected $table = 'shipment_details';
     protected $guarded = [];
+
+    public function shipment()
+    {
+        return $this->belongsTo(Shipment::class, 'shipment_id');
+    }
 }

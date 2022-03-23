@@ -275,10 +275,7 @@
                                 </thead>
                                 <tbody>
                                     @isset($orders)
-                                        @php
-                                            $count = 1;
-                                        @endphp
-                                        @foreach ($orders as $order)
+                                        @foreach ($orders as $key => $order)
                                             <tr>
                                                 <td>
                                                     @if ($share_role_auth['auth_query'])
@@ -288,7 +285,7 @@
                                                         </button>
                                                     @endif
                                                 </td>
-                                                <td>{{ $count++ }}</td>
+                                                <td>{{ $key + 1 }}</td>
                                                 <td>{{ $order['ordered_date'] ?? '' }}</td>
                                                 <td>{{ $order['order_no'] ?? '' }}</td>
                                                 <td>{{ $order['order_status_desc'] ?? '' }}</td>

@@ -396,6 +396,65 @@ class OrderService
         return $orders;
     }
 
+    public function getTableList($payload)
+    {
+        $orders = Order::with(['shipments'])->where('is_latest', 1);
+
+        // 訂單開始時間
+        if (isset($payload['ordered_date_start'])) {
+            $orders = $orders->whereDate('ordered_date', '>=', $payload['ordered_date_start']);
+        }
+
+        // 訂單結束時間
+        if (isset($payload['ordered_date_end'])) {
+            $orders = $orders->whereDate('ordered_date', '<=', $payload['ordered_date_end']);
+        }
+
+        // 訂單編號
+        if (isset($payload['order_no'])) {
+            $orders = $orders->where('order_no', $payload['order_no']);
+        }
+
+        // 會員帳號
+        if (isset($payload['member_account'])) {
+            $orders = $orders->where('member_account', $payload['member_account']);
+        }
+
+        // 訂單狀態
+        if (isset($payload['order_status_code'])) {
+            $orders = $orders->where('status_code', $payload['order_status_code']);
+        }
+
+        // 付款狀態
+        if (isset($payload['pay_status'])) {
+            $orders = $orders->where('pay_status', $payload['pay_status']);
+        }
+
+        // 出貨單狀態
+        if (isset($payload['shipment_status_code'])) {
+            $orders = $orders->whereRelation('shipments', 'status_code', $payload['shipment_status_code']);
+        }
+
+        // 商品序號
+        if (isset($payload['product_no'])) {
+            $orders = $orders->whereRelation('orderDetails.product', 'product_no', $payload['product_no']);
+        }
+
+        // 商品名稱
+        if (isset($payload['product_name'])) {
+            $orders = $orders->whereRelation('orderDetails.product', 'product_name', 'LIKE', "%{$payload['product_name']}%");
+        }
+
+        // 活動名稱
+        if (isset($payload['campaign_name'])) {
+            $orders = $orders->whereRelation('orderCampaignDiscounts.promotionalCampaign', 'campaign_name', 'LIKE', "%{$payload['campaign_name']}%");
+        }
+
+        return $orders->select()
+            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
+            ->get();
+    }
+
     /**
      * 是否可以取消訂單
      *
