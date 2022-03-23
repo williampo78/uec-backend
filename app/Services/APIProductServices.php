@@ -691,6 +691,8 @@ class APIProductServices
             }
             if ($rel_category) {
                 $data['relateCategory'] = $rel_category;
+            } else {
+                $data['relateCategory'] = null;
             }
             $data['googleShop'] = $s3 . $product[$id]->google_shop_photo_name;
             $meta = [];
