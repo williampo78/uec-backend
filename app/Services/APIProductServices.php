@@ -207,7 +207,7 @@ class APIProductServices
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' ";
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
@@ -429,7 +429,7 @@ class APIProductServices
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
 
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N'";
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
@@ -904,7 +904,7 @@ class APIProductServices
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N'";
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
             if ($category) {
                 $strSQL .= " and cate.`id`=" . $category;
             }
