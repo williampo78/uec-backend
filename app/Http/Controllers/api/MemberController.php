@@ -224,7 +224,10 @@ class MemberController extends Controller
             // 出貨單
             if (isset($order->shipments)) {
                 $shipment = $order->shipments->first();
-                $order->package_no = $shipment->package_no;
+
+                if (isset($shipment)) {
+                    $order->package_no = $shipment->package_no;
+                }
             }
 
             return $order->only([
@@ -422,11 +425,13 @@ class MemberController extends Controller
         if (isset($order->shipments)) {
             $shipment = $order->shipments->first();
 
-            $order->package_no = $shipment->package_no;
+            if (isset($shipment)) {
+                $order->package_no = $shipment->package_no;
 
-            // 待出貨時間
-            if (isset($shipment->edi_exported_at)) {
-                $order->prepared_shipment_at = Carbon::parse($shipment->edi_exported_at)->format('Y-m-d H:i:s');
+                // 待出貨時間
+                if (isset($shipment->edi_exported_at)) {
+                    $order->prepared_shipment_at = Carbon::parse($shipment->edi_exported_at)->format('Y-m-d H:i:s');
+                }
             }
         }
 

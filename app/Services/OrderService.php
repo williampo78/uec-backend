@@ -2,20 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\Invoice;
-use App\Models\InvoiceAllowance;
-use App\Models\InvoiceAllowanceDetail;
-use App\Models\InvoiceDetail;
+use Carbon\Carbon;
 use App\Models\Order;
-use App\Models\OrderCampaignDiscount;
+use App\Models\Invoice;
+use App\Models\Shipment;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
 use App\Models\ProductPhoto;
+use App\Models\InvoiceDetail;
 use App\Models\ReturnRequest;
-use App\Models\Shipment;
 use App\Models\ShipmentDetail;
-use Carbon\Carbon;
+use App\Models\InvoiceAllowance;
 use Illuminate\Support\Facades\DB;
+use App\Models\OrderCampaignDiscount;
+use App\Models\InvoiceAllowanceDetail;
+use Illuminate\Database\Eloquent\Collection;
 
 class OrderService
 {
@@ -396,7 +397,13 @@ class OrderService
         return $orders;
     }
 
-    public function getTableList($payload)
+    /**
+     * 取得訂單table列表
+     *
+     * @param array $payload
+     * @return Collection
+     */
+    public function getTableList(array $payload = []): Collection
     {
         $orders = Order::with(['shipments'])->where('is_latest', 1);
 
