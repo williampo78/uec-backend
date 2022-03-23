@@ -94,7 +94,7 @@ class CheckoutController extends Controller
             if ($points > $response['result']['point']['discountMax']) {//超過最大可點數折抵
                 $status = false;
                 $err = '401';
-                $data['point_discount'] = "點數折抵超出本次可抵用點數";
+                $data['points'] = "點數折抵超出本次可抵用點數";
             } elseif ($response['result']['totalPrice'] == $request->total_price && $response['result']['discount'] == $request->discount) {
                 //檢核使用點數折抵後，運費是否要運費
                 if ($points > 0){
@@ -253,7 +253,7 @@ class CheckoutController extends Controller
             if (abs($points) > $response['result']['point']['discountMax']) {//超過最大可點數折抵
                 $status = false;
                 $err = '401';
-                $data['point_discount'] = "點數折抵超出本次可抵用數";
+                $data['points'] = "點數折抵超出本次可抵用點數";
             } elseif ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount) {
                 //檢核使用點數折抵後，運費是否要運費
                 if ($points == 0){
