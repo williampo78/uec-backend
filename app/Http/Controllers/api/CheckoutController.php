@@ -99,6 +99,8 @@ class CheckoutController extends Controller
                 //檢核使用點數折抵後，運費是否要運費
                 if ($points > 0){
                     $point_discount = ($points * $response['result']['point']['exchangeRate']);
+                } else {
+                    $point_discount = 0;
                 }
                 if (($response['result']['totalPrice'] - $response['result']['discount'] - $point_discount) < $response['result']['feeInfo']['free_threshold']) {
                     $shipping_fee = 80;
@@ -256,6 +258,8 @@ class CheckoutController extends Controller
                 //檢核使用點數折抵後，運費是否要運費
                 if ($points == 0){
                     $points_discount = ($points * $response['result']['point']['exchangeRate']);
+                } else {
+                    $points_discount = 0;
                 }
                 if (($response['result']['totalPrice'] - $response['result']['discount'] - abs($points_discount)) < $response['result']['feeInfo']['free_threshold']) {
                     $shipping_fee = 80;
