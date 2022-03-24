@@ -100,9 +100,9 @@ class APIIndexServices
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
             } elseif ($ad_slot->slot_type == 'S') {
+                $product_info = [];
                 if ($ad_slot->product_assigned_type == 'C') {
                     if (isset($categoryProducts[$ad_slot->web_category_hierarchy_id])) {
-                        $product_info = [];
                         foreach ($categoryProducts[$ad_slot->web_category_hierarchy_id] as $product) {
                             if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
                                 $promotion_desc = $product->promotion_desc;
@@ -148,7 +148,6 @@ class APIIndexServices
                         } else {
                             $promotion_desc = null;
                         }
-
                         if (isset($is_collection)) {
                             $collection = false;
                             foreach ($is_collection as $k => $v) {
@@ -157,7 +156,6 @@ class APIIndexServices
                                 }
                             }
                         }
-
                         if (count($product_check) > 0) {
                             $product_info[$ad_slot->slot_code][] = array(
                                 'product_id' => $ad_slot->product_id,
@@ -172,7 +170,6 @@ class APIIndexServices
                                 "collection" => $collection,
                             );
                         }
-
                         if (count($product_info) > 0) {
                             $data[$ad_slot->slot_code] = array(
                                 'slot_color_code' => $ad_slot->slot_color_code,
