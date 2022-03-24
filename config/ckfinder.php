@@ -24,7 +24,7 @@ $config = array();
 $config['loadRoutes'] = true;
 
 $config['authentication'] = function () {
-     return Auth::check();
+    return Auth::check();
 };
 
 /*============================ License Key ============================================*/
@@ -43,8 +43,8 @@ $config['privateDir'] = array(
     'thumbs' => 'ckfinder/cache/thumbs',
     'logs' => array(
         'backend' => 'laravel_logs',
-        'path' => 'ckfinder/logs'
-    )
+        'path' => 'ckfinder/logs',
+    ),
 );
 
 /*============================ Images and Thumbnails ==================================*/
@@ -57,8 +57,8 @@ $config['images'] = array(
     'sizes' => array(
         'small' => array('width' => 480, 'height' => 320, 'quality' => 80),
         'medium' => array('width' => 600, 'height' => 480, 'quality' => 80),
-        'large' => array('width' => 800, 'height' => 600, 'quality' => 80)
-    )
+        'large' => array('width' => 800, 'height' => 600, 'quality' => 80),
+    ),
 );
 
 /*=================================== Backends ========================================*/
@@ -69,25 +69,25 @@ $config['images'] = array(
 $config['backends']['laravel_cache'] = array(
     'name' => 'laravel_cache',
     'adapter' => 'local',
-    'root' => storage_path('framework/cache')
+    'root' => storage_path('framework/cache'),
 );
 
 $config['backends']['laravel_logs'] = array(
     'name' => 'laravel_logs',
     'adapter' => 'local',
-    'root' => storage_path('logs')
+    'root' => storage_path('logs'),
 );
 
 // Backends
 
 $config['backends']['default'] = array(
-    'name'         => 'default',
-    'adapter'      => 'local',
-    'baseUrl'      => config('app.url').'/userfiles/',
-    'root'         => public_path('/userfiles/'),
-    'chmodFiles'   => 0777,
+    'name' => 'default',
+    'adapter' => 'local',
+    'baseUrl' => config('app.url') . '/userfiles/',
+    'root' => public_path('/userfiles/'),
+    'chmodFiles' => 0777,
     'chmodFolders' => 0755,
-    'filesystemEncoding' => 'UTF-8'
+    'filesystemEncoding' => 'UTF-8',
 );
 
 $config['backends']['awss3'] = array(
@@ -109,7 +109,7 @@ $config['defaultResourceTypes'] = 'Images';
 $config['resourceTypes'][] = array(
     'name' => 'Images',
     'directory' => 'webimg/',
-    'maxSize' => '1M',
+    'maxSize' => '50M',
     'allowedExtensions' => 'bmp,gif,jpeg,jpg,png',
     'deniedExtensions' => '',
     'backend' => 'awss3',
@@ -121,10 +121,8 @@ $config['resourceTypes'][] = array(
     'maxSize' => 0,
     'allowedExtensions' => '7z,aiff,asf,avi,bmp,csv,doc,docx,fla,flv,gif,gz,gzip,jpeg,jpg,mid,mov,mp3,mp4,mpc,mpeg,mpg,ods,odt,pdf,png,ppt,pptx,pxd,qt,ram,rar,rm,rmi,rmvb,rtf,sdc,sitd,swf,sxc,sxw,tar,tgz,tif,tiff,txt,vsd,wav,wma,wmv,xls,xlsx,zip',
     'deniedExtensions' => '',
-    'backend' => 'default'
+    'backend' => 'default',
 );
-
-
 
 /*================================ Access Control =====================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_roleSessionVar
@@ -148,9 +146,8 @@ $config['accessControl'][] = array(
     'FILE_DELETE' => true,
 
     'IMAGE_RESIZE' => true,
-    'IMAGE_RESIZE_CUSTOM' => true
+    'IMAGE_RESIZE_CUSTOM' => true,
 );
-
 
 /*================================ Other Settings =====================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html
@@ -174,16 +171,16 @@ $config['debug'] = false;
 
 $config['plugins'] = array(
     array(
-    'name' => 'RandomRenameService',
-    'path' => app_path().'/Services/RandomRenameService.php'
-));
+        'name' => 'RandomRenameService',
+        'path' => app_path() . '/Services/RandomRenameService.php',
+    ));
 
 /*================================ Cache settings =====================================*/
 // http://docs.cksource.com/ckfinder3-php/configuration.html#configuration_options_cache
 
 $config['cache'] = array(
     'imagePreview' => 24 * 3600,
-    'thumbnails' => 24 * 3600 * 365
+    'thumbnails' => 24 * 3600 * 365,
 );
 
 /*============================ Temp Directory settings ================================*/
