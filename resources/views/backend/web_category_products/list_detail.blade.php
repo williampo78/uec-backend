@@ -71,7 +71,7 @@
                                         <td>@{{ category_products_list . selling_price }}</td>
                                         <td>@{{ category_products_list . start_launched_at }} ~
                                             @{{ category_products_list . end_launched_at }}</td>
-                                        <td>@{{ category_products_list . launched_status }}</td>
+                                        <td>@{{ category_products_list . launched_status_desc }}</td>
                                         <td>@{{ category_products_list . gross_margin }}</td>
                                     </tr>
                                 </tbody>
