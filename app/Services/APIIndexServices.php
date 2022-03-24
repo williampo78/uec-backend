@@ -160,7 +160,6 @@ class APIIndexServices
 
                         if (count($product_check) > 0) {
                             $product_info[$ad_slot->slot_code][] = array(
-                                'prod_test2' => count($product_check),
                                 'product_id' => $ad_slot->product_id,
                                 'product_no' => $products[$ad_slot->product_id]->product_no,
                                 'product_name' => $products[$ad_slot->product_id]->product_name,
@@ -174,14 +173,16 @@ class APIIndexServices
                             );
                         }
 
-                        $data[$ad_slot->slot_code] = array(
-                            'slot_color_code' => $ad_slot->slot_color_code,
-                            'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
-                            'slot_title' => $ad_slot->slot_title,
-                            'mobile_applicable' => $ad_slot->is_mobile_applicable,
-                            'desktop_applicable' => $ad_slot->is_desktop_applicable,
-                            'products' => $product_info[$ad_slot->slot_code]
-                        );
+                        if (count($product_info) > 0) {
+                            $data[$ad_slot->slot_code] = array(
+                                'slot_color_code' => $ad_slot->slot_color_code,
+                                'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
+                                'slot_title' => $ad_slot->slot_title,
+                                'mobile_applicable' => $ad_slot->is_mobile_applicable,
+                                'desktop_applicable' => $ad_slot->is_desktop_applicable,
+                                'products' => $product_info[$ad_slot->slot_code]
+                            );
+                        }
                     }
                 }
             } elseif ($ad_slot->slot_type == 'IS') {
