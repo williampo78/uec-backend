@@ -459,7 +459,16 @@ class OrderService
 
         return $orders->select()
             ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
+            ->orderBy('ordered_date', 'desc')
             ->get();
+    }
+
+
+    public function getTableDetailById(int $id)
+    {
+        $order = Order::with(['shipments', 'orderDetails', 'orderDetails.product', 'orderDetails.productItem']);
+
+        return $order->find($id);
     }
 
     /**
