@@ -244,12 +244,14 @@ class APIProductServices
         $products = DB::select($strSQL);
         $data = [];
         $product_id = 0;
+        $web_category_hierarchy_id = 0;
         foreach ($products as $product) {
             if (!$id) {//依產品編號找相關分類不進此判斷
-                if ($product->id == $product_id) continue;
+                if ($product->id == $product_id && $product->web_category_hierarchy_id==$web_category_hierarchy_id) continue;
             }
             $data[$product->web_category_hierarchy_id][] = $product;
             $product_id = $product->id;
+            $web_category_hierarchy_id = $product->web_category_hierarchy_id;
         }
         return $data;
     }
