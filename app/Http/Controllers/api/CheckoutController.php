@@ -103,7 +103,7 @@ class CheckoutController extends Controller
                     $point_discount = 0;
                 }
                 if (($response['result']['totalPrice'] - $response['result']['discount'] - $point_discount) < $response['result']['feeInfo']['free_threshold']) {
-                    $shipping_fee = 80;
+                    $shipping_fee = $response['result']['feeInfo']['shipping_fee'];
                 } else {
                     $shipping_fee = 0;
                 }
@@ -256,13 +256,13 @@ class CheckoutController extends Controller
                 $data['points'] = "點數折抵超出本次可抵用點數";
             } elseif ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount) {
                 //檢核使用點數折抵後，運費是否要運費
-                if ($points == 0){
+                if (abs($points) > 0){
                     $points_discount = ($points * $response['result']['point']['exchangeRate']);
                 } else {
                     $points_discount = 0;
                 }
                 if (($response['result']['totalPrice'] - $response['result']['discount'] - abs($points_discount)) < $response['result']['feeInfo']['free_threshold']) {
-                    $shipping_fee = 80;
+                    $shipping_fee = $response['result']['feeInfo']['shipping_fee'];
                 } else {
                     $shipping_fee = 0;
                 }
