@@ -2,21 +2,21 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use App\Models\Order;
 use App\Models\Invoice;
-use App\Models\Shipment;
+use App\Models\InvoiceAllowance;
+use App\Models\InvoiceAllowanceDetail;
+use App\Models\InvoiceDetail;
+use App\Models\Order;
+use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
 use App\Models\ProductPhoto;
-use App\Models\InvoiceDetail;
 use App\Models\ReturnRequest;
+use App\Models\Shipment;
 use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
-use Illuminate\Support\Facades\DB;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
@@ -463,12 +463,65 @@ class OrderService
             ->get();
     }
 
-
     public function getTableDetailById(int $id)
     {
-        $order = Order::with(['shipments', 'orderDetails', 'orderDetails.product', 'orderDetails.productItem']);
+        $order = Order::with([
+            'shipments',
+            'orderDetails' => function ($query) {
+                $query->orderBy('order_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'orderDetails.product',
+            'orderDetails.productItem',
+            'orderDetails.shipmentDetail.shipment',
+            'orderPayments' => function ($query) {
+                $query->orderBy('created_at', 'asc');
+            },
+            'orderCampaignDiscounts' => function ($query) {
+                $query->orderBy('group_seq', 'asc')
+                    ->orderBy('order_detail_id', 'asc');
+            },
+            'orderCampaignDiscounts.product',
+            'orderCampaignDiscounts.productItem',
+            'orderCampaignDiscounts.promotionalCampaign',
+            'invoices' => function ($query) {
+                $query->select()
+                    ->addSelect('invoice_date AS transaction_date');
+            },
+            'invoices.invoiceDetails' => function ($query) {
+                $query->orderBy('invoice_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'invoiceAllowances' => function ($query) {
+                $query->select()
+                    ->addSelect('allowance_date AS transaction_date');
+            },
+            'invoiceAllowances.invoiceAllowanceDetails' => function ($query) {
+                $query->orderBy('invoice_allowance_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'invoiceAllowances.invoice',
+            'donatedInstitution',
+        ]);
 
-        return $order->find($id);
+        $order = $order->find($id);
+
+        // 合併發票開立、發票折讓
+        $combineInvoices = collect();
+
+        if ($order->invoices->isNotEmpty()) {
+            $combineInvoices = $combineInvoices->concat($order->invoices);
+        }
+
+        if ($order->invoiceAllowances->isNotEmpty()) {
+            $combineInvoices = $combineInvoices->concat($order->invoiceAllowances);
+        }
+
+        $combineInvoices = $combineInvoices->sortBy('transaction_date');
+
+        $order->combineInvoices = $combineInvoices;
+
+        return $order;
     }
 
     /**
