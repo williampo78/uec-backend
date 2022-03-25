@@ -157,7 +157,7 @@ class APIIndexServices
                             }
                         }
                         if (count($product_check) > 0) {
-                            $product_info[$ad_slot->slot_code][] = array(
+                            $product_info[$ad_slot->slot_code][$ad_slot->product_id] = array(
                                 'product_id' => $ad_slot->product_id,
                                 'product_no' => $products[$ad_slot->product_id]->product_no,
                                 'product_name' => $products[$ad_slot->product_id]->product_name,
