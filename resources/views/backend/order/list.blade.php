@@ -433,9 +433,8 @@
                         // 物流
                         $('#modal-lgst-method').empty().text(order.lgst_method);
                         $('#modal-shipment-status-code').empty();
-                        if (order.shipments && order.shipments[0]) {
-                            $('#modal-shipment-status-code').text(order.shipments[0]
-                                .status_code);
+                        if (order.shipment) {
+                            $('#modal-shipment-status-code').text(order.shipment.status_code);
                         }
 
                         // 金額區塊
@@ -449,7 +448,7 @@
                         $("#tab-order-detail tbody").empty();
 
                         if (order.order_details) {
-                            $.each(order.order_details, function(key, order_detail) {
+                            order.order_details.forEach((order_detail) => {
                                 let spec_1_value = order_detail.spec_1_value ? order_detail
                                     .spec_1_value : '';
                                 let spec_2_value = order_detail.spec_2_value ? order_detail
@@ -496,7 +495,8 @@
 
                         if (order.invoices) {
                             let count = 1;
-                            $.each(order.invoices, function(key, invoice) {
+
+                            order.invoices.forEach((invoice) => {
                                 $("#tab-invoice-info tbody").append(`
                                     <tr data-count="${count}">
                                         <td>${count}</td>
@@ -520,7 +520,7 @@
                         $("#tab-payment-info tbody").empty();
 
                         if (order.order_payments) {
-                            $.each(order.order_payments, function(key, order_payment) {
+                            order.order_payments.forEach((order_payment) => {
                                 let count = 1;
                                 let latest_api_date = order_payment.latest_api_date ?
                                     order_payment.latest_api_date : '';
@@ -545,8 +545,7 @@
                         $("#tab-campaign-discount tbody").empty();
 
                         if (order.order_campaign_discounts) {
-                            $.each(order.order_campaign_discounts, function(key,
-                                order_campaign_discount) {
+                            order.order_campaign_discounts.forEach((order_campaign_discount) => {
                                 let item_no = order_campaign_discount.item_no ?
                                     order_campaign_discount.item_no : '';
                                 let product_name = order_campaign_discount.product_name !=
@@ -605,7 +604,7 @@
                     $("#invoice-modal-invoice-info-table tbody").empty();
 
                     if (invoices[count].invoice_details) {
-                        $.each(invoices[count].invoice_details, function(key, invoice_detail) {
+                        invoices[count].invoice_details.forEach((invoice_detail) => {
                             $("#invoice-modal-invoice-info-table tbody").append(`
                                 <tr>
                                     <td>${invoice_detail.seq}</td>
