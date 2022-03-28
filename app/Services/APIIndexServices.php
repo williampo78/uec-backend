@@ -117,7 +117,7 @@ class APIIndexServices
                                     }
                                 }
                             }
-                            $product_info[] = array(
+                            $product_info[$ad_slot->web_category_hierarchy_id][] = array(
                                 'product_id' => $product->id,
                                 'product_no' => $product->product_no,
                                 'product_name' => $product->product_name,
@@ -138,7 +138,7 @@ class APIIndexServices
                             'slot_title' => $ad_slot->slot_title,
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
-                            'products' => $product_info
+                            'products' => $product_info[$ad_slot->web_category_hierarchy_id]
                         );
                     }
                 } else if ($ad_slot->product_assigned_type == 'P') {
