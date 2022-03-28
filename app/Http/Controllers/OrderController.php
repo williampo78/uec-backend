@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\OrdersExport;
-use App\Services\MoneyAmountService;
-use App\Services\OrderService;
-use App\Services\RoleService;
 use Carbon\Carbon;
+use App\Exports\OrderExport;
 use Illuminate\Http\Request;
+use App\Services\RoleService;
+use App\Services\OrderService;
+use App\Services\MoneyAmountService;
 use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
@@ -481,13 +481,12 @@ class OrderController extends Controller
         //
     }
 
-    public function exportOrderExcel(Request $request)
+    public function exportExcel(Request $request)
     {
-        $input_datas = $request->input();
-        $input_datas['is_latest'] = 1;
+        $payload = $request->query();
 
-        $orders = $this->orderService->getOrders($input_datas);
+        $orders = $this->orderService->getExcelList($payload);
 
-        return Excel::download(new OrdersExport($orders), 'orders.xlsx');
+        return Excel::download(new OrderExport($orders), 'orders.xlsx');
     }
 }

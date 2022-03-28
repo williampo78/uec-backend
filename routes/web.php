@@ -228,7 +228,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/promotional_campaign/ajax/detail', [PromotionalCampaignController::class, 'getDetail']);
 
     // 訂單管理
-    Route::get('/order/ajax/excel', [OrderController::class, 'exportOrderExcel']);
+    Route::get('/order/excel', [OrderController::class, 'exportExcel']);
     Route::resource('/order', OrderController::class, [
         'names' => [
             'index' => 'order',

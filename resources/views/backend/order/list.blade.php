@@ -623,7 +623,7 @@
 
             // 匯出訂單
             $('#btn-export-excel').on('click', function() {
-                axios.get('/backend/order/ajax/excel', {
+                axios.get('/backend/order/excel', {
                         params: {
                             ordered_date_start: $('#ordered_date_start').val(),
                             ordered_date_end: $('#ordered_date_end').val(),
