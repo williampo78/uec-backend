@@ -102,8 +102,9 @@ class APIIndexServices
             } elseif ($ad_slot->slot_type == 'S') {
                 if ($ad_slot->product_assigned_type == 'C') {
                     if (isset($categoryProducts[$ad_slot->web_category_hierarchy_id])) {
-                        $product_info = [];
+                        //$product_info = [];
                         foreach ($categoryProducts[$ad_slot->web_category_hierarchy_id] as $product) {
+                            $test[$ad_slot->web_category_hierarchy_id][] = $product->id;
                             if ($now >= $product->promotion_start_at && $now <= $product->promotion_end_at) {
                                 $promotion_desc = $product->promotion_desc;
                             } else {
@@ -117,7 +118,8 @@ class APIIndexServices
                                     }
                                 }
                             }
-                            $product_info[$ad_slot->web_category_hierarchy_id][] = array(
+
+                            $product_info[$ad_slot->slot_code][$product->id] = array(
                                 'product_id' => $product->id,
                                 'product_no' => $product->product_no,
                                 'product_name' => $product->product_name,
@@ -131,6 +133,10 @@ class APIIndexServices
                             );
                         }
 
+                        $product_info_return[$ad_slot->slot_code] = [];
+                        foreach ($product_info[$ad_slot->slot_code] as $product) {
+                            $product_info_return[$ad_slot->slot_code][] = $product;
+                        }
 
                         $data[$ad_slot->slot_code] = array(
                             'slot_color_code' => $ad_slot->slot_color_code,
@@ -138,7 +144,7 @@ class APIIndexServices
                             'slot_title' => $ad_slot->slot_title,
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
-                            'products' => $product_info[$ad_slot->web_category_hierarchy_id]
+                            'products' => $product_info_return[$ad_slot->slot_code]
                         );
                     }
                 } else if ($ad_slot->product_assigned_type == 'P') {
