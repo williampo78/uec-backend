@@ -594,12 +594,12 @@ class APIOrdersServices
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
-                        Log::channel('changepoint')->info('597:taypay error!'.$tapPayResult);
+                        Log::channel('changepoint')->info('597:taypay error!'.json_encode($tapPayResult));
                     }
                 } else {
                     $result['status'] = $tapPayResult['status'];
                     $result['payment_url'] = null;
-                    Log::channel('changepoint')->info('602:taypay error!'.$tapPayResult);
+                    Log::channel('changepoint')->info('602:taypay error!'.json_encode($tapPayResult));
                 }
             }
             DB::commit();
