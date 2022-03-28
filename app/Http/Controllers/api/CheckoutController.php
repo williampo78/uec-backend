@@ -281,7 +281,7 @@ class CheckoutController extends Controller
                             break;
                         case 402:
                             $status = false;
-                            $err = '402';
+                            $err = '401';
                             $data['message'] = "第三方支付異常，無法成立訂單";
                             break;
                         default:
