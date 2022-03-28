@@ -15,7 +15,7 @@ return [
     | messages to the logs. The name specified in this option should match
     | one of the channels defined in the "channels" configuration array.
     |
-    */
+     */
 
     'default' => env('LOG_CHANNEL', 'stack'),
 
@@ -32,7 +32,7 @@ return [
     |                    "errorlog", "monolog",
     |                    "custom", "stack"
     |
-    */
+     */
 
     'channels' => [
         'stack' => [
@@ -108,6 +108,12 @@ return [
         'changepoint' => [
             'driver' => 'daily',
             'path' => storage_path('logs/api/changepoint/changepoint.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 365,
+        ],
+        'taypay_api_log' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/api/taypay/taypay_api_log.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 365,
         ],

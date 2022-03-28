@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Services\UniversalService;
-use Illuminate\Support\Facades\Auth;
-use App\Services\APIService;
-use App\Services\APIProductServices;
 use App\Services\APICartServices;
 use App\Services\APIOrdersServices;
-use Validator;
+use App\Services\APIProductServices;
+use App\Services\APIService;
 use App\Services\APITapPayService;
-
+use App\Services\UniversalService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Validator;
 
 class CheckoutController extends Controller
 {
@@ -45,7 +44,7 @@ class CheckoutController extends Controller
         foreach ($institutin as $code => $value) {
             $data[] = array(
                 "code" => $code,
-                "description" => $value
+                "description" => $value,
             );
         }
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data]);
@@ -83,7 +82,7 @@ class CheckoutController extends Controller
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
         $response = json_decode($response, true);
 
-        if ($request->points) {//結帳時使用的會員點數
+        if ($request->points) { //結帳時使用的會員點數
             $points = $request->points;
         } else {
             $points = 0;
@@ -91,13 +90,13 @@ class CheckoutController extends Controller
         //Step1, 檢核金額
         if (isset($response['result']['totalPrice'])) {
             //
-            if ($points > $response['result']['point']['discountMax']) {//超過最大可點數折抵
+            if ($points > $response['result']['point']['discountMax']) { //超過最大可點數折抵
                 $status = false;
                 $err = '401';
                 $data['points'] = "點數折抵超出本次可抵用點數";
             } elseif ($response['result']['totalPrice'] == $request->total_price && $response['result']['discount'] == $request->discount) {
                 //檢核使用點數折抵後，運費是否要運費
-                if ($points > 0){
+                if ($points > 0) {
                     $point_discount = ($points * $response['result']['point']['exchangeRate']);
                 } else {
                     $point_discount = 0;
@@ -237,7 +236,7 @@ class CheckoutController extends Controller
         /* test
         $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
-        */
+         */
         if ($response['status'] == '404') {
             $data = [];
             $status = false;
@@ -245,18 +244,18 @@ class CheckoutController extends Controller
         } else {
             //Step1, 檢核金額
             $data = [];
-            if ($request->points) {//使用會員點數折抵金額
+            if ($request->points) { //使用會員點數折抵金額
                 $points = $request->points;
             } else {
                 $points = 0;
             }
-            if (abs($points) > $response['result']['point']['discountMax']) {//超過最大可點數折抵
+            if (abs($points) > $response['result']['point']['discountMax']) { //超過最大可點數折抵
                 $status = false;
                 $err = '401';
                 $data['points'] = "點數折抵超出本次可抵用點數";
             } elseif ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount) {
                 //檢核使用點數折抵後，運費是否要運費
-                if (abs($points) > 0){
+                if (abs($points) > 0) {
                     $points_discount = ($points * $response['result']['point']['exchangeRate']);
                 } else {
                     $points_discount = 0;
@@ -269,14 +268,27 @@ class CheckoutController extends Controller
                 if ($shipping_fee == $request->shipping_fee) {
                     //Stet2, 產生訂單
                     $dataOrder = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift, $campaign_discount);
-                    if ($dataOrder['status'] == 200) {
-                        $status = true;
-                        $err = '200';
-                        $data = $dataOrder['payment_url'];
-                    } else {
-                        $status = false;
-                        $err = '401';
-                        $data['message'] = "會員點數扣點異常，無法成立訂單";
+                    switch ($dataOrder['status']) {
+                        case 200:
+                            $status = true;
+                            $err = '200';
+                            $data = $dataOrder['payment_url'];
+                            break;
+                        case 401:
+                            $status = false;
+                            $err = '401';
+                            $data['message'] = "會員點數扣點異常，無法成立訂單";
+                            break;
+                        case 402:
+                            $status = false;
+                            $err = '402';
+                            $data['message'] = "第三方支付異常，無法成立訂單";
+                            break;
+                        default:
+                            $status = false;
+                            $err = '401';
+                            $data['message'] = "產生訂單時發生異常，無法成立訂單";
+                            break;
                     }
                 } else {
                     $status = false;

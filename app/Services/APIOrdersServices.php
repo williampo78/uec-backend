@@ -585,24 +585,27 @@ class APIOrdersServices
                 $webData['prime'] = $order['taypay_prime'];
                 $tapPay = $this->apiTapPayService->payByPrime($webData);
                 $tapPayResult = json_decode($tapPay, true);
+
                 if ($tapPayResult['status'] == 0) {
                     $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => $now]);
                     if ($payment) {
                         $result['status'] = 200;
                         $result['payment_url'] = $tapPayResult['payment_url'];
                     } else {
-                        $result['status'] = 401;
+                        $result['status'] = 402;
                         $result['payment_url'] = null;
+                        Log::channel('changepoint')->info('597:taypay error!'.$tapPayResult);
                     }
                 } else {
                     $result['status'] = $tapPayResult['status'];
                     $result['payment_url'] = null;
+                    Log::channel('changepoint')->info('602:taypay error!'.$tapPayResult);
                 }
             }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::info($e);
+            Log::channel('changepoint')->info('結帳成立訂單錯誤 ! '.$e);
             $result['status'] = 401;
             $result['payment_url'] = null;
         }
