@@ -152,6 +152,12 @@ class ProductController extends Controller
             $status = false;
             $err = '901';
             $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品沒有前台分類", 'result' => $list]);
+        } else if ($result == '902'){
+            $status = false;
+            $err = '901';
+            $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品已被下架", 'result' => $list]);
         } else {
             $status = true;
             $err = '';
