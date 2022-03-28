@@ -169,10 +169,11 @@ class APIProductServices
                      FROM product_photos
                      WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
                     FROM products AS p
-                    where p.approval_status = 'APPROVED'
-                    and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+                    where p.approval_status = 'APPROVED' ";
         if ($product_id) {
             $strSQL .= " and p.id=" . $product_id;
+        } else {
+            $strSQL .= " and current_timestamp() between p.start_launched_at and p.end_launched_at ";
         }
         $products = DB::select($strSQL);
         $data = [];
@@ -531,6 +532,7 @@ class APIProductServices
         $product = self::getProducts($id);
 
         if (sizeof($product) > 0) {
+            if (strtotime($now) > strtotime($product[$id]->end_launched_at)) return 902; //此商品已被下架
             $product_categorys = self::getWebCategoryProducts('', '', '', '', $id, '', '');
             $rel_category = [];
             if (sizeof($product_categorys) > 0) {
@@ -544,7 +546,7 @@ class APIProductServices
                     }
                 }
             }
-            if (!$rel_category) return 901;
+            if (!$rel_category) return 901; //此商品沒有前台分類
             $discount = ($product[$id]->list_price == 0 ? 0 : ceil(($product[$id]->selling_price / $product[$id]->list_price) * 100));
             $brand = $this->brandsService->getBrand($product[$id]->brand_id);
             $shipping_fee = $this->shippingFeeService->getShippingFee($product[$id]->lgst_method);
@@ -780,7 +782,7 @@ class APIProductServices
 
             return json_encode($data);
         } else {
-            return 201;
+            return 903;
         }
     }
 
