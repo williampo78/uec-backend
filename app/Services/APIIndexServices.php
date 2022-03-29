@@ -50,6 +50,7 @@ class APIIndexServices
         $img_H080B = [];
         $prd_H080A = [];
         $prd_H080B = [];
+        $product_info = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
         foreach ($promotion as $k => $v) {
             $promotion_txt = '';
@@ -176,7 +177,7 @@ class APIIndexServices
                                 "collection" => $collection,
                             );
                         }
-                        if ($product_info[$ad_slot->slot_code]) {
+                        if (isset($product_info[$ad_slot->slot_code])) {
                             $data[$ad_slot->slot_code] = array(
                                 'slot_color_code' => $ad_slot->slot_color_code,
                                 'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
