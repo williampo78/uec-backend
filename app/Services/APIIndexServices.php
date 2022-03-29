@@ -133,7 +133,7 @@ class APIIndexServices
                             );
                         }
 
-                        $product_info_return[$ad_slot->slot_code] = [];
+                        $product_info_return[$ad_slot->slot_code] = []; //重新調整結構for前端使用
                         foreach ($product_info[$ad_slot->slot_code] as $product) {
                             $product_info_return[$ad_slot->slot_code][] = $product;
                         }
