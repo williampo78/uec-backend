@@ -32,15 +32,18 @@ class MemberController extends Controller
     private $api_service;
     private $sys_config_service;
     private $lookup_values_v_service;
+    private $orderService;
 
     public function __construct(
         APIService $api_service,
         SysConfigService $sys_config_service,
-        LookupValuesVService $lookup_values_v_service
+        LookupValuesVService $lookup_values_v_service,
+        OrderService $orderService
     ) {
         $this->api_service = $api_service;
         $this->sys_config_service = $sys_config_service;
         $this->lookup_values_v_service = $lookup_values_v_service;
+        $this->orderService = $orderService;
     }
 
     /**
@@ -99,19 +102,10 @@ class MemberController extends Controller
      */
     public function getOrders(GetOrdersRequest $request)
     {
-        try {
-            $member_id = auth('api')->userOrFail()->member_id;
-        } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
-            return response()->json([
-                'message' => '會員不存在',
-            ], 404);
-        }
-
-        $order_service = new OrderService;
-        $date = $request->query('date');
-        $two_years_ago_date = Carbon::now()->subYears(2);
-        $ordered_date_start = Carbon::parse($date)->subDays(90)->startOfDay();
-        $ordered_date_end = Carbon::parse($date)->endOfDay();
+        $date = $request->date;
+        $twoYearsAgoDate = now()->subYears(2);
+        $orderedDateStart = Carbon::parse($date)->subDays(90)->startOfDay();
+        $orderedDateEnd = Carbon::parse($date)->endOfDay();
 
         /**
          * 可以顯示的訂單日期範圍
@@ -129,7 +123,7 @@ class MemberController extends Controller
          * 填寫時間: 2019/12/7
          * 不能搜尋到任何訂單
          */
-        if ($ordered_date_end->lessThan($two_years_ago_date)) {
+        if ($orderedDateEnd->lessThan($twoYearsAgoDate)) {
             return response()->json([
                 'message' => '查詢成功',
                 'results' => [
@@ -138,125 +132,118 @@ class MemberController extends Controller
             ], 200);
         }
 
-        if ($ordered_date_start->lessThan($two_years_ago_date)) {
-            $ordered_date_start = $two_years_ago_date;
+        if ($orderedDateStart->lessThan($twoYearsAgoDate)) {
+            $orderedDateStart = $twoYearsAgoDate;
         }
 
         // 取得訂單
-        $orders = $order_service->getOrders([
-            'revision_no' => 0,
-            'ordered_date_start' => $ordered_date_start,
-            'ordered_date_end' => $ordered_date_end,
-            'member_id' => $member_id,
+        $orders = $this->orderService->getMemberOrders([
+            'ordered_date_start' => $orderedDateStart,
+            'ordered_date_end' => $orderedDateEnd,
         ]);
 
         // 訂單總數
-        $order_totals = count($orders);
+        $orderTotals = $orders->count();
         // 沒有任何訂單
-        if ($order_totals < 1) {
+        if ($orderTotals < 1) {
             return response()->json([
                 'message' => '查詢成功',
                 'results' => [
-                    'order_totals' => $order_totals,
+                    'order_totals' => $orderTotals,
                 ],
             ], 200);
         }
 
+        $payload = [
+            'message' => '查詢成功',
+            'results' => [
+                'order_totals' => $orderTotals,
+                'orders' => null,
+            ],
+        ];
+
         // 訂單
-        $orders->transform(function ($order) {
-            $order->product_totals = 0;
-
-            // 訂單時間
-            $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s');
-
-            // 訂單狀態
-            $order->order_status = $order->order_status_desc;
+        $orders->each(function ($order) use (&$payload) {
+            $orderPayload = [
+                'order_no' => $order->order_no,
+                'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s'),
+                'order_status' => $order->order_status_desc,
+                'photo_url' => null,
+                'product_name' => null,
+                'spec_1_value' => null,
+                'spec_2_value' => null,
+                'qty' => null,
+                'unit_price' => null,
+                'subtotal' => null,
+                'product_totals' => $order->orderDetails->count(),
+                'delivery_method' => null,
+                'shipped_at' => null,
+                'package_no' => null,
+                'invoice_no' => $order->invoice_no,
+                'paid_amount' => number_format($order->paid_amount),
+            ];
 
             // 物流方式
-            $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
+            $lgstMethod = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
 
             // 物流公司
-            $order->lgst_company_code = config('uec.lgst_company_code_options')[$order->lgst_company_code] ?? null;
+            $lgstCompanyCode = config('uec.lgst_company_code_options')[$order->lgst_company_code] ?? null;
 
             // 配送方式
-            if (isset($order->lgst_method, $order->lgst_company_code)) {
-                $order->delivery_method = "{$order->lgst_method}-{$order->lgst_company_code}";
-            } else {
-                $order->delivery_method = null;
+            if (isset($lgstMethod, $lgstCompanyCode)) {
+                $orderPayload['delivery_method'] = "{$lgstMethod}-{$lgstCompanyCode}";
             }
 
             // 出貨時間
             if (isset($order->shipped_at)) {
-                $order->shipped_at = Carbon::parse($order->shipped_at)->format('Y-m-d H:i:s');
+                $orderPayload['shipped_at'] = Carbon::parse($order->shipped_at)->format('Y-m-d H:i:s');
             }
 
-            // 結帳金額
-            $order->paid_amount = number_format($order->paid_amount);
-
             // 訂單明細
-            if (isset($order->order_details)) {
-                // 商品總數
-                $order->product_totals = count($order->order_details);
+            if ($order->orderDetails->isNotEmpty()) {
                 // 取得第一筆訂單明細
-                $order_detail = $order->order_details->first();
+                $orderDetail = $order->orderDetails->first();
+
+                // 商品名稱
+                $orderPayload['product_name'] = $orderDetail->product->product_name;
+
+                // 規格一設定值
+                $orderPayload['spec_1_value'] = $orderDetail->productItem->spec_1_value;
+
+                // 規格一設定值
+                $orderPayload['spec_2_value'] = $orderDetail->productItem->spec_2_value;
+
+                // 數量
+                $orderPayload['qty'] = $orderDetail->qty;
 
                 // 單價 (單品折扣後的單價，即前台購物車呈現的單價)
-                $order_detail->unit_price = number_format($order_detail->unit_price);
+                $orderPayload['unit_price'] = number_format($orderDetail->unit_price);
 
                 // 小計
-                $order_detail->subtotal = number_format($order_detail->subtotal);
+                $orderPayload['subtotal'] = number_format($orderDetail->subtotal);
 
                 // 商品圖片
-                if (isset($order_detail->product_photos)) {
-                    $product_photo = $order_detail->product_photos->first();
-                    $photo_url = config('filesystems.disks.s3.url') . $product_photo->photo_name;
-                    $order->photo_url = $photo_url;
-                }
+                if ($orderDetail->product->productPhotos->isNotEmpty()) {
+                    $productPhoto = $orderDetail->product->productPhotos->first();
 
-                $order->product_name = $order_detail->product_name;
-                $order->spec_1_value = $order_detail->spec_1_value;
-                $order->spec_2_value = $order_detail->spec_2_value;
-                $order->qty = $order_detail->qty;
-                $order->unit_price = $order_detail->unit_price;
-                $order->subtotal = $order_detail->subtotal;
+                    // 圖片網址
+                    $orderPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
+                }
             }
 
             // 出貨單
-            if (isset($order->shipments)) {
+            if ($order->shipments->isNotEmpty()) {
+                // 第一階段，一筆訂單只會有一筆出貨單
                 $shipment = $order->shipments->first();
 
-                if (isset($shipment)) {
-                    $order->package_no = $shipment->package_no;
-                }
+                // 託運單號
+                $orderPayload['package_no'] = $shipment->package_no;
             }
 
-            return $order->only([
-                'order_no',
-                'ordered_date',
-                'order_status',
-                'photo_url',
-                'product_name',
-                'spec_1_value',
-                'spec_2_value',
-                'qty',
-                'unit_price',
-                'subtotal',
-                'product_totals',
-                'delivery_method',
-                'shipped_at',
-                'package_no',
-                'invoice_no',
-                'paid_amount',
-            ]);
+            $payload['results']['orders'][] = $orderPayload;
         });
 
-        return response()->json([
-            'message' => '查詢成功',
-            'results' => [
-                'order_totals' => $order_totals,
-                'orders' => $orders,
-            ],
-        ], 200);
+        return response()->json($payload, 200);
     }
 
     /**
@@ -268,7 +255,7 @@ class MemberController extends Controller
     public function getOrderDetail(GetOrderDetailRequest $request)
     {
         try {
-            $member_id = auth('api')->userOrFail()->member_id;
+            $memberId = auth('api')->userOrFail()->member_id;
         } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
             return response()->json([
                 'message' => '會員不存在',
@@ -281,7 +268,7 @@ class MemberController extends Controller
         $order = $order_service->getOrders([
             'revision_no' => 0,
             'order_no' => $request->route('order_no'),
-            'member_id' => $member_id,
+            'member_id' => $memberId,
         ])->first();
 
         // 沒有任何訂單
@@ -500,7 +487,7 @@ class MemberController extends Controller
     public function cancelOrder(CancelOrderRequest $request)
     {
         try {
-            $member_id = auth('api')->userOrFail()->member_id;
+            $memberId = auth('api')->userOrFail()->member_id;
         } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
             return response()->json([
                 'message' => '會員不存在',
@@ -516,7 +503,7 @@ class MemberController extends Controller
         $order = $order_service->getOrders([
             'revision_no' => 0,
             'order_no' => $request->route('order_no'),
-            'member_id' => $member_id,
+            'member_id' => $memberId,
         ])->first();
 
         // 訂單不存在
@@ -721,7 +708,7 @@ class MemberController extends Controller
     public function returnOrder(ReturnOrderRequest $request)
     {
         try {
-            $member_id = auth('api')->userOrFail()->member_id;
+            $memberId = auth('api')->userOrFail()->member_id;
         } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
             return response()->json([
                 'message' => '會員不存在',
@@ -736,7 +723,7 @@ class MemberController extends Controller
         $order = $order_service->getOrders([
             'revision_no' => 0,
             'order_no' => $request->route('order_no'),
-            'member_id' => $member_id,
+            'member_id' => $memberId,
         ])->first();
 
         // 訂單不存在
@@ -777,7 +764,7 @@ class MemberController extends Controller
                 'agent_id' => 1,
                 'request_no' => $request_no,
                 'request_date' => $now,
-                'member_id' => $member_id,
+                'member_id' => $memberId,
                 'order_id' => $order->id,
                 'order_no' => $order->order_no,
                 'status_code' => 'CREATED',

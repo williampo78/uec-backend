@@ -531,6 +531,12 @@ class OrderService
         return $order;
     }
 
+    /**
+     * 取得訂單excel列表
+     *
+     * @param array $payload
+     * @return Collection
+     */
     public function getExcelList(array $payload = []): Collection
     {
         $orders = Order::with([
@@ -595,6 +601,40 @@ class OrderService
 
         return $orders->orderBy('ordered_date', 'desc')
             ->get();
+    }
+
+    /**
+     * 取得會員訂單
+     *
+     * @param array $payload
+     * @return Collection
+     */
+    public function getMemberOrders(array $payload = []): Collection
+    {
+        $member = auth('api')->user();
+
+        $orders = Order::with([
+            'shipments',
+            'orderDetails' => function ($query) {
+                $query->orderBy('order_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'orderDetails.product',
+            'orderDetails.productItem',
+            'orderDetails.product.productPhotos' => function ($query) {
+                $query->orderBy('product_id', 'asc')
+                    ->orderBy('sort', 'asc');
+            },
+        ])->where('revision_no', 0)
+            ->where('member_id', $member->member_id)
+            ->whereDate('ordered_date', '>=', $payload['ordered_date_start'])
+            ->whereDate('ordered_date', '<=', $payload['ordered_date_end'])
+            ->select()
+            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
+            ->orderBy('ordered_date', 'desc')
+            ->get();
+
+        return $orders;
     }
 
     /**
