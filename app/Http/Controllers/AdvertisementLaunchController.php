@@ -92,7 +92,72 @@ class AdvertisementLaunchController extends Controller
      */
     public function show($id)
     {
-        //
+        // 取得商品分類
+        $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
+        $product_category_format = array_column($product_category, 'name', 'id');
+
+        // 取得商品
+        $products = $this->product_service->getProducts();
+        $products_format = [];
+        foreach ($products as $value) {
+            $products_format[$value['id']] = "{$value['product_no']} {$value['product_name']}";
+        }
+
+        $ad_slot_content = $this->advertisement_service->getSlotContentById($id);
+
+        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $ad_slot_content['content']->slot_icon_name : null;
+
+        // 整理給前端的資料
+        $ad_slot_content['content'] = $ad_slot_content['content']->only([
+            'slot_code',
+            'slot_desc',
+            'slot_type',
+            'start_at',
+            'end_at',
+            'slot_color_code',
+            'slot_icon_name_url',
+            'slot_title',
+            'product_assigned_type',
+            'slot_content_active',
+        ]);
+
+        foreach ($ad_slot_content['details'] as $key => $obj) {
+            $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
+            $obj->product = !empty($obj->product_id) ? $products_format[$obj->product_id] ?? null : null;
+            $obj->product_category = !empty($obj->web_category_hierarchy_id) ? $product_category_format[$obj->web_category_hierarchy_id] ?? null : null;
+
+            switch ($obj->image_action) {
+                // URL
+                case 'U':
+                    $obj->link_content = $obj->target_url;
+                    break;
+                // 商品分類
+                case 'C':
+                    $obj->link_content = $product_category_format[$obj->target_cate_hierarchy_id] ?? null;
+                    break;
+                default:
+                    $obj->link_content = null;
+                    break;
+            }
+
+            // 整理給前端的資料
+            $ad_slot_content['details'][$key] = $obj->only([
+                'data_type',
+                'sort',
+                'texts',
+                'image_name_url',
+                'image_alt',
+                'image_title',
+                'image_abstract',
+                'image_action',
+                'is_target_blank',
+                'product',
+                'product_category',
+                'link_content',
+            ]);
+        }
+
+        return response()->json($ad_slot_content);
     }
 
     /**
@@ -187,78 +252,6 @@ class AdvertisementLaunchController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function getDetail(Request $request)
-    {
-        $slot_content_id = $request->input('slot_content_id');
-
-        // 取得商品分類
-        $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
-        $product_category_format = array_column($product_category, 'name', 'id');
-
-        // 取得商品
-        $products = $this->product_service->getProducts();
-        $products_format = [];
-        foreach ($products as $value) {
-            $products_format[$value['id']] = "{$value['product_no']} {$value['product_name']}";
-        }
-
-        $ad_slot_content = $this->advertisement_service->getSlotContentById($slot_content_id);
-
-        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $ad_slot_content['content']->slot_icon_name : null;
-
-        // 整理給前端的資料
-        $ad_slot_content['content'] = $ad_slot_content['content']->only([
-            'slot_code',
-            'slot_desc',
-            'slot_type',
-            'start_at',
-            'end_at',
-            'slot_color_code',
-            'slot_icon_name_url',
-            'slot_title',
-            'product_assigned_type',
-            'slot_content_active',
-        ]);
-
-        foreach ($ad_slot_content['details'] as $key => $obj) {
-            $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
-            $obj->product = !empty($obj->product_id) ? $products_format[$obj->product_id] ?? null : null;
-            $obj->product_category = !empty($obj->web_category_hierarchy_id) ? $product_category_format[$obj->web_category_hierarchy_id] ?? null : null;
-
-            switch ($obj->image_action) {
-                // URL
-                case 'U':
-                    $obj->link_content = $obj->target_url;
-                    break;
-                // 商品分類
-                case 'C':
-                    $obj->link_content = $product_category_format[$obj->target_cate_hierarchy_id] ?? null;
-                    break;
-                default:
-                    $obj->link_content = null;
-                    break;
-            }
-
-            // 整理給前端的資料
-            $ad_slot_content['details'][$key] = $obj->only([
-                'data_type',
-                'sort',
-                'texts',
-                'image_name_url',
-                'image_alt',
-                'image_title',
-                'image_abstract',
-                'image_action',
-                'is_target_blank',
-                'product',
-                'product_category',
-                'link_content',
-            ]);
-        }
-
-        return response()->json($ad_slot_content);
     }
 
     /**

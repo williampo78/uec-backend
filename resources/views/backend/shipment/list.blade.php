@@ -35,17 +35,12 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_created_at_start'>
-                                                    <input type='text'
-                                                        class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_created_at_start"
-                                                        name="created_at_start" id="created_at_start"
-                                                        value="{{ request()->input('created_at_start') }}"
-                                                        autocomplete="off" />
-                                                    <span class="input-group-addon"
-                                                        data-target="#datetimepicker_created_at_start"
-                                                        data-toggle="datetimepicker">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="created_at_start_flatpickr">
+                                                    <input type="text" class="form-control search-limit-group" name="created_at_start" id="created_at_start" value="{{ request()->input('created_at_start') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -55,17 +50,12 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <div class='input-group date' id='datetimepicker_created_at_end'>
-                                                    <input type='text'
-                                                        class="form-control datetimepicker-input search-limit-group"
-                                                        data-target="#datetimepicker_created_at_end" name="created_at_end"
-                                                        id="created_at_end"
-                                                        value="{{ request()->input('created_at_end') }}"
-                                                        autocomplete="off" />
-                                                    <span class="input-group-addon"
-                                                        data-target="#datetimepicker_created_at_end"
-                                                        data-toggle="datetimepicker">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                <div class="input-group" id="created_at_end_flatpickr">
+                                                    <input type="text" class="form-control search-limit-group" name="created_at_end" id="created_at_end" value="{{ request()->input('created_at_end') }}" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -267,26 +257,20 @@
 @section('js')
     <script>
         $(function() {
-            $('#datetimepicker_created_at_start').datetimepicker({
-                format: 'YYYY-MM-DD',
-                showClear: true,
+            let created_at_start_flatpickr = flatpickr("#created_at_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#created_at_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    created_at_end_flatpickr.set('minDate', dateStr);
+                },
             });
 
-            $('#datetimepicker_created_at_end').datetimepicker({
-                format: 'YYYY-MM-DD',
-                showClear: true,
-            });
-
-            $("#datetimepicker_created_at_start").on("dp.change", function(e) {
-                if ($('#created_at_end').val()) {
-                    $('#datetimepicker_created_at_end').datetimepicker('minDate', e.date);
-                }
-            });
-
-            $("#datetimepicker_created_at_end").on("dp.change", function(e) {
-                if ($('#created_at_start').val()) {
-                    $('#datetimepicker_created_at_start').datetimepicker('maxDate', e.date);
-                }
+            let created_at_end_flatpickr = flatpickr("#created_at_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#created_at_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    created_at_start_flatpickr.set('maxDate', dateStr);
+                },
             });
 
             $('.select2-shipment-status-code').select2();
@@ -362,9 +346,7 @@
             $(document).on('click', '.shipment_detail', function() {
                 let shipment_id = $(this).attr("data-shipment");
 
-                axios.post('/backend/shipment/ajax/detail', {
-                        shipment_id: shipment_id
-                    })
+                axios.get(`/backend/shipment/${shipment_id}`)
                     .then(function(response) {
                         let shipment = response.data;
                         let package_no = shipment.package_no ?

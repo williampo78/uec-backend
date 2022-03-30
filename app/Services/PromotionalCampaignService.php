@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\PromotionalCampaignGiveaways;
-use App\Models\PromotionalCampaignProducts;
-use App\Models\PromotionalCampaigns;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\PromotionalCampaign;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\PromotionalCampaignProduct;
+use App\Models\PromotionalCampaignGiveaway;
 
 class PromotionalCampaignService
 {
@@ -29,7 +29,7 @@ class PromotionalCampaignService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $promotional_campaigns = PromotionalCampaigns::select(
+        $promotional_campaigns = PromotionalCampaign::select(
             'promotional_campaigns.id',
             'promotional_campaigns.campaign_type',
             'promotional_campaigns.campaign_name',
@@ -94,7 +94,7 @@ class PromotionalCampaignService
             ->get()
             ->keyBy('id');
 
-        $promotional_campaign_products = PromotionalCampaignProducts::select(
+        $promotional_campaign_products = PromotionalCampaignProduct::select(
             'promotional_campaign_products.promotional_campaign_id',
             'promotional_campaign_products.sort',
             'promotional_campaign_products.product_id',
@@ -114,7 +114,7 @@ class PromotionalCampaignService
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->get();
 
-        $promotional_campaign_giveaways = PromotionalCampaignGiveaways::select(
+        $promotional_campaign_giveaways = PromotionalCampaignGiveaway::select(
             'promotional_campaign_giveaways.promotional_campaign_id',
             'promotional_campaign_giveaways.sort',
             'promotional_campaign_giveaways.product_id',
@@ -245,7 +245,7 @@ class PromotionalCampaignService
                 $create_data['x_value'] = $input_data['x_value'] ?? null;
             }
 
-            $promotional_campaign_id = PromotionalCampaigns::insertGetId($create_data);
+            $promotional_campaign_id = PromotionalCampaign::insertGetId($create_data);
 
             // 新增單品
             if (in_array($create_data['campaign_type'], ['CART04', 'PRD01', 'PRD02', 'PRD03', 'PRD04', 'PRD05'])) {
@@ -260,7 +260,7 @@ class PromotionalCampaignService
                         $create_prd_data['created_at'] = $now;
                         $create_prd_data['updated_at'] = $now;
 
-                        PromotionalCampaignProducts::insert($create_prd_data);
+                        PromotionalCampaignProduct::insert($create_prd_data);
                     }
                 }
             }
@@ -280,7 +280,7 @@ class PromotionalCampaignService
                         $create_gift_data['created_at'] = $now;
                         $create_gift_data['updated_at'] = $now;
 
-                        PromotionalCampaignGiveaways::insert($create_gift_data);
+                        PromotionalCampaignGiveaway::insert($create_gift_data);
                     }
                 }
             }
@@ -369,7 +369,7 @@ class PromotionalCampaignService
                 $update_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
             }
 
-            PromotionalCampaigns::findOrFail($promotional_campaign->id)->update($update_data);
+            PromotionalCampaign::findOrFail($promotional_campaign->id)->update($update_data);
 
             // 處理單品
             if (in_array($promotional_campaign->campaign_type, ['CART04', 'PRD01', 'PRD02', 'PRD03', 'PRD04', 'PRD05'])) {
@@ -388,7 +388,7 @@ class PromotionalCampaignService
                     if (isset($promotional_campaign->products) && !empty($delete_ids)) {
                         foreach ($promotional_campaign->products as $obj) {
                             if (in_array($obj->product_id, $delete_ids)) {
-                                PromotionalCampaignProducts::where('promotional_campaign_id', $promotional_campaign->id)
+                                PromotionalCampaignProduct::where('promotional_campaign_id', $promotional_campaign->id)
                                     ->where('product_id', $obj->product_id)
                                     ->delete();
                             }
@@ -408,7 +408,7 @@ class PromotionalCampaignService
                             $create_prd_data['created_at'] = $now;
                             $create_prd_data['updated_at'] = $now;
 
-                            PromotionalCampaignProducts::insert($create_prd_data);
+                            PromotionalCampaignProduct::insert($create_prd_data);
                         }
                         // 更新資料
                         else {
@@ -417,7 +417,7 @@ class PromotionalCampaignService
                             $update_prd_data['updated_by'] = $user_id;
                             $update_prd_data['updated_at'] = $now;
 
-                            PromotionalCampaignProducts::where('promotional_campaign_id', $promotional_campaign->id)
+                            PromotionalCampaignProduct::where('promotional_campaign_id', $promotional_campaign->id)
                                 ->where('product_id', $id)
                                 ->update($update_prd_data);
                         }
@@ -442,7 +442,7 @@ class PromotionalCampaignService
                     if (isset($promotional_campaign->giveaways) && !empty($delete_ids)) {
                         foreach ($promotional_campaign->giveaways as $obj) {
                             if (in_array($obj->product_id, $delete_ids)) {
-                                PromotionalCampaignGiveaways::where('promotional_campaign_id', $promotional_campaign->id)
+                                PromotionalCampaignGiveaway::where('promotional_campaign_id', $promotional_campaign->id)
                                     ->where('product_id', $obj->product_id)
                                     ->delete();
                             }
@@ -464,7 +464,7 @@ class PromotionalCampaignService
                             $create_gift_data['created_at'] = $now;
                             $create_gift_data['updated_at'] = $now;
 
-                            PromotionalCampaignGiveaways::insert($create_gift_data);
+                            PromotionalCampaignGiveaway::insert($create_gift_data);
                         }
                         // 更新資料
                         else {
@@ -479,7 +479,7 @@ class PromotionalCampaignService
                             $update_gift_data['updated_by'] = $user_id;
                             $update_gift_data['updated_at'] = $now;
 
-                            PromotionalCampaignGiveaways::where('promotional_campaign_id', $promotional_campaign->id)
+                            PromotionalCampaignGiveaway::where('promotional_campaign_id', $promotional_campaign->id)
                                 ->where('product_id', $id)
                                 ->update($update_gift_data);
                         }
@@ -533,7 +533,7 @@ class PromotionalCampaignService
          * 查詢上架開始、結束時間，是否在已存在的上下架時間範圍內且狀態為啟用，並檢查是否為同一個單品。
          * 如果要更新資料，則需排除要更新的該筆資料檢查。
          */
-        $results = PromotionalCampaigns::select(
+        $results = PromotionalCampaign::select(
             'promotional_campaigns.campaign_type',
             'promotional_campaign_products.product_id',
         )
@@ -624,7 +624,7 @@ class PromotionalCampaignService
          * 查詢上架開始、結束時間，是否在已存在的上下架時間範圍內，且狀態為啟用
          * 如果要更新資料，則需排除要更新的該筆資料檢查
          */
-        $promotional_campaigns = PromotionalCampaigns::where('agent_id', $agent_id)
+        $promotional_campaigns = PromotionalCampaign::where('agent_id', $agent_id)
             ->where('active', 1)
             ->where('level_code', 'CART')
             ->where('n_value', $datas['n_value'])

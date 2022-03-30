@@ -14,11 +14,10 @@ use Illuminate\Support\Facades\Log;
 class OrderSupplierService
 {
     private $universalService;
-    private $itemService;
-    public function __construct(UniversalService $universalService, ItemService $itemService)
+
+    public function __construct(UniversalService $universalService)
     {
         $this->universalService = $universalService;
-        $this->itemService = $itemService;
     }
 
     public function getOrderSupplier($data)
@@ -55,7 +54,7 @@ class OrderSupplierService
         if (isset($data['requisitions_purchase_number'])) {
             $result->where('requisitions_purchase.number', 'like', '%' . $data['requisitions_purchase_number'] . '%');
         }
-        $result->orderBy('order_supplier.number' ,'DESC');
+        $result->orderBy('order_supplier.number', 'DESC');
         $result = $result->get();
 
         return $result;
@@ -107,7 +106,7 @@ class OrderSupplierService
             ->where('order_supplier_detail.order_supplier_id', $order_supplier_id)
             ->leftJoin('product_items', 'product_items.id', 'order_supplier_detail.product_item_id')
             ->leftJoin('products', 'products.id', 'product_items.product_id')
-            ->leftJoin('requisitions_purchase_detail' , 'requisitions_purchase_detail.id' ,'order_supplier_detail.requisitions_purchase_dtl_id')
+            ->leftJoin('requisitions_purchase_detail', 'requisitions_purchase_detail.id', 'order_supplier_detail.requisitions_purchase_dtl_id')
             ->get();
         return $result;
     }
@@ -213,5 +212,20 @@ class OrderSupplierService
             $result = false;
         }
         return $result;
+    }
+    public function getFinallyOrderSupplier($product_id)
+    {
+        $result = OrderSupplier::select('users.user_name')
+            ->Join('order_supplier_detail', 'order_supplier_detail.order_supplier_id', 'order_supplier.id')
+            ->join('product_items', function ($join) use ($product_id) {
+                $join->where('product_items.product_id', '=', $product_id)
+                    ->on('product_items.id', '=', 'order_supplier_detail.product_item_id');
+            })
+            ->join('users', 'users.id', 'order_supplier.created_by')
+            ->where('order_supplier.status', 'APPROVED')
+            ->orderBy('order_supplier.closed_at', 'desc')
+            ->first();
+
+        return $result->user_name ?? '';
     }
 }

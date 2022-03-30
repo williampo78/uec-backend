@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryHierarchy extends Model
 {
     use HasFactory;
+    
     protected $table = 'web_category_hierarchy';
     public $timestamps = true;
 }

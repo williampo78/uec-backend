@@ -3,21 +3,21 @@
 
 namespace App\Services;
 
-use App\Models\ProductPhotos;
-use App\Models\ProductItems;
-use App\Models\PromotionalCampaigns;
-use App\Services\APIWebService;
-use App\Services\WebCategoryHierarchyService;
-use GuzzleHttp\Psr7\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Services\APICartServices;
+use App\Models\ProductItem;
+use App\Models\ProductPhoto;
+use GuzzleHttp\Psr7\Request;
+use App\Models\RelatedProduct;
+use App\Services\APIWebService;
 use App\Services\BrandsService;
-use App\Services\ShippingFeeRulesService;
+use App\Services\APICartServices;
 use App\Services\UniversalService;
+use Illuminate\Support\Facades\DB;
+use App\Models\PromotionalCampaign;
+use Illuminate\Support\Facades\Auth;
 use App\Services\WebShippingInfoService;
-use App\Models\RelatedProducts;
+use App\Services\ShippingFeeRulesService;
+use App\Services\WebCategoryHierarchyService;
 
 class APIProductServices
 {
@@ -169,10 +169,11 @@ class APIProductServices
                      FROM product_photos
                      WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
                     FROM products AS p
-                    where p.approval_status = 'APPROVED'
-                    and current_timestamp() between p.start_launched_at and p.end_launched_at ";
+                    where p.approval_status = 'APPROVED' ";
         if ($product_id) {
             $strSQL .= " and p.id=" . $product_id;
+        } else {
+            $strSQL .= " and current_timestamp() between p.start_launched_at and p.end_launched_at ";
         }
         $products = DB::select($strSQL);
         $data = [];
@@ -207,7 +208,7 @@ class APIProductServices
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' ";
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
@@ -244,12 +245,14 @@ class APIProductServices
         $products = DB::select($strSQL);
         $data = [];
         $product_id = 0;
+        $web_category_hierarchy_id = 0;
         foreach ($products as $product) {
             if (!$id) {//依產品編號找相關分類不進此判斷
-                if ($product->id == $product_id) continue;
+                if ($product->id == $product_id && $product->web_category_hierarchy_id==$web_category_hierarchy_id) continue;
             }
             $data[$product->web_category_hierarchy_id][] = $product;
             $product_id = $product->id;
+            $web_category_hierarchy_id = $product->web_category_hierarchy_id;
         }
         return $data;
     }
@@ -330,8 +333,8 @@ class APIProductServices
                             'product_id' => $product->id,
                             'product_no' => $product->product_no,
                             'product_name' => $product->product_name,
-                            'selling_price' => intval($product->selling_price),
-                            'product_discount' => intval($discount),
+                            'list_price' => $product->list_price,
+                            'selling_price' => $product->selling_price,
                             'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
                             'promotion_desc' => $promotion_desc,
                             'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
@@ -429,7 +432,7 @@ class APIProductServices
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
 
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N'";
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
         if ($keyword) {//依關鍵字搜尋
             $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
@@ -529,6 +532,7 @@ class APIProductServices
         $product = self::getProducts($id);
 
         if (sizeof($product) > 0) {
+            if (strtotime($now) > strtotime($product[$id]->end_launched_at)) return 902; //此商品已被下架
             $product_categorys = self::getWebCategoryProducts('', '', '', '', $id, '', '');
             $rel_category = [];
             if (sizeof($product_categorys) > 0) {
@@ -542,7 +546,7 @@ class APIProductServices
                     }
                 }
             }
-
+            if (!$rel_category) return 901; //此商品沒有前台分類
             $discount = ($product[$id]->list_price == 0 ? 0 : ceil(($product[$id]->selling_price / $product[$id]->list_price) * 100));
             $brand = $this->brandsService->getBrand($product[$id]->brand_id);
             $shipping_fee = $this->shippingFeeService->getShippingFee($product[$id]->lgst_method);
@@ -607,9 +611,9 @@ class APIProductServices
 
             //產品圖檔
             $photos = [];
-            $ProductPhotos = ProductPhotos::where('product_id', $id)->orderBy('sort', 'asc')->get();
-            if (isset($ProductPhotos)) {
-                foreach ($ProductPhotos as $photo) {
+            $productPhotos = ProductPhoto::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            if (isset($productPhotos)) {
+                foreach ($productPhotos as $photo) {
                     $photos[] = $s3 . $photo->photo_name;
                 }
             }
@@ -658,7 +662,7 @@ class APIProductServices
 
             //產品規格
             $item_spec = [];
-            $ProductSpec = ProductItems::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            $ProductSpec = ProductItem::where('product_id', $id)->orderBy('sort', 'asc')->get();
             $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
             $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
             $spec_info = [];
@@ -720,7 +724,7 @@ class APIProductServices
 
 
             //相關推薦
-            $rel_prod = RelatedProducts::getRelated($id);
+            $rel_prod = RelatedProduct::getRelated($id);
             $promotion = self::getPromotion('product_card');
             $rel_data = [];
             $products = $this->getProducts();
@@ -778,7 +782,7 @@ class APIProductServices
 
             return json_encode($data);
         } else {
-            return 201;
+            return 903;
         }
     }
 
@@ -791,7 +795,7 @@ class APIProductServices
         $now = Carbon::now();
         $data = [];
         $s3 = config('filesystems.disks.s3.url');
-        $promotional = PromotionalCampaigns::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
+        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
             ->where("promotional_campaigns.start_at", "<=", $now)
             ->where("promotional_campaigns.end_at", ">=", $now)
             ->where("promotional_campaigns.active", "=", "1")
@@ -799,9 +803,9 @@ class APIProductServices
             ->join('products', 'products.id', '=', 'promotional_campaign_giveaways.product_id')
             ->where('products.approval_status', '=', 'APPROVED')->get();
         foreach ($promotional as $promotion) {
-            $ProductPhotos = ProductPhotos::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
+            $productPhotos = ProductPhoto::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
             $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id] = $promotion; //取單品的贈品
-            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($ProductPhotos->photo_name) ? $s3 . $ProductPhotos->photo_name : null);
+            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($productPhotos->photo_name) ? $s3 . $productPhotos->photo_name : null);
             if ($promotion->level_code == 'CART') {
                 $data['CART'][] = $promotion; //取全站贈品
             }
@@ -817,7 +821,7 @@ class APIProductServices
     {
         //已審核上架與活動期間內
         $now = Carbon::now();
-        $promotional = PromotionalCampaigns::where('active', '=', '1')
+        $promotional = PromotionalCampaign::where('active', '=', '1')
             ->where("start_at", "<=", $now)
             ->where("end_at", ">=", $now)
             ->where("level_code", '=', 'CART')->get();
@@ -846,7 +850,7 @@ class APIProductServices
      */
     public function getRelated($product_id)
     {
-        $rel_prod = RelatedProducts::select('related_products.*', 'porducts.product_no')
+        $rel_prod = RelatedProduct::select('related_products.*', 'porducts.product_no')
             ->join('porducts', 'products.id', '=', 'related_products.product_id')
             ->where('related_products.product_id', '=', $product_id)->get();
         return $rel_prod;
@@ -904,7 +908,7 @@ class APIProductServices
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
                     where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N'";
+                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
             if ($category) {
                 $strSQL .= " and cate.`id`=" . $category;
             }

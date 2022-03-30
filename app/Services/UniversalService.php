@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Lookup_values_v;
+use App\Models\LookupValuesV;
 use App\Models\Quotation;
-use App\Models\Users;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -105,7 +105,7 @@ class UniversalService
     public function getUser()
     {
         $agent_id = Auth::user()->agent_id;
-        $users = Users::where('agent_id', $agent_id)->where('active', 1)->get();
+        $users = User::where('agent_id', $agent_id)->where('active', 1)->get();
         $data = [];
         foreach ($users as $k => $v) {
             $data[$v['id']] = $v;
@@ -120,7 +120,7 @@ class UniversalService
      */
     public function getLookupValues($category)
     {
-        $lookup = Lookup_values_v::where('type_code', '=', $category)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
+        $lookup = LookupValuesV::where('type_code', '=', $category)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
         $data = [];
         foreach ($lookup as $k => $v) {
             $data[$v['code']] = $v['description'];
@@ -153,7 +153,7 @@ class UniversalService
     {
         $data = [
             'TAPPAY_CREDITCARD' => '信用卡',
-            'TAPPAY_LINEPAY' => 'LINE Pay'
+            'TAPPAY_LINEPAY' => 'LINE Pay',
         ];
 
         return $data;
@@ -169,7 +169,7 @@ class UniversalService
         $data = [
             'HOME' => '宅配',
             'FAMILY' => '全家取貨',
-            'STORE' => '門市取貨'
+            'STORE' => '門市取貨',
         ];
 
         return $data;
@@ -182,7 +182,7 @@ class UniversalService
      */
     public function getLookUp($params = null)
     {
-        $result = Lookup_values_v::select('*')
+        $result = LookupValuesV::select('*')
             ->where('type_code', $params)
             ->where('active', 1)->get();
         $data = [];
@@ -191,5 +191,4 @@ class UniversalService
         }
         return $data;
     }
-
 }

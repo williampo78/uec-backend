@@ -56,7 +56,7 @@
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
                 <form role="form" id="new-form" method="POST"
-                      action="{{ route('product_small.update', $products->id) }}"
+                      action="{{ route('products_mall.update', $products->id) }}"
                       enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
@@ -326,22 +326,28 @@
                                             </label>
                                         </div>
                                         <div class="col-sm-2">
-                                            <div class='input-group date'>
-                                                <input type='text' class="form-control" name="promotion_start_at"
-                                                       id="promotion_start_at"
-                                                       value="{{ $products->promotion_start_at }}"/>
+                                            <div class="input-group" id="promotion_start_at_flatpickr">
+                                                <input type="text" class="form-control" name="promotion_start_at" id="promotion_start_at" value="{{ $products->promotion_start_at }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="col-sm-1" style="padding: 0px;width: 2%;">
                                             <label class="control-label">~</label>
                                         </div>
                                         <div class="col-sm-2">
-                                            <div class='input-group date'>
-                                                <input type='text' class="form-control" name="promotion_end_at"
-                                                       id="promotion_end_at" value="{{ $products->promotion_end_at }}"/>
+                                            <div class="input-group" id="promotion_end_at_flatpickr">
+                                                <input type="text" class="form-control" name="promotion_end_at" id="promotion_end_at" value="{{ $products->promotion_end_at }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
+                                                </span>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -536,40 +542,71 @@
             if(product_photos_count == 0){
                 alert('尚無商品圖檔，請先到「商品基本資料維護」上傳圖檔！') ;
             }
-            console.log(product_photos_count) ;
-            $('#start_created_at').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#end_created_at').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#start_launched_at_start').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#start_launched_at_end').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let start_created_at_flatpickr = flatpickr("#start_created_at_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#end_created_at").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    end_created_at_flatpickr.set('minDate', dateStr);
+                },
             });
 
-            $('#promotion_start_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+            let end_created_at_flatpickr = flatpickr("#end_created_at_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#start_created_at").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_created_at_flatpickr.set('maxDate', dateStr);
+                },
             });
-            $('#promotion_end_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+
+            let start_launched_at_start_flatpickr = flatpickr("#start_launched_at_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#start_launched_at_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_end_flatpickr.set('minDate', dateStr);
+                },
             });
-            $("#promotion_start_at").on("dp.change", function (e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(0, 0, 0)));
-                }
+
+            let start_launched_at_end_flatpickr = flatpickr("#start_launched_at_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#start_launched_at_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_start_flatpickr.set('maxDate', dateStr);
+                },
             });
-            $("#promotion_end_at").on("dp.change", function (e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(23, 59, 59)));
-                }
+
+            let promotion_start_at_flatpickr = flatpickr("#promotion_start_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                maxDate: $("#promotion_end_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 0,
+                defaultMinute: 0,
+                defaultSeconds: 0,
+                onChange: function(selectedDates, dateStr, instance) {
+                    promotion_end_at_flatpickr.set('minDate', dateStr);
+
+                    if (!promotion_end_at_flatpickr.input.value) {
+                        promotion_end_at_flatpickr.hourElement.value = 23;
+                        promotion_end_at_flatpickr.minuteElement.value = 59;
+                        promotion_end_at_flatpickr.secondElement.value = 59;
+                    }
+                },
             });
+
+            let promotion_end_at_flatpickr = flatpickr("#promotion_end_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                minDate: $("#promotion_start_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 23,
+                defaultMinute: 59,
+                defaultSeconds: 59,
+                onChange: function(selectedDates, dateStr, instance) {
+                    promotion_start_at_flatpickr.set('maxDate', dateStr);
+                },
+            });
+
             $('.product_attributes').on('change', function () { // on change of state
                 $('.product_attributes_change').val('true');
             })
@@ -578,7 +615,7 @@
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
                 ckfinder: {
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&currentFolder=mall_description/&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
@@ -591,12 +628,118 @@
                 },
                 htmlSupport: {
                     allow: [
-                        {
-                            name: /.*/,
-                            attributes: true,
-                            classes: true,
-                            styles: true
-                        }
+                        { name: 'a', attributes: true, classes: true, styles: true },
+                        { name: 'abbr', attributes: true, classes: true, styles: true },
+                        { name: 'acronym', attributes: true, classes: true, styles: true },
+                        { name: 'address', attributes: true, classes: true, styles: true },
+                        { name: 'applet', attributes: true, classes: true, styles: true },
+                        { name: 'area', attributes: true, classes: true, styles: true },
+                        { name: 'article', attributes: true, classes: true, styles: true },
+                        { name: 'aside', attributes: true, classes: true, styles: true },
+                        { name: 'audio', attributes: true, classes: true, styles: true },
+                        { name: 'b', attributes: true, classes: true, styles: true },
+                        { name: 'base', attributes: true, classes: true, styles: true },
+                        { name: 'basefont', attributes: true, classes: true, styles: true },
+                        { name: 'bdi', attributes: true, classes: true, styles: true },
+                        { name: 'bdo', attributes: true, classes: true, styles: true },
+                        { name: 'big', attributes: true, classes: true, styles: true },
+                        { name: 'blockquote', attributes: true, classes: true, styles: true },
+                        { name: 'br', attributes: true, classes: true, styles: true },
+                        { name: 'button', attributes: true, classes: true, styles: true },
+                        { name: 'canvas', attributes: true, classes: true, styles: true },
+                        { name: 'caption', attributes: true, classes: true, styles: true },
+                        { name: 'center', attributes: true, classes: true, styles: true },
+                        { name: 'cite', attributes: true, classes: true, styles: true },
+                        { name: 'code', attributes: true, classes: true, styles: true },
+                        { name: 'col', attributes: true, classes: true, styles: true },
+                        { name: 'colgroup', attributes: true, classes: true, styles: true },
+                        { name: 'data', attributes: true, classes: true, styles: true },
+                        { name: 'datalist', attributes: true, classes: true, styles: true },
+                        { name: 'dd', attributes: true, classes: true, styles: true },
+                        { name: 'del', attributes: true, classes: true, styles: true },
+                        { name: 'details', attributes: true, classes: true, styles: true },
+                        { name: 'dfn', attributes: true, classes: true, styles: true },
+                        { name: 'dialog', attributes: true, classes: true, styles: true },
+                        { name: 'dir', attributes: true, classes: true, styles: true },
+                        { name: 'div', attributes: true, classes: true, styles: true },
+                        { name: 'dl', attributes: true, classes: true, styles: true },
+                        { name: 'dt', attributes: true, classes: true, styles: true },
+                        { name: 'em', attributes: true, classes: true, styles: true },
+                        { name: 'embed', attributes: true, classes: true, styles: true },
+                        { name: 'fieldset', attributes: true, classes: true, styles: true },
+                        { name: 'figcaption', attributes: true, classes: true, styles: true },
+                        { name: 'figure', attributes: true, classes: true, styles: true },
+                        { name: 'font', attributes: true, classes: true, styles: true },
+                        { name: 'footer', attributes: true, classes: true, styles: true },
+                        { name: 'form', attributes: true, classes: true, styles: true },
+                        { name: 'frame', attributes: true, classes: true, styles: true },
+                        { name: 'frameset', attributes: true, classes: true, styles: true },
+                        { name: 'h1 to h6', attributes: true, classes: true, styles: true },
+                        { name: 'header', attributes: true, classes: true, styles: true },
+                        { name: 'hr', attributes: true, classes: true, styles: true },
+                        { name: 'i', attributes: true, classes: true, styles: true },
+                        { name: 'img', attributes: true, classes: true, styles: true },
+                        { name: 'input', attributes: true, classes: true, styles: true },
+                        { name: 'ins', attributes: true, classes: true, styles: true },
+                        { name: 'kbd', attributes: true, classes: true, styles: true },
+                        { name: 'label', attributes: true, classes: true, styles: true },
+                        { name: 'legend', attributes: true, classes: true, styles: true },
+                        { name: 'li', attributes: true, classes: true, styles: true },
+                        { name: 'link', attributes: true, classes: true, styles: true },
+                        { name: 'main', attributes: true, classes: true, styles: true },
+                        { name: 'map', attributes: true, classes: true, styles: true },
+                        { name: 'mark', attributes: true, classes: true, styles: true },
+                        { name: 'meta', attributes: true, classes: true, styles: true },
+                        { name: 'meter', attributes: true, classes: true, styles: true },
+                        { name: 'nav', attributes: true, classes: true, styles: true },
+                        { name: 'noframes', attributes: true, classes: true, styles: true },
+                        { name: 'noscript', attributes: true, classes: true, styles: true },
+                        { name: 'object', attributes: true, classes: true, styles: true },
+                        { name: 'ol', attributes: true, classes: true, styles: true },
+                        { name: 'optgroup', attributes: true, classes: true, styles: true },
+                        { name: 'option', attributes: true, classes: true, styles: true },
+                        { name: 'output', attributes: true, classes: true, styles: true },
+                        { name: 'p', attributes: true, classes: true, styles: true },
+                        { name: 'param', attributes: true, classes: true, styles: true },
+                        { name: 'picture', attributes: true, classes: true, styles: true },
+                        { name: 'pre', attributes: true, classes: true, styles: true },
+                        { name: 'progress', attributes: true, classes: true, styles: true },
+                        { name: 'q', attributes: true, classes: true, styles: true },
+                        { name: 'rp', attributes: true, classes: true, styles: true },
+                        { name: 'rt', attributes: true, classes: true, styles: true },
+                        { name: 'ruby', attributes: true, classes: true, styles: true },
+                        { name: 's', attributes: true, classes: true, styles: true },
+                        { name: 'samp', attributes: true, classes: true, styles: true },
+                        { name: 'section', attributes: true, classes: true, styles: true },
+                        { name: 'select', attributes: true, classes: true, styles: true },
+                        { name: 'small', attributes: true, classes: true, styles: true },
+                        { name: 'source', attributes: true, classes: true, styles: true },
+                        { name: 'span', attributes: true, classes: true, styles: true },
+                        { name: 'strike', attributes: true, classes: true, styles: true },
+                        { name: 'strong', attributes: true, classes: true, styles: true },
+                        { name: 'style', attributes: true, classes: true, styles: true },
+                        { name: 'sub', attributes: true, classes: true, styles: true },
+                        { name: 'summary', attributes: true, classes: true, styles: true },
+                        { name: 'sup', attributes: true, classes: true, styles: true },
+                        { name: 'svg', attributes: true, classes: true, styles: true },
+                        { name: 'table', attributes: true, classes: true, styles: true },
+                        { name: 'tbody', attributes: true, classes: true, styles: true },
+                        { name: 'td', attributes: true, classes: true, styles: true },
+                        { name: 'template', attributes: true, classes: true, styles: true },
+                        { name: 'textarea', attributes: true, classes: true, styles: true },
+                        { name: 'tfoot', attributes: true, classes: true, styles: true },
+                        { name: 'th', attributes: true, classes: true, styles: true },
+                        { name: 'thead', attributes: true, classes: true, styles: true },
+                        { name: 'time', attributes: true, classes: true, styles: true },
+                        { name: 'title', attributes: true, classes: true, styles: true },
+                        { name: 'tr', attributes: true, classes: true, styles: true },
+                        { name: 'track', attributes: true, classes: true, styles: true },
+                        { name: 'tt', attributes: true, classes: true, styles: true },
+                        { name: 'u', attributes: true, classes: true, styles: true },
+                        { name: 'ul', attributes: true, classes: true, styles: true },
+                        { name: 'var', attributes: true, classes: true, styles: true },
+                        { name: 'video', attributes: true, classes: true, styles: true },
+                        { name: 'wbr', attributes: true, classes: true, styles: true },
                     ]
                 }
             })
@@ -608,7 +751,7 @@
 
             ClassicEditor.create(document.querySelector('#specification'), {
                 ckfinder: {
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&responseType=json&_token=" +
+                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&currentFolder=mall_specification/&responseType=json&_token=" +
                         document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
@@ -620,12 +763,118 @@
                 },
                 htmlSupport: {
                     allow: [
-                        {
-                            name: /.*/,
-                            attributes: true,
-                            classes: true,
-                            styles: true
-                        }
+                        { name: 'a', attributes: true, classes: true, styles: true },
+                        { name: 'abbr', attributes: true, classes: true, styles: true },
+                        { name: 'acronym', attributes: true, classes: true, styles: true },
+                        { name: 'address', attributes: true, classes: true, styles: true },
+                        { name: 'applet', attributes: true, classes: true, styles: true },
+                        { name: 'area', attributes: true, classes: true, styles: true },
+                        { name: 'article', attributes: true, classes: true, styles: true },
+                        { name: 'aside', attributes: true, classes: true, styles: true },
+                        { name: 'audio', attributes: true, classes: true, styles: true },
+                        { name: 'b', attributes: true, classes: true, styles: true },
+                        { name: 'base', attributes: true, classes: true, styles: true },
+                        { name: 'basefont', attributes: true, classes: true, styles: true },
+                        { name: 'bdi', attributes: true, classes: true, styles: true },
+                        { name: 'bdo', attributes: true, classes: true, styles: true },
+                        { name: 'big', attributes: true, classes: true, styles: true },
+                        { name: 'blockquote', attributes: true, classes: true, styles: true },
+                        { name: 'br', attributes: true, classes: true, styles: true },
+                        { name: 'button', attributes: true, classes: true, styles: true },
+                        { name: 'canvas', attributes: true, classes: true, styles: true },
+                        { name: 'caption', attributes: true, classes: true, styles: true },
+                        { name: 'center', attributes: true, classes: true, styles: true },
+                        { name: 'cite', attributes: true, classes: true, styles: true },
+                        { name: 'code', attributes: true, classes: true, styles: true },
+                        { name: 'col', attributes: true, classes: true, styles: true },
+                        { name: 'colgroup', attributes: true, classes: true, styles: true },
+                        { name: 'data', attributes: true, classes: true, styles: true },
+                        { name: 'datalist', attributes: true, classes: true, styles: true },
+                        { name: 'dd', attributes: true, classes: true, styles: true },
+                        { name: 'del', attributes: true, classes: true, styles: true },
+                        { name: 'details', attributes: true, classes: true, styles: true },
+                        { name: 'dfn', attributes: true, classes: true, styles: true },
+                        { name: 'dialog', attributes: true, classes: true, styles: true },
+                        { name: 'dir', attributes: true, classes: true, styles: true },
+                        { name: 'div', attributes: true, classes: true, styles: true },
+                        { name: 'dl', attributes: true, classes: true, styles: true },
+                        { name: 'dt', attributes: true, classes: true, styles: true },
+                        { name: 'em', attributes: true, classes: true, styles: true },
+                        { name: 'embed', attributes: true, classes: true, styles: true },
+                        { name: 'fieldset', attributes: true, classes: true, styles: true },
+                        { name: 'figcaption', attributes: true, classes: true, styles: true },
+                        { name: 'figure', attributes: true, classes: true, styles: true },
+                        { name: 'font', attributes: true, classes: true, styles: true },
+                        { name: 'footer', attributes: true, classes: true, styles: true },
+                        { name: 'form', attributes: true, classes: true, styles: true },
+                        { name: 'frame', attributes: true, classes: true, styles: true },
+                        { name: 'frameset', attributes: true, classes: true, styles: true },
+                        { name: 'h1 to h6', attributes: true, classes: true, styles: true },
+                        { name: 'header', attributes: true, classes: true, styles: true },
+                        { name: 'hr', attributes: true, classes: true, styles: true },
+                        { name: 'i', attributes: true, classes: true, styles: true },
+                        { name: 'img', attributes: true, classes: true, styles: true },
+                        { name: 'input', attributes: true, classes: true, styles: true },
+                        { name: 'ins', attributes: true, classes: true, styles: true },
+                        { name: 'kbd', attributes: true, classes: true, styles: true },
+                        { name: 'label', attributes: true, classes: true, styles: true },
+                        { name: 'legend', attributes: true, classes: true, styles: true },
+                        { name: 'li', attributes: true, classes: true, styles: true },
+                        { name: 'link', attributes: true, classes: true, styles: true },
+                        { name: 'main', attributes: true, classes: true, styles: true },
+                        { name: 'map', attributes: true, classes: true, styles: true },
+                        { name: 'mark', attributes: true, classes: true, styles: true },
+                        { name: 'meta', attributes: true, classes: true, styles: true },
+                        { name: 'meter', attributes: true, classes: true, styles: true },
+                        { name: 'nav', attributes: true, classes: true, styles: true },
+                        { name: 'noframes', attributes: true, classes: true, styles: true },
+                        { name: 'noscript', attributes: true, classes: true, styles: true },
+                        { name: 'object', attributes: true, classes: true, styles: true },
+                        { name: 'ol', attributes: true, classes: true, styles: true },
+                        { name: 'optgroup', attributes: true, classes: true, styles: true },
+                        { name: 'option', attributes: true, classes: true, styles: true },
+                        { name: 'output', attributes: true, classes: true, styles: true },
+                        { name: 'p', attributes: true, classes: true, styles: true },
+                        { name: 'param', attributes: true, classes: true, styles: true },
+                        { name: 'picture', attributes: true, classes: true, styles: true },
+                        { name: 'pre', attributes: true, classes: true, styles: true },
+                        { name: 'progress', attributes: true, classes: true, styles: true },
+                        { name: 'q', attributes: true, classes: true, styles: true },
+                        { name: 'rp', attributes: true, classes: true, styles: true },
+                        { name: 'rt', attributes: true, classes: true, styles: true },
+                        { name: 'ruby', attributes: true, classes: true, styles: true },
+                        { name: 's', attributes: true, classes: true, styles: true },
+                        { name: 'samp', attributes: true, classes: true, styles: true },
+                        { name: 'section', attributes: true, classes: true, styles: true },
+                        { name: 'select', attributes: true, classes: true, styles: true },
+                        { name: 'small', attributes: true, classes: true, styles: true },
+                        { name: 'source', attributes: true, classes: true, styles: true },
+                        { name: 'span', attributes: true, classes: true, styles: true },
+                        { name: 'strike', attributes: true, classes: true, styles: true },
+                        { name: 'strong', attributes: true, classes: true, styles: true },
+                        { name: 'style', attributes: true, classes: true, styles: true },
+                        { name: 'sub', attributes: true, classes: true, styles: true },
+                        { name: 'summary', attributes: true, classes: true, styles: true },
+                        { name: 'sup', attributes: true, classes: true, styles: true },
+                        { name: 'svg', attributes: true, classes: true, styles: true },
+                        { name: 'table', attributes: true, classes: true, styles: true },
+                        { name: 'tbody', attributes: true, classes: true, styles: true },
+                        { name: 'td', attributes: true, classes: true, styles: true },
+                        { name: 'template', attributes: true, classes: true, styles: true },
+                        { name: 'textarea', attributes: true, classes: true, styles: true },
+                        { name: 'tfoot', attributes: true, classes: true, styles: true },
+                        { name: 'th', attributes: true, classes: true, styles: true },
+                        { name: 'thead', attributes: true, classes: true, styles: true },
+                        { name: 'time', attributes: true, classes: true, styles: true },
+                        { name: 'title', attributes: true, classes: true, styles: true },
+                        { name: 'tr', attributes: true, classes: true, styles: true },
+                        { name: 'track', attributes: true, classes: true, styles: true },
+                        { name: 'tt', attributes: true, classes: true, styles: true },
+                        { name: 'u', attributes: true, classes: true, styles: true },
+                        { name: 'ul', attributes: true, classes: true, styles: true },
+                        { name: 'var', attributes: true, classes: true, styles: true },
+                        { name: 'video', attributes: true, classes: true, styles: true },
+                        { name: 'wbr', attributes: true, classes: true, styles: true },
                     ]
                 }
             }).then(editor => {
@@ -776,7 +1025,7 @@
                     if (confirm('確定要刪除嗎?')) {
                         if (type == 'Category') {
                             if (obj.status == 'old') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                     product_id: this.products.id,
                                     category_id: obj.web_category_hierarchy_id,
                                     _token: '{{ csrf_token() }}',
@@ -793,7 +1042,7 @@
                             this.CategoryListFilter();
                         } else if (type == 'Products') {
                             if (obj.id !== '') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                     id: obj.id,
                                     _token: '{{ csrf_token() }}',
                                     type: 'DelRelatedProducts',
@@ -965,7 +1214,7 @@
                     $('input[name="google_shop_photo_name"]').val('');
                     this.products.google_shop_photo_name = '';
                     if (check) {
-                        axios.post('/backend/product_small/ajax', {
+                        axios.post('/backend/products_mall/ajax', {
                             id: this.products.id,
                             _token: '{{ csrf_token() }}',
                             type: 'DelGoogleShopPhoto',
@@ -983,7 +1232,7 @@
                     if (check) {
                         this.ProductsItem[key].photo_name = '';
 
-                        axios.post('/backend/product_small/ajax', {
+                        axios.post('/backend/products_mall/ajax', {
                             item_id: item.id,
                             _token: '{{ csrf_token() }}',
                             type: 'DelItemPhotos',

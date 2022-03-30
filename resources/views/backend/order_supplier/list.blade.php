@@ -74,12 +74,12 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_select_start_date">
-                                            <div class='input-group date' id='datetimepicker'>
-                                                <input type='text' class="form-control" name="select_start_date"
-                                                    id="select_start_date"
-                                                    value="{{ $data['getData']['select_start_date'] ?? '' }}" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="select_start_date_flatpickr">
+                                                <input type="text" class="form-control" name="select_start_date" id="select_start_date" value="{{ $data['getData']['select_start_date'] ?? '' }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -89,12 +89,12 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group" id="div_select_end_date">
-                                            <div class='input-group date' id='datetimepicker2'>
-                                                <input type='text' class="form-control" name="select_end_date"
-                                                    id="select_end_date"
-                                                    value="{{ $data['getData']['select_end_date'] ?? '' }}" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="select_end_date_flatpickr">
+                                                <input type="text" class="form-control" name="select_end_date" id="select_end_date" value="{{ $data['getData']['select_end_date'] ?? '' }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -268,15 +268,20 @@
                 },
                 supplier_deliver(obj) {
                     $('#supplier_deliver_date').val(obj.supplier_deliver_date);
-                    $('#trade_date').val(obj.trade_date);
+                    $('#trade_date').empty().text(obj.trade_date);
                     $('#expect_deliver_date').val(obj.expect_deliver_date);
                     $('#get_order_supplier_id').val(obj.id)
                     $('.show_number').html(obj.number);
+
+                    flatpickr("#supplier_deliver_date_flatpickr", {
+                        dateFormat: "Y-m-d",
+                    });
+
+                    flatpickr("#expect_deliver_date_flatpickr", {
+                        dateFormat: "Y-m-d",
+                    });
                 },
-
             },
-
-
         })
 
         new showRequisitions().$mount('#page-wrapper');
@@ -284,18 +289,22 @@
             $('#supplier').select2();
             $('#status').select2();
 
-            $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD',
+            let select_start_date_flatpickr = flatpickr("#select_start_date_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#select_end_date").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    select_end_date_flatpickr.set('minDate', dateStr);
+                },
             });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let select_end_date_flatpickr = flatpickr("#select_end_date_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#select_start_date").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    select_start_date_flatpickr.set('maxDate', dateStr);
+                },
             });
-            $('#supplier_deliver_date_dp').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#expect_deliver_date_dp').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
+
             $("#supplier_deliver_form").validate({
                 // debug: true,
                 submitHandler: function(form) {
@@ -325,7 +334,7 @@
                     supplier_deliver_date: {
                         dateGreaterEqualThan: function() {
                                 let obj = {
-                                    date: $('#trade_date').val(),
+                                    date: $('#trade_date').text().trim(),
                                     depends: true,
                                 }
                                 if ($('#supplier_deliver_date').val() !== '') {

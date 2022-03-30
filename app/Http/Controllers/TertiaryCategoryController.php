@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\RoleService;
-use App\Models\TertiaryCategories;
+use App\Models\TertiaryCategory;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -55,7 +55,7 @@ class TertiaryCategoryController extends Controller
         }
 
         try {
-            TertiaryCategories::create([
+            TertiaryCategory::create([
                 'agent_id' => Auth::user()->agent_id,
                 'category_id' => $request->category_id,
                 'number' => $request->number,
@@ -102,7 +102,7 @@ class TertiaryCategoryController extends Controller
             App::abort(403);
         }
 
-        $tertiaryCategory = TertiaryCategories::findOrFail($id);
+        $tertiaryCategory = TertiaryCategory::findOrFail($id);
 
         $params = [];
         $params['tertiaryCategory'] = $tertiaryCategory;
@@ -125,7 +125,7 @@ class TertiaryCategoryController extends Controller
         }
 
         try {
-            $tertiaryCategory = TertiaryCategories::findOrFail($id);
+            $tertiaryCategory = TertiaryCategory::findOrFail($id);
 
             $tertiaryCategory->update([
                 'category_id' => $request->category_id,

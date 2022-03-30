@@ -109,7 +109,6 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class=" form-group">
-
                                     <div class="col-sm-2 ">
                                         <label class="control-label">供應商<span class="redtext">*</span></label>
                                     </div>
@@ -275,7 +274,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
-                                            <input type="radio" name="has_expiry_date" value="0" checked> 無
+                                            <input type="radio" name="has_expiry_date" value="0"> 無
                                         </label>
                                     </div>
                                     <div class="col-sm-3">
@@ -286,7 +285,9 @@
                                     </div>
                                     {{-- 效期控管的天數 --}}
                                     <div class="col-sm-3">
-                                        <input class="form-control" name="expiry_days" value="0">
+                                        <div class="form-group">
+                                            <input class="form-control" name="expiry_days" value="0">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -558,7 +559,7 @@
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="radio-inline">
-                                            <input type="radio" name="is_with_warranty" value="0" checked> 無
+                                            <input type="radio" name="is_with_warranty" value="0"> 無
                                         </label>
                                     </div>
                                     <div class="col-sm-2">
@@ -567,8 +568,10 @@
                                             有保固，天數
                                         </label>
                                     </div>
-                                    <div class="col-sm-1 ">
-                                        <input class="form-control" name="warranty_days" value="0">
+                                    <div class="col-sm-1">
+                                        <div class="form-group">
+                                            <input class="form-control" name="expiry_days" value="0">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1192,6 +1195,12 @@
                     form.submit();
                 },
                 rules: {
+                    is_with_warranty: {
+                        required: true,
+                    },
+                    has_expiry_date: {
+                        required: true,
+                    },
                     product_name: {
                         required: true,
                     },
@@ -1209,6 +1218,10 @@
                     },
                     uom: {
                         required: true,
+                    },
+                    min_purchase_qty: {
+                        digits: true,
+                        min: 1,
                     },
                     //長
                     length: {
@@ -1281,9 +1294,14 @@
                                 return 0;
                             }
                         },
-                    }
+                    },
+
                 },
                 messages: {
+                    min_purchase_qty: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {

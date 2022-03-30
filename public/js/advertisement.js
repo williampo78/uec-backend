@@ -238,22 +238,34 @@ window.init = function () {
   }
 
   $(".js-select2-slot-id").select2();
-  $("#datetimepicker_start_at").datetimepicker({
-    format: "YYYY-MM-DD HH:mm",
-    showClear: true
-  });
-  $("#datetimepicker_start_at").on("dp.change", function (e) {
-    if (e.oldDate === null) {
-      $(this).data("DateTimePicker").date(new Date(e.date._d.setHours(0, 0, 0)));
+  var start_at_flatpickr = flatpickr("#start_at_flatpickr", {
+    dateFormat: "Y-m-d H:i:S",
+    maxDate: $("#end_at").val(),
+    enableTime: true,
+    enableSeconds: true,
+    defaultHour: 0,
+    defaultMinute: 0,
+    defaultSeconds: 0,
+    onChange: function onChange(selectedDates, dateStr, instance) {
+      end_at_flatpickr.set('minDate', dateStr);
+
+      if (!end_at_flatpickr.input.value) {
+        end_at_flatpickr.hourElement.value = 23;
+        end_at_flatpickr.minuteElement.value = 59;
+        end_at_flatpickr.secondElement.value = 59;
+      }
     }
   });
-  $("#datetimepicker_end_at").datetimepicker({
-    format: "YYYY-MM-DD HH:mm",
-    showClear: true
-  });
-  $("#datetimepicker_end_at").on("dp.change", function (e) {
-    if (e.oldDate === null) {
-      $(this).data("DateTimePicker").date(new Date(e.date._d.setHours(23, 59, 59)));
+  var end_at_flatpickr = flatpickr("#end_at_flatpickr", {
+    dateFormat: "Y-m-d H:i:S",
+    minDate: $("#start_at").val(),
+    enableTime: true,
+    enableSeconds: true,
+    defaultHour: 23,
+    defaultMinute: 59,
+    defaultSeconds: 59,
+    onChange: function onChange(selectedDates, dateStr, instance) {
+      start_at_flatpickr.set('maxDate', dateStr);
     }
   });
   $(".colorpicker").colorpicker({
@@ -291,7 +303,10 @@ window.init = function () {
   }); // 新增圖檔
 
   $("#btn-new-image").on("click", function () {
-    addImageBlock(product_category_select_options);
+    var datas = {
+      id: $("#image-block-row-no").val()
+    };
+    addImageBlock(product_category_select_options, datas);
   }); // 刪除圖檔
 
   $(document).on("click", ".btn-delete-image", function () {
@@ -301,7 +316,10 @@ window.init = function () {
   }); // 新增文字
 
   $("#btn-new-text").on("click", function () {
-    addTextBlock(product_category_select_options);
+    var datas = {
+      id: $("#text-block-row-no").val()
+    };
+    addTextBlock(product_category_select_options, datas);
   }); // 刪除文字
 
   $(document).on("click", ".btn-delete-text", function () {
@@ -311,7 +329,10 @@ window.init = function () {
   }); // 新增商品的指定商品
 
   $("#btn-new-product-product").on("click", function () {
-    addProductBlockProduct(product_select_options); // 編輯才做
+    var datas = {
+      id: $("#product-block-product-row-no").val()
+    };
+    addProductBlockProduct(product_select_options, datas); // 編輯才做
 
     if (!ad_slot_select_options) {
       // 當指定商品有項目時，隱藏指定分類的選項
@@ -343,7 +364,10 @@ window.init = function () {
   }); // 新增商品的指定分類
 
   $("#btn-new-product-category").on("click", function () {
-    addProductBlockCategory(product_category_select_options); // 編輯才做
+    var datas = {
+      id: $("#product-block-category-row-no").val()
+    };
+    addProductBlockCategory(product_category_select_options, datas); // 編輯才做
 
     if (!ad_slot_select_options) {
       // 當指定分類有項目時，隱藏指定商品的選項
@@ -436,6 +460,7 @@ window.init = function () {
     var vm = $(this);
 
     if (file) {
+<<<<<<< HEAD
       if (photo_width && photo_height) {
         //顯示選擇照片的尺寸提醒
         var img;
@@ -459,6 +484,9 @@ window.init = function () {
       }
 
       $(this).siblings('.img_image_block_image_name').attr("src", URL.createObjectURL(file));
+=======
+      $(this).siblings(".img_image_block_image_name").attr("src", URL.createObjectURL(file));
+>>>>>>> 5770c504c3852850bdaf583aacec938ce1032f5a
       $(this).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").show();
     }
   }); // 刪除圖片區的圖片
@@ -505,22 +533,25 @@ window.getProductSelectOptions = function () {
 window.addImageBlock = function () {
   var product_category_select_options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
   var datas = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var image_block_row_no = datas.id ? datas.id : $("#image-block-row-no").val();
-  var image_block_id = datas.id ? datas.id : "new";
+  var image_block_row_no = datas.id;
   var sort = datas.sort != null ? datas.sort : "";
   var image_name_url = datas.image_name_url ? datas.image_name_url : "";
   var image_alt = datas.image_alt ? datas.image_alt : "";
   var image_title = datas.image_title ? datas.image_title : "";
   var image_abstract = datas.image_abstract ? datas.image_abstract : "";
   var target_url = datas.target_url ? datas.target_url : "";
+<<<<<<< HEAD
   image_block_row_no = sanitize(String(image_block_row_no));
   $("#image-block table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"image_block_id[".concat(image_block_row_no, "]\" value=\"").concat(image_block_id, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_image_block_sort\" name=\"image_block_sort[").concat(image_block_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"file\" name=\"image_block_image_name[").concat(image_block_row_no, "]\" class=\"image_block_image_name\" value=\"\" />\n                    <div class=\"select-img-size-box\" style=\"\n                        width: 100%;\n                        height: 40px;\n                        display:none;\n                        text-align: center;\n                        background-color:red;\n                        \">\n                        <span class=\"select-img-size-text\" style=\"color:#FFFFFF;font-weight:bold; width: 100%; text-align: center; \">\n                        </span>\n                    </div>\n                    <img src=\"").concat(image_name_url, "\" class=\"img-responsive img_image_block_image_name\" width=\"300\" height=\"300\" /><br />\n                    <button type=\"button\" class=\"btn btn-danger btn-delete-image-block-image-name\" title=\"\u522A\u9664\"><i class=\"fa-solid fa-trash-can\"></i></button>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" name=\"image_block_image_alt[").concat(image_block_row_no, "]\" value=\"").concat(image_alt, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" name=\"image_block_image_title[").concat(image_block_row_no, "]\" value=\"").concat(image_title, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <textarea class=\"form-control\" rows=\"3\" name=\"image_block_image_abstract[").concat(image_block_row_no, "]\">").concat(image_abstract, "</textarea>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"radio\">\n                        <label>\n                            <input type=\"radio\" name=\"image_block_image_action[").concat(image_block_row_no, "]\" value=\"X\" checked />\n                            \u7121\u9023\u7D50\n                        </label>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"image_block_image_action[").concat(image_block_row_no, "]\" value=\"U\" />\n                                    URL\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <input type=\"text\" class=\"form-control\" name=\"image_block_target_url[").concat(image_block_row_no, "]\" value=\"").concat(target_url, "\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"image_block_image_action[").concat(image_block_row_no, "]\" value=\"C\" />\n                                    \u5546\u54C1\u5206\u985E\u9801\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <select class=\"form-control js-select2-image-block-product-category\" name=\"image_block_target_cate_hierarchy_id[").concat(image_block_row_no, "]\">\n                                    <option></option>\n                                    ").concat(product_category_select_options, "\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label>\n                            <input type=\"checkbox\" name=\"image_block_is_target_blank[").concat(image_block_row_no, "]\" value=\"enabled\" style=\"width: 20px;height: 20px;cursor: pointer;\" />\n                        </label>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-image\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
+=======
+  $("#image-block table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"image_block_id[".concat(image_block_row_no, "]\" value=\"").concat(image_block_row_no, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_image_block_sort\" name=\"image_block_sort[").concat(image_block_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"file\" name=\"image_block_image_name[").concat(image_block_row_no, "]\" class=\"image_block_image_name\" value=\"\" /><br />\n                    <img src=\"").concat(image_name_url, "\" class=\"img-responsive img_image_block_image_name\" width=\"300\" height=\"300\" /><br />\n                    <button type=\"button\" class=\"btn btn-danger btn-delete-image-block-image-name\" title=\"\u522A\u9664\"><i class=\"fa-solid fa-trash-can\"></i></button>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" name=\"image_block_image_alt[").concat(image_block_row_no, "]\" value=\"").concat(image_alt, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" name=\"image_block_image_title[").concat(image_block_row_no, "]\" value=\"").concat(image_title, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <textarea class=\"form-control\" rows=\"3\" name=\"image_block_image_abstract[").concat(image_block_row_no, "]\">").concat(image_abstract, "</textarea>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"radio\">\n                        <label>\n                            <input type=\"radio\" name=\"image_block_image_action[").concat(image_block_row_no, "]\" value=\"X\" checked />\n                            \u7121\u9023\u7D50\n                        </label>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"image_block_image_action[").concat(image_block_row_no, "]\" value=\"U\" />\n                                    URL\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <input type=\"text\" class=\"form-control\" name=\"image_block_target_url[").concat(image_block_row_no, "]\" value=\"").concat(target_url, "\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"image_block_image_action[").concat(image_block_row_no, "]\" value=\"C\" />\n                                    \u5546\u54C1\u5206\u985E\u9801\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <select class=\"form-control js-select2-image-block-product-category\" name=\"image_block_target_cate_hierarchy_id[").concat(image_block_row_no, "]\">\n                                    <option></option>\n                                    ").concat(product_category_select_options, "\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label>\n                            <input type=\"checkbox\" name=\"image_block_is_target_blank[").concat(image_block_row_no, "]\" value=\"enabled\" style=\"width: 20px;height: 20px;cursor: pointer;\" />\n                        </label>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-image\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
+>>>>>>> 5770c504c3852850bdaf583aacec938ce1032f5a
   $(".js-select2-image-block-product-category").select2();
 
-  if (image_block_id == 'new') {
-    $("#image-block table > tbody [name=\"image_block_image_name[".concat(image_block_row_no, "]\"]")).siblings('.img_image_block_image_name, .btn-delete-image-block-image-name').hide();
-  } else {
+  if (image_name_url) {
     $("#image-block table > tbody [name=\"image_block_image_name[".concat(image_block_row_no, "]\"]")).hide();
+  } else {
+    $("#image-block table > tbody [name=\"image_block_image_name[".concat(image_block_row_no, "]\"]")).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").hide();
   }
 
   $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
@@ -529,13 +560,11 @@ window.addImageBlock = function () {
 
 window.addTextBlock = function (product_category_select_options) {
   var datas = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
-  var text_block_id = datas.id ? datas.id : "new";
+  var text_block_row_no = datas.id;
   var sort = datas.sort != null ? datas.sort : "";
   var texts = datas.texts ? datas.texts : "";
   var target_url = datas.target_url ? datas.target_url : "";
-  text_block_row_no = sanitize(String(text_block_row_no));
-  $("#text-block table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"text_block_id[".concat(text_block_row_no, "]\" value=\"").concat(text_block_id, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_text_block_sort\" name=\"text_block_sort[").concat(text_block_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" name=\"text_block_texts[").concat(text_block_row_no, "]\" value=\"").concat(texts, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"radio\">\n                        <label>\n                            <input type=\"radio\" name=\"text_block_image_action[").concat(text_block_row_no, "]\" value=\"X\" checked />\n                            \u7121\u9023\u7D50\n                        </label>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"text_block_image_action[").concat(text_block_row_no, "]\" value=\"U\" />\n                                    URL\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <input type=\"text\" class=\"form-control\" name=\"text_block_target_url[").concat(text_block_row_no, "]\" value=\"").concat(target_url, "\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"text_block_image_action[").concat(text_block_row_no, "]\" value=\"C\" />\n                                    \u5546\u54C1\u5206\u985E\u9801\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <select class=\"form-control js-select2-text-block-product-category\" name=\"text_block_target_cate_hierarchy_id[").concat(text_block_row_no, "]\">\n                                    <option></option>\n                                    ").concat(product_category_select_options, "\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label>\n                            <input type=\"checkbox\" name=\"text_block_is_target_blank[").concat(text_block_row_no, "]\" value=\"enabled\" style=\"width: 20px;height: 20px;cursor: pointer;\" />\n                        </label>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-text\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
+  $("#text-block table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"text_block_id[".concat(text_block_row_no, "]\" value=\"").concat(text_block_row_no, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_text_block_sort\" name=\"text_block_sort[").concat(text_block_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <input type=\"text\" class=\"form-control\" name=\"text_block_texts[").concat(text_block_row_no, "]\" value=\"").concat(texts, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"radio\">\n                        <label>\n                            <input type=\"radio\" name=\"text_block_image_action[").concat(text_block_row_no, "]\" value=\"X\" checked />\n                            \u7121\u9023\u7D50\n                        </label>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"text_block_image_action[").concat(text_block_row_no, "]\" value=\"U\" />\n                                    URL\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <input type=\"text\" class=\"form-control\" name=\"text_block_target_url[").concat(text_block_row_no, "]\" value=\"").concat(target_url, "\" />\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-sm-4\">\n                            <div class=\"radio\">\n                                <label>\n                                    <input type=\"radio\" name=\"text_block_image_action[").concat(text_block_row_no, "]\" value=\"C\" />\n                                    \u5546\u54C1\u5206\u985E\u9801\n                                </label>\n                            </div>\n                        </div>\n                        <div class=\"col-sm-8\">\n                            <div class=\"form-group\">\n                                <select class=\"form-control js-select2-text-block-product-category\" name=\"text_block_target_cate_hierarchy_id[").concat(text_block_row_no, "]\">\n                                    <option></option>\n                                    ").concat(product_category_select_options, "\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <div class=\"checkbox\">\n                        <label>\n                            <input type=\"checkbox\" name=\"text_block_is_target_blank[").concat(text_block_row_no, "]\" value=\"enabled\" style=\"width: 20px;height: 20px;cursor: pointer;\" />\n                        </label>\n                    </div>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-text\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
   $(".js-select2-text-block-product-category").select2();
   $("#text-block-row-no").val(parseInt(text_block_row_no) + 1);
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateTextBlock(text_block_row_no);
@@ -543,11 +572,9 @@ window.addTextBlock = function (product_category_select_options) {
 
 window.addProductBlockProduct = function (product_select_options) {
   var datas = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var product_block_product_row_no = datas.id ? datas.id : $("#product-block-product-row-no").val();
-  var product_block_product_id = datas.id ? datas.id : "new";
+  var product_block_product_row_no = datas.id;
   var sort = datas.sort != null ? datas.sort : "";
-  product_block_product_row_no = sanitize(String(product_block_product_row_no));
-  $("#tab-product table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"product_block_product_id[".concat(product_block_product_row_no, "]\" value=\"").concat(product_block_product_id, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_product_block_product_sort\" name=\"product_block_product_sort[").concat(product_block_product_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <select class=\"form-control js-select2-product-block-product unique_product_block_product_product_id\" name=\"product_block_product_product_id[").concat(product_block_product_row_no, "]\">\n                        <option></option>\n                        ").concat(product_select_options, "\n                    </select>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-product-product\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
+  $("#tab-product table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"product_block_product_id[".concat(product_block_product_row_no, "]\" value=\"").concat(product_block_product_row_no, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_product_block_product_sort\" name=\"product_block_product_sort[").concat(product_block_product_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <select class=\"form-control js-select2-product-block-product unique_product_block_product_product_id\" name=\"product_block_product_product_id[").concat(product_block_product_row_no, "]\">\n                        <option></option>\n                        ").concat(product_select_options, "\n                    </select>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-product-product\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
   $(".js-select2-product-block-product").select2();
   $("#product-block-product-row-no").val(parseInt(product_block_product_row_no) + 1);
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateProductBlockProduct(product_block_product_row_no);
@@ -555,11 +582,9 @@ window.addProductBlockProduct = function (product_select_options) {
 
 window.addProductBlockCategory = function (product_category_select_options) {
   var datas = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var product_block_category_row_no = datas.id ? datas.id : $("#product-block-category-row-no").val();
-  var product_block_category_id = datas.id ? datas.id : "new";
+  var product_block_category_row_no = datas.id;
   var sort = datas.sort != null ? datas.sort : "";
-  product_block_category_row_no = sanitize(String(product_block_category_row_no));
-  $("#tab-category table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"product_block_category_id[".concat(product_block_category_row_no, "]\" value=\"").concat(product_block_category_id, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_product_block_category_sort\" name=\"product_block_category_sort[").concat(product_block_category_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <select class=\"form-control js-select2-product-block-category unique_product_block_product_web_category_hierarchy_id\" name=\"product_block_product_web_category_hierarchy_id[").concat(product_block_category_row_no, "]\">\n                        <option></option>\n                        ").concat(product_category_select_options, "\n                    </select>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-product-category\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
+  $("#tab-category table > tbody").append("\n        <tr>\n            <input type=\"hidden\" name=\"product_block_category_id[".concat(product_block_category_row_no, "]\" value=\"").concat(product_block_category_row_no, "\">\n            <td class=\"sort\">\n                <div class=\"form-group\">\n                    <input type=\"number\" class=\"form-control unique_product_block_category_sort\" name=\"product_block_category_sort[").concat(product_block_category_row_no, "]\" value=\"").concat(sort, "\" />\n                </div>\n            </td>\n            <td>\n                <div class=\"form-group\">\n                    <select class=\"form-control js-select2-product-block-category unique_product_block_product_web_category_hierarchy_id\" name=\"product_block_product_web_category_hierarchy_id[").concat(product_block_category_row_no, "]\">\n                        <option></option>\n                        ").concat(product_category_select_options, "\n                    </select>\n                </div>\n            </td>\n            <td>\n                <button type=\"button\" class=\"btn btn-danger btn-delete-product-category\"><i class=\"fa-solid fa-trash-can\"></i> \u522A\u9664</button>\n            </td>\n        </tr>\n    "));
   $(".js-select2-product-block-category").select2();
   $("#product-block-category-row-no").val(parseInt(product_block_category_row_no) + 1);
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateProductBlockCategory(product_block_category_row_no);
@@ -614,11 +639,6 @@ window.disableSlotIconName = function () {
 window.disableSlotTitle = function () {
   $("#slot_title").prop("disabled", true).val("").prev("label").find("span").remove();
   _validate__WEBPACK_IMPORTED_MODULE_0__.removeSlotTitleValidation();
-}; // 輸入值消毒
-
-
-var sanitize = function sanitize(val) {
-  return val.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 };
 })();
 

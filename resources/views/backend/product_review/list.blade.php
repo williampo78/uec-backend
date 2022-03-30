@@ -17,8 +17,7 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="{{ route('product_review') }}"
-                            enctype="multipart/form-data">
+                        <form id="select-form" method="GET" action="{{ route('product_review') }}">
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="col-sm-3">
@@ -109,48 +108,7 @@
 @section('js')
     <script>
         $(document).ready(function() {
-            $("#stock_type").select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
-            $("#selling_channel").select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
-            $("#lgst_method").select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
-            $("#product_type").select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
-            $("#supplier_id").select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
-            $("#category_id").select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
-            $('#approval_status').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
-            $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD',
-            });
-
+            
         });
     </script>
 @endsection

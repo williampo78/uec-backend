@@ -198,13 +198,12 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <div class='input-group date' id='datetimepicker'>
-                                                <input type="text" class="form-control" name="start_launched_at_start"
-                                                    id="start_launched_at_start"
-                                                    value="{{ request()->input('start_launched_at_start') }}"
-                                                    autocomplete="off" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="start_launched_at_start_flatpickr">
+                                                <input type="text" class="form-control" name="start_launched_at_start" id="start_launched_at_start" value="{{ request()->input('start_launched_at_start') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -214,13 +213,12 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <div class='input-group date' id='datetimepicker2'>
-                                                <input type="text" class="form-control" name="start_launched_at_end"
-                                                    id="start_launched_at_end"
-                                                    value="{{ request()->input('start_launched_at_end') }}"
-                                                    autocomplete="off" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="start_launched_at_end_flatpickr">
+                                                <input type="text" class="form-control" name="start_launched_at_end" id="start_launched_at_end" value="{{ request()->input('start_launched_at_end') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -242,13 +240,12 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <div class='input-group date' id='datetimepicker-create_at_start'>
-                                                <input type="text" class="form-control" name="create_at_start"
-                                                    id="create_at_start"
-                                                    value="{{ request()->input('create_at_start') }}"
-                                                    autocomplete="off" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="create_at_start_flatpickr">
+                                                <input type="text" class="form-control" name="create_at_start" id="create_at_start" value="{{ request()->input('create_at_start') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -258,13 +255,12 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <div class='input-group date' id='datetimepicker-create_at_start_end'>
-                                                <input type="text" class="form-control" name="create_at_start_end"
-                                                    id="create_at_start_end"
-                                                    value="{{ request()->input('create_at_start_end') }}"
-                                                    autocomplete="off" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="input-group" id="create_at_start_end_flatpickr">
+                                                <input type="text" class="form-control" name="create_at_start_end" id="create_at_start_end" value="{{ request()->input('create_at_start_end') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
                                                 </span>
                                             </div>
                                         </div>
@@ -389,17 +385,37 @@
             $("#supplier_id").select2();
             $('#approval_status').select2();
             $('#web_category_hierarchy_id').select2();
-            $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let start_launched_at_start_flatpickr = flatpickr("#start_launched_at_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#start_launched_at_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_end_flatpickr.set('minDate', dateStr);
+                },
             });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let start_launched_at_end_flatpickr = flatpickr("#start_launched_at_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#start_launched_at_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_start_flatpickr.set('maxDate', dateStr);
+                },
             });
-            $('#datetimepicker-create_at_start').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let create_at_start_flatpickr = flatpickr("#create_at_start_flatpickr", {
+                dateFormat: "Y-m-d",
+                maxDate: $("#create_at_start_end").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    create_at_start_end_flatpickr.set('minDate', dateStr);
+                },
             });
-            $('#datetimepicker-create_at_start_end').datetimepicker({
-                format: 'YYYY-MM-DD',
+
+            let create_at_start_end_flatpickr = flatpickr("#create_at_start_end_flatpickr", {
+                dateFormat: "Y-m-d",
+                minDate: $("#create_at_start").val(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    create_at_start_flatpickr.set('maxDate', dateStr);
+                },
             });
 
             // 重置搜尋表單

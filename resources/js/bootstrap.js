@@ -12,6 +12,7 @@ import "jquery-validation/dist/additional-methods";
 import "jquery-validation/dist/localization/messages_zh_TW";
 import Vue from "vue";
 import flatpickr from "flatpickr";
+import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
 import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
 import Croppie from "Croppie";
 
@@ -74,7 +75,36 @@ window.Vue = Vue;
  * flatpickr
  */
 window.flatpickr = flatpickr;
-flatpickr.localize(MandarinTraditional);
+flatpickr.monthSelectPlugin = monthSelectPlugin;
+
+flatpickr.setDefaults({
+	allowInput: true,
+    wrap: true,
+    clickOpens: false,
+    time_24hr: true,
+    locale: MandarinTraditional,
+    // onOpen: function(selectedDates, dateStr, instance) {
+    //     let defaultDate = new Date();
+    //     let minDate = instance.config.minDate;
+    //     let maxDate = instance.config.maxDate;
+
+    //     if (dateStr == '') {
+    //         if (minDate) {
+    //             if (minDate.getTime() > defaultDate.getTime()) {
+    //                 defaultDate = minDate;
+    //             }
+    //         }
+
+    //         if (maxDate) {
+    //             if (maxDate.getTime() < defaultDate.getTime()) {
+    //                 defaultDate = maxDate;
+    //             }
+    //         }
+
+    //         instance.setDate(defaultDate, true);
+    //     }
+    // },
+})
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

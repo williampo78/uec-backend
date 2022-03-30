@@ -2,21 +2,22 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use App\Models\Order;
 use App\Models\Invoice;
-use App\Models\Shipment;
+use App\Models\InvoiceAllowance;
+use App\Models\InvoiceAllowanceDetail;
+use App\Models\InvoiceDetail;
+use App\Models\Order;
+use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
-use App\Models\InvoiceDetail;
-use App\Models\ProductPhotos;
+use App\Models\ProductPhoto;
 use App\Models\ReturnRequest;
+use App\Models\Shipment;
 use App\Models\ShipmentDetail;
-use App\Models\InvoiceAllowance;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Models\OrderCampaignDiscount;
-use App\Models\InvoiceAllowanceDetail;
 
 class OrderService
 {
@@ -115,7 +116,7 @@ class OrderService
         $order_detail_product_ids = $order_details->pluck('product_id')->unique();
 
         // 商品圖片
-        $product_photos = ProductPhotos::whereIn('product_id', $order_detail_product_ids)
+        $product_photos = ProductPhoto::whereIn('product_id', $order_detail_product_ids)
             ->orderBy('product_id', 'asc')
             ->orderBy('sort', 'asc')
             ->get();
@@ -393,6 +394,245 @@ class OrderService
 
             return true;
         });
+
+        return $orders;
+    }
+
+    /**
+     * 取得訂單table列表
+     *
+     * @param array $payload
+     * @return Collection
+     */
+    public function getTableList(array $payload = []): Collection
+    {
+        $orders = Order::with(['shipments'])->where('is_latest', 1);
+
+        // 訂單開始時間
+        if (isset($payload['ordered_date_start'])) {
+            $orders = $orders->whereDate('ordered_date', '>=', $payload['ordered_date_start']);
+        }
+
+        // 訂單結束時間
+        if (isset($payload['ordered_date_end'])) {
+            $orders = $orders->whereDate('ordered_date', '<=', $payload['ordered_date_end']);
+        }
+
+        // 訂單編號
+        if (isset($payload['order_no'])) {
+            $orders = $orders->where('order_no', $payload['order_no']);
+        }
+
+        // 會員帳號
+        if (isset($payload['member_account'])) {
+            $orders = $orders->where('member_account', $payload['member_account']);
+        }
+
+        // 訂單狀態
+        if (isset($payload['order_status_code'])) {
+            $orders = $orders->where('status_code', $payload['order_status_code']);
+        }
+
+        // 付款狀態
+        if (isset($payload['pay_status'])) {
+            $orders = $orders->where('pay_status', $payload['pay_status']);
+        }
+
+        // 出貨單狀態
+        if (isset($payload['shipment_status_code'])) {
+            $orders = $orders->whereRelation('shipments', 'status_code', $payload['shipment_status_code']);
+        }
+
+        // 商品序號
+        if (isset($payload['product_no'])) {
+            $orders = $orders->whereRelation('orderDetails.product', 'product_no', $payload['product_no']);
+        }
+
+        // 商品名稱
+        if (isset($payload['product_name'])) {
+            $orders = $orders->whereRelation('orderDetails.product', 'product_name', 'LIKE', "%{$payload['product_name']}%");
+        }
+
+        // 活動名稱
+        if (isset($payload['campaign_name'])) {
+            $orders = $orders->whereRelation('orderCampaignDiscounts.promotionalCampaign', 'campaign_name', 'LIKE', "%{$payload['campaign_name']}%");
+        }
+
+        return $orders->select()
+            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
+            ->orderBy('ordered_date', 'desc')
+            ->get();
+    }
+
+    /**
+     * 取得訂單table明細
+     *
+     * @param integer $id
+     * @return Model
+     */
+    public function getTableDetailById(int $id): Model
+    {
+        $order = Order::with([
+            'shipments',
+            'orderDetails' => function ($query) {
+                $query->orderBy('order_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'orderDetails.product',
+            'orderDetails.productItem',
+            'orderDetails.shipmentDetail.shipment',
+            'orderPayments' => function ($query) {
+                $query->orderBy('created_at', 'asc');
+            },
+            'orderCampaignDiscounts' => function ($query) {
+                $query->orderBy('group_seq', 'asc')
+                    ->orderBy('order_detail_id', 'asc');
+            },
+            'orderCampaignDiscounts.product',
+            'orderCampaignDiscounts.productItem',
+            'orderCampaignDiscounts.promotionalCampaign',
+            'invoices' => function ($query) {
+                $query->select()
+                    ->addSelect('invoice_date AS transaction_date');
+            },
+            'invoices.invoiceDetails' => function ($query) {
+                $query->orderBy('invoice_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'invoiceAllowances' => function ($query) {
+                $query->select()
+                    ->addSelect('allowance_date AS transaction_date');
+            },
+            'invoiceAllowances.invoiceAllowanceDetails' => function ($query) {
+                $query->orderBy('invoice_allowance_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'invoiceAllowances.invoice',
+            'donatedInstitution',
+        ]);
+
+        $order = $order->find($id);
+
+        // 合併發票開立、發票折讓
+        $combineInvoices = collect();
+
+        if ($order->invoices->isNotEmpty()) {
+            $combineInvoices = $combineInvoices->concat($order->invoices);
+        }
+
+        if ($order->invoiceAllowances->isNotEmpty()) {
+            $combineInvoices = $combineInvoices->concat($order->invoiceAllowances);
+        }
+
+        $combineInvoices = $combineInvoices->sortBy('transaction_date');
+
+        $order->combineInvoices = $combineInvoices;
+
+        return $order;
+    }
+
+    /**
+     * 取得訂單excel列表
+     *
+     * @param array $payload
+     * @return Collection
+     */
+    public function getExcelList(array $payload = []): Collection
+    {
+        $orders = Order::with([
+            'orderDetails' => function ($query) {
+                $query->orderBy('order_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'orderDetails.product',
+            'orderDetails.productItem',
+            'orderDetails.shipmentDetail.shipment',
+        ])->where('is_latest', 1);
+
+        // 訂單開始時間
+        if (isset($payload['ordered_date_start'])) {
+            $orders = $orders->whereDate('ordered_date', '>=', $payload['ordered_date_start']);
+        }
+
+        // 訂單結束時間
+        if (isset($payload['ordered_date_end'])) {
+            $orders = $orders->whereDate('ordered_date', '<=', $payload['ordered_date_end']);
+        }
+
+        // 訂單編號
+        if (isset($payload['order_no'])) {
+            $orders = $orders->where('order_no', $payload['order_no']);
+        }
+
+        // 會員帳號
+        if (isset($payload['member_account'])) {
+            $orders = $orders->where('member_account', $payload['member_account']);
+        }
+
+        // 訂單狀態
+        if (isset($payload['order_status_code'])) {
+            $orders = $orders->where('status_code', $payload['order_status_code']);
+        }
+
+        // 付款狀態
+        if (isset($payload['pay_status'])) {
+            $orders = $orders->where('pay_status', $payload['pay_status']);
+        }
+
+        // 出貨單狀態
+        if (isset($payload['shipment_status_code'])) {
+            $orders = $orders->whereRelation('shipments', 'status_code', $payload['shipment_status_code']);
+        }
+
+        // 商品序號
+        if (isset($payload['product_no'])) {
+            $orders = $orders->whereRelation('orderDetails.product', 'product_no', $payload['product_no']);
+        }
+
+        // 商品名稱
+        if (isset($payload['product_name'])) {
+            $orders = $orders->whereRelation('orderDetails.product', 'product_name', 'LIKE', "%{$payload['product_name']}%");
+        }
+
+        // 活動名稱
+        if (isset($payload['campaign_name'])) {
+            $orders = $orders->whereRelation('orderCampaignDiscounts.promotionalCampaign', 'campaign_name', 'LIKE', "%{$payload['campaign_name']}%");
+        }
+
+        return $orders->orderBy('ordered_date', 'desc')
+            ->get();
+    }
+
+    /**
+     * 取得會員訂單
+     *
+     * @param array $payload
+     * @return Collection
+     */
+    public function getMemberOrders(array $payload = []): Collection
+    {
+        $member = auth('api')->user();
+
+        $orders = Order::with([
+            'shipments',
+            'orderDetails' => function ($query) {
+                $query->orderBy('order_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'orderDetails.product',
+            'orderDetails.productItem',
+            'orderDetails.product.productPhotos' => function ($query) {
+                $query->orderBy('product_id', 'asc')
+                    ->orderBy('sort', 'asc');
+            },
+        ])->where('revision_no', 0)
+            ->where('member_id', $member->member_id)
+            ->whereDate('ordered_date', '>=', $payload['ordered_date_start'])
+            ->whereDate('ordered_date', '<=', $payload['ordered_date_end'])
+            ->select()
+            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
+            ->orderBy('ordered_date', 'desc')
+            ->get();
 
         return $orders;
     }

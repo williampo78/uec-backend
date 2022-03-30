@@ -155,7 +155,15 @@
                     n_value: {
                         required: true,
                         digits: true,
-                        min: 1,
+                        min: function() {
+                            if ($('#campaign_type').val() == 'CART02') {
+                                if ($("#x_value").val()) {
+                                    return parseInt($("#x_value").val()) + 1;
+                                }
+                            }
+
+                            return 1;
+                        },
                     },
                     x_value: {
                         required: true,
@@ -212,7 +220,15 @@
                     },
                     n_value: {
                         digits: "只可輸入正整數",
-                        min: "只可輸入正整數",
+                        min: function(value) {
+                            if ($('#campaign_type').val() == 'CART02') {
+                                if (value > 1) {
+                                    return "必須大於X值";
+                                }
+                            }
+
+                            return '只可輸入正整數';
+                        },
                     },
                     x_value: {
                         digits: "只可輸入正整數",

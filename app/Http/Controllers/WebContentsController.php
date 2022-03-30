@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WebContents;
+use App\Models\WebContent;
 use Illuminate\Http\Request;
-use App\Services\WebContentsService;
 use App\Services\UniversalService;
+use App\Services\WebContentsService;
 
 class WebContentsController extends Controller
 {
@@ -77,7 +77,7 @@ class WebContentsController extends Controller
         //
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
-        $data['webcontent'] = WebContents::find($id);
+        $data['webcontent'] = WebContent::find($id);
         return view('backend.web_contents.view', compact('data'));
     }
 
@@ -92,7 +92,7 @@ class WebContentsController extends Controller
         //
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
-        $data['webcontent'] = WebContents::find($id);
+        $data['webcontent'] = WebContent::find($id);
         return view('backend.web_contents.upd', compact('data'));
     }
 

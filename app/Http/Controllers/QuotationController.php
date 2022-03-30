@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quotation;
-use App\Models\QuotationDetails;
-// use App\Services\ItemService;
+use Illuminate\Http\Request;
+use App\Models\QuotationDetail;
 use App\Services\BrandsService;
 use App\Services\ProductsService;
-use App\Services\QuotationService;
 use App\Services\SupplierService;
+use App\Services\QuotationService;
 use App\Services\UniversalService;
 use App\Services\WarehouseService;
-use Illuminate\Http\Request;
 
 class QuotationController extends Controller
 {
@@ -23,7 +22,6 @@ class QuotationController extends Controller
 
     private $quotationService;
     private $universalService;
-    // private $itemService;
     private $warehouseService;
 
     public function __construct(QuotationService $quotationService,
@@ -219,7 +217,7 @@ class QuotationController extends Controller
     {
         $data = $request->all();
 
-        QuotationDetails::destroy($data['id']);
+        QuotationDetail::destroy($data['id']);
 
         echo json_encode(['ok']);
     }

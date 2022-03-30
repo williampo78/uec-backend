@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Auth;
-use App\Models\Brands;
 use Log;
+use App\Models\Brand;
+use Illuminate\Support\Facades\Auth;
 
 class BrandsService
 {
@@ -16,11 +16,11 @@ class BrandsService
     public function getBrands()
     {
         $agent_id = Auth::user()->agent_id;
-        return Brands::where('agent_id', $agent_id)->where('active', 1)->get();
+        return Brand::where('agent_id', $agent_id)->where('active', 1)->get();
     }
 
     public function getBrand($id)
     {
-        return Brands::where('id', $id)->where('active', 1)->get();
+        return Brand::where('id', $id)->where('active', 1)->get();
     }
 }

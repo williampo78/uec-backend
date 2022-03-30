@@ -136,27 +136,29 @@
                                         <label class="control-label">上架時間起<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <div class='input-group date' id='datetimepicker'>
-                                            <input type='text' class="form-control" name="start_launched_at"
-                                                id="start_launched_at" value="{{ $products->start_launched_at }}" readonly/>
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="start_launched_at_flatpickr">
+                                            <input type="text" class="form-control" name="start_launched_at" id="start_launched_at" value="{{ $products->start_launched_at }}" readonly autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class=" form-group">
-                                    <div class="col-sm-2 ">
+                                <div class="form-group">
+                                    <div class="col-sm-2">
                                         <label class="control-label">上架時間訖<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <div class='input-group date' id='datetimepicker2'>
-                                            <input type='text' class="form-control" name="end_launched_at"
-                                                id="end_launched_at" value="{{ $products->end_launched_at }}" readonly/>
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="end_launched_at_flatpickr">
+                                            <input type="text" class="form-control" name="end_launched_at" id="end_launched_at" value="{{ $products->end_launched_at }}" readonly autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -178,7 +180,7 @@
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <label class="control-label">
-                                            <a href="{{ route('product_small.show', $products->id) }}"
+                                            <a href="{{ route('products_mall.show', $products->id) }}"
                                                 target="_blank">查看商城資訊
                                             </a>
                                         </label>

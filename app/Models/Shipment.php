@@ -11,4 +11,9 @@ class Shipment extends Model
 
     protected $table = 'shipments';
     protected $guarded = [];
+
+    public function shipmentDetails()
+    {
+        return $this->hasMany(ShipmentDetail::class, 'shipment_id');
+    }
 }

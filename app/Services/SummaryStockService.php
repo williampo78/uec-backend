@@ -16,7 +16,12 @@ class SummaryStockService
 {
     public function getSummaryStock($data)
     {
-        $result = StockMonthlySummary::select("stock_monthly_summary.*", "products.product_name","product_items.item_no","product_items.spec_2_value",
+        $result = StockMonthlySummary::select("stock_monthly_summary.*", "products.product_name", "product_items.item_no", "product_items.spec_2_value",
+            DB::raw("FORMAT(stock_monthly_summary.begin_amount, 2) as begin_amount_display"),
+            DB::raw("FORMAT(stock_monthly_summary.end_amount, 2) as end_amount_display"),
+            DB::raw("FORMAT(stock_monthly_summary.sales_amount, 2) as sales_amount_display"),
+            DB::raw("FORMAT(stock_monthly_summary.sales_return_amount, 2) as sales_return_amount_display"),
+            DB::raw("FORMAT(stock_monthly_summary.item_cost, 2) as item_cost_display"),
             DB::raw("(CASE WHEN product_items.spec_1_value = '0' THEN '' ELSE product_items.spec_1_value END) AS spec_1_value"),
             DB::raw("0 as adj_qty"),
             DB::raw("0 as adj_amount"),
@@ -28,7 +33,7 @@ class SummaryStockService
             ->join("product_items", "product_items.id", "=", "stock_monthly_summary.product_item_id");
 
         if ($data['item_id_start'] != '' && $data['item_id_end'] != '') {
-            $result = $result->whereBetween('product_items.item_no', [$data['item_id_start'].'%', $data['item_id_end'].'%']);
+            $result = $result->whereBetween('product_items.item_no', [$data['item_id_start'] . '%', $data['item_id_end'] . '%']);
         }
 
         if ($data['product_name'] != '') {
@@ -44,9 +49,9 @@ class SummaryStockService
         $result = StockMonthlySummary::select(
             DB::raw('stock_monthly_summary.transaction_month as month'),
             DB::raw('sum(stock_monthly_summary.begin_qty) begin_qty'),
-            DB::raw('sum(stock_monthly_summary.begin_amount) begin_amount'),
+            DB::raw('format(sum(stock_monthly_summary.begin_amount),2) begin_amount'),
             DB::raw('sum(stock_monthly_summary.end_qty) end_qty'),
-            DB::raw('sum(stock_monthly_summary.end_amount) end_amount'),
+            DB::raw('format(sum(stock_monthly_summary.end_amount),2) end_amount'),
             )
             ->join("products", "products.id", "=", "stock_monthly_summary.product_id")
             ->where("stock_monthly_summary.transaction_month", $data['smonth']);
@@ -86,6 +91,11 @@ class SummaryStockService
                     $data['status'] = true;
                     $data['alert'] = false;
                 }
+            } else {
+                $data['message'] = '執行滾算失敗';
+                $data['result'] = $smonth . "執行滾算失敗！";
+                $data['status'] = false;
+                $data['alert'] = false;
             }
         } elseif (strtotime($lastRecordDate) < strtotime($smonth)) {
             if ($previousCount > 0) { //上月有資料
@@ -99,6 +109,11 @@ class SummaryStockService
                         $data['status'] = true;
                         $data['alert'] = false;
                     }
+                } else {
+                    $data['message'] = '執行滾算失敗2';
+                    $data['result'] = $smonth . "執行滾算失敗！";
+                    $data['status'] = false;
+                    $data['alert'] = false;
                 }
             } else {
                 $data['message'] = '不允許執行滾算3';
@@ -119,6 +134,11 @@ class SummaryStockService
                         $data['status'] = true;
                         $data['alert'] = true;
                     }
+                } else {
+                    $data['message'] = '執行滾算失敗';
+                    $data['result'] = $smonth . "執行滾算失敗！";
+                    $data['status'] = false;
+                    $data['alert'] = false;
                 }
             }
         }
@@ -175,6 +195,13 @@ class SummaryStockService
                 $query->where('end_qty', '<>', 0);
                 $query->orwhere('end_amount', '<>', 0);
             });
+
+            $data = $data->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('product_items')
+                    ->whereRaw('product_items.id = stock_monthly_summary.product_item_id ');
+            });
+
             $data = $data->orderBy('product_item_id', 'asc')->get();
             $webDataAdd = [];
             foreach ($data as $key => $value) {
@@ -184,18 +211,18 @@ class SummaryStockService
                     $value->product_id,
                     $value->product_item_id,
                     $value->begin_qty,
-                    $value->begin_amount,
+                    round($value->begin_amount, 2),
                     $value->item_cost,
                     $value->rcv_qty,
                     $value->rcv_amount,
                     $value->rtv_qty,
                     $value->rtv_amount,
                     $value->sales_qty,
-                    $value->sales_amount,
+                    round($value->sales_amount, 2),
                     $value->sales_return_qty,
-                    $value->sales_return_amount,
+                    round($value->sales_return_amount, 2),
                     $value->end_qty,
-                    $value->end_amount,
+                    round($value->end_amount, 2),
                     $user_id,
                     $user_id,
                     $now,
@@ -244,18 +271,18 @@ class SummaryStockService
                     $value->product_id,
                     $value->product_item_id,
                     $value->begin_qty,
-                    $value->begin_amount,
+                    round($value->begin_amount, 2),
                     $value->item_cost,
                     $value->rcv_qty,
                     $value->rcv_amount,
                     $value->rtv_qty,
                     $value->rtv_amount,
                     $value->sales_qty,
-                    $value->sales_amount,
+                    round($value->sales_amount, 2),
                     $value->sales_return_qty,
-                    $value->sales_return_amount,
+                    round($value->sales_return_amount, 2),
                     $value->end_qty,
-                    $value->end_amount,
+                    round($value->end_amount, 2),
                     $user_id,
                     $user_id,
                     $now,
@@ -352,11 +379,11 @@ class SummaryStockService
         $webDataUpd = [];
         foreach ($data as $key => $value) {
             $end_qty = ($value->begin_qty + $value->rcv_qty + $value->rtv_qty + $value->sales_qty + $value->sales_return_qty);//推算期末數
-            $net_qty = ($value->begin_qty + $value->rcv_qty + $value->rtv_qty );//本期進貨淨量
-            $item_cost = round(($value->begin_amount + $value->rcv_amount + $value->rtv_amount) / ($net_qty == 0 ? 1 : $net_qty), 2);//推算單位成本
+            $net_qty = ($value->begin_qty + $value->rcv_qty + $value->rtv_qty);//本期進貨淨量
+            $item_cost = round((round($value->begin_amount, 2) + $value->rcv_amount + $value->rtv_amount) / ($net_qty == 0 ? 1 : $net_qty), 2);//推算單位成本
             $sales_amount = round($value->sales_qty * $item_cost, 2);//推算銷貨金額
             $sales_return_amount = round($value->sales_return_qty * $item_cost, 2);//推算銷退金額
-            $end_amount = $end_qty * $item_cost;
+            $end_amount = round(($end_qty * $item_cost), 2);
             $webDataUpd[$key] = [
                 "id" => $value->id,
                 "rcv_qty" => ($value->rcv_qty == 0 ? 0 : $value->rcv_qty),

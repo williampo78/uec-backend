@@ -67,7 +67,25 @@ class AdvertisementBlockController extends Controller
      */
     public function show($id)
     {
-        //
+        $ad_slot = $this->advertisement_service->getSlotById($id);
+
+        $ad_slot->remark = nl2br($ad_slot->remark);
+
+        // 整理給前端的資料
+        $ad_slot = $ad_slot->only([
+            'active',
+            'description',
+            'is_desktop_applicable',
+            'is_mobile_applicable',
+            'remark',
+            'slot_code',
+            'slot_desc',
+            'slot_type',
+        ]);
+
+        return response()->json([
+            'ad_slot' => $ad_slot,
+        ]);
     }
 
     /**
@@ -117,30 +135,5 @@ class AdvertisementBlockController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function getDetail(Request $request)
-    {
-        $slot_id = $request->input('slot_id');
-
-        $ad_slot = $this->advertisement_service->getSlotById($slot_id);
-
-        $ad_slot->remark = nl2br($ad_slot->remark);
-
-        // 整理給前端的資料
-        $ad_slot = $ad_slot->only([
-            'active',
-            'description',
-            'is_desktop_applicable',
-            'is_mobile_applicable',
-            'remark',
-            'slot_code',
-            'slot_desc',
-            'slot_type',
-        ]);
-
-        return response()->json([
-            'ad_slot' => $ad_slot,
-        ]);
     }
 }

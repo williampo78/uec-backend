@@ -73,12 +73,13 @@
                                             <h5>建檔日</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="">
-                                                <div class='input-group date' id='start_created_at'>
-                                                    <input type='text' class="form-control" name="start_created_at"
-                                                        value="" />
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="form-group">
+                                                <div class="input-group" id="start_created_at_flatpickr">
+                                                    <input type="text" class="form-control" name="start_created_at" id="start_created_at" value="" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -87,12 +88,15 @@
                                             <h5>~</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class='input-group date' id='end_created_at'>
-                                                <input type='text' class="form-control" name="end_created_at"
-                                                    value="" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                            <div class="form-group">
+                                                <div class="input-group" id="end_created_at_flatpickr">
+                                                    <input type="text" class="form-control" name="end_created_at" id="end_created_at" value="" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -101,12 +105,13 @@
                                             <h5>上架日期</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class="form-group" id="">
-                                                <div class='input-group date' id='start_launched_at_start'>
-                                                    <input type='text' class="form-control" name="start_launched_at_start"
-                                                        value="" />
-                                                    <span class="input-group-addon">
-                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                            <div class="form-group">
+                                                <div class="input-group" id="start_launched_at_start_flatpickr">
+                                                    <input type="text" class="form-control" name="start_launched_at_start" id="start_launched_at_start" value="" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -115,12 +120,15 @@
                                             <h5>~</h5>
                                         </div>
                                         <div class="col-sm-4">
-                                            <div class='input-group date' id='start_launched_at_end'>
-                                                <input type='text' class="form-control" name="start_launched_at_end"
-                                                    value="" />
-                                                <span class="input-group-addon">
-                                                    <span class="glyphicon glyphicon-calendar"></span>
-                                                </span>
+                                            <div class="form-group">
+                                                <div class="input-group" id="start_launched_at_end_flatpickr">
+                                                    <input type="text" class="form-control" name="start_launched_at_end" id="start_launched_at_end" value="" autocomplete="off" data-input />
+                                                    <span class="input-group-btn" data-toggle>
+                                                        <button class="btn btn-default" type="button">
+                                                            <i class="fa-solid fa-calendar-days"></i>
+                                                        </button>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

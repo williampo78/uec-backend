@@ -14,7 +14,7 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
-                        <form role="form" id="select-form" method="GET" action="{{ route('web_category_products') }}"
+                        <form id="select-form" method="GET" action="{{ route('web_category_products') }}"
                             enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-sm-6">
@@ -147,17 +147,10 @@
                             type: 'show_category_products',
                             id: id,
                         });
-                        console.log(id);
                         this.category_products_list = response.data.result.data.category_products_list;
-                        this.category_hierarchy_content = response.data.result.data
-                            .category_hierarchy_content;
-
-                        console.log(response.data.result.data.category_hierarchy_content);
+                        this.category_hierarchy_content = response.data.result.data.category_hierarchy_content;
                     }
                     req();
-                    // console.log(this.category_products_list) ;
-                    // console.log(this.category_hierarchy_content) ;
-
                 },
             },
             mounted: function() {

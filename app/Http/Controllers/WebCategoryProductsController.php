@@ -121,7 +121,7 @@ class WebCategoryProductsController extends Controller
     {
 
     }
-    public function Ajax(Request $request)
+    public function ajax(Request $request)
     {
         $in = $request->input();
         $result = [];

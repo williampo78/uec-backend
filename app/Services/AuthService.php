@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
+use Log;
+use App\Models\Member;
 use App\Models\AgentConfig;
-use App\Models\Members;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Log;
+
 class AuthService
 {
     public function __construct(APIService $apiService)
@@ -31,15 +32,15 @@ class AuthService
         try {
             if ($result['status'] == '200') {
                 $status = true;
-                $tmp = Members::where('member_id', '=', $result['data']['id'])->first();
+                $tmp = Member::where('member_id', '=', $result['data']['id'])->first();
                 if (!is_null($tmp)) {
                     $token = JWTAuth::fromSubject($tmp);
-                    Members::where('id', $tmp['id'])->update(['api_token' => $token]);
+                    Member::where('id', $tmp['id'])->update(['api_token' => $token]);
                 } else {
                     $credentials['member_id'] = $result['data']['id'];
-                    $member = Members::create($credentials);
+                    $member = Member::create($credentials);
                     $token = JWTAuth::fromSubject($member);
-                    Members::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
+                    Member::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
                 }
                 unset($result['data']['id']);
                 unset($result['data']['recommendSource']);

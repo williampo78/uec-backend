@@ -2,23 +2,21 @@
 
 namespace App\Services;
 
-use App\Models\Roles;
-use App\Models\RolePermissionDetails;
-use App\Models\PermissionDetail;
+use Carbon\Carbon;
+use App\Models\Role;
 use App\Models\Permission;
-
-use Illuminate\Support\Facades\Auth;
+use App\Models\PermissionDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use App\Models\RolePermissionDetail;
+use Illuminate\Support\Facades\Auth;
 
 class RolesPermissionService
 {
-
-    public function getRoles($data)
+    public function getRoles($data = [])
     {
         $agent_id = Auth::user()->agent_id;
-        $roles = Roles::where('agent_id', $agent_id);
+        $roles = Role::where('agent_id', $agent_id);
 
         if (isset($data['active'])) {
             $roles->where('active', $data['active']);
@@ -28,7 +26,7 @@ class RolesPermissionService
             $roles->where('role_name', 'like', '%' . $data['role_name'] . '%');
         }
 
-        $roles = $roles->orderBy('role_name', 'ASC')->get();
+        $roles = $roles->orderBy('role_name', 'asc')->get();
 
         return $roles;
     }
@@ -37,11 +35,13 @@ class RolesPermissionService
     {
         $permission_array = [];
         $permission = Permission::where('type', '=', 'menu')->orderBy('sort', 'asc')->get()->toArray();
+
         foreach ($permission as $data) {
             $permission_array[$data['id']]['id'] = $data['id'];
             $permission_array[$data['id']]['icon'] = $data['icon'];
             $permission_array[$data['id']]['name'] = $data['name'];
         }
+
         return $permission_array;
     }
 
@@ -49,12 +49,14 @@ class RolesPermissionService
     {
         $permission_detail_array = [];
         $permission = PermissionDetail::orderBy('sort', 'asc')->orderBy('id', 'asc')->get()->toArray();
+
         foreach ($permission as $data) {
             $permission_detail_array[$data['permission_id']]['id'][] = $data['id'];
             $permission_detail_array[$data['permission_id']]['icon'][] = $data['icon'];
             $permission_detail_array[$data['permission_id']]['code'][] = $data['code'];
             $permission_detail_array[$data['permission_id']]['name'][] = $data['name'];
         }
+
         return $permission_detail_array;
     }
 
@@ -63,6 +65,7 @@ class RolesPermissionService
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         $auth = ['query', 'create', 'update', 'delete', 'void', 'export'];
+
         DB::beginTransaction();
         try {
             $roleData = [];
@@ -74,36 +77,43 @@ class RolesPermissionService
             $roleData['created_at'] = $now;
             $roleData['updated_by'] = $user_id;
             $roleData['updated_at'] = $now;
+
             if ($act == 'add') {
-                $role_id = Roles::insertGetId($roleData);
-            } else if ($act =='upd') {
-                Roles::where('id' , $inputdata['id'])->update($roleData);
+                $role_id = Role::insertGetId($roleData);
+            } else if ($act == 'upd') {
+                Role::where('id', $inputdata['id'])->update($roleData);
                 $role_id = $inputdata['id'];
             }
 
             $detailData = [];
+
             //不管新增或編輯先把原有的權限都刪除
-            RolePermissionDetails::where('role_id', '=', $role_id)->delete();
-            foreach ($inputdata['auth_index'] as $k1 => $v1) {    //有勾選才會寫入細項權限
+            RolePermissionDetail::where('role_id', '=', $role_id)->delete();
+
+            foreach ($inputdata['auth_index'] as $k1 => $v1) { //有勾選才會寫入細項權限
                 $detailData['role_id'] = $role_id;
                 $detailData['permission_detail_id'] = $v1;
+
                 foreach ($auth as $k => $v) {
                     $detailData['auth_' . $v] = isset($inputdata['auth_' . $v . '_' . $v1]) ? $inputdata['auth_' . $v . '_' . $v1] : 0;
                 }
+
                 $detailData['created_by'] = $user_id;
                 $detailData['created_at'] = $now;
                 $detailData['updated_by'] = -1;
                 $detailData['updated_at'] = $now;
-                RolePermissionDetails::insert($detailData);
+
+                RolePermissionDetail::insert($detailData);
             }
+
             DB::commit();
             $result = true;
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e);
             $result = false;
         }
+
         return $result;
     }
 
@@ -111,17 +121,19 @@ class RolesPermissionService
     {
         $auth = ['auth_query', 'auth_create', 'auth_update', 'auth_delete', 'auth_void', 'auth_export'];
         $permission_detail_array = [];
-        $permission = RolePermissionDetails::where('role_id','=',$id)->get()->toArray();
+        $permission = RolePermissionDetail::where('role_id', '=', $id)->get()->toArray();
+
         foreach ($permission as $data) {
-            foreach ($auth as $k=>$v){
+            foreach ($auth as $k => $v) {
                 $permission_detail_array[$data['permission_detail_id']][$v] = $data[$v];
             }
         }
+
         return $permission_detail_array;
     }
 
     public function showRole($id)
     {
-        return Roles::where('id', $id)->get()->first();
+        return Role::where('id', $id)->get()->first();
     }
 }

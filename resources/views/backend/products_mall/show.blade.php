@@ -55,7 +55,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
-                <form role="form" id="new-form" method="GET" action="{{ route('product_small.show', $products->id) }}"
+                <form role="form" id="new-form" method="GET" action="{{ route('products_mall.show', $products->id) }}"
                     enctype="multipart/form-data" novalidaten="ovalidate">
                     @csrf
                     <div class="form-horizontal">
@@ -436,7 +436,7 @@
                             <i class="fa-solid fa-floppy-disk"></i>
                             儲存
                         </button> --}}
-                        <a class="btn btn-success" href="{{ route('product_small') }}"><i class="fa-solid fa-ban"></i>
+                        <a class="btn btn-success" href="{{ route('products_mall') }}"><i class="fa-solid fa-ban"></i>
                             返回</a>
                 </form>
                 {{-- @include('backend.products_mall.model_category')
@@ -453,12 +453,6 @@
     <script>
         // Get all sections that have an ID defined
         $(document).ready(function() {
-            $('#promotion_start_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
-            });
-            $('#promotion_end_at').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
-            });
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
@@ -476,12 +470,118 @@
                 },
                 htmlSupport: {
                     allow: [
-                        {
-                            name: /.*/,
-                            attributes: true,
-                            classes: true,
-                            styles: true
-                        }
+                        { name: 'a', attributes: true, classes: true, styles: true },
+                        { name: 'abbr', attributes: true, classes: true, styles: true },
+                        { name: 'acronym', attributes: true, classes: true, styles: true },
+                        { name: 'address', attributes: true, classes: true, styles: true },
+                        { name: 'applet', attributes: true, classes: true, styles: true },
+                        { name: 'area', attributes: true, classes: true, styles: true },
+                        { name: 'article', attributes: true, classes: true, styles: true },
+                        { name: 'aside', attributes: true, classes: true, styles: true },
+                        { name: 'audio', attributes: true, classes: true, styles: true },
+                        { name: 'b', attributes: true, classes: true, styles: true },
+                        { name: 'base', attributes: true, classes: true, styles: true },
+                        { name: 'basefont', attributes: true, classes: true, styles: true },
+                        { name: 'bdi', attributes: true, classes: true, styles: true },
+                        { name: 'bdo', attributes: true, classes: true, styles: true },
+                        { name: 'big', attributes: true, classes: true, styles: true },
+                        { name: 'blockquote', attributes: true, classes: true, styles: true },
+                        { name: 'br', attributes: true, classes: true, styles: true },
+                        { name: 'button', attributes: true, classes: true, styles: true },
+                        { name: 'canvas', attributes: true, classes: true, styles: true },
+                        { name: 'caption', attributes: true, classes: true, styles: true },
+                        { name: 'center', attributes: true, classes: true, styles: true },
+                        { name: 'cite', attributes: true, classes: true, styles: true },
+                        { name: 'code', attributes: true, classes: true, styles: true },
+                        { name: 'col', attributes: true, classes: true, styles: true },
+                        { name: 'colgroup', attributes: true, classes: true, styles: true },
+                        { name: 'data', attributes: true, classes: true, styles: true },
+                        { name: 'datalist', attributes: true, classes: true, styles: true },
+                        { name: 'dd', attributes: true, classes: true, styles: true },
+                        { name: 'del', attributes: true, classes: true, styles: true },
+                        { name: 'details', attributes: true, classes: true, styles: true },
+                        { name: 'dfn', attributes: true, classes: true, styles: true },
+                        { name: 'dialog', attributes: true, classes: true, styles: true },
+                        { name: 'dir', attributes: true, classes: true, styles: true },
+                        { name: 'div', attributes: true, classes: true, styles: true },
+                        { name: 'dl', attributes: true, classes: true, styles: true },
+                        { name: 'dt', attributes: true, classes: true, styles: true },
+                        { name: 'em', attributes: true, classes: true, styles: true },
+                        { name: 'embed', attributes: true, classes: true, styles: true },
+                        { name: 'fieldset', attributes: true, classes: true, styles: true },
+                        { name: 'figcaption', attributes: true, classes: true, styles: true },
+                        { name: 'figure', attributes: true, classes: true, styles: true },
+                        { name: 'font', attributes: true, classes: true, styles: true },
+                        { name: 'footer', attributes: true, classes: true, styles: true },
+                        { name: 'form', attributes: true, classes: true, styles: true },
+                        { name: 'frame', attributes: true, classes: true, styles: true },
+                        { name: 'frameset', attributes: true, classes: true, styles: true },
+                        { name: 'h1 to h6', attributes: true, classes: true, styles: true },
+                        { name: 'header', attributes: true, classes: true, styles: true },
+                        { name: 'hr', attributes: true, classes: true, styles: true },
+                        { name: 'i', attributes: true, classes: true, styles: true },
+                        { name: 'img', attributes: true, classes: true, styles: true },
+                        { name: 'input', attributes: true, classes: true, styles: true },
+                        { name: 'ins', attributes: true, classes: true, styles: true },
+                        { name: 'kbd', attributes: true, classes: true, styles: true },
+                        { name: 'label', attributes: true, classes: true, styles: true },
+                        { name: 'legend', attributes: true, classes: true, styles: true },
+                        { name: 'li', attributes: true, classes: true, styles: true },
+                        { name: 'link', attributes: true, classes: true, styles: true },
+                        { name: 'main', attributes: true, classes: true, styles: true },
+                        { name: 'map', attributes: true, classes: true, styles: true },
+                        { name: 'mark', attributes: true, classes: true, styles: true },
+                        { name: 'meta', attributes: true, classes: true, styles: true },
+                        { name: 'meter', attributes: true, classes: true, styles: true },
+                        { name: 'nav', attributes: true, classes: true, styles: true },
+                        { name: 'noframes', attributes: true, classes: true, styles: true },
+                        { name: 'noscript', attributes: true, classes: true, styles: true },
+                        { name: 'object', attributes: true, classes: true, styles: true },
+                        { name: 'ol', attributes: true, classes: true, styles: true },
+                        { name: 'optgroup', attributes: true, classes: true, styles: true },
+                        { name: 'option', attributes: true, classes: true, styles: true },
+                        { name: 'output', attributes: true, classes: true, styles: true },
+                        { name: 'p', attributes: true, classes: true, styles: true },
+                        { name: 'param', attributes: true, classes: true, styles: true },
+                        { name: 'picture', attributes: true, classes: true, styles: true },
+                        { name: 'pre', attributes: true, classes: true, styles: true },
+                        { name: 'progress', attributes: true, classes: true, styles: true },
+                        { name: 'q', attributes: true, classes: true, styles: true },
+                        { name: 'rp', attributes: true, classes: true, styles: true },
+                        { name: 'rt', attributes: true, classes: true, styles: true },
+                        { name: 'ruby', attributes: true, classes: true, styles: true },
+                        { name: 's', attributes: true, classes: true, styles: true },
+                        { name: 'samp', attributes: true, classes: true, styles: true },
+                        { name: 'section', attributes: true, classes: true, styles: true },
+                        { name: 'select', attributes: true, classes: true, styles: true },
+                        { name: 'small', attributes: true, classes: true, styles: true },
+                        { name: 'source', attributes: true, classes: true, styles: true },
+                        { name: 'span', attributes: true, classes: true, styles: true },
+                        { name: 'strike', attributes: true, classes: true, styles: true },
+                        { name: 'strong', attributes: true, classes: true, styles: true },
+                        { name: 'style', attributes: true, classes: true, styles: true },
+                        { name: 'sub', attributes: true, classes: true, styles: true },
+                        { name: 'summary', attributes: true, classes: true, styles: true },
+                        { name: 'sup', attributes: true, classes: true, styles: true },
+                        { name: 'svg', attributes: true, classes: true, styles: true },
+                        { name: 'table', attributes: true, classes: true, styles: true },
+                        { name: 'tbody', attributes: true, classes: true, styles: true },
+                        { name: 'td', attributes: true, classes: true, styles: true },
+                        { name: 'template', attributes: true, classes: true, styles: true },
+                        { name: 'textarea', attributes: true, classes: true, styles: true },
+                        { name: 'tfoot', attributes: true, classes: true, styles: true },
+                        { name: 'th', attributes: true, classes: true, styles: true },
+                        { name: 'thead', attributes: true, classes: true, styles: true },
+                        { name: 'time', attributes: true, classes: true, styles: true },
+                        { name: 'title', attributes: true, classes: true, styles: true },
+                        { name: 'tr', attributes: true, classes: true, styles: true },
+                        { name: 'track', attributes: true, classes: true, styles: true },
+                        { name: 'tt', attributes: true, classes: true, styles: true },
+                        { name: 'u', attributes: true, classes: true, styles: true },
+                        { name: 'ul', attributes: true, classes: true, styles: true },
+                        { name: 'var', attributes: true, classes: true, styles: true },
+                        { name: 'video', attributes: true, classes: true, styles: true },
+                        { name: 'wbr', attributes: true, classes: true, styles: true },
                     ]
                 }
             })
@@ -506,12 +606,118 @@
                 },
                 htmlSupport: {
                     allow: [
-                        {
-                            name: /.*/,
-                            attributes: true,
-                            classes: true,
-                            styles: true
-                        }
+                        { name: 'a', attributes: true, classes: true, styles: true },
+                        { name: 'abbr', attributes: true, classes: true, styles: true },
+                        { name: 'acronym', attributes: true, classes: true, styles: true },
+                        { name: 'address', attributes: true, classes: true, styles: true },
+                        { name: 'applet', attributes: true, classes: true, styles: true },
+                        { name: 'area', attributes: true, classes: true, styles: true },
+                        { name: 'article', attributes: true, classes: true, styles: true },
+                        { name: 'aside', attributes: true, classes: true, styles: true },
+                        { name: 'audio', attributes: true, classes: true, styles: true },
+                        { name: 'b', attributes: true, classes: true, styles: true },
+                        { name: 'base', attributes: true, classes: true, styles: true },
+                        { name: 'basefont', attributes: true, classes: true, styles: true },
+                        { name: 'bdi', attributes: true, classes: true, styles: true },
+                        { name: 'bdo', attributes: true, classes: true, styles: true },
+                        { name: 'big', attributes: true, classes: true, styles: true },
+                        { name: 'blockquote', attributes: true, classes: true, styles: true },
+                        { name: 'br', attributes: true, classes: true, styles: true },
+                        { name: 'button', attributes: true, classes: true, styles: true },
+                        { name: 'canvas', attributes: true, classes: true, styles: true },
+                        { name: 'caption', attributes: true, classes: true, styles: true },
+                        { name: 'center', attributes: true, classes: true, styles: true },
+                        { name: 'cite', attributes: true, classes: true, styles: true },
+                        { name: 'code', attributes: true, classes: true, styles: true },
+                        { name: 'col', attributes: true, classes: true, styles: true },
+                        { name: 'colgroup', attributes: true, classes: true, styles: true },
+                        { name: 'data', attributes: true, classes: true, styles: true },
+                        { name: 'datalist', attributes: true, classes: true, styles: true },
+                        { name: 'dd', attributes: true, classes: true, styles: true },
+                        { name: 'del', attributes: true, classes: true, styles: true },
+                        { name: 'details', attributes: true, classes: true, styles: true },
+                        { name: 'dfn', attributes: true, classes: true, styles: true },
+                        { name: 'dialog', attributes: true, classes: true, styles: true },
+                        { name: 'dir', attributes: true, classes: true, styles: true },
+                        { name: 'div', attributes: true, classes: true, styles: true },
+                        { name: 'dl', attributes: true, classes: true, styles: true },
+                        { name: 'dt', attributes: true, classes: true, styles: true },
+                        { name: 'em', attributes: true, classes: true, styles: true },
+                        { name: 'embed', attributes: true, classes: true, styles: true },
+                        { name: 'fieldset', attributes: true, classes: true, styles: true },
+                        { name: 'figcaption', attributes: true, classes: true, styles: true },
+                        { name: 'figure', attributes: true, classes: true, styles: true },
+                        { name: 'font', attributes: true, classes: true, styles: true },
+                        { name: 'footer', attributes: true, classes: true, styles: true },
+                        { name: 'form', attributes: true, classes: true, styles: true },
+                        { name: 'frame', attributes: true, classes: true, styles: true },
+                        { name: 'frameset', attributes: true, classes: true, styles: true },
+                        { name: 'h1 to h6', attributes: true, classes: true, styles: true },
+                        { name: 'header', attributes: true, classes: true, styles: true },
+                        { name: 'hr', attributes: true, classes: true, styles: true },
+                        { name: 'i', attributes: true, classes: true, styles: true },
+                        { name: 'img', attributes: true, classes: true, styles: true },
+                        { name: 'input', attributes: true, classes: true, styles: true },
+                        { name: 'ins', attributes: true, classes: true, styles: true },
+                        { name: 'kbd', attributes: true, classes: true, styles: true },
+                        { name: 'label', attributes: true, classes: true, styles: true },
+                        { name: 'legend', attributes: true, classes: true, styles: true },
+                        { name: 'li', attributes: true, classes: true, styles: true },
+                        { name: 'link', attributes: true, classes: true, styles: true },
+                        { name: 'main', attributes: true, classes: true, styles: true },
+                        { name: 'map', attributes: true, classes: true, styles: true },
+                        { name: 'mark', attributes: true, classes: true, styles: true },
+                        { name: 'meta', attributes: true, classes: true, styles: true },
+                        { name: 'meter', attributes: true, classes: true, styles: true },
+                        { name: 'nav', attributes: true, classes: true, styles: true },
+                        { name: 'noframes', attributes: true, classes: true, styles: true },
+                        { name: 'noscript', attributes: true, classes: true, styles: true },
+                        { name: 'object', attributes: true, classes: true, styles: true },
+                        { name: 'ol', attributes: true, classes: true, styles: true },
+                        { name: 'optgroup', attributes: true, classes: true, styles: true },
+                        { name: 'option', attributes: true, classes: true, styles: true },
+                        { name: 'output', attributes: true, classes: true, styles: true },
+                        { name: 'p', attributes: true, classes: true, styles: true },
+                        { name: 'param', attributes: true, classes: true, styles: true },
+                        { name: 'picture', attributes: true, classes: true, styles: true },
+                        { name: 'pre', attributes: true, classes: true, styles: true },
+                        { name: 'progress', attributes: true, classes: true, styles: true },
+                        { name: 'q', attributes: true, classes: true, styles: true },
+                        { name: 'rp', attributes: true, classes: true, styles: true },
+                        { name: 'rt', attributes: true, classes: true, styles: true },
+                        { name: 'ruby', attributes: true, classes: true, styles: true },
+                        { name: 's', attributes: true, classes: true, styles: true },
+                        { name: 'samp', attributes: true, classes: true, styles: true },
+                        { name: 'section', attributes: true, classes: true, styles: true },
+                        { name: 'select', attributes: true, classes: true, styles: true },
+                        { name: 'small', attributes: true, classes: true, styles: true },
+                        { name: 'source', attributes: true, classes: true, styles: true },
+                        { name: 'span', attributes: true, classes: true, styles: true },
+                        { name: 'strike', attributes: true, classes: true, styles: true },
+                        { name: 'strong', attributes: true, classes: true, styles: true },
+                        { name: 'style', attributes: true, classes: true, styles: true },
+                        { name: 'sub', attributes: true, classes: true, styles: true },
+                        { name: 'summary', attributes: true, classes: true, styles: true },
+                        { name: 'sup', attributes: true, classes: true, styles: true },
+                        { name: 'svg', attributes: true, classes: true, styles: true },
+                        { name: 'table', attributes: true, classes: true, styles: true },
+                        { name: 'tbody', attributes: true, classes: true, styles: true },
+                        { name: 'td', attributes: true, classes: true, styles: true },
+                        { name: 'template', attributes: true, classes: true, styles: true },
+                        { name: 'textarea', attributes: true, classes: true, styles: true },
+                        { name: 'tfoot', attributes: true, classes: true, styles: true },
+                        { name: 'th', attributes: true, classes: true, styles: true },
+                        { name: 'thead', attributes: true, classes: true, styles: true },
+                        { name: 'time', attributes: true, classes: true, styles: true },
+                        { name: 'title', attributes: true, classes: true, styles: true },
+                        { name: 'tr', attributes: true, classes: true, styles: true },
+                        { name: 'track', attributes: true, classes: true, styles: true },
+                        { name: 'tt', attributes: true, classes: true, styles: true },
+                        { name: 'u', attributes: true, classes: true, styles: true },
+                        { name: 'ul', attributes: true, classes: true, styles: true },
+                        { name: 'var', attributes: true, classes: true, styles: true },
+                        { name: 'video', attributes: true, classes: true, styles: true },
+                        { name: 'wbr', attributes: true, classes: true, styles: true },
                     ]
                 }
             }).then(editor => {
@@ -649,7 +855,7 @@
                     if (confirm('確定要刪除嗎?')) {
                         if (type == 'Category') {
                             if (obj.status == 'old') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                         product_id: this.products.id,
                                         category_id: obj.web_category_hierarchy_id,
                                         _token: '{{ csrf_token() }}',
@@ -666,7 +872,7 @@
                             this.CategoryListFilter();
                         } else if (type == 'Products') {
                             if (obj.id !== '') {
-                                axios.post('/backend/product_small/ajax', {
+                                axios.post('/backend/products_mall/ajax', {
                                         id: obj.id,
                                         _token: '{{ csrf_token() }}',
                                         type: 'DelRelatedProducts',

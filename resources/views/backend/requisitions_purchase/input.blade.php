@@ -47,11 +47,12 @@
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_trade_date">
                                         <label for="trade_date">請購日期 <span class="redtext">*</span></label>
-                                        <div class='input-group date' id='datetimepickera'>
-                                            <input type='text' class="form-control" name="trade_date" id="trade_date"
-                                                value="{{ isset($requisitionsPurchase->trade_date) ? $requisitionsPurchase->trade_date : date('Y-m-d') }}" />
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="trade_date_flatpickr">
+                                            <input type="text" class="form-control" name="trade_date" id="trade_date" value="{{ $requisitionsPurchase->trade_date ?? date('Y-m-d') }}" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -122,7 +123,7 @@
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_currency_code">
                                         <label for="currency_code">稅別<span class="redtext">*</span></label>
-                                        <select class="form-control" name="tax" id="tax"
+                                        <select class="form-control select2-vue-js" name="tax" id="tax"
                                             v-model="requisitions_purchase.tax" @change="getItemLastPrice">
                                             @foreach ($taxList as $id => $tax)
                                                 <option value="{{ $id }}">{{ $tax }}</option>
@@ -440,8 +441,9 @@
                     placeholder: "請選擇",
                     allowClear: false,
                 });
-                $('#datetimepickera').datetimepicker({
-                    format: 'YYYY-MM-DD',
+
+                flatpickr("#trade_date_flatpickr", {
+                    dateFormat: "Y-m-d",
                 });
 
                 $('#supplier_id').on('change', function() {

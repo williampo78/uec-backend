@@ -20,30 +20,36 @@ window.init = (datas = {}) => {
 
     $(".js-select2-slot-id").select2();
 
-    $("#datetimepicker_start_at").datetimepicker({
-        format: "YYYY-MM-DD HH:mm",
-        showClear: true,
+    let start_at_flatpickr = flatpickr("#start_at_flatpickr", {
+        dateFormat: "Y-m-d H:i:S",
+        maxDate: $("#end_at").val(),
+        enableTime: true,
+        enableSeconds: true,
+        defaultHour: 0,
+        defaultMinute: 0,
+        defaultSeconds: 0,
+        onChange: function (selectedDates, dateStr, instance) {
+            end_at_flatpickr.set('minDate', dateStr);
+
+            if (!end_at_flatpickr.input.value) {
+                end_at_flatpickr.hourElement.value = 23;
+                end_at_flatpickr.minuteElement.value = 59;
+                end_at_flatpickr.secondElement.value = 59;
+            }
+        },
     });
 
-    $("#datetimepicker_start_at").on("dp.change", function (e) {
-        if (e.oldDate === null) {
-            $(this)
-                .data("DateTimePicker")
-                .date(new Date(e.date._d.setHours(0, 0, 0)));
-        }
-    });
-
-    $("#datetimepicker_end_at").datetimepicker({
-        format: "YYYY-MM-DD HH:mm",
-        showClear: true,
-    });
-
-    $("#datetimepicker_end_at").on("dp.change", function (e) {
-        if (e.oldDate === null) {
-            $(this)
-                .data("DateTimePicker")
-                .date(new Date(e.date._d.setHours(23, 59, 59)));
-        }
+    let end_at_flatpickr = flatpickr("#end_at_flatpickr", {
+        dateFormat: "Y-m-d H:i:S",
+        minDate: $("#start_at").val(),
+        enableTime: true,
+        enableSeconds: true,
+        defaultHour: 23,
+        defaultMinute: 59,
+        defaultSeconds: 59,
+        onChange: function (selectedDates, dateStr, instance) {
+            start_at_flatpickr.set('maxDate', dateStr);
+        },
     });
 
     $(".colorpicker").colorpicker({
@@ -92,7 +98,11 @@ window.init = (datas = {}) => {
 
     // 新增圖檔
     $("#btn-new-image").on("click", function () {
-        addImageBlock(product_category_select_options);
+        let datas = {
+            id: $("#image-block-row-no").val(),
+        };
+
+        addImageBlock(product_category_select_options, datas);
     });
 
     // 刪除圖檔
@@ -104,7 +114,11 @@ window.init = (datas = {}) => {
 
     // 新增文字
     $("#btn-new-text").on("click", function () {
-        addTextBlock(product_category_select_options);
+        let datas = {
+            id: $("#text-block-row-no").val(),
+        };
+
+        addTextBlock(product_category_select_options, datas);
     });
 
     // 刪除文字
@@ -116,7 +130,11 @@ window.init = (datas = {}) => {
 
     // 新增商品的指定商品
     $("#btn-new-product-product").on("click", function () {
-        addProductBlockProduct(product_select_options);
+        let datas = {
+            id: $("#product-block-product-row-no").val(),
+        };
+
+        addProductBlockProduct(product_select_options, datas);
 
         // 編輯才做
         if (!ad_slot_select_options) {
@@ -161,7 +179,11 @@ window.init = (datas = {}) => {
 
     // 新增商品的指定分類
     $("#btn-new-product-category").on("click", function () {
-        addProductBlockCategory(product_category_select_options);
+        let datas = {
+            id: $("#product-block-category-row-no").val(),
+        };
+
+        addProductBlockCategory(product_category_select_options, datas);
 
         // 編輯才做
         if (!ad_slot_select_options) {
@@ -286,31 +308,39 @@ window.init = (datas = {}) => {
     // 選擇圖片區的圖片檔案
     $(document).on("change", ".image_block_image_name", function () {
         const file = this.files[0];
-        let photo_width  = $('#slot_id').find('option:selected').attr('data-photo-width');
+        let photo_width = $('#slot_id').find('option:selected').attr('data-photo-width');
         let photo_height = $('#slot_id').find('option:selected').attr('data-photo-height');
-        let vm = $(this) ;
+        let vm = $(this);
         if (file) {
-            if(photo_width && photo_height){ //顯示選擇照片的尺寸提醒
+            if (photo_width && photo_height) { //顯示選擇照片的尺寸提醒
                 var img;
                 img = new Image();
                 var objectUrl = URL.createObjectURL(file);
                 img.onload = function () {
-                    if(this.width !== parseInt(photo_width) || this.height !== parseInt(photo_height)){
+                    if (this.width !== parseInt(photo_width) || this.height !== parseInt(photo_height)) {
                         let show_text = '上傳尺寸 ' + this.width + '*' + this.height + ' 非預期，存檔後系統會自動壓縮成制式尺寸！';
                         vm.siblings('.select-img-size-box').show();
-                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text(show_text) ; 
-                    }else{
+                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text(show_text);
+                    } else {
                         vm.siblings('.select-img-size-box').hide();
-                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text('') ; 
+                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text('');
                     }
                     URL.revokeObjectURL(objectUrl);
                 };
-                
+
                 img.src = objectUrl;
             }
-         
+
             $(this).siblings('.img_image_block_image_name').attr("src", URL.createObjectURL(file));
             $(this).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").show();
+            $(this)
+                .siblings(".img_image_block_image_name")
+                .attr("src", URL.createObjectURL(file));
+            $(this)
+                .siblings(
+                    ".img_image_block_image_name, .btn-delete-image-block-image-name"
+                )
+                .show();
         }
     });
 
@@ -318,7 +348,7 @@ window.init = (datas = {}) => {
     $(document).on("click", ".btn-delete-image-block-image-name", function () {
         $(this).siblings(".img_image_block_image_name").attr("src", "").hide();
         $(this).siblings(".select-img-size-box").hide();
-        $(this).siblings(".select-img-size-box").find('.select-img-size-text').text('') ; 
+        $(this).siblings(".select-img-size-box").find('.select-img-size-text').text('');
         $(this).hide();
         $(this).siblings(".image_block_image_name").val("").show();
     });
@@ -329,8 +359,8 @@ window.getAdSlotSelectOptions = (datas = []) => {
     let options = "";
     $.each(datas, function (key, value) {
         options += `
-            <option value='${value["id"]}' 
-            data-is-user-defined="${value["is_user_defined"]}" 
+            <option value='${value["id"]}'
+            data-is-user-defined="${value["is_user_defined"]}"
             data-slot-type="${value["slot_type"]}"
             data-photo-width="${value["photo_width"]}"
             data-photo-height="${value["photo_height"]}"
@@ -369,24 +399,17 @@ window.getProductSelectOptions = (datas = []) => {
 };
 
 window.addImageBlock = (product_category_select_options = "", datas = {}) => {
-    let image_block_row_no = datas.id
-        ? datas.id
-        : $("#image-block-row-no").val();
-    let image_block_id = datas.id ? datas.id : "new";
+    let image_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
-    let image_name_url = datas.image_name_url
-        ? datas.image_name_url
-        : "";
+    let image_name_url = datas.image_name_url ? datas.image_name_url : "";
     let image_alt = datas.image_alt ? datas.image_alt : "";
     let image_title = datas.image_title ? datas.image_title : "";
     let image_abstract = datas.image_abstract ? datas.image_abstract : "";
     let target_url = datas.target_url ? datas.target_url : "";
 
-    image_block_row_no = sanitize(String(image_block_row_no));
-
     $("#image-block table > tbody").append(`
         <tr>
-            <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_id}">
+            <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_image_block_sort" name="image_block_sort[${image_block_row_no}]" value="${sort}" />
@@ -484,10 +507,18 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
 
     $(".js-select2-image-block-product-category").select2();
 
-    if (image_block_id == 'new') {
-        $(`#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`).siblings('.img_image_block_image_name, .btn-delete-image-block-image-name').hide();
+    if (image_name_url) {
+        $(
+            `#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`
+        ).hide();
     } else {
-        $(`#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`).hide();
+        $(
+            `#image-block table > tbody [name="image_block_image_name[${image_block_row_no}]"]`
+        )
+            .siblings(
+                ".img_image_block_image_name, .btn-delete-image-block-image-name"
+            )
+            .hide();
     }
 
     $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
@@ -496,17 +527,14 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
 };
 
 window.addTextBlock = (product_category_select_options, datas = {}) => {
-    let text_block_row_no = datas.id ? datas.id : $("#text-block-row-no").val();
-    let text_block_id = datas.id ? datas.id : "new";
+    let text_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";
     let target_url = datas.target_url ? datas.target_url : "";
 
-    text_block_row_no = sanitize(String(text_block_row_no));
-
     $("#text-block table > tbody").append(`
         <tr>
-            <input type="hidden" name="text_block_id[${text_block_row_no}]" value="${text_block_id}">
+            <input type="hidden" name="text_block_id[${text_block_row_no}]" value="${text_block_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_text_block_sort" name="text_block_sort[${text_block_row_no}]" value="${sort}" />
@@ -583,19 +611,12 @@ window.addTextBlock = (product_category_select_options, datas = {}) => {
 };
 
 window.addProductBlockProduct = (product_select_options, datas = {}) => {
-    let product_block_product_row_no = datas.id
-        ? datas.id
-        : $("#product-block-product-row-no").val();
-    let product_block_product_id = datas.id ? datas.id : "new";
+    let product_block_product_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
-
-    product_block_product_row_no = sanitize(
-        String(product_block_product_row_no)
-    );
 
     $("#tab-product table > tbody").append(`
         <tr>
-            <input type="hidden" name="product_block_product_id[${product_block_product_row_no}]" value="${product_block_product_id}">
+            <input type="hidden" name="product_block_product_id[${product_block_product_row_no}]" value="${product_block_product_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_product_block_product_sort" name="product_block_product_sort[${product_block_product_row_no}]" value="${sort}" />
@@ -628,19 +649,12 @@ window.addProductBlockCategory = (
     product_category_select_options,
     datas = {}
 ) => {
-    let product_block_category_row_no = datas.id
-        ? datas.id
-        : $("#product-block-category-row-no").val();
-    let product_block_category_id = datas.id ? datas.id : "new";
+    let product_block_category_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
-
-    product_block_category_row_no = sanitize(
-        String(product_block_category_row_no)
-    );
 
     $("#tab-category table > tbody").append(`
         <tr>
-            <input type="hidden" name="product_block_category_id[${product_block_category_row_no}]" value="${product_block_category_id}">
+            <input type="hidden" name="product_block_category_id[${product_block_category_row_no}]" value="${product_block_category_row_no}">
             <td class="sort">
                 <div class="form-group">
                     <input type="number" class="form-control unique_product_block_category_sort" name="product_block_category_sort[${product_block_category_row_no}]" value="${sort}" />
@@ -747,6 +761,3 @@ window.disableSlotTitle = () => {
 
     validate.removeSlotTitleValidation();
 };
-
-// 輸入值消毒
-const sanitize = (val) => val.replace(/</g, "&lt;").replace(/>/g, "&gt;");

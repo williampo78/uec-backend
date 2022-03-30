@@ -265,30 +265,40 @@
                 }
             },
             mounted: function() {
-
-                $('#start_created_at').datetimepicker({
-                    format: 'YYYY-MM-DD',
-                });
-                $('#end_created_at').datetimepicker({
-                    format: 'YYYY-MM-DD',
-                });
-                $('#start_launched_at_start').datetimepicker({
-                    format: 'YYYY-MM-DD',
-                });
-                $('#start_launched_at_end').datetimepicker({
-                    format: 'YYYY-MM-DD',
+                let start_created_at_flatpickr = flatpickr("#start_created_at_flatpickr", {
+                    dateFormat: "Y-m-d",
+                    maxDate: $("#end_created_at").val(),
+                    onChange: function(selectedDates, dateStr, instance) {
+                        end_created_at_flatpickr.set('minDate', dateStr);
+                    },
                 });
 
-                $("#supplier").select2({
-                    allowClear: true,
-                    theme: "bootstrap",
-                    placeholder: "請選擇"
+                let end_created_at_flatpickr = flatpickr("#end_created_at_flatpickr", {
+                    dateFormat: "Y-m-d",
+                    minDate: $("#start_created_at").val(),
+                    onChange: function(selectedDates, dateStr, instance) {
+                        start_created_at_flatpickr.set('maxDate', dateStr);
+                    },
                 });
-                $('#product_type').select2({
-                    allowClear: true,
-                    theme: "bootstrap",
-                    placeholder: "請選擇"
+
+                let start_launched_at_start_flatpickr = flatpickr("#start_launched_at_start_flatpickr", {
+                    dateFormat: "Y-m-d",
+                    maxDate: $("#start_launched_at_end").val(),
+                    onChange: function(selectedDates, dateStr, instance) {
+                        start_launched_at_end_flatpickr.set('minDate', dateStr);
+                    },
                 });
+
+                let start_launched_at_end_flatpickr = flatpickr("#start_launched_at_end_flatpickr", {
+                    dateFormat: "Y-m-d",
+                    minDate: $("#start_launched_at_start").val(),
+                    onChange: function(selectedDates, dateStr, instance) {
+                        start_launched_at_start_flatpickr.set('maxDate', dateStr);
+                    },
+                });
+
+                $("#supplier").select2();
+                $('#product_type').select2();
                 // $('#products_model_list').DataTable({
                 //     "lengthChange": false
                 // });

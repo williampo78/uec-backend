@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\CategoryHierarchy;
-use App\Models\CategoryProducts;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-
 use function Aws\filter;
+use App\Models\CategoryProduct;
+use App\Models\CategoryHierarchy;
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class WebCategoryHierarchyService
 {
@@ -71,7 +71,7 @@ class WebCategoryHierarchyService
     public function del_Category_Hierarchy($in)
     {
         $resut = [];
-        $CategoryProductsCount = CategoryProducts::where('web_category_hierarchy_id', $in['id'])->get()->count();
+        $CategoryProductsCount = CategoryProduct::where('web_category_hierarchy_id', $in['id'])->get()->count();
         $CategoryHierarchyCount = CategoryHierarchy::where('parent_id', $in['id'])->get()->count();
         $resut['Msg_Hierarchy'] = '';
         $resut['Msg_Products'] = '';
@@ -136,7 +136,7 @@ class WebCategoryHierarchyService
                 $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%" . $input['keyword'] . "%' ";
             }
         }
-  
+
 
         if ($confi_levels == 2) {
             $query = "SELECT level_two.id as id, level_two.meta_title , CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,
@@ -157,7 +157,7 @@ class WebCategoryHierarchyService
     }
     public function categoryProductsHierarchyId($id)
     {
-        $result = CategoryProducts::where('web_category_hierarchy_id', $id)
+        $result = CategoryProduct::where('web_category_hierarchy_id', $id)
             ->join('products_v', 'products_v.id', '=', 'web_category_products.product_id')
             ->select('web_category_products.id as web_category_products_id', 'web_category_products.product_id as product_id', 'products_v.*')
             ->get();
@@ -165,7 +165,7 @@ class WebCategoryHierarchyService
     }
     public function categoryProductsId($id)
     {
-        $result = CategoryProducts::where('web_category_products.product_id', $id)
+        $result = CategoryProduct::where('web_category_products.product_id', $id)
             ->leftJoin('web_category_hierarchy' ,'web_category_hierarchy.id','=' ,'web_category_products.web_category_hierarchy_id')
             ->select('web_category_products.web_category_hierarchy_id' , 'web_category_hierarchy.category_name' , 'web_category_products.sort')
             ->orderBy('web_category_products.sort', 'ASC')

@@ -40,7 +40,7 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        
+
         'api' => [
             'driver' => 'jwt',
             'provider' => 'members',
@@ -71,12 +71,12 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Users::class,
+            'model' => App\Models\User::class,
         ],
 
         'members' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Members::class,
+            'model' => App\Models\Member::class,
         ],
     ],
 

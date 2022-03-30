@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Users;
+use App\Models\User;
 use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,10 +33,13 @@ class LoginAuthController extends Controller
             'account.required' => '使用者帳號不能為空',
             'pwd.required' => '密碼不能為空',
         ]);
-        $users = Users::where([
+
+        $users = User::where([
             'user_account' => $request->account,
             'user_password' => md5($request->pwd),
-        ])->first();
+        ])
+            ->whereNull('supplier_id')
+            ->first();
 
         if ($users) {
             Auth::login($users);
@@ -54,7 +57,6 @@ class LoginAuthController extends Controller
     {
         return view('auth.registration');
     }
-
 
     public function create(array $data)
     {

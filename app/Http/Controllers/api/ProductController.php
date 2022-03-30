@@ -144,10 +144,21 @@ class ProductController extends Controller
         $params = $request['detail'];
         $result = $this->apiProductService->getProduct($id, $params);
 
-        if ($result == '201') {
+        if ($result == '903') {
             $status = false;
-            $err = '201';
+            $err = '901';
             $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "商品不存在", 'result' => $list]);
+        } else if ($result == '901'){
+            $status = false;
+            $err = '901';
+            $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品沒有前台分類", 'result' => $list]);
+        } else if ($result == '902'){
+            $status = false;
+            $err = '901';
+            $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品已被下架", 'result' => $list]);
         } else {
             $status = true;
             $err = '';

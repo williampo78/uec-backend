@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Lookup_values_v;
-use App\Models\WebContents;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Auth;
+use App\Models\WebContent;
+use App\Models\LookupValuesV;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
 
 class WebContentsService
 {
@@ -17,7 +17,7 @@ class WebContentsService
      */
     public function getCategory($apply_to)
     {
-        $lookup = Lookup_values_v::where('type_code', '=', $apply_to)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
+        $lookup = LookupValuesV::where('type_code', '=', $apply_to)->where('active', '=', '1')->orderBy('sort', 'ASC')->get();
         return $lookup;
     }
 
@@ -26,7 +26,7 @@ class WebContentsService
      */
     public function getFooter($data, $apply_to)
     {
-        $webcontents = WebContents::where('apply_to', '=', $apply_to);
+        $webcontents = WebContent::where('apply_to', '=', $apply_to);
         if (isset($data['code'])) {
             $webcontents->where('parent_code', '=', $data['code']);
         }
@@ -77,9 +77,9 @@ class WebContentsService
             $webData['updated_by'] = $user_id;
             $webData['updated_at'] = $now;
             if ($act == 'add') {
-                $new_id = WebContents::insertGetId($webData);
+                $new_id = WebContent::insertGetId($webData);
             } else if ($act == 'upd') {
-                WebContents::where('id', $inputdata['id'])->update($webData);
+                WebContent::where('id', $inputdata['id'])->update($webData);
                 $new_id = $inputdata['id'];
             }
             DB::commit();
@@ -107,7 +107,7 @@ class WebContentsService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $web_contents = WebContents::select(
+        $web_contents = WebContent::select(
             'web_contents.*',
             'lookup_values_v.description'
         )

@@ -117,8 +117,8 @@
                                         <label class="control-label">成本</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="item_cost"
-                                            value="{{ $products->item_cost }}" readonly>
+                                        <input class="form-control" name="item_cost" value="{{ $products->item_cost }}"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -141,11 +141,13 @@
                                         <label class="control-label">上架時間起<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <div class='input-group date' id='datetimepicker'>
-                                            <input type='text' class="form-control" name="start_launched_at"
-                                                id="start_launched_at" value="" />
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="start_launched_at_flatpickr">
+                                            <input type="text" class="form-control" name="start_launched_at"
+                                                id="start_launched_at" value="" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -157,11 +159,13 @@
                                         <label class="control-label">上架時間訖<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <div class='input-group date' id='datetimepicker2'>
-                                            <input type='text' class="form-control" name="end_launched_at"
-                                                id="end_launched_at" value="" />
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
+                                        <div class="input-group" id="end_launched_at_flatpickr">
+                                            <input type="text" class="form-control" name="end_launched_at"
+                                                id="end_launched_at" value="" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
                                             </span>
                                         </div>
                                     </div>
@@ -183,7 +187,7 @@
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <label class="control-label">
-                                            <a href="{{ route('product_small.show', $products->id) }}"
+                                            <a href="{{ route('products_mall.show', $products->id) }}"
                                                 target="_blank">查看商城資訊
                                             </a>
                                         </label>
@@ -191,6 +195,13 @@
                                 </div>
                             </div>
                         </div>
+                        <button class="btn btn-large btn-success" type="button" id="save_data">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            送審
+                        </button>
+                        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
+                            取消</a>
+                        <hr>
                         <div class="row">
                             <div class="col-sm-2">
                                 <div class="form-group">
@@ -202,7 +213,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <table class="table table-striped table-bordered table-hover">
@@ -228,9 +238,11 @@
                                                         @case('APPROVE')
                                                             核准
                                                         @break
+
                                                         @case('REJECT')
                                                             駁回
                                                         @break
+
                                                         @default
                                                             尚未審核
                                                     @endswitch
@@ -245,12 +257,7 @@
                                 </table>
                             </div>
                         </div>
-                        <button class="btn btn-large btn-success" type="button" id="save_data">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            送審
-                        </button>
-                        <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
-                            取消</a>
+
                     </div>
                 </form>
             </div>
@@ -262,33 +269,58 @@
 @section('js')
     <script>
         $(document).ready(function() {
+            let startLaunchedAtLastSelectedDates;
 
+            let start_launched_at_flatpickr = flatpickr("#start_launched_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                maxDate: $("#end_launched_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 0,
+                defaultMinute: 0,
+                defaultSeconds: 0,
+                onChange: function(selectedDates, dateStr, instance) {
+                    let selectedDate = selectedDates[0];
 
-            $('#datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+                    if (!startLaunchedAtLastSelectedDates || !isSameDay(startLaunchedAtLastSelectedDates[0], selectedDates[0])) {
+                        if (isToday(selectedDates[0])) {
+                            selectedDate = new Date(new Date().getTime() + 10 * 60 * 1000).setSeconds(0);
+                            this.setDate(selectedDate);
+                        } else {
+                            selectedDate = selectedDate.setHours(0,0,0);
+                            this.setDate(selectedDate);
+                        }
+                    }
+
+                    end_launched_at_flatpickr.set('minDate', selectedDate);
+
+                    if (!end_launched_at_flatpickr.input.value) {
+                        end_launched_at_flatpickr.hourElement.value = 23;
+                        end_launched_at_flatpickr.minuteElement.value = 59;
+                        end_launched_at_flatpickr.secondElement.value = 59;
+                    }
+
+                    startLaunchedAtLastSelectedDates = selectedDates;
+                },
             });
-            $('#datetimepicker2').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm:ss',
+
+            let end_launched_at_flatpickr = flatpickr("#end_launched_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                minDate: $("#start_launched_at").val(),
+                enableTime: true,
+                enableSeconds: true,
+                defaultHour: 23,
+                defaultMinute: 59,
+                defaultSeconds: 59,
+                onChange: function(selectedDates, dateStr, instance) {
+                    start_launched_at_flatpickr.set('maxDate', dateStr);
+                },
             });
+
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
 
-            $("#datetimepicker").on("dp.change", function(e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(0, 0, 0)));
-                }
-            });
-
-            $("#datetimepicker2").on("dp.change", function(e) {
-                if (e.oldDate === null) {
-                    $(this)
-                        .data("DateTimePicker")
-                        .date(new Date(e.date._d.setHours(23, 59, 59)));
-                }
-            });
             $("#new-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
@@ -360,5 +392,19 @@
                 },
             });
         });
+
+        const isToday = (date) => {
+            const today = new Date();
+
+            return date.getDate() == today.getDate() &&
+                date.getMonth() == today.getMonth() &&
+                date.getFullYear() == today.getFullYear();
+        }
+
+        const isSameDay = (date1, date2) => {
+            return date1.getDate() == date2.getDate() &&
+                date1.getMonth() == date2.getMonth() &&
+                date1.getFullYear() == date2.getFullYear();
+        }
     </script>
 @endsection

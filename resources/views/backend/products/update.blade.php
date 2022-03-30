@@ -3,9 +3,8 @@
 @section('content')
     <style>
         /* .no-pa {
-                                padding: 0px;
-                            } */
-
+                padding: 0px;
+        } */
         .ondragover {
             background: #b7e0fb !important;
             transition: background-color 0.5s;
@@ -522,7 +521,8 @@
                                         <label class="control-label">採購人員</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword"
+                                            value="{{ $finallyOrderSupplier }}" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -701,8 +701,7 @@
                                             <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                                 multiple>
                                         </div>
-                                        <textarea style="display:none;" name="imgJson" id="" cols="30"
-                                            rows="10">@{{ images }}</textarea>
+                                        <textarea style="display:none;" name="imgJson" id="" cols="30" rows="10">@{{ images }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -728,7 +727,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{-- </div> --}}
                             </div>
                         </div>
                     </div>
@@ -736,28 +734,29 @@
                 <hr>
                 <div id="page-2">
                     <div id="SkuComponent">
-                        <textarea style="display: none" name="SpecListJson" id="" cols="30"
-                            rows="10">@{{ SpecList }}</textarea>
+                        <textarea style="display: none;" name="SpecListJson" id="" cols="30" rows="10">@{{ SpecList }}</textarea>
                         <div class="row form-group">
                             <div class="col-sm-12">
                                 <div class="col-sm-2 ">
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="0"
-                                            {{ $products->spec_dimension == '0' ? 'checked' : 'disabled' }}>
+                                            v-model="products.spec_dimension"
+                                            :disabled="products.spec_dimension !== 0 || edit_readonly == 1">
                                         單規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="1"
-                                            {{ $products->spec_dimension == '1' ? 'checked' : 'disabled' }}>
+                                            v-model="products.spec_dimension"
+                                            :disabled="products.spec_dimension == 2 || edit_readonly == 1">
                                         一維多規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="2"
-                                            {{ $products->spec_dimension == '2' ? 'checked' : 'disabled' }}>
+                                            v-model="products.spec_dimension" :disabled="edit_readonly == 1">
                                         二維多規格
                                     </label>
                                 </div>
@@ -771,7 +770,7 @@
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                            value="{{ $products->spec_1 }}" disabled>
+                                            value="{{ $products->spec_1 }}">
                                     </div>
                                 </div>
                             </div>
@@ -782,8 +781,8 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="form-group">
-                                        <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                            value="{{ $products->spec_2 }}" disabled>
+                                        <input class="form-control" type="text" name="spec_2" id="spec_2"
+                                            value="{{ $products->spec_2 }}">
                                     </div>
                                 </div>
                             </div>
@@ -817,7 +816,7 @@
                                                         <div class="form-group">
                                                             <input class="form-control spec_1_va"
                                                                 :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name"
-                                                                data-va="spec_1_va" readonly>
+                                                                data-va="spec_1_va">
                                                         </div>
                                                     </div>
                                                     <div v-else>
@@ -830,7 +829,9 @@
                                                 </div>
                                                 <div class="col-sm-2">
                                                     <div v-if="spec_1.old_spec">
-
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                            @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)"
+                                                            disabled>刪除</button>
                                                     </div>
                                                     <div v-else>
                                                         <button class="btn btn-danger btn-sm" type="button"
@@ -870,7 +871,7 @@
                                                         <div class="form-group">
                                                             <input class="form-control spec_2_va"
                                                                 :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name"
-                                                                data-va="spec_2_va" disabled>
+                                                                data-va="spec_2_va">
                                                         </div>
                                                     </div>
                                                     <div v-else>
@@ -883,7 +884,11 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-2">
-                                                    <div v-if="spec_2.old_spec"></div>
+                                                    <div v-if="spec_2.old_spec">
+                                                        <button class="btn btn-danger btn-sm" type="button"
+                                                            @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)"
+                                                            disabled>刪除</button>
+                                                    </div>
                                                     <div v-else>
                                                         <button class="btn btn-danger btn-sm" type="button"
                                                             @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button>
@@ -910,7 +915,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea style="display: none" style="display: none" id="SkuListdata" name="SkuListdata" cols="30"
+                        <textarea style="display: none;" id="SkuListdata" name="SkuListdata" cols="30"
                             rows="10">@{{ SkuList }}</textarea>
 
                         <table class="table table-striped table-bordered table-hover">
@@ -998,11 +1003,15 @@
                     SpecList: [],
                     SkuList: @json($products_item),
                     products: @json($products),
+                    old_spec_dimension: 0, // 0 單規 1一規 2 二規
                     product_spec_info: @json($product_spec_info),
                     safty_qty_all: 0,
+                    edit_readonly: null,
                 }
             },
-            mounted() {},
+            mounted() {
+                this.edit_readonly = document.querySelector('#edit_readonly').value;
+            },
             created() {
                 let spec_value_list = JSON.parse(this.product_spec_info.spec_value_list);
                 let item_list = JSON.parse(this.product_spec_info.item_list);
@@ -1013,6 +1022,7 @@
                 spec_value_list.spec_2.map(function(value, key) {
                     value.old_spec = 1;
                 });
+                this.old_spec_dimension = this.products.spec_dimension;
 
                 this.SpecList = spec_value_list;
                 this.SkuList = item_list;
@@ -1043,6 +1053,7 @@
                 },
                 DelSpecList(obj, type, index) { //刪除規格
                     if (type == 'spec_1') {
+                        //這邊要檢查對應到要刪除的 sku list 是否包含item編號
                         this.SpecList.spec_1.splice(index, 1);
                         let new_SkuList = this.SkuList.filter(data => data.spec_1_only_key !== obj.only_key);
                         this.SkuList = new_SkuList;
@@ -1179,6 +1190,47 @@
                         }
                     }
                 },
+                change_spec_dimension(changeVal) {
+                    if (this.old_spec_dimension == 0) {
+                        let add_spec_1_only_key = Math.random().toString(36).substring(8);
+                        let add_spec_2_only_key = Math.random().toString(36).substring(8);
+                        this.old_spec_dimension = changeVal;
+                        this.SkuList.forEach((person, i, array) => {
+                            this.SkuList[i].spec_1_only_key = add_spec_1_only_key;
+                            if (changeVal == 2) {
+                                this.SkuList[i].spec_2_only_key = add_spec_2_only_key;
+                            }
+                        })
+                        this.SpecList.spec_1.push({
+                            name: '',
+                            sort: 0,
+                            only_key: add_spec_1_only_key,
+                            old_spec: 1,
+                        });
+                        if (changeVal == 2) {
+                            this.SpecList.spec_2.push({
+                                name: '',
+                                sort: 0,
+                                only_key: add_spec_2_only_key,
+                                old_spec: 1,
+                            });
+                        }
+                    }
+                    if (this.old_spec_dimension == 1) {
+                        if (changeVal == 2) {
+                            let add_spec_2_only_key = Math.random().toString(36).substring(8);
+                            this.SkuList.forEach((person, i, array) => {
+                                this.SkuList[i].spec_2_only_key = add_spec_2_only_key;
+                            })
+                            this.SpecList.spec_2.push({
+                                name: '',
+                                sort: 0,
+                                only_key: add_spec_2_only_key,
+                                old_spec: 1,
+                            });
+                        }
+                    }
+                },
 
             },
             watch: {
@@ -1191,28 +1243,7 @@
                 },
                 "products.spec_dimension": {
                     handler(val) {
-                        this.Spec = { // 選擇的規格
-                            spec_1: '',
-                            spec_2: '',
-                        };
-                        this.SpecList = {
-                            spec_1: [],
-                            spec_2: [],
-                        }
-                        switch (val) {
-                            case '0': //單規格
-                                this.SkuList = [{}];
-                                break;
-                            case '1': //一維多規格
-                                this.SkuList = [];
-                                break;
-                            case '2': //二維多規格
-                                this.SkuList = [];
-                                break;
-                            default:
-                                break;
-                        }
-
+                        return this.change_spec_dimension(val);
                     },
                     deep: true
                 }
@@ -1564,6 +1595,10 @@
                     uom: {
                         required: true,
                     },
+                    min_purchase_qty: {
+                        digits: true,
+                        min: 1,
+                    },
                     //長
                     length: {
                         required: true,
@@ -1592,6 +1627,14 @@
                     product_brief_1: {
                         maxlength: 60,
                     },
+                    spec_1: {
+                        required: true,
+                        maxlength: 4,
+                    },
+                    spec_2: {
+                        required: true,
+                        maxlength: 4,
+                    },
                     product_brief_2: {
                         maxlength: 60,
                     },
@@ -1615,6 +1658,10 @@
                     },
                 },
                 messages: {
+                    min_purchase_qty: {
+                        digits: "只可輸入正整數",
+                        min: "只可輸入正整數",
+                    },
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
