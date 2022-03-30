@@ -11,6 +11,11 @@ use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 
 class JwtMiddleware extends BaseMiddleware
 {
+    public function __construct()
+    {
+        config(['auth.defaults.guard' => 'api']);
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -22,6 +27,8 @@ class JwtMiddleware extends BaseMiddleware
     {
         try {
             if (!$member = JWTAuth::parseToken()->authenticate()) {
+                JWTAuth::parseToken()->invalidate();
+
                 return response()->json([
                     'message' => '會員不存在',
                 ], 404);
