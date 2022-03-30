@@ -40,8 +40,8 @@ class JwtMiddleware extends BaseMiddleware
                 ], 401);
             } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
                 try {
-                    $token = $this->auth->refresh();
-                    Auth::guard('api')->onceUsingId($this->auth->manager()->getPayloadFactory()->buildClaimsCollection()->toPlainArray()['sub']);
+                    $token = JWTAuth::parseToken()->refresh();
+                    Auth::guard('api')->onceUsingId(JWTAuth::parseToken()->manager()->getPayloadFactory()->buildClaimsCollection()->toPlainArray()['sub']);
                     return $this->setAuthenticationHeader($next($request), $token);
                 } catch (JWTException $exception) {
                     return response()->json([
