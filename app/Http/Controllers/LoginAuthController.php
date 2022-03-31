@@ -17,6 +17,7 @@ class LoginAuthController extends Controller
 
     public function index()
     {
+        //登入
         if (!Auth::check()) {
             return view('login');
         } else {
