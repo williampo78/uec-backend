@@ -637,7 +637,13 @@ class OrderService
         return $orders;
     }
 
-    public function getMemberOrderDetailByOrderNo(string $orderNo): Model
+    /**
+     * 取得會員訂單詳細內容
+     *
+     * @param string $orderNo
+     * @return Model|null
+     */
+    public function getMemberOrderDetailByOrderNo(string $orderNo): ?Model
     {
         $member = auth('api')->user();
 

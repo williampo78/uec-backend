@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests\Api;
 
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ReturnOrderRequest extends FormRequest
@@ -41,7 +42,10 @@ class ReturnOrderRequest extends FormRequest
     {
         return [
             'order_no' => 'required|regex:/^OD[0-9]{6}[0-9a-zA-Z]{6}$/',
-            'code' => 'required',
+            'code' => [
+                'required',
+                Rule::exists('lookup_values_v', 'code')->where('active', 1)->where('type_code', 'RETURN_REQ_REASON'),
+            ],
             'remark' => 'max:300',
             'name' => 'required|max:10',
             'mobile' => 'required_without:telephone|max:10',
@@ -60,6 +64,7 @@ class ReturnOrderRequest extends FormRequest
             'order_no.required' => '訂單編號不能為空',
             'order_no.regex' => '訂單編號格式錯誤',
             'code.required' => '退貨原因代碼不能為空',
+            'code.exists' => '退貨原因代碼不存在',
             'remark.max' => '退貨說明不能超過:max個字',
             'name.required' => '退貨人姓名不能為空',
             'name.max' => '退貨人姓名不能超過:max個字',

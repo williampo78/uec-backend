@@ -29,21 +29,27 @@ use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
-    private $api_service;
+    private $apiService;
     private $sysConfigService;
-    private $lookup_values_v_service;
     private $orderService;
+    private $warehouseService;
+    private $warehouseStockService;
+    private $returnRequestService;
 
     public function __construct(
-        APIService $api_service,
+        APIService $apiService,
         SysConfigService $sysConfigService,
-        LookupValuesVService $lookup_values_v_service,
-        OrderService $orderService
+        OrderService $orderService,
+        WarehouseService $warehouseService,
+        WarehouseStockService $warehouseStockService,
+        ReturnRequestService $returnRequestService
     ) {
-        $this->api_service = $api_service;
+        $this->apiService = $apiService;
         $this->sysConfigService = $sysConfigService;
-        $this->lookup_values_v_service = $lookup_values_v_service;
         $this->orderService = $orderService;
+        $this->warehouseService = $warehouseService;
+        $this->warehouseStockService = $warehouseStockService;
+        $this->returnRequestService = $returnRequestService;
     }
 
     /**
@@ -62,7 +68,7 @@ class MemberController extends Controller
             ], 404);
         }
 
-        $results = $this->api_service->resetPassword($token, [
+        $results = $this->apiService->resetPassword($token, [
             'password' => $request->input('pwd'),
         ]);
 
@@ -410,24 +416,8 @@ class MemberController extends Controller
      */
     public function cancelOrder(CancelOrderRequest $request)
     {
-        try {
-            $memberId = auth('api')->userOrFail()->member_id;
-        } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
-            return response()->json([
-                'message' => '會員不存在',
-            ], 404);
-        }
-
-        $warehouse_service = new WarehouseService;
-        $warehouse_stock_service = new WarehouseStockService;
-        $now = Carbon::now();
-
         // 取得訂單
-        $order = $this->orderService->getOrders([
-            'revision_no' => 0,
-            'order_no' => $request->route('order_no'),
-            'member_id' => $memberId,
-        ])->first();
+        $order = $this->orderService->getMemberOrderDetailByOrderNo($request->order_no);
 
         // 訂單不存在
         if (!isset($order)) {
@@ -447,28 +437,19 @@ class MemberController extends Controller
             ], 423);
         }
 
-        // 取得訂單取消原因
-        $cancel_req_reason = $this->lookup_values_v_service->getLookupValuesVs([
-            'disable_agent_id_auth' => true,
-            'type_code' => 'CANCEL_REQ_REASON',
-            'code' => $request->input('code'),
-        ])->first();
-
-        // 取消原因代碼不存在
-        if (!isset($cancel_req_reason)) {
-            return response()->json([
-                'message' => '取消原因代碼不存在',
-            ], 404);
-        }
-
         // 商城良品倉
         $sysConfig = $this->sysConfigService->getSysConfigByConfigKey('EC_WAREHOUSE_GOODS');
-        $ec_warehouse_goods = isset($sysConfig) ? $sysConfig->config_value : null;
+        $ecWarehouseGoods = isset($sysConfig) ? $sysConfig->config_value : null;
 
         // 取得倉庫
-        $warehouse = $warehouse_service->getWarehouses([
-            'number' => $ec_warehouse_goods,
-        ])->first();
+        $warehouse = $this->warehouseService->getWarehouseByNumber($ecWarehouseGoods);
+
+        // 倉庫不存在
+        if (!isset($warehouse)) {
+            return response()->json([
+                'message' => '倉庫不存在',
+            ], 404);
+        }
 
         DB::beginTransaction();
 
@@ -476,7 +457,7 @@ class MemberController extends Controller
             // (-)退款
             $amount = $order->paid_amount == 0 ? $order->paid_amount : $order->paid_amount * -1;
             // (+)歸還點數折抵金額
-            $point_discount = $order->point_discount == 0 ? $order->point_discount : $order->point_discount * -1;
+            $pointDiscount = $order->point_discount == 0 ? $order->point_discount : $order->point_discount * -1;
             // (+)歸還點數
             $points = $order->points == 0 ? $order->points : $order->points * -1;
 
@@ -487,9 +468,9 @@ class MemberController extends Controller
                     ->update([
                         'status_code' => 'CANCELLED',
                         'refund_status' => 'PENDING',
-                        'cancel_req_reason_code' => $request->input('code'),
-                        'cancel_req_remark' => $request->input('remark'),
-                        'cancelled_at' => $now,
+                        'cancel_req_reason_code' => $request->code,
+                        'cancel_req_remark' => $request->remark,
+                        'cancelled_at' => now(),
                         'updated_by' => -1,
                     ]);
 
@@ -502,7 +483,7 @@ class MemberController extends Controller
                     'payment_method' => $order->payment_method,
                     'payment_status' => 'PENDING',
                     'amount' => $amount,
-                    'point_discount' => $point_discount,
+                    'point_discount' => $pointDiscount,
                     'points' => $points,
                     'record_created_reason' => 'ORDER_CANCELLED',
                     'created_by' => -1,
@@ -517,9 +498,9 @@ class MemberController extends Controller
                         'status_code' => 'CANCELLED',
                         'pay_status' => 'VOIDED',
                         'refund_status' => 'NA',
-                        'cancel_req_reason_code' => $request->input('code'),
-                        'cancel_req_remark' => $request->input('remark'),
-                        'cancelled_at' => $now,
+                        'cancel_req_reason_code' => $request->code,
+                        'cancel_req_remark' => $request->remark,
+                        'cancelled_at' => now(),
                         'updated_by' => -1,
                     ]);
 
@@ -543,7 +524,7 @@ class MemberController extends Controller
                         'payment_method' => $order->payment_method,
                         'payment_status' => 'NA',
                         'amount' => 0,
-                        'point_discount' => $point_discount,
+                        'point_discount' => $pointDiscount,
                         'points' => $points,
                         'record_created_reason' => 'ORDER_CANCELLED',
                         'created_by' => -1,
@@ -556,52 +537,49 @@ class MemberController extends Controller
             Shipment::where('order_id', $order->id)
                 ->update([
                     'status_code' => 'CANCELLED',
-                    'cancelled_at' => $now,
+                    'cancelled_at' => now(),
                     'updated_by' => -1,
                 ]);
 
             // 訂單明細
-            if (isset($order->order_details)) {
-                foreach ($order->order_details as $order_detail) {
+            if ($order->orderDetails->isNotEmpty()) {
+                $order->orderDetails->each(function ($orderDetail) use ($order, $warehouse) {
                     // 新增庫存異動紀錄
                     StockTransactionLog::create([
                         'transaction_type' => 'ORDER_CANCEL',
-                        'transaction_date' => $now,
+                        'transaction_date' => now(),
                         'warehouse_id' => $warehouse->id,
-                        'product_item_id' => $order_detail->product_item_id,
-                        'item_no' => $order_detail->item_no,
-                        'transaction_qty' => $order_detail->qty,
+                        'product_item_id' => $orderDetail->product_item_id,
+                        'item_no' => $orderDetail->item_no,
+                        'transaction_qty' => $orderDetail->qty,
                         'source_doc_no' => $order->order_no,
                         'source_table_name' => 'order_details',
-                        'source_table_id' => $order_detail->id,
+                        'source_table_id' => $orderDetail->id,
                         'created_by' => -1,
                         'updated_by' => -1,
                     ]);
 
                     // 取得倉庫庫存
-                    $warehouse_stock = $warehouse_stock_service->getWarehouseStocks([
-                        'warehouse_id' => $warehouse->id,
-                        'product_item_id' => $order_detail->product_item_id,
-                    ])->first();
+                    $warehouseStock = $this->warehouseStockService->getWarehouseStock($warehouse->id, $orderDetail->product_item_id);
 
                     // 新增庫存
-                    if (!isset($warehouse_stock)) {
+                    if (!isset($warehouseStock)) {
                         WarehouseStock::create([
                             'warehouse_id' => $warehouse->id,
-                            'product_item_id' => $order_detail->product_item_id,
-                            'stock_qty' => $order_detail->qty,
+                            'product_item_id' => $orderDetail->product_item_id,
+                            'stock_qty' => $orderDetail->qty,
                             'created_by' => -1,
                             'updated_by' => -1,
                         ]);
                     }
                     // 更新庫存
                     else {
-                        WarehouseStock::findOrFail($warehouse_stock->id)
+                        WarehouseStock::findOrFail($warehouseStock->id)
                             ->update([
-                                'stock_qty' => $warehouse_stock->stock_qty + $order_detail->qty,
+                                'stock_qty' => $warehouseStock->stock_qty + $orderDetail->qty,
                             ]);
                     }
-                }
+                });
             }
 
             DB::commit();
@@ -617,7 +595,7 @@ class MemberController extends Controller
         return response()->json([
             'message' => '訂單取消成功',
             'results' => [
-                'cancelled_at' => $now->format('Y-m-d H:i:s'),
+                'cancelled_at' => now()->format('Y-m-d H:i:s'),
             ],
         ], 200);
     }
@@ -630,23 +608,8 @@ class MemberController extends Controller
      */
     public function returnOrder(ReturnOrderRequest $request)
     {
-        try {
-            $memberId = auth('api')->userOrFail()->member_id;
-        } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
-            return response()->json([
-                'message' => '會員不存在',
-            ], 404);
-        }
-
-        $return_request_service = new ReturnRequestService;
-        $now = Carbon::now();
-
         // 取得訂單
-        $order = $this->orderService->getOrders([
-            'revision_no' => 0,
-            'order_no' => $request->route('order_no'),
-            'member_id' => $memberId,
-        ])->first();
+        $order = $this->orderService->getMemberOrderDetailByOrderNo($request->order_no);
 
         // 訂單不存在
         if (!isset($order)) {
@@ -662,73 +625,59 @@ class MemberController extends Controller
             ], 423);
         }
 
-        // 取得訂單退貨原因
-        $return_req_reason = $this->lookup_values_v_service->getLookupValuesVs([
-            'disable_agent_id_auth' => true,
-            'type_code' => 'RETURN_REQ_REASON',
-            'code' => $request->input('code'),
-        ])->first();
-
-        // 退貨原因代碼不存在
-        if (!isset($return_req_reason)) {
-            return response()->json([
-                'message' => '退貨原因代碼不存在',
-            ], 404);
-        }
-
         DB::beginTransaction();
 
         try {
-            $request_no = $return_request_service->generateRequestNo();
+            $requestNo = $this->returnRequestService->generateRequestNo();
 
             // 新增退貨申請單
-            $return_request = ReturnRequest::create([
+            $returnRequest = ReturnRequest::create([
                 'agent_id' => 1,
-                'request_no' => $request_no,
-                'request_date' => $now,
-                'member_id' => $memberId,
+                'request_no' => $requestNo,
+                'request_date' => now(),
+                'member_id' => auth('api')->user()->member_id,
                 'order_id' => $order->id,
                 'order_no' => $order->order_no,
                 'status_code' => 'CREATED',
                 'refund_method' => $order->payment_method,
                 'lgst_method' => $order->lgst_method,
-                'req_name' => $request->input('name'),
-                'req_mobile' => $request->input('mobile'),
-                'req_city' => $request->input('city'),
-                'req_district' => $request->input('district'),
-                'req_address' => $request->input('address'),
-                'req_zip_code' => $request->input('zip_code'),
-                'req_telephone' => $request->input('telephone'),
-                'req_telephone_ext' => $request->input('telephone_ext'),
-                'req_reason_code' => $request->input('code'),
-                'req_remark' => $request->input('remark'),
+                'req_name' => $request->name,
+                'req_mobile' => $request->mobile,
+                'req_city' => $request->city,
+                'req_district' => $request->district,
+                'req_address' => $request->address,
+                'req_zip_code' => $request->zip_code,
+                'req_telephone' => $request->telephone,
+                'req_telephone_ext' => $request->telephone_ext,
+                'req_reason_code' => $request->code,
+                'req_remark' => $request->remark,
                 'created_by' => -1,
                 'updated_by' => -1,
             ]);
 
             // 訂單明細
-            if (isset($order->order_details)) {
-                foreach ($order->order_details as $order_detail) {
+            if ($order->orderDetails->isNotEmpty()) {
+                $order->orderDetails->each(function ($orderDetail) use ($returnRequest) {
                     // 新增退貨申請單明細
                     ReturnRequestDetail::create([
-                        'return_request_id' => $return_request->id,
-                        'seq' => $order_detail->seq,
-                        'order_detail_id' => $order_detail->id,
-                        'product_item_id' => $order_detail->product_item_id,
-                        'item_no' => $order_detail->item_no,
-                        'request_qty' => $order_detail->qty,
+                        'return_request_id' => $returnRequest->id,
+                        'seq' => $orderDetail->seq,
+                        'order_detail_id' => $orderDetail->id,
+                        'product_item_id' => $orderDetail->product_item_id,
+                        'item_no' => $orderDetail->item_no,
+                        'request_qty' => $orderDetail->qty,
                         'passed_qty' => 0,
                         'failed_qty' => 0,
                         'created_by' => -1,
                         'updated_by' => -1,
                     ]);
-                }
+                });
             }
 
             // 更新訂單
             Order::findOrFail($order->id)
                 ->update([
-                    'return_request_id' => $return_request->id,
+                    'return_request_id' => $returnRequest->id,
                     'updated_by' => -1,
                 ]);
 
@@ -745,8 +694,8 @@ class MemberController extends Controller
         return response()->json([
             'message' => '訂單退貨成功',
             'results' => [
-                'return_no' => $request_no,
-                'return_date' => $now->format('Y-m-d H:i:s'),
+                'return_no' => $requestNo,
+                'return_date' => now()->format('Y-m-d H:i:s'),
             ],
         ], 200);
     }
