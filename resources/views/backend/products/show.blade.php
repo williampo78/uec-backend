@@ -195,7 +195,7 @@
                                 <div class="col-sm-9">
                                     <label class="radio-inline">
                                         <input type="radio" name="selling_channel" value="EC"
-                                            {{ $products->selling_channel == 'EC' ? 'checked' : 'disabled' }}> 網路獨賣
+                                            {{ $products->selling_channel == 'WHOLE' ? 'checked' : 'disabled' }}> 全通路
                                     </label>
                                 </div>
                             </div>
