@@ -30,18 +30,18 @@ use Illuminate\Support\Facades\Log;
 class MemberController extends Controller
 {
     private $api_service;
-    private $sys_config_service;
+    private $sysConfigService;
     private $lookup_values_v_service;
     private $orderService;
 
     public function __construct(
         APIService $api_service,
-        SysConfigService $sys_config_service,
+        SysConfigService $sysConfigService,
         LookupValuesVService $lookup_values_v_service,
         OrderService $orderService
     ) {
         $this->api_service = $api_service;
-        $this->sys_config_service = $sys_config_service;
+        $this->sysConfigService = $sysConfigService;
         $this->lookup_values_v_service = $lookup_values_v_service;
         $this->orderService = $orderService;
     }
@@ -254,22 +254,8 @@ class MemberController extends Controller
      */
     public function getOrderDetail(GetOrderDetailRequest $request)
     {
-        try {
-            $memberId = auth('api')->userOrFail()->member_id;
-        } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
-            return response()->json([
-                'message' => '會員不存在',
-            ], 404);
-        }
-
-        $order_service = new OrderService;
-
         // 取得訂單
-        $order = $order_service->getOrders([
-            'revision_no' => 0,
-            'order_no' => $request->route('order_no'),
-            'member_id' => $memberId,
-        ])->first();
+        $order = $this->orderService->getMemberOrderDetailByOrderNo($request->order_no);
 
         // 沒有任何訂單
         if (!isset($order)) {
@@ -279,203 +265,141 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $sys_config = $this->sys_config_service->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
-        $cancel_limit_mins = isset($sys_config) ? (int) $sys_config->config_value : null;
+        $sysConfig = $this->sysConfigService->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
+        $cancelLimitMins = isset($sysConfig) ? (int) $sysConfig->config_value : null;
 
-        // 是否可以取消訂單
-        $order->can_cancel_order = $order_service->canCancelOrder($order->status_code, $order->ordered_date, $cancel_limit_mins);
-
-        // 是否可以申請退貨
-        $order->can_return_order = $order_service->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id);
-
-        // 訂單時間
-        $order->ordered_date = Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s');
+        $payload = [
+            'message' => '取得成功',
+            'results' => [
+                'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s'),
+                'paid_at' => null,
+                'prepared_shipment_at' => null,
+                'shipped_at' => null,
+                'delivered_at' => null,
+                'order_status' => $order->order_status_desc,
+                'cancelled_at' => null,
+                'order_no' => $order->order_no,
+                'payment_method' => config('uec.payment_method_options')[$order->payment_method] ?? null,
+                'receiver_name' => $order->receiver_name,
+                'receiver_mobile' => $order->receiver_mobile,
+                'receiver_zip_code' => $order->receiver_zip_code,
+                'receiver_city' => $order->receiver_city,
+                'receiver_district' => $order->receiver_district,
+                'receiver_address' => $order->receiver_address,
+                'return_no' => null,
+                'return_date' => null,
+                'order_details' => null,
+                'product_totals' => $order->orderDetails->count(),
+                'delivery_method' => null,
+                'package_no' => null,
+                'total_amount' => number_format($order->total_amount),
+                'shipping_fee' => number_format($order->shipping_fee),
+                'point_discount' => number_format($order->point_discount * -1),
+                'cart_campaign_discount' => number_format($order->cart_campaign_discount * -1),
+                'points' => $order->points * -1,
+                'paid_amount' => number_format($order->paid_amount),
+                'invoice_type' => config('uec.invoice_usage_options')[$order->invoice_usage] ?? null,
+                'invoice_no' => $order->invoice_no,
+                'invoice_date' => null,
+                'invoice_gui_number' => $order->buyer_gui_number,
+                'invoice_title' => $order->buyer_title,
+                'can_cancel_order' => $this->orderService->canCancelOrder($order->status_code, $order->ordered_date, $cancelLimitMins),
+                'can_return_order' => $this->orderService->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id),
+            ],
+        ];
 
         // 付款完成時間
         if (isset($order->paid_at)) {
-            $order->paid_at = Carbon::parse($order->paid_at)->format('Y-m-d H:i:s');
+            $payload['results']['paid_at'] = Carbon::parse($order->paid_at)->format('Y-m-d H:i:s');
         }
 
         // 出貨時間
         if (isset($order->shipped_at)) {
-            $order->shipped_at = Carbon::parse($order->shipped_at)->format('Y-m-d H:i:s');
+            $payload['results']['shipped_at'] = Carbon::parse($order->shipped_at)->format('Y-m-d H:i:s');
         }
 
         // 宅配配達時間/超商取件時間
         if (isset($order->delivered_at)) {
-            $order->delivered_at = Carbon::parse($order->delivered_at)->format('Y-m-d H:i:s');
+            $payload['results']['delivered_at'] = Carbon::parse($order->delivered_at)->format('Y-m-d H:i:s');
         }
-
-        // 訂單狀態
-        $order->order_status = $order->order_status_desc;
-
-        // 付款方式
-        $order->payment_method = config('uec.payment_method_options')[$order->payment_method] ?? null;
 
         // 物流方式
-        $order->lgst_method = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
+        $lgstMethod = config('uec.lgst_method_options')[$order->lgst_method] ?? null;
 
         // 物流公司
-        $order->lgst_company_code = config('uec.lgst_company_code_options')[$order->lgst_company_code] ?? null;
+        $lgstCompanyCode = config('uec.lgst_company_code_options')[$order->lgst_company_code] ?? null;
 
         // 配送方式
-        if (isset($order->lgst_method, $order->lgst_company_code)) {
-            $order->delivery_method = "{$order->lgst_method}-{$order->lgst_company_code}";
-        } else {
-            $order->delivery_method = null;
+        if (isset($lgstMethod, $lgstCompanyCode)) {
+            $payload['results']['delivery_method'] = "{$lgstMethod}-{$lgstCompanyCode}";
         }
-
-        // 出貨時間
-        if (isset($order->shipped_at)) {
-            $order->shipped_at = Carbon::parse($order->shipped_at)->format('Y-m-d H:i:s');
-        }
-
-        // 商品原總計
-        $order->total_amount = number_format($order->total_amount);
-
-        // 運費
-        $order->shipping_fee = number_format($order->shipping_fee);
-
-        // 會員點數折抵金額，由負數改為正數呈現
-        $order->point_discount = number_format($order->point_discount * -1);
-
-        // 滿額活動折抵金額，由負數改為正數呈現
-        $order->cart_campaign_discount = number_format($order->cart_campaign_discount * -1);
-
-        // 結帳時使用的會員點數，由負數改為正數呈現
-        $order->points = $order->points * -1;
-
-        // 實際支付金額
-        $order->paid_amount = number_format($order->paid_amount);
-
-        // 商品總數
-        $order->product_totals = 0;
-
-        // 發票用途
-        $order->invoice_type = config('uec.invoice_usage_options')[$order->invoice_usage] ?? null;
 
         // 發票開立時間
         if (isset($order->invoice_date)) {
-            $order->invoice_date = Carbon::parse($order->invoice_date)->format('Y-m-d H:i:s');
+            $payload['results']['invoice_date'] = Carbon::parse($order->invoice_date)->format('Y-m-d H:i:s');
         }
-
-        // 統編
-        $order->invoice_gui_number = $order->buyer_gui_number;
-
-        // 發票抬頭
-        $order->invoice_title = $order->buyer_title;
 
         // 訂單取消時間
         if (isset($order->cancelled_at)) {
-            $order->cancelled_at = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i:s');
+            $payload['results']['cancelled_at'] = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i:s');
         }
 
         // 訂單明細
-        if (isset($order->order_details)) {
-            // 商品總數
-            $order->product_totals = count($order->order_details);
-
-            // 取得第一筆訂單明細
-            $order->order_details->transform(function ($order_detail) {
-                // 單價 (單品折扣後的單價，即前台購物車呈現的單價)
-                $order_detail->unit_price = number_format($order_detail->unit_price);
-
-                // 小計
-                $order_detail->subtotal = number_format($order_detail->subtotal);
+        if ($order->orderDetails->isNotEmpty()) {
+            $order->orderDetails->each(function ($orderDetail) use (&$payload) {
+                $orderDetailPayload = [
+                    'photo_url' => null,
+                    'product_name' => $orderDetail->product->product_name,
+                    'spec_1_value' => $orderDetail->productItem->spec_1_value,
+                    'spec_2_value' => $orderDetail->productItem->spec_2_value,
+                    'qty' => $orderDetail->qty,
+                    'unit_price' => number_format($orderDetail->unit_price),
+                    'subtotal' => number_format($orderDetail->subtotal),
+                    'product_id' => $orderDetail->product_id,
+                    'product_no' => $orderDetail->product->product_no,
+                    'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
+                ];
 
                 // 商品圖片
-                if (isset($order_detail->product_photos)) {
-                    $product_photo = $order_detail->product_photos->first();
-                    $photo_url = config('filesystems.disks.s3.url') . $product_photo->photo_name;
-                    $order_detail->photo_url = $photo_url;
+                if ($orderDetail->product->productPhotos->isNotEmpty()) {
+                    $productPhoto = $orderDetail->product->productPhotos->first();
+
+                    // 圖片網址
+                    $orderDetailPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
                 }
 
-                // 是否可購買
-                $order_detail->can_buy = $order_detail->record_identity == 'M' ? true : false;
-
-                return $order_detail->only([
-                    'photo_url',
-                    'product_name',
-                    'spec_1_value',
-                    'spec_2_value',
-                    'qty',
-                    'unit_price',
-                    'subtotal',
-                    'product_id',
-                    'product_no',
-                    'can_buy',
-                ]);
+                $payload['results']['order_details'][] = $orderDetailPayload;
             });
         }
 
         // 出貨單
-        if (isset($order->shipments)) {
+        if ($order->shipments->isNotEmpty()) {
+            // 第一階段，一筆訂單只會有一筆出貨單
             $shipment = $order->shipments->first();
 
-            if (isset($shipment)) {
-                $order->package_no = $shipment->package_no;
+            // 託運單號
+            $payload['results']['package_no'] = $shipment->package_no;
 
-                // 待出貨時間
-                if (isset($shipment->edi_exported_at)) {
-                    $order->prepared_shipment_at = Carbon::parse($shipment->edi_exported_at)->format('Y-m-d H:i:s');
-                }
+            // 待出貨時間
+            if (isset($shipment->edi_exported_at)) {
+                $payload['results']['prepared_shipment_at'] = Carbon::parse($shipment->edi_exported_at)->format('Y-m-d H:i:s');
             }
         }
 
         // 退貨申請單
-        if (isset($order->return_requests)) {
-            $return_request = $order->return_requests->first();
+        if ($order->returnRequests->isNotEmpty()) {
+            $returnRequest = $order->returnRequests->first();
+
+            // 退貨申請單號
+            $payload['results']['return_no'] = $returnRequest->request_no;
 
             // 退貨申請時間
-            if (isset($return_request->request_date)) {
-                $return_request->request_date = Carbon::parse($return_request->request_date)->format('Y-m-d H:i:s');
+            if (isset($returnRequest->request_date)) {
+                $payload['results']['return_date'] = Carbon::parse($returnRequest->request_date)->format('Y-m-d H:i:s');
             }
-
-            $order->return_no = $return_request->request_no;
-            $order->return_date = $return_request->request_date;
         }
 
-        $order = $order->only([
-            'ordered_date',
-            'paid_at',
-            'prepared_shipment_at',
-            'shipped_at',
-            'delivered_at',
-            'order_status',
-            'cancelled_at',
-            'order_no',
-            'payment_method',
-            'receiver_name',
-            'receiver_mobile',
-            'receiver_zip_code',
-            'receiver_city',
-            'receiver_district',
-            'receiver_address',
-            'return_no',
-            'return_date',
-            'order_details',
-            'product_totals',
-            'delivery_method',
-            'package_no',
-            'total_amount',
-            'shipping_fee',
-            'point_discount',
-            'cart_campaign_discount',
-            'points',
-            'paid_amount',
-            'invoice_type',
-            'invoice_no',
-            'invoice_date',
-            'invoice_gui_number',
-            'invoice_title',
-            'can_cancel_order',
-            'can_return_order',
-        ]);
-
-        return response()->json([
-            'message' => '取得成功',
-            'results' => $order,
-        ], 200);
+        return response()->json($payload, 200);
     }
 
     /**
@@ -494,13 +418,12 @@ class MemberController extends Controller
             ], 404);
         }
 
-        $order_service = new OrderService;
         $warehouse_service = new WarehouseService;
         $warehouse_stock_service = new WarehouseStockService;
         $now = Carbon::now();
 
         // 取得訂單
-        $order = $order_service->getOrders([
+        $order = $this->orderService->getOrders([
             'revision_no' => 0,
             'order_no' => $request->route('order_no'),
             'member_id' => $memberId,
@@ -514,11 +437,11 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $sys_config = $this->sys_config_service->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
-        $cancel_limit_mins = isset($sys_config) ? (int) $sys_config->config_value : null;
+        $sysConfig = $this->sysConfigService->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
+        $cancelLimitMins = isset($sysConfig) ? (int) $sysConfig->config_value : null;
 
         // 是否可以取消訂單
-        if (!$order_service->canCancelOrder($order->status_code, $order->ordered_date, $cancel_limit_mins)) {
+        if (!$this->orderService->canCancelOrder($order->status_code, $order->ordered_date, $cancelLimitMins)) {
             return response()->json([
                 'message' => '訂單已進入處理階段/已超過限制時間，不可取消訂單',
             ], 423);
@@ -539,8 +462,8 @@ class MemberController extends Controller
         }
 
         // 商城良品倉
-        $sys_config = $this->sys_config_service->getSysConfigByConfigKey('EC_WAREHOUSE_GOODS');
-        $ec_warehouse_goods = isset($sys_config) ? $sys_config->config_value : null;
+        $sysConfig = $this->sysConfigService->getSysConfigByConfigKey('EC_WAREHOUSE_GOODS');
+        $ec_warehouse_goods = isset($sysConfig) ? $sysConfig->config_value : null;
 
         // 取得倉庫
         $warehouse = $warehouse_service->getWarehouses([
@@ -715,12 +638,11 @@ class MemberController extends Controller
             ], 404);
         }
 
-        $order_service = new OrderService;
         $return_request_service = new ReturnRequestService;
         $now = Carbon::now();
 
         // 取得訂單
-        $order = $order_service->getOrders([
+        $order = $this->orderService->getOrders([
             'revision_no' => 0,
             'order_no' => $request->route('order_no'),
             'member_id' => $memberId,
@@ -734,7 +656,7 @@ class MemberController extends Controller
         }
 
         // 是否可以申請退貨
-        if (!$order_service->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id)) {
+        if (!$this->orderService->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id)) {
             return response()->json([
                 'message' => '商品尚未配達/已超過鑑賞期/退貨處理中，不可申請退貨',
             ], 423);

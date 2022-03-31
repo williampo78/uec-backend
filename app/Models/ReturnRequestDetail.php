@@ -11,4 +11,12 @@ class ReturnRequestDetail extends Model
 
     protected $table = 'return_request_details';
     protected $guarded = [];
+
+    /**
+     * 建立與退貨申請單的關聯
+     */
+    public function returnRequest()
+    {
+        return $this->belongsTo(ReturnRequest::class, 'return_request_id');
+    }
 }

@@ -637,6 +637,35 @@ class OrderService
         return $orders;
     }
 
+    public function getMemberOrderDetailByOrderNo(string $orderNo): Model
+    {
+        $member = auth('api')->user();
+
+        $order = Order::with([
+            'shipments',
+            'orderDetails' => function ($query) {
+                $query->orderBy('order_id', 'asc')
+                    ->orderBy('seq', 'asc');
+            },
+            'orderDetails.product',
+            'orderDetails.productItem',
+            'orderDetails.product.productPhotos' => function ($query) {
+                $query->orderBy('product_id', 'asc')
+                    ->orderBy('sort', 'asc');
+            },
+            'returnRequests' => function ($query) {
+                $query->orderBy('id', 'desc');
+            },
+        ])->where('revision_no', 0)
+            ->where('member_id', $member->member_id)
+            ->where('order_no', $orderNo)
+            ->select()
+            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
+            ->first();
+
+        return $order;
+    }
+
     /**
      * 是否可以取消訂單
      *
