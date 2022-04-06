@@ -2,33 +2,26 @@
 
 namespace App\Services;
 
-use App\Models\supplier;
 use App\Models\Warehouse;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class WarehouseService
 {
-    public function getWarehouseList(){
+    public function getWarehouseList()
+    {
         $agent_id = Auth::user()->agent_id;
         return Warehouse::where('agent_id', $agent_id)->orderBy('id')->get();
     }
 
     /**
-     * 取得倉庫資料
+     * 取得單筆倉庫資料
      *
-     * @param array $datas
-     * @return Collection
+     * @param string $number
+     * @return Model|null
      */
-    public function getWarehouses(array $datas = []) :Collection
+    public function getWarehouseByNumber(string $number): ?Model
     {
-        $warehouses = Warehouse::where('delete', 0);
-
-        // 代碼
-        if (isset($datas['number'])) {
-            $warehouses = $warehouses->where('number', $datas['number']);
-        }
-
-        return $warehouses->get();
+        return Warehouse::where('delete', 0)->where('number', $number)->first();
     }
 }

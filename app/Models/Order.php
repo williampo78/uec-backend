@@ -69,6 +69,14 @@ class Order extends Model
     }
 
     /**
+     * 建立與退貨申請單的關聯
+     */
+    public function returnRequests()
+    {
+        return $this->hasMany(ReturnRequest::class, 'order_id');
+    }
+
+    /**
      * 取得 訂單
      *
      */
