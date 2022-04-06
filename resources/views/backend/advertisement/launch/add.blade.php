@@ -26,10 +26,18 @@
                             <div class="row">
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
-                                    @include('backend.advertisement.launch.slot_block')
-                                    @include('backend.advertisement.launch.image_block')
-                                    @include('backend.advertisement.launch.text_block')
-                                    @include('backend.advertisement.launch.product_block')
+                                    @include(
+                                        'backend.advertisement.launch.slot_block'
+                                    )
+                                    @include(
+                                        'backend.advertisement.launch.image_block'
+                                    )
+                                    @include(
+                                        'backend.advertisement.launch.text_block'
+                                    )
+                                    @include(
+                                        'backend.advertisement.launch.product_block'
+                                    )
 
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -191,7 +199,39 @@
                 let element = $(this).find('option:selected');
                 let is_user_defined = element.attr('data-is-user-defined');
                 let slot_type = element.attr('data-slot-type');
+                let photo_width = element.attr('data-photo-width');
+                let photo_height = element.attr('data-photo-height');
 
+                $('.image_block_image_name').map(function(obj) {
+                    let vm = $(this);
+                    const file = this.files[0];
+                    if (file) {
+                        if (photo_width && photo_height) { //顯示選擇照片的尺寸提醒
+                            var img;
+                            img = new Image();
+                            var objectUrl = URL.createObjectURL(file);
+                            img.onload = function() {
+                                if (this.width !== parseInt(photo_width) || this.height !==
+                                    parseInt(photo_height)) {
+                                    let show_text = '上傳尺寸 ' + this.width + '*' + this.height + ' 非預期，存檔後系統會自動壓縮成制式尺寸！';
+                                    vm.siblings('.select-img-size-box').show();
+                                    vm.siblings('.select-img-size-box').find('.select-img-size-text').text(show_text);
+                                } else {
+                                    vm.siblings('.select-img-size-box').hide();
+                                    vm.siblings('.select-img-size-box').find('.select-img-size-text').text('');
+                                }
+                                URL.revokeObjectURL(objectUrl);
+                            };
+                            img.src = objectUrl;
+                        }
+                    }
+                });
+
+                if (photo_width > 0 || photo_height > 0) {
+                    $('.show_size').text('尺寸：' + photo_width + '*' + photo_height);
+                } else {
+                    $('.show_size').text('');
+                }
                 // 開放編輯 版位主色、版位icon、版位標題
                 if (is_user_defined == 1) {
                     enableSlotColorCode();

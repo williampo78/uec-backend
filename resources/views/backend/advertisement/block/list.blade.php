@@ -4,7 +4,6 @@
 
 @section('style')
     <style>
-
         td .fa-solid.fa-check,
         .form-group .fa-solid.fa-check {
             color: green;
@@ -97,7 +96,8 @@
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
+                                                <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i>
+                                                    查詢</button>
                                             @endif
                                         </div>
                                     </div>
@@ -121,13 +121,15 @@
                                         <th class="text-nowrap">Desktop適用</th>
                                         <th class="text-nowrap">上架類型</th>
                                         <th class="text-nowrap">狀態</th>
+                                        <th class="text-nowrap">圖檔寬度(px)</th>
+                                        <th class="text-nowrap">圖檔高度(px))</th>
                                         <th class="text-nowrap">備註</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($ad_slots as $obj)
                                         <tr>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 @if ($share_role_auth['auth_query'])
                                                     <button type="button" class="btn btn-info btn-sm slot_detail"
                                                         data-slot="{{ $obj->id }}" title="檢視">
@@ -142,32 +144,42 @@
                                                     </a>
                                                 @endif
                                             </td>
-                                            <td>{{ $obj->description }}</td>
-                                            <td>{{ $obj->slot_code }}</td>
-                                            <td>{{ $obj->slot_desc }}</td>
-                                            <td>
+                                            <td class="text-nowrap">{{ $obj->description }}</td>
+                                            <td class="text-nowrap">{{ $obj->slot_code }}</td>
+                                            <td class="text-nowrap">{{ $obj->slot_desc }}</td>
+                                            <td class="text-nowrap">
                                                 @if ($obj->is_mobile_applicable == 1)
                                                     <i class="fa-solid fa-check fa-lg"></i>
                                                 @else
                                                     <i class="fa-solid fa-xmark fa-lg"></i>
                                                 @endif
                                             </td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 @if ($obj->is_desktop_applicable == 1)
                                                     <i class="fa-solid fa-check fa-lg"></i>
                                                 @else
                                                     <i class="fa-solid fa-xmark fa-lg"></i>
                                                 @endif
                                             </td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 @isset(config('uec.ad_slot_type_option')[$obj->slot_type])
                                                     {{ config('uec.ad_slot_type_option')[$obj->slot_type] }}
                                                 @endisset
                                             </td>
-                                            <td>
+                                            <td class="text-nowrap">
                                                 @isset(config('uec.active_options')[$obj->active])
                                                     {{ config('uec.active_options')[$obj->active] }}
                                                 @endisset
+                                            </td>
+                                            <td class="text-nowrap">
+                                                @if ($obj->photo_width !== '' && $obj->photo_width > 0)
+                                                    {{ $obj->photo_width }}
+                                                @endif
+                                            </td>
+                                            <td class="text-nowrap">
+                                                @if ($obj->photo_height !== '' && $obj->photo_height > 0)
+                                                    {{ $obj->photo_height }}
+                                                @endif
                                             </td>
                                             <td>{!! nl2br(e($obj->remark)) !!}</td>
                                         </tr>

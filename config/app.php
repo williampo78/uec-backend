@@ -184,6 +184,7 @@ return [
         App\Providers\RepositoryServiceProvider::class,
         App\Providers\ExcelServiceProvider::class,
         App\Providers\StrServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class , // 裁切圖片套件
     ],
 
     /*
@@ -241,6 +242,7 @@ return [
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'ImageUpload' => App\Facades\ImageUpload::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'Image' => Intervention\Image\Facades\Image::class,
     ],
 
 ];

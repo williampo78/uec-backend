@@ -14,6 +14,7 @@ import Vue from "vue";
 import flatpickr from "flatpickr";
 import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
 import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
+import Croppie from "Croppie";
 
 window._ = lodash;
 
@@ -121,3 +122,8 @@ flatpickr.setDefaults({
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+/**
+ * 裁切圖片
+ */
+ window.Croppie = Croppie;
+ 
