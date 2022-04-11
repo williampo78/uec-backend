@@ -329,7 +329,7 @@ class APIProductServices
                         }
                     }*/
                     if ($product->id != $product_id) {
-                        $data[] = array(
+                        $data[$product->id] = array(
                             'product_id' => $product->id,
                             'product_no' => $product->product_no,
                             'product_name' => $product->product_name,
@@ -347,8 +347,12 @@ class APIProductServices
 
                 }
             }
+            $return_data=[];
+            foreach ($data as $key=>$product){
+                $return_data[] = $product;
+            }
             //array_multisort(array_column($data, 'selling_price'), $sort_flag, $data);
-            $searchResult = self::getPages($data, $size, $page);
+            $searchResult = self::getPages($return_data, $size, $page);
         } else {
             $searchResult = '404';
         }
