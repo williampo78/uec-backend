@@ -584,8 +584,7 @@
                                         <label class="control-label">保固範圍</label>
                                     </div>
                                     <div class="col-sm-11">
-                                        <textarea class="form-control" rows="10" cols="10"
-                                            name="warranty_scope"></textarea>
+                                        <textarea class="form-control" rows="10" cols="10" name="warranty_scope"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -922,17 +921,15 @@
                         var file = selectedFiles[i];
                         var setStr = 0;
                         var objectUrl = URL.createObjectURL(selectedFiles[i]);
-                        if (selectedFiles[i].size > 1048576) {
-                            alert('照片名稱:' + file.name + '已經超出大小');
-                        } else if (selectedFiles[i].type !== 'image/jpeg' && selectedFiles[i].type !==
-                            'image/png') {
-                            alert('照片名稱:' + file.name + '格式錯誤');
-                        }
                         this.getImage(objectUrl, file, function(callback) {
-                            if (callback.width < 480 && callback.height < 480) {
+                            if (callback.file.size > 1048576) {
+                                alert('照片名稱:' + callback.file.name + '已經超出大小');
+                            } else if (callback.file.type !== 'image/jpeg' && callback.file.type !==
+                                'image/png') {
+                                alert('照片名稱:' + file.name + '格式錯誤');
+                            } else if (callback.width < 480 && callback.height < 480) {
                                 alert('照片名稱:' + callback.file.name + '照片尺寸必須為480*480以上');
                             } else if (callback.width !== callback.height) {
-                                console.log(callback.width, callback.height);
                                 alert('照片名稱:' + callback.file.name + '照片比例必須為1:1');
                             } else {
                                 vm.images.push(callback.file);
