@@ -21,8 +21,7 @@ class AdminController extends Controller
     }
     public function index()
     {
-//        $user = Auth::user();
-        return view('backend.example');
+        return view('backend.home');
     }
 
     /**
@@ -89,12 +88,5 @@ class AdminController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-    public function signOut() {
-        Session::flush();
-        Auth::logout();
-
-        return Redirect('/');
     }
 }

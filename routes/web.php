@@ -3,14 +3,13 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdvertisementBlockController;
 use App\Http\Controllers\AdvertisementLaunchController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuyoutProductsReportController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ExternalInventoryDailyReportController;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\ItemController;
-use App\Http\Controllers\LoginAuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderPaymentsReportController;
 use App\Http\Controllers\OrderRefundController;
@@ -56,12 +55,16 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
+Route::get('/', function () {
+    return redirect()->route('backend_home');
+});
+Route::get('/login', [AuthController::class, 'showLoginPage'])->name('login.show');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+
 Route::any('/ckfinder/connector', [CKFinderController::class, 'requestAction'])->name('ckfinder_connector');
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
-    Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
-    Route::get('/', [AdminController::class, 'index'])->name('backend-home');
-    Route::get('/signOut', [AdminController::class, 'signOut'])->name('signOut');
-    Route::resource('/admin', AdminController::class);
+    Route::resource('/', AdminController::class, ['names' => ['index' => 'backend_home']]);
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // 倉庫管理
     Route::resource('/warehouse', WarehouseController::class, ['names' => ['index' => 'warehouse']]);
@@ -252,7 +255,3 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/summary_stock/ajax', [SummaryStockController::class, 'ajaxDetail']);
     Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
 });
-
-Route::get('/', [LoginAuthController::class, 'index'])->name('login');
-Route::post('custom-login', [LoginAuthController::class, 'customLogin'])->name('login.custom');
-Route::post('custom-registration', [LoginAuthController::class, 'customRegistration'])->name('register.custom');

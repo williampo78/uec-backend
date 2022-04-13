@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
 
 class UserService
 {
@@ -143,5 +145,81 @@ class UserService
         }
 
         return $result;
+    }
+
+    /**
+     * 設定導覽頁session
+     *
+     * @return void
+     */
+    public function setMenuSession()
+    {
+        $user = auth()->user();
+        $authorizedPermissionDetailIds = collect();
+
+        // 取得使用者
+        $user = User::with([
+            'roles.permissionDetails' => function ($query) {
+                return $query->where('role_permission_details.auth_query', 1);
+            },
+        ])->find($user->id);
+
+        // 取得使用者被授權的子權限
+        if ($user->roles->isNotEmpty()) {
+            $user->roles->each(function ($role) use (&$authorizedPermissionDetailIds) {
+                $authorizedPermissionDetailIds = $authorizedPermissionDetailIds->merge($role->permissionDetails->pluck('id'));
+            });
+
+            $authorizedPermissionDetailIds = $authorizedPermissionDetailIds->unique();
+        }
+
+        // 取得權限資料
+        $permissions = Permission::with([
+            'permissionDetails' => function ($query) {
+                return $query->orderBy('sort', 'asc');
+            },
+        ])
+            ->where('type', 'menu')
+            ->orderBy('sort', 'asc')
+            ->get();
+
+        // 取得所有路由名稱
+        $routes = Route::getRoutes();
+        $routeNames = collect();
+        foreach ($routes as $route) {
+            $routeName = $route->getName();
+
+            if (isset($routeName)) {
+                $routeNames->push($routeName);
+            }
+        }
+
+        $menu = [];
+        $permissions->each(function ($permission) use (&$menu, $authorizedPermissionDetailIds, $routeNames) {
+            $subMenu = [];
+
+            if ($permission->permissionDetails->isNotEmpty()) {
+                $permission->permissionDetails->each(function ($permissionDetail) use (&$subMenu, $authorizedPermissionDetailIds, $routeNames) {
+                    if ($authorizedPermissionDetailIds->contains($permissionDetail->id)
+                        && $routeNames->contains($permissionDetail->code)) {
+                        $subMenu[] = [
+                            'icon' => $permissionDetail->icon,
+                            'name' => $permissionDetail->name,
+                            'code' => $permissionDetail->code,
+                        ];
+                    }
+                });
+            }
+
+            if (!empty($subMenu)) {
+                $menu[] = [
+                    'icon' => $permission->icon,
+                    'name' => $permission->name,
+                    'sub_menu' => $subMenu,
+                ];
+            }
+        });
+
+        session(['menu' => $menu]);
     }
 }

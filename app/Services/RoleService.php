@@ -74,7 +74,7 @@ class RoleService
         $auth = 0;
         $act = explode('@', Route::currentRouteAction());
 
-        if (isset($roles[$code]) && ($code != 'admin' && $code != '' && $code != 'signOut')) {
+        if (isset($roles[$code]) && ($code != '' && $code != 'logout')) {
             switch ($act[1]) {
                 case 'show':
                     $auth = $roles[$code]->auth_query;
@@ -101,8 +101,9 @@ class RoleService
                     $auth = 1;
                     break;
             }
-            //在admin及登出頁面必須回傳1 , 否則會一直無限導向
-        } elseif (in_array($code, ['admin', '', 'signOut', 'backend-home', 'user_profile']) || Str::is('generated*', $code)) {
+        }
+        //在admin及登出頁面必須回傳1 , 否則會一直無限導向
+        elseif (in_array($code, ['', 'logout', 'backend_home', 'user_profile']) || Str::is('generated*', $code)) {
             $auth = 1;
         }
 
