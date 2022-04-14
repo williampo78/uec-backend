@@ -28,7 +28,7 @@ window.init = (datas = {}) => {
         defaultHour: 0,
         defaultMinute: 0,
         defaultSeconds: 0,
-        onChange: function(selectedDates, dateStr, instance) {
+        onChange: function (selectedDates, dateStr, instance) {
             end_at_flatpickr.set('minDate', dateStr);
 
             if (!end_at_flatpickr.input.value) {
@@ -47,7 +47,7 @@ window.init = (datas = {}) => {
         defaultHour: 23,
         defaultMinute: 59,
         defaultSeconds: 59,
-        onChange: function(selectedDates, dateStr, instance) {
+        onChange: function (selectedDates, dateStr, instance) {
             start_at_flatpickr.set('maxDate', dateStr);
         },
     });
@@ -308,8 +308,31 @@ window.init = (datas = {}) => {
     // 選擇圖片區的圖片檔案
     $(document).on("change", ".image_block_image_name", function () {
         const file = this.files[0];
-
+        let photo_width = $('#slot_id').find('option:selected').attr('data-photo-width');
+        let photo_height = $('#slot_id').find('option:selected').attr('data-photo-height');
+        let vm = $(this);
         if (file) {
+            if (photo_width && photo_height) { //顯示選擇照片的尺寸提醒
+                var img;
+                img = new Image();
+                var objectUrl = URL.createObjectURL(file);
+                img.onload = function () {
+                    if (this.width !== parseInt(photo_width) || this.height !== parseInt(photo_height)) {
+                        let show_text = '上傳尺寸 ' + this.width + '*' + this.height + ' 非預期，存檔後系統會自動壓縮成制式尺寸！';
+                        vm.siblings('.select-img-size-box').show();
+                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text(show_text);
+                    } else {
+                        vm.siblings('.select-img-size-box').hide();
+                        vm.siblings('.select-img-size-box').find('.select-img-size-text').text('');
+                    }
+                    URL.revokeObjectURL(objectUrl);
+                };
+
+                img.src = objectUrl;
+            }
+
+            $(this).siblings('.img_image_block_image_name').attr("src", URL.createObjectURL(file));
+            $(this).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").show();
             $(this)
                 .siblings(".img_image_block_image_name")
                 .attr("src", URL.createObjectURL(file));
@@ -324,6 +347,8 @@ window.init = (datas = {}) => {
     // 刪除圖片區的圖片
     $(document).on("click", ".btn-delete-image-block-image-name", function () {
         $(this).siblings(".img_image_block_image_name").attr("src", "").hide();
+        $(this).siblings(".select-img-size-box").hide();
+        $(this).siblings(".select-img-size-box").find('.select-img-size-text').text('');
         $(this).hide();
         $(this).siblings(".image_block_image_name").val("").show();
     });
@@ -332,10 +357,15 @@ window.init = (datas = {}) => {
 // 取得版位下拉選項
 window.getAdSlotSelectOptions = (datas = []) => {
     let options = "";
-
     $.each(datas, function (key, value) {
         options += `
-            <option value='${value["id"]}' data-is-user-defined="${value["is_user_defined"]}" data-slot-type="${value["slot_type"]}">【${value["slot_code"]}】${value["slot_desc"]}</option>
+            <option value='${value["id"]}'
+            data-is-user-defined="${value["is_user_defined"]}"
+            data-slot-type="${value["slot_type"]}"
+            data-photo-width="${value["photo_width"]}"
+            data-photo-height="${value["photo_height"]}"
+            >【${value["slot_code"]}】${value["slot_desc"]}
+            </option>
         `;
     });
 
@@ -387,7 +417,17 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
             </td>
             <td>
                 <div class="form-group">
-                    <input type="file" name="image_block_image_name[${image_block_row_no}]" class="image_block_image_name" value="" /><br />
+                    <input type="file" name="image_block_image_name[${image_block_row_no}]" class="image_block_image_name" value="" />
+                    <div class="select-img-size-box" style="
+                        width: 100%;
+                        height: 40px;
+                        display:none;
+                        text-align: center;
+                        background-color:red;
+                        ">
+                        <span class="select-img-size-text" style="color:#FFFFFF;font-weight:bold; width: 100%; text-align: center; ">
+                        </span>
+                    </div>
                     <img src="${image_name_url}" class="img-responsive img_image_block_image_name" width="300" height="300" /><br />
                     <button type="button" class="btn btn-danger btn-delete-image-block-image-name" title="刪除"><i class="fa-solid fa-trash-can"></i></button>
                 </div>

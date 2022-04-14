@@ -584,8 +584,7 @@
                                         <label class="control-label">保固範圍</label>
                                     </div>
                                     <div class="col-sm-11">
-                                        <textarea class="form-control" rows="10" cols="10"
-                                            name="warranty_scope"></textarea>
+                                        <textarea class="form-control" rows="10" cols="10" name="warranty_scope"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -600,6 +599,7 @@
                                         </div>
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
+                                            <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
                                             <input type="file" @change="fileSelected" multiple accept=".jpg,.jpeg,.png">
                                             <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
                                                 multiple>
@@ -900,33 +900,64 @@
             data: function() {
                 return {
                     images: [],
+                    images_size: [],
                 }
             },
             methods: {
+
                 fileSelected(e) {
-                    let vm = this;
+                    var vm = this;
                     var selectedFiles = e.target.files;
+                    // img.src = objectUrl;
+                    //判斷照片是否是一比一
+                    //判斷照片是否有 480 吋以上
                     if (selectedFiles.length + this.images.length > 15) {
                         alert('不能超過15張照片');
                         e.target.value = '';
                         return false;
                     }
                     for (let i = 0; i < selectedFiles.length; i++) {
-                        let type = selectedFiles[i].type;
+                        var img;
+                        var file = selectedFiles[i];
+                        var setStr = 0;
+                        var objectUrl = URL.createObjectURL(selectedFiles[i]);
+                        this.getImage(objectUrl, file, function(callback) {
+                            if (callback.file.size > 1048576) {
+                                alert('照片名稱:' + callback.file.name + '已經超出大小');
+                            } else if (callback.file.type !== 'image/jpeg' && callback.file.type !==
+                                'image/png') {
+                                alert('照片名稱:' + file.name + '格式錯誤');
+                            } else if (callback.width < 480 && callback.height < 480) {
+                                alert('照片名稱:' + callback.file.name + '照片尺寸必須為480*480以上');
+                            } else if (callback.width !== callback.height) {
+                                alert('照片名稱:' + callback.file.name + '照片比例必須為1:1');
+                            } else {
+                                vm.images.push(callback.file);
+                                vm.adjustTheDisplay();
+                                vm.images.map(function(value, key) {
+                                    value.sizeConvert = vm.formatBytes(value.size);
+                                });
+                            }
+                        });
 
-                        if (selectedFiles[i].size > 1048576) {
-                            alert('照片名稱:' + selectedFiles[i].name + '已經超出大小');
-                        } else if (type !== 'image/jpeg' && type !== 'image/png') {
-                            alert('照片名稱:' + selectedFiles[i].name + '格式錯誤');
-                        } else {
-                            this.images.push(selectedFiles[i]);
-                        }
                     }
-                    this.adjustTheDisplay();
-                    this.images.map(function(value, key) {
-                        value.sizeConvert = vm.formatBytes(value.size);
-                    });
+                    // this.images.map(function(value, key) {
+                    //     value.sizeConvert = vm.formatBytes(value.size);
+                    // });
                     e.target.value = '';
+                },
+                getImage(fileurl, file, callback) {
+                    vm = this;
+                    img = new Image();
+                    img.src = fileurl;
+                    img.onload = function() {
+                        result = {
+                            width: this.width,
+                            height: this.height,
+                            file: file
+                        };
+                        callback(result);
+                    };
                 },
                 delImages(index) {
                     this.$delete(this.images, index);
@@ -934,7 +965,9 @@
                 },
                 imagesCheck() {
                     console.log('-----------------------');
-                    console.log(this.images);
+                    console.log(vm.images_size);
+                    console.log('-----------------------');
+
                 },
                 formatBytes(bytes, decimals = 2) {
                     if (bytes === 0) return '0 Bytes';
