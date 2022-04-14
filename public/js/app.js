@@ -3849,19 +3849,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery_validation_dist_additional_methods__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(jquery_validation_dist_additional_methods__WEBPACK_IMPORTED_MODULE_10__);
 /* harmony import */ var jquery_validation_dist_localization_messages_zh_TW__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! jquery-validation/dist/localization/messages_zh_TW */ "./node_modules/jquery-validation/dist/localization/messages_zh_TW.js");
 /* harmony import */ var jquery_validation_dist_localization_messages_zh_TW__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(jquery_validation_dist_localization_messages_zh_TW__WEBPACK_IMPORTED_MODULE_11__);
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
 /* harmony import */ var flatpickr__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! flatpickr */ "./node_modules/flatpickr/dist/esm/index.js");
-<<<<<<< HEAD
-/* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! flatpickr/dist/l10n/zh-tw.js */ "./node_modules/flatpickr/dist/l10n/zh-tw.js");
-/* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_13__);
-/* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! Croppie */ "./node_modules/Croppie/croppie.js");
-/* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(Croppie__WEBPACK_IMPORTED_MODULE_14__);
-=======
 /* harmony import */ var flatpickr_dist_plugins_monthSelect__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! flatpickr/dist/plugins/monthSelect */ "./node_modules/flatpickr/dist/plugins/monthSelect/index.js");
 /* harmony import */ var flatpickr_dist_plugins_monthSelect__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(flatpickr_dist_plugins_monthSelect__WEBPACK_IMPORTED_MODULE_13__);
 /* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! flatpickr/dist/l10n/zh-tw.js */ "./node_modules/flatpickr/dist/l10n/zh-tw.js");
 /* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_14__);
->>>>>>> 5770c504c3852850bdaf583aacec938ce1032f5a
+/* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! Croppie */ "./node_modules/Croppie/croppie.js");
+/* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(Croppie__WEBPACK_IMPORTED_MODULE_15__);
+
 
 
 
@@ -3929,7 +3925,7 @@ jQuery.validator.setDefaults({
  * vue
  */
 
-window.Vue = vue__WEBPACK_IMPORTED_MODULE_15__["default"];
+window.Vue = vue__WEBPACK_IMPORTED_MODULE_16__["default"];
 /**
  * flatpickr
  */
@@ -3979,7 +3975,7 @@ flatpickr__WEBPACK_IMPORTED_MODULE_12__["default"].setDefaults({
  * 裁切圖片
  */
 
-window.Croppie = (Croppie__WEBPACK_IMPORTED_MODULE_14___default());
+window.Croppie = (Croppie__WEBPACK_IMPORTED_MODULE_15___default());
 
 /***/ }),
 
