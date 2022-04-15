@@ -134,7 +134,6 @@ class APICartServices
     public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount)
     {
         $now = Carbon::now();
-        $productInfo = self::getProducts();
         //購物車內容
         $cartInfo = self::getCartInfo($member_id);
         //商城倉庫代碼
@@ -208,7 +207,7 @@ class APICartServices
                                 $giftAway[] = array(
                                     "productPhoto" => $giftInfo['photo'],
                                     "productId" => $giftInfo->product_id,
-                                    "productName" => $productInfo[$giftInfo->product_id]->product_name,
+                                    "productName" => $giftInfo->product_name,
                                     "sellingPrice" => $giftInfo->selling_price,
                                     "assignedQty" => $giftInfo->assignedQty,
                                 );
