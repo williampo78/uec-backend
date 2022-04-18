@@ -14,7 +14,7 @@ use App\Http\Controllers\api\MessagesController;
 use App\Http\Controllers\api\ShoppingController;
 use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\MemberInfoController;
-
+use App\Http\Controllers\api\CaptchaController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -146,3 +146,4 @@ Route::group(['prefix' => 'checkout'], function () {
     Route::post('/tapPayNotify', [CheckoutController::class, 'tapPayNotify']);
 });
 
+Route::get('capcha', [CaptchaController::class, 'getCapcha']);

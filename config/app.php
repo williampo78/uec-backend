@@ -185,6 +185,7 @@ return [
         App\Providers\ExcelServiceProvider::class,
         App\Providers\StrServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class , // 裁切圖片套件
+        Mews\Captcha\CaptchaServiceProvider::class
     ],
 
     /*
@@ -243,6 +244,7 @@ return [
         'ImageUpload' => App\Facades\ImageUpload::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Image' => Intervention\Image\Facades\Image::class,
+        'Captcha' => Mews\Captcha\Facades\Captcha::class
     ],
 
 ];
