@@ -146,4 +146,4 @@ Route::group(['prefix' => 'checkout'], function () {
     Route::post('/tapPayNotify', [CheckoutController::class, 'tapPayNotify']);
 });
 
-Route::get('capcha', [CaptchaController::class, 'getCapcha']);
+Route::get('captcha', [CaptchaController::class, 'getCapcha']);
