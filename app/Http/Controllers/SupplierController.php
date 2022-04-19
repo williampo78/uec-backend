@@ -11,7 +11,8 @@ class SupplierController extends Controller
 {
     private $supplierService;
     private $supplierTypeService;
-    private $contactService ;
+    private $contactService;
+
     /**
      * Display a listing of the resource.
      *
@@ -20,16 +21,23 @@ class SupplierController extends Controller
     public function __construct(
         SupplierService $supplierService,
         SupplierTypeService $supplierTypeService,
-        ContactService $contactService) {
+        ContactService $contactService
+    ) {
         $this->supplierService = $supplierService;
         $this->supplierTypeService = $supplierTypeService;
         $this->contactService = $contactService;
     }
-    public function index()
+
+    public function index(Request $request)
     {
+        $queryData = $request->query();
+
         $result = [];
-        $result['supplier'] = $this->supplierService->getSuppliers();
-        return view('backend.supplier.list', $result);
+        $result['supplierTypes'] = $this->supplierTypeService->getSupplierTypes();
+        $result['activeOptions'] = config('uec.active_options');
+        $result['suppliers'] = $this->supplierService->getTableList($queryData);
+
+        return view('backend.supplier.index', $result);
     }
 
     /**
@@ -41,6 +49,7 @@ class SupplierController extends Controller
     {
         $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
         $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
+
         return view('backend.supplier.input', $result);
     }
 
@@ -56,6 +65,7 @@ class SupplierController extends Controller
         $act = 'add';
         $route_name = 'supplier';
         $result = $this->supplierService->addSupplier($input);
+
         return view('backend.success', compact('route_name', 'act'));
     }
 
@@ -70,9 +80,9 @@ class SupplierController extends Controller
         $result = [];
         $result['Supplier'] = $this->supplierService->showSupplier($id);
         $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        $result['Contact'] = $this->contactService->getContact('Supplier',$id);
+        $result['Contact'] = $this->contactService->getContact('Supplier', $id);
         $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
-        $result['readonly'] = 1 ; 
+        $result['readonly'] = 1;
 
         return view('backend.supplier.input', $result);
     }
@@ -88,7 +98,7 @@ class SupplierController extends Controller
         $result = [];
         $result['Supplier'] = $this->supplierService->showSupplier($id);
         $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        $result['Contact'] = $this->contactService->getContact('Supplier',$id);
+        $result['Contact'] = $this->contactService->getContact('Supplier', $id);
         $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
 
         return view('backend.supplier.input', $result);
@@ -103,13 +113,14 @@ class SupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $contact_json = $request->input('contact_json') ;
+        $contact_json = $request->input('contact_json');
         $input = $request->input();
-        unset($input['contact_json']) ;
-        $this->contactService->createContact('tablename' , $contact_json) ;
+        unset($input['contact_json']);
+        $this->contactService->createContact('tablename', $contact_json);
         $result = $this->supplierService->updateSupplier($input, $id);
         $act = 'upd';
         $route_name = 'supplier';
+
         return view('backend.success', compact('route_name', 'act'));
     }
 
@@ -123,8 +134,10 @@ class SupplierController extends Controller
     {
         //
     }
-    public function ajax(Request $request){
-        $in = $request->input() ;
+
+    public function ajax(Request $request)
+    {
+        $in = $request->input();
         switch ($in['type']) {
             case 'checkDisplayNumber':
                 $result = $this->supplierService->checkDisplayNumber($in['display_number']);
@@ -133,9 +146,10 @@ class SupplierController extends Controller
                 # code...
                 break;
         }
+
         return response()->json([
             'req' => $request->input(),
-            'result' =>  $result,
+            'result' => $result,
         ]);
     }
 }

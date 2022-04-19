@@ -13,7 +13,12 @@
 @import "~flatpickr/dist/flatpickr.css";
 @import "~flatpickr/dist/plugins/monthSelect/style.css";
 
-@import "~croppie/croppie.css" ;
+/* croppie */
+@import "~croppie/croppie.css";
+
+/* vue-select */
+@import "~vue-select/dist/vue-select.css";
+
 body {
     font-family: Segoe UI Light, 微軟正黑體;
     /* font-weight: bold; */
