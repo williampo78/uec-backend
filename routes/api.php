@@ -51,6 +51,9 @@ Route::group(['prefix' => 'v1'], function () {
     //UTM
     Route::get('/utm', [IndexController::class, 'getUTM']);
 
+    //filter
+    Route::get('/filter', [ProductController::class, 'getFilter']);
+
 });
 
 // jwt驗證
