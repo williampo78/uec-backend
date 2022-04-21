@@ -41,7 +41,7 @@ class AuthController extends Controller
         $v = Validator::make($credentials, [
             'mobile' => 'required',
             'pwd' => 'required',
-            'captcha' => 'required|captcha_api:'.$credentials['key'],
+            'captcha' => 'required|captcha_api:'.$credentials['key'].',math',
         ], $messages);
 
         if ($v->fails()) {
