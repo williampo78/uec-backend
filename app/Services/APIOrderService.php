@@ -607,19 +607,19 @@ class APIOrderService
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
-                        Log::channel('taypay_api_log')->error('597:taypay error!' . json_encode($tapPayResult));
+                        Log::channel('tappay_api_log')->error('597:tappay error!' . json_encode($tapPayResult));
                     }
                 } else {
                     $result['status'] = $tapPayResult['status'];
                     $result['payment_url'] = null;
-                    Log::channel('taypay_api_log')->error('602:taypay error!' . json_encode($tapPayResult));
+                    Log::channel('tappay_api_log')->error('602:tappay error!' . json_encode($tapPayResult));
                 }
             }
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::channel('taypay_api_log')->error('結帳成立訂單錯誤 ! ' . $e->getMessage());
+            Log::channel('tappay_api_log')->error('結帳成立訂單錯誤 ! ' . $e->getMessage());
             $result['status'] = 401;
             $result['payment_url'] = null;
         }
