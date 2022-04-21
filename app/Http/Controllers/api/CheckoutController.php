@@ -221,7 +221,7 @@ class CheckoutController extends Controller
             'utm.medium' => 'string|nullable|max:100',
             'utm.campaign' => 'string|nullable|max:100',
             'utm.sales' => 'string|nullable|max:100',
-            'utm.time' => 'string|nullable|date',
+            'utm.time' => 'nullable',
         ], $messages);
 
         if ($v->fails()) {
