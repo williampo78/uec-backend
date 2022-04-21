@@ -13,6 +13,7 @@ use App\Models\WarehouseStock;
 use App\Services\APIService;
 use App\Services\APITapPayService;
 use App\Services\StockService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -176,7 +177,7 @@ class APIOrderService
             $webData['utm_medium'] = $order['utm']['medium'];
             $webData['utm_campaign'] = $order['utm']['campaign'];
             $webData['utm_sales'] = $order['utm']['sales'];
-            $webData['utm_time'] = $order['utm']['time'];
+            $webData['utm_time'] = Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s');
             $newOrder = Order::create($webData);
 
             //建立一筆金流單
