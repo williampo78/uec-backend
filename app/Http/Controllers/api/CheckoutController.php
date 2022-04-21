@@ -183,7 +183,7 @@ class CheckoutController extends Controller
 
         $v = Validator::make($request->all(), [
             'payment_method' => 'required|string|in:TAPPAY_CREDITCARD,TAPPAY_LINEPAY',
-            'taypay_prime' => 'required|string',
+            'tappay_prime' => 'required|string',
             'lgst_method' => 'required|string|in:HOME,FAMILY',
             'store_no' => 'string|nullable|max:30',
             'invoice.usage' => 'required|string|in:P,D,C',
@@ -221,7 +221,7 @@ class CheckoutController extends Controller
             'utm.medium' => 'string|nullable|max:100',
             'utm.campaign' => 'string|nullable|max:100',
             'utm.sales' => 'string|nullable|max:100',
-            'utm.time' => 'string|nullable|date',
+            'utm.time' => 'nullable',
         ], $messages);
 
         if ($v->fails()) {

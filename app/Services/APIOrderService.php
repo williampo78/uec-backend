@@ -13,6 +13,7 @@ use App\Models\WarehouseStock;
 use App\Services\APIService;
 use App\Services\APITapPayService;
 use App\Services\StockService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -24,7 +25,8 @@ class APIOrderService
         APITapPayService $apiTapPayService,
         StockService $stockService,
         APIService $apiService
-    ) {
+    )
+    {
         $this->apiTapPayService = $apiTapPayService;
         $this->stockService = $stockService;
         $this->apiService = $apiService;
@@ -41,70 +43,6 @@ class APIOrderService
         $random = Str::random(6);
         //商城倉庫代碼
         $warehouseCode = $this->stockService->getWarehouseConfig();
-        /* test
-        $webData = [];
-        $webData['agent_id'] = 1;
-        $webData['order_no'] = "OD220107GFAZYW";
-        $webData['member_id'] = $member_id;
-        $webData['member_account'] = $order['buyer']['mobile'];
-        $webData['ordered_date'] = now();
-        $webData['is_latest'] = 1;
-        $webData['is_cash_on_delivery'] = 0;
-        $webData['status_code'] = 'CREATED';
-        $webData['payment_method'] = $order['payment_method'];
-        $webData['lgst_method'] = $order['lgst_method'];
-        $webData['is_shipping_free'] = ($order['shipping_fee'] == 0 ? 1 : 0);
-        $webData['shipping_fee'] = $order['shipping_fee'];
-        $webData['shipping_free_threshold'] = 0;
-        $webData['total_amount'] = $order['total_price'];
-        $webData['cart_campaign_discount'] = $order['cart_campaign_discount'];
-        $webData['point_discount'] = $order['point_discount'];
-        $webData['paid_amount'] = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee']);
-        $webData['points'] = $order['points'];
-        $webData['pay_status'] = 'PENDING';
-        $webData['buyer_name'] = $order['buyer']['name'];
-        $webData['buyer_mobile'] = $order['buyer']['mobile'];
-        $webData['buyer_email'] = $order['buyer']['email'];
-        $webData['buyer_zip_code'] = $order['buyer']['zip'];
-        $webData['buyer_city'] = $order['buyer']['city'];
-        $webData['buyer_district'] = $order['buyer']['district'];
-        $webData['buyer_address'] = $order['buyer']['address'];
-        $webData['receiver_name'] = $order['receiver']['name'];
-        $webData['receiver_mobile'] = $order['receiver']['mobile'];
-        $webData['receiver_zip_code'] = $order['receiver']['zip'];
-        $webData['receiver_city'] = $order['receiver']['city'];
-        $webData['receiver_district'] = $order['receiver']['district'];
-        $webData['receiver_address'] = $order['receiver']['address'];
-        $webData['invoice_usage'] = $order['invoice']['usage'];
-        $webData['carrier_type'] = $order['invoice']['carrier_type'];
-        $webData['carrier_no'] = $order['invoice']['carrier_no'];
-        $webData['donated_institution'] = $order['invoice']['donated_code'];
-        $webData['buyer_gui_number'] = $order['invoice']['buyer_gui_number'];
-        $webData['buyer_title'] = $order['invoice']['buyer_title'];
-        $webData['created_by'] = $member_id;
-        $webData['created_at'] = now();
-        $webData['updated_by'] = -1;
-        $webData['updated_at'] = now();
-
-        $payment_id = 26;
-        $webData['prime'] = $order['taypay_prime'];
-        $tapPay = $this->apiTapPayService->payByPrime($webData);
-        $tapPayResult = json_decode($tapPay, true);
-        if ($tapPayResult['status'] == 0) {
-            $payment = OrderPayment::where('id', $payment_id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id']]);
-            if ($payment) {
-                $result['status'] = 200;
-                $result['payment_url'] = $tapPayResult['payment_url'];
-                $result['rec_trade_id'] = $tapPayResult['rec_trade_id'];
-            } else {
-                $result['status'] = 401;
-            }
-        } else {
-            $result['status'] = $tapPayResult['status'];
-            $result['msg'] = $tapPayResult['msg'];
-        }
-        return $result;
-        */
 
         $utms = ShoppingCartDetail::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
@@ -172,11 +110,11 @@ class APIOrderService
             $webData['store_no'] = $order['store_no'];
             $webData['created_by'] = $member_id;
             $webData['updated_by'] = $member_id;
-            $webData['utm_source'] = $order['utm']['source'];
-            $webData['utm_medium'] = $order['utm']['medium'];
-            $webData['utm_campaign'] = $order['utm']['campaign'];
-            $webData['utm_sales'] = $order['utm']['sales'];
-            $webData['utm_time'] = $order['utm']['time'];
+            $webData['utm_source'] = isset($order['utm']['source']) ? $order['utm']['source'] : null;
+            $webData['utm_medium'] = isset($order['utm']['medium']) ? $order['utm']['medium'] : null;
+            $webData['utm_campaign'] = isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null;
+            $webData['utm_sales'] = isset($order['utm']['sales']) ? $order['utm']['sales'] : null;
+            $webData['utm_time'] = isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null;
             $newOrder = Order::create($webData);
 
             //建立一筆金流單
@@ -495,8 +433,7 @@ class APIOrderService
                     if ($item->campaign_type == 'CART01') {
                         $cartDiscount = $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
                         $campaignID = $item->id;
-                    }
-                    //﹝滿額﹞購物車滿N元，折X元
+                    } //﹝滿額﹞購物車滿N元，折X元
                     elseif ($item->campaign_type == 'CART02') {
                         $cartDiscount = $item->x_value; //打折後10000-1000
                         $campaignID = $item->id;
@@ -594,7 +531,7 @@ class APIOrderService
 
             //TapPay
             if ($isTapPay) {
-                $webData['prime'] = $order['taypay_prime'];
+                $webData['prime'] = $order['tappay_prime'];
                 $tapPay = $this->apiTapPayService->payByPrime($webData);
                 $tapPayResult = json_decode($tapPay, true);
 
@@ -606,19 +543,19 @@ class APIOrderService
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
-                        Log::channel('taypay_api_log')->error('597:taypay error!' . json_encode($tapPayResult));
+                        Log::channel('tappay_api_log')->error('597:tappay error!' . json_encode($tapPayResult));
                     }
                 } else {
                     $result['status'] = $tapPayResult['status'];
                     $result['payment_url'] = null;
-                    Log::channel('taypay_api_log')->error('602:taypay error!' . json_encode($tapPayResult));
+                    Log::channel('tappay_api_log')->error('602:tappay error!' . json_encode($tapPayResult));
                 }
             }
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::channel('taypay_api_log')->error('結帳成立訂單錯誤 ! ' . $e->getMessage());
+            Log::channel('tappay_api_log')->error('結帳成立訂單錯誤 ! ' . $e->getMessage());
             $result['status'] = 401;
             $result['payment_url'] = null;
         }
