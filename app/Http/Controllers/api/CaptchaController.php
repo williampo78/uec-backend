@@ -16,7 +16,7 @@ class CaptchaController extends Controller
         return response()->json([
             'status_code' => '200',
             'message' => 'created succeed',
-            'url' => app('captcha')->create('default', true)
+            'url' => app('captcha')->create('flat', true)
         ]);
     }
 
