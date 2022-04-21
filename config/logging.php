@@ -113,7 +113,7 @@ return [
         ],
         'tappay_api_log' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/api/taypay/tappay_api_log.log'),
+            'path' => storage_path('logs/api/tappay/tappay_api_log.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 365,
         ],
