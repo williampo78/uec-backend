@@ -25,10 +25,10 @@
                                                 <label class="control-label">供應商類別</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="searchForm.supplierTypeId" :reduce="option => option.id" :options="[
+                                                <v-select v-model="searchForm.supplierTypeId" :reduce="option => option.code" :options="[
                                                     @isset($supplierTypes)
                                                         @foreach ($supplierTypes as $supplierType)
-                                                            {label: '{{ $supplierType->name }}', id: '{{ $supplierType->id }}'},
+                                                            {label: '{{ $supplierType->name }}', code: '{{ $supplierType->id }}'},
                                                         @endforeach
                                                     @endisset
                                                 ]">
@@ -70,10 +70,10 @@
                                                 <label class="control-label">狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="searchForm.active" :reduce="option => option.id" :options="[
+                                                <v-select v-model="searchForm.active" :reduce="option => option.code" :options="[
                                                     @isset($activeOptions)
                                                         @foreach ($activeOptions as $key => $activeOption)
-                                                            {label: '{{ $activeOption }}', id: '{{ $key }}'},
+                                                            {label: '{{ $activeOption }}', code: '{{ $key }}'},
                                                         @endforeach
                                                     @endisset
                                                 ]">

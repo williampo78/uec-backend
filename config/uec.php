@@ -16,7 +16,7 @@ return [
      */
     'isTesting' => env('UEC_TEST', 'true'),
     'mailPrefix' => env('MAIL_PREFIX', '[ 電商測試 ]'),
-    'mailFrom'=>env('MAIL_FROM_ADDRESS'),
+    'mailFrom' => env('MAIL_FROM_ADDRESS'),
     'mailTo' => env('MAIL_TO_ADDRESS') ? array_filter(explode(',', env('MAIL_TO_ADDRESS'))) : [],
 
     // 版位類型
@@ -193,5 +193,13 @@ return [
         'ORDER_CANCELLED' => '訂單取消',
         'RETURNED' => '銷退',
         'ORDER_VOIDED' => '訂單作廢',
-    ]
+    ],
+
+    // 供應商合約狀態
+    'supplier_contract_status_code_options' => [
+        'CREATED' => '未啟動',
+        'PROCESSING' => '用印中',
+        'APPROVED' => '已合作',
+        'EXPIRED' => '已過期',
+    ],
 ];

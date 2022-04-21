@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Services\ContactService;
 use App\Services\SupplierService;
 use App\Services\SupplierTypeService;
-use Illuminate\Http\Request;
+use App\Services\LookupValuesVService;
 
 class SupplierController extends Controller
 {
     private $supplierService;
     private $supplierTypeService;
     private $contactService;
+    private $lookupValuesVService;
 
     /**
      * Display a listing of the resource.
@@ -21,11 +23,13 @@ class SupplierController extends Controller
     public function __construct(
         SupplierService $supplierService,
         SupplierTypeService $supplierTypeService,
-        ContactService $contactService
+        ContactService $contactService,
+        LookupValuesVService $lookupValuesVService
     ) {
         $this->supplierService = $supplierService;
         $this->supplierTypeService = $supplierTypeService;
         $this->contactService = $contactService;
+        $this->lookupValuesVService = $lookupValuesVService;
     }
 
     public function index(Request $request)
@@ -33,7 +37,9 @@ class SupplierController extends Controller
         $queryData = $request->query();
 
         $result = [];
+        // 供應商類別
         $result['supplierTypes'] = $this->supplierTypeService->getSupplierTypes();
+        // 狀態
         $result['activeOptions'] = config('uec.active_options');
         $result['suppliers'] = $this->supplierService->getTableList($queryData);
 
@@ -47,10 +53,24 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
+        // 供應商類別
+        $result['supplierTypes'] = $this->supplierTypeService->getSupplierTypes();
+        // 付款條件
+        $result['paymentTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'PAYMENT_TERMS',
+        ]);
+        // 稅別
+        $result['taxTypeOptions'] = config('uec.tax_type_options');
+        // 狀態
+        $result['activeOptions'] = config('uec.active_options');
+        // 合約狀態
+        $result['supplierContractStatusCodeOptions'] = config('uec.supplier_contract_status_code_options');
+        // 供應商合約條款
+        $result['supplierContractTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'SUPPLIER_CONTRACT_TERMS',
+        ]);
 
-        return view('backend.supplier.input', $result);
+        return view('backend.supplier.create', $result);
     }
 
     /**
@@ -61,12 +81,18 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->input();
-        $act = 'add';
-        $route_name = 'supplier';
-        $result = $this->supplierService->addSupplier($input);
+        $inputData = $request->input();
 
-        return view('backend.success', compact('route_name', 'act'));
+        if (!$this->supplierService->createSupplier($inputData)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        $result = [
+            'route_name' => 'supplier',
+            'act' => 'add',
+        ];
+
+        return view('backend.success', $result);
     }
 
     /**
