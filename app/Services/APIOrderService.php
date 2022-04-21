@@ -25,7 +25,8 @@ class APIOrderService
         APITapPayService $apiTapPayService,
         StockService $stockService,
         APIService $apiService
-    ) {
+    )
+    {
         $this->apiTapPayService = $apiTapPayService;
         $this->stockService = $stockService;
         $this->apiService = $apiService;
@@ -109,11 +110,11 @@ class APIOrderService
             $webData['store_no'] = $order['store_no'];
             $webData['created_by'] = $member_id;
             $webData['updated_by'] = $member_id;
-            $webData['utm_source'] = $order['utm']['source'];
-            $webData['utm_medium'] = $order['utm']['medium'];
-            $webData['utm_campaign'] = $order['utm']['campaign'];
-            $webData['utm_sales'] = $order['utm']['sales'];
-            $webData['utm_time'] = Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s');
+            $webData['utm_source'] = isset($order['utm']['source']) ? $order['utm']['source'] : null;
+            $webData['utm_medium'] = isset($order['utm']['medium']) ? $order['utm']['medium'] : null;
+            $webData['utm_campaign'] = isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null;
+            $webData['utm_sales'] = isset($order['utm']['sales']) ? $order['utm']['sales'] : null;
+            $webData['utm_time'] = isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null;
             $newOrder = Order::create($webData);
 
             //建立一筆金流單
@@ -432,8 +433,7 @@ class APIOrderService
                     if ($item->campaign_type == 'CART01') {
                         $cartDiscount = $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
                         $campaignID = $item->id;
-                    }
-                    //﹝滿額﹞購物車滿N元，折X元
+                    } //﹝滿額﹞購物車滿N元，折X元
                     elseif ($item->campaign_type == 'CART02') {
                         $cartDiscount = $item->x_value; //打折後10000-1000
                         $campaignID = $item->id;
