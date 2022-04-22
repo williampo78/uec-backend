@@ -4,32 +4,38 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Services\APICartServices;
-use App\Services\APIOrdersServices;
+use App\Services\APIOrderService;
 use App\Services\APIProductServices;
 use App\Services\APIService;
 use App\Services\APITapPayService;
 use App\Services\UniversalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CheckoutController extends Controller
 {
-
     private $universalService;
     private $apiService;
     private $apiProductServices;
     private $apiCartService;
-    private $apiOrdersService;
+    private $apiOrderService;
     private $apiTapPay;
 
-    public function __construct(UniversalService $universalService, APIService $apiService, APIProductServices $apiProductServices, APICartServices $apiCartService, APIOrdersServices $apiOrdersService, APITapPayService $apiTapPay)
-    {
+    public function __construct(
+        UniversalService $universalService,
+        APIService $apiService,
+        APIProductServices $apiProductServices,
+        APICartServices $apiCartService,
+        APIOrderService $apiOrderService,
+        APITapPayService $apiTapPay
+    ) {
         $this->universalService = $universalService;
         $this->apiService = $apiService;
         $this->apiProductServices = $apiProductServices;
         $this->apiCartService = $apiCartService;
-        $this->apiOrdersService = $apiOrdersService;
+        $this->apiOrderService = $apiOrderService;
         $this->apiTapPay = $apiTapPay;
     }
 
@@ -47,8 +53,8 @@ class CheckoutController extends Controller
                 "description" => $value,
             );
         }
-        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data]);
 
+        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data]);
     }
 
     /*
@@ -133,6 +139,7 @@ class CheckoutController extends Controller
             $err = '401';
             $data['total_price'] = "商品總價有誤";
         }
+
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
     }
 
@@ -143,87 +150,82 @@ class CheckoutController extends Controller
     {
         $err = null;
         $error_code = $this->apiService->getErrorCode();
+
+        switch ($request->invoice['carrier_type']) {
+            // 自然人憑證條碼
+            case '2':
+                $carrierNoRegexRule = '|regex:/^[A-Z]{2}[0-9]{14}$/';
+                break;
+
+            // 手機條碼
+            case '3':
+                $carrierNoRegexRule = '|regex:/^\/[0-9A-Z\.\-\+]{7}$/';
+                break;
+
+            default:
+                $carrierNoRegexRule = '';
+                break;
+        }
+
         $messages = [
-            'payment_method.required' => '付款方式不能為空',
-            'taypay_prime.required' => '未取得TapPay Prime',
-            'invoice.usage.required' => '請選擇發票開立方式',
-            'buyer.*.required' => '訂購人資訊未填寫完整',
-            'buyer.email.email' => 'Email格式錯誤',
-            'receiver.*.required' => '收件人資訊未填寫完整',
-            'receiver.email.email' => 'Email格式錯誤',
-            'total_price.required' => '商品總價不能為空',
-            'total_price.numeric' => '商品總價必須為數值',
-            'discount.required' => '滿額折抵不能為空',
-            'discount.numeric' => '滿額折抵必須為數值',
-            'point_discount.required' => '點數折抵不能為空',
-            'point_discount.numeric' => '點數折抵必須為數值',
-            'shipping_fee.required' => '運費不能為空',
-            'shipping_fee.numeric' => '運費必須為數值',
-            'payment.required' => '結帳金額不能為空',
-            'payment.numeric' => '結帳金額必須為數值',
-            'points.required' => '會員使用的點數不能為空',
-            'points.numeric' => '會員使用的點數必須為數值',
+            'string' => '資料型態必須為string',
+            'integer' => '資料型態必須為integer',
+            'numeric' => '資料型態必須為numeric',
+            'in' => '必須存在列表中的值: :values',
+            'required' => '不能為空',
+            'required_if' => '不能為空',
+            'max' => '不可大於:max個字元',
+            'regex' => '格式錯誤',
+            'exists' => '不存在輸入的值',
+            'email' => 'Email格式錯誤',
+            'date' => '日期格式錯誤',
         ];
 
         $v = Validator::make($request->all(), [
-            'payment_method' => 'required',
-            'taypay_prime' => 'required',
-            'invoice.usage' => 'required',
+            'payment_method' => 'required|string|in:TAPPAY_CREDITCARD,TAPPAY_LINEPAY',
+            'tappay_prime' => 'required|string',
+            'lgst_method' => 'required|string|in:HOME,FAMILY',
+            'store_no' => 'string|nullable|max:30',
+            'invoice.usage' => 'required|string|in:P,D,C',
+            'invoice.carrier_type' => 'required_if:invoice.usage,P|string|nullable|in:1,2,3',
+            'invoice.carrier_no' => 'required_if:invoice.carrier_type,2,3|string|nullable' . $carrierNoRegexRule,
+            'invoice.donated_code' => [
+                'required_if:invoice.usage,D',
+                'string',
+                'nullable',
+                Rule::exists('lookup_values_v', 'code')->where('active', 1)->where('type_code', 'DONATED_INSTITUTION'),
+            ],
+            'invoice.buyer_gui_number' => 'required_if:invoice.usage,C|string|nullable|regex:/^[0-9]{8}$/',
+            'invoice.buyer_title' => 'required_if:invoice.usage,C|string|nullable|max:100',
             'buyer.*' => 'required',
-            'buyer.email' => 'email',
+            'buyer.name' => 'string|max:50',
+            'buyer.mobile' => 'string|regex:/^09[0-9]{8}$/',
+            'buyer.email' => 'email:rfc,dns|string|max:50',
+            'buyer.zip' => 'string|max:10',
+            'buyer.city' => 'string|max:50',
+            'buyer.district' => 'string|max:50',
+            'buyer.address' => 'string|max:255',
             'receiver.*' => 'required',
-            'receiver.email' => 'email',
+            'receiver.name' => 'string|max:50',
+            'receiver.mobile' => 'string|regex:/^09[0-9]{8}$/',
+            'receiver.zip' => 'string|max:10',
+            'receiver.city' => 'string|max:50',
+            'receiver.district' => 'string|max:50',
+            'receiver.address' => 'string|max:255',
             'total_price' => 'required|numeric',
-            'discount' => 'required|numeric',
+            'cart_campaign_discount' => 'required|numeric',
             'point_discount' => 'required|numeric',
             'shipping_fee' => 'required|numeric',
-            'payment' => 'required|numeric',
-            'points' => 'required|numeric',
+            'points' => 'required|integer',
+            'utm.source' => 'string|nullable|max:100',
+            'utm.medium' => 'string|nullable|max:100',
+            'utm.campaign' => 'string|nullable|max:100',
+            'utm.sales' => 'string|nullable|max:100',
+            'utm.time' => 'nullable',
         ], $messages);
 
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
-        }
-
-        if ($request->invoice['usage'] == 'P') { //二聯式，個人電子發票
-            if ($request->invoice['carrier_type'] == 3) {
-                $errInvoice = [
-                    'carrier_no.required' => '手機條碼載具必填',
-                    'carrier_no.min' => '手機條碼載具最少8碼',
-                    'carrier_no.max' => '手機條碼載具最多8碼',
-                ];
-                $v_invocie = Validator::make($request->invoice, [
-                    'carrier_no' => 'required|min:8|max:8',
-                ], $errInvoice);
-            } else {
-                $errInvoice = [];
-                $v_invocie = Validator::make($request->invoice, [], $errInvoice);
-
-            }
-        } elseif ($request->invoice['usage'] == 'C') { //三聯式，公司戶電子發票
-            $errInvoice = [
-                'buyer_gui_number.required' => '統一編號必填',
-                'buyer_title.required' => '發票抬頭必填',
-            ];
-            $v_invocie = Validator::make($request->invoice, [
-                'buyer_gui_number' => 'required',
-                'buyer_title' => 'required',
-            ], $errInvoice);
-
-        } elseif ($request->invoice['usage'] == 'D') { //發票捐贈
-            $errInvoice = [
-                'donated_code.required' => '機構捐贈碼必填',
-            ];
-            $v_invocie = Validator::make($request->invoice, [
-                'donated_code' => 'required',
-            ], $errInvoice);
-
-        }
-
-        if ($v_invocie) {
-            if ($v_invocie->fails()) {
-                return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v_invocie->errors()]);
-            }
         }
 
         $member_id = Auth::guard('api')->user()->member_id;
@@ -234,7 +236,7 @@ class CheckoutController extends Controller
         $response = json_decode($response, true);
 
         /* test
-        $data = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift);
+        $data = $this->apiOrderService->setOrders($response['result'], $request, $campaign, $campaign_gift);
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
          */
         if ($response['status'] == '404') {
@@ -244,46 +246,54 @@ class CheckoutController extends Controller
         } else {
             //Step1, 檢核金額
             $data = [];
-            if ($request->points) { //使用會員點數折抵金額
+            //使用會員點數折抵金額
+            if ($request->points) {
                 $points = $request->points;
             } else {
                 $points = 0;
             }
-            if (abs($points) > $response['result']['point']['discountMax']) { //超過最大可點數折抵
+
+            //超過最大可點數折抵
+            if (abs($points) > $response['result']['point']['discountMax']) {
                 $status = false;
                 $err = '401';
                 $data['points'] = "點數折抵超出本次可抵用點數";
-            } elseif ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->discount) {
-                //檢核使用點數折抵後，運費是否要運費
+            } elseif ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->cart_campaign_discount) {
+                //檢核使用點數折抵後，是否要運費
                 if (abs($points) > 0) {
                     $points_discount = ($points * $response['result']['point']['exchangeRate']);
                 } else {
                     $points_discount = 0;
                 }
+
                 if (($response['result']['totalPrice'] - $response['result']['discount'] - abs($points_discount)) < $response['result']['feeInfo']['free_threshold']) {
                     $shipping_fee = $response['result']['feeInfo']['shipping_fee'];
                 } else {
                     $shipping_fee = 0;
                 }
+
                 if ($shipping_fee == $request->shipping_fee) {
                     //Stet2, 產生訂單
-                    $dataOrder = $this->apiOrdersService->setOrders($response['result'], $request, $campaign, $campaign_gift, $campaign_discount);
+                    $dataOrder = $this->apiOrderService->setOrders($response['result'], $request, $campaign, $campaign_gift, $campaign_discount);
                     switch ($dataOrder['status']) {
                         case 200:
                             $status = true;
                             $err = '200';
                             $data = $dataOrder['payment_url'];
                             break;
+
                         case 401:
                             $status = false;
                             $err = '401';
                             $data['message'] = "會員點數扣點異常，無法成立訂單";
                             break;
+
                         case 402:
                             $status = false;
                             $err = '401';
                             $data['message'] = "第三方支付異常，無法成立訂單";
                             break;
+
                         default:
                             $status = false;
                             $err = '401';
@@ -298,17 +308,21 @@ class CheckoutController extends Controller
             } else {
                 $status = false;
                 $err = '401';
+
                 if ($response['result']['totalPrice'] != $request->total_price) {
                     $data['total_price'] = "商品總價有誤";
                 }
-                if ($response['result']['discount'] != $request->discount) {
-                    $data['discount'] = "滿額折抵有誤";
+
+                if ($response['result']['discount'] != $request->cart_campaign_discount) {
+                    $data['cart_campaign_discount'] = "滿額折抵有誤";
                 }
+
                 if ($response['result']['shippingFee'] != $request->shipping_fee) {
                     $data['shipping_fee'] = "運費有誤";
                 }
             }
         }
+
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
     }
 
@@ -336,6 +350,7 @@ class CheckoutController extends Controller
     {
         $data['APP_ID'] = config('tappay.app_id');
         $data['APP_KEY'] = config('tappay.app_key');
+
         return $data;
     }
 }
