@@ -239,7 +239,7 @@
                         parent_id: '',
                         category_name: '',
                         old_category_name: '',
-                        content_type:'M',
+                        content_type:'P',
                         act: ''
                     },
                     disabled: {

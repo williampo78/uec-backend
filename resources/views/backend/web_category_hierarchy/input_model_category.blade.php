@@ -50,7 +50,7 @@
                         <div class="col-sm-2 "><label> 內容類型</label></div>
                         <div class="col-sm-4 ">
                             <select class="form-control js-select2" disabled name="content_type" id="content_type" v-model="addCategory.content_type">
-                                <option value="M" selected>指定賣場</option>
+                                <option value="P" selected>指定商品</option>
                             </select>
                         </div>
                     </div>
