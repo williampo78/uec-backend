@@ -34,6 +34,7 @@ class WebCategoryHierarchyService
             $insert['parent_id'] = $in['parent_id']; //父ID
             $insert['category_level'] = $in['category_level']; // 階級
             $insert['category_name'] = $in['category_name'];
+            $insert['content_type'] = $in['content_type'];
             $insert['agent_id'] = $agent_id;
             $insert['sort'] = $this->getSort($in);
             $insert['created_by'] = $user_id;
@@ -57,6 +58,7 @@ class WebCategoryHierarchyService
         try {
             DB::beginTransaction();
             $insert['category_name'] = $in['category_name'];
+            $insert['content_type'] = $in['content_type'];
             $insert['updated_by'] = $user_id;
             $insert['updated_at'] = $now;
             CategoryHierarchy::where('id', $in['id'])->update($insert);

@@ -239,6 +239,7 @@
                         parent_id: '',
                         category_name: '',
                         old_category_name: '',
+                        content_type:'M',
                         act: ''
                     },
                     disabled: {
@@ -373,6 +374,7 @@
                             category_level: this.addCategory.category_level,
                             parent_id: this.addCategory.parent_id,
                             category_name: this.addCategory.category_name,
+                            content_type:this.addCategory.category_level == this.UecConfig.web_category_hierarchy_levels ? this.addCategory.content_type : '' ,
                         });
                         switch (this.addCategory.category_level) {
                             case '1':
