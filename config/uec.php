@@ -18,7 +18,7 @@ return [
     'mailPrefix' => env('MAIL_PREFIX', '[ 電商測試 ]'),
     'mailFrom'=>env('MAIL_FROM_ADDRESS'),
     'mailTo' => env('MAIL_TO_ADDRESS') ? array_filter(explode(',', env('MAIL_TO_ADDRESS'))) : [],
-
+    'swithBackendUrl' => env('SWITCH_BACKEND_URL'),
     // 版位類型
     'ad_slot_type_option' => [
         'I' => '圖檔',
