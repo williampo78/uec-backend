@@ -130,7 +130,6 @@ class WebCategoryHierarchyService
         }
 
         if(isset($input['exclude_content_type']) && $input['exclude_content_type']){
-            dump($input['exclude_content_type']);
             $where .= " AND content_type <> " . $input['exclude_content_type'] ;
         }
         if($confi_levels == 2){
