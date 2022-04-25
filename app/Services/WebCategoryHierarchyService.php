@@ -120,22 +120,26 @@ class WebCategoryHierarchyService
     public function category_hierarchy_content($input = array())
     {
         $confi_levels = config('uec.web_category_hierarchy_levels');
-        $whereID = '';
+        $keyword = '';
         $where = '';
-
         if (isset($input['id']) && $input['id'] !== '') {
-            $whereID .= "AND id = " . $input['id'];
+            $where .= "AND id = " . $input['id'];
         }
         if (isset($input['active']) && $input['active'] !== '') {
-            $whereID .= " AND active = " . $input['active'];
+            $where .= " AND active = " . $input['active'];
+        }
+
+        if(isset($input['exclude_content_type']) && $input['exclude_content_type']){
+            dump($input['exclude_content_type']);
+            $where .= " AND content_type <> " . $input['exclude_content_type'] ;
         }
         if($confi_levels == 2){
             if (isset($input['keyword']) && $input['keyword'] !== '') {
-                $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name )  LIKE '%" . $input['keyword'] . "%' ";
+                $keyword .= "WHERE concat(level_one.category_name, '>', level_two.category_name )  LIKE '%" . $input['keyword'] . "%' ";
             }
         }else{
             if (isset($input['keyword']) && $input['keyword'] !== '') {
-                $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%" . $input['keyword'] . "%' ";
+                $keyword .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%" . $input['keyword'] . "%' ";
             }
         }
 
@@ -144,17 +148,16 @@ class WebCategoryHierarchyService
             $query = "SELECT level_two.id as id, level_two.meta_title , CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,
             level_two.content_type ,'' as meta_title ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
             FROM (SELECT * FROM web_category_hierarchy WHERE category_level = 1 ) level_one
-            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $whereID . ") level_two ON level_two.parent_id = level_one.id
-            " . $where . " ORDER BY level_one.category_name, level_two.category_name";
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $where . ") level_two ON level_two.parent_id = level_one.id
+            " . $keyword . " ORDER BY level_one.category_name, level_two.category_name";
         } else {
             $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active,
             level_three.content_type  ,level_three.meta_title ,level_three.meta_description,level_three.content_type ,level_three.meta_keywords
             FROM ( SELECT id , category_name FROM web_category_hierarchy WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ) level_two ON level_two.parent_id = level_one.id
-            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 " . $whereID . ") level_three ON level_three.parent_id = level_two.id
-            " . $where . " ORDER BY level_one.category_name, level_two.category_name , level_three.category_name";
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 " . $where . ") level_three ON level_three.parent_id = level_two.id
+            " . $keyword . " ORDER BY level_one.category_name, level_two.category_name , level_three.category_name";
         }
-
         return DB::select($query);
     }
     public function categoryProductsHierarchyId($id)
