@@ -22,7 +22,7 @@ class AdminAuthmiddleware
         if (!auth()->check()) {
             return redirect()->route('login.show');
         }
-        if(!session('supplier_menu')){
+        if(!session('dradvice_menu')){
             $userService = new UserService ;
             $userService->setMenuSession();
         }
