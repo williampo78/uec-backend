@@ -13,8 +13,8 @@
                 <a class="navbar-brand" href="/backend">健康力公司</a>
             </div>
             <ul class="nav navbar-nav">
-                @if (session()->has('menu'))
-                    @foreach (session('menu') as $menuItem)
+                @if (session()->has('dradvice_menu'))
+                    @foreach (session('dradvice_menu') as $menuItem)
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">
