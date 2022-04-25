@@ -108,7 +108,7 @@ class ProductsMallController extends Controller
         $result['products_item'] = $this->productsService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content(array("exclude_content_type"=>"'M'"));
         $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id); //前台分類
         $result['product_photos'] = $this->productsService->getProductsPhoto($id);
         $result['product_photos_count'] =  $result['product_photos']->count();
