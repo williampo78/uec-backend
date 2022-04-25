@@ -25,7 +25,7 @@
                                                 <label class="control-label">供應商類別</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="searchForm.supplierTypeId" :reduce="option => option.code" :options="[
+                                                <v-select v-model="form.supplierTypeId" :reduce="option => option.code" :options="[
                                                     @isset($supplierTypes)
                                                         @foreach ($supplierTypes as $supplierType)
                                                             {label: '{{ $supplierType->name }}', code: '{{ $supplierType->id }}'},
@@ -33,7 +33,7 @@
                                                     @endisset
                                                 ]">
                                                 </v-select>
-                                                <input type="hidden" v-model="searchForm.supplierTypeId" name="supplier_type_id" />
+                                                <input type="hidden" v-model="form.supplierTypeId" name="supplier_type_id" />
                                             </div>
                                         </div>
                                     </div>
@@ -45,7 +45,7 @@
                                             </div>
                                             <div class="col-sm-9">
                                                 <input type="text" class="form-control" name="display_number_or_name"
-                                                    v-model="searchForm.displayNumberOrName" placeholder="模糊查詢" />
+                                                    v-model="form.displayNumberOrName" placeholder="模糊查詢" />
                                             </div>
                                         </div>
                                     </div>
@@ -57,7 +57,7 @@
                                             </div>
                                             <div class="col-sm-9">
                                                 <input type="text" class="form-control" name="company_number"
-                                                    v-model="searchForm.companyNumber" />
+                                                    v-model="form.companyNumber" />
                                             </div>
                                         </div>
                                     </div>
@@ -70,7 +70,7 @@
                                                 <label class="control-label">狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="searchForm.active" :reduce="option => option.code" :options="[
+                                                <v-select v-model="form.active" :reduce="option => option.code" :options="[
                                                     @isset($activeOptions)
                                                         @foreach ($activeOptions as $key => $activeOption)
                                                             {label: '{{ $activeOption }}', code: '{{ $key }}'},
@@ -78,7 +78,7 @@
                                                     @endisset
                                                 ]">
                                                 </v-select>
-                                                <input type="hidden" v-model="searchForm.active" name="active" />
+                                                <input type="hidden" v-model="form.active" name="active" />
                                             </div>
                                         </div>
                                     </div>
@@ -187,7 +187,7 @@
         let vm = new Vue({
             el: "#app",
             data: {
-                searchForm: {
+                form: {
                     supplierTypeId: "",
                     displayNumberOrName: "",
                     companyNumber: "",
@@ -195,17 +195,17 @@
                 },
             },
             created() {
-                this.searchForm.supplierTypeId = "{{ request()->input('supplier_type_id') }}";
-                this.searchForm.displayNumberOrName = "{{ request()->input('display_number_or_name') }}";
-                this.searchForm.companyNumber = "{{ request()->input('company_number') }}";
-                this.searchForm.active = "{{ request()->input('active') }}";
+                this.form.supplierTypeId = "{{ request()->input('supplier_type_id') }}";
+                this.form.displayNumberOrName = "{{ request()->input('display_number_or_name') }}";
+                this.form.companyNumber = "{{ request()->input('company_number') }}";
+                this.form.active = "{{ request()->input('active') }}";
             },
             methods: {
                 resetForm() {
                     let self = this;
 
-                    Object.keys(self.searchForm).forEach(function(value, index) {
-                        self.searchForm[value] = "";
+                    Object.keys(self.form).forEach(function(value, index) {
+                        self.form[value] = "";
                     });
                 },
             },

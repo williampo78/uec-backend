@@ -76,7 +76,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/contact/ajax/del', [ContactController::class, 'ajax_del_contact']);
 
     // 供應商主檔管理
-    Route::post('/supplier/ajax', [SupplierController::class, 'ajax']);
+    Route::post('/supplier/display-number-exists', [SupplierController::class, 'displayNumberExists']);
     Route::resource('/supplier', SupplierController::class, ['names' => ['index' => 'supplier']]);
 
     // 商品主檔 - 基本資訊管理

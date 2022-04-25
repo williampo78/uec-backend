@@ -35,4 +35,20 @@ class Supplier extends Model
     {
         return $this->belongsTo(LookupValuesV::class, 'payment_term', 'code')->where('type_code', 'PAYMENT_TERMS');
     }
+
+    /**
+     * 建立與聯絡人的關聯
+     */
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class, 'table_id')->where('table_name', 'Supplier');
+    }
+
+    /**
+     * 建立與供應商合約的關聯
+     */
+    public function supplierContract()
+    {
+        return $this->hasOne(SupplierContract::class, 'supplier_id');
+    }
 }

@@ -121,13 +121,26 @@ class SupplierController extends Controller
      */
     public function edit($id)
     {
-        $result = [];
-        $result['Supplier'] = $this->supplierService->showSupplier($id);
-        $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        $result['Contact'] = $this->contactService->getContact('Supplier', $id);
-        $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
+        // 供應商類別
+        $result['supplierTypes'] = $this->supplierTypeService->getSupplierTypes();
+        // 付款條件
+        $result['paymentTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'PAYMENT_TERMS',
+        ]);
+        // 稅別
+        $result['taxTypeOptions'] = config('uec.tax_type_options');
+        // 狀態
+        $result['activeOptions'] = config('uec.active_options');
+        // 合約狀態
+        $result['supplierContractStatusCodeOptions'] = config('uec.supplier_contract_status_code_options');
+        // 供應商合約條款
+        $result['supplierContractTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'SUPPLIER_CONTRACT_TERMS',
+        ]);
+        // 供應商
+        $result['supplier'] = $this->supplierService->getSupplierById($id);
 
-        return view('backend.supplier.input', $result);
+        return view('backend.supplier.edit', $result);
     }
 
     /**
@@ -139,15 +152,19 @@ class SupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $contact_json = $request->input('contact_json');
-        $input = $request->input();
-        unset($input['contact_json']);
-        $this->contactService->createContact('tablename', $contact_json);
-        $result = $this->supplierService->updateSupplier($input, $id);
-        $act = 'upd';
-        $route_name = 'supplier';
+        $inputData = $request->input();
+        $inputData['id'] = $id;
 
-        return view('backend.success', compact('route_name', 'act'));
+        if (!$this->supplierService->updateSupplier($inputData)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        $result = [
+            'route_name' => 'supplier',
+            'act' => 'upd',
+        ];
+
+        return view('backend.success', $result);
     }
 
     /**
@@ -161,21 +178,16 @@ class SupplierController extends Controller
         //
     }
 
-    public function ajax(Request $request)
+    public function displayNumberExists(Request $request)
     {
-        $in = $request->input();
-        switch ($in['type']) {
-            case 'checkDisplayNumber':
-                $result = $this->supplierService->checkDisplayNumber($in['display_number']);
-                break;
-            default:
-                # code...
-                break;
+        if ($this->supplierService->displayNumberExists($request->display_number, $request->supplier_id)) {
+            return response()->json([
+                'result' => true,
+            ]);
         }
 
         return response()->json([
-            'req' => $request->input(),
-            'result' => $result,
+            'result' => false,
         ]);
     }
 }

@@ -1,6 +1,6 @@
 @extends('backend.master')
 
-@section('title', '新增供應商')
+@section('title', '編輯供應商')
 
 @section('content')
     <div id="app">
@@ -14,7 +14,7 @@
             <!-- 表頭名稱 -->
             <div class="row">
                 <div class="col-sm-12">
-                    <h1 class="page-header"><i class="fa-solid fa-plus"></i> 新增供應商</h1>
+                    <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 編輯供應商</h1>
                 </div>
             </div>
             <!-- /.row -->
@@ -23,7 +23,8 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">請輸入下列欄位資料</div>
                         <div class="panel-body">
-                            <form id="create-form" method="post" action="{{ route('supplier.store') }}" ref="createform">
+                            <form id="edit-form" method="post" action="{{ route('supplier.update', $supplier->id) }}">
+                                @method('PUT')
                                 @csrf
                                 <div class="row">
                                     <div class="col-sm-4">
@@ -217,6 +218,7 @@
                                 <h4>聯絡人</h4>
                                 <div class="well" v-for="(contact, index) in form.contacts" :key="index"
                                     style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
+                                    <input type="hidden" :name="`contacts[${index}][contact_id]`" :value="contact.contactId">
                                     <div class="row">
                                         <div class="col-sm-2">
                                             <label>姓名 <span style="color: red;">*</span></label>
@@ -264,6 +266,7 @@
                                 <hr style="border-top: 1px solid gray;">
 
                                 <h4>合約</h4>
+                                <input type="hidden" name="supplier_contract_id" :value="form.contract.supplierContractId">
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
@@ -376,6 +379,7 @@
             el: "#app",
             data: {
                 form: {
+                    supplierId: null,
                     supplierTypeId: null,
                     displayNumber: "",
                     companyNumber: "",
@@ -407,6 +411,7 @@
                         remark: "",
                     }],
                     contract: {
+                        supplierContractId: null,
                         dateFrom: "",
                         dateTo: "",
                         statusCode: "",
@@ -428,6 +433,7 @@
                 let activeOptions = @json($activeOptions);
                 let supplierContractStatusCodeOptions = @json($supplierContractStatusCodeOptions);
                 let supplierContractTerms = @json($supplierContractTerms);
+                let supplier = @json($supplier);
 
                 if (supplierTypes) {
                     supplierTypes.forEach(supplierType => {
@@ -488,8 +494,72 @@
                         });
                     });
                 }
+
+                if (supplier) {
+                    this.form.supplierId = supplier.id;
+                    this.form.supplierTypeId = supplier.supplier_type_id;
+                    this.form.displayNumber = supplier.display_number;
+                    this.form.companyNumber = supplier.company_number;
+                    this.form.shortName = supplier.short_name;
+                    this.form.name = supplier.name;
+                    this.form.paymentTerm = supplier.payment_term;
+                    this.form.contactName = supplier.contact_name;
+                    this.form.email = supplier.email;
+                    this.form.telephone = supplier.telephone;
+                    this.form.fax = supplier.fax;
+                    this.form.postalCode = supplier.postal_code;
+                    this.form.cellPhone = supplier.cell_phone;
+                    this.form.taxType = supplier.tax_type;
+                    this.form.address = supplier.address;
+                    this.form.address2 = supplier.address2;
+                    this.form.address3 = supplier.address3;
+                    this.form.address4 = supplier.address4;
+                    this.form.address5 = supplier.address5;
+                    this.form.active = supplier.active;
+                    this.form.bankName = supplier.bank_name;
+                    this.form.bankBranch = supplier.bank_branch;
+                    this.form.remark = supplier.remark;
+
+                    // 已存在的聯絡人
+                    if (Array.isArray(supplier.contacts) && supplier.contacts.length) {
+                        this.form.contacts = [];
+
+                        supplier.contacts.forEach(contact => {
+                            this.form.contacts.push({
+                                contactId: contact.id,
+                                name: contact.name,
+                                telephone: contact.telephone,
+                                cellPhone: contact.cell_phone,
+                                fax: contact.fax,
+                                email: contact.email,
+                                remark: contact.remark,
+                            });
+                        });
+                    }
+
+                    // 已存在的供應商合約
+                    if (supplier.supplier_contract) {
+                        this.form.contract.supplierContractId = supplier.supplier_contract.id;
+                        this.form.contract.dateFrom = supplier.supplier_contract.date_from;
+                        this.form.contract.dateTo = supplier.supplier_contract.date_to;
+                        this.form.contract.statusCode = supplier.supplier_contract.status_code;
+                        this.form.contract.billingCycle = supplier.supplier_contract.billing_cycle;
+
+                        if (Array.isArray(supplier.supplier_contract.supplier_contract_terms) && supplier.supplier_contract.supplier_contract_terms.length) {
+                            supplier.supplier_contract.supplier_contract_terms.forEach(supplier_contract_term => {
+                                let termIndex = this.form.contract.terms.findIndex(term => term.termCode == supplier_contract_term.term_code);
+
+                                if (termIndex !== -1) {
+                                    this.form.contract.terms[termIndex].termValue = supplier_contract_term.term_value;
+                                }
+                            });
+                        }
+                    }
+                }
             },
             mounted() {
+                let self = this;
+
                 if (this.$refs.errorMessage) {
                     alert(this.$refs.errorMessage.innerText.trim());
                 }
@@ -511,7 +581,7 @@
                 });
 
                 // 驗證表單
-                $("#create-form").validate({
+                $("#edit-form").validate({
                     // debug: true,
                     submitHandler: function(form) {
                         $('#btn-save').prop('disabled', true);
@@ -533,7 +603,9 @@
                                         type: "post",
                                         dataType: "json",
                                         cache: false,
-                                        data: {},
+                                        data: {
+                                            supplier_id: self.form.supplierId,
+                                        },
                                         dataFilter: function(response) {
                                             if (response) {
                                                 let data = JSON.parse(response);
@@ -617,14 +689,16 @@
             },
             methods: {
                 addContact() {
-                    this.form.contacts.push({
-                        name: "",
-                        telephone: "",
-                        cellPhone: "",
-                        fax: "",
-                        email: "",
-                        remark: "",
-                    });
+                    this.form.contacts.push(
+                        {
+                            name: "",
+                            telephone: "",
+                            cellPhone: "",
+                            fax: "",
+                            email: "",
+                            remark: "",
+                        }
+                    );
                 },
                 deleteContact(index) {
                     if (confirm('確定要刪除嗎？')) {
@@ -632,8 +706,7 @@
                     }
                 },
                 submitForm() {
-                    // this.$refs.createform.submit();
-                    $("#create-form").submit();
+                    $("#edit-form").submit();
                 },
             }
         });
