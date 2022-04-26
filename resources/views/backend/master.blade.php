@@ -71,15 +71,16 @@
         var UecConfig = @json(Config('uec'));
 
         $(function() {
-            @if (session()->has('inDradviceUse') && session('inDradviceUse') == 1)
             //檢查使用平台的權限機制　如果沒有使用權限，則回另一個平台
+            var inDradviceUse = @json(session('inDradviceUse')) ;
             var swithBackendUrl = @json(config('uec.swithBackendUrl')) ; //另一個平台的 url
             function checkingBackendUse(){
                 alert('沒有權限，請聯絡管理人員');
                 return location.href=swithBackendUrl ;
             }
-            checkingBackendUse();
-            @endif
+            if(inDradviceUse == 0){
+                checkingBackendUse();
+            }
 
             $('#table_list').DataTable({
                 "aaSorting": [],
