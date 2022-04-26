@@ -4125,19 +4125,17 @@ jQuery.validator.addMethod("notRepeating", function (value, element, params) {
   return matches.length == 0;
 }, function (params, element) {
   return "\u5DF2\u8DDF\u5176\u4ED6\u8F38\u5165\u7684\u6B04\u4F4D\u91CD\u8907";
-});
-jQuery.validator.addMethod("isTWCompanyNumber", function (value, element, obj) {
-  var regexp = /^[0-9]{8}$/;
-  return regexp.test(obj.number);
-}, function (params, element) {
-  return "\u7D71\u4E00\u7DE8\u865F\u5FC5\u9808\u70BA8\u78BC\u3001\u53EA\u80FD\u8F38\u5165\u6578\u5B57";
-});
-jQuery.validator.addMethod("isEnglishNumber", function (value, element, obj) {
-  var regexp = /^[A-Za-z0-9]+$/;
-  return regexp.test(obj.number);
-}, function (params, element) {
-  return "\u53EA\u80FD\u8F38\u5165\u82F1\u6587\u4EE5\u53CA\u6578\u5B57";
-});
+}); // 驗證統一編號格式
+
+jQuery.validator.addMethod("isGUINumber", function (value, element, params) {
+  var regex = /^[0-9]{8}$/;
+  return regex.test(value);
+}, "統一編號必須為8個數字"); // 驗證英文、數字格式
+
+jQuery.validator.addMethod("isAlphaNumeric", function (value, element, params) {
+  var regex = /^[A-Za-z0-9]+$/;
+  return regex.test(value);
+}, "只能輸入英文及數字");
 jQuery.validator.addMethod("notChinese", function (value, element, obj) {
   var regexp = /.*[\u4e00-\u9fa5]+.*$/;
 
@@ -39272,7 +39270,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n*[data-v-74a8f747]  {\n    --vs-search-input-placeholder-color: #999;\n\n    --vs-font-size: 1.4rem;\n    --vs-line-height: 1.6;\n\n    --vs-dropdown-option-padding: 6px 12px;\n}\n.v-select .vs__dropdown-toggle[data-v-74a8f747] {\n    background: #fff;\n    padding-left: 3px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n*[data-v-74a8f747]  {\r\n    --vs-search-input-placeholder-color: #999;\r\n\r\n    --vs-font-size: 1.4rem;\r\n    --vs-line-height: 1.6;\r\n\r\n    --vs-dropdown-option-padding: 6px 12px;\n}\n.v-select .vs__dropdown-toggle[data-v-74a8f747] {\r\n    background: #fff;\r\n    padding-left: 3px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

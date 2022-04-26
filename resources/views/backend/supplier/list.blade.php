@@ -25,13 +25,7 @@
                                                 <label class="control-label">供應商類別</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="form.supplierTypeId" :reduce="option => option.code" :options="[
-                                                    @isset($supplierTypes)
-                                                        @foreach ($supplierTypes as $supplierType)
-                                                            {label: '{{ $supplierType->name }}', code: '{{ $supplierType->id }}'},
-                                                        @endforeach
-                                                    @endisset
-                                                ]">
+                                                <v-select v-model="form.supplierTypeId" :reduce="option => option.code" :options="supplierTypes">
                                                 </v-select>
                                                 <input type="hidden" v-model="form.supplierTypeId" name="supplier_type_id" />
                                             </div>
@@ -70,13 +64,7 @@
                                                 <label class="control-label">狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="form.active" :reduce="option => option.code" :options="[
-                                                    @isset($activeOptions)
-                                                        @foreach ($activeOptions as $key => $activeOption)
-                                                            {label: '{{ $activeOption }}', code: '{{ $key }}'},
-                                                        @endforeach
-                                                    @endisset
-                                                ]">
+                                                <v-select v-model="form.active" :reduce="option => option.code" :options="activeOptions">
                                                 </v-select>
                                                 <input type="hidden" v-model="form.active" name="active" />
                                             </div>
@@ -188,17 +176,42 @@
             el: "#app",
             data: {
                 form: {
-                    supplierTypeId: "",
+                    supplierTypeId: null,
                     displayNumberOrName: "",
                     companyNumber: "",
-                    active: "",
+                    active: null,
                 },
+                supplierTypes: [],
+                activeOptions: [],
             },
             created() {
+                let supplierTypes = @json($supplierTypes);
+                let activeOptions = @json($activeOptions);
+
+                if (supplierTypes) {
+                    supplierTypes.forEach(supplierType => {
+                        this.supplierTypes.push({
+                            label: supplierType.name,
+                            code: supplierType.id,
+                        });
+                    });
+                }
+
+                if (activeOptions) {
+                    Object.entries(activeOptions).forEach(([key, activeOption]) => {
+                        this.activeOptions.push({
+                            label: activeOption,
+                            code: parseInt(key),
+                        });
+                    });
+                }
+
                 this.form.supplierTypeId = "{{ request()->input('supplier_type_id') }}";
+                this.form.supplierTypeId = this.form.supplierTypeId ? parseInt(this.form.supplierTypeId) : null;
                 this.form.displayNumberOrName = "{{ request()->input('display_number_or_name') }}";
                 this.form.companyNumber = "{{ request()->input('company_number') }}";
                 this.form.active = "{{ request()->input('active') }}";
+                this.form.active = this.form.active ? parseInt(this.form.active) : null;
             },
             methods: {
                 resetForm() {

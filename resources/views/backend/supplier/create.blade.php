@@ -23,28 +23,31 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">請輸入下列欄位資料</div>
                         <div class="panel-body">
-                            <form id="create-form" method="post" action="{{ route('supplier.store') }}" ref="createform">
+                            <form id="create-form" method="post" action="{{ route('supplier.store') }}">
                                 @csrf
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="supplier_type">供應商類別 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="supplier_type">供應商類別 <span style="color: red;">*</span></label>
                                             <v-select v-model="form.supplierTypeId" :reduce="option => option.code"
-                                                :options="supplierTypes"></v-select>
+                                                :options="supplierTypes">
+                                                <template #search="{attributes, events}">
+                                                    <input class="vs__search" :required="!form.supplierTypeId" v-bind="attributes" v-on="events">
+                                                </template>
+                                            </v-select>
                                             <input type="hidden" v-model="form.supplierTypeId" name="supplier_type_id">
-                                            <span class="help-block"></span>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="display_number">供應商編號 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="display_number">供應商編號 <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="display_number"
                                                 id="display_number" v-model="form.displayNumber">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="company_number">統一編號 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="company_number">統一編號 <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="company_number"
                                                 id="company_number" v-model="form.companyNumber">
                                         </div>
@@ -54,21 +57,21 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="short_name">簡稱 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="short_name">簡稱 <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="short_name" id="short_name"
                                                 v-model="form.shortName">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="name">完整名稱 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="name">完整名稱 <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control" name="name" id="name"
                                                 v-model="form.name">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="payment_term">付款條件</label>
+                                            <label class="control-label" for="payment_term">付款條件</label>
                                             <v-select v-model="form.paymentTerm" :reduce="option => option.code"
                                                 :options="paymentTerms"></v-select>
                                             <input type="hidden" v-model="form.paymentTerm" name="payment_term">
@@ -79,21 +82,21 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="contact_name">負責人名稱</label>
+                                            <label class="control-label" for="contact_name">負責人名稱</label>
                                             <input type="text" class="form-control" name="contact_name" id="contact_name"
                                                 v-model="form.contactName">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="email">電子信箱</label>
+                                            <label class="control-label" for="email">電子信箱</label>
                                             <input type="text" class="form-control" name="email" id="email"
                                                 v-model="form.email">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="telephone">聯絡電話</label>
+                                            <label class="control-label" for="telephone">聯絡電話</label>
                                             <input type="text" class="form-control" name="telephone" id="telephone"
                                                 v-model="form.telephone">
                                         </div>
@@ -103,21 +106,21 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="fax">傳真號碼</label>
+                                            <label class="control-label" for="fax">傳真號碼</label>
                                             <input type="text" class="form-control" name="fax" id="fax"
                                                 v-model="form.fax">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="postal_code">郵遞區號</label>
+                                            <label class="control-label" for="postal_code">郵遞區號</label>
                                             <input type="text" class="form-control" name="postal_code" id="postal_code"
                                                 v-model="form.postalCode">
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="cell_phone">手機號碼</label>
+                                            <label class="control-label" for="cell_phone">手機號碼</label>
                                             <input type="text" class="form-control" name="cell_phone" id="cell_phone"
                                                 v-model="form.cellPhone">
                                         </div>
@@ -127,7 +130,7 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="tax_type">稅別</label>
+                                            <label class="control-label" for="tax_type">稅別</label>
                                             <v-select v-model="form.taxType" :reduce="option => option.code"
                                                 :options="taxTypeOptions" :clearable="false"></v-select>
                                             <input type="hidden" v-model="form.taxType" name="tax_type">
@@ -138,14 +141,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="address">地址</label>
+                                            <label class="control-label" for="address">地址</label>
                                             <input type="text" class="form-control" name="address" id="address"
                                                 v-model="form.address">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="address2">地址2</label>
+                                            <label class="control-label" for="address2">地址2</label>
                                             <input type="text" class="form-control" name="address2" id="address2"
                                                 v-model="form.address2">
                                         </div>
@@ -155,14 +158,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="address3">地址3</label>
+                                            <label class="control-label" for="address3">地址3</label>
                                             <input type="text" class="form-control" name="address3" id="address3"
                                                 v-model="form.address3">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="address4">地址4</label>
+                                            <label class="control-label" for="address4">地址4</label>
                                             <input type="text" class="form-control" name="address4" id="address4"
                                                 v-model="form.address4">
                                         </div>
@@ -172,14 +175,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="address5">地址5</label>
+                                            <label class="control-label" for="address5">地址5</label>
                                             <input type="text" class="form-control" name="address5" id="address5"
                                                 v-model="form.address5">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="active">狀態</label>
+                                            <label class="control-label" for="active">狀態</label>
                                             <v-select v-model="form.active" :reduce="option => option.code"
                                                 :options="activeOptions" :clearable="false"></v-select>
                                             <input type="hidden" v-model="form.active" name="active">
@@ -190,14 +193,14 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="bank_name">收款銀行</label>
+                                            <label class="control-label" for="bank_name">收款銀行</label>
                                             <input type="text" class="form-control" name="bank_name" id="bank_name"
                                                 v-model="form.bankName">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="bank_branch">支行名稱</label>
+                                            <label class="control-label" for="bank_branch">支行名稱</label>
                                             <input type="text" class="form-control" name="bank_branch" id="bank_branch"
                                                 v-model="form.bankBranch">
                                         </div>
@@ -207,7 +210,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label for="remark">備註</label>
+                                            <label class="control-label" for="remark">備註</label>
                                             <textarea class="form-control" rows="3" name="remark" id="remark" v-model="form.remark"></textarea>
                                         </div>
                                     </div>
@@ -215,38 +218,51 @@
                                 <hr style="border-top: 1px solid gray;">
 
                                 <h4>聯絡人</h4>
-                                <div class="well" v-for="(contact, index) in form.contacts" :key="index"
+                                <div class="well" v-for="(contact, index) in form.contacts"
+                                    :key="index"
                                     style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
                                     <div class="row">
                                         <div class="col-sm-2">
-                                            <label>姓名 <span style="color: red;">*</span></label>
-                                            <input type="text" class="form-control" v-model="contact.name"
-                                                :name="`contacts[${index}][name]`">
+                                            <div class="form-group">
+                                                <label class="control-label">姓名 <span style="color: red;">*</span></label>
+                                                <input type="text" class="form-control contact-name" v-model="contact.name"
+                                                    :name="`contacts[${index}][name]`">
+                                            </div>
                                         </div>
                                         <div class="col-sm-2">
-                                            <label>電話 <span style="color: red;">*</span></label>
-                                            <input type="text" class="form-control" v-model="contact.telephone"
-                                                :name="`contacts[${index}][telephone]`">
+                                            <div class="form-group">
+                                                <label class="control-label">電話 <span style="color: red;">*</span></label>
+                                                <input type="text" class="form-control contact-telephone"
+                                                    v-model="contact.telephone" :name="`contacts[${index}][telephone]`">
+                                            </div>
                                         </div>
                                         <div class="col-sm-2">
-                                            <label>手機 <span style="color: red;">*</span></label>
-                                            <input type="text" class="form-control" v-model="contact.cellPhone"
-                                                :name="`contacts[${index}][cell_phone]`">
+                                            <div class="form-group">
+                                                <label class="control-label">手機 <span style="color: red;">*</span></label>
+                                                <input type="text" class="form-control contact-cellPhone"
+                                                    v-model="contact.cellPhone" :name="`contacts[${index}][cell_phone]`">
+                                            </div>
                                         </div>
                                         <div class="col-sm-2">
-                                            <label>傳真 <span style="color: red;">*</span></label>
-                                            <input type="text" class="form-control" v-model="contact.fax"
-                                                :name="`contacts[${index}][fax]`">
+                                            <div class="form-group">
+                                                <label class="control-label">傳真 <span style="color: red;">*</span></label>
+                                                <input type="text" class="form-control contact-fax" v-model="contact.fax"
+                                                    :name="`contacts[${index}][fax]`">
+                                            </div>
                                         </div>
                                         <div class="col-sm-2">
-                                            <label>信箱 <span style="color: red;">*</span></label>
-                                            <input type="text" class="form-control" v-model="contact.email"
-                                                :name="`contacts[${index}][email]`">
+                                            <div class="form-group">
+                                                <label class="control-label">信箱 <span style="color: red;">*</span></label>
+                                                <input type="text" class="form-control contact-email"
+                                                    v-model="contact.email" :name="`contacts[${index}][email]`">
+                                            </div>
                                         </div>
                                         <div class="col-sm-2">
-                                            <label>備註 <span style="color: red;">*</span></label>
-                                            <input type="text" class="form-control" v-model="contact.remark"
-                                                :name="`contacts[${index}][remark]`">
+                                            <div class="form-group">
+                                                <label class="control-label">備註 <span style="color: red;">*</span></label>
+                                                <input type="text" class="form-control contact-remark"
+                                                    v-model="contact.remark" :name="`contacts[${index}][remark]`">
+                                            </div>
                                         </div>
                                     </div>
                                     <br>
@@ -267,7 +283,7 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="date_from">合約起日 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="date_from">合約起日 <span style="color: red;">*</span></label>
                                             <div class="input-group" id="date_from_flatpickr">
                                                 <input type="text" class="form-control" name="date_from" id="date_from"
                                                     autocomplete="off" data-input v-model="form.contract.dateFrom">
@@ -281,7 +297,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="date_to">合約訖日 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="date_to">合約訖日 <span style="color: red;">*</span></label>
                                             <div class="input-group" id="date_to_flatpickr">
                                                 <input type="text" class="form-control" name="date_to" id="date_to"
                                                     autocomplete="off" data-input v-model="form.contract.dateTo">
@@ -295,9 +311,13 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for="status_code">合約狀態 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="status_code">合約狀態 <span style="color: red;">*</span></label>
                                             <v-select v-model="form.contract.statusCode" :reduce="option => option.code"
-                                                :options="supplierContractStatusCodeOptions" :clearable="false"></v-select>
+                                                :options="supplierContractStatusCodeOptions">
+                                                <template #search="{attributes, events}">
+                                                    <input class="vs__search" :required="!form.contract.statusCode" v-bind="attributes" v-on="events">
+                                                </template>
+                                            </v-select>
                                             <input type="hidden" v-model="form.contract.statusCode" name="status_code">
                                         </div>
                                     </div>
@@ -333,7 +353,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(supplierContractTerm, index) in supplierContractTerms" :key="index">
+                                        <tr v-for="(supplierContractTerm, index) in supplierContractTerms"
+                                            :key="index">
                                             <td>@{{ index + 1 }}</td>
                                             <td>@{{ supplierContractTerm.description }}</td>
                                             <td>
@@ -551,40 +572,29 @@
                                     return $('#display_number').val();
                                 },
                             },
-                            isEnglishNumber: {
-                                param: function() {
-                                    let obj = {
-                                        number: $('#display_number').val(),
-                                    }
-                                    return obj;
-                                },
-                                depends: function(element) {
-                                    return true;
-                                },
-                            }
+                            isAlphaNumeric: true,
                         },
                         company_number: {
                             required: true,
-                            isTWCompanyNumber: {
-                                param: function() {
-                                    let obj = {
-                                        number: $('#company_number').val(),
-                                    }
-                                    return obj;
-                                },
-                                depends: function(element) {
-                                    return true;
-                                },
-                            },
+                            isGUINumber: true,
                         },
                         short_name: {
                             required: true,
-                        }
+                        },
+                        date_from: {
+                            required: true,
+                        },
+                        date_to: {
+                            required: true,
+                        },
+                        billing_cycle: {
+                            required: true,
+                        },
+                        status_code: {
+                            required: true,
+                        },
                     },
                     messages: {
-                        supplier_type_id: {
-                            required: "請選擇類別",
-                        },
                         display_number: {
                             remote: '供應商編號已存在',
                         }
@@ -606,9 +616,6 @@
                     },
                     highlight: function(element, errorClass, validClass) {
                         $(element).closest(".form-group").addClass("has-error");
-                    },
-                    unhighlight: function(element, errorClass, validClass) {
-                        $(element).closest(".form-group").removeClass("has-error");
                     },
                     success: function(label, element) {
                         $(element).closest(".form-group").removeClass("has-error");
@@ -632,7 +639,42 @@
                     }
                 },
                 submitForm() {
-                    // this.$refs.createform.submit();
+                    $(`.contact-name`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    });
+
+                    $(`.contact-telephone`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    });
+
+                    $(`.contact-cellPhone`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    });
+
+                    $(`.contact-fax`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    });
+
+                    $(`.contact-email`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    });
+
+                    $(`.contact-remark`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                        });
+                    });
+
                     $("#create-form").submit();
                 },
             }

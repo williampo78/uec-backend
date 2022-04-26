@@ -165,27 +165,28 @@ jQuery.validator.addMethod(
     }
 );
 
+// 驗證統一編號格式
 jQuery.validator.addMethod(
-    "isTWCompanyNumber",
-    function (value, element, obj) {
-        var regexp = /^[0-9]{8}$/;
-        return regexp.test(obj.number);
+    "isGUINumber",
+    function (value, element, params) {
+        let regex = /^[0-9]{8}$/;
+
+        return regex.test(value);
     },
-    function (params, element) {
-        return `統一編號必須為8碼、只能輸入數字`;
-    }
+    "統一編號必須為8個數字"
 );
 
+// 驗證英文、數字格式
 jQuery.validator.addMethod(
-    "isEnglishNumber",
-    function (value, element, obj) {
-        var regexp = /^[A-Za-z0-9]+$/;
-        return regexp.test(obj.number);
+    "isAlphaNumeric",
+    function (value, element, params) {
+        let regex = /^[A-Za-z0-9]+$/;
+
+        return regex.test(value);
     },
-    function (params, element) {
-        return `只能輸入英文以及數字`;
-    }
+    "只能輸入英文及數字"
 );
+
 jQuery.validator.addMethod(
     "notChinese",
     function (value, element, obj) {

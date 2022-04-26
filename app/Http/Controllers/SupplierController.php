@@ -43,7 +43,7 @@ class SupplierController extends Controller
         $result['activeOptions'] = config('uec.active_options');
         $result['suppliers'] = $this->supplierService->getTableList($queryData);
 
-        return view('backend.supplier.index', $result);
+        return view('backend.supplier.list', $result);
     }
 
     /**
