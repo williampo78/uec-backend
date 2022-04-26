@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/editor.css') }}">
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
-
     <style>
         [v-cloak] {
             display: none;
@@ -53,7 +52,8 @@
 
     <script src="{{ mix('js/app.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
-    <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}"></script>
+    <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}">
+    </script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/collapse.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/transition.js') }}"></script>
     <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
@@ -71,6 +71,16 @@
         var UecConfig = @json(Config('uec'));
 
         $(function() {
+            @if (session()->has('inDradviceUse') && session('inDradviceUse') == 1)
+            //檢查使用平台的權限機制　如果沒有使用權限，則回另一個平台
+            var swithBackendUrl = @json(config('uec.swithBackendUrl')) ; //另一個平台的 url
+            function checkingBackendUse(){
+                alert('沒有權限，請聯絡管理人員');
+                return location.href=swithBackendUrl ;
+            }
+            checkingBackendUse();
+            @endif
+
             $('#table_list').DataTable({
                 "aaSorting": [],
             });

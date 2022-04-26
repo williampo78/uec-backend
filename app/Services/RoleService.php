@@ -78,20 +78,22 @@ class RoleService
         ->where('user_id' ,$user_id)
         ->leftJoin('roles','roles.id', '=', 'user_roles.role_id')
         ->get();
-        $inDradviceToSupplier = 0;
-        $inSupplierToDradvice = 0;
+        $inSupplierUse = 0;
+        $inDradviceUse = 0;
         foreach($UserRole as $obj){
+            //使用供應商的權限
             if ($obj->is_for_supplier == 1 || $obj->is_for_supplier == 2) {
-                $inDradviceToSupplier = 1;
+                $inSupplierUse = 1;
 
             }
+            //使用健康力的權限
             if ($obj->is_for_supplier == 0) {
-                $inSupplierToDradvice = 1;
+                $inDradviceUse = 1;
             }
         }
         session([
-            'inDradviceToSupplier' => $inDradviceToSupplier,
-            'inSupplierToDradvice' => $inSupplierToDradvice]);
+            'inSupplierUse' => $inSupplierUse,
+            'inDradviceUse' => $inDradviceUse]);
     }
     public function getDisplayRoles()
     {

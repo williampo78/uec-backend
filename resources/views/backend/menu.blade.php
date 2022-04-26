@@ -49,7 +49,7 @@
                                 <i class="fa-solid fa-user fa-fw"></i> 個人資料
                             </a>
                         </li>
-                        @if (session()->has('inDradviceToSupplier') && session('inDradviceToSupplier') == 1)
+                        @if (session()->has('inSupplierUse') && session('inSupplierUse') == 1)
                             <li>
                                 <a href="{{ config('uec.swithBackendUrl') }}">
                                     <i class="fa-solid fa-cube fa-fw"></i> 供應商後台
