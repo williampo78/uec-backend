@@ -103,14 +103,26 @@ class SupplierController extends Controller
      */
     public function show($id)
     {
-        $result = [];
-        $result['Supplier'] = $this->supplierService->showSupplier($id);
-        $result['SupplierType'] = $this->supplierTypeService->getSupplierType();
-        $result['Contact'] = $this->contactService->getContact('Supplier', $id);
-        $result['getPaymentTerms'] = $this->supplierService->getPaymentTerms();
-        $result['readonly'] = 1;
+        // 供應商類別
+        $result['supplierTypes'] = $this->supplierTypeService->getSupplierTypes();
+        // 付款條件
+        $result['paymentTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'PAYMENT_TERMS',
+        ]);
+        // 稅別
+        $result['taxTypeOptions'] = config('uec.tax_type_options');
+        // 狀態
+        $result['activeOptions'] = config('uec.active_options');
+        // 合約狀態
+        $result['supplierContractStatusCodeOptions'] = config('uec.supplier_contract_status_code_options');
+        // 供應商合約條款
+        $result['supplierContractTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'SUPPLIER_CONTRACT_TERMS',
+        ]);
+        // 供應商
+        $result['supplier'] = $this->supplierService->getSupplierById($id);
 
-        return view('backend.supplier.input', $result);
+        return view('backend.supplier.show', $result);
     }
 
     /**
