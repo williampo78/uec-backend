@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 use App\Services\RoleService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 use Illuminate\Http\Request;
@@ -21,7 +22,10 @@ class AdminAuthmiddleware
         if (!auth()->check()) {
             return redirect()->route('login.show');
         }
-
+        if(!session('dradvice_menu')){
+            $userService = new UserService ;
+            $userService->setMenuSession();
+        }
         $roleService = new RoleService;
         //顯示頁面權限，無權限將被導至首頁
         $roleAuth = $roleService->getDisplayRoles();

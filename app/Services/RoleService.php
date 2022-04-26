@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -63,10 +64,37 @@ class RoleService
                 $role_data[$role->code] = $role;
             }
         }
-
         session(['roles' => $role_data]);
     }
+    /**
+     * setUrlSsoSwitchBtn function
+     * 取得切換平台開關的權限
+     * @return session
+     */
+    public function setUrlSsoSwitchBtn()
+    {
+        $user_id = Auth::user()->id;
+        $UserRole = UserRole::select('roles.is_for_supplier')
+        ->where('user_id' ,$user_id)
+        ->leftJoin('roles','roles.id', '=', 'user_roles.role_id')
+        ->get();
+        $inSupplierUse = 0;
+        $inDradviceUse = 0;
+        foreach($UserRole as $obj){
+            //使用供應商的權限
+            if ($obj->is_for_supplier == 1 || $obj->is_for_supplier == 2) {
+                $inSupplierUse = 1;
 
+            }
+            //使用健康力的權限
+            if ($obj->is_for_supplier == 0) {
+                $inDradviceUse = 1;
+            }
+        }
+        session([
+            'inSupplierUse' => $inSupplierUse,
+            'inDradviceUse' => $inDradviceUse]);
+    }
     public function getDisplayRoles()
     {
         $code = explode('.', Route::currentRouteName())[0];
@@ -117,7 +145,6 @@ class RoleService
     {
         $code = explode('.', Route::currentRouteName())[0];
         $roles = session('roles');
-
         //預設0 , DB未建置資料皆判斷為無權限
         $data = [
             'auth_query' => 0,

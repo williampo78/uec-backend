@@ -219,7 +219,6 @@ class UserService
                 ];
             }
         });
-
-        session(['menu' => $menu]);
+        session(['dradvice_menu' => $menu]);
     }
 }

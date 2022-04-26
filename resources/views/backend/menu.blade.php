@@ -13,8 +13,8 @@
                 <a class="navbar-brand" href="/backend">健康力公司</a>
             </div>
             <ul class="nav navbar-nav">
-                @if (session()->has('menu'))
-                    @foreach (session('menu') as $menuItem)
+                @if (session()->has('dradvice_menu'))
+                    @foreach (session('dradvice_menu') as $menuItem)
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">
@@ -49,6 +49,13 @@
                                 <i class="fa-solid fa-user fa-fw"></i> 個人資料
                             </a>
                         </li>
+                        @if (session()->has('inSupplierUse') && session('inSupplierUse') == 1)
+                            <li>
+                                <a href="{{ config('uec.swithBackendUrl') }}">
+                                    <i class="fa-solid fa-cube fa-fw"></i> 供應商後台
+                                </a>
+                            </li>
+                        @endif
                         <li class="divider"></li>
                         <li>
                             <a href="{{ route('logout') }}">
