@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use App\Models\Role;
 use App\Models\Permission;
 use App\Models\PermissionDetail;
+use App\Models\Role;
+use App\Models\RolePermissionDetail;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\RolePermissionDetail;
-use Illuminate\Support\Facades\Auth;
 
 class RolesPermissionService
 {
@@ -89,21 +89,21 @@ class RolesPermissionService
 
             //不管新增或編輯先把原有的權限都刪除
             RolePermissionDetail::where('role_id', '=', $role_id)->delete();
+            if (!empty($inputdata['auth_index'])) {
+                foreach ($inputdata['auth_index'] as $k1 => $v1) { //有勾選才會寫入細項權限
+                    $detailData['role_id'] = $role_id;
+                    $detailData['permission_detail_id'] = $v1;
 
-            foreach ($inputdata['auth_index'] as $k1 => $v1) { //有勾選才會寫入細項權限
-                $detailData['role_id'] = $role_id;
-                $detailData['permission_detail_id'] = $v1;
+                    foreach ($auth as $k => $v) {
+                        $detailData['auth_' . $v] = isset($inputdata['auth_' . $v . '_' . $v1]) ? $inputdata['auth_' . $v . '_' . $v1] : 0;
+                    }
+                    $detailData['created_by'] = $user_id;
+                    $detailData['created_at'] = $now;
+                    $detailData['updated_by'] = -1;
+                    $detailData['updated_at'] = $now;
 
-                foreach ($auth as $k => $v) {
-                    $detailData['auth_' . $v] = isset($inputdata['auth_' . $v . '_' . $v1]) ? $inputdata['auth_' . $v . '_' . $v1] : 0;
+                    RolePermissionDetail::insert($detailData);
                 }
-
-                $detailData['created_by'] = $user_id;
-                $detailData['created_at'] = $now;
-                $detailData['updated_by'] = -1;
-                $detailData['updated_at'] = $now;
-
-                RolePermissionDetail::insert($detailData);
             }
 
             DB::commit();

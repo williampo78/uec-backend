@@ -52,6 +52,7 @@ class AuthController extends Controller
 
         Auth::login($user);
         $this->roleService->putUserRolesSession();
+        $this->roleService->setUrlSsoSwitchBtn();
         return redirect()->route('backend_home');
     }
 
