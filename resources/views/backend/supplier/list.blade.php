@@ -25,9 +25,9 @@
                                                 <label class="control-label">供應商類別</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="form.supplierTypeId" :reduce="option => option.code" :options="supplierTypes">
-                                                </v-select>
-                                                <input type="hidden" v-model="form.supplierTypeId" name="supplier_type_id" />
+                                                <select2 class="form-control" :options="supplierTypes" v-model="form.supplierTypeId" name="supplier_type_id">
+                                                    <option disabled value=""></option>
+                                                </select2>
                                             </div>
                                         </div>
                                     </div>
@@ -64,9 +64,9 @@
                                                 <label class="control-label">狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <v-select v-model="form.active" :reduce="option => option.code" :options="activeOptions">
-                                                </v-select>
-                                                <input type="hidden" v-model="form.active" name="active" />
+                                                <select2 class="form-control" :options="activeOptions" v-model="form.active" name="active">
+                                                    <option disabled value=""></option>
+                                                </select2>
                                             </div>
                                         </div>
                                     </div>
@@ -191,8 +191,8 @@
                 if (supplierTypes) {
                     supplierTypes.forEach(supplierType => {
                         this.supplierTypes.push({
-                            label: supplierType.name,
-                            code: supplierType.id,
+                            text: supplierType.name,
+                            id: supplierType.id,
                         });
                     });
                 }
@@ -200,8 +200,8 @@
                 if (activeOptions) {
                     Object.entries(activeOptions).forEach(([key, activeOption]) => {
                         this.activeOptions.push({
-                            label: activeOption,
-                            code: parseInt(key),
+                            text: activeOption,
+                            id: parseInt(key),
                         });
                     });
                 }

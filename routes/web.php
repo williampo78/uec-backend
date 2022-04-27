@@ -72,9 +72,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     // 供應商類別管理
     Route::resource('/supplier_type', SupplierTypeController::class, ['names' => ['index' => 'supplier_type']]);
 
-    //刪除聯絡人
-    Route::post('/contact/ajax/del', [ContactController::class, 'ajax_del_contact']);
-
     // 供應商主檔管理
     Route::post('/supplier/display-number-exists', [SupplierController::class, 'displayNumberExists']);
     Route::resource('/supplier', SupplierController::class, ['names' => ['index' => 'supplier']]);

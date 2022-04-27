@@ -146,11 +146,6 @@ class SupplierService
         return true;
     }
 
-    public function showSupplier($id)
-    {
-        return Supplier::where('id', $id)->get()->first();
-    }
-
     public function updateSupplier(array $inputData): bool
     {
         $user = auth()->user();
@@ -225,7 +220,7 @@ class SupplierService
                     $supplierContractTerm = SupplierContractTerm::where('supplier_contract_id', $inputData['supplier_contract_id'])
                         ->where('term_code', $contactTerm['term_code'])
                         ->first();
-                    
+
                     if (!isset($supplierContractTerm)) {
                         $createdSupplierContractTerm = SupplierContractTerm::create([
                             'supplier_contract_id' => $inputData['supplier_contract_id'],
@@ -258,11 +253,6 @@ class SupplierService
         }
 
         return $result;
-    }
-
-    public function getPaymentTerms()
-    {
-        return DB::table('lookup_values')->where('lookup_type_id', '9')->get();
     }
 
     /**

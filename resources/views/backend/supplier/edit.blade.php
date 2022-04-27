@@ -31,14 +31,9 @@
                                         <div class="form-group">
                                             <label class="control-label" for="supplier_type">供應商類別 <span
                                                     style="color: red;">*</span></label>
-                                            <v-select v-model="form.supplierTypeId" :reduce="option => option.code"
-                                                :options="supplierTypes">
-                                                <template #search="{attributes, events}">
-                                                    <input class="vs__search" :required="!form.supplierTypeId"
-                                                        v-bind="attributes" v-on="events">
-                                                </template>
-                                            </v-select>
-                                            <input type="hidden" v-model="form.supplierTypeId" name="supplier_type_id">
+                                            <select2 class="form-control" :options="supplierTypes" v-model="form.supplierTypeId" name="supplier_type_id">
+                                                <option disabled value=""></option>
+                                            </select2>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
@@ -79,9 +74,9 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label" for="payment_term">付款條件</label>
-                                            <v-select v-model="form.paymentTerm" :reduce="option => option.code"
-                                                :options="paymentTerms"></v-select>
-                                            <input type="hidden" v-model="form.paymentTerm" name="payment_term">
+                                            <select2 class="form-control" :options="paymentTerms" v-model="form.paymentTerm" name="payment_term">
+                                                <option disabled value=""></option>
+                                            </select2>
                                         </div>
                                     </div>
                                 </div>
@@ -138,9 +133,9 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label" for="tax_type">稅別</label>
-                                            <v-select v-model="form.taxType" :reduce="option => option.code"
-                                                :options="taxTypeOptions" :clearable="false"></v-select>
-                                            <input type="hidden" v-model="form.taxType" name="tax_type">
+                                            <select2 class="form-control" :options="taxTypeOptions" v-model="form.taxType" name="tax_type" :allow-clear="false">
+                                                <option disabled value=""></option>
+                                            </select2>
                                         </div>
                                     </div>
                                 </div>
@@ -190,9 +185,9 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label class="control-label" for="active">狀態</label>
-                                            <v-select v-model="form.active" :reduce="option => option.code"
-                                                :options="activeOptions" :clearable="false"></v-select>
-                                            <input type="hidden" v-model="form.active" name="active">
+                                            <select2 class="form-control" :options="activeOptions" v-model="form.active" name="active" :allow-clear="false">
+                                                <option disabled value=""></option>
+                                            </select2>
                                         </div>
                                     </div>
                                 </div>
@@ -325,14 +320,9 @@
                                         <div class="form-group">
                                             <label class="control-label" for="status_code">合約狀態 <span
                                                     style="color: red;">*</span></label>
-                                            <v-select v-model="form.contract.statusCode" :reduce="option => option.code"
-                                                :options="supplierContractStatusCodeOptions">
-                                                <template #search="{attributes, events}">
-                                                    <input class="vs__search" :required="!form.contract.statusCode"
-                                                        v-bind="attributes" v-on="events">
-                                                </template>
-                                            </v-select>
-                                            <input type="hidden" v-model="form.contract.statusCode" name="status_code">
+                                            <select2 class="form-control" :options="supplierContractStatusCodeOptions" v-model="form.contract.statusCode" name="status_code">
+                                                <option disabled value=""></option>
+                                            </select2>
                                         </div>
                                     </div>
                                 </div>
@@ -470,8 +460,8 @@
                 if (supplierTypes) {
                     supplierTypes.forEach(supplierType => {
                         this.supplierTypes.push({
-                            label: supplierType.name,
-                            code: supplierType.id
+                            text: supplierType.name,
+                            id: supplierType.id
                         });
                     });
                 }
@@ -479,8 +469,8 @@
                 if (paymentTerms) {
                     paymentTerms.forEach(paymentTerm => {
                         this.paymentTerms.push({
-                            label: paymentTerm.description,
-                            code: paymentTerm.code
+                            text: paymentTerm.description,
+                            id: paymentTerm.code
                         });
                     });
                 }
@@ -488,8 +478,8 @@
                 if (taxTypeOptions) {
                     Object.entries(taxTypeOptions).forEach(([key, taxTypeOption]) => {
                         this.taxTypeOptions.push({
-                            label: taxTypeOption,
-                            code: key
+                            text: taxTypeOption,
+                            id: key
                         });
                     });
                 }
@@ -497,8 +487,8 @@
                 if (activeOptions) {
                     Object.entries(activeOptions).forEach(([key, activeOption]) => {
                         this.activeOptions.push({
-                            label: activeOption,
-                            code: parseInt(key)
+                            text: activeOption,
+                            id: parseInt(key)
                         });
                     });
                 }
@@ -508,8 +498,8 @@
                         supplierContractStatusCodeOption
                     ]) => {
                         this.supplierContractStatusCodeOptions.push({
-                            label: supplierContractStatusCodeOption,
-                            code: key
+                            text: supplierContractStatusCodeOption,
+                            id: key
                         });
                     });
                 }

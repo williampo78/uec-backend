@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\ContactService;
+use App\Services\LookupValuesVService;
 use App\Services\SupplierService;
 use App\Services\SupplierTypeService;
-use App\Services\LookupValuesVService;
+use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
     private $supplierService;
     private $supplierTypeService;
-    private $contactService;
     private $lookupValuesVService;
 
     /**
@@ -23,12 +21,10 @@ class SupplierController extends Controller
     public function __construct(
         SupplierService $supplierService,
         SupplierTypeService $supplierTypeService,
-        ContactService $contactService,
         LookupValuesVService $lookupValuesVService
     ) {
         $this->supplierService = $supplierService;
         $this->supplierTypeService = $supplierTypeService;
-        $this->contactService = $contactService;
         $this->lookupValuesVService = $lookupValuesVService;
     }
 

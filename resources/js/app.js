@@ -1,6 +1,6 @@
 import "./bootstrap";
 import "./my-jquery-validate-methods";
-import vSelect from "./components/VueSelect.vue";
+import Select2 from "./components/Select2.vue";
 
 // selec2
 $(".select2-default").select2();
@@ -13,6 +13,6 @@ $.ajaxSetup({
 });
 
 /**
- * vue-select
+ * select2
  */
-Vue.component("v-select", vSelect);
+Vue.component("select2", Select2);
