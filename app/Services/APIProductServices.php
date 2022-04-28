@@ -278,12 +278,14 @@ class APIProductServices
         if ($products) {
             $promotion = self::getPromotion('product_card');
             foreach ($promotion as $k => $v) {
-                $promotion_txt = '';
                 foreach ($v as $label) {
-                    if ($promotion_txt != $label->promotional_label) {
-                        $promotional[$k][] = $label->promotional_label;
-                        $promotion_txt = $label->promotional_label;
-                    }
+                    $promotional_array[$k][$label->promotional_label] = $label->promotional_label;
+                }
+            }
+
+            foreach ($promotional_array as $product_id => $label) {
+                foreach ($label as $k=>$v){
+                    $promotional[$product_id][] = $v;
                 }
             }
             $login = Auth::guard('api')->check();
