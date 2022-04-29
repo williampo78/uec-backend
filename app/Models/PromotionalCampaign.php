@@ -11,4 +11,12 @@ class PromotionalCampaign extends Model
 
     protected $table = 'promotional_campaigns';
     protected $guarded = [];
+
+    /**
+     * 滿額活動指定商品
+     */
+    public function campaignProduct()
+    {
+        return $this->hasMany(PromotionalCampaignProduct::class, 'promotional_campaign_id');
+    }
 }

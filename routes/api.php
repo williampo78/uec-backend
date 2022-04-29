@@ -51,6 +51,9 @@ Route::group(['prefix' => 'v1'], function () {
     //UTM
     Route::get('/utm', [IndexController::class, 'getUTM']);
 
+    //Event
+    Route::get('/event/{id}', [ProductController::class, 'getEvent']);
+
 });
 
 // jwt驗證

@@ -223,4 +223,28 @@ class ProductController extends Controller
 
     }
 
+    /*
+     * 取得活動賣場頁
+     * @param int $id
+     */
+    public function getEvent(Request $request)
+    {
+        $error_code = $this->apiService->getErrorCode();
+
+        $messages = [
+            'event.numeric' => '賣場編號必須是數字',
+            'event.required' => '賣場編號不能為空',
+        ];
+
+        $v = Validator::make($request->all(), [
+            'event' => 'numeric|required'
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+
+
+    }
+
 }
