@@ -11,4 +11,12 @@ class PromotionalCampaign extends Model
 
     protected $table = 'promotional_campaigns';
     protected $guarded = [];
+
+    /**
+     * 活動門檻的關聯
+     */
+    public function campaignThreshold()
+    {
+        return $this->hasMany(PromotionalCampaignThreshold::class, 'promotional_campaign_id');
+    }
 }
