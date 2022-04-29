@@ -193,31 +193,38 @@ class APICartServices
                     }
                 }
             }
-
-            //活動滿額門檻資料
+            //活動滿額門檻資料 (活動時間內才做)
             $campaignThreshold = [];
+            $campaignThreshold_calc = [];
             if (isset($campaign['CART'])) {
                 foreach ($campaign['CART'] as $type => $items) {
                     foreach ($items as $product_id => $data) {
+                        $campaignThreshold_brief = [];
                         $campaignThreshold_item = [];
                         $campaignThresholds = PromotionalCampaign::find($data->id)->campaignThreshold;
                         foreach ($campaignThresholds as $threshold) {
-                            $campaignThreshold_item[] = $threshold->threshold_brief;
+                            $campaignThreshold_brief[] = $threshold->threshold_brief;
+                            $campaignThreshold_item[] = $threshold;
                         }
+                        //畫面顯示用
                         $campaignThreshold[$type][$product_id] = array(
                             "campaignId" => $data->id,
                             "campaignName" => $data->campaign_name,
-                            "campaignThreshold" => $campaignThreshold_item
+                            "campaignThreshold" => $campaignThreshold_brief
                         );
+                        //滿額計算用
+                        $campaignThreshold_calc[$type][$product_id] = $campaignThreshold_item;
                     }
                 }
             }
-            //活動滿額門檻資料
+            //活動滿額門檻資料 (活動時間內才做)
 
             $productRow = 0;
             foreach ($cartQty as $product_id => $item) {
                 $product = [];
                 $prod_gift = [];
+                $prod_amount[$product_id] = 0;
+                $prod_qty[$product_id] = 0;
                 if ($now >= $cartInfo[$product_id]['start_launched_at'] && $now <= $cartInfo[$product_id]['end_launched_at']) { //在上架期間內
                     $product_type = "effective";
                     $qty = array_sum($prodQty[$product_id]); //合併不同規格但同一商品的數量
@@ -317,6 +324,8 @@ class APICartServices
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
                                     $cartTotal += round($amount);
+                                    $prod_amount[$product_id] += round($amount);
+                                    $prod_qty[$product_id] += $return_qty;
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -398,7 +407,8 @@ class APICartServices
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
                                     $cartTotal += round($amount);
-
+                                    $prod_amount[$product_id] += round($amount);
+                                    $prod_qty[$product_id] += $return_qty;
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -454,6 +464,8 @@ class APICartServices
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
                                     $cartTotal += round($amount);
+                                    $prod_amount[$product_id] += round($amount);
+                                    $prod_qty[$product_id] += $return_qty;
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -509,6 +521,8 @@ class APICartServices
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
                                     $cartTotal += round($amount);
+                                    $prod_amount[$product_id] += round($amount);
+                                    $prod_qty[$product_id] += $return_qty;
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -557,6 +571,8 @@ class APICartServices
                                     "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                 );
                                 $cartTotal += round($item_info->selling_price * $detail_qty);
+                                $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
+                                $prod_qty[$product_id] += $detail_qty;
                                 if ($product_type == 'effective') {
                                     $productRow++;
                                 }
@@ -606,6 +622,8 @@ class APICartServices
                                 "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                             );
                             $cartTotal += round($item_info->selling_price * $detail_qty);
+                            $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
+                            $prod_qty[$product_id] += $detail_qty;
                             if ($product_type == 'effective') {
                                 $productRow++;
                             }
@@ -620,6 +638,8 @@ class APICartServices
                             }
                         }
                     }
+
+                    //滿額折扣計算CART_P01 & CART_P02
                 } else {
                     //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                     foreach ($cartDetail[$product_id] as $item_id => $item_info) {
@@ -655,6 +675,8 @@ class APICartServices
                             "campaignThresholdDiscount" => []
                         );
                         $cartTotal += 0;
+                        $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
+                        $prod_qty[$product_id] += $detail_qty;
                         $productRow++;
                     }
                 }
@@ -667,7 +689,28 @@ class APICartServices
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product,
                 );
+
+                //滿額折扣計算
+                $prodDiscount = 0;
+                $compare_n_value = 0;
+                if (isset($campaignThreshold_calc['DISCOUNT'][$product_id])) {
+                    foreach ($campaignThreshold_calc['DISCOUNT'][$product_id] as $item) {
+                        if ($compare_n_value > $item->n_value) continue;
+                        if ($prod_amount[$product_id] >= $item->n_value) {
+                            if ($item->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
+                                $cartDiscount = $prod_amount[$product_id] - ($prod_amount[$product_id] * $item->x_value); //打折3000-(3000*0.95)
+                            } else if ($item->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
+                                $cartDiscount = $item->x_value; //-200
+                            }
+                            $compare_n_value = $item->n_value;
+                        }
+                    }
+                }
+                //滿額折扣計算
+
             }
+            //dd($prod_amount);
+
             //全車滿額贈
             $cartDiscount = 0;
             $compare_n_value = 0;
@@ -738,6 +781,7 @@ class APICartServices
                     }
                 }
             }
+
             //會員可用點數
             $pointData = $this->apiService->getMemberPoint($member_id);
             $info = json_decode($pointData);
