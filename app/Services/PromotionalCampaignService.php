@@ -2,13 +2,15 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Models\PromotionalCampaign;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use App\Models\PromotionalCampaignProduct;
 use App\Models\PromotionalCampaignGiveaway;
+use App\Models\PromotionalCampaignProduct;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PromotionalCampaignService
 {
@@ -182,6 +184,128 @@ class PromotionalCampaignService
         }
 
         return $promotional_campaigns;
+    }
+
+    /**
+     * 取得滿額活動table列表
+     *
+     * @param array $queryData
+     * @return Collection
+     */
+    public function getCartTableList(array $queryData = []): Collection
+    {
+        $user = Auth::user();
+        $cartCampaigns = PromotionalCampaign::with(['campaignType'])
+            ->where('agent_id', $user->agent_id)
+            ->where('level_code', 'Cart');
+
+        // 活動名稱 or 前台文案
+        if (!empty($queryData['campaign_name_or_campaign_brief'])) {
+            $cartCampaigns = $cartCampaigns->where(function ($query) use ($queryData) {
+                return $query->where('campaign_name', 'LIKE', '%' . $queryData['campaign_name_or_campaign_brief'] . '%')
+                    ->orWhere('campaign_brief', 'LIKE', '%' . $queryData['campaign_name_or_campaign_brief'] . '%');
+            });
+        }
+
+        // 上下架狀態
+        if (isset($queryData['launch_status'])) {
+            switch ($queryData['launch_status']) {
+                // 待上架
+                case 'prepare_to_launch':
+                    $cartCampaigns = $cartCampaigns->where(function ($query) {
+                        $query->where('active', 1)
+                            ->whereDate('start_at', '>', now());
+                    });
+                    break;
+
+                // 已上架
+                case 'launched':
+                    $cartCampaigns = $cartCampaigns->where(function ($query) {
+                        $query->where('active', 1)
+                            ->whereDate('start_at', '<=', now())
+                            ->whereDate('end_at', '>=', now());
+                    });
+                    break;
+
+                // 下架
+                case 'no_launch':
+                    $cartCampaigns = $cartCampaigns->where(function ($query) {
+                        $query->where('active', 1)
+                            ->whereDate('end_at', '<', now());
+                    });
+                    break;
+
+                // 關閉
+                case 'disabled':
+                    $cartCampaigns = $cartCampaigns->where(function ($query) {
+                        $query->where('active', 0);
+                    });
+                    break;
+            }
+        }
+
+        // 活動類型
+        if (isset($queryData['campaign_type'])) {
+            $cartCampaigns = $cartCampaigns->where('campaign_type', $queryData['campaign_type']);
+        }
+
+        // 上架開始時間-起始日
+        if (!empty($queryData['start_at_start'])) {
+            $cartCampaigns = $cartCampaigns->whereDate('start_at', '>=', $queryData['start_at_start']);
+        }
+
+        // 上架開始時間-結束日
+        if (!empty($queryData['start_at_end'])) {
+            $cartCampaigns = $cartCampaigns->whereDate('start_at', '<=', $queryData['start_at_end']);
+        }
+
+        // 商品序號查詢
+        if (!empty($queryData['product_no'])) {
+            $cartCampaigns = $cartCampaigns->where(function ($query) use ($queryData) {
+                return $query->whereHas('promotionalCampaignProducts.product', function (Builder $query) use ($queryData) {
+                    return $query->where('product_no', $queryData['product_no']);
+                })
+                    ->orWhereHas('promotionalCampaignGiveaways.product', function (Builder $query) use ($queryData) {
+                        return $query->where('product_no', $queryData['product_no']);
+                    });
+            });
+        }
+
+        $cartCampaigns = $cartCampaigns->latest('start_at')->get();
+
+        return $cartCampaigns;
+    }
+
+    /**
+     * 整理滿額活動table列表
+     *
+     * @param Collection $cartCampaigns
+     * @return array
+     */
+    public function formatCartTableList(Collection $cartCampaigns): array
+    {
+        $result = [];
+
+        foreach ($cartCampaigns as $cartCampaign) {
+            $tmpCartCampaign = [
+                'id' => $cartCampaign->id,
+                'campaign_name' => $cartCampaign->campaign_name,
+                'campaign_brief' => $cartCampaign->campaign_brief,
+                'campaign_type' => null,
+                'launch_status' => $cartCampaign->launch_status,
+                'start_at' => Carbon::parse($cartCampaign->start_at)->format('Y-m-d H:i'),
+                'end_at' => Carbon::parse($cartCampaign->end_at)->format('Y-m-d H:i'),
+            ];
+
+            // 活動類型
+            if (isset($cartCampaign->campaignType)) {
+                $tmpCartCampaign['campaign_type'] = $cartCampaign->campaignType->description;
+            }
+
+            $result[] = $tmpCartCampaign;
+        }
+
+        return $result;
     }
 
     /**

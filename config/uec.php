@@ -41,6 +41,14 @@ return [
         0 => '失效',
     ],
 
+    // 上下架狀態
+    'launch_status_options' => [
+        'prepare_to_launch' => '待上架',
+        'launched' => '已上架',
+        'no_launch' => '下架',
+        'disabled' => '關閉',
+    ],
+
     // 商品類型
     'product_type_option' => [
         'N' => '一般品',

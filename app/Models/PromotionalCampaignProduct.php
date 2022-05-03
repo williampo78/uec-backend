@@ -11,4 +11,12 @@ class PromotionalCampaignProduct extends Model
 
     protected $table = 'promotional_campaign_products';
     protected $guarded = [];
+
+    /**
+     * 建立與商品的關聯
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }

@@ -11,20 +11,20 @@ use App\Services\PromotionalCampaignService;
 
 class PromotionalCampaignCartV2Controller extends Controller
 {
-    private $promotional_campaign_service;
-    private $lookup_values_v_service;
+    private $promotionalCampaignService;
+    private $lookupValuesVService;
     private $supplier_service;
     private $products_service;
     private const LEVEL_CODE = 'CART';
 
     public function __construct(
-        PromotionalCampaignService $promotional_campaign_service,
-        LookupValuesVService $lookup_values_v_service,
+        PromotionalCampaignService $promotionalCampaignService,
+        LookupValuesVService $lookupValuesVService,
         SupplierService $supplier_service,
         ProductsService $products_service
     ) {
-        $this->promotional_campaign_service = $promotional_campaign_service;
-        $this->lookup_values_v_service = $lookup_values_v_service;
+        $this->promotionalCampaignService = $promotionalCampaignService;
+        $this->lookupValuesVService = $lookupValuesVService;
         $this->supplier_service = $supplier_service;
         $this->products_service = $products_service;
     }
@@ -36,34 +36,32 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function index(Request $request)
     {
-        $promotional_campaigns = [];
+        $result = [];
         $queryData = [];
-
         $queryData = $request->only([
-            'campaign_name',
-            'active',
+            'campaign_name_or_campaign_brief',
+            'launch_status',
             'campaign_type',
             'start_at_start',
             'start_at_end',
             'product_no',
         ]);
 
+        // 上下架狀態
+        $result['launchStatusOptions'] = config('uec.launch_status_options');
+
         // 活動類型
-        $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+        $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'CAMPAIGN_TYPE',
             'udf_01' => self::LEVEL_CODE,
         ]);
 
-        // 網址列參數不足，直接返回列表頁
-        if (count($queryData) < 1) {
-            return view('backend.promotional_campaign.cart.list', compact('campaign_types'));
+        if (count($queryData) > 0) {
+            $result['cartCampaigns'] = $this->promotionalCampaignService->getCartTableList($queryData);
+            $result['cartCampaigns'] = $this->promotionalCampaignService->formatCartTableList($result['cartCampaigns']);
         }
 
-        $queryData['level_code'] = self::LEVEL_CODE;
-
-        $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns($queryData);
-
-        return view('backend.promotional_campaign.cart_v2.list', compact('promotional_campaigns', 'campaign_types'));
+        return view('backend.promotional_campaign.cart_v2.list', $result);
     }
 
     /**
