@@ -176,7 +176,6 @@ class APICartServices
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
-                    //echo $item['item_qty'];
                     $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
                 }
             }
@@ -196,6 +195,7 @@ class APICartServices
             //活動滿額門檻資料 (活動時間內才做)
             $campaignThreshold = [];
             $campaignThreshold_calc = [];
+            $campaignInfo = [];
             if (isset($campaign['CART'])) {
                 foreach ($campaign['CART'] as $type => $items) {
                     foreach ($items as $product_id => $data) {
@@ -214,12 +214,26 @@ class APICartServices
                         );
                         //滿額計算用
                         $campaignThreshold_calc[$type][$product_id] = $campaignThreshold_item;
+                        $campaignInfo[$type][$product_id] = $data;
                     }
                 }
             }
+
+            /*
+            $campaignThresholdGiftaway= [];
+            if (isset($campaign_gift['CART'])) {
+                foreach ($campaign_gift['CART'] as $type => $items) {
+                    if ($now >= $items['start_at'] && $now <= $items['end_at']){
+                        $campaignThresholdGiftaway[$items->campaign_type][$items['product_id']];
+                    }
+                }
+            }
+            */
             //活動滿額門檻資料 (活動時間內才做)
 
+
             $productRow = 0;
+            $cartDiscount = 0;
             foreach ($cartQty as $product_id => $item) {
                 $product = [];
                 $prod_gift = [];
@@ -232,6 +246,22 @@ class APICartServices
                     $giftAway = [];
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
+                            foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                $giftAway[] = array(
+                                    "productPhoto" => $giftInfo['photo'],
+                                    "productId" => $giftInfo->product_id,
+                                    "productName" => $giftInfo->product_name,
+                                    "sellingPrice" => $giftInfo->selling_price,
+                                    "assignedQty" => $giftInfo->assignedQty,
+                                );
+                            }
+                        }
+                    }
+
+                    //活動門檻贈品
+                    $thresholdGiftaway = [];
+                    if (isset($campaign['CART']['GIFT'][$product_id])) { //在活動內指定單品的滿額贈禮
+                        if ($campaign['CART']['GIFT'][$product_id]->campaign_type == 'CART_P03') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftAway[] = array(
                                     "productPhoto" => $giftInfo['photo'],
@@ -320,6 +350,7 @@ class APICartServices
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
+                                        "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
@@ -403,6 +434,7 @@ class APICartServices
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
+                                        "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
@@ -460,6 +492,7 @@ class APICartServices
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
+                                        "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
@@ -517,6 +550,7 @@ class APICartServices
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
+                                        "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
                                         "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                     );
@@ -567,6 +601,7 @@ class APICartServices
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                     "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                                     "campaignDiscountStatus" => false,
+                                    "campaignDiscount" => 0,
                                     "campaignGiftAway" => $prod_gift,
                                     "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
                                 );
@@ -618,8 +653,9 @@ class APICartServices
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                 "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
                                 "campaignDiscountStatus" => false,
+                                "campaignDiscount" => 0,
                                 "campaignGiftAway" => $prod_gift,
-                                "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
+                                "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                             );
                             $cartTotal += round($item_info->selling_price * $detail_qty);
                             $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -638,8 +674,6 @@ class APICartServices
                             }
                         }
                     }
-
-                    //滿額折扣計算CART_P01 & CART_P02
                 } else {
                     //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                     foreach ($cartDetail[$product_id] as $item_id => $item_info) {
@@ -671,6 +705,7 @@ class APICartServices
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                             "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                             "campaignDiscountStatus" => false,
+                            "campaignDiscount" => 0,
                             "campaignGiftAway" => [],
                             "campaignThresholdDiscount" => []
                         );
@@ -695,12 +730,25 @@ class APICartServices
                 $compare_n_value = 0;
                 if (isset($campaignThreshold_calc['DISCOUNT'][$product_id])) {
                     foreach ($campaignThreshold_calc['DISCOUNT'][$product_id] as $item) {
-                        if ($compare_n_value > $item->n_value) continue;
-                        if ($prod_amount[$product_id] >= $item->n_value) {
-                            if ($item->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
-                                $cartDiscount = $prod_amount[$product_id] - ($prod_amount[$product_id] * $item->x_value); //打折3000-(3000*0.95)
-                            } else if ($item->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
-                                $cartDiscount = $item->x_value; //-200
+                        if ($compare_n_value > $prod_amount[$product_id]) continue;
+                        if ($prod_amount[$product_id] <= $item->n_value) continue;
+                        if ($prod_amount[$product_id] >= $compare_n_value) {
+                            if ($campaignInfo['DISCOUNT'][$product_id]->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
+                                $prodDiscount = $prod_amount[$product_id] - ($prod_amount[$product_id] * $item->x_value); //打折3000-(3000*0.95)
+                                $thresholdDiscount[] = array(
+                                    "campaignName" => $campaignInfo['DISCOUNT'][$product_id]->campaign_name,
+                                    "campaignBrief" => $item->threshold_brief,
+                                    "campaignDiscount" => ($prodDiscount * -1)
+                                );
+                                $cartDiscount += ($prodDiscount);
+                            } else if ($campaignInfo['DISCOUNT'][$product_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
+                                $prodDiscount = $item->x_value; //-200
+                                $thresholdDiscount[] = array(
+                                    "campaignName" => $campaignInfo['DISCOUNT'][$product_id]->campaign_name,
+                                    "campaignBrief" => $item->threshold_brief,
+                                    "campaignDiscount" => ($prodDiscount * -1)
+                                );
+                                $cartDiscount += ($prodDiscount);
                             }
                             $compare_n_value = $item->n_value;
                         }
@@ -709,10 +757,9 @@ class APICartServices
                 //滿額折扣計算
 
             }
-            //dd($prod_amount);
 
             //全車滿額贈
-            $cartDiscount = 0;
+            //$cartDiscount = 0;
             $compare_n_value = 0;
             foreach ($campaign_discount as $items => $item) {
                 if ($compare_n_value > $item->n_value) {
@@ -721,13 +768,14 @@ class APICartServices
 
                 if ($cartTotal >= $item->n_value) {
                     if ($item->campaign_type == 'CART01') { //﹝滿額﹞購物車滿N元，打X折
-                        $cartDiscount = $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
+                        $cartDiscount += $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
                     } elseif ($item->campaign_type == 'CART02') { //﹝滿額﹞購物車滿N元，折X元
-                        $cartDiscount = $item->x_value; //打折後10000-1000
+                        $cartDiscount += $item->x_value; //打折後10000-1000
                     }
                     $compare_n_value = $item->n_value;
                 }
             }
+
             $total_amount = ($cartTotal - $cartDiscount);
             if (isset($campaign_gift['CART'])) {
                 $compare_value = 0;
@@ -807,6 +855,7 @@ class APICartServices
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
+                "thresholdDiscount" => $thresholdDiscount,
                 "discount" => round($cartDiscount),
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
