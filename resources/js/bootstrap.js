@@ -10,11 +10,13 @@ import axios from "axios";
 import "jquery-validation";
 import "jquery-validation/dist/additional-methods";
 import "jquery-validation/dist/localization/messages_zh_TW";
-import Vue from "vue";
 import flatpickr from "flatpickr";
 import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
 import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
 import Croppie from "Croppie";
+import moment from "moment";
+
+import Vue from "vue";
 
 window._ = lodash;
 
@@ -67,18 +69,13 @@ jQuery.validator.setDefaults({
 });
 
 /**
- * vue
- */
-window.Vue = Vue;
-
-/**
  * flatpickr
  */
 window.flatpickr = flatpickr;
 flatpickr.monthSelectPlugin = monthSelectPlugin;
 
 flatpickr.setDefaults({
-	allowInput: true,
+    allowInput: true,
     wrap: true,
     clickOpens: false,
     time_24hr: true,
@@ -104,7 +101,12 @@ flatpickr.setDefaults({
     //         instance.setDate(defaultDate, true);
     //     }
     // },
-})
+});
+
+/**
+ * moment
+ */
+window.moment = moment;
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
@@ -122,8 +124,13 @@ flatpickr.setDefaults({
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
 /**
  * 裁切圖片
  */
- window.Croppie = Croppie;
- 
+window.Croppie = Croppie;
+
+/**
+ * vue
+ */
+window.Vue = Vue;

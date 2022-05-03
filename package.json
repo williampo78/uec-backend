@@ -31,6 +31,7 @@
         "flatpickr": "^4.6.9",
         "jquery": "^3.6.0",
         "jquery-validation": "^1.19.3",
+        "moment": "^2.29.3",
         "select2": "^4.0.13",
         "select2-bootstrap-theme": "^0.1.0-beta.10",
         "sweetalert2": "^11.4.0",
