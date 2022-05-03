@@ -52,7 +52,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/utm', [IndexController::class, 'getUTM']);
 
     //Event
-    Route::get('/event/{id}', [ProductController::class, 'getEvent']);
+    Route::post('/event', [ProductController::class, 'getEvent']);
 
 });
 

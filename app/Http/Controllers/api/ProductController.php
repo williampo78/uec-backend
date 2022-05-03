@@ -149,12 +149,12 @@ class ProductController extends Controller
             $err = '901';
             $list = [];
             return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "商品不存在", 'result' => $list]);
-        } else if ($result == '901'){
+        } else if ($result == '901') {
             $status = false;
             $err = '901';
             $list = [];
             return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品沒有前台分類", 'result' => $list]);
-        } else if ($result == '902'){
+        } else if ($result == '902') {
             $status = false;
             $err = '901';
             $list = [];
@@ -162,7 +162,7 @@ class ProductController extends Controller
         } else {
             $status = true;
             $err = '';
-            $list = json_decode($result,true);
+            $list = json_decode($result, true);
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
     }
@@ -229,21 +229,37 @@ class ProductController extends Controller
      */
     public function getEvent(Request $request)
     {
-        $error_code = $this->apiService->getErrorCode();
 
+        $error_code = $this->apiService->getErrorCode();
         $messages = [
-            'event.numeric' => '賣場編號必須是數字',
-            'event.required' => '賣場編號不能為空',
+            'event.numeric' => '活動代碼必須是數字',
+            'event.required' => '活動代碼不能為空',
+            "size.numeric"=>'每頁筆數必須是數字',
+            "size.required"=>'每頁筆數不能為空',
+            "page.numeric"=>'當前頁數必須是數字',
+            "page.required"=>'當前頁數不能為空',
         ];
 
         $v = Validator::make($request->all(), [
-            'event' => 'numeric|required'
+            'event' => 'numeric|required',
+            'size' => 'numeric|required',
+            'page' => 'numeric|required',
         ], $messages);
 
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
+        $result = $this->apiProductService->getEventStore($request);
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => $status, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
 
     }
 
