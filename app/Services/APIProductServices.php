@@ -1008,6 +1008,10 @@ class APIProductServices
             foreach ($campaigns as $product_id => $campaign) {
                 foreach ($campaign as $item) {
                     if ($now >= $item->start_at && $now <= $item->end_at) {
+                        $photoDesktop = $item->banner_photo_desktop;
+                        $photoMobile = $item->banner_photo_mobile;
+                        $campaignName = $item->campaign_name;
+                        $campaignBrief = $item->campaign_brief;
                         $product_check = $this->getWebCategoryProducts('', '', '', '', $product_id, '', '');
                         if (count($product_check) > 0) {
                             if ($now >= $products[$product_id]->promotion_start_at && $now <= $products[$product_id]->promotion_end_at) {
@@ -1052,6 +1056,10 @@ class APIProductServices
             $searchResult = self::getPages($product_info, $size, $page);
 
             if (isset($searchResult)) {
+                $searchResult['bannerPhotoDesktop'] = $photoDesktop;
+                $searchResult['bannerPhotoMobile'] = $photoMobile;
+                $searchResult['breadcrumbCampaignName'] = $campaignName;
+                $searchResult['breadcrumbCampaignBrief'] = $campaignBrief;
                 $result['status'] = 200;
                 $result['result'] = $searchResult;
             } else {
