@@ -19,4 +19,12 @@ class PromotionalCampaign extends Model
     {
         return $this->hasMany(PromotionalCampaignProduct::class, 'promotional_campaign_id');
     }
+
+    /**
+     * 活動門檻的關聯
+     */
+    public function campaignThreshold()
+    {
+        return $this->hasMany(PromotionalCampaignThreshold::class, 'promotional_campaign_id')->orderBy('n_value');
+    }
 }
