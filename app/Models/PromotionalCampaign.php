@@ -17,6 +17,6 @@ class PromotionalCampaign extends Model
      */
     public function campaignThreshold()
     {
-        return $this->hasMany(PromotionalCampaignThreshold::class, 'promotional_campaign_id');
+        return $this->hasMany(PromotionalCampaignThreshold::class, 'promotional_campaign_id')->orderBy('n_value');
     }
 }
