@@ -221,6 +221,30 @@ class APIOrderService
                     $updData['status_code'] = 1;
                     ShoppingCartDetail::where('member_id', '=', $member_id)->where('product_item_id', '=', $item['itemId'])->update($updData);
 
+                    //有折扣則寫入折扣資訊
+                    if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
+                        if ($campaign_id != $item['campaignDiscountId']) {
+                            $discount_group++;
+                        }
+                        $campaign_details[$seq] = [
+                            "order_id" => $newOrder->id,
+                            "level_code" => $campaigns[$products['productID']][0]->level_code,
+                            "group_seq" => $discount_group,
+                            "order_detail_id" => $order_detail_id,
+                            "promotion_campaign_id" => $item['campaignDiscountId'],
+                            "product_id" => $products['productID'],
+                            "product_item_id" => $item['itemId'],
+                            "item_no" => $item['itemNo'],
+                            "discount" => $discount,
+                            "record_identity" => "M",
+                            "created_by" => $member_id,
+                            "updated_by" => $member_id,
+                            "created_at" => now(),
+                            "updated_at" => now(),
+                        ];
+                        OrderCampaignDiscount::insert($campaign_details[$seq]);
+                    }
+
                     //有單品滿額贈品時先新增單身
                     if (isset($item['campaignGiftAway']['campaignProdList'])) {
                         //符合條件
@@ -335,30 +359,6 @@ class APIOrderService
                             ];
                             OrderCampaignDiscount::insert($campaign_details[$seq]);
                         }
-                    }
-
-                    //有折扣則寫入折扣資訊
-                    if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
-                        if ($campaign_id != $item['campaignDiscountId']) {
-                            $discount_group++;
-                        }
-                        $campaign_details[$seq] = [
-                            "order_id" => $newOrder->id,
-                            "level_code" => $campaigns[$products['productID']][0]->level_code,
-                            "group_seq" => $discount_group,
-                            "order_detail_id" => $order_detail_id,
-                            "promotion_campaign_id" => $item['campaignDiscountId'],
-                            "product_id" => $products['productID'],
-                            "product_item_id" => $item['itemId'],
-                            "item_no" => $item['itemNo'],
-                            "discount" => $discount,
-                            "record_identity" => "M",
-                            "created_by" => $member_id,
-                            "updated_by" => $member_id,
-                            "created_at" => now(),
-                            "updated_at" => now(),
-                        ];
-                        OrderCampaignDiscount::insert($campaign_details[$seq]);
                     }
                 }
             }
