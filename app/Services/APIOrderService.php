@@ -189,7 +189,7 @@ class APIOrderService
                         "returned_point_discount" => 0,
                         "returned_points" => 0,
                     ];
-                    $order_detail_id = OrderDetail::insertGetId($details[$seq]);
+                    $order_detail_id_M = OrderDetail::insertGetId($details[$seq]);
 
                     $campaign_id = 0;
                     //有單品滿額贈時，正貨也寫入discount
@@ -198,7 +198,7 @@ class APIOrderService
                             "order_id" => $newOrder->id,
                             "level_code" => 'PRD',
                             "group_seq" => $discount_group,
-                            "order_detail_id" => $order_detail_id,
+                            "order_detail_id" => $order_detail_id_M,
                             "promotion_campaign_id" => $campaign['PRD']['GIFT'][$products['productID']]->id,
                             "product_id" => $products['productID'],
                             "product_item_id" => $item['itemId'],
@@ -213,37 +213,13 @@ class APIOrderService
                         OrderCampaignDiscount::insert($campaign_details[$seq]);
                         $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
                     }
-                    if ($order_detail_id > 0) {
+                    if ($order_detail_id_M > 0) {
                         $detail_count++;
                     }
 
                     //訂單明細建立後，更新購物車中的商品狀態為 - 已轉為訂單
                     $updData['status_code'] = 1;
                     ShoppingCartDetail::where('member_id', '=', $member_id)->where('product_item_id', '=', $item['itemId'])->update($updData);
-
-                    //有折扣則寫入折扣資訊
-                    if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
-                        if ($campaign_id != $item['campaignDiscountId']) {
-                            $discount_group++;
-                        }
-                        $campaign_details[$seq] = [
-                            "order_id" => $newOrder->id,
-                            "level_code" => $campaigns[$products['productID']][0]->level_code,
-                            "group_seq" => $discount_group,
-                            "order_detail_id" => $order_detail_id,
-                            "promotion_campaign_id" => $item['campaignDiscountId'],
-                            "product_id" => $products['productID'],
-                            "product_item_id" => $item['itemId'],
-                            "item_no" => $item['itemNo'],
-                            "discount" => $discount,
-                            "record_identity" => "M",
-                            "created_by" => $member_id,
-                            "updated_by" => $member_id,
-                            "created_at" => now(),
-                            "updated_at" => now(),
-                        ];
-                        OrderCampaignDiscount::insert($campaign_details[$seq]);
-                    }
 
                     //有單品滿額贈品時先新增單身
                     if (isset($item['campaignGiftAway']['campaignProdList'])) {
@@ -359,6 +335,30 @@ class APIOrderService
                             ];
                             OrderCampaignDiscount::insert($campaign_details[$seq]);
                         }
+                    }
+
+                    //有折扣則寫入折扣資訊
+                    if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
+                        if ($campaign_id != $item['campaignDiscountId']) {
+                            $discount_group++;
+                        }
+                        $campaign_details[$seq] = [
+                            "order_id" => $newOrder->id,
+                            "level_code" => $campaigns[$products['productID']][0]->level_code,
+                            "group_seq" => $discount_group,
+                            "order_detail_id" => $order_detail_id_M,
+                            "promotion_campaign_id" => $item['campaignDiscountId'],
+                            "product_id" => $products['productID'],
+                            "product_item_id" => $item['itemId'],
+                            "item_no" => $item['itemNo'],
+                            "discount" => $discount,
+                            "record_identity" => "M",
+                            "created_by" => $member_id,
+                            "updated_by" => $member_id,
+                            "created_at" => now(),
+                            "updated_at" => now(),
+                        ];
+                        OrderCampaignDiscount::insert($campaign_details[$seq]);
                     }
                 }
             }
