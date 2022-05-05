@@ -136,14 +136,11 @@ class APIOrderService
             //訂單單身
             $seq = 0;
             $details = [];
-            $detail_count = 0;
             $point_rate = 0;
             $discount_group = 0;
             foreach ($cart['list'] as $products) {
                 foreach ($products['itemList'] as $item) {
                     $seq++;
-                    $discount_group++;
-
                     //有活動折扣
                     if ($item['campaignDiscountStatus']) {
                         $discount = -($products['sellingPrice'] * $item['itemQty'] - $item['amount']);
@@ -194,6 +191,7 @@ class APIOrderService
                     $campaign_id = 0;
                     //有單品滿額贈時，正貨也寫入discount
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])) {
+                        $discount_group ++;
                         $campaign_details[$seq] = [
                             "order_id" => $newOrder->id,
                             "level_code" => 'PRD',
@@ -212,9 +210,6 @@ class APIOrderService
                         ];
                         OrderCampaignDiscount::insert($campaign_details[$seq]);
                         $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
-                    }
-                    if ($order_detail_id_M > 0) {
-                        $detail_count++;
                     }
 
                     //訂單明細建立後，更新購物車中的商品狀態為 - 已轉為訂單
