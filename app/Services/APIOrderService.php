@@ -277,7 +277,7 @@ class APIOrderService
                                     ];
                                     OrderCampaignDiscount::insert($campaign_details[$seq]);
                                 }
-                                $products['productID'] = $productID;
+                                $productID = $products['productID'];
                             }
                         }
                     }
