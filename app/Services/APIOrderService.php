@@ -360,6 +360,7 @@ class APIOrderService
 
             //購物車滿額新增單身
             if ($cart['giftAway']) {
+                $campaign_id_gift = 0;
                 foreach ($cart['giftAway'] as $gift) {
                     $seq++;
                     $details[$seq] = [
@@ -392,7 +393,9 @@ class APIOrderService
                         "returned_points" => 0,
                     ];
                     $order_detail_id = OrderDetail::insertGetId($details[$seq]);
-                    $discount_group++;
+                    if ($campaign_id_gift != $gift['campaignId']) {
+                        $discount_group++;
+                    }
                     //寫入折扣資訊
                     $campaign_details[$seq] = [
                         "order_id" => $newOrder->id,
@@ -411,6 +414,7 @@ class APIOrderService
                         "updated_at" => now(),
                     ];
                     OrderCampaignDiscount::insert($campaign_details[$seq]);
+                    $campaign_id_gift = $gift['campaignId'];
                 }
             }
 
