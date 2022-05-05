@@ -13,19 +13,19 @@ class PromotionalCampaignCartV2Controller extends Controller
 {
     private $promotionalCampaignService;
     private $lookupValuesVService;
-    private $supplier_service;
+    private $supplierService;
     private $products_service;
     private const LEVEL_CODE = 'CART';
 
     public function __construct(
         PromotionalCampaignService $promotionalCampaignService,
         LookupValuesVService $lookupValuesVService,
-        SupplierService $supplier_service,
+        SupplierService $supplierService,
         ProductsService $products_service
     ) {
         $this->promotionalCampaignService = $promotionalCampaignService;
         $this->lookupValuesVService = $lookupValuesVService;
-        $this->supplier_service = $supplier_service;
+        $this->supplierService = $supplierService;
         $this->products_service = $products_service;
     }
 
@@ -71,7 +71,16 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function create()
     {
-        //
+        $result = [];
+        // 活動類型
+        $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
+
+        return view('backend.promotional_campaign.cart_v2.create', $result);
     }
 
     /**

@@ -200,3 +200,14 @@ jQuery.validator.addMethod(
         return `不能輸入中文`;
     }
 );
+
+// 驗證英文、數字、下底線、連字號格式
+jQuery.validator.addMethod(
+    "isAlphaNumericUnderscoreHyphen",
+    function (value, element, params) {
+        let regex = /^[a-zA-Z0-9-_]+$/;
+
+        return regex.test(value);
+    },
+    "只能輸入英文、數字、下底線( _ )、連字號( - )"
+);

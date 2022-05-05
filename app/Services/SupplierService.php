@@ -3,34 +3,32 @@
 namespace App\Services;
 
 use App\Models\Supplier;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SupplierService
 {
-    public function __construct()
+    /**
+     * 取得所有供應商
+     *
+     * @param array $queryData
+     * @return Collection
+     */
+    public function getSuppliers(array $queryData = []): Collection
     {
-    }
+        $user = auth()->user();
+        $suppliers = Supplier::where('agent_id', $user->agent_id);
 
-    public function getSuppliers($query_data = [])
-    {
-        $agent_id = Auth::user()->agent_id;
-        $result = [];
-
-        $result = Supplier::where('agent_id', $agent_id);
-
-        if (isset($query_data['active'])) {
-            if ($query_data['active'] == 1) {
-                $result = $result->where('active', 1);
-            } else {
-                $result = $result->where('active', 0);
+        // 檢查使用者是否為供應商
+        if (!empty($queryData['check_user_is_supplier'])) {
+            if (isset($user->supplier_id)) {
+                $suppliers = $suppliers->where('id', $user->supplier_id);
             }
         }
 
-        $result = $result->get();
-
-        return $result;
+        return $suppliers->get();
     }
 
     public function addSupplier($inputdata)
@@ -48,12 +46,13 @@ class SupplierService
             Log::warning($e->getMessage());
             $result = false;
         }
-        return $result ;
+        return $result;
 
     }
-    public function checkDisplayNumber($DisplayNumber){
-        $check = Supplier::where('display_number',$DisplayNumber)->count();
-        return $check == 0 ; 
+    public function checkDisplayNumber($DisplayNumber)
+    {
+        $check = Supplier::where('display_number', $DisplayNumber)->count();
+        return $check == 0;
     }
 
     public function showSupplier($id)
@@ -61,16 +60,16 @@ class SupplierService
         return Supplier::where('id', $id)->get()->first();
     }
 
-    public function updateSupplier($input,$id)
+    public function updateSupplier($input, $id)
     {
         unset($input['_token']);
         unset($input['_method']);
 
         return Supplier::where('id', $id)->update($input);
     }
-    public function getPaymentTerms(){
-       return DB::table('lookup_values')->where('lookup_type_id','9')->get();
+    public function getPaymentTerms()
+    {
+        return DB::table('lookup_values')->where('lookup_type_id', '9')->get();
     }
-
 
 }

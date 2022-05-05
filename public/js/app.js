@@ -4196,7 +4196,12 @@ jQuery.validator.addMethod("notChinese", function (value, element, obj) {
   }
 }, function (params, element) {
   return "\u4E0D\u80FD\u8F38\u5165\u4E2D\u6587";
-});
+}); // 驗證英文、數字、下底線、連字號格式
+
+jQuery.validator.addMethod("isAlphaNumericUnderscoreHyphen", function (value, element, params) {
+  var regex = /^[a-zA-Z0-9-_]+$/;
+  return regex.test(value);
+}, "只能輸入英文、數字、下底線( _ )、連字號( - )");
 
 /***/ }),
 
