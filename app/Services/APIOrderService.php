@@ -57,9 +57,17 @@ class APIOrderService
         }
 
         //行銷活動
-        foreach ($campaigns as $product_id => $item) {
-            foreach ($item as $k => $v) {
-                $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+        $campaign_group = [];
+        $group_i = 0;
+        foreach ($cart['list'] as $products) {
+            foreach ($campaigns as $product_id => $item) {
+                if ($products['productID'] == $product_id) {
+                    foreach ($item as $k => $v) {
+                        $group_i ++;
+                        $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+                        $campaign_group[$product_id][$v->id] = $group_i;
+                    }
+                }
             }
         }
 
@@ -192,11 +200,10 @@ class APIOrderService
                     $campaign_id = 0;
                     //有單品滿額贈時，正貨也寫入discount
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])) {
-                        $discount_group++;
                         $campaign_details[$seq] = [
                             "order_id" => $newOrder->id,
                             "level_code" => 'PRD',
-                            "group_seq" => $discount_group,
+                            "group_seq" => $campaign_group[$products['productID']][$campaign['PRD']['GIFT'][$products['productID']]->id],
                             "order_detail_id" => $order_detail_id_M,
                             "promotion_campaign_id" => $campaign['PRD']['GIFT'][$products['productID']]->id,
                             "product_id" => $products['productID'],
@@ -256,13 +263,10 @@ class APIOrderService
                                     ];
                                     $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                     //寫入折扣資訊
-                                    if ($campaign_id != $item['campaignGiftAway']['campaignGiftId']) {
-                                        $discount_group++;
-                                    }
                                     $campaign_details[$seq] = [
                                         "order_id" => $newOrder->id,
                                         "level_code" => $campaign_gift['PROD'][$item['campaignGiftAway']['campaignGiftId']][$gift['productId']]['level_code'],
-                                        "group_seq" => $discount_group,
+                                        "group_seq" => $campaign_group[$products['productID']][$item['campaignGiftAway']['campaignGiftId']],
                                         "order_detail_id" => $order_detail_id,
                                         "promotion_campaign_id" => $item['campaignGiftAway']['campaignGiftId'],
                                         "product_id" => $gift['productId'],
@@ -284,13 +288,10 @@ class APIOrderService
 
                     //有折扣則寫入折扣資訊
                     if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
-                        if ($campaign_id != $item['campaignDiscountId']) {
-                            $discount_group++;
-                        }
                         $campaign_details[$seq] = [
                             "order_id" => $newOrder->id,
                             "level_code" => $campaigns[$products['productID']][0]->level_code,
-                            "group_seq" => $discount_group,
+                            "group_seq" => $campaign_group[$products['productID']][$item['campaignDiscountId']],
                             "order_detail_id" => $order_detail_id_M,
                             "promotion_campaign_id" => $item['campaignDiscountId'],
                             "product_id" => $products['productID'],
@@ -309,6 +310,7 @@ class APIOrderService
             }
 
             //購物車滿額新增單身
+            $discount_group = $group_i;
             if ($cart['giftAway']) {
                 $campaign_id_gift = 0;
                 foreach ($cart['giftAway'] as $gift) {
