@@ -709,8 +709,8 @@ class APICartServices
                 $compare_n_value = 0;
                 if (isset($campaignThreshold_calc['DISCOUNT'][$product_id])) {
                     foreach ($campaignThreshold_calc['DISCOUNT'][$product_id] as $item) {
-                        if ($compare_n_value > $prod_amount[$product_id]) continue;
-                        if ($prod_amount[$product_id] <= $item->n_value) continue;
+                        if ($compare_n_value >= $prod_amount[$product_id]) continue;
+                        if ($prod_amount[$product_id] < $item->n_value) continue;
                         if ($prod_amount[$product_id] >= $compare_n_value) {
                             if ($campaignInfo['DISCOUNT'][$product_id]->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
                                 $prodDiscount = $prod_amount[$product_id] - ($prod_amount[$product_id] * $item->x_value); //打折3000-(3000*0.95)
@@ -748,8 +748,8 @@ class APICartServices
                                         foreach ($giftawayInfo as $giftInfoK) {
                                             foreach ($giftInfoK as $giftInfo) {
                                                 //購買金額
-                                                if ($compare_n_value > $prod_amount[$product_id]) continue;
-                                                if ($prod_amount[$product_id] <= $item->n_value) continue;
+                                                if ($compare_n_value >= $prod_amount[$product_id]) continue;
+                                                if ($prod_amount[$product_id] < $item->n_value) continue;
                                                 $prod[] = array(
                                                     "productPhoto" => $campaign_gift['PROD'][$campaign['CART']['GIFT'][$product_id]->id][$giftInfo->product_id]['photo'],
                                                     "productId" => $giftInfo->product_id,
@@ -779,8 +779,8 @@ class APICartServices
                                         foreach ($giftawayInfo as $giftInfoK) {
                                             foreach ($giftInfoK as $giftInfo) {
                                                 //購買數量
-                                                if ($compare_n_value > $prod_qty[$product_id]) continue;
-                                                if ($prod_qty[$product_id] <= $item->n_value) continue;
+                                                if ($compare_n_value >= $prod_qty[$product_id]) continue;
+                                                if ($prod_qty[$product_id] < $item->n_value) continue;
                                                 $prod[] = array(
                                                     "productPhoto" => $campaign_gift['PROD'][$campaign['CART']['GIFT'][$product_id]->id][$giftInfo->product_id]['photo'],
                                                     "productId" => $giftInfo->product_id,
