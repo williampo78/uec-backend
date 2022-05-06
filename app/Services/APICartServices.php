@@ -331,7 +331,7 @@ class APICartServices
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
+                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -415,7 +415,7 @@ class APICartServices
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
+                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -473,7 +473,7 @@ class APICartServices
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
+                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -531,7 +531,7 @@ class APICartServices
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
+                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -582,7 +582,7 @@ class APICartServices
                                     "campaignDiscountStatus" => false,
                                     "campaignDiscount" => 0,
                                     "campaignGiftAway" => $prod_gift,
-                                    "campaignThresholdDiscount" => $campaignThreshold['DISCOUNT'][$product_id]
+                                    "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                 );
                                 $cartTotal += round($item_info->selling_price * $detail_qty);
                                 $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -901,8 +901,8 @@ class APICartServices
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
-                "thresholdDiscount" => $thresholdDiscount,
-                "thresholdGiftAway" => $thresholdGiftAway,
+                "thresholdDiscount" => isset($thresholdDiscount)?$thresholdDiscount:[],
+                "thresholdGiftAway" => isset($thresholdGiftAway)?$thresholdGiftAway:[],
                 "discount" => round($cartDiscount),
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
