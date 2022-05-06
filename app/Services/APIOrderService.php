@@ -57,11 +57,16 @@ class APIOrderService
         }
 
         //行銷活動
-        foreach ($campaigns as $product_id => $item) {
-            foreach ($item as $k => $v) {
-                $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+        foreach ($cart['list'] as $products) {
+            foreach ($campaigns as $product_id => $item) {
+                if ($products['productID'] == $product_id) {
+                    foreach ($item as $k => $v) {
+                        $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+                    }
+                }
             }
         }
+        //dd($campaign);
 
         DB::beginTransaction();
         try {
