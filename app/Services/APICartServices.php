@@ -182,11 +182,17 @@ class APICartServices
                 }
             }
             //行銷活動
+            $campaign_has_prod = [];
             foreach ($campaigns as $product_id => $item) {
                 foreach ($item as $k => $v) {
                     if ($now >= $v->start_at and $now <= $v->end_at) { //活動時間內才做
                         //先取活動類型為單品或車子(贈品或折扣) $campaign['PRD']['DISCOUNT'] 單品折扣
                         $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+                        //取C003滿額活動下有哪些商品
+                        $campaign_prod = PromotionalCampaign::find($v->id)->campaignProduct;
+                        foreach ($campaign_prod as $prod) {
+                            $campaign_has_prod[$v->id][$prod->product_id] = $prod->product_id;
+                        }
                         if ($v->campaign_type == 'CART04') {
                             $CART04[$v->id][$product_id] = 1;
                             $CART04_n[$v->id] = $v->n_value; //CART04 同系列商品滿額條件
@@ -197,10 +203,11 @@ class APICartServices
             //活動滿額門檻資料 (活動時間內才做)
             $campaignThreshold = [];
             $campaignThreshold_calc = [];
+            $campaignThresholdItem = [];
             $campaignInfo = [];
             $campaignThresholdGift = [];
-            if (isset($campaign['CART'])) {
-                foreach ($campaign['CART'] as $type => $items) {
+            if (isset($campaign['CART_P'])) {
+                foreach ($campaign['CART_P'] as $type => $items) {
                     foreach ($items as $product_id => $data) {
                         $campaignThreshold_brief = [];
                         $campaignThreshold_item = [];
@@ -209,7 +216,7 @@ class APICartServices
                             $campaignThreshold_brief[] = $threshold->threshold_brief;
                             $campaignThreshold_item[] = $threshold;
                             $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->campaignThresholdGift;
-                            $campaignThresholdGift[$product_id][$threshold->promotional_campaign_id][$threshold->id][] = $thresholdGift;
+                            $campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
 
                         }
                         //畫面顯示用
@@ -221,13 +228,24 @@ class APICartServices
                         //滿額計算用
                         $campaignThreshold_calc[$type][$product_id] = $campaignThreshold_item;
                         $campaignInfo[$type][$product_id] = $data;
+                        $campaignThresholdItem[$data->id] = $campaignThreshold_item;//活動門檻資料
+                        $campaignThresholdMain[$data->id] = $data; //活動主檔
                     }
                 }
             }
             //活動滿額門檻資料 (活動時間內才做)
-
+            //重組活動贈品
+            $threshold_prod = [];
+            foreach ($campaign_gift['PROD'] as $campaign_id => $item) {
+                foreach ($item as $product_id => $data) {
+                    if ($now >= $data['start_launched_at'] && $now <= $data['end_launched_at']) {
+                        $threshold_prod[$product_id] = $data;
+                    }
+                }
+            }
             $productRow = 0;
             $cartDiscount = 0;
+            $prod_campaign = [];//活動下的單品
             foreach ($cartQty as $product_id => $item) {
                 $product = [];
                 $prod_gift = [];
@@ -327,15 +345,20 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#1",
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
                                     $prod_qty[$product_id] += $return_qty;
+                                    if (isset($campaignThreshold['DISCOUNT'][$product_id])) {
+                                        $prod_campaign['DISCOUNT'][$campaignThreshold['DISCOUNT'][$product_id]['campaignId']][] = $product_id;
+                                    }
+                                    if (isset($campaignThreshold['GIFT'][$product_id])) {
+                                        $prod_campaign['GIFT'][$campaignThreshold['GIFT'][$product_id]['campaignId']][] = $product_id;
+                                    }
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -411,15 +434,20 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#2",
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
                                     $prod_qty[$product_id] += $return_qty;
+                                    if (isset($campaignThreshold['DISCOUNT'][$product_id])) {
+                                        $prod_campaign['DISCOUNT'][$campaignThreshold['DISCOUNT'][$product_id]['campaignId']][] = $product_id;
+                                    }
+                                    if (isset($campaignThreshold['GIFT'][$product_id])) {
+                                        $prod_campaign['GIFT'][$campaignThreshold['GIFT'][$product_id]['campaignId']][] = $product_id;
+                                    }
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -469,15 +497,20 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#3",
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
                                     $prod_qty[$product_id] += $return_qty;
+                                    if (isset($campaignThreshold['DISCOUNT'][$product_id])) {
+                                        $prod_campaign['DISCOUNT'][$campaignThreshold['DISCOUNT'][$product_id]['campaignId']][] = $product_id;
+                                    }
+                                    if (isset($campaignThreshold['GIFT'][$product_id])) {
+                                        $prod_campaign['GIFT'][$campaignThreshold['GIFT'][$product_id]['campaignId']][] = $product_id;
+                                    }
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -527,15 +560,20 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#4",
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
-                                        "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
                                     $prod_qty[$product_id] += $return_qty;
+                                    if (isset($campaignThreshold['DISCOUNT'][$product_id])) {
+                                        $prod_campaign['DISCOUNT'][$campaignThreshold['DISCOUNT'][$product_id]['campaignId']][] = $product_id;
+                                    }
+                                    if (isset($campaignThreshold['GIFT'][$product_id])) {
+                                        $prod_campaign['GIFT'][$campaignThreshold['GIFT'][$product_id]['campaignId']][] = $product_id;
+                                    }
                                     if ($product_type == 'effective') {
                                         $productRow++;
                                     }
@@ -578,15 +616,20 @@ class APICartServices
                                     "itemStock" => $stock,
                                     "outOfStock" => $outOfStock,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
-                                    "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
+                                    "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null) . "#5",
                                     "campaignDiscountStatus" => false,
                                     "campaignDiscount" => 0,
                                     "campaignGiftAway" => $prod_gift,
-                                    "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                                 );
                                 $cartTotal += round($item_info->selling_price * $detail_qty);
                                 $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
                                 $prod_qty[$product_id] += $detail_qty;
+                                if (isset($campaignThreshold['DISCOUNT'][$product_id])) {
+                                    $prod_campaign['DISCOUNT'][$campaignThreshold['DISCOUNT'][$product_id]['campaignId']][] = $product_id;
+                                }
+                                if (isset($campaignThreshold['GIFT'][$product_id])) {
+                                    $prod_campaign['GIFT'][$campaignThreshold['GIFT'][$product_id]['campaignId']][] = $product_id;
+                                }
                                 if ($product_type == 'effective') {
                                     $productRow++;
                                 }
@@ -630,15 +673,20 @@ class APICartServices
                                 "itemStock" => $stock,
                                 "outOfStock" => $outOfStock,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
-                                "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
+                                "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null) . "#6",
                                 "campaignDiscountStatus" => false,
                                 "campaignDiscount" => 0,
                                 "campaignGiftAway" => $prod_gift,
-                                "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                             );
                             $cartTotal += round($item_info->selling_price * $detail_qty);
                             $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
                             $prod_qty[$product_id] += $detail_qty;
+                            if (isset($campaignThreshold['DISCOUNT'][$product_id])) {
+                                $prod_campaign['DISCOUNT'][$campaignThreshold['DISCOUNT'][$product_id]['campaignId']][] = $product_id;
+                            }
+                            if (isset($campaignThreshold['GIFT'][$product_id])) {
+                                $prod_campaign['GIFT'][$campaignThreshold['GIFT'][$product_id]['campaignId']][] = $product_id;
+                            }
                             if ($product_type == 'effective') {
                                 $productRow++;
                             }
@@ -682,15 +730,20 @@ class APICartServices
                             "itemStock" => $stock,
                             "outOfStock" => $outOfStock,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
-                            "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
+                            "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null) . "#7",
                             "campaignDiscountStatus" => false,
                             "campaignDiscount" => 0,
                             "campaignGiftAway" => [],
-                            "campaignThresholdDiscount" => []
                         );
                         $cartTotal += 0;
                         $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
                         $prod_qty[$product_id] += $detail_qty;
+                        if (isset($campaignThreshold['DISCOUNT'][$product_id])) {
+                            $prod_campaign['DISCOUNT'][$campaignThreshold['DISCOUNT'][$product_id]['campaignId']][] = $product_id;
+                        }
+                        if (isset($campaignThreshold['GIFT'][$product_id])) {
+                            $prod_campaign['GIFT'][$campaignThreshold['GIFT'][$product_id]['campaignId']][] = $product_id;
+                        }
                         $productRow++;
                     }
                 }
@@ -702,108 +755,121 @@ class APICartServices
                     "sellingPrice" => $cartInfo[$product_id]['selling_price'],
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product,
+                    "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
                 );
 
-                //滿額折扣計算
-                $prodDiscount = 0;
-                $compare_n_value = 0;
-                if (isset($campaignThreshold_calc['DISCOUNT'][$product_id])) {
-                    foreach ($campaignThreshold_calc['DISCOUNT'][$product_id] as $item) {
-                        if ($compare_n_value >= $prod_amount[$product_id]) continue;
-                        if ($prod_amount[$product_id] < $item->n_value) continue;
-                        if ($prod_amount[$product_id] >= $compare_n_value) {
-                            if ($campaignInfo['DISCOUNT'][$product_id]->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
-                                $prodDiscount = $prod_amount[$product_id] - ($prod_amount[$product_id] * $item->x_value); //打折3000-(3000*0.95)
-                                $thresholdDiscount[] = array(
-                                    "campaignName" => $campaignInfo['DISCOUNT'][$product_id]->campaign_name,
-                                    "campaignBrief" => $item->threshold_brief,
-                                    "campaignDiscount" => ($prodDiscount * -1)
-                                );
-                                $cartDiscount += ($prodDiscount);
-                            } else if ($campaignInfo['DISCOUNT'][$product_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
-                                $prodDiscount = $item->x_value; //-200
-                                $thresholdDiscount[] = array(
-                                    "campaignName" => $campaignInfo['DISCOUNT'][$product_id]->campaign_name,
-                                    "campaignBrief" => $item->threshold_brief,
-                                    "campaignDiscount" => ($prodDiscount * -1)
-                                );
-                                $cartDiscount += ($prodDiscount);
-                            }
-                            $compare_n_value = $item->n_value;
-                        }
-                    }
-                }
-                //滿額折扣計算
-
-                $compare_n_value = 0;
-                //滿額贈品計算
-                if (isset($campaign['CART']['GIFT'][$product_id])) { //在活動內指定單品的滿額贈禮
-                    //﹝滿額﹞單品滿N元，送贈
-                    if ($campaign['CART']['GIFT'][$product_id]->campaign_type == 'CART_P03') {//﹝滿額﹞單品滿N元，送贈
-                        if (isset($campaignThreshold_calc['GIFT'][$product_id])) {
-                            foreach ($campaignThreshold_calc['GIFT'][$product_id] as $item) {
-                                //$campaign['CART']['GIFT'][$product_id]->id = campaign_id
-                                foreach ($campaignThresholdGift[$product_id][$campaign['CART']['GIFT'][$product_id]->id] as $threshold_id => $giftawayInfo) {
-                                    if ($threshold_id == $item->id) { //取同門檻贈品
-                                        foreach ($giftawayInfo as $giftInfoK) {
-                                            foreach ($giftInfoK as $giftInfo) {
-                                                //購買金額
-                                                if ($compare_n_value >= $prod_amount[$product_id]) continue;
-                                                if ($prod_amount[$product_id] < $item->n_value) continue;
-                                                $prod[] = array(
-                                                    "productPhoto" => $campaign_gift['PROD'][$campaign['CART']['GIFT'][$product_id]->id][$giftInfo->product_id]['photo'],
-                                                    "productId" => $giftInfo->product_id,
-                                                    "productName" => $campaign_gift['PROD'][$campaign['CART']['GIFT'][$product_id]->id][$giftInfo->product_id]['product_name'],
-                                                    "assignedQty" => $giftInfo->assigned_qty,
-                                                );
-                                                $compare_n_value = $item->n_value;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            $thresholdGiftAway[] = array(
-                                "campaignName" => $campaign['CART']['GIFT'][$product_id]->campaign_name,
-                                "campaignBrief" => $campaign['CART']['GIFT'][$product_id]->campaign_brief,
-                                "campaignProdList" => $prod,
-                            );
-                        }
-                    }
-                    //﹝滿額﹞單品滿N件，送贈
-                    if ($campaign['CART']['GIFT'][$product_id]->campaign_type == 'CART_P04') {//﹝滿額﹞單品滿N件，送贈
-                        if (isset($campaignThreshold_calc['GIFT'][$product_id])) {
-                            foreach ($campaignThreshold_calc['GIFT'][$product_id] as $item) {
-                                //$campaign['CART']['GIFT'][$product_id]->id = campaign_id
-                                foreach ($campaignThresholdGift[$product_id][$campaign['CART']['GIFT'][$product_id]->id] as $threshold_id => $giftawayInfo) {
-                                    if ($threshold_id == $item->id) { //取同門檻贈品
-                                        foreach ($giftawayInfo as $giftInfoK) {
-                                            foreach ($giftInfoK as $giftInfo) {
-                                                //購買數量
-                                                if ($compare_n_value >= $prod_qty[$product_id]) continue;
-                                                if ($prod_qty[$product_id] < $item->n_value) continue;
-                                                $prod[] = array(
-                                                    "productPhoto" => $campaign_gift['PROD'][$campaign['CART']['GIFT'][$product_id]->id][$giftInfo->product_id]['photo'],
-                                                    "productId" => $giftInfo->product_id,
-                                                    "productName" => $campaign_gift['PROD'][$campaign['CART']['GIFT'][$product_id]->id][$giftInfo->product_id]['product_name'],
-                                                    "assignedQty" => $giftInfo->assigned_qty,
-                                                );
-                                                $compare_n_value = $item->n_value;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            $thresholdGiftAway[] = array(
-                                "campaignName" => $campaign['CART']['GIFT'][$product_id]->campaign_name,
-                                "campaignBrief" => $campaign['CART']['GIFT'][$product_id]->campaign_brief,
-                                "campaignProdList" => isset($prod) ? $prod :null,
-                            );
-                        }
-                    }
-                }
-                //滿額贈品計算
-
             }
+
+            $calc_amount = [];
+            $calc_qty[] = 0;
+            $price = 0;
+            $quantity = 0;
+            $cartDiscount = 0;
+            $pid = [];
+            $thresholdDiscount_display = [];
+            //滿額折扣 CART_P01 & CART_P02
+            if (isset($prod_campaign['DISCOUNT'])) {
+                foreach ($prod_campaign['DISCOUNT'] as $campaign_id => $product_in_campaign) {
+                    foreach ($product_in_campaign as $key => $product_id) {
+                        $price += $prod_amount[$product_id];
+                        $quantity += $prod_qty[$product_id];
+                        $pid[] = $product_id;
+                    }
+                    $calc_amount[$campaign_id] = $price;
+                    $calc_qty[$campaign_id] = $quantity;
+                    $compare_n_value = 0;
+                    foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
+                        if ($calc_amount[$campaign_id] < $item->n_value) continue;
+                        if ($compare_n_value >= $calc_amount[$campaign_id]) continue;
+                        if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
+                            $prodDiscount = $calc_amount[$campaign_id] - round($calc_amount[$campaign_id] * $item->x_value); //打折3000-(3000*0.95)
+                        } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
+                            $prodDiscount = $item->x_value;
+                        }
+
+                        $thresholdDiscount[$campaign_id] = array(
+                            "thresholdID" => $item->id,
+                            "campaignID" => $campaign_id,
+                            "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
+                            "campaignBrief" => $item->threshold_brief,
+                            "campaignDiscount" => ($prodDiscount * -1),
+                            "products" => $pid
+                        );
+                        $cartDiscount += ($prodDiscount);
+                        $compare_n_value = $item->n_value;
+                    }
+                }
+
+                $thresholdDiscount_display = []; //重新調整結構for前端使用
+                foreach ($thresholdDiscount as $campaign_id=>$data ) {
+                    $thresholdDiscount_display[] = $data;
+                }
+            }
+
+            //滿額折扣CART_P01 & CART_P02
+            $calc_amount = [];
+            $calc_qty[] = 0;
+            $price = 0;
+            $quantity = 0;
+            $pid = [];
+            //滿額送贈 CART_P03 & CART_P04
+            if (isset($prod_campaign['GIFT'])) {
+                foreach ($prod_campaign['GIFT'] as $campaign_id => $product_in_campaign) {
+                    foreach ($product_in_campaign as $key => $product_id) {
+                        $price += $prod_amount[$product_id];
+                        $quantity += $prod_qty[$product_id];
+                        $pid[] = $product_id;
+                    }
+                    $calc_amount[$campaign_id] = $price;
+                    $calc_qty[$campaign_id] = $quantity;
+                    $compare_n_value = 0;
+                    foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
+                        if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P03') { //﹝滿額﹞指定商品滿N元，送贈
+                            if ($calc_amount[$campaign_id] < $item->n_value) continue;
+                            if ($compare_n_value >= $calc_amount[$campaign_id]) continue;
+                        } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P04') { //﹝滿額﹞指定商品滿N件送贈
+                            if ($calc_qty[$campaign_id] < $item->n_value) continue;
+                            if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
+                        }
+
+                        foreach ($campaignThresholdGift[$campaign_id] as $key => $giftawayInfo) {
+                            foreach ($giftawayInfo as $giftInfo) {
+                                foreach ($giftInfo as $k => $v) {
+                                    $prods[$v['product_id']] = array(
+                                        "productPhoto" => $threshold_prod[$v['product_id']]->photo,
+                                        "productId" => $v['product_id'],
+                                        "productName" => $threshold_prod[$v['product_id']]->product_name,
+                                        "assignedQty" => $v->assigned_qty,
+                                    );
+                                }
+                            }
+                        }
+                        $compare_n_value = $item->n_value;
+                    }
+
+                    $prods_display = [];//重新調整結構for前端使用
+                    foreach ($prods as $prod){
+                        $prods_display[] = $prod;
+                    }
+
+                    $thresholdGiftAway[$campaign_id] = array(
+                        "thresholdID" => $item->id,
+                        "campaignID" => $campaign_id,
+                        "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
+                        "campaignBrief" => $item->threshold_brief,
+                        "campaignProdList" => $prods_display,
+                        "products" => $pid,
+                    );
+                }
+
+                $thresholdGiftAway_display = []; //重新調整結構for前端使用
+                foreach ($thresholdGiftAway as $campaign_id=>$data ) {
+                    $thresholdGiftAway_display[] = $data;
+                }
+            }
+            //滿額送贈 CART_P03 & CART_P04
+
+
             //全車滿額贈
             //$cartDiscount = 0;
             $compare_n_value = 0;
@@ -896,13 +962,15 @@ class APICartServices
                 $fee = 0;
             }
             $cart = [];
+
+
             $cart = array(
                 "feeInfo" => $feeInfo,
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
-                "thresholdDiscount" => isset($thresholdDiscount)?$thresholdDiscount:[],
-                "thresholdGiftAway" => isset($thresholdGiftAway)?$thresholdGiftAway:[],
+                "thresholdDiscount" => isset($thresholdDiscount_display) ? $thresholdDiscount_display : [],
+                "thresholdGiftAway" => isset($thresholdGiftAway_display) ? $thresholdGiftAway_display : [],
                 "discount" => round($cartDiscount),
                 "giftAway" => $cartGift,
                 "point" => $pointInfo,
