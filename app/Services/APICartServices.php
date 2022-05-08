@@ -182,17 +182,11 @@ class APICartServices
                 }
             }
             //行銷活動
-            $campaign_has_prod = [];
             foreach ($campaigns as $product_id => $item) {
                 foreach ($item as $k => $v) {
                     if ($now >= $v->start_at and $now <= $v->end_at) { //活動時間內才做
                         //先取活動類型為單品或車子(贈品或折扣) $campaign['PRD']['DISCOUNT'] 單品折扣
                         $campaign[$v->level_code][$v->category_code][$product_id] = $v;
-                        //取C003滿額活動下有哪些商品
-                        $campaign_prod = PromotionalCampaign::find($v->id)->campaignProduct;
-                        foreach ($campaign_prod as $prod) {
-                            $campaign_has_prod[$v->id][$prod->product_id] = $prod->product_id;
-                        }
                         if ($v->campaign_type == 'CART04') {
                             $CART04[$v->id][$product_id] = 1;
                             $CART04_n[$v->id] = $v->n_value; //CART04 同系列商品滿額條件
@@ -202,9 +196,7 @@ class APICartServices
             }
             //活動滿額門檻資料 (活動時間內才做)
             $campaignThreshold = [];
-            $campaignThreshold_calc = [];
             $campaignThresholdItem = [];
-            $campaignInfo = [];
             $campaignThresholdGift = [];
             if (isset($campaign['CART_P'])) {
                 foreach ($campaign['CART_P'] as $type => $items) {
@@ -226,8 +218,6 @@ class APICartServices
                             "campaignThreshold" => $campaignThreshold_brief
                         );
                         //滿額計算用
-                        $campaignThreshold_calc[$type][$product_id] = $campaignThreshold_item;
-                        $campaignInfo[$type][$product_id] = $data;
                         $campaignThresholdItem[$data->id] = $campaignThreshold_item;//活動門檻資料
                         $campaignThresholdMain[$data->id] = $data; //活動主檔
                     }
@@ -345,7 +335,7 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#1",
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
@@ -434,7 +424,7 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#2",
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => 0,
                                         "campaignGiftAway" => $prod_gift,
@@ -497,7 +487,7 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#3",
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
@@ -560,7 +550,7 @@ class APICartServices
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
-                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name . "#4",
+                                        "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
@@ -616,7 +606,7 @@ class APICartServices
                                     "itemStock" => $stock,
                                     "outOfStock" => $outOfStock,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
-                                    "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null) . "#5",
+                                    "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                                     "campaignDiscountStatus" => false,
                                     "campaignDiscount" => 0,
                                     "campaignGiftAway" => $prod_gift,
@@ -673,7 +663,7 @@ class APICartServices
                                 "itemStock" => $stock,
                                 "outOfStock" => $outOfStock,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
-                                "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null) . "#6",
+                                "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
                                 "campaignDiscountStatus" => false,
                                 "campaignDiscount" => 0,
                                 "campaignGiftAway" => $prod_gift,
@@ -730,7 +720,7 @@ class APICartServices
                             "itemStock" => $stock,
                             "outOfStock" => $outOfStock,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
-                            "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null) . "#7",
+                            "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                             "campaignDiscountStatus" => false,
                             "campaignDiscount" => 0,
                             "campaignGiftAway" => [],
