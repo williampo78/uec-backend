@@ -755,12 +755,12 @@ class APICartServices
             $price = 0;
             $quantity = 0;
             $cartDiscount = 0;
-            $pid = [];
             $thresholdDiscount_display = [];
             $thresholdAmount = 0;
             //滿額折扣 CART_P01 & CART_P02
             if (isset($prod_campaign['DISCOUNT'])) {
                 foreach ($prod_campaign['DISCOUNT'] as $campaign_id => $product_in_campaign) {
+                    $pid = [];
                     foreach ($product_in_campaign as $key => $product_id) {
                         $price += $prod_amount[$product_id];
                         $quantity += $prod_qty[$product_id];
@@ -805,10 +805,10 @@ class APICartServices
             $calc_qty[] = 0;
             $price = 0;
             $quantity = 0;
-            $pid = [];
             //滿額送贈 CART_P03 & CART_P04
             if (isset($prod_campaign['GIFT'])) {
                 foreach ($prod_campaign['GIFT'] as $campaign_id => $product_in_campaign) {
+                    $pid = [];
                     foreach ($product_in_campaign as $key => $product_id) {
                         $price += $prod_amount[$product_id];
                         $quantity += $prod_qty[$product_id];
@@ -825,16 +825,18 @@ class APICartServices
                             if ($calc_qty[$campaign_id] < $item->n_value) continue;
                             if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
                         }
-
+                        $threshold_id = 0;
                         foreach ($campaignThresholdGift[$campaign_id] as $key => $giftawayInfo) {
                             foreach ($giftawayInfo as $giftInfo) {
                                 foreach ($giftInfo as $k => $v) {
+                                    if ($threshold_id != $v->threshold_id)
                                     $prods[$v['product_id']] = array(
                                         "productPhoto" => $threshold_prod[$v['product_id']]->photo,
                                         "productId" => $v['product_id'],
                                         "productName" => $threshold_prod[$v['product_id']]->product_name,
                                         "assignedQty" => $v->assigned_qty,
                                     );
+                                    $threshold_id = $v->threshold_id;
                                 }
                             }
                         }
