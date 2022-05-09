@@ -33,7 +33,7 @@ class APIIndexServices
 
         $strSQL = "select ad1.`slot_code`, ad1.`slot_desc`, ad1.`slot_type`, ad1.`is_mobile_applicable`, ad1.`is_desktop_applicable`
                 , ad2.`slot_color_code`, ad2.`slot_icon_name`, ad2.`slot_title`, ad2.`product_assigned_type`
-                , ad3.*, event.`campaign_brief`
+                , ad3.*, event.`url_code`
                 from `ad_slots` ad1
                 inner join `ad_slot_contents` ad2 on ad2.`slot_id`=ad1.`id`
                 inner join `ad_slot_content_details` ad3 on ad3.`ad_slot_content_id`=ad2.`id`
@@ -82,7 +82,7 @@ class APIIndexServices
                     'url' => $ad_slot->target_url,
                     'target_blank' => $ad_slot->is_target_blank,
                     'target_campaign' => $ad_slot->target_campaign_id,
-                    'campaign_brief' => $ad_slot->campaign_brief,
+                    'campaign_url_code' => $ad_slot->url_code,
                     'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                     'img_action' => $ad_slot->image_action,
                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
@@ -101,7 +101,7 @@ class APIIndexServices
                     'url' => $ad_slot->target_url,
                     'target_blank' => $ad_slot->is_target_blank,
                     'target_campaign' => $ad_slot->target_campaign_id,
-                    'campaign_brief' => $ad_slot->campaign_brief,
+                    'campaign_url_code' => $ad_slot->url_code,
                     'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
@@ -261,7 +261,7 @@ class APIIndexServices
                                 'url' => $ad_slot->target_url,
                                 'target_blank' => $ad_slot->is_target_blank,
                                 'target_campaign' => $ad_slot->target_campaign_id,
-                                'campaign_brief' => $ad_slot->campaign_brief,
+                                'campaign_url_code' => $ad_slot->url_code,
                                 'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                                 'mobile_applicable' => $ad_slot->is_mobile_applicable,
                                 'desktop_applicable' => $ad_slot->is_desktop_applicable
@@ -279,7 +279,7 @@ class APIIndexServices
                                 'url' => $ad_slot->target_url,
                                 'target_blank' => $ad_slot->is_target_blank,
                                 'target_campaign' => $ad_slot->target_campaign_id,
-                                'campaign_brief' => $ad_slot->campaign_brief,
+                                'campaign_url_code' => $ad_slot->url_code,
                                 'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                                 'mobile_applicable' => $ad_slot->is_mobile_applicable,
                                 'desktop_applicable' => $ad_slot->is_desktop_applicable
