@@ -30,16 +30,18 @@ class AuthController extends Controller
     {
 
         $err = null;
-        $credentials = request(['mobile', 'pwd']);
-
+        $credentials = request(['mobile', 'pwd', 'captcha', 'key']);
         $messages = [
             'mobile.required' => '帳號不能為空',
             'pwd.required' => '密碼不能為空',
+            'captcha.required' => '驗證碼不能為空',
+            'captcha.captcha_api' => '驗證碼錯誤',
         ];
 
         $v = Validator::make($credentials, [
             'mobile' => 'required',
             'pwd' => 'required',
+            'captcha' => 'required|captcha_api:'.$credentials['key'].',flat',
         ], $messages);
 
         if ($v->fails()) {
@@ -49,6 +51,7 @@ class AuthController extends Controller
         $credentials['channel'] = "EC";
         $credentials['password'] = $credentials['pwd'];
         unset($credentials['pwd']);
+        unset($credentials['captcha']);
         $fields = json_encode($credentials);
         $response = $this->apiService->memberLogin($fields);
         $result = json_decode($response, true);
