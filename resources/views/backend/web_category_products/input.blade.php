@@ -14,6 +14,15 @@
             display: none;
         }
 
+        .nav-tabs li a {
+            color: #333;
+            pointer-events: none;
+        }
+
+        .nav-tabs .active a {
+            font-weight: bold;
+        }
+
     </style>
     <div id="page-wrapper">
         <div class="row">
@@ -90,8 +99,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <textarea style="display:none" name="category_products_list_json" cols="30"
-                                        rows="10">@{{ category_products_list }}</textarea>
+                                    <textarea style="display: none" name="category_products_list_json" cols="30" rows="10">@{{ category_products_list }}</textarea>
                                     <hr>
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -100,15 +108,17 @@
                                                     <div class="col-sm-4">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="content_type" id="content_type1"
-                                                                value="P" checked="checked">指定商品
+                                                                v-model="category_hierarchy_content.content_type"
+                                                                :value="'P'">指定商品
                                                         </label>
                                                     </div>
-                                                    {{-- <div class="col-sm-4">
+                                                    <div class="col-sm-4">
                                                         <label class="radio-inline">
-                                                            <input type="radio" name="content_type"
-                                                            id="content_type2" value="0">指定賣場
+                                                            <input type="radio" name="content_type" id="content_type2"
+                                                                v-model="category_hierarchy_content.content_type"
+                                                                :value="'M'">指定賣場
                                                         </label>
-                                                    </div> --}}
+                                                    </div>
                                                 </div>
                                                 <div class="col-sm-6">
                                                 </div>
@@ -118,13 +128,11 @@
                                     </div>
                                     @include('backend.web_category_products.tab_list')
                                     <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <button type="button" class="btn btn-success" @click="submit"
-                                                    id="btn-save"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
-                                                <a class="btn btn-danger" type="button"
-                                                    href="{{ route('web_category_products') }}"><i class="fa-solid fa-ban"></i> 取消</a>
-                                            </div>
+                                        <div class="col-sm-1 pull-right">
+                                            <a class="btn btn-danger" type="button" href="{{redirect()->back()->getTargetUrl()}}"><i class="fa-solid fa-ban"></i> 取消</a>
+                                        </div>
+                                        <div class="col-sm-1 pull-right">
+                                                <button type="button" class="btn btn-success " @click="submit" id="btn-save"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
                                         </div>
                                     </div>
                                 </div>
@@ -145,13 +153,14 @@
                 return {
                     category_products_list: @json($category_products_list),
                     select_req: {
-                        // supplier_id :$('#supplier').val() ,
                         product_no: '',
                         product_name: '',
                         selling_price_min: '',
                         selling_price_max: '',
                     },
+                    category_hierarchy_content: @json($category_hierarchy_content),
                     result_products: [],
+                    result_promotional_campaigns:[],
                 }
             },
             methods: {
@@ -162,7 +171,7 @@
                     var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
                     var selling_price_min = $('input[name="selling_price_min"]').val();
                     var selling_price_max = $('input[name="selling_price_max"]').val();
-                    var supplier_id = $('#supplier').val() ;
+                    var supplier_id = $('#supplier').val();
                     var limit = $('#limit').val();
                     var product_type = $('#product_type').val();
                     var filter_product_id = [];
@@ -173,7 +182,7 @@
                         const response = await axios.post('/backend/web_category_products/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'getProductsList',
-                            supplier_id:supplier_id,
+                            supplier_id: supplier_id,
                             product_no: this.select_req.product_no,
                             product_name: this.select_req.product_name,
                             selling_price_min: selling_price_min,
@@ -183,10 +192,24 @@
                             start_launched_at_start: start_launched_at_start, //上架 - 起
                             start_launched_at_end: start_launched_at_end, //上架 - 止
                             filter_product_id: filter_product_id, //排除掉 ID
-                            limit:limit,
-                            product_type:product_type,
+                            limit: limit,
+                            product_type: product_type,
                         });
                         this.result_products = response.data.result.data;
+                    }
+                    req();
+                },
+                promotionalCampaignsGetAjax(){
+                    var promotional_campaigns_time_type = $('#promotional_campaigns_time_type').val();
+                    var promotional_campaigns_key_word = $('#promotional_campaigns_key_word').val();
+                    var req = async () => {
+                        const response = await axios.post('/backend/web_category_products/ajax', {
+                            _token: $('meta[name="csrf-token"]').attr('content'),
+                            type: 'promotionalCampaignsGetAjax',
+                            promotional_campaigns_time_type:promotional_campaigns_time_type,
+                            promotional_campaigns_key_word:promotional_campaigns_key_word,
+                        });
+                        this.result_promotional_campaigns = response.data.result.data;
                     }
                     req();
                 },
@@ -257,12 +280,16 @@
                     }
 
                 },
-                TESTFUNCTION() {
-                    var start_created_at = $('input[name="start_created_at"]').val();
-                    var end_created_at = $('input[name="end_created_at"]').val();
-                    var start_launched_at_start = $('input[name="start_launched_at_start"]').val();
-                    var start_launched_at_end = $('input[name="start_launched_at_end"]').val();
-                }
+                exchange_promotional_campaigns(promotional_campaigns_data){
+
+                    this.category_hierarchy_content.campaign_name = promotional_campaigns_data.campaign_name;
+                    this.category_hierarchy_content.promotion_campaign_id = promotional_campaigns_data.id;
+                    $('#campaign_name').rules("add", {required: true,});
+                },
+                del_promotion_campaign_id(){
+                    this.category_hierarchy_content.campaign_name = null;
+                    this.category_hierarchy_content.promotion_campaign_id = null;
+                },
             },
             mounted: function() {
                 let start_created_at_flatpickr = flatpickr("#start_created_at_flatpickr", {
@@ -299,15 +326,15 @@
 
                 $("#supplier").select2();
                 $('#product_type').select2();
-                // $('#products_model_list').DataTable({
-                //     "lengthChange": false
-                // });
-
+                $("#promotional_campaigns_time_type").select2({
+                    allowClear: false,
+                    theme: "bootstrap",
+                });
                 // 驗證表單
                 $("#update-form").validate({
                     // debug: true,
                     submitHandler: function(form) {
-                        $('#btn-save').prop('disabled', true);
+                        console.log('submit') ;
                         form.submit();
                     },
                     rules: {
@@ -317,6 +344,9 @@
                         active: {
                             required: true,
                         },
+                        campaign_name:{
+                            required: true,
+                        }
                     },
                     errorClass: "help-block",
                     errorElement: "span",
@@ -345,7 +375,23 @@
                 });
             },
             computed: {},
-
+            watch: {
+                'category_hierarchy_content.content_type': function() {
+                    // 監聽切換型態 - M賣場 P商品
+                    if (this.category_hierarchy_content.content_type == 'M' && this.category_products_list
+                        .length > 0) {
+                        alert('請先將商品刪除');
+                        this.category_hierarchy_content.content_type = 'P';
+                        $("#content_type1").prop("checked", true);
+                    }
+                    if (this.category_hierarchy_content.content_type == 'P' && this.category_hierarchy_content
+                        .promotion_campaign_id !== null) {
+                        alert('請先將賣場移除');
+                        this.category_hierarchy_content.content_type = 'M';
+                        $("#content_type2").prop("checked", true);
+                    }
+                },
+            }
         });
 
         new products().$mount('#category_hierarchy_content_input');
