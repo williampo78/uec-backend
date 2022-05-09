@@ -958,4 +958,45 @@ class APIProductServices
         return $data;
 
     }
+
+    /*
+     * 取得滿額活動折扣內容
+     * @param
+     */
+    public function getCampaignDiscountByID($campaigns)
+    {
+        $explode_campaign = explode(",", $campaigns);
+        $now = Carbon::now();
+
+        $now = Carbon::now();
+        $promotional = PromotionalCampaign::where('active', '=', '1')
+            ->where("start_at", "<=", $now)
+            ->where("end_at", ">=", $now)->get();
+        foreach ($promotional as $promotion) {
+            $discount[$promotion->id] = $promotion;
+        }
+        $discountArray = [];
+        foreach ($explode_campaign as $k => $campaign_id) {
+            if (isset($discount[$campaign_id])) {
+                $discountArray[] = array(
+                    "campaignID" => $campaign_id,
+                    "campaignUrlCode" => $discount[$campaign_id]['url_code'],
+                    "campaignBrief" => $discount[$campaign_id]['campaign_brief'] ?? $discount[$campaign_id]['campaign_name'],
+                    "campaignName" => $discount[$campaign_id]['campaign_name'],
+                    "expireDate" => $discount[$campaign_id]['end_at'],
+                    "gotoEvent" => ($discount[$campaign_id]['level_code'] == 'CART_P' ? true : false),
+                );
+            }
+        }
+
+        if (count($discountArray) > 0) {
+            $result['status'] = 200;
+            $result['result'] = $discountArray;
+        } else {
+            $result['status'] = 401;
+            $result['result'] = null;
+        }
+
+        return $result;
+    }
 }

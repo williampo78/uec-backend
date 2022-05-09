@@ -223,4 +223,25 @@ class ProductController extends Controller
 
     }
 
+
+    /*
+     * 取得滿額活動折扣內容
+     * @param int $id
+     */
+    public function getCampaignDiscount($id)
+    {
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductService->getCampaignDiscountByID($id);
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
+
+    }
+
 }
