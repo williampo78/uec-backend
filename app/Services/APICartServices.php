@@ -844,8 +844,10 @@ class APICartServices
                     }
 
                     $prods_display = [];//重新調整結構for前端使用
-                    foreach ($prods as $prod){
-                        $prods_display[] = $prod;
+                    if (isset($prods)) {
+                        foreach ($prods as $prod) {
+                            $prods_display[] = $prod;
+                        }
                     }
 
                     $thresholdGiftAway[$campaign_id] = array(
