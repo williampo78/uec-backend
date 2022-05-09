@@ -248,7 +248,7 @@ class APIProductServices
         $web_category_hierarchy_id = 0;
         foreach ($products as $product) {
             if (!$id) {//依產品編號找相關分類不進此判斷
-                if ($product->id == $product_id && $product->web_category_hierarchy_id==$web_category_hierarchy_id) continue;
+                if ($product->id == $product_id && $product->web_category_hierarchy_id == $web_category_hierarchy_id) continue;
             }
             $data[$product->web_category_hierarchy_id][] = $product;
             $product_id = $product->id;
@@ -347,8 +347,8 @@ class APIProductServices
 
                 }
             }
-            $return_data=[];
-            foreach ($data as $key=>$product){
+            $return_data = [];
+            foreach ($data as $key => $product) {
                 $return_data[] = $product;
             }
             //array_multisort(array_column($data, 'selling_price'), $sort_flag, $data);
@@ -638,7 +638,8 @@ class APIProductServices
                     if ($item->product_id == $id) {
                         $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
                             "campaign_id" => $item->id,
-                            "campaign_name" => $item->campaign_name,
+                            "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
+                            "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
                         );
                     }
                 }
