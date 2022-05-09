@@ -791,8 +791,10 @@ class APICartServices
                 }
 
                 $thresholdDiscount_display = []; //重新調整結構for前端使用
-                foreach ($thresholdDiscount as $campaign_id=>$data ) {
-                    $thresholdDiscount_display[] = $data;
+                if (isset($thresholdDiscount)) {
+                    foreach ($thresholdDiscount as $campaign_id => $data) {
+                        $thresholdDiscount_display[] = $data;
+                    }
                 }
             }
 
@@ -853,8 +855,10 @@ class APICartServices
                 }
 
                 $thresholdGiftAway_display = []; //重新調整結構for前端使用
-                foreach ($thresholdGiftAway as $campaign_id=>$data ) {
-                    $thresholdGiftAway_display[] = $data;
+                if (isset($thresholdGiftAway)) {
+                    foreach ($thresholdGiftAway as $campaign_id => $data) {
+                        $thresholdGiftAway_display[] = $data;
+                    }
                 }
             }
             //滿額送贈 CART_P03 & CART_P04
