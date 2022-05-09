@@ -278,14 +278,12 @@ class APIProductServices
         if ($products) {
             $promotion = self::getPromotion('product_card');
             foreach ($promotion as $k => $v) {
+                $promotion_txt = '';
                 foreach ($v as $label) {
-                    $promotional_array[$k][$label->promotional_label] = $label->promotional_label;
-                }
-            }
-
-            foreach ($promotional_array as $product_id => $label) {
-                foreach ($label as $k=>$v){
-                    $promotional[$product_id][] = $v;
+                    if ($promotion_txt != $label->promotional_label) {
+                        $promotional[$k][] = $label->promotional_label;
+                        $promotion_txt = $label->promotional_label;
+                    }
                 }
             }
             $login = Auth::guard('api')->check();
@@ -385,6 +383,7 @@ class APIProductServices
         for ($i = $startRow; $i <= $endRow; $i++) {
             $list[] = $data[$i];
         }
+
         $result = array('totalRows' => $totalRows, 'totalPages' => $totalPages, 'currentPage' => $currentPage, 'list' => $list);
         return $result;
 
@@ -645,7 +644,8 @@ class APIProductServices
                     if ($item->product_id == $id) {
                         $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
                             "campaign_id" => $item->id,
-                            "campaign_name" => $item->campaign_name,
+                            "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
+                            "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
                         );
                     }
                 }
@@ -1072,6 +1072,47 @@ class APIProductServices
             $result['status'] = 401;
             $result['result'] = null;
         }
+        return $result;
+    }
+
+    /*
+     * 取得滿額活動折扣內容
+     * @param
+     */
+    public function getCampaignDiscountByID($campaigns)
+    {
+        $explode_campaign = explode(",", $campaigns);
+        $now = Carbon::now();
+
+        $now = Carbon::now();
+        $promotional = PromotionalCampaign::where('active', '=', '1')
+            ->where("start_at", "<=", $now)
+            ->where("end_at", ">=", $now)->get();
+        foreach ($promotional as $promotion) {
+            $discount[$promotion->id] = $promotion;
+        }
+        $discountArray = [];
+        foreach ($explode_campaign as $k => $campaign_id) {
+            if (isset($discount[$campaign_id])) {
+                $discountArray[] = array(
+                    "campaignID" => $campaign_id,
+                    "campaignUrlCode" => $discount[$campaign_id]['url_code'],
+                    "campaignBrief" => $discount[$campaign_id]['campaign_brief'] ?? $discount[$campaign_id]['campaign_name'],
+                    "campaignName" => $discount[$campaign_id]['campaign_name'],
+                    "expireDate" => $discount[$campaign_id]['end_at'],
+                    "gotoEvent" => ($discount[$campaign_id]['level_code'] == 'CART_P' ? true : false),
+                );
+            }
+        }
+
+        if (count($discountArray) > 0) {
+            $result['status'] = 200;
+            $result['result'] = $discountArray;
+        } else {
+            $result['status'] = 401;
+            $result['result'] = null;
+        }
+
         return $result;
     }
 }
