@@ -762,10 +762,12 @@ class APICartServices
             if (isset($prod_campaign['DISCOUNT'])) {
                 foreach ($prod_campaign['DISCOUNT'] as $campaign_id => $product_in_campaign) {
                     $pid = [];
+                    $subAmount = [];
                     foreach ($product_in_campaign as $key => $product_id) {
                         $price += $prod_amount[$product_id];
                         $quantity += $prod_qty[$product_id];
                         $pid[] = $product_id;
+                        $subAmount[] = $prod_amount[$product_id];
                     }
                     $calc_amount[$campaign_id] = $price;
                     $calc_qty[$campaign_id] = $quantity;
@@ -785,8 +787,11 @@ class APICartServices
                             "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
                             "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
                             "campaignBrief" => $item->threshold_brief,
+                            "campaignNvalue" => $item->n_value,
+                            "campaignXvalue" => $item->x_value,
                             "campaignDiscount" => ($prodDiscount * -1),
-                            "products" => $pid
+                            "products" => $pid,
+                            "productAmount" => $subAmount
                         );
                         $cartDiscount += ($prodDiscount);
                         $compare_n_value = $item->n_value;
@@ -811,10 +816,12 @@ class APICartServices
             if (isset($prod_campaign['GIFT'])) {
                 foreach ($prod_campaign['GIFT'] as $campaign_id => $product_in_campaign) {
                     $pid = [];
+                    $subAmount = [];
                     foreach ($product_in_campaign as $key => $product_id) {
                         $price += $prod_amount[$product_id];
                         $quantity += $prod_qty[$product_id];
                         $pid[] = $product_id;
+                        $subAmount[] = $prod_amount[$product_id];
                     }
                     $calc_amount[$campaign_id] = $price;
                     $calc_qty[$campaign_id] = $quantity;
@@ -836,6 +843,7 @@ class APICartServices
                                         "productPhoto" => $threshold_prod[$v['product_id']]->photo,
                                         "productId" => $v['product_id'],
                                         "productName" => $threshold_prod[$v['product_id']]->product_name,
+                                        "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
                                         "assignedQty" => $v->assigned_qty,
                                     );
                                     $threshold_id = $v->threshold_id;
@@ -858,8 +866,11 @@ class APICartServices
                         "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
                         "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
                         "campaignBrief" => $item->threshold_brief,
+                        "campaignNvalue" => $item->n_value,
+                        "campaignXvalue" => $item->x_value,
                         "campaignProdList" => $prods_display,
                         "products" => $pid,
+                        "productAmount" => $subAmount
                     );
                 }
 
