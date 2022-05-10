@@ -215,6 +215,7 @@ class APICartServices
                         $campaignThreshold[$type][$product_id] = array(
                             "campaignId" => $data->id,
                             "campaignName" => $data->campaign_name,
+                            "campaignUrlCode" => $data->url_code,
                             "campaignThreshold" => $campaignThreshold_brief
                         );
                         //滿額計算用
