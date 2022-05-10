@@ -570,7 +570,7 @@
                                     </div>
                                     <div class="col-sm-1">
                                         <div class="form-group">
-                                            <input class="form-control" name="expiry_days" value="0">
+                                            <input class="form-control" name="warranty_days" value="0">
                                         </div>
                                     </div>
                                 </div>
