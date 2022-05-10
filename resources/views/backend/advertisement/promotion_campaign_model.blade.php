@@ -72,7 +72,7 @@
                             <br>
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
                             id="products_model_list" data-page-length='100'>
-                            <thead id="promotion_campaign_model_list">
+                            <thead>
                                 <tr>
                                     <th>功能</th>
                                     <th>活動文案</th>
@@ -80,13 +80,7 @@
                                     <th>活動ID</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>2</td>
-                                    <td>3</td>
-                                    <td>4</td>
-                                </tr>
+                            <tbody id="promotion_campaign_model_list">
                             </tbody>
                         </table>
                         </div>

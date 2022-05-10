@@ -291,8 +291,12 @@ class AdvertisementLaunchController extends Controller
      * @return json
      */
     public function searchPromotionCampaign(Request $request){
+        $in = $request->input();
+        $data = $this->advertisement_service->searchPromotionCampaign($in);
         return response()->json([
             'status' => true,
+            'data' => $data ,
+            'in'=>$in,
         ]);
     }
 }

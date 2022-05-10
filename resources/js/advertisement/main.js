@@ -377,6 +377,7 @@ window.init = (datas = {}) => {
         $('#promotion_campaign_model').modal('toggle');
     });
     $(document).on("click" , ".search_btn",function(){
+        $("#promotion_campaign_model_list").empty();
         let type = $(this).data('type') ;
         let promotional_campaigns_key_word = $('#promotional_campaigns_key_word').val() ;
         let promotional_campaigns_time_type = $('#promotional_campaigns_time_type').val() ;
@@ -384,10 +385,27 @@ window.init = (datas = {}) => {
         switch (type) {
             case 'promotion_campaign':
                 axios.post('/backend/advertisemsement_launch/ajax/search-promotion-campaign', {
-                    'id': '1'
+                    'promotional_campaigns_key_word' :promotional_campaigns_key_word,
+                    'promotional_campaigns_time_type':promotional_campaigns_time_type,
+                    'level_code':level_code,
                 })
                 .then(function(response) {
-                   console.log(response) ;
+                    let html = '' ;
+                    $.each( response.data.data, function( key, value ) {
+                        html +=
+                        `<tr>
+                            <td>
+                                <button type="button" class="btn btn-primary btn_add_promotion_campaign"
+                                data-id="${value.id}" data-name="${value.campaign_name}"
+                                data-dismiss="modal">帶入
+                                </button>
+                            </td>
+                            <td>${value.campaign_name}</td>
+                            <td>${value.start_at} ~ ${value.end_at}上架時間</td>
+                            <td>${value.id}</td>
+                        </tr>`
+                    });
+                    $('#promotion_campaign_model_list').append(html);
                 })
                 .catch(function(error) {
                     console.log('ERROR');
@@ -396,6 +414,11 @@ window.init = (datas = {}) => {
         }
     });
 
+    $(document).on("click" , ".btn_add_promotion_campaign",function(){
+        let now_row_num = $('#now_row_num').val();
+        $('.target_campaign_name_'+now_row_num).val($(this).data('name'));
+        $('.target_campaign_id_'+now_row_num).val($(this).data('id'));
+    });
     // 刪除圖片區的圖片
     $(document).on("click", ".btn-delete-image-block-image-name", function () {
         $(this).siblings(".img_image_block_image_name").attr("src", "").hide();
@@ -553,8 +576,8 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
                         </div>
                         <div class="col-sm-8">
                             <div class="form-group">
-                                <input type="text" class="form-control" name="target_campaign_name[${image_block_row_no}]" value="${target_campaign_name}" readonly/>
-                                <input type="hidden" class="form-control" name="target_campaign_id[${image_block_row_no}]" value="${target_campaign_id}" readonly/>
+                                <input type="text" class="form-control target_campaign_name_${image_block_row_no}" name="target_campaign_name[${image_block_row_no}]" value="${target_campaign_name}" readonly/>
+                                <input type="hidden" class="form-control target_campaign_id_${image_block_row_no}" name="target_campaign_id[${image_block_row_no}]" value="${target_campaign_id}" readonly/>
                             </div>
                         </div>
                         <div class="col-sm-12 target_campaign_btn_div" style="display:none;">

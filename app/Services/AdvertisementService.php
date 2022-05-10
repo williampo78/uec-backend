@@ -848,5 +848,26 @@ class AdvertisementService
         }
 
     }
+    public function searchPromotionCampaign($in){
+        $now = Carbon::now();
+        $promotionalCampaigns = DB::table('promotional_campaigns');
+        if (!empty($in['level_code'])) {
+            $promotionalCampaigns->where('level_code', $in['level_code']);
+        }
+        if (!empty($in['promotional_campaigns_time_type'])) {
+            if ($in['promotional_campaigns_time_type'] == 'all') {
+            }
+            if ($in['promotional_campaigns_time_type'] == 'not_expired') {
+                $promotionalCampaigns->where('start_at', '<=', $now)->where('end_at', '>=', $now);
+            }
+        }
+        if (!empty($in['promotional_campaigns_key_word'])) {
+            $promotionalCampaigns->whereLike('campaign_name', $in['promotional_campaigns_key_word'])->orWhereLike('campaign_brief', $in['promotional_campaigns_key_word']);
+        }
+        if (!empty($in['id'])) {
+            $promotionalCampaigns->where('id', $in['id']);
+        };
+        return $promotionalCampaigns->get();
+    }
 
 }
