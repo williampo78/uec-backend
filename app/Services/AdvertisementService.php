@@ -260,7 +260,9 @@ class AdvertisementService
             ->where('lookup_values_v.type_code', 'APPLICABLE_PAGE')
             ->find($id);
 
-        $result['details'] = AdSlotContentDetail::where('ad_slot_content_id', $id)
+        $result['details'] = AdSlotContentDetail::select('ad_slot_content_details.*',DB::raw('promotional_campaigns.campaign_name as campaign_name'))
+            ->where('ad_slot_content_id', $id)
+            ->leftJoin('promotional_campaigns', 'ad_slot_content_details.target_campaign_id', '=', 'promotional_campaigns.id')
             ->orderBy('sort', 'ASC')
             ->get();
 
@@ -279,7 +281,6 @@ class AdvertisementService
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         $slot = $this->getSlotById($input_data['slot_id']);
-
         DB::beginTransaction();
 
         try {
@@ -327,7 +328,6 @@ class AdvertisementService
 
                 AdSlotContent::findOrFail($slot_contents_id)->update($update_content_data);
             }
-
             // 新增圖檔資料 (圖檔 or 圖檔+商品)
             if ($slot['slot_type'] == 'I' || $slot['slot_type'] == 'IS') {
                 if (isset($input_data['image_block_id'])) {
@@ -341,6 +341,7 @@ class AdvertisementService
                         $detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key] ?? null;
                         $detail_data['image_action'] = $input_data['image_block_image_action'][$key] ?? null;
                         $detail_data['target_url'] = $input_data['image_block_target_url'][$key] ?? null;
+                        $detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key] ?? null;
                         $detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $detail_data['created_by'] = $user_id;
@@ -371,6 +372,7 @@ class AdvertisementService
                         $detail_data['sort'] = $input_data['text_block_sort'][$key] ?? null;
                         $detail_data['texts'] = $input_data['text_block_texts'][$key] ?? null;
                         $detail_data['image_action'] = $input_data['text_block_image_action'][$key] ?? null;
+                        $detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $detail_data['target_url'] = $input_data['text_block_target_url'][$key] ?? null;
                         $detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key] ?? null;
                         $detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
@@ -536,6 +538,7 @@ class AdvertisementService
                         $create_detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key] ?? null;
                         $create_detail_data['image_action'] = $input_data['image_block_image_action'][$key] ?? null;
                         $create_detail_data['target_url'] = $input_data['image_block_target_url'][$key] ?? null;
+                        $create_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $create_detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key] ?? null;
                         $create_detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $create_detail_data['created_by'] = $user_id;
@@ -562,6 +565,7 @@ class AdvertisementService
                         $update_detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key];
                         $update_detail_data['image_action'] = $input_data['image_block_image_action'][$key];
                         $update_detail_data['target_url'] = $input_data['image_block_target_url'][$key];
+                        $update_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $update_detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key];
                         $update_detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $update_detail_data['updated_by'] = $user_id;
@@ -618,6 +622,7 @@ class AdvertisementService
                         $create_detail_data['texts'] = $input_data['text_block_texts'][$key] ?? null;
                         $create_detail_data['image_action'] = $input_data['text_block_image_action'][$key] ?? null;
                         $create_detail_data['target_url'] = $input_data['text_block_target_url'][$key] ?? null;
+                        $create_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $create_detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key] ?? null;
                         $create_detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $create_detail_data['created_by'] = $user_id;
@@ -635,6 +640,7 @@ class AdvertisementService
                         $update_detail_data['image_action'] = $input_data['text_block_image_action'][$key];
                         $update_detail_data['target_url'] = $input_data['text_block_target_url'][$key];
                         $update_detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key];
+                        $update_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $update_detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $update_detail_data['updated_by'] = $user_id;
                         $update_detail_data['updated_at'] = $now;

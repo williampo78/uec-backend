@@ -55,6 +55,7 @@
                 </div>
             </div>
         </div>
+        @include('backend.advertisement.promotion_campaign_model')
     </div>
 @endsection
 
@@ -241,7 +242,7 @@
                 'disabled', true);
             $('#start_at').val(content.start_at);
             $('#end_at').val(content.end_at);
-            
+
             // 唯有「當前時間」小於﹝上架開始時間﹞時，﹝上架開始時間﹞、﹝上架結束時間﹞、﹝狀態﹞才都開放修改；否則﹝上架開始時間﹞與﹝狀態﹞都不開放修改
             if (new Date() >= new Date($('#start_at').val())) {
                 $('#start_at, #active_enabled, #active_disabled').prop('disabled', true);
@@ -291,6 +292,9 @@
                                 $(`#image-block table > tbody [name="image_block_image_action[${value.id}]"][value="C"]`)
                                     .prop('checked', true);
                                 break;
+                            case 'M':
+                                $(`#image-block table > tbody [name="image_block_image_action[${value.id}]"][value="M"]`).prop('checked', true);
+                            break;
                         }
 
                         if (value.target_cate_hierarchy_id) {
@@ -321,6 +325,10 @@
                                 $(`#text-block table > tbody [name="text_block_image_action[${value.id}]"][value="C"]`)
                                     .prop('checked', true);
                                 break;
+                            case 'M':
+                                $(`#text-block table > tbody [name="text_block_image_action[${value.id}]"][value="M"]`)
+                                    .prop('checked', true);
+                            break;
                         }
 
                         if (value.target_cate_hierarchy_id) {

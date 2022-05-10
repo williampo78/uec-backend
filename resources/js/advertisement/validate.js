@@ -44,6 +44,15 @@ export let validateImageBlock = (row_no) => {
             }
         },
     });
+    $(`#image-block table > tbody [name="target_campaign_name[${row_no}]"]`).rules("add", {
+        required: {
+            depends: function (element) {
+                return $(
+                    `#image-block table > tbody [name="image_block_image_action[${row_no}]"][value="M"]`
+                ).is(":checked");
+            }
+        },
+    });
 }
 
 // 加入文字區塊欄位驗證
@@ -71,6 +80,15 @@ export let validateTextBlock = (row_no) => {
             }
         },
         url: true,
+    });
+    $(`#text-block table > tbody [name="target_campaign_name[${row_no}]"]`).rules("add", {
+        required: {
+            depends: function (element) {
+                return $(
+                    `#text-block table > tbody [name="text_block_image_action[${row_no}]"][value="M"]`
+                ).is(":checked");
+            }
+        },
     });
 
     $(`#text-block table > tbody [name="text_block_target_cate_hierarchy_id[${row_no}]"]`).rules("add", {

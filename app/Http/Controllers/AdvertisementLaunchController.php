@@ -73,7 +73,6 @@ class AdvertisementLaunchController extends Controller
     public function store(Request $request)
     {
         $input_data = $request->except('_token');
-
         if (!$this->advertisement_service->addSlotContents($input_data)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
@@ -190,10 +189,8 @@ class AdvertisementLaunchController extends Controller
             'photo_width',
             'photo_height',
         ]);
-
         foreach ($ad_slot_content['details'] as $key => $obj) {
             $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
-
             // 整理給前端的資料
             $ad_slot_content['details'][$key] = $obj->only([
                 'id',
@@ -210,6 +207,8 @@ class AdvertisementLaunchController extends Controller
                 'web_category_hierarchy_id',
                 'target_url',
                 'target_cate_hierarchy_id',
+                'campaign_name',
+                'target_campaign_id',
             ]);
         }
 
@@ -217,7 +216,8 @@ class AdvertisementLaunchController extends Controller
         $products = $this->product_service->getProducts([
             'product_type' => 'N',
         ]);
-
+        //target_campaign_id
+        //campaign_name
         return view('backend.advertisement.launch.update', compact('ad_slot_content', 'product_category', 'products'));
     }
 
