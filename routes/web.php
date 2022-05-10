@@ -11,7 +11,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PhotosController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\SupplierController;
@@ -78,8 +78,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/supplier', SupplierController::class, ['names' => ['index' => 'supplier']]);
 
     // 商品主檔 - 基本資訊管理
-    Route::post('/products/ajax', [ProductsController::class, 'ajax']);
-    Route::resource('/products', ProductsController::class, ['names' => ['index' => 'products']]);
+    Route::post('/products/ajax', [ProductController::class, 'ajax']);
+    Route::get('/products/modal/options', [ProductController::class, 'getModalOptions']);
+    Route::get('/products/modal/products', [ProductController::class, 'getModalProducts']);
+    Route::resource('/products', ProductController::class, ['names' => ['index' => 'products']]);
 
     // 商品主檔 - 商城資訊管理
     Route::post('/products_mall/ajax', [ProductsMallController::class, 'ajax']);
@@ -217,6 +219,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/promotional_campaign_cart/ajax/can-pass-active-validation', [PromotionalCampaignCartController::class, 'canPassActiveValidation']);
 
     // 滿額活動新版
+    Route::post('/promotional_campaign_cart_v2/can-active', [PromotionalCampaignCartV2Controller::class, 'canActive']);
     Route::resource('/promotional_campaign_cart_v2', PromotionalCampaignCartV2Controller::class, [
         'names' => [
             'index' => 'promotional_campaign_cart_v2',

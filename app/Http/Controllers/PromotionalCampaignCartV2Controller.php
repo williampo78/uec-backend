@@ -4,29 +4,30 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\RoleService;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\SupplierService;
 use App\Services\LookupValuesVService;
 use App\Services\PromotionalCampaignService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PromotionalCampaignCartV2Controller extends Controller
 {
     private $promotionalCampaignService;
     private $lookupValuesVService;
     private $supplierService;
-    private $products_service;
+    private $productService;
     private const LEVEL_CODE = 'CART';
 
     public function __construct(
         PromotionalCampaignService $promotionalCampaignService,
         LookupValuesVService $lookupValuesVService,
         SupplierService $supplierService,
-        ProductsService $products_service
+        ProductService $productService
     ) {
         $this->promotionalCampaignService = $promotionalCampaignService;
         $this->lookupValuesVService = $lookupValuesVService;
         $this->supplierService = $supplierService;
-        $this->products_service = $products_service;
+        $this->productService = $productService;
     }
 
     /**
@@ -91,7 +92,18 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $inputData = $request->input();
+
+        if (!$this->promotionalCampaignService->createPromotionalCampaignCart($inputData)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
+
+        $result = [
+            'route_name' => 'promotional_campaign_cart_v2',
+            'act' => 'add',
+        ];
+
+        return view('backend.success', $result);
     }
 
     /**
@@ -137,5 +149,27 @@ class PromotionalCampaignCartV2Controller extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * 是否可以通過滿額活動的狀態驗證
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function canActive(Request $request): JsonResponse
+    {
+        $result = $this->promotionalCampaignService->canPromotionalCampaignCartV2Active($request->campaign_type, $request->start_at, $request->end_at, $request->product_ids);
+
+        if ($result['status']) {
+            return response()->json([
+                'result' => true,
+            ]);
+        }
+
+        return response()->json([
+            'result' => false,
+            'conflict_campaigns' => $result['conflict_campaigns'],
+        ]);
     }
 }

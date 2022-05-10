@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\BrandsService;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\QuotationService;
 use App\Services\RequisitionsPurchaseService;
 use App\Services\SupplierService;
@@ -24,13 +24,13 @@ class RequisitionsPurchaseController extends Controller
     private $supplierService;
     private $universalService;
     private $quotationService;
-    private $productsService;
+    private $productService;
 
     public function __construct(
         RequisitionsPurchaseService $requisitionsPurchaseService,
         WarehouseService $warehouseService,
         SupplierService $supplierService,
-        ProductsService $productsService,
+        ProductService $productService,
         UniversalService $universalService,
         QuotationService $quotationService,
         BrandsService $brandsService
@@ -40,7 +40,7 @@ class RequisitionsPurchaseController extends Controller
         $this->supplierService = $supplierService; //供應商
         $this->universalService = $universalService; // 共用服務
         $this->quotationService = $quotationService; //報價單服務
-        $this->productsService = $productsService;
+        $this->productService = $productService;
         $this->brandsService = $brandsService;
     }
 
@@ -156,7 +156,7 @@ class RequisitionsPurchaseController extends Controller
         $result['warehouse'] = $this->warehouseService->getWarehouseList(); //取得倉庫
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
 
-        $result['itemOptions'] = $this->productsService->getItemsAndProduct([
+        $result['itemOptions'] = $this->productService->getItemsAndProduct([
             'supplier_id' => $result['requisitionsPurchase']['supplier_id'],
         ])->transform(function ($obj, $key) {
             $obj->text = $obj->item_no . '-' . $obj->brand_name . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
@@ -223,7 +223,7 @@ class RequisitionsPurchaseController extends Controller
                 echo "OK@@" . json_encode($data);
                 break;
             case 'getItemOption':
-                $products_item = $this->productsService->getItemsAndProduct(['supplier_id' => $rs['supplier_id']])->transform(function ($obj, $key) {
+                $products_item = $this->productService->getItemsAndProduct(['supplier_id' => $rs['supplier_id']])->transform(function ($obj, $key) {
                     $obj->text = $obj->item_no . '-' . $obj->brand_name . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
                     return $obj;
                 });

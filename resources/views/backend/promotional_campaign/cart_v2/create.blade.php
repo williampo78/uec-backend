@@ -21,7 +21,7 @@
 @section('content')
     <div id="app">
         @if ($errors->any())
-            <div id="error-message" style="display: none;">
+            <div ref="errorMessage" style="display: none;">
                 {{ $errors->first('message') }}
             </div>
         @endif
@@ -202,7 +202,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <select2 class="form-control" :options="suppliers"
-                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false">
+                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false" @selecting="selectingSupplier">
                                                         <option disabled value=""></option>
                                                     </select2>
                                                 </div>
@@ -259,29 +259,33 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr v-for="(threshold, index) in form.thresholds"
-                                                                    :key="index">
-                                                                    <td>@{{ index + 1 }}</td>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
-                                                                        <input type="number" class="form-control"
-                                                                            :name="`thresholds[${index}][n_value]`" min="0"
-                                                                            v-model="threshold.nValue">
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
                                                                     </td>
                                                                     <td>
-                                                                        <input type="number" class="form-control"
-                                                                            :name="`thresholds[${index}][x_value]`" min="0"
-                                                                            v-model="threshold.xValue">
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-x-value"
+                                                                                :name="`thresholds[${thresholdIndex}][x_value]`" min="0"
+                                                                                v-model="threshold.xValue">
+                                                                        </div>
                                                                     </td>
                                                                     <td>
                                                                         <button type="button" class="btn btn-danger"
-                                                                            @click="deleteThreshold(index)">
+                                                                            @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                                         </button>
                                                                     </td>
                                                                     <td>
                                                                         @{{ thresholdBrief(threshold) }}
                                                                         <input type="hidden"
-                                                                            :name="`thresholds[${index}][threshold_brief]`">
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -313,29 +317,33 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr v-for="(threshold, index) in form.thresholds"
-                                                                    :key="index">
-                                                                    <td>@{{ index + 1 }}</td>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
-                                                                        <input type="number" class="form-control"
-                                                                            :name="`thresholds[${index}][n_value]`" min="0"
-                                                                            v-model="threshold.nValue">
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
                                                                     </td>
                                                                     <td>
-                                                                        <input type="number" class="form-control"
-                                                                            :name="`thresholds[${index}][x_value]`" min="0"
-                                                                            v-model="threshold.xValue">
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-x-value"
+                                                                                :name="`thresholds[${thresholdIndex}][x_value]`" min="0"
+                                                                                v-model="threshold.xValue">
+                                                                        </div>
                                                                     </td>
                                                                     <td>
                                                                         <button type="button" class="btn btn-danger"
-                                                                            @click="deleteThreshold(index)">
+                                                                            @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                                         </button>
                                                                     </td>
                                                                     <td>
                                                                         @{{ thresholdBrief(threshold) }}
                                                                         <input type="hidden"
-                                                                            :name="`thresholds[${index}][threshold_brief]`">
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -367,27 +375,29 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr v-for="(threshold, index) in form.thresholds"
-                                                                    :key="index">
-                                                                    <td>@{{ index + 1 }}</td>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
-                                                                        <input type="number" class="form-control"
-                                                                            :name="`thresholds[${index}][n_value]`" min="0"
-                                                                            v-model="threshold.nValue">
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
                                                                     </td>
                                                                     <td>
                                                                         @include('backend.promotional_campaign.cart_v2.giveaway_block')
                                                                     </td>
                                                                     <td>
                                                                         <button type="button" class="btn btn-danger"
-                                                                            @click="deleteThreshold(index)">
+                                                                            @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                                         </button>
                                                                     </td>
                                                                     <td>
                                                                         @{{ thresholdBrief(threshold) }}
                                                                         <input type="hidden"
-                                                                            :name="`thresholds[${index}][threshold_brief]`">
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -419,27 +429,29 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                <tr v-for="(threshold, index) in form.thresholds"
-                                                                    :key="index">
-                                                                    <td>@{{ index + 1 }}</td>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
-                                                                        <input type="number" class="form-control"
-                                                                            :name="`thresholds[${index}][n_value]`" min="0"
-                                                                            v-model="threshold.nValue">
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
                                                                     </td>
                                                                     <td>
                                                                         @include('backend.promotional_campaign.cart_v2.giveaway_block')
                                                                     </td>
                                                                     <td>
                                                                         <button type="button" class="btn btn-danger"
-                                                                            @click="deleteThreshold(index)">
+                                                                            @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                                         </button>
                                                                     </td>
                                                                     <td>
                                                                         @{{ thresholdBrief(threshold) }}
                                                                         <input type="hidden"
-                                                                            :name="`thresholds[${index}][threshold_brief]`">
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
@@ -476,15 +488,15 @@
                                                             <tr v-for="(product, index) in form.products"
                                                                 :key="index">
                                                                 <input type="hidden"
-                                                                    :name="`products[${index}][product_id]`">
+                                                                    :name="`products[${index}][product_id]`" :value="product.id">
                                                                 <td>@{{ index + 1 }}</td>
                                                                 <td>@{{ product.productNo }}</td>
                                                                 <td>@{{ product.productName }}</td>
                                                                 <td>@{{ product.sellingPrice }}</td>
-                                                                <td>@{{ product.startAt }}</td>
-                                                                <td>@{{ product.launchedStatus }}</td>
+                                                                <td>@{{ product.startLaunchedAt }}</td>
+                                                                <td>@{{ product.launchStatus }}</td>
                                                                 <td>@{{ product.grossMargin }}</td>
-                                                                <td>@{{ product.category }}</td>
+                                                                <td>@{{ product.webCategoryHierarchy }}</td>
                                                                 <td>
                                                                     <button type="button" class="btn btn-danger"
                                                                         @click="deleteProduct(index)">
@@ -541,7 +553,7 @@
                                         <div class="form-group">
                                             @if ($share_role_auth['auth_create'])
                                                 <button class="btn btn-success" type="button" @click="submitForm"
-                                                    :disabled='form.save.isDisabled'>
+                                                    :disabled='saveButton.isDisabled'>
                                                     <i class="fa-solid fa-floppy-disk"></i> 儲存
                                                 </button>
                                             @endif
@@ -558,10 +570,8 @@
             </div>
         </div>
 
-        <product-modal :id="`product-modal`" :modal-title="`新增指定商品`"></product-modal>
-        <product-modal :id="`giveaway-modal`" :modal-title="`新增贈品`"></product-modal>
-        {{-- @include('backend.promotional_campaign.cart_v2.prd_modal') --}}
-        {{-- @include('backend.promotional_campaign.cart_v2.gift_modal') --}}
+        <product-modal :modal="productModal" @save="saveProductModalProducts"></product-modal>
+        <product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></product-modal>
     </div>
 @endsection
 
@@ -583,15 +593,44 @@
                     supplierId: "all",
                     thresholds: [],
                     products: [],
-                    save: {
-                        isDisabled: false,
-                    },
+                },
+                saveButton: {
+                    isDisabled: false,
                 },
                 campaignTypes: [],
                 suppliers: [{
                     text: "全部",
                     id: "all",
                 }],
+                productModal: {
+                    id: "product-modal",
+                    title: "新增指定商品",
+                    supplier: {
+                        id: "",
+                        isDisabled: true,
+                    },
+                    productType: {
+                        id: "N",
+                        includeOptions: ["N"],
+                    },
+                    stockType: "",
+                    excludeProductIds: [],
+                },
+                giveawayModal: {
+                    id: "giveaway-modal",
+                    title: "新增贈品",
+                    supplier: {
+                        id: "",
+                        isDisabled: true,
+                    },
+                    productType: {
+                        id: "G",
+                        includeOptions: ["N", "G"],
+                    },
+                    stockType: "",
+                    excludeProductIds: [],
+                },
+                currentThreshold: {},
             },
             created() {
                 let campaignTypes = @json($campaignTypes);
@@ -654,12 +693,12 @@
                     },
                 });
 
-                let conflict_campaign_names = '';
+                let conflictCampaigns = '';
                 // 驗證表單
                 $("#create-form").validate({
-                    debug: true,
+                    // debug: true,
                     submitHandler: function(form) {
-                        self.form.save.isDisabled = true;
+                        self.saveButton.isDisabled = true;
                         form.submit();
                     },
                     rules: {
@@ -674,27 +713,33 @@
                             required: true,
                             remote: {
                                 param: function() {
+                                    let productIds = self.form.products.map((product) => {
+                                        return product.id;
+                                    });
+
                                     return {
-                                        url: "/backend/promotional_campaign_cart/ajax/can-pass-active-validation",
+                                        url: "/backend/promotional_campaign_cart_v2/can-active",
                                         type: "post",
                                         dataType: "json",
                                         cache: false,
                                         data: {
-                                            campaign_type: $("#campaign_type").val(),
-                                            start_at: $('#start_at').val(),
-                                            end_at: $('#end_at').val(),
-                                            n_value: $('#n_value').val(),
+                                            campaign_type: self.form.campaignType,
+                                            start_at: self.form.startAt,
+                                            end_at: self.form.endAt,
+                                            product_ids: productIds,
                                         },
-                                        dataFilter: function(response, type) {
-                                            conflict_campaign_names = '';
-                                            let data = JSON.parse(response);
+                                        dataFilter: function(response) {
+                                            conflictCampaigns = "";
+                                            if (response) {
+                                                let data = JSON.parse(response);
 
-                                            if (data.status) {
-                                                return true;
-                                            }
+                                                if (data.result) {
+                                                    return true;
+                                                }
 
-                                            if (data.conflict_campaign_names) {
-                                                conflict_campaign_names = data.conflict_campaign_names;
+                                                if (data.conflict_campaigns) {
+                                                    conflictCampaigns = data.conflict_campaigns;
+                                                }
                                             }
 
                                             return false;
@@ -702,11 +747,37 @@
                                     }
                                 },
                                 depends: function(element) {
-                                    return $("#campaign_type").val() &&
-                                        $('#start_at').val() &&
-                                        $('#end_at').val() &&
-                                        $('#n_value').val();
-                                }
+                                    return self.form.campaignType &&
+                                        self.form.startAt &&
+                                        self.form.endAt &&
+                                        self.form.products &&
+                                        self.form.products.length &&
+                                        self.form.active == 1;
+                                },
+                            },
+                            atLeastOneThreshold: {
+                                param: function() {
+                                    return self.form.thresholds;
+                                },
+                                depends: function(element) {
+                                    return self.form.active == 1;
+                                },
+                            },
+                            atLeastOneProduct: {
+                                param: function() {
+                                    return self.form.products;
+                                },
+                                depends: function(element) {
+                                    return self.form.active == 1;
+                                },
+                            },
+                            eachThresholdAtLeastOneGiveaway: {
+                                param: function() {
+                                    return self.form.thresholds;
+                                },
+                                depends: function(element) {
+                                    return self.form.active == 1 && ['CART03', 'CART04'].includes(self.form.campaignType);
+                                },
                             },
                         },
                         start_at: {
@@ -731,90 +802,24 @@
                         stock_type: {
                             required: true,
                         },
-                        n_value: {
+                        supplier_id: {
                             required: true,
-                            digits: true,
-                            min: function() {
-                                if ($('#campaign_type').val() == 'CART02') {
-                                    if ($("#x_value").val()) {
-                                        return parseInt($("#x_value").val()) + 1;
-                                    }
-                                }
-
-                                return 1;
-                            },
-                        },
-                        x_value: {
-                            required: true,
-                            min: function() {
-                                if ($('#campaign_type').val() == 'CART01') {
-                                    return 0.01;
-                                } else if ($('#campaign_type').val() == 'CART02') {
-                                    return 1;
-                                }
-
-                                return 0;
-                            },
-                            max: {
-                                param: 0.99,
-                                depends: function(element) {
-                                    return $('#campaign_type').val() == 'CART01';
-                                },
-                            },
-                            maxlength: {
-                                param: 4,
-                                depends: function(element) {
-                                    return $('#campaign_type').val() == 'CART01';
-                                },
-                            },
-                            digits: {
-                                depends: function(element) {
-                                    return $('#campaign_type').val() == 'CART02';
-                                },
-                            },
-                            number: {
-                                depends: function(element) {
-                                    return $('#campaign_type').val() == 'CART01';
-                                },
-                            },
                         },
                     },
                     messages: {
                         active: {
                             remote: function(element) {
-                                if (['CART01', 'CART02'].includes($("#campaign_type").val())) {
-                                    return `同一時間點、同一N值不可存在其他生效的﹝購物車滿N元，打X折﹞、﹝購物車滿N元，折X元﹞的行銷活動<br/>
-                                    衝突的活動名稱: ${conflict_campaign_names}`;
-                                } else if (['CART03'].includes($("#campaign_type").val())) {
-                                    return `同一時間點、同一N值不可存在其他生效的﹝購物車滿N元，送贈品﹞的行銷活動<br/>
-                                    衝突的活動名稱: ${conflict_campaign_names}`;
+                                if (['CART01', 'CART02'].includes(self.form.campaignType)) {
+                                    return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N元，打X折」、「指定商品滿N元，折X元」類型的生效活動<br/>
+                                    衝突的活動名稱: ${conflictCampaigns}`;
+                                } else if (['CART03', 'CART04'].includes(self.form.campaignType)) {
+                                    return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N件，送贈品」、「指定商品滿N元，送贈品」類型的生效活動<br/>
+                                    衝突的活動名稱: ${conflictCampaigns}`;
                                 }
                             },
                         },
                         end_at: {
                             greaterThan: "結束時間必須大於開始時間",
-                        },
-                        n_value: {
-                            digits: "只可輸入正整數",
-                            min: function(value) {
-                                if ($('#campaign_type').val() == 'CART02') {
-                                    if (value > 1) {
-                                        return "必須大於X值";
-                                    }
-                                }
-
-                                return '只可輸入正整數';
-                            },
-                        },
-                        x_value: {
-                            digits: "只可輸入正整數",
-                            min: function() {
-                                if ($('#campaign_type').val() == 'CART02') {
-                                    return '只可輸入正整數';
-                                }
-
-                                return '請輸入不小於 0 的數值';
-                            },
                         },
                     },
                     errorClass: "help-block",
@@ -855,37 +860,37 @@
                     },
                 });
             },
+            watch: {
+                "form.stockType"(newValue, oldValue) {
+                    // 若「庫存類型」為「轉單」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
+                    if (newValue == "T") {
+                        this.$set(this.suppliers[0], "disabled", true);
+                        if (this.form.supplierId == "all") {
+                            this.form.supplierId = "";
+                        }
+                    }
+                    // 若「庫存類型」為「買斷 /寄售」：可選擇「全部」、亦可指定到單一供應商。
+                    else {
+                        if (this.suppliers[0].hasOwnProperty('disabled')) {
+                            this.suppliers[0].disabled = false;
+                        }
+                    }
+
+                    this.productModal.stockType = newValue;
+                    this.giveawayModal.stockType = newValue;
+                },
+                "form.supplierId"(newValue, oldValue) {
+                    this.productModal.supplier.id = newValue;
+                    this.giveawayModal.supplier.id = newValue;
+                },
+            },
             methods: {
                 addThreshold() {
-                    switch (this.form.campaignType) {
-                        case "CART01":
-                            this.form.thresholds.push({
-                                nValue: "",
-                                xValue: "",
-                            });
-                            break;
-
-                        case "CART02":
-                            this.form.thresholds.push({
-                                nValue: "",
-                                xValue: "",
-                            });
-                            break;
-
-                        case "CART03":
-                            this.form.thresholds.push({
-                                nValue: "",
-                                giveaways: [],
-                            });
-                            break;
-
-                        case "CART04":
-                            this.form.thresholds.push({
-                                nValue: "",
-                                giveaways: [],
-                            });
-                            break;
-                    }
+                    this.form.thresholds.push({
+                        nValue: "",
+                        xValue: "",
+                        giveaways: [],
+                    });
                 },
                 deleteThreshold(index) {
                     if (confirm('確定要刪除嗎？')) {
@@ -893,10 +898,18 @@
                     }
                 },
                 addGiveaway(threshold) {
-                    // $('#giveaway-modal').modal('show');
-                    threshold.giveaways.push({
-                        productNo: "6666",
+                    if (!this.form.stockType || !this.form.supplierId) {
+                        alert("尚未指定「庫存類型」、「供應商」，不允許新增贈品！");
+                        return;
+                    }
+
+                    this.currentThreshold = threshold;
+                    this.giveawayModal.excludeProductIds = [];
+                    threshold.giveaways.forEach(giveaway => {
+                        this.giveawayModal.excludeProductIds.push(giveaway.id);
                     });
+
+                    $('#giveaway-modal').modal('show');
                 },
                 deleteGiveaway(threshold, index) {
                     if (confirm('確定要刪除嗎？')) {
@@ -904,6 +917,17 @@
                     }
                 },
                 addProduct() {
+                    if (!this.form.stockType || !this.form.supplierId) {
+                        alert("尚未指定「庫存類型」、「供應商」，不允許新增商品！");
+                        return;
+                    }
+
+                    this.productModal.excludeProductIds = [];
+
+                    this.form.products.forEach(product => {
+                        this.productModal.excludeProductIds.push(product.id);
+                    });
+
                     $('#product-modal').modal('show');
                 },
                 deleteProduct(index) {
@@ -918,11 +942,95 @@
 
                 },
                 submitForm() {
-                    // $(`.contact-name`).each(function() {
-                    //     $(this).rules("add", {
-                    //         required: true,
-                    //     });
-                    // });
+                    let self = this;
+
+                    $(`.threshold-n-value`).each(function() {
+                        let nValueElement = $(this);
+
+                        $(this).rules("add", {
+                            required: true,
+                            digits: true,
+                            min: function() {
+                                let xValue = nValueElement.closest("tr").find(".threshold-x-value").val();
+
+                                if (self.form.campaignType == 'CART02') {
+                                    if (xValue) {
+                                        return parseInt(xValue) + 1;
+                                    }
+                                }
+
+                                return 1;
+                            },
+                            unique: ".threshold-n-value",
+                            messages: {
+                                digits: "只可輸入正整數",
+                                min: function(value) {
+                                    if (self.form.campaignType == 'CART02') {
+                                        if (value > 1) {
+                                            return "必須大於X值";
+                                        }
+                                    }
+
+                                    return '只可輸入正整數';
+                                },
+                            },
+                        });
+                    });
+
+                    $(`.threshold-x-value`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                            min: function() {
+                                if (self.form.campaignType == 'CART01') {
+                                    return 0.01;
+                                } else if (self.form.campaignType == 'CART02') {
+                                    return 1;
+                                }
+
+                                return 0;
+                            },
+                            max: {
+                                param: 0.99,
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART01';
+                                },
+                            },
+                            maxlength: {
+                                param: 4,
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART01';
+                                },
+                            },
+                            digits: {
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART02';
+                                },
+                            },
+                            number: {
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART01';
+                                },
+                            },
+                            messages: {
+                                digits: "只可輸入正整數",
+                                min: function() {
+                                    if (self.form.campaignType == 'CART02') {
+                                        return '只可輸入正整數';
+                                    }
+
+                                    return '請輸入不小於 0 的數值';
+                                },
+                            },
+                        });
+                    });
+
+                    $(`.giveaway-assigned-qty`).each(function () {
+                        $(this).rules("add", {
+                            required: true,
+                            digits: true,
+                            min: 1,
+                        });
+                    });
 
                     $("#create-form").submit();
                 },
@@ -932,7 +1040,7 @@
                     switch (this.form.campaignType) {
                         case "CART01":
                             if (threshold.nValue && threshold.xValue) {
-                                let discount = parseFloat(threshold.xValue) * 100;
+                                let discount = Math.round(threshold.xValue * 100);
                                 thresholdBrief = `指定商品達$${threshold.nValue}，打${discount}折`;
                             }
                             break;
@@ -944,187 +1052,108 @@
                             break;
 
                         case "CART03":
-                            if (threshold.nValue && threshold.giveaways) {
-                                console.log(threshold.giveaways);
-                                // thresholdBrief = `指定商品達$${threshold.nValue}，折$${threshold.xValue}`;
+                            if (threshold.nValue && threshold.giveaways && threshold.giveaways.length) {
+                                thresholdBrief = `指定商品達$${threshold.nValue}送`;
+
+                                threshold.giveaways.forEach((giveaway, index) => {
+                                    thresholdBrief += `「${giveaway.productName} (${giveaway.assignedQty}${giveaway.uom})」`;
+                                    if (index !== threshold.giveaways.length - 1) {
+                                        thresholdBrief += `、`;
+                                    }
+                                });
                             }
                             break;
 
                         case "CART04":
+                            if (threshold.nValue && threshold.giveaways && threshold.giveaways.length) {
+                                thresholdBrief = `指定商品達${threshold.nValue}件送`;
 
+                                threshold.giveaways.forEach((giveaway, index) => {
+                                    thresholdBrief += `「${giveaway.productName} (${giveaway.assignedQty}${giveaway.uom})」`;
+                                    if (index !== threshold.giveaways.length - 1) {
+                                        thresholdBrief += `、`;
+                                    }
+                                });
+                            }
                             break;
                     }
 
                     return thresholdBrief;
                 },
+                // 點擊庫存類型
                 clickStockType(event) {
-                    if (this.form.thresholds.giveaways) {
-                        console.log(this.form.thresholds.giveaways)
+                    if (this.form.stockType == event.target.value) {
+                        return;
                     }
-                    console.log(event.target.value)
-                    // console.log(this.form.stockType);
-                    // if (this.form.stockType == "T") {
-                    //     event.preventDefault();
-                    // }
-                    // this.form.stockType = "";
-                    // event.preventDefault();
+
+                    let errorMessage = "";
+                    // 頁籤「門檻」已有指定贈品
+                    if (this.form.thresholds.some(threshold => threshold.giveaways.length)) {
+                        errorMessage += "請先刪除「門檻」頁籤的贈品設定，才能切換「庫存類型」！\n"
+                    }
+
+                    // 頁籤「指定商品」已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除「指定商品」頁籤的商品設定，才能切換「庫存類型」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
+                // 處理選擇供應商時的事件
+                selectingSupplier(event) {
+                    if (event.params.args.data.id == "all") {
+                        return;
+                    }
+
+                    let errorMessage = "";
+                    // 頁籤「門檻」已有指定贈品
+                    if (this.form.thresholds.some(threshold => threshold.giveaways.length)) {
+                        errorMessage += "請先刪除「門檻」頁籤的贈品設定，才能切換「供應商」！\n"
+                    }
+
+                    // 頁籤「指定商品」已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除「指定商品」頁籤的商品設定，才能切換「供應商」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
+                saveProductModalProducts(products) {
+                    products.forEach(product => {
+                        this.form.products.push({
+                            id: product.id,
+                            productNo: product.productNo,
+                            productName: product.productName,
+                            sellingPrice: product.sellingPrice,
+                            startLaunchedAt: product.startLaunchedAt,
+                            launchStatus: product.launchStatus,
+                            grossMargin: product.grossMargin,
+                            webCategoryHierarchy: product.webCategoryHierarchy,
+                        });
+                    });
+                },
+                saveGiveawayModalProducts(products) {
+                    products.forEach(product => {
+                        this.currentThreshold.giveaways.push({
+                            id: product.id,
+                            productNo: product.productNo,
+                            productName: product.productName,
+                            assignedQty: 1,
+                            stockType: product.stockType,
+                            productType: product.productType,
+                            supplier: product.supplier,
+                            // stockQty: product.stockQty,
+                            uom: product.uom,
+                        });
+                    });
                 },
             },
         });
-        // $(function() {
-        //     let campaign_types = json($campaign_types);
-        //     renderCampaignType(campaign_types);
-
-        //     let suppliers = json($suppliers);
-        //     renderPrdModalSupplier(suppliers);
-        //     renderGiftModalSupplier(suppliers);
-
-        //     let product_types = json(config('uec.product_type_option'));
-        //     renderPrdModalProductType(product_types);
-        //     renderGiftModalProductType(product_types);
-
-        //     $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove(); // 移除贈品、加購品
-        //     $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
-
-        //     $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
-        //     $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
-
-        //     init();
-
-        //     var prd_modal_product_list = {}; // 單品modal清單中的商品
-        //     var prd_product_list = {}; // 單品清單中的商品
-
-        //     // 新增單品
-        //     $('#btn-new-prd').on('click', function() {
-        //         $('#prd-modal').modal('show');
-        //     });
-
-        //     // 單品modal商品全勾選
-        //     $('#prd-modal-btn-check-all').on('click', function() {
-        //         $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-        //     });
-
-        //     // 單品modal商品全取消
-        //     $('#prd-modal-btn-cancel-all').on('click', function() {
-        //         $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-        //     });
-
-        //     // 單品modal儲存、儲存並關閉
-        //     $('#prd-modal-btn-save, #prd-modal-btn-save-and-close').on('click', function() {
-        //         // 取得單品modal清單中有勾選的商品
-        //         $('#prd-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-        //             function() {
-        //                 let id = $(this).attr('data-id');
-
-        //                 prd_product_list[id] = prd_modal_product_list[id]; // 增加單品清單中的商品
-        //                 delete prd_modal_product_list[id]; // 移除單品modal清單中的商品
-        //             });
-
-        //         renderPrdProductList(prd_product_list);
-        //         renderPrdModalProductList(prd_modal_product_list);
-        //     });
-
-        //     // 刪除單品清單中的商品
-        //     $(document).on('click', '.btn-delete-prd', function() {
-        //         if (confirm('確定要刪除嗎?')) {
-        //             let id = $(this).closest('tr').attr('data-id');
-
-        //             delete prd_product_list[id]; // 移除單品清單中的商品
-
-        //             renderPrdProductList(prd_product_list);
-        //         }
-        //     });
-
-        //     // 單品modal搜尋
-        //     $('#prd-modal-btn-search').on('click', function() {
-        //         let query_datas = {
-        //             'supplier_id': $('#prd-modal-supplier-id').val(),
-        //             'product_no': $('#prd-modal-product-no').val(),
-        //             'product_name': $('#prd-modal-product-name').val(),
-        //             'selling_price_min': $('#prd-modal-selling-price-min').val(),
-        //             'selling_price_max': $('#prd-modal-selling-price-max').val(),
-        //             'start_created_at': $('#prd-modal-start-created-at').val(),
-        //             'end_created_at': $('#prd-modal-end-created-at').val(),
-        //             'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
-        //             'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
-        //             'product_type': $('#prd-modal-product-type').val(),
-        //             'limit': $('#prd-modal-limit').val(),
-        //             'exist_products': Object.keys(prd_product_list),
-        //         };
-
-        //         getProducts(query_datas).then(products => {
-        //             prd_modal_product_list = products;
-
-        //             renderPrdModalProductList(prd_modal_product_list);
-        //         });
-        //     });
-
-        //     var gift_modal_product_list = {}; // 贈品modal清單中的商品
-        //     var gift_product_list = {}; // 贈品清單中的商品
-
-        //     // 新增贈品
-        //     $('#btn-new-gift').on('click', function() {
-        //         $('#gift-modal').modal('show');
-        //     });
-
-        //     // 贈品modal商品全勾選
-        //     $('#gift-modal-btn-check-all').on('click', function() {
-        //         $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-        //     });
-
-        //     // 贈品modal商品全取消
-        //     $('#gift-modal-btn-cancel-all').on('click', function() {
-        //         $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-        //     });
-
-        //     // 贈品modal儲存、儲存並關閉
-        //     $('#gift-modal-btn-save, #gift-modal-btn-save-and-close').on('click', function() {
-        //         // 取得贈品modal清單中有勾選的商品
-        //         $('#gift-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-        //             function() {
-        //                 let id = $(this).attr('data-id');
-
-        //                 gift_product_list[id] = gift_modal_product_list[id]; // 增加贈品清單中的商品
-        //                 delete gift_modal_product_list[id]; // 移除贈品modal清單中的商品
-        //             });
-
-        //         renderGiftProductList(gift_product_list);
-        //         renderGiftModalProductList(gift_modal_product_list);
-        //     });
-
-        //     // 刪除贈品清單中的商品
-        //     $(document).on('click', '.btn-delete-gift', function() {
-        //         if (confirm('確定要刪除嗎?')) {
-        //             let id = $(this).closest('tr').attr('data-id');
-
-        //             delete gift_product_list[id]; // 移除贈品清單中的商品
-
-        //             renderGiftProductList(gift_product_list);
-        //         }
-        //     });
-
-        //     // 贈品modal搜尋
-        //     $('#gift-modal-btn-search').on('click', function() {
-        //         let query_datas = {
-        //             'supplier_id': $('#gift-modal-supplier-id').val(),
-        //             'product_no': $('#gift-modal-product-no').val(),
-        //             'product_name': $('#gift-modal-product-name').val(),
-        //             'selling_price_min': $('#gift-modal-selling-price-min').val(),
-        //             'selling_price_max': $('#gift-modal-selling-price-max').val(),
-        //             'start_created_at': $('#gift-modal-start-created-at').val(),
-        //             'end_created_at': $('#gift-modal-end-created-at').val(),
-        //             'start_launched_at_start': $('#gift-modal-start-launched-at-start').val(),
-        //             'start_launched_at_end': $('#gift-modal-start-launched-at-end').val(),
-        //             'product_type': $('#gift-modal-product-type').val(),
-        //             'limit': $('#gift-modal-limit').val(),
-        //             'exist_products': Object.keys(gift_product_list),
-        //         };
-
-        //         getProducts(query_datas).then(products => {
-        //             gift_modal_product_list = products;
-
-        //             renderGiftModalProductList(gift_modal_product_list);
-        //         });
-        //     });
     </script>
 @endsection

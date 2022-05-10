@@ -71,7 +71,7 @@
     <script>
         $(function() {
             let suppliers = @json($suppliers);
-            let product_types = @json(config('uec.product_type_option'));
+            let product_types = @json(config('uec.product_type_options'));
             let promotional_campaign = @json($promotional_campaign);
 
             if ($('#error-message').length) {

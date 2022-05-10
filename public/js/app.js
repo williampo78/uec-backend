@@ -3831,17 +3831,22 @@ __webpack_require__.r(__webpack_exports__);
       allowClear: this.allowClear
     }).val(this.value).trigger("change").on("change", function () {
       vm.$emit("input", this.value);
+    }).on("select2:selecting", function (event) {
+      vm.$emit("selecting", event);
     });
   },
   watch: {
     value: function value(_value) {
       $(this.$el).val(_value).trigger("change");
     },
-    options: function options(_options) {
-      $(this.$el).empty().select2({
-        data: _options,
-        allowClear: this.allowClear
-      });
+    options: {
+      handler: function handler(options) {
+        $(this.$el).empty().select2({
+          data: options,
+          allowClear: this.allowClear
+        }).val(this.value).trigger("change");
+      },
+      deep: true
     }
   },
   destroyed: function destroyed() {

@@ -71,7 +71,7 @@
     <script>
         $(function() {
             let suppliers = @json($suppliers);
-            let product_types = @json(config('uec.product_type_option'));
+            let product_types = @json(config('uec.product_type_options'));
             let promotional_campaign = @json($promotional_campaign);
             var prd_modal_product_list = {}; // 單品modal清單中的商品
             var prd_product_list = {}; // 單品清單中的商品

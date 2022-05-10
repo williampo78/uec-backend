@@ -2,26 +2,28 @@
 
 namespace App\Services;
 
-use App\Models\CategoryHierarchy;
-use App\Models\CategoryProduct;
+use Batch;
+use ImageUpload;
+use Carbon\Carbon;
 use App\Models\Product;
-use App\Models\ProductAttribute;
-use App\Models\ProductAuditLog;
+use App\Models\Products;
 use App\Models\ProductItem;
 use App\Models\ProductPhoto;
-use App\Models\ProductReviewLog;
-use App\Models\Products;
-use App\Models\ProductSpecInfo;
 use App\Models\RelatedProduct;
+use App\Models\CategoryProduct;
+use App\Models\ProductAuditLog;
+use App\Models\ProductSpecInfo;
+use App\Models\ProductAttribute;
+use App\Models\ProductReviewLog;
+use App\Models\CategoryHierarchy;
 use App\Services\UniversalService;
-use Batch;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use ImageUpload;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
-class ProductsService
+class ProductService
 {
     private $universalService;
 
@@ -51,7 +53,7 @@ class ProductsService
                     ->on('web_category_products.product_id', '=', 'products.id');
             });
         }
-//庫存類型
+
         if (isset($input_data['id'])) {
             $products->where('products.id', '=', $input_data['id']);
         }
@@ -1287,4 +1289,158 @@ class ProductsService
         });
     }
 
+    /**
+     * 取得modal的商品
+     *
+     * @param array $queryData
+     * @return Collection
+     */
+    public function getModalProducts(array $queryData = []): Collection
+    {
+        $user = Auth::user();
+
+        $products = Product::with([
+            'supplier',
+            'webCategoryHierarchies' => function ($query) {
+                return $query->oldest('sort');
+            },
+        ])
+            ->where('agent_id', $user->agent_id);
+
+        // 供應商
+        if (isset($queryData['supplier_id'])) {
+            $products = $products->where('supplier_id', $queryData['supplier_id']);
+        }
+
+        // 商品序號
+        if (isset($queryData['product_no'])) {
+            $productNos = explode(',', $queryData['product_no']);
+            $productNos = array_unique($productNos);
+
+            if (!empty($productNos)) {
+                $products = $products->where(function ($query) use ($productNos) {
+                    foreach ($productNos as $productNo) {
+                        $query->orWhere('product_no', 'like', '%' . $productNo . '%');
+                    }
+                });
+            }
+        }
+
+        // 商品名稱
+        if (isset($queryData['product_name'])) {
+            $products = $products->where('product_name', 'like', '%' . $queryData['product_name'] . '%');
+        }
+
+        // 最低售價
+        if (isset($queryData['selling_price_min'])) {
+            $products = $products->where('selling_price', '>=', $queryData['selling_price_min']);
+        }
+
+        // 最高售價
+        if (isset($queryData['selling_price_max'])) {
+            $products = $products->where('selling_price', '<=', $queryData['selling_price_max']);
+        }
+
+        // 建檔日-起始日期
+        if (!empty($queryData['created_at_start'])) {
+            $products = $products->whereDate('created_at', '>=', $queryData['created_at_start']);
+        }
+
+        // 建檔日-結束日期
+        if (!empty($queryData['created_at_end'])) {
+            $products = $products->whereDate('created_at', '<=', $queryData['created_at_end']);
+        }
+
+        // 上架時間起-起始日期
+        if (!empty($queryData['start_launched_at_start'])) {
+            $products = $products->whereDate('start_launched_at', '>=', $queryData['start_launched_at_start']);
+        }
+
+        // 上架時間起-結束日期
+        if (!empty($queryData['start_launched_at_end'])) {
+            $products = $products->whereDate('start_launched_at', '<=', $queryData['start_launched_at_end']);
+        }
+
+        // 商品類型
+        if (isset($queryData['product_type'])) {
+            $products = $products->where('product_type', $queryData['product_type']);
+        }
+
+        // 前台分類
+        if (isset($queryData['web_category_hierarchy_id'])) {
+            $products = $products->whereHas('webCategoryHierarchies', function (Builder $query) use ($queryData) {
+                return $query->where('web_category_hierarchy.id', $queryData['web_category_hierarchy_id']);
+            });
+        }
+
+        // 限制筆數
+        if (isset($queryData['limit'])) {
+            $products = $products->limit($queryData['limit']);
+        }
+
+        // 庫存類型
+        if (!empty($queryData['stock_types'])) {
+            $products = $products->whereIn('stock_type', $queryData['stock_types']);
+        }
+
+        // 排除已存在的商品
+        if (!empty($queryData['exclude_product_ids'])) {
+            $products = $products->whereNotIn('id', $queryData['exclude_product_ids']);
+        }
+
+        return $products->get();
+    }
+
+    /**
+     * 整理modal的商品
+     *
+     * @param Collection $products
+     * @return array
+     */
+    public function formatModalProducts(Collection $products): array
+    {
+        $result = [];
+
+        foreach ($products as $product) {
+            $tmpProduct = [
+                'id' => $product->id,
+                'product_no' => $product->product_no,
+                'product_name' => $product->product_name,
+                'selling_price' => number_format($product->selling_price),
+                'start_launched_at' => null,
+                'launch_status' => $product->launch_status,
+                'gross_margin' => $product->gross_margin,
+                'product_type' => null,
+                'web_category_hierarchy' => null,
+                'supplier' => null,
+                'stock_type' => config('uec.stock_type_options')[$product->stock_type] ?? null,
+                'uom' => $product->uom,
+            ];
+
+            // 上架時間起
+            if (isset($product->start_launched_at)) {
+                $tmpProduct['start_launched_at'] = Carbon::parse($product->start_launched_at)->format('Y-m-d H:i');
+            }
+
+            // 商品類型
+            if (isset($product->product_type)) {
+                $tmpProduct['product_type'] = config('uec.product_type_options')[$product->product_type] ?? null;
+            }
+
+            // 供應商
+            if (isset($product->supplier)) {
+                $tmpProduct['supplier'] = $product->supplier->name;
+            }
+
+            // 前台分類
+            if ($product->webCategoryHierarchies->isNotEmpty()) {
+                $webCategoryHierarchy = $product->webCategoryHierarchies->first();
+                $tmpProduct['web_category_hierarchy'] = $webCategoryHierarchy->id;
+            }
+
+            $result[] = $tmpProduct;
+        }
+
+        return $result;
+    }
 }

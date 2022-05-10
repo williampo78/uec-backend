@@ -29,17 +29,27 @@ export default {
             .trigger("change")
             .on("change", function () {
                 vm.$emit("input", this.value);
+            })
+            .on("select2:selecting", function (event) {
+                vm.$emit("selecting", event);
             });
     },
     watch: {
         value: function (value) {
             $(this.$el).val(value).trigger("change");
         },
-        options: function (options) {
-            $(this.$el).empty().select2({
-                data: options,
-                allowClear: this.allowClear,
-            });
+        options: {
+            handler: function (options) {
+                $(this.$el)
+                    .empty()
+                    .select2({
+                        data: options,
+                        allowClear: this.allowClear,
+                    })
+                    .val(this.value)
+                    .trigger("change");
+            },
+            deep: true,
         },
     },
     destroyed: function () {

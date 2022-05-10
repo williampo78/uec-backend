@@ -71,7 +71,7 @@
         $(function() {
             let campaign_types = @json($campaign_types);
             let suppliers = @json($suppliers);
-            let product_types = @json(config('uec.product_type_option'));
+            let product_types = @json(config('uec.product_type_options'));
             var prd_modal_product_list = {}; // 單品modal清單中的商品
             var prd_product_list = {}; // 單品清單中的商品
             var gift_modal_product_list = {}; // 贈品modal清單中的商品
