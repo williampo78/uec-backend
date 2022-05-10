@@ -372,6 +372,29 @@ window.init = (datas = {}) => {
                 .show();
         }
     });
+    $(document).on("click" , ".target_campaign_btn",function(){
+        $('#now_row_num').val($(this).data('rownum')) ;
+        $('#promotion_campaign_model').modal('toggle');
+    });
+    $(document).on("click" , ".search_btn",function(){
+        let type = $(this).data('type') ;
+        let promotional_campaigns_key_word = $('#promotional_campaigns_key_word').val() ;
+        let promotional_campaigns_time_type = $('#promotional_campaigns_time_type').val() ;
+        let level_code = 'CART_P' ;
+        switch (type) {
+            case 'promotion_campaign':
+                axios.post('/backend/advertisemsement_launch/ajax/search-promotion-campaign', {
+                    'id': '1'
+                })
+                .then(function(response) {
+                   console.log(response) ;
+                })
+                .catch(function(error) {
+                    console.log('ERROR');
+                })
+            break;
+        }
+    });
 
     // 刪除圖片區的圖片
     $(document).on("click", ".btn-delete-image-block-image-name", function () {
@@ -535,7 +558,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
                             </div>
                         </div>
                         <div class="col-sm-12 target_campaign_btn_div" style="display:none;">
-                            <button type="button" class="btn btn-warning" data-rownum="${image_block_row_no}">挑選賣場</button>
+                            <button type="button" class="btn btn-warning target_campaign_btn" data-rownum="${image_block_row_no}" >挑選賣場</button>
                         </div>
                     </div>
                 </div>
@@ -577,6 +600,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
 };
 
 window.addTextBlock = (product_category_select_options, datas = {}) => {
+    console.log("addTextBlock");
     let text_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";

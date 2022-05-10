@@ -26,19 +26,10 @@
                             <div class="row">
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
-                                    @include(
-                                        'backend.advertisement.launch.slot_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.image_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.text_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.product_block'
-                                    )
-
+                                    @include('backend.advertisement.launch.slot_block')
+                                    @include('backend.advertisement.launch.image_block')
+                                    @include('backend.advertisement.launch.text_block')
+                                    @include('backend.advertisement.launch.product_block')
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
@@ -60,6 +51,7 @@
                 </div>
             </div>
         </div>
+        @include('backend.advertisement.promotion_campaign_model')
     </div>
 @endsection
 
@@ -68,6 +60,7 @@
 
     <script>
         $(function() {
+            $("#promotional_campaigns_time_type").select2({allowClear: false,});
             let ad_slots = @json($ad_slots);
             // 商品分類下拉選項
             let product_category = @json($product_category);

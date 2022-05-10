@@ -284,4 +284,15 @@ class AdvertisementLaunchController extends Controller
             'status' => false,
         ]);
     }
+    /**
+     * 取得活動賣場
+     *
+     * @param Request $request
+     * @return json
+     */
+    public function searchPromotionCampaign(Request $request){
+        return response()->json([
+            'status' => true,
+        ]);
+    }
 }

@@ -201,6 +201,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
 
     // 廣告上架
     Route::post('/advertisemsement_launch/ajax/can-pass-active-validation', [AdvertisementLaunchController::class, 'canPassActiveValidation']);
+    Route::post('/advertisemsement_launch/ajax/search-promotion-campaign', [AdvertisementLaunchController::class, 'searchPromotionCampaign']);
     Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, [
         'names' => [
             'index' => 'advertisemsement_launch',
