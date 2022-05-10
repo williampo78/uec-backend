@@ -783,6 +783,7 @@ class APICartServices
                             "thresholdID" => $item->id,
                             "campaignID" => $campaign_id,
                             "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
+                            "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
                             "campaignBrief" => $item->threshold_brief,
                             "campaignDiscount" => ($prodDiscount * -1),
                             "products" => $pid
@@ -855,6 +856,7 @@ class APICartServices
                         "thresholdID" => $item->id,
                         "campaignID" => $campaign_id,
                         "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
+                        "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
                         "campaignBrief" => $item->threshold_brief,
                         "campaignProdList" => $prods_display,
                         "products" => $pid,
