@@ -70,4 +70,12 @@ class PromotionalCampaign extends Model
     {
         return $this->hasMany(PromotionalCampaignGiveaway::class, 'promotional_campaign_id');
     }
+
+    /**
+     * 建立與行銷活動-門檻的關聯
+     */
+    public function promotionalCampaignThresholds()
+    {
+        return $this->hasMany(PromotionalCampaignThreshold::class, 'promotional_campaign_id');
+    }
 }

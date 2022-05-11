@@ -125,7 +125,19 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function edit($id)
     {
-        //
+        $result = [];
+        // 活動類型
+        $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
+        // 滿額活動
+        $result['cartCampaign'] = $this->promotionalCampaignService->getPromotionalCampaignCartById($id);
+        $result['cartCampaign'] = $this->promotionalCampaignService->formatPromotionalCampaignCart($result['cartCampaign']);
+
+        return view('backend.promotional_campaign.cart_v2.edit', $result);
     }
 
     /**
@@ -137,7 +149,20 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // $input_data = $request->except('_token', '_method');
+        // $input_data['promotional_campaign_id'] = $id;
+
+        // if (!$this->promotional_campaign_service->updatePromotionalCampaign($input_data)) {
+        //     return back()->withErrors(['message' => '儲存失敗']);
+        // }
+
+        // $route_name = 'promotional_campaign_cart';
+        // $act = 'upd';
+
+        // return view(
+        //     'backend.success',
+        //     compact('route_name', 'act')
+        // );
     }
 
     /**

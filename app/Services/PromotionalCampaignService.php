@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\PromotionalCampaign;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\PromotionalCampaignProduct;
 use App\Models\PromotionalCampaignGiveaway;
@@ -15,12 +16,12 @@ use App\Models\PromotionalCampaignThreshold;
 
 class PromotionalCampaignService
 {
-    private $lookup_values_v_service;
+    private $lookupValuesVService;
     private const CART_UPLOAD_PATH_PREFIX = 'promotional_campaign/cart/';
 
-    public function __construct()
+    public function __construct(LookupValuesVService $lookupValuesVService)
     {
-        $this->lookup_values_v_service = new LookupValuesVService;
+        $this->lookupValuesVService = $lookupValuesVService;
     }
 
     /**
@@ -235,7 +236,7 @@ class PromotionalCampaignService
                 $create_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
             }
 
-            $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+            $campaign_types = $this->lookupValuesVService->getLookupValuesVs([
                 'type_code' => 'CAMPAIGN_TYPE',
                 'code' => $create_data['campaign_type'],
             ]);
@@ -858,6 +859,92 @@ class PromotionalCampaignService
     }
 
     /**
+     * 取得滿額活動
+     *
+     * @param integer $id
+     * @return Model
+     */
+    public function getPromotionalCampaignCartById(int $id): Model
+    {
+        $user = Auth::user();
+        $cartCampaign = PromotionalCampaign::with([
+            'promotionalCampaignThresholds',
+            'promotionalCampaignThresholds.promotionalCampaignGiveaways',
+            'promotionalCampaignProducts',
+        ])
+            ->where('agent_id', $user->agent_id)
+            ->where('level_code', 'CART_P')
+            ->find($id);
+
+        return $cartCampaign;
+    }
+
+    /**
+     * 整理滿額活動
+     *
+     * @param Model $cartCampaigns
+     * @return array
+     */
+    public function formatPromotionalCampaignCart(Model $cartCampaign): array
+    {
+        // 庫存類型
+        $stockType = null;
+        if ($cartCampaign->ship_from_whs == 'SELF') {
+            $stockType = 'A_B';
+        } elseif ($cartCampaign->ship_from_whs == 'SUP') {
+            $stockType = 'T';
+        }
+
+        $result = [
+            'id' => $cartCampaign->id,
+            'campaign_name' => $cartCampaign->campaign_name,
+            'campaign_type' => $cartCampaign->campaign_type,
+            'active' => $cartCampaign->active,
+            'start_at' => $cartCampaign->start_at,
+            'end_at' => $cartCampaign->end_at,
+            'campaign_brief' => $cartCampaign->campaign_brief,
+            'url_code' => $cartCampaign->url_code,
+            'stock_type' => $stockType,
+            'supplier_id' => isset($cartCampaign->supplier_id) ? $cartCampaign->supplier_id : 'all',
+            'banner_photo_desktop_url' => !empty($cartCampaign->banner_photo_desktop) ? config('filesystems.disks.s3.url') . $cartCampaign->banner_photo_desktop : null,
+            'banner_photo_mobile_url' => !empty($cartCampaign->banner_photo_mobile) ? config('filesystems.disks.s3.url') . $cartCampaign->banner_photo_mobile : null,
+            'thresholds' => null,
+            'products' => null,
+        ];
+// dd($cartCampaign);
+        // 活動門檻
+        if ($cartCampaign->promotionalCampaignThresholds->isNotEmpty()) {
+            foreach ($cartCampaign->promotionalCampaignThresholds as $threshold) {
+                $tmpThreshold = [
+                    'n_value' => $threshold->n_value,
+                    'x_value' => null,
+                    'giveaways' => null,
+                ];
+
+                // ﹝指定商品滿N元，打X折﹞、﹝指定商品滿N元，折X元﹞
+                if (in_array($cartCampaign->campaign_type, ['CART_P01', 'CART_P02'])) {
+                    $tmpThreshold['x_value'] = $threshold->x_value;
+                }
+                // ﹝指定商品滿N件，送贈品﹞、﹝指定商品滿N元，送贈品﹞
+                elseif (in_array($cartCampaign->campaign_type, ['CART_P03', 'CART_P04'])) {
+                    // 贈品
+                    if ($threshold->promotionalCampaignGiveaways->isNotEmpty()) {
+                        foreach ($threshold->promotionalCampaignGiveaways as $giveaway) {
+                            $tmpGiveaway = [
+
+                            ];
+                        }
+                    }
+                }
+
+                $result['products'][] = $tmpThreshold;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * 新增滿額活動
      *
      * @param array $data
@@ -953,7 +1040,6 @@ class PromotionalCampaignService
                         if (isset($data['giveaways'])) {
                             foreach ($data['giveaways'] as $giveaway) {
                                 PromotionalCampaignGiveaway::create([
-                                    'promotional_campaign_id' => $createdPromotionalCampaign->id,
                                     'sort' => 1,
                                     'product_id' => $giveaway['product_id'],
                                     'assigned_qty' => $giveaway['assigned_qty'],

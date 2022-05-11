@@ -1,6 +1,6 @@
 @extends('backend.master')
 
-@section('title', '滿額活動 編輯資料')
+@section('title', '購物車滿額活動 編輯資料')
 
 @section('style')
     <style>
@@ -8,484 +8,1272 @@
             max-width: 100%;
         }
 
+        .tab-content {
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding: 30px;
+        }
+
     </style>
 @endsection
 
 @section('content')
-    @if ($errors->any())
-        <div id="error-message" style="display: none;">
-            {{ $errors->first('message') }}
-        </div>
-    @endif
+    <div id="app">
+        @if ($errors->any())
+            <div ref="errorMessage" style="display: none;">
+                {{ $errors->first('message') }}
+            </div>
+        @endif
 
-    <div id="page-wrapper">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">請輸入下列欄位資料</div>
-                    <div class="panel-body">
-                        <form role="form" id="update-form" method="post"
-                            action="{{ route('promotional_campaign_cart.update', $promotional_campaign->id) }}">
-                            @method('PUT')
-                            @csrf
-
-                            <div class="row">
-                                <!-- 欄位 -->
-                                <div class="col-sm-12">
-                                    @include('backend.promotional_campaign.campaign_block')
-                                    @include('backend.promotional_campaign.applicable_target_block')
-                                    @include('backend.promotional_campaign.prd_block')
-                                    @include('backend.promotional_campaign.gift_block')
-
+        <div id="page-wrapper">
+            <!-- 表頭名稱 -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <h1 class="page-header"><i class="fa-solid fa-plus"></i> 購物車滿額活動 編輯資料</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">請輸入下列欄位資料</div>
+                        <div class="panel-body">
+                            <form id="edit-form" method="post"
+                                action="{{ route('promotional_campaign_cart_v2.update', $cartCampaign['id']) }}" enctype="multipart/form-data">
+                                @method('PUT')
+                                @csrf
+                                <div class="form-horizontal">
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                @if ($share_role_auth['auth_update'])
-                                                    <button class="btn btn-success" type="button" id="btn-save">
-                                                        <i class="fa-solid fa-floppy-disk"></i> 儲存
-                                                    </button>
-                                                @endif
-                                                <button class="btn btn-danger" type="button" id="btn-cancel">
-                                                    <i class="fa-solid fa-ban"></i> 取消
-                                                </button>
+                                                <div class="col-sm-1">
+                                                    <label class="control-label">活動名稱 <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <input type="text" class="form-control" name="campaign_name"
+                                                        v-model="form.campaignName">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-1">
+                                                    <label for="campaign_type" class="control-label">活動類型 <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <select2 class="form-control" :options="campaignTypes"
+                                                        v-model="form.campaignType" name="campaign_type" @select2-change="changeCampaignType">
+                                                        <option disabled value=""></option>
+                                                    </select2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-1">
+                                                    <label class="control-label">狀態 <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="active" value="1"
+                                                                    v-model="form.active">生效
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-sm-1">
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="active" value="0"
+                                                                    v-model="form.active">失效
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-1">
+                                                    <label class="control-label">上架時間 <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <div class="row">
+                                                        <div class="col-sm-5">
+                                                            <div class="input-group" id="start_at_flatpickr">
+                                                                <input type="text" class="form-control" name="start_at"
+                                                                    id="start_at" autocomplete="off" data-input
+                                                                    v-model="form.startAt">
+                                                                <span class="input-group-btn" data-toggle>
+                                                                    <button class="btn btn-default" type="button">
+                                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-2 text-center">
+                                                            <label class="control-label">～</label>
+                                                        </div>
+                                                        <div class="col-sm-5">
+                                                            <div class="input-group" id="end_at_flatpickr">
+                                                                <input type="text" class="form-control" name="end_at"
+                                                                    id="end_at" autocomplete="off" data-input
+                                                                    v-model="form.endAt" />
+                                                                <span class="input-group-btn" data-toggle>
+                                                                    <button class="btn btn-default" type="button">
+                                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-1">
+                                                    <label class="control-label">前台文案 <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <input type="text" class="form-control" name="campaign_brief"
+                                                        v-model="form.campaignBrief">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-1">
+                                                    <label class="control-label">前台URL <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <input type="text" class="form-control" name="url_code"
+                                                        v-model="form.urlCode">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-1">
+                                                    <label class="control-label">庫存類型 <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="stock_type" value="A_B"
+                                                                    v-model="form.stockType" @click="clickStockType">買斷 / 寄售
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-sm-1">
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="stock_type" value="T"
+                                                                    v-model="form.stockType" @click="clickStockType">轉單
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-1">
+                                                    <label for="campaign_type" class="control-label">供應商 <span
+                                                            style="color: red;">*</span></label>
+                                                </div>
+                                                <div class="col-sm-11">
+                                                    <select2 class="form-control" :options="suppliers"
+                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false" @select2-selecting="selectingSupplier">
+                                                        <option disabled value=""></option>
+                                                    </select2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr style="border-top: 1px solid gray;" />
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <!-- Nav tabs -->
+                                        <ul class="nav nav-tabs">
+                                            <li class="active">
+                                                <a href="#tab-threshold" data-toggle="tab">門檻</a>
+                                            </li>
+                                            <li>
+                                                <a href="#tab-product" data-toggle="tab">指定商品</a>
+                                            </li>
+                                            <li>
+                                                <a href="#tab-banner" data-toggle="tab">Banner</a>
+                                            </li>
+                                        </ul>
+
+                                        <!-- Tab panes -->
+                                        <div class="tab-content">
+                                            <div class="tab-pane fade in active" id="tab-threshold">
+                                                <div v-if="form.campaignType === 'CART_P01'">
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <button type="button" class="btn btn-warning"
+                                                                @click="addThreshold">
+                                                                <i class="fa-solid fa-plus"></i> 新增門檻
+                                                            </button>
+                                                        </div>
+                                                        <div class="col-sm-11">
+                                                            <p class="text-primary form-control-static">※ 打「85折」時，折數輸入「0.85」
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="table-responsive">
+                                                        <table class='table table-striped table-bordered table-hover'
+                                                            style='width:100%'>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="text-nowrap">項次</th>
+                                                                    <th class="text-nowrap">N (滿額) <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">X (折數) <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
+                                                                    <td>
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-x-value"
+                                                                                :name="`thresholds[${thresholdIndex}][x_value]`" min="0"
+                                                                                v-model="threshold.xValue">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" class="btn btn-danger"
+                                                                            @click="deleteThreshold(thresholdIndex)">
+                                                                            <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                        </button>
+                                                                    </td>
+                                                                    <td>
+                                                                        @{{ thresholdBrief(threshold) }}
+                                                                        <input type="hidden"
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div v-else-if="form.campaignType === 'CART_P02'">
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <button type="button" class="btn btn-warning"
+                                                                @click="addThreshold">
+                                                                <i class="fa-solid fa-plus"></i> 新增門檻
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="table-responsive">
+                                                        <table class='table table-striped table-bordered table-hover'
+                                                            style='width:100%'>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="text-nowrap">項次</th>
+                                                                    <th class="text-nowrap">N (滿額) <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">X (折扣金額) <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
+                                                                    <td>
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-x-value"
+                                                                                :name="`thresholds[${thresholdIndex}][x_value]`" min="0"
+                                                                                v-model="threshold.xValue">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" class="btn btn-danger"
+                                                                            @click="deleteThreshold(thresholdIndex)">
+                                                                            <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                        </button>
+                                                                    </td>
+                                                                    <td>
+                                                                        @{{ thresholdBrief(threshold) }}
+                                                                        <input type="hidden"
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div v-else-if="form.campaignType === 'CART_P03'">
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <button type="button" class="btn btn-warning"
+                                                                @click="addThreshold">
+                                                                <i class="fa-solid fa-plus"></i> 新增門檻
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="table-responsive">
+                                                        <table class='table table-striped table-bordered table-hover'
+                                                            style='width:100%'>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="text-nowrap">項次</th>
+                                                                    <th class="text-nowrap">N (滿額) <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">贈品 <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
+                                                                    <td>
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        @include('backend.promotional_campaign.cart_v2.giveaway_block')
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" class="btn btn-danger"
+                                                                            @click="deleteThreshold(thresholdIndex)">
+                                                                            <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                        </button>
+                                                                    </td>
+                                                                    <td>
+                                                                        @{{ thresholdBrief(threshold) }}
+                                                                        <input type="hidden"
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div v-else-if="form.campaignType === 'CART_P04'">
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <button type="button" class="btn btn-warning"
+                                                                @click="addThreshold">
+                                                                <i class="fa-solid fa-plus"></i> 新增門檻
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class="table-responsive">
+                                                        <table class='table table-striped table-bordered table-hover'
+                                                            style='width:100%'>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="text-nowrap">項次</th>
+                                                                    <th class="text-nowrap">N (滿件) <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">贈品 <span
+                                                                            style="color:red;">*</span></th>
+                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr v-for="(threshold, thresholdIndex) in form.thresholds"
+                                                                    :key="thresholdIndex">
+                                                                    <td>@{{ thresholdIndex + 1 }}</td>
+                                                                    <td>
+                                                                        <div class="form-group">
+                                                                            <input type="number" class="form-control threshold-n-value"
+                                                                                :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
+                                                                                v-model="threshold.nValue">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        @include('backend.promotional_campaign.cart_v2.giveaway_block')
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" class="btn btn-danger"
+                                                                            @click="deleteThreshold(thresholdIndex)">
+                                                                            <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                        </button>
+                                                                    </td>
+                                                                    <td>
+                                                                        @{{ thresholdBrief(threshold) }}
+                                                                        <input type="hidden"
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="tab-product">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <button type="button" class="btn btn-warning" @click="addProduct">
+                                                            <i class="fa-solid fa-plus"></i> 新增商品
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <div class="table-responsive">
+                                                    <table class='table table-striped table-bordered table-hover'
+                                                        style='width:100%'>
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-nowrap">項次</th>
+                                                                <th class="text-nowrap">商品序號</th>
+                                                                <th class="text-nowrap">商品名稱</th>
+                                                                <th class="text-nowrap">售價(含稅)</th>
+                                                                <th class="text-nowrap">開賣時間</th>
+                                                                <th class="text-nowrap">上架狀態</th>
+                                                                <th class="text-nowrap">毛利(%)</th>
+                                                                <th class="text-nowrap">前台分類</th>
+                                                                <th class="text-nowrap">功能</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="(product, index) in form.products"
+                                                                :key="index">
+                                                                <input type="hidden"
+                                                                    :name="`products[${index}][product_id]`" :value="product.id">
+                                                                <td>@{{ index + 1 }}</td>
+                                                                <td>@{{ product.productNo }}</td>
+                                                                <td>@{{ product.productName }}</td>
+                                                                <td>@{{ product.sellingPrice }}</td>
+                                                                <td>@{{ product.startLaunchedAt }}</td>
+                                                                <td>@{{ product.launchStatus }}</td>
+                                                                <td>@{{ product.grossMargin }}</td>
+                                                                <td>@{{ product.webCategoryHierarchy }}</td>
+                                                                <td>
+                                                                    <button type="button" class="btn btn-danger"
+                                                                        @click="deleteProduct(index)">
+                                                                        <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="tab-banner">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <label>Desktop版</label>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為1200*150</p>
+                                                        <img v-if="bannerPhotoDesktop.url" :src="bannerPhotoDesktop.url" width="100%" height="150">
+                                                        <div v-if="bannerPhotoDesktop.showInputFile" class="form-group">
+                                                            <input type="file" name="banner_photo_desktop" :data-image-width="bannerPhotoDesktop.width" :data-image-height="bannerPhotoDesktop.height" ref="bannerPhotoDesktop" @change="onDesktopFileChange">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <button v-if="bannerPhotoDesktop.showDeleteButton" type="button" class="btn btn-danger"
+                                                            @click="deleteDesktopFile">
+                                                            <i class="fa-solid fa-trash-can"></i> 刪除
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <hr style="border-top: 1px solid gray;">
+                                                <div class="row">
+                                                    <div class="col-sm-3">
+                                                        <label>Mobile版</label>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為345*180</p>
+                                                        <img v-if="bannerPhotoMobile.url" :src="bannerPhotoMobile.url" width="100%" height="180">
+                                                        <div v-if="bannerPhotoMobile.showInputFile" class="form-group">
+                                                            <input type="file" name="banner_photo_mobile" :data-image-width="bannerPhotoMobile.width" :data-image-height="bannerPhotoMobile.height" ref="bannerPhotoMobile" @change="onMobileFileChange">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <button v-if="bannerPhotoMobile.showDeleteButton" type="button" class="btn btn-danger"
+                                                            @click="deleteMobileFile">
+                                                            <i class="fa-solid fa-trash-can"></i> 刪除
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                                <hr style="border-top: 1px solid gray;">
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            @if ($share_role_auth['auth_update'])
+                                                <button class="btn btn-success" type="button" @click="submitForm"
+                                                    :disabled='saveButton.isDisabled'>
+                                                    <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                                </button>
+                                            @endif
+                                            <a href="{{ route('promotional_campaign_cart_v2') }}" class="btn btn-danger"
+                                                id="btn-cancel"><i class="fa-solid fa-ban"></i> 取消
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    @include('backend.promotional_campaign.prd_modal')
-    @include('backend.promotional_campaign.gift_modal')
+        <product-modal :modal="productModal" @save="saveProductModalProducts"></product-modal>
+        <product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></product-modal>
+    </div>
 @endsection
 
 @section('js')
-    <script src="{{ asset('asset/js/promotional-campaign/main.js') }}"></script>
-    <script src="{{ asset('asset/js/promotional-campaign/validate.js') }}"></script>
-
+    <script src="{{ mix('js/promotional_campaign/cart/main.js') }}"></script>
     <script>
-        $(function() {
-            let suppliers = @json($suppliers);
-            let product_types = @json(config('uec.product_type_options'));
-            let promotional_campaign = @json($promotional_campaign);
-
-            if ($('#error-message').length) {
-                alert($('#error-message').text().trim());
-            }
-
-            $('#btn-save').on('click', function() {
-                $("#update-form").submit();
-            });
-
-            $('#btn-cancel').on('click', function() {
-                location.href = "{{ route('promotional_campaign_cart') }}";
-            });
-
-            let conflict_campaign_names = '';
-            // 驗證表單
-            $("#update-form").validate({
-                // debug: true,
-                submitHandler: function(form) {
-                    $('#btn-save').prop('disabled', true);
-                    form.submit();
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                form: {
+                    campaignName: "",
+                    campaignType: "",
+                    active: "0",
+                    startAt: "",
+                    endAt: "",
+                    campaignBrief: "",
+                    urlCode: "",
+                    stockType: "",
+                    supplierId: "all",
+                    thresholds: [],
+                    products: [],
                 },
-                rules: {
-                    campaign_name: {
-                        required: true,
-                        maxlength: 80,
+                saveButton: {
+                    isDisabled: false,
+                },
+                campaignTypes: [],
+                suppliers: [{
+                    text: "全部",
+                    id: "all",
+                }],
+                productModal: {
+                    id: "product-modal",
+                    title: "新增指定商品",
+                    supplier: {
+                        id: "",
+                        isDisabled: true,
                     },
-                    active: {
-                        required: true,
-                        remote: {
-                            param: function() {
-                                return {
-                                    url: "/backend/promotional_campaign_cart/ajax/can-pass-active-validation",
-                                    type: "post",
-                                    dataType: "json",
-                                    cache: false,
-                                    data: {
-                                        campaign_type: $("#campaign_type").val(),
-                                        start_at: $('#start_at').val(),
-                                        end_at: $('#end_at').val(),
-                                        n_value: $('#n_value').val(),
-                                        promotional_campaign_id: promotional_campaign.id,
-                                    },
-                                    dataFilter: function(response, type) {
-                                        conflict_campaign_names = '';
-                                        let data = JSON.parse(response);
+                    productType: {
+                        id: "N",
+                        includeOptions: ["N"],
+                    },
+                    stockType: "",
+                    excludeProductIds: [],
+                },
+                giveawayModal: {
+                    id: "giveaway-modal",
+                    title: "新增贈品",
+                    supplier: {
+                        id: "",
+                        isDisabled: true,
+                    },
+                    productType: {
+                        id: "G",
+                        includeOptions: ["N", "G"],
+                    },
+                    stockType: "",
+                    excludeProductIds: [],
+                },
+                currentThreshold: {},
+                bannerPhotoDesktop: {
+                    url: "",
+                    width: "",
+                    height: "",
+                    showInputFile: true,
+                    showDeleteButton: false,
+                },
+                bannerPhotoMobile: {
+                    url: "",
+                    width: "",
+                    height: "",
+                    showInputFile: true,
+                    showDeleteButton: false,
+                },
+            },
+            created() {
+                let campaignTypes = @json($campaignTypes);
+                let suppliers = @json($suppliers);
+                let cartCampaign = @json($cartCampaign);
 
-                                        if (data.status) {
-                                            return true;
-                                        }
+                if (campaignTypes) {
+                    campaignTypes.forEach(campaignType => {
+                        this.campaignTypes.push({
+                            text: campaignType.description,
+                            id: campaignType.code,
+                        });
+                    });
+                }
 
-                                        if (data.conflict_campaign_names) {
-                                            conflict_campaign_names = data.conflict_campaign_names;
-                                        }
+                if (suppliers) {
+                    suppliers.forEach(supplier => {
+                        this.suppliers.push({
+                            text: supplier.name,
+                            id: supplier.id,
+                        });
+                    });
+                }
 
-                                        return false;
-                                    },
+                if (cartCampaign) {
+                    console.log(cartCampaign);
+
+                    this.form.campaignName = cartCampaign.campaign_name;
+                    this.form.campaignType = cartCampaign.campaign_type;
+                    this.form.active = cartCampaign.active;
+                    this.form.startAt = cartCampaign.start_at;
+                    this.form.endAt = cartCampaign.end_at;
+                    this.form.campaignBrief = cartCampaign.campaign_brief;
+                    this.form.urlCode = cartCampaign.url_code;
+                    this.form.stockType = cartCampaign.stock_type;
+                    this.form.supplierId = cartCampaign.supplier_id;
+                    // this.form.thresholds
+                    // this.form.products
+                }
+            },
+            mounted() {
+                let self = this;
+
+                if (this.$refs.errorMessage) {
+                    alert(this.$refs.errorMessage.innerText.trim());
+                }
+
+                let startAtFlatpickr = flatpickr("#start_at_flatpickr", {
+                    dateFormat: "Y-m-d H:i:S",
+                    minDate: moment().format("YYYY-MM-DD"),
+                    maxDate: this.form.endAt,
+                    enableTime: true,
+                    enableSeconds: true,
+                    defaultHour: 0,
+                    defaultMinute: 0,
+                    defaultSeconds: 0,
+                    onChange: function(selectedDates, dateStr, instance) {
+                        endAtFlatpickr.set('minDate', dateStr);
+
+                        if (!endAtFlatpickr.input.value) {
+                            endAtFlatpickr.hourElement.value = 23;
+                            endAtFlatpickr.minuteElement.value = 59;
+                            endAtFlatpickr.secondElement.value = 59;
+                        }
+                    },
+                });
+
+                let endAtFlatpickr = flatpickr("#end_at_flatpickr", {
+                    dateFormat: "Y-m-d H:i:S",
+                    minDate: this.form.startAt,
+                    enableTime: true,
+                    enableSeconds: true,
+                    defaultHour: 23,
+                    defaultMinute: 59,
+                    defaultSeconds: 59,
+                    onChange: function(selectedDates, dateStr, instance) {
+                        startAtFlatpickr.set('maxDate', dateStr);
+                    },
+                });
+
+                let conflictCampaigns = '';
+                // 驗證表單
+                $("#create-form").validate({
+                    // debug: true,
+                    submitHandler: function(form) {
+                        self.saveButton.isDisabled = true;
+                        form.submit();
+                    },
+                    rules: {
+                        campaign_name: {
+                            required: true,
+                            maxlength: 80,
+                        },
+                        campaign_type: {
+                            required: true,
+                        },
+                        active: {
+                            required: true,
+                            remote: {
+                                param: function() {
+                                    let productIds = self.form.products.map((product) => {
+                                        return product.id;
+                                    });
+
+                                    return {
+                                        url: "/backend/promotional_campaign_cart_v2/can-active",
+                                        type: "post",
+                                        dataType: "json",
+                                        cache: false,
+                                        data: {
+                                            campaign_type: self.form.campaignType,
+                                            start_at: self.form.startAt,
+                                            end_at: self.form.endAt,
+                                            product_ids: productIds,
+                                        },
+                                        dataFilter: function(response) {
+                                            conflictCampaigns = "";
+                                            if (response) {
+                                                let data = JSON.parse(response);
+
+                                                if (data.result) {
+                                                    return true;
+                                                }
+
+                                                if (data.conflict_campaigns) {
+                                                    conflictCampaigns = data.conflict_campaigns;
+                                                }
+                                            }
+
+                                            return false;
+                                        },
+                                    }
+                                },
+                                depends: function(element) {
+                                    return self.form.campaignType &&
+                                        self.form.startAt &&
+                                        self.form.endAt &&
+                                        self.form.products &&
+                                        self.form.products.length &&
+                                        self.form.active == 1;
+                                },
+                            },
+                            atLeastOneThreshold: {
+                                param: function() {
+                                    return self.form.thresholds;
+                                },
+                                depends: function(element) {
+                                    return self.form.active == 1;
+                                },
+                            },
+                            atLeastOneProduct: {
+                                param: function() {
+                                    return self.form.products;
+                                },
+                                depends: function(element) {
+                                    return self.form.active == 1;
+                                },
+                            },
+                            eachThresholdAtLeastOneGiveaway: {
+                                param: function() {
+                                    return self.form.thresholds;
+                                },
+                                depends: function(element) {
+                                    return self.form.active == 1 && ['CART_P03', 'CART_P04'].includes(self.form.campaignType);
+                                },
+                            },
+                        },
+                        start_at: {
+                            required: true,
+                            dateGreaterThanNow: true,
+                        },
+                        end_at: {
+                            required: true,
+                            dateGreaterThanNow: true,
+                            greaterThan: function() {
+                                return self.form.startAt;
+                            },
+                        },
+                        campaign_brief: {
+                            required: true,
+                            maxlength: 20,
+                        },
+                        url_code: {
+                            required: true,
+                            isAlphaNumericUnderscoreHyphen: true,
+                        },
+                        stock_type: {
+                            required: true,
+                        },
+                        supplier_id: {
+                            required: true,
+                        },
+                        banner_photo_desktop: {
+                            accept: "image/*",
+                            filesize: [1, 'MB'],
+                            minImageWidth: 1200,
+                            minImageHeight: 150,
+                        },
+                        banner_photo_mobile: {
+                            accept: "image/*",
+                            filesize: [1, 'MB'],
+                            minImageWidth: 345,
+                            minImageHeight: 180,
+                        },
+                    },
+                    messages: {
+                        active: {
+                            remote: function(element) {
+                                if (['CART_P01', 'CART_P02'].includes(self.form.campaignType)) {
+                                    return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N元，打X折」、「指定商品滿N元，折X元」類型的生效活動<br/>
+                                    衝突的活動名稱: ${conflictCampaigns}`;
+                                } else if (['CART_P03', 'CART_P04'].includes(self.form.campaignType)) {
+                                    return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N件，送贈品」、「指定商品滿N元，送贈品」類型的生效活動<br/>
+                                    衝突的活動名稱: ${conflictCampaigns}`;
                                 }
                             },
-                            depends: function(element) {
-                                return $("#campaign_type").val() &&
-                                    $('#start_at').val() &&
-                                    $('#end_at').val() &&
-                                    $('#n_value').val();
-                            }
+                        },
+                        end_at: {
+                            greaterThan: "結束時間必須大於開始時間",
+                        },
+                        banner_photo_desktop: {
+                            accept: "檔案類型錯誤",
                         },
                     },
-                    campaign_type: {
-                        required: true,
-                    },
-                    start_at: {
-                        required: true,
-                        // dateGreaterThanNow: true,
-                    },
-                    end_at: {
-                        required: true,
-                        greaterThan: function() {
-                            return $('#start_at').val();
-                        },
-                    },
-                    n_value: {
-                        required: true,
-                        digits: true,
-                        min: function() {
-                            if ($('#campaign_type').val() == 'CART02') {
-                                if ($("#x_value").val()) {
-                                    return parseInt($("#x_value").val()) + 1;
-                                }
-                            }
+                    errorClass: "help-block",
+                    errorElement: "span",
+                    errorPlacement: function(error, element) {
+                        if (element.closest(".input-group").length) {
+                            element.closest(".input-group").parent().append(error);
+                            return;
+                        }
 
-                            return 1;
-                        },
+                        if (element.closest(".radio-inline").length) {
+                            error.insertAfter(element.closest(".row"));
+                            return;
+                        }
+
+                        if (element.is('select')) {
+                            element.parent().append(error);
+                            return;
+                        }
+
+                        error.insertAfter(element);
                     },
-                    x_value: {
-                        required: true,
-                        min: function() {
-                            if ($('#campaign_type').val() == 'CART01') {
-                                return 0.01;
-                            } else if ($('#campaign_type').val() == 'CART02') {
+                    highlight: function(element, errorClass, validClass) {
+                        if ($(element).closest('.input-group').length) {
+                            $(element).closest(".input-group").parent().addClass("has-error");
+                            return;
+                        }
+
+                        $(element).closest(".form-group").addClass("has-error");
+                    },
+                    success: function(label, element) {
+                        if ($(element).closest('.input-group').length) {
+                            $(element).closest(".input-group").parent().removeClass("has-error");
+                            return;
+                        }
+
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                });
+            },
+            watch: {
+                "form.stockType"(newValue, oldValue) {
+                    // 若「庫存類型」為「轉單」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
+                    if (newValue == "T") {
+                        this.$set(this.suppliers[0], "disabled", true);
+                        if (this.form.supplierId == "all") {
+                            this.form.supplierId = "";
+                        }
+                    }
+                    // 若「庫存類型」為「買斷 /寄售」：可選擇「全部」、亦可指定到單一供應商。
+                    else {
+                        if (this.suppliers[0].hasOwnProperty('disabled')) {
+                            this.suppliers[0].disabled = false;
+                        }
+                    }
+
+                    this.productModal.stockType = newValue;
+                    this.giveawayModal.stockType = newValue;
+                },
+                "form.supplierId"(newValue, oldValue) {
+                    this.productModal.supplier.id = newValue;
+                    this.giveawayModal.supplier.id = newValue;
+                },
+            },
+            methods: {
+                // 新增門檻
+                addThreshold() {
+                    this.form.thresholds.push({
+                        nValue: "",
+                        xValue: "",
+                        giveaways: [],
+                    });
+                },
+                // 刪除門檻
+                deleteThreshold(index) {
+                    if (confirm('確定要刪除嗎？')) {
+                        this.form.thresholds.splice(index, 1);
+                    }
+                },
+                // 新增贈品
+                addGiveaway(threshold) {
+                    if (!this.form.stockType || !this.form.supplierId) {
+                        alert("尚未指定「庫存類型」、「供應商」，不允許新增贈品！");
+                        return;
+                    }
+
+                    this.currentThreshold = threshold;
+                    this.giveawayModal.excludeProductIds = [];
+                    threshold.giveaways.forEach(giveaway => {
+                        this.giveawayModal.excludeProductIds.push(giveaway.id);
+                    });
+
+                    $('#giveaway-modal').modal('show');
+                },
+                // 刪除贈品
+                deleteGiveaway(threshold, index) {
+                    if (confirm('確定要刪除嗎？')) {
+                        threshold.giveaways.splice(index, 1);
+                    }
+                },
+                // 新增商品
+                addProduct() {
+                    if (!this.form.stockType || !this.form.supplierId) {
+                        alert("尚未指定「庫存類型」、「供應商」，不允許新增商品！");
+                        return;
+                    }
+
+                    this.productModal.excludeProductIds = [];
+
+                    this.form.products.forEach(product => {
+                        this.productModal.excludeProductIds.push(product.id);
+                    });
+
+                    $('#product-modal').modal('show');
+                },
+                // 刪除商品
+                deleteProduct(index) {
+                    if (confirm('確定要刪除嗎？')) {
+                        this.form.products.splice(index, 1);
+                    }
+                },
+                // 儲存
+                submitForm() {
+                    let self = this;
+
+                    $(`.threshold-n-value`).each(function() {
+                        let nValueElement = $(this);
+
+                        $(this).rules("add", {
+                            required: true,
+                            digits: true,
+                            min: function() {
+                                let xValue = nValueElement.closest("tr").find(".threshold-x-value").val();
+
+                                if (self.form.campaignType == 'CART_P02') {
+                                    if (xValue) {
+                                        return parseInt(xValue) + 1;
+                                    }
+                                }
+
                                 return 1;
-                            }
+                            },
+                            unique: ".threshold-n-value",
+                            messages: {
+                                digits: "只可輸入正整數",
+                                min: function(value) {
+                                    if (self.form.campaignType == 'CART_P02') {
+                                        if (value > 1) {
+                                            return "必須大於X值";
+                                        }
+                                    }
 
-                            return 0;
-                        },
-                        max: {
-                            param: 0.99,
-                            depends: function(element) {
-                                return $('#campaign_type').val() == 'CART01';
+                                    return '只可輸入正整數';
+                                },
                             },
-                        },
-                        maxlength: {
-                            param: 4,
-                            depends: function(element) {
-                                return $('#campaign_type').val() == 'CART01';
-                            },
-                        },
-                        digits: {
-                            depends: function(element) {
-                                return $('#campaign_type').val() == 'CART02';
-                            },
-                        },
-                        number: {
-                            depends: function(element) {
-                                return $('#campaign_type').val() == 'CART01';
-                            },
-                        },
-                    },
-                    target_groups: {
-                        required: true,
-                    },
-                },
-                messages: {
-                    active: {
-                        remote: function(element) {
-                            if (['CART01', 'CART02'].includes($("#campaign_type").val())) {
-                                return `同一時間點、同一N值不可存在其他生效的﹝購物車滿N元，打X折﹞、﹝購物車滿N元，折X元﹞的行銷活動<br/>
-                                    衝突的活動名稱: ${conflict_campaign_names}`;
-                            } else if (['CART03'].includes($("#campaign_type").val())) {
-                                return `同一時間點、同一N值不可存在其他生效的﹝購物車滿N元，送贈品﹞的行銷活動<br/>
-                                    衝突的活動名稱: ${conflict_campaign_names}`;
-                            }
-                        },
-                    },
-                    end_at: {
-                        greaterThan: "結束時間必須大於開始時間",
-                    },
-                    n_value: {
-                        digits: "只可輸入正整數",
-                        min: function(value) {
-                            if ($('#campaign_type').val() == 'CART02') {
-                                if (value > 1) {
-                                    return "必須大於X值";
+                        });
+                    });
+
+                    $(`.threshold-x-value`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                            min: function() {
+                                if (self.form.campaignType == 'CART_P01') {
+                                    return 0.01;
+                                } else if (self.form.campaignType == 'CART_P02') {
+                                    return 1;
                                 }
-                            }
 
-                            return '只可輸入正整數';
-                        },
-                    },
-                    x_value: {
-                        digits: "只可輸入正整數",
-                        min: function() {
-                            if ($('#campaign_type').val() == 'CART02') {
-                                return '只可輸入正整數';
-                            }
+                                return 0;
+                            },
+                            max: {
+                                param: 0.99,
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART_P01';
+                                },
+                            },
+                            maxlength: {
+                                param: 4,
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART_P01';
+                                },
+                            },
+                            digits: {
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART_P02';
+                                },
+                            },
+                            number: {
+                                depends: function(element) {
+                                    return self.form.campaignType == 'CART_P01';
+                                },
+                            },
+                            messages: {
+                                digits: "只可輸入正整數",
+                                min: function() {
+                                    if (self.form.campaignType == 'CART_P02') {
+                                        return '只可輸入正整數';
+                                    }
 
-                            return '請輸入不小於 0 的數值';
-                        },
-                    },
-                },
-                errorClass: "help-block",
-                errorElement: "span",
-                errorPlacement: function(error, element) {
-                    if (element.is(':radio[name="active"]')) {
-                        element.parent().parent().parent().append(error);
-                        return;
-                    }
-
-                    if (element.parent('.input-group').length || element.is(':radio')) {
-                        error.insertAfter(element.parent());
-                        return;
-                    }
-
-                    if (element.is('select')) {
-                        element.parent().append(error);
-                        return;
-                    }
-
-                    error.insertAfter(element);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").addClass("has-error");
-                },
-                success: function(label, element) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-            });
-
-
-            renderPrdModalSupplier(suppliers);
-            renderGiftModalSupplier(suppliers);
-
-            renderPrdModalProductType(product_types);
-            renderGiftModalProductType(product_types);
-
-            $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove(); // 移除贈品、加購品
-            $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
-
-            $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
-            $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
-
-            $('#campaign_name').val(promotional_campaign.campaign_name);
-
-            if (promotional_campaign.active == 1) {
-                $('#active_enabled').prop('checked', true);
-            } else {
-                $('#active_disabled').prop('checked', true);
-            }
-
-            $('#campaign_type').empty().append(
-                `<option value="${promotional_campaign.campaign_type}">${promotional_campaign.description}</option>`
-            ).prop('disabled', true);
-            $('#n_value').val(promotional_campaign.n_value);
-            $('#x_value').val(promotional_campaign.x_value);
-            $('#start_at').val(promotional_campaign.start_at);
-            $('#end_at').val(promotional_campaign.end_at);
-
-            // 活動類型
-            switch (promotional_campaign.campaign_type) {
-                // ﹝滿額﹞購物車滿N元，打X折
-                case 'CART01':
-                    $('#prd-block').hide();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').show();
-                    break;
-                    // ﹝滿額﹞購物車滿N元，折X元
-                case 'CART02':
-                    $('#prd-block').hide();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').hide();
-                    break;
-                    // ﹝滿額﹞購物車滿N元，送贈品
-                case 'CART03':
-                    $('#prd-block').hide();
-                    $('#gift-block').show();
-                    $('#x_value').closest('.form-group').hide();
-                    break;
-                    // ﹝滿額﹞指定商品滿N件，送贈品
-                case 'CART04':
-                    $('#prd-block').show();
-                    $('#gift-block').show();
-                    $('#x_value').closest('.form-group').hide();
-                    break;
-            }
-
-            // 當下時間>=上架時間起，僅開放修改活動名稱、狀態、上架時間訖
-            if (new Date() >= new Date($('#start_at').val())) {
-                $('#n_value, #x_value, #start_at').prop('disabled', true);
-                $('#btn-new-prd, #btn-new-gift').prop('disabled', true).hide();
-                $('#prd-product-table > thead th:last, #gift-product-table > thead th:last').hide();
-            }
-
-            init();
-
-            var prd_modal_product_list = {}; // 單品modal清單中的商品
-            var prd_product_list = {}; // 單品清單中的商品
-
-            if (promotional_campaign.products) {
-                $.each(promotional_campaign.products, function(id, product) {
-                    prd_product_list[id] = product;
-                });
-
-                renderPrdProductList(prd_product_list);
-            }
-
-            // 新增單品
-            $('#btn-new-prd').on('click', function() {
-                $('#prd-modal').modal('show');
-            });
-
-            // 單品modal商品全勾選
-            $('#prd-modal-btn-check-all').on('click', function() {
-                $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-            });
-
-            // 單品modal商品全取消
-            $('#prd-modal-btn-cancel-all').on('click', function() {
-                $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-            });
-
-            // 單品modal儲存、儲存並關閉
-            $('#prd-modal-btn-save, #prd-modal-btn-save-and-close').on('click', function() {
-                // 取得單品modal清單中有勾選的商品
-                $('#prd-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-                    function() {
-                        let id = $(this).attr('data-id');
-
-                        prd_product_list[id] = prd_modal_product_list[id]; // 增加單品清單中的商品
-                        delete prd_modal_product_list[id]; // 移除單品modal清單中的商品
+                                    return '請輸入不小於 0 的數值';
+                                },
+                            },
+                        });
                     });
 
-                renderPrdProductList(prd_product_list);
-                renderPrdModalProductList(prd_modal_product_list);
-            });
-
-            // 刪除單品清單中的商品
-            $(document).on('click', '.btn-delete-prd', function() {
-                if (confirm('確定要刪除嗎?')) {
-                    let id = $(this).closest('tr').attr('data-id');
-
-                    delete prd_product_list[id]; // 移除單品清單中的商品
-
-                    renderPrdProductList(prd_product_list);
-                }
-            });
-
-            // 單品modal搜尋
-            $('#prd-modal-btn-search').on('click', function() {
-                let query_datas = {
-                    'supplier_id': $('#prd-modal-supplier-id').val(),
-                    'product_no': $('#prd-modal-product-no').val(),
-                    'product_name': $('#prd-modal-product-name').val(),
-                    'selling_price_min': $('#prd-modal-selling-price-min').val(),
-                    'selling_price_max': $('#prd-modal-selling-price-max').val(),
-                    'start_created_at': $('#prd-modal-start-created-at').val(),
-                    'end_created_at': $('#prd-modal-end-created-at').val(),
-                    'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
-                    'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
-                    'product_type': $('#prd-modal-product-type').val(),
-                    'limit': $('#prd-modal-limit').val(),
-                    'exist_products': Object.keys(prd_product_list),
-                };
-
-                getProducts(query_datas).then(products => {
-                    prd_modal_product_list = products;
-
-                    renderPrdModalProductList(prd_modal_product_list);
-                });
-            });
-
-            var gift_modal_product_list = {}; // 贈品modal清單中的商品
-            var gift_product_list = {}; // 贈品清單中的商品
-
-            if (promotional_campaign.giveaways) {
-                $.each(promotional_campaign.giveaways, function(id, product) {
-                    gift_product_list[id] = product;
-                });
-
-                renderGiftProductList(gift_product_list);
-            }
-
-            // 新增贈品
-            $('#btn-new-gift').on('click', function() {
-                $('#gift-modal').modal('show');
-            });
-
-            // 贈品modal商品全勾選
-            $('#gift-modal-btn-check-all').on('click', function() {
-                $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-            });
-
-            // 贈品modal商品全取消
-            $('#gift-modal-btn-cancel-all').on('click', function() {
-                $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-            });
-
-            // 贈品modal儲存、儲存並關閉
-            $('#gift-modal-btn-save, #gift-modal-btn-save-and-close').on('click', function() {
-                // 取得贈品modal清單中有勾選的商品
-                $('#gift-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-                    function() {
-                        let id = $(this).attr('data-id');
-
-                        gift_product_list[id] = gift_modal_product_list[id]; // 增加贈品清單中的商品
-                        delete gift_modal_product_list[id]; // 移除贈品modal清單中的商品
+                    $(`.giveaway-assigned-qty`).each(function () {
+                        $(this).rules("add", {
+                            required: true,
+                            digits: true,
+                            min: 1,
+                        });
                     });
 
-                renderGiftProductList(gift_product_list);
-                renderGiftModalProductList(gift_modal_product_list);
-            });
+                    $("#create-form").submit();
+                },
+                // 設定門檻簡述
+                thresholdBrief(threshold) {
+                    let thresholdBrief = null;
 
-            // 刪除贈品清單中的商品
-            $(document).on('click', '.btn-delete-gift', function() {
-                if (confirm('確定要刪除嗎?')) {
-                    let id = $(this).closest('tr').attr('data-id');
+                    switch (this.form.campaignType) {
+                        case "CART_P01":
+                            if (threshold.nValue && threshold.xValue) {
+                                let discount = Math.round(threshold.xValue * 100);
+                                thresholdBrief = `指定商品達$${threshold.nValue}，打${discount}折`;
+                            }
+                            break;
 
-                    delete gift_product_list[id]; // 移除贈品清單中的商品
+                        case "CART_P02":
+                            if (threshold.nValue && threshold.xValue) {
+                                thresholdBrief = `指定商品達$${threshold.nValue}，折$${threshold.xValue}`;
+                            }
+                            break;
 
-                    renderGiftProductList(gift_product_list);
-                }
-            });
+                        case "CART_P03":
+                            if (threshold.nValue) {
+                                thresholdBrief = `指定商品達$${threshold.nValue}送贈`;
+                            }
+                            break;
 
-            // 贈品modal搜尋
-            $('#gift-modal-btn-search').on('click', function() {
-                let query_datas = {
-                    'supplier_id': $('#gift-modal-supplier-id').val(),
-                    'product_no': $('#gift-modal-product-no').val(),
-                    'product_name': $('#gift-modal-product-name').val(),
-                    'selling_price_min': $('#gift-modal-selling-price-min').val(),
-                    'selling_price_max': $('#gift-modal-selling-price-max').val(),
-                    'start_created_at': $('#gift-modal-start-created-at').val(),
-                    'end_created_at': $('#gift-modal-end-created-at').val(),
-                    'start_launched_at_start': $('#gift-modal-start-launched-at-start').val(),
-                    'start_launched_at_end': $('#gift-modal-start-launched-at-end').val(),
-                    'product_type': $('#gift-modal-product-type').val(),
-                    'limit': $('#gift-modal-limit').val(),
-                    'exist_products': Object.keys(gift_product_list),
-                };
+                        case "CART_P04":
+                            if (threshold.nValue) {
+                                thresholdBrief = `指定商品達${threshold.nValue}件送贈`;
+                            }
+                            break;
+                    }
 
-                getProducts(query_datas).then(products => {
-                    gift_modal_product_list = products;
+                    return thresholdBrief;
+                },
+                // 點擊庫存類型
+                clickStockType(event) {
+                    if (this.form.stockType == event.target.value) {
+                        return;
+                    }
 
-                    renderGiftModalProductList(gift_modal_product_list);
-                });
-            });
+                    let errorMessage = "";
+                    // 頁籤「門檻」已有指定贈品
+                    if (this.form.thresholds.some(threshold => threshold.giveaways.length)) {
+                        errorMessage += "請先刪除「門檻」頁籤的贈品設定，才能切換「庫存類型」！\n"
+                    }
+
+                    // 頁籤「指定商品」已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除「指定商品」頁籤的商品設定，才能切換「庫存類型」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
+                // 當選擇供應商時
+                selectingSupplier(event) {
+                    if (event.params.args.data.id == "all") {
+                        return;
+                    }
+
+                    let errorMessage = "";
+                    // 頁籤「門檻」已有指定贈品
+                    if (this.form.thresholds.some(threshold => threshold.giveaways.length)) {
+                        errorMessage += "請先刪除「門檻」頁籤的贈品設定，才能切換「供應商」！\n"
+                    }
+
+                    // 頁籤「指定商品」已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除「指定商品」頁籤的商品設定，才能切換「供應商」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
+                // 選擇活動類型
+                changeCampaignType() {
+                    this.form.thresholds = [];
+                },
+                // 儲存商品modal的商品
+                saveProductModalProducts(products) {
+                    products.forEach(product => {
+                        this.form.products.push({
+                            id: product.id,
+                            productNo: product.productNo,
+                            productName: product.productName,
+                            sellingPrice: product.sellingPrice,
+                            startLaunchedAt: product.startLaunchedAt,
+                            launchStatus: product.launchStatus,
+                            grossMargin: product.grossMargin,
+                            webCategoryHierarchy: product.webCategoryHierarchy,
+                        });
+                    });
+                },
+                // 儲存贈品modal的商品
+                saveGiveawayModalProducts(products) {
+                    products.forEach(product => {
+                        this.currentThreshold.giveaways.push({
+                            id: product.id,
+                            productNo: product.productNo,
+                            productName: product.productName,
+                            assignedQty: 1,
+                            stockType: product.stockType,
+                            productType: product.productType,
+                            supplier: product.supplier,
+                            stockQty: product.stockQty,
+                            uom: product.uom,
+                        });
+                    });
+                },
+                // 上傳Desktop圖片
+                onDesktopFileChange(event) {
+                    this.bannerPhotoDesktop.url = "";
+                    this.bannerPhotoDesktop.width = "";
+                    this.bannerPhotoDesktop.height = "";
+
+                    const file = event.target.files[0];
+
+                    if (!file || file.type.indexOf('image/') !== 0) {
+                        this.bannerPhotoDesktop.showDeleteButton = false;
+                        return;
+                    }
+
+                    let reader = new FileReader();
+
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        let img = new Image();
+                        img.onload = () => {
+                            this.bannerPhotoDesktop.width = img.width;
+                            this.bannerPhotoDesktop.height = img.height;
+                        }
+                        img.src = event.target.result;
+                        this.bannerPhotoDesktop.url = event.target.result;
+                        this.bannerPhotoDesktop.showDeleteButton = true;
+                    }
+
+                    reader.onerror = (event) => {
+                        console.error(event);
+                    }
+                },
+                // 刪除Desktop圖片
+                deleteDesktopFile() {
+                    this.bannerPhotoDesktop.showDeleteButton = false;
+                    this.bannerPhotoDesktop.url = "";
+                    this.$refs.bannerPhotoDesktop.value = "";
+                },
+                // 上傳Mobile圖片
+                onMobileFileChange(event) {
+                    this.bannerPhotoMobile.url = "";
+                    this.bannerPhotoMobile.width = "";
+                    this.bannerPhotoMobile.height = "";
+
+                    const file = event.target.files[0];
+
+                    if (!file || file.type.indexOf('image/') !== 0) {
+                        this.bannerPhotoMobile.showDeleteButton = false;
+                        return;
+                    }
+
+                    let reader = new FileReader();
+
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        let img = new Image();
+                        img.onload = () => {
+                            this.bannerPhotoMobile.width = img.width;
+                            this.bannerPhotoMobile.height = img.height;
+                        }
+                        img.src = event.target.result;
+                        this.bannerPhotoMobile.url = event.target.result;
+                        this.bannerPhotoMobile.showDeleteButton = true;
+                    }
+
+                    reader.onerror = (event) => {
+                        console.error(event);
+                    }
+                },
+                // 刪除Mobile圖片
+                deleteMobileFile() {
+                    this.bannerPhotoMobile.showDeleteButton = false;
+                    this.bannerPhotoMobile.url = "";
+                    this.$refs.bannerPhotoMobile.value = "";
+                },
+            },
         });
     </script>
 @endsection

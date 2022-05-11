@@ -19,4 +19,12 @@ class PromotionalCampaignProduct extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+
+    /**
+     * 建立與行銷活動的關聯
+     */
+    public function promotionalCampaign()
+    {
+        return $this->belongsTo(PromotionalCampaign::class, 'promotional_campaign_id');
+    }
 }

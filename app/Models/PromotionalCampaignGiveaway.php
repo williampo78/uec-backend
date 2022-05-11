@@ -19,4 +19,12 @@ class PromotionalCampaignGiveaway extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+
+    /**
+     * 建立與行銷活動-門檻的關聯
+     */
+    public function promotionalCampaignThreshold()
+    {
+        return $this->belongsTo(PromotionalCampaignThreshold::class, 'threshold_id');
+    }
 }
