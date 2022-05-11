@@ -567,9 +567,9 @@ class APIProductServices
             $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
         }
         $products = DB::select($strSQL);
+
         if ($products) {
             $data = [];
-            $product_id = 0;
             foreach ($products as $category) {
                 if ($config_levels == 2) {
                     $sub[$category->L1][] = array(
@@ -578,7 +578,7 @@ class APIProductServices
                         'count' => $category->count
                     );
                 } elseif ($config_levels == 3) {
-                    $sub[$category->L2][$category->L2][] = array(
+                    $sub[$category->L1][$category->L2][] = array(
                         'id' => $category->id,
                         'name' => $category->category_name,
                         'count' => $category->count
@@ -601,8 +601,8 @@ class APIProductServices
                 foreach ($products as $category) {
                     if ($subCate == $category->L2) continue;
                     $main[] = array(
-                        'id' => $category->L2,
-                        'name' => $category->L2_Name,
+                        'id' => $category->L1,
+                        'name' => $category->L1_Name,
                         'sub' => $sub[$category->L1][$category->L2]
                     );
                     $subCate = $category->L2;
