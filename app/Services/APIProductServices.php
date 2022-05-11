@@ -52,7 +52,9 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-            $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
+            $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+                    '' as campaign_name, '' as url_code, '' as campaign_brief
+                    from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
                     inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
@@ -73,7 +75,9 @@ class APIProductServices
             $strSQL .= " group by cate.`id`
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
         } elseif ($config_levels == '2') {
-            $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
+            $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+                    '' as campaign_name, '' as url_code, '' as campaign_brief
+                    from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
                     inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
@@ -94,7 +98,6 @@ class APIProductServices
         }
         $categorys = DB::select($strSQL);
         foreach ($categorys as $category) {
-
             $L1_data[$category->L1ID]["id"] = $category->L1ID;
             $L1_data[$category->L1ID]["name"] = $category->L1_NAME;
 
@@ -109,6 +112,11 @@ class APIProductServices
                 $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_description'] = $category->meta_description;
                 $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_keywords'] = $category->meta_keywords;
                 $L3_data[$category->L1ID][$category->L2ID][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['sort'] = $category->sort;
 
             } else if ($config_levels == '2') {
 
@@ -119,6 +127,88 @@ class APIProductServices
                 $L2_data[$category->L1ID][$category->id]['meta_description'] = $category->meta_description;
                 $L2_data[$category->L1ID][$category->id]['meta_keywords'] = $category->meta_keywords;
                 $L2_data[$category->L1ID][$category->id]['count'] = $category->pCount;
+                $L2_data[$category->L1ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L2_data[$category->L1ID][$category->id]['campaign_name'] = $category->campaign_name;
+                $L2_data[$category->L1ID][$category->id]['url_code'] = $category->url_code;
+                $L2_data[$category->L1ID][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L2_data[$category->L1ID][$category->id]['sort'] = $category->sort;
+            }
+
+        }
+
+        //根據階層顯示層級資料(賣場)
+        if ($config_levels == '3') {
+            $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*,0 as pCount,
+                    '' as campaign_name, '' as url_code, '' as campaign_brief
+                    from `web_category_hierarchy` cate
+                    inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
+                    inner join `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
+                    inner join `promotional_campaigns` pcc on pcc.`id`=cate2.`promotion_campaign_id`
+                    where cate.`active`=1 and pcc.`active`=1
+                    and current_timestamp() between pcc.`start_at` and pcc.`end_at` and cate.content_type='M' ";
+            if ($keyword) {
+                $strSQL .= " and (cate.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or pcc.campaign_name like '%" . $keyword . "%'";
+                $strSQL .= " or pcc.campaign_brief like '%" . $keyword . "%'";
+                $strSQL .= ")";
+            }
+            $strSQL .= " group by cate.`id`
+                    order by cate2.`sort`, cate1.`sort`, cate.`sort`";
+        } elseif ($config_levels == '2') {
+            $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, 0 as 'pCount',
+                    pcc.`campaign_name`, pcc.`url_code`, pcc.`campaign_brief`
+                    from web_category_hierarchy cate
+                    inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
+                    inner join `promotional_campaigns` pcc on pcc.`id`=cate.`promotion_campaign_id`
+                    where cate.`active`=1 and pcc.`active`=1
+                    and current_timestamp() between pcc.`start_at` and pcc.`end_at` and cate.content_type='M' ";
+            if ($keyword) {
+                $strSQL .= " and (cate.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+                $strSQL .= " or pcc.campaign_name like '%" . $keyword . "%'";
+                $strSQL .= " or pcc.campaign_brief like '%" . $keyword . "%'";
+                $strSQL .= ")";
+            }
+            $strSQL .= " group by cate.`id`
+                    order by cate1.`sort`, cate.`sort`";
+        }
+        $categorys = DB::select($strSQL);
+        foreach ($categorys as $category) {
+            $L1_data[$category->L1ID]["id"] = $category->L1ID;
+            $L1_data[$category->L1ID]["name"] = $category->L1_NAME;
+
+            if ($config_levels == '3') {
+                $L2_data[$category->L1ID][$category->L2ID]["id"] = $category->L2ID;
+                $L2_data[$category->L1ID][$category->L2ID]["name"] = $category->L2_NAME;
+
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['id'] = $category->id;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['name'] = $category->category_name;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['type'] = $category->content_type;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_title'] = $category->meta_title;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_description'] = $category->meta_description;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1ID][$category->L2ID][$category->id]['sort'] = $category->sort;
+
+            } else if ($config_levels == '2') {
+                $L2_data[$category->L1ID][$category->id]['id'] = $category->id;
+                $L2_data[$category->L1ID][$category->id]['name'] = $category->category_name;
+                $L2_data[$category->L1ID][$category->id]['type'] = $category->content_type;
+                $L2_data[$category->L1ID][$category->id]['meta_title'] = $category->meta_title;
+                $L2_data[$category->L1ID][$category->id]['meta_description'] = $category->meta_description;
+                $L2_data[$category->L1ID][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L2_data[$category->L1ID][$category->id]['count'] = $category->pCount;
+                $L2_data[$category->L1ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L2_data[$category->L1ID][$category->id]['campaign_name'] = $category->campaign_name;
+                $L2_data[$category->L1ID][$category->id]['url_code'] = $category->url_code;
+                $L2_data[$category->L1ID][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L2_data[$category->L1ID][$category->id]['sort'] = $category->sort;
             }
 
         }
@@ -130,11 +220,15 @@ class APIProductServices
                 $data2 = [];
                 $data[$key1]["id"] = $value1["id"];
                 $data[$key1]["name"] = $value1["name"];
+                if ($config_levels == 2) {
+                    array_multisort(array_column($L2_data[$key1], 'sort'), SORT_ASC, $L2_data[$key1]);
+                }
                 foreach ($L2_data[$key1] as $key2 => $value2) {
                     $data2[$key2]["id"] = $value2["id"];
                     $data2[$key2]["name"] = $value2["name"];
                     if ($config_levels == 3) {
                         $data3 = [];
+                        array_multisort(array_column($L3_data[$key1][$key2], 'sort'), SORT_ASC, $L3_data[$key1][$key2]);
                         foreach ($L3_data[$key1][$key2] as $key3 => $value3) {
                             $data3[$key3]["id"] = $value3["id"];
                             $data3[$key3]["name"] = $value3["name"];
@@ -143,6 +237,10 @@ class APIProductServices
                             $data3[$key3]["meta_title"] = $value3["meta_title"];
                             $data3[$key3]["meta_description"] = $value3["meta_description"];
                             $data3[$key3]["meta_keywords"] = $value3["meta_keywords"];
+                            $data3[$key3]["campaign_id"] = $value3["promotion_campaign_id"];
+                            $data3[$key3]["campaign_name"] = $value3["campaign_name"];
+                            $data3[$key3]["campaign_url_code"] = $value3["url_code"];
+                            $data3[$key3]["campaign_brief"] = $value3["campaign_brief"];
                         }
                         $data2[$key2]["cateInfo"] = $data3;
                     } elseif ($config_levels == 2) {
@@ -151,6 +249,10 @@ class APIProductServices
                         $data2[$key2]["meta_title"] = $value2["meta_title"];
                         $data2[$key2]["meta_description"] = $value2["meta_description"];
                         $data2[$key2]["meta_keywords"] = $value2["meta_keywords"];
+                        $data2[$key2]["campaign_id"] = $value2["promotion_campaign_id"];
+                        $data2[$key2]["campaign_name"] = $value2["campaign_name"];
+                        $data2[$key2]["campaign_url_code"] = $value2["url_code"];
+                        $data2[$key2]["campaign_brief"] = $value2["campaign_brief"];
                     }
                 }
                 $data[$key1]["cateInfo"] = $data2;
@@ -248,7 +350,7 @@ class APIProductServices
         $web_category_hierarchy_id = 0;
         foreach ($products as $product) {
             if (!$id) {//依產品編號找相關分類不進此判斷
-                if ($product->id == $product_id && $product->web_category_hierarchy_id==$web_category_hierarchy_id) continue;
+                if ($product->id == $product_id && $product->web_category_hierarchy_id == $web_category_hierarchy_id) continue;
             }
             $data[$product->web_category_hierarchy_id][] = $product;
             $product_id = $product->id;
@@ -347,8 +449,8 @@ class APIProductServices
 
                 }
             }
-            $return_data=[];
-            foreach ($data as $key=>$product){
+            $return_data = [];
+            foreach ($data as $key => $product) {
                 $return_data[] = $product;
             }
             //array_multisort(array_column($data, 'selling_price'), $sort_flag, $data);
