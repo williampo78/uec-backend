@@ -250,6 +250,12 @@ class AdvertisementService
             'ad_slot_contents.id AS slot_content_id',
             'ad_slot_contents.active AS slot_content_active',
             'ad_slot_contents.agent_id AS slot_content_agent_id',
+            'ad_slot_contents.remark AS contents_remark',
+            'ad_slot_contents.see_more_url',
+            'ad_slot_contents.see_more_action',
+            'ad_slot_contents.see_more_cate_hierarchy_id',
+            'ad_slot_contents.see_more_target_blank',
+            'ad_slot_contents.slot_title_color',
             'lookup_values_v.description',
         )
             ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
@@ -292,7 +298,11 @@ class AdvertisementService
             $content_data['updated_by'] = $user_id;
             $content_data['created_at'] = $now;
             $content_data['updated_at'] = $now;
-
+            $content_data['remark'] = $input_data['remark'];
+            $content_data['see_more_action'] = $input_data['see_more_action'] ?? null;
+            $content_data['see_more_url'] = $input_data['see_more_url'] ?? null;
+            $content_data['see_more_target_blank'] = $input_data['see_more_target_blank'] ?? null;
+            $content_data['see_more_cate_hierarchy_id'] = $input_data['see_more_cate_hierarchy_id'] ?? null;
             if (!empty($input_data['start_at'])) {
                 $content_data['start_at'] = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
             }
@@ -305,6 +315,7 @@ class AdvertisementService
             if ($slot['is_user_defined'] == 1) {
                 $content_data['slot_color_code'] = $input_data['slot_color_code'] ?? null;
                 $content_data['slot_title'] = $input_data['slot_title'] ?? null;
+                $content_data['slot_title_color'] = $input_data['slot_title_color'] ?? null;
             }
             // 使用者自定義版位，新增主色
             elseif ($slot['is_user_defined'] == 2) {
@@ -465,10 +476,17 @@ class AdvertisementService
             if (isset($input_data['slot_title'])) {
                 $update_content_data['slot_title'] = $input_data['slot_title'];
             }
-
+            if (isset($input_data['slot_title_color'])) {
+                $update_content_data['slot_title_color'] = $input_data['slot_title_color'];
+            }
             if (isset($input_data['product_assigned_type'])) {
                 $update_content_data['product_assigned_type'] = $input_data['product_assigned_type'];
             }
+            $update_content_data['remark'] = $input_data['remark'];
+            $update_content_data['see_more_action'] = $input_data['see_more_action'] ?? null;
+            $update_content_data['see_more_url'] = $input_data['see_more_url'] ?? null;
+            $update_content_data['see_more_target_blank'] = $input_data['see_more_target_blank'] ?? null;
+            $update_content_data['see_more_cate_hierarchy_id'] = $input_data['see_more_cate_hierarchy_id'] ?? null;
 
             $update_content_data['updated_by'] = $user_id;
             $update_content_data['updated_at'] = $now;
@@ -492,7 +510,6 @@ class AdvertisementService
                 // 上傳新圖片
                 $update_content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
             }
-
             AdSlotContent::findOrFail($slot_content['content']->slot_content_id)->update($update_content_data);
 
             $details_image_name = $slot_content['details']->pluck('image_name', 'id')->all();

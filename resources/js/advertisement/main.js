@@ -345,6 +345,26 @@ window.init = (datas = {}) => {
                 break;
         }
     });
+    //切換看更多時,清除其他選項的值以及disable其他欄位
+    $(document).on("click",'[name^="see_more_action"]',function(){
+        //X：無連結、U：開啟URL、C：前往商品分類頁
+        let see_more_action = $(this).val() ;
+        let see_more_url = $("input[name='see_more_url']") ;
+        let see_more_cate_hierarchy_id = $("select[name='see_more_cate_hierarchy_id']")
+        switch (see_more_action) {
+            case 'X':
+                see_more_url.val("");
+                see_more_cate_hierarchy_id.val("").trigger("change");
+                break;
+            case 'U':
+                see_more_cate_hierarchy_id.val("").trigger("change");
+                break;
+            case 'C':
+                see_more_url.val("");
+                break;
+
+        }
+    })
 
     // 選擇版位icon檔案
     $("#slot_icon_name").on("change", function () {
@@ -842,7 +862,16 @@ window.enableSlotColorCode = () => {
 
     validate.validateSlotColorCode();
 };
-
+// 啟用版位標題色
+window.enableTitleleColorCode = () => {
+    $("#slot_title_color").prop("disabled", false);
+    if ($("#slot_title_color").prev("label").find("span").length < 1) {
+        $("#slot_title_color")
+            .prev("label")
+            .append('<span style="color:red;">*</span>');
+    }
+    validate.validateTitleColorCode();
+};
 // 啟用版位icon
 window.enableSlotIconName = () => {
     $("#slot_icon_name").prop("disabled", false);
@@ -883,6 +912,18 @@ window.disableSlotColorCode = () => {
         .remove();
 
     validate.removeSlotColorCodeValidation();
+};
+
+// 停用版位標題色
+window.disableTitleColorCode= () => {
+    $("#slot_title_color")
+        .prop("disabled", true)
+        .val("")
+        .prev("label")
+        .find("span")
+        .remove();
+
+    validate.removeTitleColorCodeValidation();
 };
 
 // 停用版位icon

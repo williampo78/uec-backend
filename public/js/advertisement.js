@@ -15,9 +15,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "validateProductBlockProduct": () => (/* binding */ validateProductBlockProduct),
 /* harmony export */   "validateProductBlockCategory": () => (/* binding */ validateProductBlockCategory),
 /* harmony export */   "validateSlotColorCode": () => (/* binding */ validateSlotColorCode),
+/* harmony export */   "validateTitleColorCode": () => (/* binding */ validateTitleColorCode),
 /* harmony export */   "validateSlotIconName": () => (/* binding */ validateSlotIconName),
 /* harmony export */   "validateSlotTitle": () => (/* binding */ validateSlotTitle),
 /* harmony export */   "removeSlotColorCodeValidation": () => (/* binding */ removeSlotColorCodeValidation),
+/* harmony export */   "removeTitleColorCodeValidation": () => (/* binding */ removeTitleColorCodeValidation),
 /* harmony export */   "removeSlotIconNameValidation": () => (/* binding */ removeSlotIconNameValidation),
 /* harmony export */   "removeSlotTitleValidation": () => (/* binding */ removeSlotTitleValidation)
 /* harmony export */ });
@@ -132,6 +134,12 @@ var validateSlotColorCode = function validateSlotColorCode() {
   $("#slot_color_code").rules("add", {
     required: true
   });
+}; //加入版位標題顏色欄位驗證
+
+var validateTitleColorCode = function validateTitleColorCode() {
+  $("#slot_title_color").rules("add", {
+    required: true
+  });
 }; // 加入版位icon欄位驗證
 
 var validateSlotIconName = function validateSlotIconName() {
@@ -159,6 +167,11 @@ var validateSlotTitle = function validateSlotTitle() {
 var removeSlotColorCodeValidation = function removeSlotColorCodeValidation() {
   $("#slot_color_code").rules("remove");
   $("#slot_color_code").closest(".form-group").removeClass("has-error").find('.help-block').hide();
+}; // 移除版位標題顏色欄位驗證
+
+var removeTitleColorCodeValidation = function removeTitleColorCodeValidation() {
+  $("#slot_title_color").rules("remove");
+  $("#slot_title_color").closest(".form-group").removeClass("has-error").find('.help-block').hide();
 }; // 移除版位icon欄位驗證
 
 var removeSlotIconNameValidation = function removeSlotIconNameValidation() {
@@ -478,6 +491,28 @@ window.init = function () {
         target_campaign_btn_div.show();
         break;
     }
+  }); //切換看更多時,清除其他選項的值以及disable其他欄位
+
+  $(document).on("click", '[name^="see_more_action"]', function () {
+    //X：無連結、U：開啟URL、C：前往商品分類頁
+    var see_more_action = $(this).val();
+    var see_more_url = $("input[name='see_more_url']");
+    var see_more_cate_hierarchy_id = $("select[name='see_more_cate_hierarchy_id']");
+
+    switch (see_more_action) {
+      case 'X':
+        see_more_url.val("");
+        see_more_cate_hierarchy_id.val("").trigger("change");
+        break;
+
+      case 'U':
+        see_more_cate_hierarchy_id.val("").trigger("change");
+        break;
+
+      case 'C':
+        see_more_url.val("");
+        break;
+    }
   }); // 選擇版位icon檔案
 
   $("#slot_icon_name").on("change", function () {
@@ -675,6 +710,17 @@ window.enableSlotColorCode = function () {
   }
 
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateSlotColorCode();
+}; // 啟用版位標題色
+
+
+window.enableTitleleColorCode = function () {
+  $("#slot_title_color").prop("disabled", false);
+
+  if ($("#slot_title_color").prev("label").find("span").length < 1) {
+    $("#slot_title_color").prev("label").append('<span style="color:red;">*</span>');
+  }
+
+  _validate__WEBPACK_IMPORTED_MODULE_0__.validateTitleColorCode();
 }; // 啟用版位icon
 
 
@@ -703,6 +749,12 @@ window.enableSlotTitle = function () {
 window.disableSlotColorCode = function () {
   $("#slot_color_code").prop("disabled", true).val("").prev("label").find("span").remove();
   _validate__WEBPACK_IMPORTED_MODULE_0__.removeSlotColorCodeValidation();
+}; // 停用版位標題色
+
+
+window.disableTitleColorCode = function () {
+  $("#slot_title_color").prop("disabled", true).val("").prev("label").find("span").remove();
+  _validate__WEBPACK_IMPORTED_MODULE_0__.removeTitleColorCodeValidation();
 }; // 停用版位icon
 
 

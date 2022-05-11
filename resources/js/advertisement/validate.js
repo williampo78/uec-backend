@@ -136,6 +136,12 @@ export let validateSlotColorCode = () => {
         required: true,
     });
 }
+//加入版位標題顏色欄位驗證
+export let validateTitleColorCode = () => {
+    $("#slot_title_color").rules("add", {
+        required: true,
+    });
+}
 
 // 加入版位icon欄位驗證
 export let validateSlotIconName = () => {
@@ -167,6 +173,11 @@ export let removeSlotColorCodeValidation = () => {
     $("#slot_color_code").closest(".form-group").removeClass("has-error").find('.help-block').hide();
 }
 
+// 移除版位標題顏色欄位驗證
+export let removeTitleColorCodeValidation = () => {
+    $("#slot_title_color").rules("remove");
+    $("#slot_title_color").closest(".form-group").removeClass("has-error").find('.help-block').hide();
+}
 // 移除版位icon欄位驗證
 export let removeSlotIconNameValidation = () => {
     $("#slot_icon_name").rules("remove");

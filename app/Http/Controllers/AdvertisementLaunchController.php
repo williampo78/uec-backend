@@ -186,8 +186,14 @@ class AdvertisementLaunchController extends Controller
             'product_assigned_type',
             'slot_content_id',
             'slot_id',
+            'contents_remark',
             'photo_width',
             'photo_height',
+            'see_more_action',
+            'see_more_url',
+            'see_more_cate_hierarchy_id',
+            'see_more_target_blank',
+            'slot_title_color',
         ]);
         foreach ($ad_slot_content['details'] as $key => $obj) {
             $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
