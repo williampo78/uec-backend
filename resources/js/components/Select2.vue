@@ -29,9 +29,10 @@ export default {
             .trigger("change")
             .on("change", function () {
                 vm.$emit("input", this.value);
+                vm.$emit("select2-change", this.value);
             })
             .on("select2:selecting", function (event) {
-                vm.$emit("selecting", event);
+                vm.$emit("select2-selecting", event);
             });
     },
     watch: {

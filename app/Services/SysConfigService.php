@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\SysConfig;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 
 class SysConfigService
@@ -10,28 +11,45 @@ class SysConfigService
     /**
      * 取得系統設定檔
      *
-     * @param array $datas
+     * @param array $data
      * @return Collection
      */
-    public function getSysConfigs(array $datas = []) :Collection
+    public function getSysConfigs(array $data = []) :Collection
     {
-        $sys_configs = SysConfig::where('active', 1)->get();
+        $sysConfigs = SysConfig::where('active', 1)->get();
 
-        return $sys_configs;
+        return $sysConfigs;
     }
 
     /**
      * 藉由config_key，取得系統設定檔
      *
-     * @param string $config_key
-     * @return object|null
+     * @param string $configKey
+     * @return Model|null
      */
-    public function getSysConfigByConfigKey(string $config_key): ?object
+    public function getSysConfigByConfigKey(string $configKey): ?Model
     {
-        $sys_config = SysConfig::where('active', 1)
-            ->where('config_key', $config_key)
+        $sysConfig = SysConfig::where('active', 1)
+            ->where('config_key', $configKey)
             ->first();
 
-        return $sys_config;
+        return $sysConfig;
+    }
+
+    /**
+     * 藉由config_key，取得系統設定檔的值
+     *
+     * @param string $configKey
+     * @return string|null
+     */
+    public function getConfigValueByConfigKey(string $configKey): ?string
+    {
+        $sysConfig = SysConfig::where('active', 1)
+            ->where('config_key', $configKey)
+            ->first();
+
+        $configValue = isset($sysConfig) ? $sysConfig->config_value : null;
+        
+        return $configValue;
     }
 }

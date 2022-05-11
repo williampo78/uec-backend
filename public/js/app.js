@@ -3831,8 +3831,9 @@ __webpack_require__.r(__webpack_exports__);
       allowClear: this.allowClear
     }).val(this.value).trigger("change").on("change", function () {
       vm.$emit("input", this.value);
+      vm.$emit("select2-change", this.value);
     }).on("select2:selecting", function (event) {
-      vm.$emit("selecting", event);
+      vm.$emit("select2-selecting", event);
     });
   },
   watch: {
@@ -4127,6 +4128,32 @@ jQuery.validator.addMethod("filesize", function (value, element, param) {
   }
 
   return "\u6A94\u6848\u5927\u5C0F\u4E0D\u53EF\u8D85\u904E".concat(params[0], "Bytes");
+});
+/**
+ * 驗證圖片寬度
+ */
+
+jQuery.validator.addMethod("minImageWidth", function (value, element, minWidth) {
+  if (element.files.length == 0) {
+    return true;
+  }
+
+  return ($(element).attr("data-image-width") || 0) >= minWidth;
+}, function (minWidth, element) {
+  return "\u5716\u7247\u5BEC\u5EA6\u5FC5\u9700\u5927\u65BC\u7B49\u65BC".concat(minWidth, "px");
+});
+/**
+ * 驗證圖片高度
+ */
+
+jQuery.validator.addMethod("minImageHeight", function (value, element, minHeight) {
+  if (element.files.length == 0) {
+    return true;
+  }
+
+  return ($(element).attr("data-image-height") || 0) >= minHeight;
+}, function (minHeight, element) {
+  return "\u5716\u7247\u5BEC\u5EA6\u5FC5\u9700\u5927\u65BC\u7B49\u65BC".concat(minHeight, "px");
 });
 /**
  *  let obj  = {

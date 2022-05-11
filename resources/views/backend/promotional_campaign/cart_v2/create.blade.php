@@ -39,7 +39,7 @@
                         <div class="panel-heading">請輸入下列欄位資料</div>
                         <div class="panel-body">
                             <form id="create-form" method="post"
-                                action="{{ route('promotional_campaign_cart_v2.store') }}">
+                                action="{{ route('promotional_campaign_cart_v2.store') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-horizontal">
                                     <div class="row">
@@ -65,7 +65,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <select2 class="form-control" :options="campaignTypes"
-                                                        v-model="form.campaignType" name="campaign_type">
+                                                        v-model="form.campaignType" name="campaign_type" @select2-change="changeCampaignType">
                                                         <option disabled value=""></option>
                                                     </select2>
                                                 </div>
@@ -202,7 +202,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <select2 class="form-control" :options="suppliers"
-                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false" @selecting="selectingSupplier">
+                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false" @select2-selecting="selectingSupplier">
                                                         <option disabled value=""></option>
                                                     </select2>
                                                 </div>
@@ -230,7 +230,7 @@
                                         <!-- Tab panes -->
                                         <div class="tab-content">
                                             <div class="tab-pane fade in active" id="tab-threshold">
-                                                <div v-if="form.campaignType === 'CART01'">
+                                                <div v-if="form.campaignType === 'CART_P01'">
                                                     <div class="row">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
@@ -285,14 +285,14 @@
                                                                     <td>
                                                                         @{{ thresholdBrief(threshold) }}
                                                                         <input type="hidden"
-                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`">
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
                                                 </div>
-                                                <div v-else-if="form.campaignType === 'CART02'">
+                                                <div v-else-if="form.campaignType === 'CART_P02'">
                                                     <div class="row">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
@@ -343,14 +343,14 @@
                                                                     <td>
                                                                         @{{ thresholdBrief(threshold) }}
                                                                         <input type="hidden"
-                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`">
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
                                                 </div>
-                                                <div v-else-if="form.campaignType === 'CART03'">
+                                                <div v-else-if="form.campaignType === 'CART_P03'">
                                                     <div class="row">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
@@ -397,14 +397,14 @@
                                                                     <td>
                                                                         @{{ thresholdBrief(threshold) }}
                                                                         <input type="hidden"
-                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`">
+                                                                            :name="`thresholds[${thresholdIndex}][threshold_brief]`" :value="thresholdBrief(threshold)">
                                                                     </td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
                                                     </div>
                                                 </div>
-                                                <div v-else-if="form.campaignType === 'CART04'">
+                                                <div v-else-if="form.campaignType === 'CART_P04'">
                                                     <div class="row">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
@@ -515,12 +515,14 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為1200*150</p>
-                                                        {{-- <img src="" class="img-responsive" width="300" height="300"> --}}
-                                                        <input type="file" name="banner_photo_desktop">
+                                                        <img v-if="bannerPhotoDesktop.url" :src="bannerPhotoDesktop.url" width="100%" height="150">
+                                                        <div v-if="bannerPhotoDesktop.showInputFile" class="form-group">
+                                                            <input type="file" name="banner_photo_desktop" :data-image-width="bannerPhotoDesktop.width" :data-image-height="bannerPhotoDesktop.height" ref="bannerPhotoDesktop" @change="onDesktopFileChange">
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger"
-                                                            @click="deleteBannerPhotoDesktop">
+                                                        <button v-if="bannerPhotoDesktop.showDeleteButton" type="button" class="btn btn-danger"
+                                                            @click="deleteDesktopFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                         </button>
                                                     </div>
@@ -532,12 +534,14 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為345*180</p>
-                                                        {{-- <img src="" class="img-responsive" width="300" height="300"> --}}
-                                                        <input type="file" name="banner_photo_mobile">
+                                                        <img v-if="bannerPhotoMobile.url" :src="bannerPhotoMobile.url" width="100%" height="180">
+                                                        <div v-if="bannerPhotoMobile.showInputFile" class="form-group">
+                                                            <input type="file" name="banner_photo_mobile" :data-image-width="bannerPhotoMobile.width" :data-image-height="bannerPhotoMobile.height" ref="bannerPhotoMobile" @change="onMobileFileChange">
+                                                        </div>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger"
-                                                            @click="deleteBannerPhotoMobile">
+                                                        <button v-if="bannerPhotoMobile.showDeleteButton" type="button" class="btn btn-danger"
+                                                            @click="deleteMobileFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                         </button>
                                                     </div>
@@ -631,6 +635,20 @@
                     excludeProductIds: [],
                 },
                 currentThreshold: {},
+                bannerPhotoDesktop: {
+                    url: "",
+                    width: "",
+                    height: "",
+                    showInputFile: true,
+                    showDeleteButton: false,
+                },
+                bannerPhotoMobile: {
+                    url: "",
+                    width: "",
+                    height: "",
+                    showInputFile: true,
+                    showDeleteButton: false,
+                },
             },
             created() {
                 let campaignTypes = @json($campaignTypes);
@@ -776,7 +794,7 @@
                                     return self.form.thresholds;
                                 },
                                 depends: function(element) {
-                                    return self.form.active == 1 && ['CART03', 'CART04'].includes(self.form.campaignType);
+                                    return self.form.active == 1 && ['CART_P03', 'CART_P04'].includes(self.form.campaignType);
                                 },
                             },
                         },
@@ -805,14 +823,26 @@
                         supplier_id: {
                             required: true,
                         },
+                        banner_photo_desktop: {
+                            accept: "image/*",
+                            filesize: [1, 'MB'],
+                            minImageWidth: 1200,
+                            minImageHeight: 150,
+                        },
+                        banner_photo_mobile: {
+                            accept: "image/*",
+                            filesize: [1, 'MB'],
+                            minImageWidth: 345,
+                            minImageHeight: 180,
+                        },
                     },
                     messages: {
                         active: {
                             remote: function(element) {
-                                if (['CART01', 'CART02'].includes(self.form.campaignType)) {
+                                if (['CART_P01', 'CART_P02'].includes(self.form.campaignType)) {
                                     return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N元，打X折」、「指定商品滿N元，折X元」類型的生效活動<br/>
                                     衝突的活動名稱: ${conflictCampaigns}`;
-                                } else if (['CART03', 'CART04'].includes(self.form.campaignType)) {
+                                } else if (['CART_P03', 'CART_P04'].includes(self.form.campaignType)) {
                                     return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N件，送贈品」、「指定商品滿N元，送贈品」類型的生效活動<br/>
                                     衝突的活動名稱: ${conflictCampaigns}`;
                                 }
@@ -820,6 +850,9 @@
                         },
                         end_at: {
                             greaterThan: "結束時間必須大於開始時間",
+                        },
+                        banner_photo_desktop: {
+                            accept: "檔案類型錯誤",
                         },
                     },
                     errorClass: "help-block",
@@ -885,6 +918,7 @@
                 },
             },
             methods: {
+                // 新增門檻
                 addThreshold() {
                     this.form.thresholds.push({
                         nValue: "",
@@ -892,11 +926,13 @@
                         giveaways: [],
                     });
                 },
+                // 刪除門檻
                 deleteThreshold(index) {
                     if (confirm('確定要刪除嗎？')) {
                         this.form.thresholds.splice(index, 1);
                     }
                 },
+                // 新增贈品
                 addGiveaway(threshold) {
                     if (!this.form.stockType || !this.form.supplierId) {
                         alert("尚未指定「庫存類型」、「供應商」，不允許新增贈品！");
@@ -911,11 +947,13 @@
 
                     $('#giveaway-modal').modal('show');
                 },
+                // 刪除贈品
                 deleteGiveaway(threshold, index) {
                     if (confirm('確定要刪除嗎？')) {
                         threshold.giveaways.splice(index, 1);
                     }
                 },
+                // 新增商品
                 addProduct() {
                     if (!this.form.stockType || !this.form.supplierId) {
                         alert("尚未指定「庫存類型」、「供應商」，不允許新增商品！");
@@ -930,17 +968,13 @@
 
                     $('#product-modal').modal('show');
                 },
+                // 刪除商品
                 deleteProduct(index) {
                     if (confirm('確定要刪除嗎？')) {
                         this.form.products.splice(index, 1);
                     }
                 },
-                deleteBannerPhotoDesktop() {
-
-                },
-                deleteBannerPhotoMobile() {
-
-                },
+                // 儲存
                 submitForm() {
                     let self = this;
 
@@ -953,7 +987,7 @@
                             min: function() {
                                 let xValue = nValueElement.closest("tr").find(".threshold-x-value").val();
 
-                                if (self.form.campaignType == 'CART02') {
+                                if (self.form.campaignType == 'CART_P02') {
                                     if (xValue) {
                                         return parseInt(xValue) + 1;
                                     }
@@ -965,7 +999,7 @@
                             messages: {
                                 digits: "只可輸入正整數",
                                 min: function(value) {
-                                    if (self.form.campaignType == 'CART02') {
+                                    if (self.form.campaignType == 'CART_P02') {
                                         if (value > 1) {
                                             return "必須大於X值";
                                         }
@@ -981,9 +1015,9 @@
                         $(this).rules("add", {
                             required: true,
                             min: function() {
-                                if (self.form.campaignType == 'CART01') {
+                                if (self.form.campaignType == 'CART_P01') {
                                     return 0.01;
-                                } else if (self.form.campaignType == 'CART02') {
+                                } else if (self.form.campaignType == 'CART_P02') {
                                     return 1;
                                 }
 
@@ -992,29 +1026,29 @@
                             max: {
                                 param: 0.99,
                                 depends: function(element) {
-                                    return self.form.campaignType == 'CART01';
+                                    return self.form.campaignType == 'CART_P01';
                                 },
                             },
                             maxlength: {
                                 param: 4,
                                 depends: function(element) {
-                                    return self.form.campaignType == 'CART01';
+                                    return self.form.campaignType == 'CART_P01';
                                 },
                             },
                             digits: {
                                 depends: function(element) {
-                                    return self.form.campaignType == 'CART02';
+                                    return self.form.campaignType == 'CART_P02';
                                 },
                             },
                             number: {
                                 depends: function(element) {
-                                    return self.form.campaignType == 'CART01';
+                                    return self.form.campaignType == 'CART_P01';
                                 },
                             },
                             messages: {
                                 digits: "只可輸入正整數",
                                 min: function() {
-                                    if (self.form.campaignType == 'CART02') {
+                                    if (self.form.campaignType == 'CART_P02') {
                                         return '只可輸入正整數';
                                     }
 
@@ -1034,46 +1068,33 @@
 
                     $("#create-form").submit();
                 },
+                // 設定門檻簡述
                 thresholdBrief(threshold) {
                     let thresholdBrief = null;
 
                     switch (this.form.campaignType) {
-                        case "CART01":
+                        case "CART_P01":
                             if (threshold.nValue && threshold.xValue) {
                                 let discount = Math.round(threshold.xValue * 100);
                                 thresholdBrief = `指定商品達$${threshold.nValue}，打${discount}折`;
                             }
                             break;
 
-                        case "CART02":
+                        case "CART_P02":
                             if (threshold.nValue && threshold.xValue) {
                                 thresholdBrief = `指定商品達$${threshold.nValue}，折$${threshold.xValue}`;
                             }
                             break;
 
-                        case "CART03":
-                            if (threshold.nValue && threshold.giveaways && threshold.giveaways.length) {
-                                thresholdBrief = `指定商品達$${threshold.nValue}送`;
-
-                                threshold.giveaways.forEach((giveaway, index) => {
-                                    thresholdBrief += `「${giveaway.productName} (${giveaway.assignedQty}${giveaway.uom})」`;
-                                    if (index !== threshold.giveaways.length - 1) {
-                                        thresholdBrief += `、`;
-                                    }
-                                });
+                        case "CART_P03":
+                            if (threshold.nValue) {
+                                thresholdBrief = `指定商品達$${threshold.nValue}送贈`;
                             }
                             break;
 
-                        case "CART04":
-                            if (threshold.nValue && threshold.giveaways && threshold.giveaways.length) {
-                                thresholdBrief = `指定商品達${threshold.nValue}件送`;
-
-                                threshold.giveaways.forEach((giveaway, index) => {
-                                    thresholdBrief += `「${giveaway.productName} (${giveaway.assignedQty}${giveaway.uom})」`;
-                                    if (index !== threshold.giveaways.length - 1) {
-                                        thresholdBrief += `、`;
-                                    }
-                                });
+                        case "CART_P04":
+                            if (threshold.nValue) {
+                                thresholdBrief = `指定商品達${threshold.nValue}件送贈`;
                             }
                             break;
                     }
@@ -1102,7 +1123,7 @@
                         alert(errorMessage);
                     }
                 },
-                // 處理選擇供應商時的事件
+                // 當選擇供應商時
                 selectingSupplier(event) {
                     if (event.params.args.data.id == "all") {
                         return;
@@ -1124,6 +1145,11 @@
                         alert(errorMessage);
                     }
                 },
+                // 選擇活動類型
+                changeCampaignType() {
+                    this.form.thresholds = [];
+                },
+                // 儲存商品modal的商品
                 saveProductModalProducts(products) {
                     products.forEach(product => {
                         this.form.products.push({
@@ -1138,6 +1164,7 @@
                         });
                     });
                 },
+                // 儲存贈品modal的商品
                 saveGiveawayModalProducts(products) {
                     products.forEach(product => {
                         this.currentThreshold.giveaways.push({
@@ -1148,10 +1175,84 @@
                             stockType: product.stockType,
                             productType: product.productType,
                             supplier: product.supplier,
-                            // stockQty: product.stockQty,
+                            stockQty: product.stockQty,
                             uom: product.uom,
                         });
                     });
+                },
+                // 上傳Desktop圖片
+                onDesktopFileChange(event) {
+                    this.bannerPhotoDesktop.url = "";
+                    this.bannerPhotoDesktop.width = "";
+                    this.bannerPhotoDesktop.height = "";
+
+                    const file = event.target.files[0];
+
+                    if (!file || file.type.indexOf('image/') !== 0) {
+                        this.bannerPhotoDesktop.showDeleteButton = false;
+                        return;
+                    }
+
+                    let reader = new FileReader();
+
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        let img = new Image();
+                        img.onload = () => {
+                            this.bannerPhotoDesktop.width = img.width;
+                            this.bannerPhotoDesktop.height = img.height;
+                        }
+                        img.src = event.target.result;
+                        this.bannerPhotoDesktop.url = event.target.result;
+                        this.bannerPhotoDesktop.showDeleteButton = true;
+                    }
+
+                    reader.onerror = (event) => {
+                        console.error(event);
+                    }
+                },
+                // 刪除Desktop圖片
+                deleteDesktopFile() {
+                    this.bannerPhotoDesktop.showDeleteButton = false;
+                    this.bannerPhotoDesktop.url = "";
+                    this.$refs.bannerPhotoDesktop.value = "";
+                },
+                // 上傳Mobile圖片
+                onMobileFileChange(event) {
+                    this.bannerPhotoMobile.url = "";
+                    this.bannerPhotoMobile.width = "";
+                    this.bannerPhotoMobile.height = "";
+
+                    const file = event.target.files[0];
+
+                    if (!file || file.type.indexOf('image/') !== 0) {
+                        this.bannerPhotoMobile.showDeleteButton = false;
+                        return;
+                    }
+
+                    let reader = new FileReader();
+
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        let img = new Image();
+                        img.onload = () => {
+                            this.bannerPhotoMobile.width = img.width;
+                            this.bannerPhotoMobile.height = img.height;
+                        }
+                        img.src = event.target.result;
+                        this.bannerPhotoMobile.url = event.target.result;
+                        this.bannerPhotoMobile.showDeleteButton = true;
+                    }
+
+                    reader.onerror = (event) => {
+                        console.error(event);
+                    }
+                },
+                // 刪除Mobile圖片
+                deleteMobileFile() {
+                    this.bannerPhotoMobile.showDeleteButton = false;
+                    this.bannerPhotoMobile.url = "";
+                    this.$refs.bannerPhotoMobile.value = "";
                 },
             },
         });

@@ -26,10 +26,17 @@ use Illuminate\Database\Eloquent\Builder;
 class ProductService
 {
     private $universalService;
+    private $sysConfigService;
+    private $webCategoryHierarchyService;
 
-    public function __construct()
-    {
-        $this->universalService = new UniversalService;
+    public function __construct(
+        UniversalService $universalService,
+        SysConfigService $sysConfigService,
+        WebCategoryHierarchyService $webCategoryHierarchyService
+    ) {
+        $this->universalService = $universalService;
+        $this->sysConfigService = $sysConfigService;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
     }
 
     public function getProducts($input_data = [])
@@ -1298,17 +1305,20 @@ class ProductService
     public function getModalProducts(array $queryData = []): Collection
     {
         $user = Auth::user();
+        $warehouseNumber = $this->sysConfigService->getConfigValueByConfigKey('EC_WAREHOUSE_GOODS');
 
         $products = Product::with([
             'supplier',
             'webCategoryHierarchies' => function ($query) {
                 return $query->oldest('sort');
             },
-        ])
-            ->where('agent_id', $user->agent_id);
+            'productItems.warehouses' => function ($query) use($warehouseNumber) {
+                return $query->where('number', $warehouseNumber);
+            },
+        ])->where('agent_id', $user->agent_id);
 
         // 供應商
-        if (isset($queryData['supplier_id'])) {
+        if (isset($queryData['supplier_id']) && $queryData['supplier_id'] != 'all') {
             $products = $products->where('supplier_id', $queryData['supplier_id']);
         }
 
@@ -1415,6 +1425,7 @@ class ProductService
                 'supplier' => null,
                 'stock_type' => config('uec.stock_type_options')[$product->stock_type] ?? null,
                 'uom' => $product->uom,
+                'stock_qty' => 0,
             ];
 
             // 上架時間起
@@ -1435,8 +1446,25 @@ class ProductService
             // 前台分類
             if ($product->webCategoryHierarchies->isNotEmpty()) {
                 $webCategoryHierarchy = $product->webCategoryHierarchies->first();
-                $tmpProduct['web_category_hierarchy'] = $webCategoryHierarchy->id;
+
+                $webCategoryHierarchyContents = $this->webCategoryHierarchyService->getCategoryHierarchyContents([
+                    'id' => $webCategoryHierarchy->id,
+                ]);
+
+                $tmpProduct['web_category_hierarchy'] = !empty($webCategoryHierarchyContents) ? $webCategoryHierarchyContents[0]->name : null;
             }
+
+            // 合計各個商品品項的庫存數
+            $stockQty = 0;
+            if ($product->productItems->isNotEmpty()) {
+                foreach ($product->productItems as $productItem) {
+                    $warehouse = $productItem->warehouses->first();
+                    if (isset($warehouse)) {
+                        $stockQty += $warehouse->pivot->stock_qty;
+                    }
+                }
+            }
+            $tmpProduct['stock_qty'] = $stockQty;
 
             $result[] = $tmpProduct;
         }

@@ -667,12 +667,10 @@ export default {
                 });
         },
         async search() {
-            let supplierId =
-                this.form.supplierId == "all" ? null : this.form.supplierId;
             let stockTypes = this.form.stockType.split("_");
 
             let data = {
-                supplier_id: supplierId,
+                supplier_id: this.form.supplierId,
                 product_no: this.form.productNo,
                 product_name: this.form.productName,
                 selling_price_min: this.form.sellingPriceMin,
@@ -706,6 +704,7 @@ export default {
                     supplier: product.supplier,
                     stockType: product.stock_type,
                     uom: product.uom,
+                    stockQty: product.stock_qty,
                 });
             });
         },

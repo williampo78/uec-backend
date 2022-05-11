@@ -96,4 +96,12 @@ class Product extends Model
     {
         return $this->belongsToMany(WebCategoryHierarchy::class, 'web_category_products', 'product_id', 'web_category_hierarchy_id')->withTimestamps();
     }
+
+    /**
+     * 建立與商品品項的關聯
+     */
+    public function productItems()
+    {
+        return $this->hasMany(ProductItem::class, 'product_id');
+    }
 }

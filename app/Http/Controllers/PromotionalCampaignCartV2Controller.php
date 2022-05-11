@@ -16,7 +16,7 @@ class PromotionalCampaignCartV2Controller extends Controller
     private $lookupValuesVService;
     private $supplierService;
     private $productService;
-    private const LEVEL_CODE = 'CART';
+    private const LEVEL_CODE = 'CART_P';
 
     public function __construct(
         PromotionalCampaignService $promotionalCampaignService,
@@ -92,9 +92,9 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function store(Request $request)
     {
-        $inputData = $request->input();
+        $payload = $request->all();
 
-        if (!$this->promotionalCampaignService->createPromotionalCampaignCart($inputData)) {
+        if (!$this->promotionalCampaignService->createPromotionalCampaignCart($payload)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 

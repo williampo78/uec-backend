@@ -708,15 +708,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var supplierId, stockTypes, data, products;
+        var stockTypes, data, products;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                supplierId = _this2.form.supplierId == "all" ? null : _this2.form.supplierId;
                 stockTypes = _this2.form.stockType.split("_");
                 data = {
-                  supplier_id: supplierId,
+                  supplier_id: _this2.form.supplierId,
                   product_no: _this2.form.productNo,
                   product_name: _this2.form.productName,
                   selling_price_min: _this2.form.sellingPriceMin,
@@ -731,10 +730,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   stock_types: stockTypes,
                   exclude_product_ids: _this2.form.excludeProductIds
                 };
-                _context2.next = 5;
+                _context2.next = 4;
                 return _this2.getProducts(data);
 
-              case 5:
+              case 4:
                 products = _context2.sent;
                 _this2.products = [];
                 products.forEach(function (product) {
@@ -751,11 +750,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     webCategoryHierarchy: product.web_category_hierarchy,
                     supplier: product.supplier,
                     stockType: product.stock_type,
-                    uom: product.uom
+                    uom: product.uom,
+                    stockQty: product.stock_qty
                   });
                 });
 
-              case 8:
+              case 7:
               case "end":
                 return _context2.stop();
             }

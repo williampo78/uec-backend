@@ -101,6 +101,40 @@ jQuery.validator.addMethod(
 );
 
 /**
+ * 驗證圖片寬度
+ */
+jQuery.validator.addMethod(
+    "minImageWidth",
+    function (value, element, minWidth) {
+        if (element.files.length == 0) {
+            return true;
+        }
+
+        return ($(element).attr("data-image-width") || 0) >= minWidth;
+    },
+    function (minWidth, element) {
+        return `圖片寬度必需大於等於${minWidth}px`;
+    }
+);
+
+/**
+ * 驗證圖片高度
+ */
+jQuery.validator.addMethod(
+    "minImageHeight",
+    function (value, element, minHeight) {
+        if (element.files.length == 0) {
+            return true;
+        }
+
+        return ($(element).attr("data-image-height") || 0) >= minHeight;
+    },
+    function (minHeight, element) {
+        return `圖片寬度必需大於等於${minHeight}px`;
+    }
+);
+
+/**
  *  let obj  = {
         startTime :$('#trade_date_start').val(),
         endTime : $('#trade_date_end').val() ,
@@ -119,7 +153,7 @@ jQuery.validator.addMethod(
         let nowTime = new Date();
         let RangeTime = new Date();
         let setTime = RangeTime - nowTime;
-        console.log(startEndRange , setTime)
+        console.log(startEndRange, setTime);
         return startEndRange >= setTime;
     },
     function (params, element) {
@@ -131,14 +165,15 @@ jQuery.validator.addMethod(
 jQuery.validator.addMethod(
     "dateGreaterEqualThan",
     function (value, element, params) {
-        if(!params.depends){
-            return true ;
+        if (!params.depends) {
+            return true;
         }
         if (!/Invalid|NaN/.test(new Date(value))) {
             return new Date(value) >= new Date(params.date);
         }
         return (
-            (isNaN(value) && isNaN(params.date)) || Number(value) > Number(params.date)
+            (isNaN(value) && isNaN(params.date)) ||
+            Number(value) > Number(params.date)
         );
     },
     "必須大於 {0}"
@@ -189,12 +224,13 @@ jQuery.validator.addMethod(
 jQuery.validator.addMethod(
     "notChinese",
     function (value, element, obj) {
-        var regexp =/.*[\u4e00-\u9fa5]+.*$/;
-        if (regexp.test(obj.text)) {//中文不給過
-            return false
-          } else {
-            return true
-          }
+        var regexp = /.*[\u4e00-\u9fa5]+.*$/;
+        if (regexp.test(obj.text)) {
+            //中文不給過
+            return false;
+        } else {
+            return true;
+        }
     },
     function (params, element) {
         return `不能輸入中文`;
