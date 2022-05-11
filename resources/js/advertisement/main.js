@@ -230,7 +230,8 @@ window.init = (datas = {}) => {
     $(document).on("click", '[name^="image_block_image_action"]', function () {
         let image_action = $(this).val();
         let form_group_element = $(this).closest(".form-group");
-
+        let target_campaign_btn_div = form_group_element.find('.target_campaign_btn_div');
+        target_campaign_btn_div.hide();
         switch (image_action) {
             case "X":
                 form_group_element
@@ -240,6 +241,12 @@ window.init = (datas = {}) => {
                     .find('[name^="image_block_target_cate_hierarchy_id"]')
                     .val("")
                     .trigger("change");
+                form_group_element
+                    .find('[name^="target_campaign_name"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="target_campaign_id"]')
+                    .val("");
                 break;
 
             case "U":
@@ -247,12 +254,34 @@ window.init = (datas = {}) => {
                     .find('[name^="image_block_target_cate_hierarchy_id"]')
                     .val("")
                     .trigger("change");
+                form_group_element
+                    .find('[name^="target_campaign_name"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="target_campaign_id"]')
+                    .val("");
                 break;
 
             case "C":
                 form_group_element
                     .find('[name^="image_block_target_url"]')
                     .val("");
+                form_group_element
+                    .find('[name^="target_campaign_name"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="target_campaign_id"]')
+                    .val("");
+                break;
+            case "M":
+                form_group_element
+                    .find('[name^="image_block_target_url"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="image_block_target_cate_hierarchy_id"]')
+                    .val("")
+                    .trigger("change");
+                target_campaign_btn_div.show();
                 break;
         }
     });
@@ -343,7 +372,53 @@ window.init = (datas = {}) => {
                 .show();
         }
     });
+    $(document).on("click" , ".target_campaign_btn",function(){
+        $('#now_row_num').val($(this).data('rownum')) ;
+        $('#promotion_campaign_model').modal('toggle');
+    });
+    $(document).on("click" , ".search_btn",function(){
+        $("#promotion_campaign_model_list").empty();
+        let type = $(this).data('type') ;
+        let promotional_campaigns_key_word = $('#promotional_campaigns_key_word').val() ;
+        let promotional_campaigns_time_type = $('#promotional_campaigns_time_type').val() ;
+        let level_code = 'CART_P' ;
+        switch (type) {
+            case 'promotion_campaign':
+                axios.post('/backend/advertisemsement_launch/ajax/search-promotion-campaign', {
+                    'promotional_campaigns_key_word' :promotional_campaigns_key_word,
+                    'promotional_campaigns_time_type':promotional_campaigns_time_type,
+                    'level_code':level_code,
+                })
+                .then(function(response) {
+                    let html = '' ;
+                    $.each( response.data.data, function( key, value ) {
+                        html +=
+                        `<tr>
+                            <td>
+                                <button type="button" class="btn btn-primary btn_add_promotion_campaign"
+                                data-id="${value.id}" data-name="${value.campaign_name}"
+                                data-dismiss="modal">帶入
+                                </button>
+                            </td>
+                            <td>${value.campaign_name}</td>
+                            <td>${value.start_at} ~ ${value.end_at}上架時間</td>
+                            <td>${value.id}</td>
+                        </tr>`
+                    });
+                    $('#promotion_campaign_model_list').append(html);
+                })
+                .catch(function(error) {
+                    console.log('ERROR');
+                })
+            break;
+        }
+    });
 
+    $(document).on("click" , ".btn_add_promotion_campaign",function(){
+        let now_row_num = $('#now_row_num').val();
+        $('.target_campaign_name_'+now_row_num).val($(this).data('name'));
+        $('.target_campaign_id_'+now_row_num).val($(this).data('id'));
+    });
     // 刪除圖片區的圖片
     $(document).on("click", ".btn-delete-image-block-image-name", function () {
         $(this).siblings(".img_image_block_image_name").attr("src", "").hide();
@@ -399,6 +474,7 @@ window.getProductSelectOptions = (datas = []) => {
 };
 
 window.addImageBlock = (product_category_select_options = "", datas = {}) => {
+    console.log("addImageBlock");
     let image_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
     let image_name_url = datas.image_name_url ? datas.image_name_url : "";
@@ -406,7 +482,8 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
     let image_title = datas.image_title ? datas.image_title : "";
     let image_abstract = datas.image_abstract ? datas.image_abstract : "";
     let target_url = datas.target_url ? datas.target_url : "";
-
+    let target_campaign_name = '賣場名稱' ;
+    let target_campaign_id = '18' ;
     $("#image-block table > tbody").append(`
         <tr>
             <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_row_no}">
@@ -488,6 +565,25 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="image_block_image_action[${image_block_row_no}]" value="M" />
+                                    活動賣場
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <input type="text" class="form-control target_campaign_name_${image_block_row_no}" name="target_campaign_name[${image_block_row_no}]" value="${target_campaign_name}" readonly/>
+                                <input type="hidden" class="form-control target_campaign_id_${image_block_row_no}" name="target_campaign_id[${image_block_row_no}]" value="${target_campaign_id}" readonly/>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 target_campaign_btn_div" style="display:none;">
+                            <button type="button" class="btn btn-warning target_campaign_btn" data-rownum="${image_block_row_no}" >挑選賣場</button>
+                        </div>
+                    </div>
                 </div>
             </td>
             <td>
@@ -527,6 +623,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
 };
 
 window.addTextBlock = (product_category_select_options, datas = {}) => {
+    console.log("addTextBlock");
     let text_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";
