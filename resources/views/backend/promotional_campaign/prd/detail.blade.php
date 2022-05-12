@@ -95,6 +95,19 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="control-label">前台文案</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="form-control-static" id="modal-campaign-brief"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <hr style="border-top: 1px solid gray;" />
                 </div>
 
