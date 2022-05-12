@@ -216,14 +216,15 @@ class OrderController extends Controller
                     'unit_price' => null,
                     'qty' => $orderDetail->qty,
                     'campaign_discount' => null,
-                    'cart_p_discount' =>null,
                     'subtotal' => null,
+                    'cart_p_discount' =>null,
                     'point_discount' => null,
                     'record_identity' => null,
                     'package_no' => null,
                     'returned_qty' => $orderDetail->returned_qty,
                     'returned_campaign_discount' => null,
                     'returned_subtotal' => null,
+                    'returned_cart_p_discount' =>null,
                     'returned_point_discount' => null,
                 ];
 
@@ -256,8 +257,11 @@ class OrderController extends Controller
                 // 累計已銷退的活動折扣金額
                 $orderDetails['returned_campaign_discount'] = number_format($orderDetail->returned_campaign_discount);
 
-                // 累計已銷退的的小計
+                // 累計已銷退的小計
                 $orderDetails['returned_subtotal'] = number_format($orderDetail->returned_subtotal);
+
+                // 累計已銷退的購物車活動折扣金額
+                $orderDetails['returned_cart_p_discount'] = number_format($orderDetail->returned_cart_p_discount);
 
                 // 累計已銷退的會員點數扣抵金額
                 $orderDetails['returned_point_discount'] = number_format($orderDetail->returned_point_discount);
