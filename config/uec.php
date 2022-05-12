@@ -156,6 +156,7 @@ return [
     'campaign_level_code_options' => [
         'PRD' => '單品',
         'CART' => '滿額',
+        'CART_P' => '購物車滿額',
     ],
 
     // 物流公司

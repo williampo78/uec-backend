@@ -130,8 +130,9 @@ class OrderController extends Controller
             'receiver_mobile' => $order->receiver_mobile,
             'receiver_address' => null,
             'lgst_method' => config('uec.lgst_method_options')[$order->lgst_method] ?? null,
-            'total_amount' => number_format($order->total_amount),
+            'total_amount' => number_format($order->total_amount + $order->cart_p_discount),
             'cart_campaign_discount' => number_format($order->cart_campaign_discount),
+            'cart_p_discount' => number_format($order->cart_p_discount),
             'point_discount' => number_format($order->point_discount),
             'shipping_fee' => number_format($order->shipping_fee),
             'paid_amount' => number_format($order->paid_amount),
@@ -215,6 +216,7 @@ class OrderController extends Controller
                     'unit_price' => null,
                     'qty' => $orderDetail->qty,
                     'campaign_discount' => null,
+                    'cart_p_discount' =>null,
                     'subtotal' => null,
                     'point_discount' => null,
                     'record_identity' => null,
@@ -236,6 +238,9 @@ class OrderController extends Controller
 
                 // 小計
                 $orderDetails['subtotal'] = number_format($orderDetail->subtotal);
+
+                // 購物車滿額折抵金額
+                $orderDetails['cart_p_discount'] = number_format($orderDetail->cart_p_discount);
 
                 // 會員點數扣抵金額
                 $orderDetails['point_discount'] = number_format($orderDetail->point_discount);
@@ -418,6 +423,11 @@ class OrderController extends Controller
                     'discount' => null,
                     'is_voided' => null,
                 ];
+
+                if (isset($orderCampaignDiscount->promotionalCampaign->campaign_brief)) {
+
+                    $orderCampaignDiscounts['campaign_name'] = $orderCampaignDiscount->promotionalCampaign->campaign_brief." | ".$orderCampaignDiscount->promotionalCampaign->campaign_name;
+                }
 
                 // 活動階層
                 $orderCampaignDiscounts['level_code'] = config('uec.campaign_level_code_options')[$orderCampaignDiscount->promotionalCampaign->level_code] ?? null;

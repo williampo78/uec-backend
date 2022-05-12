@@ -286,8 +286,9 @@
                                         <th class="text-nowrap">售價</th>
                                         <th class="text-nowrap">商品活動價</th>
                                         <th class="text-nowrap">數量</th>
-                                        <th class="text-nowrap">活動折抵</th>
+                                        <th class="text-nowrap">單品<br>活動折抵</th>
                                         <th class="text-nowrap">小計</th>
+                                        <th class="text-nowrap">購物車<br>滿額折抵</th>
                                         <th class="text-nowrap">點數折抵</th>
                                         <th class="text-nowrap">備註</th>
                                         <th class="text-nowrap">託運單號</th>
