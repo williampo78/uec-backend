@@ -290,7 +290,8 @@ window.init = (datas = {}) => {
     $(document).on("click", '[name^="text_block_image_action"]', function () {
         let image_action = $(this).val();
         let form_group_element = $(this).closest(".form-group");
-
+        let target_campaign_btn_div = form_group_element.find('.target_campaign_btn_div');
+        target_campaign_btn_div.hide();
         switch (image_action) {
             case "X":
                 form_group_element
@@ -300,6 +301,12 @@ window.init = (datas = {}) => {
                     .find('[name^="text_block_target_cate_hierarchy_id"]')
                     .val("")
                     .trigger("change");
+                form_group_element
+                    .find('[name^="target_campaign_name"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="target_campaign_id"]')
+                    .val("");
                 break;
 
             case "U":
@@ -307,15 +314,57 @@ window.init = (datas = {}) => {
                     .find('[name^="text_block_target_cate_hierarchy_id"]')
                     .val("")
                     .trigger("change");
+                form_group_element
+                    .find('[name^="target_campaign_name"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="target_campaign_id"]')
+                    .val("");
                 break;
 
             case "C":
                 form_group_element
                     .find('[name^="text_block_target_url"]')
                     .val("");
+                form_group_element
+                    .find('[name^="target_campaign_name"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="target_campaign_id"]')
+                    .val("");
+                break;
+            case "M":
+                form_group_element
+                    .find('[name^="text_block_target_url"]')
+                    .val("");
+                form_group_element
+                    .find('[name^="text_block_target_cate_hierarchy_id"]')
+                    .val("")
+                    .trigger("change");
+                target_campaign_btn_div.show();
                 break;
         }
     });
+    //切換看更多時,清除其他選項的值以及disable其他欄位
+    $(document).on("click",'[name^="see_more_action"]',function(){
+        //X：無連結、U：開啟URL、C：前往商品分類頁
+        let see_more_action = $(this).val() ;
+        let see_more_url = $("input[name='see_more_url']") ;
+        let see_more_cate_hierarchy_id = $("select[name='see_more_cate_hierarchy_id']")
+        switch (see_more_action) {
+            case 'X':
+                see_more_url.val("");
+                see_more_cate_hierarchy_id.val("").trigger("change");
+                break;
+            case 'U':
+                see_more_cate_hierarchy_id.val("").trigger("change");
+                break;
+            case 'C':
+                see_more_url.val("");
+                break;
+
+        }
+    })
 
     // 選擇版位icon檔案
     $("#slot_icon_name").on("change", function () {
@@ -474,7 +523,6 @@ window.getProductSelectOptions = (datas = []) => {
 };
 
 window.addImageBlock = (product_category_select_options = "", datas = {}) => {
-    console.log("addImageBlock");
     let image_block_row_no = datas.id;
     let sort = datas.sort != null ? datas.sort : "";
     let image_name_url = datas.image_name_url ? datas.image_name_url : "";
@@ -482,8 +530,9 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
     let image_title = datas.image_title ? datas.image_title : "";
     let image_abstract = datas.image_abstract ? datas.image_abstract : "";
     let target_url = datas.target_url ? datas.target_url : "";
-    let target_campaign_name = '賣場名稱' ;
-    let target_campaign_id = '18' ;
+    let target_campaign_name = datas.campaign_name ? datas.campaign_name : "";
+    let target_campaign_id = datas.target_campaign_id ? datas.target_campaign_id : "";
+    let target_campaign_btn_show = datas.target_campaign_id ? "" : "display:none";
     $("#image-block table > tbody").append(`
         <tr>
             <input type="hidden" name="image_block_id[${image_block_row_no}]" value="${image_block_row_no}">
@@ -580,7 +629,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
                                 <input type="hidden" class="form-control target_campaign_id_${image_block_row_no}" name="target_campaign_id[${image_block_row_no}]" value="${target_campaign_id}" readonly/>
                             </div>
                         </div>
-                        <div class="col-sm-12 target_campaign_btn_div" style="display:none;">
+                        <div class="col-sm-12 target_campaign_btn_div" style="${target_campaign_btn_show}">
                             <button type="button" class="btn btn-warning target_campaign_btn" data-rownum="${image_block_row_no}" >挑選賣場</button>
                         </div>
                     </div>
@@ -628,7 +677,9 @@ window.addTextBlock = (product_category_select_options, datas = {}) => {
     let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";
     let target_url = datas.target_url ? datas.target_url : "";
-
+    let target_campaign_name = datas.campaign_name ? datas.campaign_name : "";
+    let target_campaign_id = datas.target_campaign_id ? datas.target_campaign_id : "";
+    let target_campaign_btn_show = datas.target_campaign_id ? "" : "display:none";
     $("#text-block table > tbody").append(`
         <tr>
             <input type="hidden" name="text_block_id[${text_block_row_no}]" value="${text_block_row_no}">
@@ -681,6 +732,25 @@ window.addTextBlock = (product_category_select_options, datas = {}) => {
                                     ${product_category_select_options}
                                 </select>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="text_block_image_action[${text_block_row_no}]" value="M" />
+                                    活動賣場
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <input type="text" class="form-control target_campaign_name_${text_block_row_no}" name="target_campaign_name[${text_block_row_no}]" value="${target_campaign_name}" readonly/>
+                                <input type="hidden" class="form-control target_campaign_id_${text_block_row_no}" name="target_campaign_id[${text_block_row_no}]" value="${target_campaign_id}" readonly/>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 target_campaign_btn_div" style="${target_campaign_btn_show}">
+                            <button type="button" class="btn btn-warning target_campaign_btn" data-rownum="${text_block_row_no}" >挑選賣場</button>
                         </div>
                     </div>
                 </div>
@@ -792,7 +862,16 @@ window.enableSlotColorCode = () => {
 
     validate.validateSlotColorCode();
 };
-
+// 啟用版位標題色
+window.enableTitleleColorCode = () => {
+    $("#slot_title_color").prop("disabled", false);
+    if ($("#slot_title_color").prev("label").find("span").length < 1) {
+        $("#slot_title_color")
+            .prev("label")
+            .append('<span style="color:red;">*</span>');
+    }
+    validate.validateTitleColorCode();
+};
 // 啟用版位icon
 window.enableSlotIconName = () => {
     $("#slot_icon_name").prop("disabled", false);
@@ -833,6 +912,18 @@ window.disableSlotColorCode = () => {
         .remove();
 
     validate.removeSlotColorCodeValidation();
+};
+
+// 停用版位標題色
+window.disableTitleColorCode= () => {
+    $("#slot_title_color")
+        .prop("disabled", true)
+        .val("")
+        .prev("label")
+        .find("span")
+        .remove();
+
+    validate.removeTitleColorCodeValidation();
 };
 
 // 停用版位icon

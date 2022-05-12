@@ -28,10 +28,18 @@
                             <div class="row">
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
-                                    @include('backend.advertisement.launch.slot_block')
-                                    @include('backend.advertisement.launch.image_block')
-                                    @include('backend.advertisement.launch.text_block')
-                                    @include('backend.advertisement.launch.product_block')
+                                    @include(
+                                        'backend.advertisement.launch.slot_block'
+                                    )
+                                    @include(
+                                        'backend.advertisement.launch.image_block'
+                                    )
+                                    @include(
+                                        'backend.advertisement.launch.text_block'
+                                    )
+                                    @include(
+                                        'backend.advertisement.launch.product_block'
+                                    )
 
                                     <div class="row">
                                         <div class="col-sm-12">
@@ -55,6 +63,7 @@
                 </div>
             </div>
         </div>
+        @include('backend.advertisement.promotion_campaign_model')
     </div>
 @endsection
 
@@ -63,6 +72,7 @@
 
     <script>
         $(function() {
+            $("#see_more_cate_hierarchy_id").select2();
             // 商品分類下拉選項
             let product_category = @json($product_category);
             // 商品下拉選項
@@ -93,6 +103,25 @@
                     form.submit();
                 },
                 rules: {
+                    see_more_url:{
+                        required: {
+                            depends: function (element) {
+                                return $("input[name='see_more_action'][value='U']").is(":checked");
+                            }
+                        },
+                        url:{
+                            depends: function (element) {
+                                return $("input[name='see_more_action'][value='U']").is(":checked");
+                            }
+                        },
+                    },
+                    see_more_cate_hierarchy_id:{
+                        required: {
+                            depends: function (element) {
+                                return $("input[name='see_more_action'][value='C']").is(":checked");
+                            }
+                        },
+                    },
                     slot_id: {
                         required: true,
                     },
@@ -229,22 +258,39 @@
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
-                let photo_width = content.photo_width;
-                let photo_height = content.photo_height;
-                if(photo_width >0 || photo_height >0){
-                    $('.show_size').text('尺寸：'+photo_width +'*'+photo_height);
-                }else{
-                    $('.show_size').text('');
-                }
+            let photo_width = content.photo_width;
+            let photo_height = content.photo_height;
+            if (photo_width > 0 || photo_height > 0) {
+                $('.show_size').text('尺寸：' + photo_width + '*' + photo_height);
+            } else {
+                $('.show_size').text('');
+            }
             $('#slot_id').empty().append(
-                `<option data-photo-width="${content.photo_width}" data-photo-height="${content.photo_height}" value="${content.slot_id}">【${content.slot_code}】${content.slot_desc}</option>`).prop(
+                `<option data-photo-width="${content.photo_width}" data-photo-height="${content.photo_height}" value="${content.slot_id}">【${content.slot_code}】${content.slot_desc}</option>`
+            ).prop(
                 'disabled', true);
             $('#start_at').val(content.start_at);
             $('#end_at').val(content.end_at);
-            
+
             // 唯有「當前時間」小於﹝上架開始時間﹞時，﹝上架開始時間﹞、﹝上架結束時間﹞、﹝狀態﹞才都開放修改；否則﹝上架開始時間﹞與﹝狀態﹞都不開放修改
             if (new Date() >= new Date($('#start_at').val())) {
                 $('#start_at, #active_enabled, #active_disabled').prop('disabled', true);
+            }
+            switch (content.see_more_action) {
+                case 'X':
+                    $("input[name='see_more_action'][value='X']").prop('checked', true);
+                    break;
+                case 'U':
+                    $("input[name='see_more_action'][value='U']").prop('checked', true);
+                    $('#see_more_url').val(content.see_more_url);
+                    break;
+                case 'C':
+                    $("input[name='see_more_action'][value='C']").prop('checked', true);
+                    $('#see_more_cate_hierarchy_id').val(content.see_more_cate_hierarchy_id).trigger("change");
+                    break;
+                default:
+                    $('#see_more_url').val(content.see_more_url);
+                    break;
             }
 
             if (content.slot_content_active == 1) {
@@ -254,13 +300,18 @@
             }
 
             $('#img_slot_icon_name, #btn-delete-slot-icon-name').hide();
+            $('#remark').val(content.contents_remark);
+            if(content.see_more_target_blank){
+                $('#see_more_target_blank').prop('checked', true);
+            }
             // 開放編輯 版位主色、版位icon、版位標題
             if (content.is_user_defined == 1) {
                 enableSlotColorCode();
                 enableSlotIconName();
                 enableSlotTitle();
-
+                enableTitleleColorCode();
                 $('#slot_color_code').val(content.slot_color_code);
+                $('#slot_title_color').val(content.slot_title_color);
                 $('#img_slot_icon_name').attr('src', content.slot_icon_name_url);
                 $("#slot_icon_name").hide();
                 $('#img_slot_icon_name, #btn-delete-slot-icon-name').show();
@@ -269,7 +320,6 @@
             // 開放編輯 版位主色
             else if (content.is_user_defined == 2) {
                 enableSlotColorCode();
-
                 $('#slot_color_code').val(content.slot_color_code);
             }
 
@@ -289,6 +339,10 @@
                                 break;
                             case 'C':
                                 $(`#image-block table > tbody [name="image_block_image_action[${value.id}]"][value="C"]`)
+                                    .prop('checked', true);
+                                break;
+                            case 'M':
+                                $(`#image-block table > tbody [name="image_block_image_action[${value.id}]"][value="M"]`)
                                     .prop('checked', true);
                                 break;
                         }
@@ -319,6 +373,10 @@
 
                             case 'C':
                                 $(`#text-block table > tbody [name="text_block_image_action[${value.id}]"][value="C"]`)
+                                    .prop('checked', true);
+                                break;
+                            case 'M':
+                                $(`#text-block table > tbody [name="text_block_image_action[${value.id}]"][value="M"]`)
                                     .prop('checked', true);
                                 break;
                         }
