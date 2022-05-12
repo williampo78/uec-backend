@@ -237,10 +237,10 @@ class APIProductServices
                             $data3[$key3]["meta_title"] = $value3["meta_title"];
                             $data3[$key3]["meta_description"] = $value3["meta_description"];
                             $data3[$key3]["meta_keywords"] = $value3["meta_keywords"];
-                            $data3[$key3]["campaign_id"] = $value3["promotion_campaign_id"];
-                            $data3[$key3]["campaign_name"] = $value3["campaign_name"];
-                            $data3[$key3]["campaign_url_code"] = $value3["url_code"];
-                            $data3[$key3]["campaign_brief"] = $value3["campaign_brief"];
+                            $data3[$key3]["campaignID"] = $value3["promotion_campaign_id"];
+                            $data3[$key3]["campaignName"] = $value3["campaign_name"];
+                            $data3[$key3]["campaignUrlCode"] = $value3["url_code"];
+                            $data3[$key3]["campaignBrief"] = $value3["campaign_brief"];
                         }
                         $data2[$key2]["cateInfo"] = $data3;
                     } elseif ($config_levels == 2) {
@@ -249,10 +249,10 @@ class APIProductServices
                         $data2[$key2]["meta_title"] = $value2["meta_title"];
                         $data2[$key2]["meta_description"] = $value2["meta_description"];
                         $data2[$key2]["meta_keywords"] = $value2["meta_keywords"];
-                        $data2[$key2]["campaign_id"] = $value2["promotion_campaign_id"];
-                        $data2[$key2]["campaign_name"] = $value2["campaign_name"];
-                        $data2[$key2]["campaign_url_code"] = $value2["url_code"];
-                        $data2[$key2]["campaign_brief"] = $value2["campaign_brief"];
+                        $data2[$key2]["campaignID"] = $value2["promotion_campaign_id"];
+                        $data2[$key2]["campaignName"] = $value2["campaign_name"];
+                        $data2[$key2]["campaignUrlCode"] = $value2["url_code"];
+                        $data2[$key2]["campaignBrief"] = $value2["campaign_brief"];
                     }
                 }
                 $data[$key1]["cateInfo"] = $data2;
