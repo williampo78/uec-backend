@@ -88,7 +88,7 @@ class APIOrderService
             $threshold_discount['discount'][$threshold['thresholdID']] = $threshold['campaignDiscount']; //門檻折扣
             $threshold_discount['price'][$threshold['thresholdID']] = $total; //符合門檻總金額
         }
-        foreach ($cart['thresholdGiftAway'] as $key =>$threshold){
+        foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
             $group_i++;
             foreach ($threshold['products'] as $k => $product_id) {
                 $campaign_group[$product_id][$threshold['campaignID']] = $group_i;
@@ -472,6 +472,7 @@ class APIOrderService
                             "item_no" => null,
                             "discount" => $cart_p_discount_prod[$product_id],
                             "record_identity" => 'M',
+                            "campaign_threshold_id" => $threshold_prod['threshold'][$product_id],
                             "created_by" => $member_id,
                             "updated_by" => $member_id,
                             "created_at" => now(),
@@ -506,6 +507,7 @@ class APIOrderService
                             "item_no" => null,
                             "discount" => 0,
                             "record_identity" => 'M',
+                            "campaign_threshold_id" => $threshold_prod['threshold'][$product_id],
                             "created_by" => $member_id,
                             "updated_by" => $member_id,
                             "created_at" => now(),
@@ -557,6 +559,7 @@ class APIOrderService
                                 "item_no" => $prod_info[$gift['productId']]['item_no'],
                                 "discount" => 0,
                                 "record_identity" => "G",
+                                "campaign_threshold_id" => $threshold_prod['threshold'][$product_id],
                                 "created_by" => $member_id,
                                 "updated_by" => $member_id,
                                 "created_at" => now(),
