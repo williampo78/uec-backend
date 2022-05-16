@@ -114,7 +114,19 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function show($id)
     {
-        //
+        $result = [];
+        // 活動類型
+        $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
+        // 滿額活動
+        $result['cartCampaign'] = $this->promotionalCampaignService->getPromotionalCampaignCartById($id);
+        $result['cartCampaign'] = $this->promotionalCampaignService->formatPromotionalCampaignCart($result['cartCampaign']);
+
+        return view('backend.promotional_campaign.cart_v2.show', $result);
     }
 
     /**

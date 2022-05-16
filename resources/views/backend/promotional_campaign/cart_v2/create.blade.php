@@ -19,7 +19,7 @@
 @endsection
 
 @section('content')
-    <div id="app">
+    <div id="app" v-cloak>
         @if ($errors->any())
             <div ref="errorMessage" style="display: none;">
                 {{ $errors->first('message') }}

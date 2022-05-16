@@ -164,11 +164,10 @@
                                                 <tr>
                                                     <td>
                                                         @if ($share_role_auth['auth_query'])
-                                                            <button type="button"
-                                                                class="btn btn-info btn-sm promotional_campaign_detail"
-                                                                data-promotional-campaign-id="{{ $cartCampaign['id'] }}" title="檢視">
+                                                            <a class="btn btn-info btn-sm"
+                                                                href="{{ route('promotional_campaign_cart_v2.show', $cartCampaign['id']) }}" title="檢視">
                                                                 <i class="fa-solid fa-magnifying-glass"></i>
-                                                            </button>
+                                                            </a>
                                                         @endif
 
                                                         @if ($share_role_auth['auth_update'])
@@ -302,114 +301,5 @@
                 },
             },
         });
-        /*
-        $(function() {
-            $(document).on('click', '.promotional_campaign_detail', function() {
-                let promotional_campaign_id = $(this).attr("data-promotional-campaign-id");
-
-                axios.post('/backend/promotional_campaign/ajax/detail', {
-                        promotional_campaign_id: promotional_campaign_id,
-                        level_code: 'CART',
-                    })
-                    .then(function(response) {
-                        let promotional_campaign = response.data;
-
-                        $('#modal-campaign-name').empty().append(
-                            `${promotional_campaign.campaign_name}`);
-
-                        if (promotional_campaign.active == 1) {
-                            $('#modal-active').empty().append(`生效`);
-                        } else {
-                            $('#modal-active').empty().append(`失效`);
-                        }
-
-                        $('#modal-campaign-type').empty().append(`${promotional_campaign.description}`);
-                        $('#modal-n-value').empty().append(`${promotional_campaign.n_value}`);
-
-                        if (promotional_campaign.x_value) {
-                            $('#modal-x-value').empty().append(`${promotional_campaign.x_value}`)
-                                .closest('.form-group').show();
-                        } else {
-                            $('#modal-x-value').closest('.form-group').hide();
-                        }
-
-                        $('#modal-start-at').empty().append(`${promotional_campaign.start_at}`);
-                        $('#modal-end-at').empty().append(`${promotional_campaign.end_at}`);
-                        $('#modal-target-groups').empty().append(`所有會員`);
-
-                        // 活動類型
-                        switch (promotional_campaign.campaign_type) {
-                            // ﹝滿額﹞購物車滿N元，打X折
-                            case 'CART01':
-                                $('#prd-block').hide();
-                                $('#gift-block').hide();
-                                break;
-                                // ﹝滿額﹞購物車滿N元，折X元
-                            case 'CART02':
-                                $('#prd-block').hide();
-                                $('#gift-block').hide();
-                                break;
-                                // ﹝滿額﹞購物車滿N元，送贈品
-                            case 'CART03':
-                                $('#prd-block').hide();
-                                $('#gift-block').show();
-
-                                $("#gift-product-table > tbody").empty();
-                                break;
-                                // ﹝滿額﹞指定商品滿N件，送贈品
-                            case 'CART04':
-                                $('#prd-block').show();
-                                $('#gift-block').show();
-
-                                $("#prd-product-table > tbody").empty();
-                                $("#gift-product-table > tbody").empty();
-                                break;
-                            default:
-                                $('#prd-block').hide();
-                                $('#gift-block').hide();
-                                break;
-                        }
-
-                        if (promotional_campaign.products) {
-                            let count = 1;
-
-                            $.each(promotional_campaign.products, function(id, product) {
-                                $("#prd-product-table > tbody").append(`
-                                <tr>
-                                    <td>${count++}</td>
-                                    <td>${product.product_no}</td>
-                                    <td>${product.product_name}</td>
-                                    <td>${product.selling_price}</td>
-                                    <td>${product.launched_at}</td>
-                                    <td>${product.launched_status}</td>
-                                    <td>${product.gross_margin ? product.gross_margin : ''}</td>
-                                </tr>
-                            `);
-                            });
-                        }
-
-                        if (promotional_campaign.giveaways) {
-                            let count = 1;
-
-                            $.each(promotional_campaign.giveaways, function(id, product) {
-                                $("#gift-product-table > tbody").append(`
-                                <tr>
-                                    <td>${count++}</td>
-                                    <td>${product.product_no}</td>
-                                    <td>${product.product_name}</td>
-                                    <td>${product.assigned_qty}</td>
-                                </tr>
-                            `);
-                            });
-                        }
-
-                        $('#promotional_campaign_detail').modal('show');
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                    });
-            });
-        });
-        */
     </script>
 @endsection

@@ -19,7 +19,7 @@
 @endsection
 
 @section('content')
-    <div id="app">
+    <div id="app" v-cloak>
         @if ($errors->any())
             <div ref="errorMessage" style="display: none;">
                 {{ $errors->first('message') }}
@@ -30,7 +30,7 @@
             <!-- 表頭名稱 -->
             <div class="row">
                 <div class="col-sm-12">
-                    <h1 class="page-header"><i class="fa-solid fa-plus"></i> 購物車滿額活動 編輯資料</h1>
+                    <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 購物車滿額活動 編輯資料</h1>
                 </div>
             </div>
             <div class="row">
