@@ -703,7 +703,6 @@ export default {
                     webCategoryHierarchy: product.web_category_hierarchy,
                     supplier: product.supplier,
                     stockType: product.stock_type,
-                    uom: product.uom,
                     stockQty: product.stock_qty,
                 });
             });

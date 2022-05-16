@@ -750,7 +750,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     webCategoryHierarchy: product.web_category_hierarchy,
                     supplier: product.supplier,
                     stockType: product.stock_type,
-                    uom: product.uom,
                     stockQty: product.stock_qty
                   });
                 });

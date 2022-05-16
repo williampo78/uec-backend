@@ -9,6 +9,7 @@ use App\Models\PromotionalCampaign;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\PromotionalCampaignProduct;
 use App\Models\PromotionalCampaignGiveaway;
@@ -17,11 +18,18 @@ use App\Models\PromotionalCampaignThreshold;
 class PromotionalCampaignService
 {
     private $lookupValuesVService;
+    private $sysConfigService;
+    private $webCategoryHierarchyService;
     private const CART_UPLOAD_PATH_PREFIX = 'promotional_campaign/cart/';
 
-    public function __construct(LookupValuesVService $lookupValuesVService)
-    {
+    public function __construct(
+        LookupValuesVService $lookupValuesVService,
+        SysConfigService $sysConfigService,
+        WebCategoryHierarchyService $webCategoryHierarchyService
+    ) {
         $this->lookupValuesVService = $lookupValuesVService;
+        $this->sysConfigService = $sysConfigService;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
     }
 
     /**
@@ -694,7 +702,7 @@ class PromotionalCampaignService
          */
         $promotionalCampaigns = PromotionalCampaign::where('agent_id', $user->agent_id)
             ->where('active', 1)
-            ->where('level_code', 'CART')
+            ->where('level_code', 'CART_P')
             ->where(function ($query) use ($startAt, $endAt) {
                 $query->whereBetween('start_at', [$startAt, $endAt])
                     ->orWhereBetween('end_at', [$startAt, $endAt])
@@ -867,10 +875,20 @@ class PromotionalCampaignService
     public function getPromotionalCampaignCartById(int $id): Model
     {
         $user = Auth::user();
+        $warehouseNumber = $this->sysConfigService->getConfigValueByConfigKey('EC_WAREHOUSE_GOODS');
         $cartCampaign = PromotionalCampaign::with([
             'promotionalCampaignThresholds',
             'promotionalCampaignThresholds.promotionalCampaignGiveaways',
+            'promotionalCampaignThresholds.promotionalCampaignGiveaways.product',
+            'promotionalCampaignThresholds.promotionalCampaignGiveaways.product.supplier',
+            'promotionalCampaignThresholds.promotionalCampaignGiveaways.product.productItems.warehouses' => function ($query) use ($warehouseNumber) {
+                return $query->where('number', $warehouseNumber);
+            },
             'promotionalCampaignProducts',
+            'promotionalCampaignProducts.product',
+            'promotionalCampaignProducts.product.webCategoryHierarchies' => function ($query) {
+                return $query->oldest('sort');
+            },
         ])
             ->where('agent_id', $user->agent_id)
             ->where('level_code', 'CART_P')
@@ -887,14 +905,6 @@ class PromotionalCampaignService
      */
     public function formatPromotionalCampaignCart(Model $cartCampaign): array
     {
-        // 庫存類型
-        $stockType = null;
-        if ($cartCampaign->ship_from_whs == 'SELF') {
-            $stockType = 'A_B';
-        } elseif ($cartCampaign->ship_from_whs == 'SUP') {
-            $stockType = 'T';
-        }
-
         $result = [
             'id' => $cartCampaign->id,
             'campaign_name' => $cartCampaign->campaign_name,
@@ -904,18 +914,26 @@ class PromotionalCampaignService
             'end_at' => $cartCampaign->end_at,
             'campaign_brief' => $cartCampaign->campaign_brief,
             'url_code' => $cartCampaign->url_code,
-            'stock_type' => $stockType,
+            'stock_type' => null,
             'supplier_id' => isset($cartCampaign->supplier_id) ? $cartCampaign->supplier_id : 'all',
             'banner_photo_desktop_url' => !empty($cartCampaign->banner_photo_desktop) ? config('filesystems.disks.s3.url') . $cartCampaign->banner_photo_desktop : null,
             'banner_photo_mobile_url' => !empty($cartCampaign->banner_photo_mobile) ? config('filesystems.disks.s3.url') . $cartCampaign->banner_photo_mobile : null,
             'thresholds' => null,
             'products' => null,
         ];
-// dd($cartCampaign);
+
+        // 庫存類型
+        if ($cartCampaign->ship_from_whs == 'SELF') {
+            $result['stock_type'] = 'A_B';
+        } elseif ($cartCampaign->ship_from_whs == 'SUP') {
+            $result['stock_type'] = 'T';
+        }
+
         // 活動門檻
         if ($cartCampaign->promotionalCampaignThresholds->isNotEmpty()) {
             foreach ($cartCampaign->promotionalCampaignThresholds as $threshold) {
                 $tmpThreshold = [
+                    'id' => $threshold->id,
                     'n_value' => $threshold->n_value,
                     'x_value' => null,
                     'giveaways' => null,
@@ -931,13 +949,94 @@ class PromotionalCampaignService
                     if ($threshold->promotionalCampaignGiveaways->isNotEmpty()) {
                         foreach ($threshold->promotionalCampaignGiveaways as $giveaway) {
                             $tmpGiveaway = [
-
+                                'id' => $giveaway->id,
+                                'product_id' => $giveaway->product_id,
+                                'product_no' => null,
+                                'product_name' => null,
+                                'assigned_qty' => $giveaway->assigned_qty,
+                                'stock_type' => null,
+                                'product_type' => null,
+                                'supplier' => null,
+                                'stock_qty' => 0,
                             ];
+
+                            if (isset($giveaway->product)) {
+                                $tmpGiveaway['product_no'] = $giveaway->product->product_no;
+                                $tmpGiveaway['product_name'] = $giveaway->product->product_name;
+                                $tmpGiveaway['stock_type'] = config('uec.stock_type_options')[$giveaway->product->stock_type] ?? null;
+
+                                // 商品類型
+                                if (isset($giveaway->product->product_type)) {
+                                    $tmpGiveaway['product_type'] = config('uec.product_type_options')[$giveaway->product->product_type] ?? null;
+                                }
+
+                                // 供應商
+                                if (isset($giveaway->product->supplier)) {
+                                    $tmpGiveaway['supplier'] = $giveaway->product->supplier->name;
+                                }
+
+                                // 合計各個商品品項的庫存數
+                                $stockQty = 0;
+                                if ($giveaway->product->productItems->isNotEmpty()) {
+                                    foreach ($giveaway->product->productItems as $productItem) {
+                                        $warehouse = $productItem->warehouses->first();
+                                        if (isset($warehouse)) {
+                                            $stockQty += $warehouse->pivot->stock_qty;
+                                        }
+                                    }
+                                }
+                                $tmpGiveaway['stock_qty'] = $stockQty;
+                            }
+
+                            $tmpThreshold['giveaways'][] = $tmpGiveaway;
                         }
                     }
                 }
 
-                $result['products'][] = $tmpThreshold;
+                $result['thresholds'][] = $tmpThreshold;
+            }
+        }
+
+        // 活動指定商品
+        if ($cartCampaign->promotionalCampaignProducts->isNotEmpty()) {
+            foreach ($cartCampaign->promotionalCampaignProducts as $campaignProduct) {
+                $tmpCampaignProduct = [
+                    'id' => $campaignProduct->id,
+                    'product_id' => $campaignProduct->product_id,
+                    'product_no' => null,
+                    'product_name' => null,
+                    'selling_price' => null,
+                    'start_launched_at' => null,
+                    'launch_status' => null,
+                    'gross_margin' => null,
+                    'web_category_hierarchy' => null,
+                ];
+
+                if (isset($campaignProduct->product)) {
+                    $tmpCampaignProduct['product_no'] = $campaignProduct->product->product_no;
+                    $tmpCampaignProduct['product_name'] = $campaignProduct->product->product_name;
+                    $tmpCampaignProduct['selling_price'] = number_format($campaignProduct->product->selling_price);
+                    $tmpCampaignProduct['launch_status'] = $campaignProduct->product->launch_status;
+                    $tmpCampaignProduct['gross_margin'] = $campaignProduct->product->gross_margin;
+
+                    // 上架時間起
+                    if (isset($campaignProduct->product->start_launched_at)) {
+                        $tmpCampaignProduct['start_launched_at'] = Carbon::parse($campaignProduct->product->start_launched_at)->format('Y-m-d H:i');
+                    }
+
+                    // 前台分類
+                    if ($campaignProduct->product->webCategoryHierarchies->isNotEmpty()) {
+                        $webCategoryHierarchy = $campaignProduct->product->webCategoryHierarchies->first();
+
+                        $webCategoryHierarchyContents = $this->webCategoryHierarchyService->getCategoryHierarchyContents([
+                            'id' => $webCategoryHierarchy->id,
+                        ]);
+
+                        $tmpCampaignProduct['web_category_hierarchy'] = !empty($webCategoryHierarchyContents) ? $webCategoryHierarchyContents[0]->name : null;
+                    }
+                }
+
+                $result['products'][] = $tmpCampaignProduct;
             }
         }
 
@@ -1037,9 +1136,10 @@ class PromotionalCampaignService
 
                     // 新增活動贈品
                     if (in_array($data['campaign_type'], ['CART_P03', 'CART_P04'])) {
-                        if (isset($data['giveaways'])) {
-                            foreach ($data['giveaways'] as $giveaway) {
+                        if (isset($threshold['giveaways'])) {
+                            foreach ($threshold['giveaways'] as $giveaway) {
                                 PromotionalCampaignGiveaway::create([
+                                    'promotional_campaign_id' => $createdPromotionalCampaign->id,
                                     'sort' => 1,
                                     'product_id' => $giveaway['product_id'],
                                     'assigned_qty' => $giveaway['assigned_qty'],
@@ -1065,6 +1165,245 @@ class PromotionalCampaignService
                         'updated_by' => $user->id,
                     ]);
                 }
+            }
+
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+        }
+
+        return $result;
+    }
+
+    /**
+     * 更新滿額活動
+     *
+     * @param integer $id
+     * @param array $data
+     * @return boolean
+     */
+    public function updatePromotionalCampaignCart(int $id, array $data): bool
+    {
+        $user = Auth::user();
+        $result = false;
+        $originPromotionalCampaign = PromotionalCampaign::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            if (now()->greaterThanOrEqualTo($originPromotionalCampaign->start_at)) {
+                PromotionalCampaign::findOrFail($id)->update([
+                    'campaign_name' => $data['campaign_name'],
+                    'active' => $data['active'],
+                    'end_at' => $data['end_at'],
+                    'updated_by' => $user->id,
+                ]);
+            } else {
+                $promotionalCampaignData = [
+                    'campaign_name' => $data['campaign_name'],
+                    'active' => $data['active'],
+                    'start_at' => $data['start_at'],
+                    'end_at' => $data['end_at'],
+                    'campaign_brief' => $data['campaign_brief'],
+                    'url_code' => $data['url_code'],
+                    'updated_by' => $user->id,
+                ];
+
+                // 出貨倉
+                if ($data['stock_type'] == 'A_B') {
+                    $promotionalCampaignData['ship_from_whs'] = 'SELF';
+                } elseif ($data['stock_type'] == 'T') {
+                    $promotionalCampaignData['ship_from_whs'] = 'SUP';
+                }
+
+                // 供應商
+                if ($data['supplier_id'] != 'all') {
+                    $promotionalCampaignData['supplier_id'] = $data['supplier_id'];
+                } else {
+                    $promotionalCampaignData['supplier_id'] = null;
+                }
+
+                // Banner圖檔路徑-Desktop版
+                if (isset($data['banner_photo_desktop'])) {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
+                    }
+
+                    // 上傳新圖片
+                    $promotionalCampaignData['banner_photo_desktop'] = $data['banner_photo_desktop']->storePublicly(self::CART_UPLOAD_PATH_PREFIX . $id, 's3');
+                } elseif (isset($data['is_delete_banner_photo_desktop']) && $data['is_delete_banner_photo_desktop'] == 'true') {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
+                    }
+
+                    $promotionalCampaignData['banner_photo_desktop'] = null;
+                }
+
+                // Banner圖檔路徑-Mobile版
+                if (isset($data['banner_photo_mobile'])) {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
+                    }
+
+                    // 上傳新圖片
+                    $promotionalCampaignData['banner_photo_mobile'] = $data['banner_photo_mobile']->storePublicly(self::CART_UPLOAD_PATH_PREFIX . $id, 's3');
+                } elseif (isset($data['is_delete_banner_photo_mobile']) && $data['is_delete_banner_photo_mobile'] == 'true') {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
+                    }
+
+                    $promotionalCampaignData['banner_photo_mobile'] = null;
+                }
+
+                PromotionalCampaign::findOrFail($id)->update($promotionalCampaignData);
+
+                $updatedThresholdIds = [];
+                // 新增或更新活動門檻
+                if (isset($data['thresholds'])) {
+                    $originThresholdIds = PromotionalCampaignThreshold::where('promotional_campaign_id', $id)->pluck('id');
+                    foreach ($data['thresholds'] as $threshold) {
+                        // 新增
+                        if (!$originThresholdIds->contains($threshold['id'])) {
+                            $xValue = 0;
+                            if (in_array($originPromotionalCampaign->campaign_type, ['CART_P01', 'CART_P02'])) {
+                                $xValue = $threshold['x_value'];
+                            }
+
+                            $createdThreshold = PromotionalCampaignThreshold::create([
+                                'promotional_campaign_id' => $id,
+                                'n_value' => $threshold['n_value'],
+                                'x_value' => $xValue,
+                                'threshold_brief' => $threshold['threshold_brief'],
+                                'created_by' => $user->id,
+                                'updated_by' => $user->id,
+                            ]);
+
+                            // 新增活動贈品
+                            if (in_array($originPromotionalCampaign->campaign_type, ['CART_P03', 'CART_P04'])) {
+                                if (isset($threshold['giveaways'])) {
+                                    foreach ($threshold['giveaways'] as $giveaway) {
+                                        PromotionalCampaignGiveaway::create([
+                                            'promotional_campaign_id' => $id,
+                                            'sort' => 1,
+                                            'product_id' => $giveaway['product_id'],
+                                            'assigned_qty' => $giveaway['assigned_qty'],
+                                            'assigned_unit_price' => 0,
+                                            'threshold_id' => $createdThreshold->id,
+                                            'created_by' => $user->id,
+                                            'updated_by' => $user->id,
+                                        ]);
+                                    }
+                                }
+                            }
+
+                            $updatedThresholdIds[] = $createdThreshold->id;
+                        }
+                        // 更新
+                        else {
+                            $xValue = 0;
+                            if (in_array($originPromotionalCampaign->campaign_type, ['CART_P01', 'CART_P02'])) {
+                                $xValue = $threshold['x_value'];
+                            }
+
+                            PromotionalCampaignThreshold::findOrFail($threshold['id'])->update([
+                                'n_value' => $threshold['n_value'],
+                                'x_value' => $xValue,
+                                'threshold_brief' => $threshold['threshold_brief'],
+                                'updated_by' => $user->id,
+                            ]);
+
+                            $updatedGiveawayIds = [];
+                            // 新增或更新活動贈品
+                            if (in_array($originPromotionalCampaign->campaign_type, ['CART_P03', 'CART_P04'])) {
+                                if (isset($threshold['giveaways'])) {
+                                    $originGiveawayIds = PromotionalCampaignGiveaway::where('threshold_id', $threshold['id'])->pluck('id');
+                                    foreach ($threshold['giveaways'] as $giveaway) {
+                                        // 新增
+                                        if (!$originGiveawayIds->contains($giveaway['id'])) {
+                                            $createdGiveaway = PromotionalCampaignGiveaway::create([
+                                                'promotional_campaign_id' => $id,
+                                                'sort' => 1,
+                                                'product_id' => $giveaway['product_id'],
+                                                'assigned_qty' => $giveaway['assigned_qty'],
+                                                'assigned_unit_price' => 0,
+                                                'threshold_id' => $threshold['id'],
+                                                'created_by' => $user->id,
+                                                'updated_by' => $user->id,
+                                            ]);
+
+                                            $updatedGiveawayIds[] = $createdGiveaway->id;
+                                        }
+                                        // 更新
+                                        else {
+                                            PromotionalCampaignGiveaway::findOrFail($giveaway['id'])->update([
+                                                'product_id' => $giveaway['product_id'],
+                                                'assigned_qty' => $giveaway['assigned_qty'],
+                                                'updated_by' => $user->id,
+                                            ]);
+
+                                            $updatedGiveawayIds[] = $giveaway['id'];
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 刪除活動贈品
+                            PromotionalCampaignGiveaway::where('threshold_id', $threshold['id'])->whereNotIn('id', $updatedGiveawayIds)->delete();
+
+                            $updatedThresholdIds[] = $threshold['id'];
+                        }
+                    }
+                }
+
+                // 刪除活動贈品
+                PromotionalCampaignGiveaway::where('promotional_campaign_id', $id)->whereNotIn('threshold_id', $updatedThresholdIds)->delete();
+                // 刪除活動門檻
+                PromotionalCampaignThreshold::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedThresholdIds)->delete();
+
+                $updatedProductIds = [];
+                // 新增或更新活動指定商品
+                if (isset($data['products'])) {
+                    $originProductIds = PromotionalCampaignProduct::where('promotional_campaign_id', $id)->pluck('id');
+                    foreach ($data['products'] as $product) {
+                        // 新增
+                        if (!$originProductIds->contains($product['id'])) {
+                            $createdProduct = PromotionalCampaignProduct::create([
+                                'promotional_campaign_id' => $id,
+                                'sort' => 1,
+                                'product_id' => $product['product_id'],
+                                'created_by' => $user->id,
+                                'updated_by' => $user->id,
+                            ]);
+
+                            $updatedProductIds[] = $createdProduct->id;
+                        }
+                        // 更新
+                        else {
+                            PromotionalCampaignProduct::findOrFail($product['id'])->update([
+                                'product_id' => $product['product_id'],
+                                'updated_by' => $user->id,
+                            ]);
+
+                            $updatedProductIds[] = $product['id'];
+                        }
+                    }
+                }
+
+                // 刪除活動指定商品
+                PromotionalCampaignProduct::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedProductIds)->delete();
             }
 
             DB::commit();

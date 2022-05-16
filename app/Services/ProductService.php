@@ -2,26 +2,26 @@
 
 namespace App\Services;
 
-use Batch;
-use ImageUpload;
-use Carbon\Carbon;
+use App\Models\CategoryHierarchy;
+use App\Models\CategoryProduct;
 use App\Models\Product;
-use App\Models\Products;
+use App\Models\ProductAttribute;
+use App\Models\ProductAuditLog;
 use App\Models\ProductItem;
 use App\Models\ProductPhoto;
-use App\Models\RelatedProduct;
-use App\Models\CategoryProduct;
-use App\Models\ProductAuditLog;
-use App\Models\ProductSpecInfo;
-use App\Models\ProductAttribute;
 use App\Models\ProductReviewLog;
-use App\Models\CategoryHierarchy;
+use App\Models\Products;
+use App\Models\ProductSpecInfo;
+use App\Models\RelatedProduct;
 use App\Services\UniversalService;
+use Batch;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
+use ImageUpload;
 
 class ProductService
 {
@@ -285,7 +285,7 @@ class ProductService
             $uploadPath = 'products/' . $products_id;
             if (isset($file['filedata'])) {
                 foreach ($file['filedata'] as $key => $val) {
-                    $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath,'product');
+                    $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath, 'product');
                 }
                 foreach ($fileList as $key => $val) {
                     $insertImg = [
@@ -388,7 +388,7 @@ class ProductService
                     ];
                     ProductPhoto::where('id', $val['id'])->update($updateImg);
                 } else {
-                    $ImageUpload = ImageUpload::uploadImage($file['filedata'][$key], $uploadPath,'product');
+                    $ImageUpload = ImageUpload::uploadImage($file['filedata'][$key], $uploadPath, 'product');
                     $insertImg = [
                         'product_id' => $products_id,
                         'photo_name' => $ImageUpload['image'],
@@ -1312,7 +1312,7 @@ class ProductService
             'webCategoryHierarchies' => function ($query) {
                 return $query->oldest('sort');
             },
-            'productItems.warehouses' => function ($query) use($warehouseNumber) {
+            'productItems.warehouses' => function ($query) use ($warehouseNumber) {
                 return $query->where('number', $warehouseNumber);
             },
         ])->where('agent_id', $user->agent_id);
@@ -1424,7 +1424,6 @@ class ProductService
                 'web_category_hierarchy' => null,
                 'supplier' => null,
                 'stock_type' => config('uec.stock_type_options')[$product->stock_type] ?? null,
-                'uom' => $product->uom,
                 'stock_qty' => 0,
             ];
 

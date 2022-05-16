@@ -66,7 +66,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <select2 class="form-control" :options="campaignTypes"
-                                                        v-model="form.campaignType" name="campaign_type" @select2-change="changeCampaignType">
+                                                        v-model="form.campaignType" name="campaign_type" @select2-change="changeCampaignType" disabled>
                                                         <option disabled value=""></option>
                                                     </select2>
                                                 </div>
@@ -112,7 +112,7 @@
                                                             <div class="input-group" id="start_at_flatpickr">
                                                                 <input type="text" class="form-control" name="start_at"
                                                                     id="start_at" autocomplete="off" data-input
-                                                                    v-model="form.startAt">
+                                                                    v-model="form.startAt" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                 <span class="input-group-btn" data-toggle>
                                                                     <button class="btn btn-default" type="button">
                                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -149,7 +149,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <input type="text" class="form-control" name="campaign_brief"
-                                                        v-model="form.campaignBrief">
+                                                        v-model="form.campaignBrief" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                 </div>
                                             </div>
                                         </div>
@@ -163,7 +163,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <input type="text" class="form-control" name="url_code"
-                                                        v-model="form.urlCode">
+                                                        v-model="form.urlCode" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                 </div>
                                             </div>
                                         </div>
@@ -180,13 +180,13 @@
                                                         <div class="col-sm-1">
                                                             <label class="radio-inline">
                                                                 <input type="radio" name="stock_type" value="A_B"
-                                                                    v-model="form.stockType" @click="clickStockType">買斷 / 寄售
+                                                                    v-model="form.stockType" @click="clickStockType" :disabled="isNowGreaterThanOrEqualToStartAt">買斷 / 寄售
                                                             </label>
                                                         </div>
                                                         <div class="col-sm-1">
                                                             <label class="radio-inline">
                                                                 <input type="radio" name="stock_type" value="T"
-                                                                    v-model="form.stockType" @click="clickStockType">轉單
+                                                                    v-model="form.stockType" @click="clickStockType" :disabled="isNowGreaterThanOrEqualToStartAt">轉單
                                                             </label>
                                                         </div>
                                                     </div>
@@ -203,7 +203,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <select2 class="form-control" :options="suppliers"
-                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false" @select2-selecting="selectingSupplier">
+                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false" @select2-selecting="selectingSupplier" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                         <option disabled value=""></option>
                                                     </select2>
                                                 </div>
@@ -232,7 +232,7 @@
                                         <div class="tab-content">
                                             <div class="tab-pane fade in active" id="tab-threshold">
                                                 <div v-if="form.campaignType === 'CART_P01'">
-                                                    <div class="row">
+                                                    <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
@@ -255,29 +255,30 @@
                                                                             style="color:red;">*</span></th>
                                                                     <th class="text-nowrap">X (折數) <span
                                                                             style="color:red;">*</span></th>
-                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                                     <th class="text-nowrap"></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr v-for="(threshold, thresholdIndex) in form.thresholds"
                                                                     :key="thresholdIndex">
+                                                                    <input type="hidden" :name="`thresholds[${thresholdIndex}][id]`" :value="threshold.id">
                                                                     <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <input type="number" class="form-control threshold-n-value"
                                                                                 :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
-                                                                                v-model="threshold.nValue">
+                                                                                v-model="threshold.nValue" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                         </div>
                                                                     </td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <input type="number" class="form-control threshold-x-value"
                                                                                 :name="`thresholds[${thresholdIndex}][x_value]`" min="0"
-                                                                                v-model="threshold.xValue">
+                                                                                v-model="threshold.xValue" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                         </div>
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="!isNowGreaterThanOrEqualToStartAt">
                                                                         <button type="button" class="btn btn-danger"
                                                                             @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
@@ -294,7 +295,7 @@
                                                     </div>
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P02'">
-                                                    <div class="row">
+                                                    <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
@@ -313,29 +314,30 @@
                                                                             style="color:red;">*</span></th>
                                                                     <th class="text-nowrap">X (折扣金額) <span
                                                                             style="color:red;">*</span></th>
-                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                                     <th class="text-nowrap"></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr v-for="(threshold, thresholdIndex) in form.thresholds"
                                                                     :key="thresholdIndex">
+                                                                    <input type="hidden" :name="`thresholds[${thresholdIndex}][id]`" :value="threshold.id">
                                                                     <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <input type="number" class="form-control threshold-n-value"
                                                                                 :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
-                                                                                v-model="threshold.nValue">
+                                                                                v-model="threshold.nValue" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                         </div>
                                                                     </td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <input type="number" class="form-control threshold-x-value"
                                                                                 :name="`thresholds[${thresholdIndex}][x_value]`" min="0"
-                                                                                v-model="threshold.xValue">
+                                                                                v-model="threshold.xValue" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                         </div>
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="!isNowGreaterThanOrEqualToStartAt">
                                                                         <button type="button" class="btn btn-danger"
                                                                             @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
@@ -352,7 +354,7 @@
                                                     </div>
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P03'">
-                                                    <div class="row">
+                                                    <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
@@ -371,25 +373,26 @@
                                                                             style="color:red;">*</span></th>
                                                                     <th class="text-nowrap">贈品 <span
                                                                             style="color:red;">*</span></th>
-                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                                     <th class="text-nowrap"></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr v-for="(threshold, thresholdIndex) in form.thresholds"
                                                                     :key="thresholdIndex">
+                                                                    <input type="hidden" :name="`thresholds[${thresholdIndex}][id]`" :value="threshold.id">
                                                                     <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <input type="number" class="form-control threshold-n-value"
                                                                                 :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
-                                                                                v-model="threshold.nValue">
+                                                                                v-model="threshold.nValue" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                         </div>
                                                                     </td>
                                                                     <td>
                                                                         @include('backend.promotional_campaign.cart_v2.giveaway_block')
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="!isNowGreaterThanOrEqualToStartAt">
                                                                         <button type="button" class="btn btn-danger"
                                                                             @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
@@ -406,7 +409,7 @@
                                                     </div>
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P04'">
-                                                    <div class="row">
+                                                    <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
                                                         <div class="col-sm-1">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
@@ -425,25 +428,26 @@
                                                                             style="color:red;">*</span></th>
                                                                     <th class="text-nowrap">贈品 <span
                                                                             style="color:red;">*</span></th>
-                                                                    <th class="text-nowrap">功能</th>
+                                                                    <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                                     <th class="text-nowrap"></th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 <tr v-for="(threshold, thresholdIndex) in form.thresholds"
                                                                     :key="thresholdIndex">
+                                                                    <input type="hidden" :name="`thresholds[${thresholdIndex}][id]`" :value="threshold.id">
                                                                     <td>@{{ thresholdIndex + 1 }}</td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <input type="number" class="form-control threshold-n-value"
                                                                                 :name="`thresholds[${thresholdIndex}][n_value]`" min="0"
-                                                                                v-model="threshold.nValue">
+                                                                                v-model="threshold.nValue" :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                         </div>
                                                                     </td>
                                                                     <td>
                                                                         @include('backend.promotional_campaign.cart_v2.giveaway_block')
                                                                     </td>
-                                                                    <td>
+                                                                    <td v-if="!isNowGreaterThanOrEqualToStartAt">
                                                                         <button type="button" class="btn btn-danger"
                                                                             @click="deleteThreshold(thresholdIndex)">
                                                                             <i class="fa-solid fa-trash-can"></i> 刪除
@@ -461,7 +465,7 @@
                                                 </div>
                                             </div>
                                             <div class="tab-pane fade" id="tab-product">
-                                                <div class="row">
+                                                <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
                                                     <div class="col-sm-12">
                                                         <button type="button" class="btn btn-warning" @click="addProduct">
                                                             <i class="fa-solid fa-plus"></i> 新增商品
@@ -482,14 +486,15 @@
                                                                 <th class="text-nowrap">上架狀態</th>
                                                                 <th class="text-nowrap">毛利(%)</th>
                                                                 <th class="text-nowrap">前台分類</th>
-                                                                <th class="text-nowrap">功能</th>
+                                                                <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <tr v-for="(product, index) in form.products"
                                                                 :key="index">
+                                                                <input type="hidden" :name="`products[${index}][id]`" :value="product.id">
                                                                 <input type="hidden"
-                                                                    :name="`products[${index}][product_id]`" :value="product.id">
+                                                                    :name="`products[${index}][product_id]`" :value="product.productId">
                                                                 <td>@{{ index + 1 }}</td>
                                                                 <td>@{{ product.productNo }}</td>
                                                                 <td>@{{ product.productName }}</td>
@@ -498,7 +503,7 @@
                                                                 <td>@{{ product.launchStatus }}</td>
                                                                 <td>@{{ product.grossMargin }}</td>
                                                                 <td>@{{ product.webCategoryHierarchy }}</td>
-                                                                <td>
+                                                                <td v-if="!isNowGreaterThanOrEqualToStartAt">
                                                                     <button type="button" class="btn btn-danger"
                                                                         @click="deleteProduct(index)">
                                                                         <i class="fa-solid fa-trash-can"></i> 刪除
@@ -516,13 +521,14 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為1200*150</p>
-                                                        <img v-if="bannerPhotoDesktop.url" :src="bannerPhotoDesktop.url" width="100%" height="150">
-                                                        <div v-if="bannerPhotoDesktop.showInputFile" class="form-group">
+                                                        <img v-show="bannerPhotoDesktop.url" :src="bannerPhotoDesktop.url" width="100%" height="150">
+                                                        <div v-show="bannerPhotoDesktop.showInputFile && !isNowGreaterThanOrEqualToStartAt" class="form-group">
                                                             <input type="file" name="banner_photo_desktop" :data-image-width="bannerPhotoDesktop.width" :data-image-height="bannerPhotoDesktop.height" ref="bannerPhotoDesktop" @change="onDesktopFileChange">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button v-if="bannerPhotoDesktop.showDeleteButton" type="button" class="btn btn-danger"
+                                                        <input type="hidden" name="is_delete_banner_photo_desktop" :value="bannerPhotoDesktop.isDeleteFile">
+                                                        <button v-show="bannerPhotoDesktop.showDeleteButton && !isNowGreaterThanOrEqualToStartAt" type="button" class="btn btn-danger"
                                                             @click="deleteDesktopFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                         </button>
@@ -535,13 +541,14 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為345*180</p>
-                                                        <img v-if="bannerPhotoMobile.url" :src="bannerPhotoMobile.url" width="100%" height="180">
-                                                        <div v-if="bannerPhotoMobile.showInputFile" class="form-group">
+                                                        <img v-show="bannerPhotoMobile.url" :src="bannerPhotoMobile.url" width="100%" height="180">
+                                                        <div v-show="bannerPhotoMobile.showInputFile && !isNowGreaterThanOrEqualToStartAt" class="form-group">
                                                             <input type="file" name="banner_photo_mobile" :data-image-width="bannerPhotoMobile.width" :data-image-height="bannerPhotoMobile.height" ref="bannerPhotoMobile" @change="onMobileFileChange">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button v-if="bannerPhotoMobile.showDeleteButton" type="button" class="btn btn-danger"
+                                                        <input type="hidden" name="is_delete_banner_photo_mobile" :value="bannerPhotoMobile.isDeleteFile">
+                                                        <button v-show="bannerPhotoMobile.showDeleteButton && !isNowGreaterThanOrEqualToStartAt" type="button" class="btn btn-danger"
                                                             @click="deleteMobileFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                         </button>
@@ -587,6 +594,7 @@
             el: "#app",
             data: {
                 form: {
+                    cartCampaignId: "",
                     campaignName: "",
                     campaignType: "",
                     active: "0",
@@ -642,6 +650,7 @@
                     height: "",
                     showInputFile: true,
                     showDeleteButton: false,
+                    isDeleteFile: false,
                 },
                 bannerPhotoMobile: {
                     url: "",
@@ -649,7 +658,9 @@
                     height: "",
                     showInputFile: true,
                     showDeleteButton: false,
+                    isDeleteFile: false,
                 },
+                isNowGreaterThanOrEqualToStartAt: false,
             },
             created() {
                 let campaignTypes = @json($campaignTypes);
@@ -675,8 +686,7 @@
                 }
 
                 if (cartCampaign) {
-                    console.log(cartCampaign);
-
+                    this.form.cartCampaignId = cartCampaign.id;
                     this.form.campaignName = cartCampaign.campaign_name;
                     this.form.campaignType = cartCampaign.campaign_type;
                     this.form.active = cartCampaign.active;
@@ -686,8 +696,68 @@
                     this.form.urlCode = cartCampaign.url_code;
                     this.form.stockType = cartCampaign.stock_type;
                     this.form.supplierId = cartCampaign.supplier_id;
-                    // this.form.thresholds
-                    // this.form.products
+
+                    if (cartCampaign.banner_photo_desktop_url) {
+                        this.bannerPhotoDesktop.url = cartCampaign.banner_photo_desktop_url;
+                        this.bannerPhotoDesktop.showInputFile = false;
+                        this.bannerPhotoDesktop.showDeleteButton = true;
+                    }
+
+                    if (cartCampaign.banner_photo_mobile_url) {
+                        this.bannerPhotoMobile.url = cartCampaign.banner_photo_mobile_url;
+                        this.bannerPhotoMobile.showInputFile = false;
+                        this.bannerPhotoMobile.showDeleteButton = true;
+                    }
+
+                    if (cartCampaign.thresholds) {
+                        cartCampaign.thresholds.forEach(threshold => {
+                            let giveaways = [];
+
+                            if (threshold.giveaways) {
+                                threshold.giveaways.forEach(giveaway => {
+                                    giveaways.push({
+                                        id: giveaway.id,
+                                        productId: giveaway.product_id,
+                                        productNo: giveaway.product_no,
+                                        productName: giveaway.product_name,
+                                        assignedQty: giveaway.assigned_qty,
+                                        stockType: giveaway.stock_type,
+                                        productType: giveaway.product_type,
+                                        supplier: giveaway.supplier,
+                                        stockQty: giveaway.stock_qty,
+                                    });
+                                });
+                            }
+
+                            this.form.thresholds.push({
+                                id: threshold.id,
+                                nValue: threshold.n_value,
+                                xValue: threshold.x_value,
+                                giveaways: giveaways,
+                            });
+                        });
+                    }
+
+                    if (cartCampaign.products) {
+                        cartCampaign.products.forEach(product => {
+                            this.form.products.push({
+                                id: product.id,
+                                productId: product.product_id,
+                                productNo: product.product_no,
+                                productName: product.product_name,
+                                sellingPrice: product.selling_price,
+                                startLaunchedAt: product.start_launched_at,
+                                launchStatus: product.launch_status,
+                                grossMargin: product.gross_margin,
+                                webCategoryHierarchy: product.web_category_hierarchy,
+                            });
+                        });
+                    }
+                }
+
+                // 若當下時間 ≧ ﹝上架時間起﹞，僅開放﹝活動名稱﹞、﹝狀態﹞、﹝上架時間訖﹞供修改
+                if (moment().isSameOrAfter(this.form.startAt)) {
+                    this.isNowGreaterThanOrEqualToStartAt = true;
                 }
             },
             mounted() {
@@ -730,9 +800,13 @@
                     },
                 });
 
+                if (this.isNowGreaterThanOrEqualToStartAt) {
+                    endAtFlatpickr.set("minDate", moment().format("YYYY-MM-DD"));
+                }
+
                 let conflictCampaigns = '';
                 // 驗證表單
-                $("#create-form").validate({
+                $("#edit-form").validate({
                     // debug: true,
                     submitHandler: function(form) {
                         self.saveButton.isDisabled = true;
@@ -751,7 +825,7 @@
                             remote: {
                                 param: function() {
                                     let productIds = self.form.products.map((product) => {
-                                        return product.id;
+                                        return product.productId;
                                     });
 
                                     return {
@@ -764,6 +838,7 @@
                                             start_at: self.form.startAt,
                                             end_at: self.form.endAt,
                                             product_ids: productIds,
+                                            exclude_cart_campaign_id: self.form.cartCampaignId,
                                         },
                                         dataFilter: function(response) {
                                             conflictCampaigns = "";
@@ -961,7 +1036,7 @@
                     this.currentThreshold = threshold;
                     this.giveawayModal.excludeProductIds = [];
                     threshold.giveaways.forEach(giveaway => {
-                        this.giveawayModal.excludeProductIds.push(giveaway.id);
+                        this.giveawayModal.excludeProductIds.push(giveaway.productId);
                     });
 
                     $('#giveaway-modal').modal('show');
@@ -982,7 +1057,7 @@
                     this.productModal.excludeProductIds = [];
 
                     this.form.products.forEach(product => {
-                        this.productModal.excludeProductIds.push(product.id);
+                        this.productModal.excludeProductIds.push(product.productId);
                     });
 
                     $('#product-modal').modal('show');
@@ -1085,7 +1160,7 @@
                         });
                     });
 
-                    $("#create-form").submit();
+                    $("#edit-form").submit();
                 },
                 // 設定門檻簡述
                 thresholdBrief(threshold) {
@@ -1172,7 +1247,7 @@
                 saveProductModalProducts(products) {
                     products.forEach(product => {
                         this.form.products.push({
-                            id: product.id,
+                            productId: product.id,
                             productNo: product.productNo,
                             productName: product.productName,
                             sellingPrice: product.sellingPrice,
@@ -1187,7 +1262,7 @@
                 saveGiveawayModalProducts(products) {
                     products.forEach(product => {
                         this.currentThreshold.giveaways.push({
-                            id: product.id,
+                            productId: product.id,
                             productNo: product.productNo,
                             productName: product.productName,
                             assignedQty: 1,
@@ -1195,7 +1270,6 @@
                             productType: product.productType,
                             supplier: product.supplier,
                             stockQty: product.stockQty,
-                            uom: product.uom,
                         });
                     });
                 },
@@ -1234,6 +1308,8 @@
                 deleteDesktopFile() {
                     this.bannerPhotoDesktop.showDeleteButton = false;
                     this.bannerPhotoDesktop.url = "";
+                    this.bannerPhotoDesktop.showInputFile = true;
+                    this.bannerPhotoDesktop.isDeleteFile = true;
                     this.$refs.bannerPhotoDesktop.value = "";
                 },
                 // 上傳Mobile圖片
@@ -1271,6 +1347,8 @@
                 deleteMobileFile() {
                     this.bannerPhotoMobile.showDeleteButton = false;
                     this.bannerPhotoMobile.url = "";
+                    this.bannerPhotoMobile.showInputFile = true;
+                    this.bannerPhotoMobile.isDeleteFile = true;
                     this.$refs.bannerPhotoMobile.value = "";
                 },
             },

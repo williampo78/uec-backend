@@ -488,7 +488,7 @@
                                                             <tr v-for="(product, index) in form.products"
                                                                 :key="index">
                                                                 <input type="hidden"
-                                                                    :name="`products[${index}][product_id]`" :value="product.id">
+                                                                    :name="`products[${index}][product_id]`" :value="product.productId">
                                                                 <td>@{{ index + 1 }}</td>
                                                                 <td>@{{ product.productNo }}</td>
                                                                 <td>@{{ product.productName }}</td>
@@ -515,13 +515,13 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為1200*150</p>
-                                                        <img v-if="bannerPhotoDesktop.url" :src="bannerPhotoDesktop.url" width="100%" height="150">
-                                                        <div v-if="bannerPhotoDesktop.showInputFile" class="form-group">
+                                                        <img v-show="bannerPhotoDesktop.url" :src="bannerPhotoDesktop.url" width="100%" height="150">
+                                                        <div v-show="bannerPhotoDesktop.showInputFile" class="form-group">
                                                             <input type="file" name="banner_photo_desktop" :data-image-width="bannerPhotoDesktop.width" :data-image-height="bannerPhotoDesktop.height" ref="bannerPhotoDesktop" @change="onDesktopFileChange">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button v-if="bannerPhotoDesktop.showDeleteButton" type="button" class="btn btn-danger"
+                                                        <button v-show="bannerPhotoDesktop.showDeleteButton" type="button" class="btn btn-danger"
                                                             @click="deleteDesktopFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                         </button>
@@ -534,13 +534,13 @@
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為345*180</p>
-                                                        <img v-if="bannerPhotoMobile.url" :src="bannerPhotoMobile.url" width="100%" height="180">
-                                                        <div v-if="bannerPhotoMobile.showInputFile" class="form-group">
+                                                        <img v-show="bannerPhotoMobile.url" :src="bannerPhotoMobile.url" width="100%" height="180">
+                                                        <div v-show="bannerPhotoMobile.showInputFile" class="form-group">
                                                             <input type="file" name="banner_photo_mobile" :data-image-width="bannerPhotoMobile.width" :data-image-height="bannerPhotoMobile.height" ref="bannerPhotoMobile" @change="onMobileFileChange">
                                                         </div>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button v-if="bannerPhotoMobile.showDeleteButton" type="button" class="btn btn-danger"
+                                                        <button v-show="bannerPhotoMobile.showDeleteButton" type="button" class="btn btn-danger"
                                                             @click="deleteMobileFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                         </button>
@@ -649,6 +649,7 @@
                     showInputFile: true,
                     showDeleteButton: false,
                 },
+                isNowGreaterThanOrEqualToStartAt: false,
             },
             created() {
                 let campaignTypes = @json($campaignTypes);
@@ -732,7 +733,7 @@
                             remote: {
                                 param: function() {
                                     let productIds = self.form.products.map((product) => {
-                                        return product.id;
+                                        return product.productId;
                                     });
 
                                     return {
@@ -942,7 +943,7 @@
                     this.currentThreshold = threshold;
                     this.giveawayModal.excludeProductIds = [];
                     threshold.giveaways.forEach(giveaway => {
-                        this.giveawayModal.excludeProductIds.push(giveaway.id);
+                        this.giveawayModal.excludeProductIds.push(giveaway.productId);
                     });
 
                     $('#giveaway-modal').modal('show');
@@ -963,7 +964,7 @@
                     this.productModal.excludeProductIds = [];
 
                     this.form.products.forEach(product => {
-                        this.productModal.excludeProductIds.push(product.id);
+                        this.productModal.excludeProductIds.push(product.productId);
                     });
 
                     $('#product-modal').modal('show');
@@ -1153,7 +1154,7 @@
                 saveProductModalProducts(products) {
                     products.forEach(product => {
                         this.form.products.push({
-                            id: product.id,
+                            productId: product.id,
                             productNo: product.productNo,
                             productName: product.productName,
                             sellingPrice: product.sellingPrice,
@@ -1168,7 +1169,7 @@
                 saveGiveawayModalProducts(products) {
                     products.forEach(product => {
                         this.currentThreshold.giveaways.push({
-                            id: product.id,
+                            productId: product.id,
                             productNo: product.productNo,
                             productName: product.productName,
                             assignedQty: 1,
@@ -1176,7 +1177,6 @@
                             productType: product.productType,
                             supplier: product.supplier,
                             stockQty: product.stockQty,
-                            uom: product.uom,
                         });
                     });
                 },
@@ -1215,6 +1215,7 @@
                 deleteDesktopFile() {
                     this.bannerPhotoDesktop.showDeleteButton = false;
                     this.bannerPhotoDesktop.url = "";
+                    this.bannerPhotoDesktop.showInputFile = true;
                     this.$refs.bannerPhotoDesktop.value = "";
                 },
                 // 上傳Mobile圖片
@@ -1252,6 +1253,7 @@
                 deleteMobileFile() {
                     this.bannerPhotoMobile.showDeleteButton = false;
                     this.bannerPhotoMobile.url = "";
+                    this.bannerPhotoMobile.showInputFile = true;
                     this.$refs.bannerPhotoMobile.value = "";
                 },
             },

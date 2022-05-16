@@ -149,20 +149,18 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function update(Request $request, $id)
     {
-        // $input_data = $request->except('_token', '_method');
-        // $input_data['promotional_campaign_id'] = $id;
+        $payload = $request->all();
 
-        // if (!$this->promotional_campaign_service->updatePromotionalCampaign($input_data)) {
-        //     return back()->withErrors(['message' => '儲存失敗']);
-        // }
+        if (!$this->promotionalCampaignService->updatePromotionalCampaignCart($id, $payload)) {
+            return back()->withErrors(['message' => '儲存失敗']);
+        }
 
-        // $route_name = 'promotional_campaign_cart';
-        // $act = 'upd';
+        $result = [
+            'route_name' => 'promotional_campaign_cart_v2',
+            'act' => 'upd',
+        ];
 
-        // return view(
-        //     'backend.success',
-        //     compact('route_name', 'act')
-        // );
+        return view('backend.success', $result);
     }
 
     /**
@@ -184,7 +182,7 @@ class PromotionalCampaignCartV2Controller extends Controller
      */
     public function canActive(Request $request): JsonResponse
     {
-        $result = $this->promotionalCampaignService->canPromotionalCampaignCartV2Active($request->campaign_type, $request->start_at, $request->end_at, $request->product_ids);
+        $result = $this->promotionalCampaignService->canPromotionalCampaignCartV2Active($request->campaign_type, $request->start_at, $request->end_at, $request->product_ids, $request->exclude_cart_campaign_id);
 
         if ($result['status']) {
             return response()->json([
