@@ -450,6 +450,19 @@ class OrderService
             }
 
         }
+        if(isset($cart['discount'])){
+            array_multisort($cart['discount'], SORT_ASC);
+        }
+        if(isset($cart['gift'])){
+            array_multisort($cart['gift'], SORT_ASC);
+            foreach($cart['gift'] as $key => $val){
+                array_multisort($cart['gift'][$key]['campaignProdList'],SORT_ASC);
+            }
+        }
+        foreach($order_details as $key => $val){
+            array_multisort($order_details[$key]['discount_content'], SORT_ASC);
+        }
+
         $orders['results']['order_details'] = $order_details;
         $orders['results']['thresholdDiscount'] = $cart['discount'] ?? []; //折扣
         $orders['results']['thresholdGiftAway'] = $cart['gift'] ?? []; //送禮,
