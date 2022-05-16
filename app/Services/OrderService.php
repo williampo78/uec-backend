@@ -371,6 +371,7 @@ class OrderService
         $order_details = $orders['results']['order_details'];
         $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']);
         $void_id = [];
+        $thresholdAmount = 0 ;
         foreach ($discount as $obj) {
             switch ($obj->level_code) {
                 case 'PRD':
@@ -446,6 +447,7 @@ class OrderService
                         $cart['discount'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                         $cart['discount'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = $obj->discount;
+                        $thresholdAmount += $obj->discount;
                     }
                     break;
             }
@@ -463,7 +465,7 @@ class OrderService
         foreach($order_details as $key => $val){
             array_multisort($order_details[$key]['discount_content'], SORT_ASC);
         }
-
+        $orders['results']['thresholdAmount'] = $thresholdAmount ;
         $orders['results']['order_details'] = $order_details;
         $orders['results']['thresholdDiscount'] = $cart['discount'] ?? []; //折扣
         $orders['results']['thresholdGiftAway'] = $cart['gift'] ?? []; //送禮,
