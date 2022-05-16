@@ -7,16 +7,18 @@ use App\Services\APIProductServices;
 use Illuminate\Http\Request;
 use App\Services\APIService;
 use Validator;
+use App\Services\ProductAttributeLovService;
 
 class ProductController extends Controller
 {
     //
     private $apiProductService;
 
-    public function __construct(APIProductServices $apiProductService, APIService $apiService)
+    public function __construct(APIProductServices $apiProductService, APIService $apiService, ProductAttributeLovService $apiProductAttributeLovService)
     {
         $this->apiProductService = $apiProductService;
         $this->apiService = $apiService;
+        $this->apiProductAttributeLovService = $apiProductAttributeLovService;
     }
 
     /*
@@ -282,6 +284,24 @@ class ProductController extends Controller
 
         return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
 
+    }
+
+    /*
+     * 取得進階搜尋篩選器 (產品搜尋結果頁用)
+     */
+    public function getFilter()
+    {
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductAttributeLovService->getProductFilter();
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
     }
 
 }
