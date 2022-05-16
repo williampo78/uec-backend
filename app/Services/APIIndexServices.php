@@ -40,8 +40,9 @@ class APIIndexServices
                 inner join `ad_slot_content_details` ad3 on ad3.`ad_slot_content_id`=ad2.`id`
                 left join `promotional_campaigns` event on event.`id`=ad3.`target_campaign_id`
                 where current_timestamp() between ad2.`start_at` and ad2.`end_at` and ad1.active = 1 and ad2.active = 1 ";
-        if ($params == 1) {
+        if ($params) {
             $strSQL .= " and ad1.`applicable_page` !='HOME'";
+            $strSQL .= " and ad1.`slot_code` = '".$params."'";
         } else {
             $strSQL .= " and ad1.`applicable_page` ='HOME'";
         }
