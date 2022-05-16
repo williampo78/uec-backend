@@ -354,7 +354,7 @@ class OrderService
     {
         return OrderCampaignDiscount::with([
         'promotionalCampaign',
-        'promotionalCampaign.promotionalCampaignThresholds',
+        'promotionalCampaignThresholds',
         'product',
         'product.productPhotos'=> function ($query) {
             $query->orderBy('sort', 'asc');
@@ -371,6 +371,7 @@ class OrderService
         $order_details = $orders['results']['order_details'];
         $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']);
         $void_id = [];
+        $thresholdAmount = 0 ;
         foreach ($discount as $obj) {
             switch ($obj->level_code) {
                 case 'PRD':
@@ -428,13 +429,13 @@ class OrderService
                         // $cart['gift'][$obj->group_seq]['campaignNvalue'] =$cart['gift'][$obj->group_seq]['campaignNvalue'] == 0 ? 1 :  $cart['gift'][$obj->group_seq]['campaignNvalue'] += 1  ;
                         // $cart['gift'][$obj->group_seq]['campaignXvalue'] = 0.00 ; //贈品不會有折扣金額
                         if(!isset($cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'])){
-                            $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'] = 0 ;
+                            $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['assignedQty'] = 0 ;
                         }
                         $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
                             'productPhoto'=> config('filesystems.disks.s3.url') .$obj->product->productPhotos[0]->photo_name,
                             'productId'=>$obj->product->id,
                             'productName'=>$obj->product->product_name,
-                            'count'=> $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'] += 1  ,
+                            'assignedQty'=> $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['assignedQty'] += 1  ,
                         ] ;//贈送的商品列表
                     }
                     //折扣
@@ -442,14 +443,29 @@ class OrderService
                         if(!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])){
                             $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0 ;
                         }
+                        $cart['discount'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaignThresholds ? $obj->promotionalCampaignThresholds->threshold_brief : '';
                         $cart['discount'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                         $cart['discount'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = $obj->discount;
+                        $thresholdAmount += $obj->discount;
                     }
                     break;
             }
 
         }
+        if(isset($cart['discount'])){
+            array_multisort($cart['discount'], SORT_ASC);
+        }
+        if(isset($cart['gift'])){
+            array_multisort($cart['gift'], SORT_ASC);
+            foreach($cart['gift'] as $key => $val){
+                array_multisort($cart['gift'][$key]['campaignProdList'],SORT_ASC);
+            }
+        }
+        foreach($order_details as $key => $val){
+            array_multisort($order_details[$key]['discount_content'], SORT_ASC);
+        }
+        $orders['results']['thresholdAmount'] = $thresholdAmount ;
         $orders['results']['order_details'] = $order_details;
         $orders['results']['thresholdDiscount'] = $cart['discount'] ?? []; //折扣
         $orders['results']['thresholdGiftAway'] = $cart['gift'] ?? []; //送禮,
