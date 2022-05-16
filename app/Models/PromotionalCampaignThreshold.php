@@ -12,9 +12,17 @@ class PromotionalCampaignThreshold extends Model
     protected $guarded = [];
 
     /**
-     * 活動門檻的贈品
+     * 建立與行銷活動的關聯
      */
-    public function campaignThresholdGift()
+    public function promotionalCampaign()
+    {
+        return $this->belongsTo(PromotionalCampaign::class, 'promotional_campaign_id');
+    }
+
+    /**
+     * 建立與行銷活動-贈品or加購品的關聯
+     */
+    public function promotionalCampaignGiveaways()
     {
         return $this->hasMany(PromotionalCampaignGiveaway::class, 'threshold_id');
     }

@@ -209,7 +209,7 @@ class APICartServices
                         foreach ($campaignThresholds as $threshold) {
                             $campaignThreshold_brief[] = $threshold->threshold_brief;
                             $campaignThreshold_item[] = $threshold;
-                            $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->campaignThresholdGift;
+                            $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
                             $campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
 
                         }
