@@ -104,4 +104,11 @@ class Product extends Model
     {
         return $this->hasMany(ProductItem::class, 'product_id');
     }
+
+    public function orderCampaignDiscount(){
+        return $this->hasMany(orderCampaignDiscount::class, 'product_id');
+    }
+    public function firstProductPhotos() {
+        return $this->hasMany(ProductPhoto::class, 'product_id');
+    }
 }
