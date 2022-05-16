@@ -92,6 +92,7 @@ class APICartServices
             $webData = [];
             if ($act == 'add') {
                 $webData['member_id'] = $member_id;
+                $webData['product_id'] =  $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
                 $webData['status_code'] = $input['status_code'];
                 $webData['qty'] = $input['item_qty'];
@@ -109,6 +110,7 @@ class APICartServices
                 }
                 $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
+                $webData['product_id'] =  $item[0]['product_id'];
                 $webData['qty'] = ($input['status_code'] == 0 ? $input['item_qty'] : 0);
                 $webData['status_code'] = $input['status_code'];
                 $webData['updated_by'] = $member_id;
@@ -1021,11 +1023,15 @@ class APICartServices
         $webDataAdd = [];
         $webDataUpd = [];
         foreach ($input['item_id'] as $key => $value) {
+
+            //確認是否有該品項
+            $product_item = ProductItem::where('id', $value)->get()->toArray();
             //確認是否有該品項
             $item = ShoppingCartDetail::where('member_id', '=', $member_id)->where('product_item_id', '=', $value)->first();
             if ($item) {
                 $webDataUpd[$key] = [
                     "id" => $item->id,
+                    "product_id" => $product_item[0]['product_id'],
                     "product_item_id" => $input['item_id'][$key],
                     "qty" => ($input['item_qty'][$key] + $item->qty),
                     "status_code" => $input['status_code'],
@@ -1040,6 +1046,7 @@ class APICartServices
             } else {
                 $webDataAdd[$key] = [
                     $member_id,
+                    $product_item[0]['product_id'],
                     $value,
                     $input['item_qty'][$key],
                     $input['status_code'],
@@ -1057,7 +1064,7 @@ class APICartServices
 
         }
         $addColumn = [
-            "member_id", "product_item_id", "qty", "status_code",
+            "member_id", "product_id", "product_item_id", "qty", "status_code",
             "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_time",
             "created_by", "updated_by", "created_at", "updated_at",
         ];
@@ -1117,6 +1124,7 @@ class APICartServices
             $webData = [];
             if ($act == 'add') {
                 $webData['member_id'] = $member_id;
+                $webData['product_id'] =  $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
                 $webData['status_code'] = $input['status_code'];
                 $webData['qty'] = $input['item_qty'];
@@ -1134,6 +1142,7 @@ class APICartServices
                 }
                 $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
+                $webData['product_id'] =  $item[0]['product_id'];
                 $webData['qty'] = $qty;
                 $webData['status_code'] = $input['status_code'];
                 $webData['utm_source'] = $input['utm_source'];
