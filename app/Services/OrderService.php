@@ -443,6 +443,7 @@ class OrderService
                             $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0 ;
                         }
                         $cart['discount'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
+                        $cart['discount'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = $obj->discount;
                     }
                     break;
