@@ -3831,19 +3831,15 @@ __webpack_require__.r(__webpack_exports__);
       allowClear: this.allowClear
     }).val(this.value).trigger("change").on("change", function () {
       vm.$emit("input", this.value);
-<<<<<<< HEAD
       vm.$emit("select2-change", this.value);
     }).on("select2:selecting", function (event) {
       vm.$emit("select2-selecting", event);
-=======
->>>>>>> develop
     });
   },
   watch: {
     value: function value(_value) {
       $(this.$el).val(_value).trigger("change");
     },
-<<<<<<< HEAD
     options: {
       handler: function handler(options) {
         $(this.$el).empty().select2({
@@ -3852,13 +3848,6 @@ __webpack_require__.r(__webpack_exports__);
         }).val(this.value).trigger("change");
       },
       deep: true
-=======
-    options: function options(_options) {
-      $(this.$el).empty().select2({
-        data: _options,
-        allowClear: this.allowClear
-      });
->>>>>>> develop
     }
   },
   destroyed: function destroyed() {
@@ -3938,14 +3927,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_14__);
 /* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! Croppie */ "./node_modules/Croppie/croppie.js");
 /* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(Croppie__WEBPACK_IMPORTED_MODULE_15__);
-<<<<<<< HEAD
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_16__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
 
-=======
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
->>>>>>> develop
 
 
 
@@ -4069,11 +4054,7 @@ window.Croppie = (Croppie__WEBPACK_IMPORTED_MODULE_15___default());
  * vue
  */
 
-<<<<<<< HEAD
 window.Vue = vue__WEBPACK_IMPORTED_MODULE_17__["default"];
-=======
-window.Vue = vue__WEBPACK_IMPORTED_MODULE_16__["default"];
->>>>>>> develop
 
 /***/ }),
 
