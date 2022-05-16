@@ -33,13 +33,16 @@ class APIIndexServices
 
         $strSQL = "select ad1.`slot_code`, ad1.`slot_desc`, ad1.`slot_type`, ad1.`is_mobile_applicable`, ad1.`is_desktop_applicable`
                 , ad2.`slot_color_code`, ad2.`slot_icon_name`, ad2.`slot_title`, ad2.`product_assigned_type`
-                , ad3.*
+                , ad2.`slot_title_color`, ad2.`see_more_action`, ad2.`see_more_url`, ad2.`see_more_cate_hierarchy_id`, ad2.`see_more_target_blank`
+                , ad3.*, event.`url_code`
                 from `ad_slots` ad1
                 inner join `ad_slot_contents` ad2 on ad2.`slot_id`=ad1.`id`
                 inner join `ad_slot_content_details` ad3 on ad3.`ad_slot_content_id`=ad2.`id`
+                left join `promotional_campaigns` event on event.`id`=ad3.`target_campaign_id`
                 where current_timestamp() between ad2.`start_at` and ad2.`end_at` and ad1.active = 1 and ad2.active = 1 ";
-        if ($params == 1) {
+        if ($params) {
             $strSQL .= " and ad1.`applicable_page` !='HOME'";
+            $strSQL .= " and ad1.`slot_code` = '".$params."'";
         } else {
             $strSQL .= " and ad1.`applicable_page` ='HOME'";
         }
@@ -53,14 +56,17 @@ class APIIndexServices
         $product_info = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
         foreach ($promotion as $k => $v) {
-            $promotion_txt = '';
             foreach ($v as $label) {
-                if ($promotion_txt != $label->promotional_label) {
-                    $promotional[$k][] = $label->promotional_label;
-                    $promotion_txt = $label->promotional_label;
-                }
+                $promotional_array[$k][$label->promotional_label] = $label->promotional_label;
             }
         }
+
+        foreach ($promotional_array as $product_id => $label) {
+            foreach ($label as $k=>$v){
+                $promotional[$product_id][] = $v;
+            }
+        }
+
         $login = Auth::guard('api')->check();
         $is_collection = [];
         if ($login) {
@@ -78,6 +84,7 @@ class APIIndexServices
                     'url' => $ad_slot->target_url,
                     'target_blank' => $ad_slot->is_target_blank,
                     'target_campaign' => $ad_slot->target_campaign_id,
+                    'campaign_url_code' => $ad_slot->url_code,
                     'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                     'img_action' => $ad_slot->image_action,
                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
@@ -86,6 +93,7 @@ class APIIndexServices
             } elseif ($ad_slot->slot_type == 'I') {
                 $data[$ad_slot->slot_code][] = array(
                     'slot_color_code' => $ad_slot->slot_color_code,
+                    'slot_title_color' => $ad_slot->slot_title_color,
                     'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
                     'slot_title' => $ad_slot->slot_title,
                     'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
@@ -96,7 +104,12 @@ class APIIndexServices
                     'url' => $ad_slot->target_url,
                     'target_blank' => $ad_slot->is_target_blank,
                     'target_campaign' => $ad_slot->target_campaign_id,
+                    'campaign_url_code' => $ad_slot->url_code,
                     'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
+                    'see_more_action'=> $ad_slot->see_more_action,
+                    'see_more_url'=> $ad_slot->see_more_url,
+                    'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
+                    'see_more_target_blank'=> $ad_slot->see_more_target_blank,
                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
@@ -141,8 +154,13 @@ class APIIndexServices
 
                         $data[$ad_slot->slot_code] = array(
                             'slot_color_code' => $ad_slot->slot_color_code,
+                            'slot_title_color' => $ad_slot->slot_title_color,
                             'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
                             'slot_title' => $ad_slot->slot_title,
+                            'see_more_action'=> $ad_slot->see_more_action,
+                            'see_more_url'=> $ad_slot->see_more_url,
+                            'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
+                            'see_more_target_blank'=> $ad_slot->see_more_target_blank,
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'products' => $product_info_return[$ad_slot->slot_code]
@@ -180,8 +198,13 @@ class APIIndexServices
                         if (isset($product_info[$ad_slot->slot_code])) {
                             $data[$ad_slot->slot_code] = array(
                                 'slot_color_code' => $ad_slot->slot_color_code,
+                                'slot_title_color' => $ad_slot->slot_title_color,
                                 'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
                                 'slot_title' => $ad_slot->slot_title,
+                                'see_more_action'=> $ad_slot->see_more_action,
+                                'see_more_url'=> $ad_slot->see_more_url,
+                                'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
+                                'see_more_target_blank'=> $ad_slot->see_more_target_blank,
                                 'mobile_applicable' => $ad_slot->is_mobile_applicable,
                                 'desktop_applicable' => $ad_slot->is_desktop_applicable,
                                 'products' => $product_info[$ad_slot->slot_code]
@@ -255,6 +278,7 @@ class APIIndexServices
                                 'url' => $ad_slot->target_url,
                                 'target_blank' => $ad_slot->is_target_blank,
                                 'target_campaign' => $ad_slot->target_campaign_id,
+                                'campaign_url_code' => $ad_slot->url_code,
                                 'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                                 'mobile_applicable' => $ad_slot->is_mobile_applicable,
                                 'desktop_applicable' => $ad_slot->is_desktop_applicable
@@ -272,6 +296,7 @@ class APIIndexServices
                                 'url' => $ad_slot->target_url,
                                 'target_blank' => $ad_slot->is_target_blank,
                                 'target_campaign' => $ad_slot->target_campaign_id,
+                                'campaign_url_code' => $ad_slot->url_code,
                                 'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
                                 'mobile_applicable' => $ad_slot->is_mobile_applicable,
                                 'desktop_applicable' => $ad_slot->is_desktop_applicable
@@ -286,6 +311,10 @@ class APIIndexServices
             unset($data['H080A']);
         } else {
             $data['H080A'] = array(
+                'see_more_action'=> $ad_slot->see_more_action,
+                'see_more_url'=> $ad_slot->see_more_url,
+                'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
+                'see_more_target_blank'=> $ad_slot->see_more_target_blank,
                 'images' => $img_H080A,
                 'products' => $prd_H080A
             );
@@ -294,6 +323,10 @@ class APIIndexServices
             unset($data['H080B']);
         } else {
             $data['H080B'] = array(
+                'see_more_action'=> $ad_slot->see_more_action,
+                'see_more_url'=> $ad_slot->see_more_url,
+                'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
+                'see_more_target_blank'=> $ad_slot->see_more_target_blank,
                 'images' => $img_H080B,
                 'products' => $prd_H080B
             );

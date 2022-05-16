@@ -210,6 +210,10 @@
                     target_groups: {
                         required: true,
                     },
+                    campaign_brief: {
+                        required: true,
+                        maxlength: 20,
+                    },
                 },
                 messages: {
                     end_at: {
@@ -285,6 +289,8 @@
 
 
             $('#campaign_name').val(promotional_campaign.campaign_name);
+
+            $('#campaign_brief').val(promotional_campaign.campaign_brief);
 
             if (promotional_campaign.active == 1) {
                 $('#active_enabled').prop('checked', true);

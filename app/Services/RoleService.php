@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -63,10 +64,37 @@ class RoleService
                 $role_data[$role->code] = $role;
             }
         }
-
         session(['roles' => $role_data]);
     }
+    /**
+     * setUrlSsoSwitchBtn function
+     * 取得切換平台開關的權限
+     * @return session
+     */
+    public function setUrlSsoSwitchBtn()
+    {
+        $user_id = Auth::user()->id;
+        $UserRole = UserRole::select('roles.is_for_supplier')
+        ->where('user_id' ,$user_id)
+        ->leftJoin('roles','roles.id', '=', 'user_roles.role_id')
+        ->get();
+        $inSupplierUse = 0;
+        $inDradviceUse = 0;
+        foreach($UserRole as $obj){
+            //使用供應商的權限
+            if ($obj->is_for_supplier == 1 || $obj->is_for_supplier == 2) {
+                $inSupplierUse = 1;
 
+            }
+            //使用健康力的權限
+            if ($obj->is_for_supplier == 0) {
+                $inDradviceUse = 1;
+            }
+        }
+        session([
+            'inSupplierUse' => $inSupplierUse,
+            'inDradviceUse' => $inDradviceUse]);
+    }
     public function getDisplayRoles()
     {
         $code = explode('.', Route::currentRouteName())[0];
@@ -74,7 +102,7 @@ class RoleService
         $auth = 0;
         $act = explode('@', Route::currentRouteAction());
 
-        if (isset($roles[$code]) && ($code != 'admin' && $code != '' && $code != 'signOut')) {
+        if (isset($roles[$code]) && ($code != '' && $code != 'logout')) {
             switch ($act[1]) {
                 case 'show':
                     $auth = $roles[$code]->auth_query;
@@ -101,8 +129,9 @@ class RoleService
                     $auth = 1;
                     break;
             }
-            //在admin及登出頁面必須回傳1 , 否則會一直無限導向
-        } elseif (in_array($code, ['admin', '', 'signOut', 'backend-home', 'user_profile']) || Str::is('generated*', $code)) {
+        }
+        //在admin及登出頁面必須回傳1 , 否則會一直無限導向
+        elseif (in_array($code, ['', 'logout', 'backend_home', 'user_profile']) || Str::is('generated*', $code)) {
             $auth = 1;
         }
 
@@ -116,7 +145,6 @@ class RoleService
     {
         $code = explode('.', Route::currentRouteName())[0];
         $roles = session('roles');
-
         //預設0 , DB未建置資料皆判斷為無權限
         $data = [
             'auth_query' => 0,

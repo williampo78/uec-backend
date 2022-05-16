@@ -21,10 +21,10 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">活動名稱</label>
+                                        <div class="col-sm-4">
+                                            <label class="control-label">活動名稱/文案</label>
                                         </div>
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-8">
                                             <input type="text" class="form-control" name="campaign_name" id="campaign_name"
                                                 value="{{ request()->input('campaign_name') }}" placeholder="模糊查詢" />
                                         </div>
@@ -163,6 +163,7 @@
                                         <th class="text-nowrap">功能</th>
                                         <th class="text-nowrap">項次</th>
                                         <th class="text-nowrap">活動名稱</th>
+                                        <th class="text-nowrap">前台文案</th>
                                         <th class="text-nowrap">活動類型</th>
                                         <th class="text-nowrap">狀態</th>
                                         <th class="text-nowrap">上架時間起</th>
@@ -195,6 +196,7 @@
                                                 </td>
                                                 <td>{{ $count++ }}</td>
                                                 <td>{{ $obj->campaign_name ?? '' }}</td>
+                                                <td>{{ $obj->campaign_brief ?? '' }}</td>
                                                 <td>{{ $obj->description ?? '' }}</td>
                                                 <td>
                                                     @isset(config('uec.active2_options')[$obj->active])
@@ -282,6 +284,8 @@
 
                         $('#modal-start-at').empty().append(`${promotional_campaign.start_at}`);
                         $('#modal-end-at').empty().append(`${promotional_campaign.end_at}`);
+                        $('#modal-campaign-brief').empty().append(`${promotional_campaign.campaign_brief}`);
+
                         $('#modal-target-groups').empty().append(`所有會員`);
 
                         // 活動類型

@@ -471,6 +471,7 @@
                                         <td>${order_detail.qty}</td>
                                         <td>${order_detail.campaign_discount}</td>
                                         <td>${order_detail.subtotal}</td>
+                                        <td>${order_detail.cart_p_discount}</td>
                                         <td>${order_detail.point_discount}</td>
                                         <td>${record_identity}</td>
                                         <td>${package_no}</td>

@@ -7,16 +7,18 @@ use App\Services\APIProductServices;
 use Illuminate\Http\Request;
 use App\Services\APIService;
 use Validator;
+use App\Services\ProductAttributeLovService;
 
 class ProductController extends Controller
 {
     //
     private $apiProductService;
 
-    public function __construct(APIProductServices $apiProductService, APIService $apiService)
+    public function __construct(APIProductServices $apiProductService, APIService $apiService, ProductAttributeLovService $apiProductAttributeLovService)
     {
         $this->apiProductService = $apiProductService;
         $this->apiService = $apiService;
+        $this->apiProductAttributeLovService = $apiProductAttributeLovService;
     }
 
     /*
@@ -149,12 +151,12 @@ class ProductController extends Controller
             $err = '901';
             $list = [];
             return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "商品不存在", 'result' => $list]);
-        } else if ($result == '901'){
+        } else if ($result == '901') {
             $status = false;
             $err = '901';
             $list = [];
             return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品沒有前台分類", 'result' => $list]);
-        } else if ($result == '902'){
+        } else if ($result == '902') {
             $status = false;
             $err = '901';
             $list = [];
@@ -162,7 +164,7 @@ class ProductController extends Controller
         } else {
             $status = true;
             $err = '';
-            $list = json_decode($result,true);
+            $list = json_decode($result, true);
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
     }
@@ -221,6 +223,85 @@ class ProductController extends Controller
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
 
+    }
+
+    /*
+     * 取得活動賣場頁
+     * @param int $id
+     */
+    public function getEvent(Request $request)
+    {
+
+        $error_code = $this->apiService->getErrorCode();
+        $messages = [
+            'event.numeric' => '活動代碼必須是數字',
+            'event.required' => '活動代碼不能為空',
+            "size.numeric"=>'每頁筆數必須是數字',
+            "size.required"=>'每頁筆數不能為空',
+            "page.numeric"=>'當前頁數必須是數字',
+            "page.required"=>'當前頁數不能為空',
+        ];
+
+        $v = Validator::make($request->all(), [
+            'event' => 'numeric|required',
+            'size' => 'numeric|required',
+            'page' => 'numeric|required',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+
+        $result = $this->apiProductService->getEventStore($request);
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => $status, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
+
+    }
+
+
+    /*
+     * 取得滿額活動折扣內容
+     * @param int $id
+     */
+    public function getCampaignDiscount($id)
+    {
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductService->getCampaignDiscountByID($id);
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
+
+    }
+
+    /*
+     * 取得進階搜尋篩選器 (產品搜尋結果頁用)
+     */
+    public function getFilter()
+    {
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductAttributeLovService->getProductFilter();
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
     }
 
 }

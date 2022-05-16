@@ -3831,15 +3831,19 @@ __webpack_require__.r(__webpack_exports__);
       allowClear: this.allowClear
     }).val(this.value).trigger("change").on("change", function () {
       vm.$emit("input", this.value);
+<<<<<<< HEAD
       vm.$emit("select2-change", this.value);
     }).on("select2:selecting", function (event) {
       vm.$emit("select2-selecting", event);
+=======
+>>>>>>> develop
     });
   },
   watch: {
     value: function value(_value) {
       $(this.$el).val(_value).trigger("change");
     },
+<<<<<<< HEAD
     options: {
       handler: function handler(options) {
         $(this.$el).empty().select2({
@@ -3848,6 +3852,13 @@ __webpack_require__.r(__webpack_exports__);
         }).val(this.value).trigger("change");
       },
       deep: true
+=======
+    options: function options(_options) {
+      $(this.$el).empty().select2({
+        data: _options,
+        allowClear: this.allowClear
+      });
+>>>>>>> develop
     }
   },
   destroyed: function destroyed() {
@@ -3927,10 +3938,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_14__);
 /* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! Croppie */ "./node_modules/Croppie/croppie.js");
 /* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(Croppie__WEBPACK_IMPORTED_MODULE_15__);
+<<<<<<< HEAD
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_16__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
 
+=======
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+>>>>>>> develop
 
 
 
@@ -4054,7 +4069,11 @@ window.Croppie = (Croppie__WEBPACK_IMPORTED_MODULE_15___default());
  * vue
  */
 
+<<<<<<< HEAD
 window.Vue = vue__WEBPACK_IMPORTED_MODULE_17__["default"];
+=======
+window.Vue = vue__WEBPACK_IMPORTED_MODULE_16__["default"];
+>>>>>>> develop
 
 /***/ }),
 
@@ -4204,19 +4223,17 @@ jQuery.validator.addMethod("notRepeating", function (value, element, params) {
   return matches.length == 0;
 }, function (params, element) {
   return "\u5DF2\u8DDF\u5176\u4ED6\u8F38\u5165\u7684\u6B04\u4F4D\u91CD\u8907";
-});
-jQuery.validator.addMethod("isTWCompanyNumber", function (value, element, obj) {
-  var regexp = /^[0-9]{8}$/;
-  return regexp.test(obj.number);
-}, function (params, element) {
-  return "\u7D71\u4E00\u7DE8\u865F\u5FC5\u9808\u70BA8\u78BC\u3001\u53EA\u80FD\u8F38\u5165\u6578\u5B57";
-});
-jQuery.validator.addMethod("isEnglishNumber", function (value, element, obj) {
-  var regexp = /^[A-Za-z0-9]+$/;
-  return regexp.test(obj.number);
-}, function (params, element) {
-  return "\u53EA\u80FD\u8F38\u5165\u82F1\u6587\u4EE5\u53CA\u6578\u5B57";
-});
+}); // 驗證統一編號格式
+
+jQuery.validator.addMethod("isGUINumber", function (value, element, params) {
+  var regex = /^[0-9]{8}$/;
+  return regex.test(value);
+}, "統一編號必須為8個數字"); // 驗證英文、數字格式
+
+jQuery.validator.addMethod("isAlphaNumeric", function (value, element, params) {
+  var regex = /^[A-Za-z0-9]+$/;
+  return regex.test(value);
+}, "只能輸入英文及數字");
 jQuery.validator.addMethod("notChinese", function (value, element, obj) {
   var regexp = /.*[\u4e00-\u9fa5]+.*$/;
 

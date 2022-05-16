@@ -56,8 +56,8 @@ class PromotionalCampaignService
             'promotional_campaigns.category_code',
             'promotional_campaigns.promotional_label',
             'promotional_campaigns.remark',
-
             'lookup_values_v.description',
+            DB::raw('ifnull(promotional_campaigns.campaign_brief,"") as campaign_brief')
         )
             ->leftJoin('lookup_values_v', 'promotional_campaigns.campaign_type', '=', 'lookup_values_v.code')
             ->where('promotional_campaigns.agent_id', $agent_id)
@@ -74,8 +74,16 @@ class PromotionalCampaignService
         }
 
         // 活動名稱查詢
+        /*
         if (!empty($query_data['campaign_name'])) {
             $promotional_campaigns = $promotional_campaigns->where('promotional_campaigns.campaign_name', 'like', '%' . $query_data['campaign_name'] . '%');
+        }
+        */
+        if (!empty($query_data['campaign_name'])) {
+            $promotional_campaigns = $promotional_campaigns->where(function ($query) use ($query_data) {
+                $query->where('promotional_campaigns.campaign_name', 'LIKE', '%' . $query_data['campaign_name'] . '%')
+                    ->orWhere('promotional_campaigns.campaign_brief', 'LIKE', '%' . $query_data['campaign_name'] . '%');
+            });
         }
 
         // 狀態查詢
@@ -227,6 +235,7 @@ class PromotionalCampaignService
             $create_data['agent_id'] = $agent_id;
             $create_data['campaign_type'] = $input_data['campaign_type'] ?? null;
             $create_data['campaign_name'] = $input_data['campaign_name'] ?? '';
+            $create_data['campaign_brief'] = $input_data['campaign_brief'] ?? null;
             $create_data['active'] = $input_data['active'] ?? 1;
             $create_data['n_value'] = $input_data['n_value'] ?? null;
             $create_data['target_groups'] = null;
@@ -380,6 +389,11 @@ class PromotionalCampaignService
             // 上架結束時間
             if (!empty($input_data['end_at'])) {
                 $update_data['end_at'] = Carbon::parse($input_data['end_at'])->format('Y-m-d H:i:s');
+            }
+
+            // 前台文案
+            if (isset($input_data['campaign_brief'])) {
+                $update_data['campaign_brief'] = $input_data['campaign_brief'];
             }
 
             PromotionalCampaign::findOrFail($promotional_campaign->id)->update($update_data);

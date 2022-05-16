@@ -112,6 +112,20 @@
             </div>
         </div>
     </div>
+    <br/>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <div class="col-sm-2">
+                    <label for="campaign_brief" class="control-label">前台文案 <span style="color: red;">*</span></label>
+                </div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="campaign_brief" name="campaign_brief" value="" />
+                </div>
+            </div>
+        </div>
+    </div>
 
     <hr style="border-top: 1px solid gray;" />
 </div>

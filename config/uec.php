@@ -6,7 +6,7 @@ return [
      *   指定為2時，中分類清單不顯示﹝展小類﹞的按鈕
      *   指定為3時，中分類清單顯示﹝展小類﹞的按鈕
      */
-    'web_category_hierarchy_levels' => '2',
+    'web_category_hierarchy_levels' => env('UEC_CATEGORY_LEVEL','2'),
 
     'config_key' => 'EC_WAREHOUSE_GOODS',
 
@@ -16,9 +16,9 @@ return [
      */
     'isTesting' => env('UEC_TEST', 'true'),
     'mailPrefix' => env('MAIL_PREFIX', '[ 電商測試 ]'),
-    'mailFrom'=>env('MAIL_FROM_ADDRESS'),
+    'mailFrom' => env('MAIL_FROM_ADDRESS'),
     'mailTo' => env('MAIL_TO_ADDRESS') ? array_filter(explode(',', env('MAIL_TO_ADDRESS'))) : [],
-
+    'swithBackendUrl' => env('SWITCH_BACKEND_URL'),
     // 版位類型
     'ad_slot_type_option' => [
         'I' => '圖檔',
@@ -171,6 +171,7 @@ return [
     'campaign_level_code_options' => [
         'PRD' => '單品',
         'CART' => '滿額',
+        'CART_P' => '購物車滿額',
     ],
 
     // 物流公司
@@ -208,5 +209,13 @@ return [
         'ORDER_CANCELLED' => '訂單取消',
         'RETURNED' => '銷退',
         'ORDER_VOIDED' => '訂單作廢',
-    ]
+    ],
+
+    // 供應商合約狀態
+    'supplier_contract_status_code_options' => [
+        'CREATED' => '未啟動',
+        'PROCESSING' => '用印中',
+        'APPROVED' => '已合作',
+        'EXPIRED' => '已過期',
+    ],
 ];

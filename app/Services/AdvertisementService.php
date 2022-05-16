@@ -250,6 +250,12 @@ class AdvertisementService
             'ad_slot_contents.id AS slot_content_id',
             'ad_slot_contents.active AS slot_content_active',
             'ad_slot_contents.agent_id AS slot_content_agent_id',
+            'ad_slot_contents.remark AS contents_remark',
+            'ad_slot_contents.see_more_url',
+            'ad_slot_contents.see_more_action',
+            'ad_slot_contents.see_more_cate_hierarchy_id',
+            'ad_slot_contents.see_more_target_blank',
+            'ad_slot_contents.slot_title_color',
             'lookup_values_v.description',
         )
             ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
@@ -260,7 +266,9 @@ class AdvertisementService
             ->where('lookup_values_v.type_code', 'APPLICABLE_PAGE')
             ->find($id);
 
-        $result['details'] = AdSlotContentDetail::where('ad_slot_content_id', $id)
+        $result['details'] = AdSlotContentDetail::select('ad_slot_content_details.*',DB::raw('promotional_campaigns.campaign_name as campaign_name'))
+            ->where('ad_slot_content_id', $id)
+            ->leftJoin('promotional_campaigns', 'ad_slot_content_details.target_campaign_id', '=', 'promotional_campaigns.id')
             ->orderBy('sort', 'ASC')
             ->get();
 
@@ -279,7 +287,6 @@ class AdvertisementService
         $user_id = Auth::user()->id;
         $now = Carbon::now();
         $slot = $this->getSlotById($input_data['slot_id']);
-
         DB::beginTransaction();
 
         try {
@@ -291,7 +298,11 @@ class AdvertisementService
             $content_data['updated_by'] = $user_id;
             $content_data['created_at'] = $now;
             $content_data['updated_at'] = $now;
-
+            $content_data['remark'] = $input_data['remark'];
+            $content_data['see_more_action'] = $input_data['see_more_action'] ?? null;
+            $content_data['see_more_url'] = $input_data['see_more_url'] ?? null;
+            $content_data['see_more_target_blank'] = $input_data['see_more_target_blank'] ?? null;
+            $content_data['see_more_cate_hierarchy_id'] = $input_data['see_more_cate_hierarchy_id'] ?? null;
             if (!empty($input_data['start_at'])) {
                 $content_data['start_at'] = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
             }
@@ -304,6 +315,7 @@ class AdvertisementService
             if ($slot['is_user_defined'] == 1) {
                 $content_data['slot_color_code'] = $input_data['slot_color_code'] ?? null;
                 $content_data['slot_title'] = $input_data['slot_title'] ?? null;
+                $content_data['slot_title_color'] = $input_data['slot_title_color'] ?? null;
             }
             // 使用者自定義版位，新增主色
             elseif ($slot['is_user_defined'] == 2) {
@@ -327,7 +339,6 @@ class AdvertisementService
 
                 AdSlotContent::findOrFail($slot_contents_id)->update($update_content_data);
             }
-
             // 新增圖檔資料 (圖檔 or 圖檔+商品)
             if ($slot['slot_type'] == 'I' || $slot['slot_type'] == 'IS') {
                 if (isset($input_data['image_block_id'])) {
@@ -341,6 +352,7 @@ class AdvertisementService
                         $detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key] ?? null;
                         $detail_data['image_action'] = $input_data['image_block_image_action'][$key] ?? null;
                         $detail_data['target_url'] = $input_data['image_block_target_url'][$key] ?? null;
+                        $detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key] ?? null;
                         $detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $detail_data['created_by'] = $user_id;
@@ -371,6 +383,7 @@ class AdvertisementService
                         $detail_data['sort'] = $input_data['text_block_sort'][$key] ?? null;
                         $detail_data['texts'] = $input_data['text_block_texts'][$key] ?? null;
                         $detail_data['image_action'] = $input_data['text_block_image_action'][$key] ?? null;
+                        $detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $detail_data['target_url'] = $input_data['text_block_target_url'][$key] ?? null;
                         $detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key] ?? null;
                         $detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
@@ -463,10 +476,17 @@ class AdvertisementService
             if (isset($input_data['slot_title'])) {
                 $update_content_data['slot_title'] = $input_data['slot_title'];
             }
-
+            if (isset($input_data['slot_title_color'])) {
+                $update_content_data['slot_title_color'] = $input_data['slot_title_color'];
+            }
             if (isset($input_data['product_assigned_type'])) {
                 $update_content_data['product_assigned_type'] = $input_data['product_assigned_type'];
             }
+            $update_content_data['remark'] = $input_data['remark'];
+            $update_content_data['see_more_action'] = $input_data['see_more_action'] ?? null;
+            $update_content_data['see_more_url'] = $input_data['see_more_url'] ?? null;
+            $update_content_data['see_more_target_blank'] = $input_data['see_more_target_blank'] ?? null;
+            $update_content_data['see_more_cate_hierarchy_id'] = $input_data['see_more_cate_hierarchy_id'] ?? null;
 
             $update_content_data['updated_by'] = $user_id;
             $update_content_data['updated_at'] = $now;
@@ -490,7 +510,6 @@ class AdvertisementService
                 // 上傳新圖片
                 $update_content_data['slot_icon_name'] = $input_data['slot_icon_name']->storePublicly(self::SLOT_CONTENTS_UPLOAD_PATH_PREFIX . $slot_content['content']->slot_content_id, 's3');
             }
-
             AdSlotContent::findOrFail($slot_content['content']->slot_content_id)->update($update_content_data);
 
             $details_image_name = $slot_content['details']->pluck('image_name', 'id')->all();
@@ -536,6 +555,7 @@ class AdvertisementService
                         $create_detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key] ?? null;
                         $create_detail_data['image_action'] = $input_data['image_block_image_action'][$key] ?? null;
                         $create_detail_data['target_url'] = $input_data['image_block_target_url'][$key] ?? null;
+                        $create_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $create_detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key] ?? null;
                         $create_detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $create_detail_data['created_by'] = $user_id;
@@ -562,6 +582,7 @@ class AdvertisementService
                         $update_detail_data['image_abstract'] = $input_data['image_block_image_abstract'][$key];
                         $update_detail_data['image_action'] = $input_data['image_block_image_action'][$key];
                         $update_detail_data['target_url'] = $input_data['image_block_target_url'][$key];
+                        $update_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $update_detail_data['target_cate_hierarchy_id'] = $input_data['image_block_target_cate_hierarchy_id'][$key];
                         $update_detail_data['is_target_blank'] = (isset($input_data['image_block_is_target_blank'][$key]) && $input_data['image_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $update_detail_data['updated_by'] = $user_id;
@@ -618,6 +639,7 @@ class AdvertisementService
                         $create_detail_data['texts'] = $input_data['text_block_texts'][$key] ?? null;
                         $create_detail_data['image_action'] = $input_data['text_block_image_action'][$key] ?? null;
                         $create_detail_data['target_url'] = $input_data['text_block_target_url'][$key] ?? null;
+                        $create_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $create_detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key] ?? null;
                         $create_detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $create_detail_data['created_by'] = $user_id;
@@ -635,6 +657,7 @@ class AdvertisementService
                         $update_detail_data['image_action'] = $input_data['text_block_image_action'][$key];
                         $update_detail_data['target_url'] = $input_data['text_block_target_url'][$key];
                         $update_detail_data['target_cate_hierarchy_id'] = $input_data['text_block_target_cate_hierarchy_id'][$key];
+                        $update_detail_data['target_campaign_id'] = $input_data['target_campaign_id'][$key] ?? null ;
                         $update_detail_data['is_target_blank'] = (isset($input_data['text_block_is_target_blank'][$key]) && $input_data['text_block_is_target_blank'][$key] == 'enabled') ? 1 : 0;
                         $update_detail_data['updated_by'] = $user_id;
                         $update_detail_data['updated_at'] = $now;
@@ -847,6 +870,27 @@ class AdvertisementService
             return null;
         }
 
+    }
+    public function searchPromotionCampaign($in){
+        $now = Carbon::now();
+        $promotionalCampaigns = DB::table('promotional_campaigns');
+        if (!empty($in['level_code'])) {
+            $promotionalCampaigns->where('level_code', $in['level_code']);
+        }
+        if (!empty($in['promotional_campaigns_time_type'])) {
+            if ($in['promotional_campaigns_time_type'] == 'all') {
+            }
+            if ($in['promotional_campaigns_time_type'] == 'not_expired') {
+                $promotionalCampaigns->where('start_at', '<=', $now)->where('end_at', '>=', $now);
+            }
+        }
+        if (!empty($in['promotional_campaigns_key_word'])) {
+            $promotionalCampaigns->whereLike('campaign_name', $in['promotional_campaigns_key_word'])->orWhereLike('campaign_brief', $in['promotional_campaigns_key_word']);
+        }
+        if (!empty($in['id'])) {
+            $promotionalCampaigns->where('id', $in['id']);
+        };
+        return $promotionalCampaigns->get();
     }
 
 }

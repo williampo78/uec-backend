@@ -1,50 +1,48 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\QAController;
-use App\Http\Controllers\ItemController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\TestController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PhotosController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\ShipmentController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\LoginAuthController;
-use App\Http\Controllers\QuotationController;
-use App\Http\Controllers\WarehouseController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\OrderRefundController;
-use App\Http\Controllers\WebContentsController;
-use App\Http\Controllers\ProductsMallController;
-use App\Http\Controllers\SummaryStockController;
-use App\Http\Controllers\SupplierTypeController;
-use App\Http\Controllers\OrderSupplierController;
-use App\Http\Controllers\ProductReviewController;
-use App\Http\Controllers\PrimaryCategoryController;
-use App\Http\Controllers\QuotationReviewController;
-use App\Http\Controllers\TertiaryCategoryController;
 use App\Http\Controllers\AdvertisementBlockController;
 use App\Http\Controllers\AdvertisementLaunchController;
-use App\Http\Controllers\OrderPaymentsReportController;
-use App\Http\Controllers\PromotionalCampaignController;
-use App\Http\Controllers\WebCategoryProductsController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuyoutProductsReportController;
-use App\Http\Controllers\RequisitionsPurchaseController;
-use App\Http\Controllers\WebCategoryHierarchyController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\ExternalInventoryDailyReportController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderPaymentsReportController;
+use App\Http\Controllers\OrderRefundController;
+use App\Http\Controllers\OrderSupplierController;
+use App\Http\Controllers\PhotosController;
+use App\Http\Controllers\PrimaryCategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\ProductReviewRegisterController;
-use App\Http\Controllers\PromotionalCampaignPrdController;
-use CKSource\CKFinderBridge\Controller\CKFinderController;
+use App\Http\Controllers\ProductsMallController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\PromotionalCampaignCartV2Controller;
+use App\Http\Controllers\PromotionalCampaignController;
+use App\Http\Controllers\PromotionalCampaignPrdController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\QAController;
+use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\QuotationReviewController;
+use App\Http\Controllers\RequisitionsPurchaseController;
 use App\Http\Controllers\RequisitionsPurchaseReviewController;
-use App\Http\Controllers\ExternalInventoryDailyReportController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\SummaryStockController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\SupplierTypeController;
+use App\Http\Controllers\TertiaryCategoryController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\WebCategoryHierarchyController;
+use App\Http\Controllers\WebCategoryProductsController;
+use App\Http\Controllers\WebContentsController;
+use CKSource\CKFinderBridge\Controller\CKFinderController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,12 +55,16 @@ use App\Http\Controllers\ExternalInventoryDailyReportController;
 |
  */
 
+Route::get('/', function () {
+    return redirect()->route('backend_home');
+});
+Route::get('/login', [AuthController::class, 'showLoginPage'])->name('login.show');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+
 Route::any('/ckfinder/connector', [CKFinderController::class, 'requestAction'])->name('ckfinder_connector');
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
-    Route::get('registration', [LoginAuthController::class, 'registration'])->name('register-user');
-    Route::get('/', [AdminController::class, 'index'])->name('backend-home');
-    Route::get('/signOut', [AdminController::class, 'signOut'])->name('signOut');
-    Route::resource('/admin', AdminController::class);
+    Route::resource('/', AdminController::class, ['names' => ['index' => 'backend_home']]);
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // 倉庫管理
     Route::resource('/warehouse', WarehouseController::class, ['names' => ['index' => 'warehouse']]);
@@ -70,11 +72,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     // 供應商類別管理
     Route::resource('/supplier_type', SupplierTypeController::class, ['names' => ['index' => 'supplier_type']]);
 
-    //刪除聯絡人
-    Route::post('/contact/ajax/del', [ContactController::class, 'ajax_del_contact']);
-
     // 供應商主檔管理
-    Route::post('/supplier/ajax', [SupplierController::class, 'ajax']);
+    Route::post('/supplier/display-number-exists', [SupplierController::class, 'displayNumberExists']);
     Route::resource('/supplier', SupplierController::class, ['names' => ['index' => 'supplier']]);
 
     // 商品主檔 - 基本資訊管理
@@ -204,6 +203,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
 
     // 廣告上架
     Route::post('/advertisemsement_launch/ajax/can-pass-active-validation', [AdvertisementLaunchController::class, 'canPassActiveValidation']);
+    Route::post('/advertisemsement_launch/ajax/search-promotion-campaign', [AdvertisementLaunchController::class, 'searchPromotionCampaign']);
     Route::resource('/advertisemsement_launch', AdvertisementLaunchController::class, [
         'names' => [
             'index' => 'advertisemsement_launch',
@@ -263,7 +263,3 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/summary_stock/ajax', [SummaryStockController::class, 'ajaxDetail']);
     Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
 });
-
-Route::get('/', [LoginAuthController::class, 'index'])->name('login');
-Route::post('custom-login', [LoginAuthController::class, 'customLogin'])->name('login.custom');
-Route::post('custom-registration', [LoginAuthController::class, 'customRegistration'])->name('register.custom');

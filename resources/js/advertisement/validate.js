@@ -44,6 +44,15 @@ export let validateImageBlock = (row_no) => {
             }
         },
     });
+    $(`#image-block table > tbody [name="target_campaign_name[${row_no}]"]`).rules("add", {
+        required: {
+            depends: function (element) {
+                return $(
+                    `#image-block table > tbody [name="image_block_image_action[${row_no}]"][value="M"]`
+                ).is(":checked");
+            }
+        },
+    });
 }
 
 // 加入文字區塊欄位驗證
@@ -71,6 +80,15 @@ export let validateTextBlock = (row_no) => {
             }
         },
         url: true,
+    });
+    $(`#text-block table > tbody [name="target_campaign_name[${row_no}]"]`).rules("add", {
+        required: {
+            depends: function (element) {
+                return $(
+                    `#text-block table > tbody [name="text_block_image_action[${row_no}]"][value="M"]`
+                ).is(":checked");
+            }
+        },
     });
 
     $(`#text-block table > tbody [name="text_block_target_cate_hierarchy_id[${row_no}]"]`).rules("add", {
@@ -118,6 +136,12 @@ export let validateSlotColorCode = () => {
         required: true,
     });
 }
+//加入版位標題顏色欄位驗證
+export let validateTitleColorCode = () => {
+    $("#slot_title_color").rules("add", {
+        required: true,
+    });
+}
 
 // 加入版位icon欄位驗證
 export let validateSlotIconName = () => {
@@ -149,6 +173,11 @@ export let removeSlotColorCodeValidation = () => {
     $("#slot_color_code").closest(".form-group").removeClass("has-error").find('.help-block').hide();
 }
 
+// 移除版位標題顏色欄位驗證
+export let removeTitleColorCodeValidation = () => {
+    $("#slot_title_color").rules("remove");
+    $("#slot_title_color").closest(".form-group").removeClass("has-error").find('.help-block').hide();
+}
 // 移除版位icon欄位驗證
 export let removeSlotIconNameValidation = () => {
     $("#slot_icon_name").rules("remove");

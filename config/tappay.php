@@ -11,7 +11,8 @@ return [
     // TapPay 收款商家
     'merchant_id' => [
         'TAPPAY_CREDITCARD' => env('TAP_PAY_CREDITCARD'),
-        'TAPPAY_LINEPAY' => env('TAP_PAY_LINEPAY')
+        'TAPPAY_LINEPAY' => env('TAP_PAY_LINEPAY'),
+        'TAP_PAY_JKOPAY' => env('TAP_PAY_JKOPAY')
     ],
 
     //銀行對帳系統交易明細

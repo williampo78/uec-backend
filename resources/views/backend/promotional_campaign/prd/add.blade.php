@@ -208,6 +208,10 @@
                     target_groups: {
                         required: true,
                     },
+                    campaign_brief: {
+                        required: true,
+                        maxlength: 20,
+                    },
                 },
                 messages: {
                     end_at: {

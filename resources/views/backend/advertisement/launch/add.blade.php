@@ -26,19 +26,10 @@
                             <div class="row">
                                 <!-- 欄位 -->
                                 <div class="col-sm-12">
-                                    @include(
-                                        'backend.advertisement.launch.slot_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.image_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.text_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.product_block'
-                                    )
-
+                                    @include('backend.advertisement.launch.slot_block')
+                                    @include('backend.advertisement.launch.image_block')
+                                    @include('backend.advertisement.launch.text_block')
+                                    @include('backend.advertisement.launch.product_block')
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
@@ -60,6 +51,7 @@
                 </div>
             </div>
         </div>
+        @include('backend.advertisement.promotion_campaign_model')
     </div>
 @endsection
 
@@ -68,6 +60,8 @@
 
     <script>
         $(function() {
+            $("#promotional_campaigns_time_type").select2({allowClear: false,});
+            $("#see_more_cate_hierarchy_id").select2();
             let ad_slots = @json($ad_slots);
             // 商品分類下拉選項
             let product_category = @json($product_category);
@@ -105,6 +99,25 @@
                         required: true,
                         greaterThan: function() {
                             return $('#start_at').val();
+                        },
+                    },
+                    see_more_url:{
+                        required: {
+                            depends: function (element) {
+                                return $("input[name='see_more_action'][value='U']").is(":checked");
+                            }
+                        },
+                        url:{
+                            depends: function (element) {
+                                return $("input[name='see_more_action'][value='U']").is(":checked");
+                            }
+                        },
+                    },
+                    see_more_cate_hierarchy_id:{
+                        required: {
+                            depends: function (element) {
+                                return $("input[name='see_more_action'][value='C']").is(":checked");
+                            }
                         },
                     },
                     active: {
@@ -237,18 +250,21 @@
                     enableSlotColorCode();
                     enableSlotIconName();
                     enableSlotTitle();
+                    enableTitleleColorCode();
                 }
                 // 開放編輯 版位主色
                 else if (is_user_defined == 2) {
                     enableSlotColorCode();
                     disableSlotIconName();
                     disableSlotTitle();
+                    disableTitleColorCode();
                 }
                 // 關閉編輯 版位主色、版位icon、版位標題
                 else {
                     disableSlotColorCode();
                     disableSlotIconName();
                     disableSlotTitle();
+                    disableTitleColorCode();
                 }
 
                 switch (slot_type) {

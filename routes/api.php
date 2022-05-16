@@ -14,7 +14,7 @@ use App\Http\Controllers\api\MessagesController;
 use App\Http\Controllers\api\ShoppingController;
 use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\MemberInfoController;
-
+use App\Http\Controllers\api\CaptchaController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -38,6 +38,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/product/category', [ProductController::class, 'getCategory']);
     Route::get('/product/{id}', [ProductController::class, 'getProduct']);
     Route::get('/campaign/{id}', [ProductController::class, 'getCampaignGift']);
+    Route::get('/campaignDiscount/{id}', [ProductController::class, 'getCampaignDiscount']);
 
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
     Route::post('/advanceSearch', [ProductController::class, 'getProductSearchResult']);
@@ -50,6 +51,12 @@ Route::group(['prefix' => 'v1'], function () {
 
     //UTM
     Route::get('/utm', [IndexController::class, 'getUTM']);
+
+    //filter
+    Route::get('/filter', [ProductController::class, 'getFilter']);
+
+    //Event
+    Route::post('/event', [ProductController::class, 'getEvent']);
 
 });
 
@@ -146,3 +153,4 @@ Route::group(['prefix' => 'checkout'], function () {
     Route::post('/tapPayNotify', [CheckoutController::class, 'tapPayNotify']);
 });
 
+Route::get('captcha', [CaptchaController::class, 'getCapcha']);

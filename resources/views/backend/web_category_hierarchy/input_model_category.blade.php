@@ -45,6 +45,15 @@
                             </div>
                         </div>
                     </div>
+                    <br>
+                    <div class="row" v-show="addCategory.category_level == UecConfig.web_category_hierarchy_levels ">
+                        <div class="col-sm-2 "><label> 內容類型</label></div>
+                        <div class="col-sm-4 ">
+                            <select class="form-control js-select2" disabled name="content_type" id="content_type" v-model="addCategory.content_type">
+                                <option value="P" selected>指定商品</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" @click="CategoryToList()">

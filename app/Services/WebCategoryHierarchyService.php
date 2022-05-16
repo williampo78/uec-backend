@@ -2,14 +2,12 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use function Aws\filter;
-use App\Models\CategoryProduct;
 use App\Models\CategoryHierarchy;
-use Illuminate\Support\Facades\DB;
-
-use Illuminate\Support\Facades\Log;
+use App\Models\CategoryProduct;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class WebCategoryHierarchyService
 {
@@ -34,6 +32,7 @@ class WebCategoryHierarchyService
             $insert['parent_id'] = $in['parent_id']; //父ID
             $insert['category_level'] = $in['category_level']; // 階級
             $insert['category_name'] = $in['category_name'];
+            $insert['content_type'] = $in['content_type'];
             $insert['agent_id'] = $agent_id;
             $insert['sort'] = $this->getSort($in);
             $insert['created_by'] = $user_id;
@@ -57,6 +56,7 @@ class WebCategoryHierarchyService
         try {
             DB::beginTransaction();
             $insert['category_name'] = $in['category_name'];
+            $insert['content_type'] = $in['content_type'];
             $insert['updated_by'] = $user_id;
             $insert['updated_at'] = $now;
             CategoryHierarchy::where('id', $in['id'])->update($insert);
@@ -118,41 +118,42 @@ class WebCategoryHierarchyService
     public function getCategoryHierarchyContents($input = [])
     {
         $confi_levels = config('uec.web_category_hierarchy_levels');
-        $whereID = '';
+        $keyword = '';
         $where = '';
-
         if (isset($input['id']) && $input['id'] !== '') {
-            $whereID .= "AND id = " . $input['id'];
+            $where .= "AND id = " . $input['id'];
         }
         if (isset($input['active']) && $input['active'] !== '') {
-            $whereID .= " AND active = " . $input['active'];
-        }
-        if($confi_levels == 2){
-            if (isset($input['keyword']) && $input['keyword'] !== '') {
-                $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name )  LIKE '%" . $input['keyword'] . "%' ";
-            }
-        }else{
-            if (isset($input['keyword']) && $input['keyword'] !== '') {
-                $where .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%" . $input['keyword'] . "%' ";
-            }
+            $where .= " AND active = " . $input['active'];
         }
 
+        if(isset($input['exclude_content_type']) && $input['exclude_content_type']){
+            $where .= " AND content_type <> " . $input['exclude_content_type'] ;
+        }
+        if ($confi_levels == 2) {
+            if (isset($input['keyword']) && $input['keyword'] !== '') {
+                $keyword .= "WHERE concat(level_one.category_name, '>', level_two.category_name )  LIKE '%" . $input['keyword'] . "%' ";
+            }
+        } else {
+            if (isset($input['keyword']) && $input['keyword'] !== '') {
+                $keyword .= "WHERE concat(level_one.category_name, '>', level_two.category_name , ' > ' ,level_three.category_name)  LIKE '%" . $input['keyword'] . "%' ";
+            }
+        }
 
         if ($confi_levels == 2) {
             $query = "SELECT level_two.id as id, level_two.meta_title , CONCAT( level_one.category_name, ' > ', level_two.category_name ) as name, level_two.active,
-            level_two.content_type ,'' as meta_title ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
+            level_two.content_type , level_two.promotion_campaign_id,'' as meta_title ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
             FROM (SELECT * FROM web_category_hierarchy WHERE category_level = 1 ) level_one
-            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $whereID . ") level_two ON level_two.parent_id = level_one.id
-            " . $where . " ORDER BY level_one.category_name, level_two.category_name";
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $where . ") level_two ON level_two.parent_id = level_one.id
+            " . $keyword . " ORDER BY level_one.category_name, level_two.category_name";
         } else {
             $query = "SELECT level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active,
-            level_three.content_type  ,level_three.meta_title ,level_three.meta_description,level_three.content_type ,level_three.meta_keywords
+            level_three.content_type  ,level_three.meta_title ,level_three.meta_description,level_three.content_type ,level_three.meta_keywords,level_three.promotion_campaign_id
             FROM ( SELECT id , category_name FROM web_category_hierarchy WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ) level_two ON level_two.parent_id = level_one.id
-            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 " . $whereID . ") level_three ON level_three.parent_id = level_two.id
-            " . $where . " ORDER BY level_one.category_name, level_two.category_name , level_three.category_name";
+            JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 " . $where . ") level_three ON level_three.parent_id = level_two.id
+            " . $keyword . " ORDER BY level_one.category_name, level_two.category_name , level_three.category_name";
         }
-
         return DB::select($query);
     }
     public function categoryProductsHierarchyId($id)
@@ -166,8 +167,8 @@ class WebCategoryHierarchyService
     public function categoryProductsId($id)
     {
         $result = CategoryProduct::where('web_category_products.product_id', $id)
-            ->leftJoin('web_category_hierarchy' ,'web_category_hierarchy.id','=' ,'web_category_products.web_category_hierarchy_id')
-            ->select('web_category_products.web_category_hierarchy_id' , 'web_category_hierarchy.category_name' , 'web_category_products.sort')
+            ->leftJoin('web_category_hierarchy', 'web_category_hierarchy.id', '=', 'web_category_products.web_category_hierarchy_id')
+            ->select('web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.category_name', 'web_category_products.sort')
             ->orderBy('web_category_products.sort', 'ASC')
             ->get();
         return $result;
@@ -219,7 +220,6 @@ class WebCategoryHierarchyService
         $now = Carbon::now();
 
         DB::beginTransaction();
-
         try {
             CategoryHierarchy::where('id', $id)->update([
                 'active' => $in['active'],
@@ -227,6 +227,7 @@ class WebCategoryHierarchyService
                 'meta_description' => $in['meta_description'],
                 'meta_keywords' => $in['meta_keyword'],
                 'content_type' => $in['content_type'],
+                'promotion_campaign_id' => $in['content_type'] == "M" ? $in['promotion_campaign_id'] : null,
             ]);
             foreach ($category_products_list as $key => $val) {
                 if (!isset($val['web_category_products_id']) || $val['web_category_products_id'] == '') {
@@ -256,11 +257,32 @@ class WebCategoryHierarchyService
         return DB::table('web_category_products')->where('id', $id)->delete();
     }
 
-    public function DelCategoryInProduct($in){
-        return DB::table('web_category_products')->where('web_category_hierarchy_id' , $in['category_id'])->where('product_id',$in['product_id'])->delete() ;
+    public function DelCategoryInProduct($in)
+    {
+        return DB::table('web_category_products')->where('web_category_hierarchy_id', $in['category_id'])->where('product_id', $in['product_id'])->delete();
     }
-    public function DelRelatedProducts($id){
-        return DB::table('related_products')->where('id' , $id)->delete() ;
+    public function DelRelatedProducts($id)
+    {
+        return DB::table('related_products')->where('id', $id)->delete();
+    }
+    public function getRomotionalCampaigns($in)
+    {
+        $now = Carbon::now();
+        $promotionalCampaigns = DB::table('promotional_campaigns')->where('level_code', 'CART_P');
+        if (!empty($in['promotional_campaigns_time_type'])) {
+            if ($in['promotional_campaigns_time_type'] == 'all') {
+            }
+            if ($in['promotional_campaigns_time_type'] == 'not_expired') {
+                $promotionalCampaigns->where('start_at', '<=', $now)->where('end_at', '>=', $now);
+            }
+        }
+        if (!empty($in['promotional_campaigns_key_word'])) {
+            $promotionalCampaigns->whereLike('campaign_name', $in['promotional_campaigns_key_word'])->orWhereLike('campaign_brief', $in['promotional_campaigns_key_word']);
+        }
+        if (!empty($in['id'])) {
+            $promotionalCampaigns->where('id', $in['id']);
+        };
+        return $promotionalCampaigns->get();
     }
 
 }

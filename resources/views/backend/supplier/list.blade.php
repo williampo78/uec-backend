@@ -1,98 +1,227 @@
 @extends('backend.master')
 
-@section('title', '供應商資料')
+@section('title', '供應商主檔管理')
 
 @section('content')
-    <!--新增-->
-    <div id="page-wrapper">
-        <!-- 表頭名稱 -->
-        <div class="row">
-            <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa-solid fa-truck"></i> 供應商資料</h1>
+    <div id="app">
+        <!--新增-->
+        <div id="page-wrapper">
+            <!-- 表頭名稱 -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <h1 class="page-header"><i class="fa-solid fa-truck"></i> 供應商主檔管理</h1>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <!-- 功能按鈕(新增) -->
-                    <div class="panel-heading">
-                        <div class="row">
-                            @if ($share_role_auth['auth_create'])
-                                <div class="col-sm-2">
-                                    <a href="{{ route('supplier') }}/create" class="btn btn-block btn-warning btn-sm"
-                                        id="btn-new"><i class="fa-solid fa-plus"></i>
-                                        新增</a>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <!-- 功能按鈕(新增) -->
+                        <div class="panel-heading">
+                            <form id="search-form" class="form-horizontal" method="get" action="">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div class="col-sm-3">
+                                                <label class="control-label">供應商類別</label>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <select2 class="form-control" :options="supplierTypes" v-model="form.supplierTypeId" name="supplier_type_id">
+                                                    <option disabled value=""></option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div class="col-sm-3">
+                                                <label class="control-label">供應商</label>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="display_number_or_name"
+                                                    v-model="form.displayNumberOrName" placeholder="模糊查詢" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div class="col-sm-3">
+                                                <label class="control-label">統一編號</label>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="company_number"
+                                                    v-model="form.companyNumber" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            @endif
-                        </div>
-                    </div>
 
-                    <!-- Table list -->
-                    <div class="panel-body">
-                        <div id="table_list_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-                            <table class="table table-striped table-bordered table-hover" style="width:100%"
-                                id="table_list">
-                                <thead>
-                                    <tr role="row">
-                                        <th class="col-sm-1 ">功能</th>
-                                        <th class="col-sm-1 ">編號</th>
-                                        <th class="col-sm-1 ">統編</th>
-                                        <th class="col-sm-1 ">簡稱</th>
-                                        <th class="col-sm-1 ">名稱</th>
-                                        <th class="col-sm-1 ">付款條件</th>
-                                        <th class="col-sm-1 ">電話</th>
-                                        <th class="col-sm-1 ">地址</th>
-                                        <th class="col-sm-1 ">備註</th>
-                                        <th class="col-sm-1 ">顯示</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($supplier as $obj)
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <div class="col-sm-3">
+                                                <label class="control-label">狀態</label>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <select2 class="form-control" :options="activeOptions" v-model="form.active" name="active">
+                                                    <option disabled value=""></option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <div class="col-sm-3"></div>
+                                            <div class="col-sm-9 text-right">
+                                                @if ($share_role_auth['auth_query'])
+                                                    <button type="button" class="btn btn-danger" @click="resetForm">
+                                                        <i class="fa-solid fa-eraser"></i> 清除
+                                                    </button>
+
+                                                    <button class="btn btn-warning">
+                                                        <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Table list -->
+                        <div class="panel-body">
+                            <div class="row">
+                                @if ($share_role_auth['auth_create'])
+                                    <div class="col-sm-2">
+                                        <a href="{{ route('supplier.create') }}" class="btn btn-block btn-warning btn-sm"
+                                            id="btn-create">
+                                            <i class="fa-solid fa-plus"></i> 新增
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                            <hr />
+                            <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
+                                <table class="table table-striped table-bordered table-hover" style="width:100%"
+                                    id="table_list">
+                                    <thead>
                                         <tr>
-                                            <td>
-                                                <a class="btn btn-info btn-sm"
-                                                    href="{{ route('supplier') }}/{{ $obj->id }}"
-                                                    data-supplier="{{ $obj->id }}">
-                                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                                </a>
-                                                <button data-toggle="modal" id="hideShowMod" style="display:none;"
-                                                    data-target="#supplier_detail">Click me</button>
-
-                                                @if ($share_role_auth['auth_update'])
-                                                    <a class="btn btn-info btn-sm"
-                                                        href="{{ route('supplier') }}/{{ $obj->id }}/edit" value="1">
-                                                        <i class="fa-solid fa-pencil"></i>
-                                                        編輯
-                                                    </a>
-                                                @endif
-                                            </td>
-                                            <td>{{ $obj->display_number }}</td>
-                                            <td>{{ $obj->company_number }}</td>
-                                            <td>{{ $obj->short_name }}</td>
-                                            <td>{{ $obj->name }}</td>
-                                            <td>{{-- $obj->number->pay_condition_id 需要left id --}}</td>
-                                            <td>{{ $obj->telephone }}</td>
-                                            <td>{{ $obj->address }}</td>
-                                            <td>{{ $obj->remark }}</td>
-                                            <td>
-                                                @if($obj->active)
-                                                    開啟
-                                                @else
-                                                    關閉
-                                                @endif
-                                            </td>
+                                            <th class="text-nowrap">功能</th>
+                                            <th class="text-nowrap">供應商編號</th>
+                                            <th class="text-nowrap">統一統編</th>
+                                            <th class="text-nowrap">簡稱</th>
+                                            <th class="text-nowrap">完整名稱</th>
+                                            <th class="text-nowrap">狀態</th>
+                                            <th class="text-nowrap">付款條件</th>
+                                            <th class="text-nowrap">聯絡電話</th>
+                                            <th class="text-nowrap">地址</th>
                                         </tr>
-                                    @endforeach
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($suppliers as $supplier)
+                                            <tr>
+                                                <td>
+                                                    @if ($share_role_auth['auth_query'])
+                                                        <a class="btn btn-info btn-sm"
+                                                            href="{{ route('supplier.show', $supplier->id) }}" title="檢視">
+                                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                                        </a>
+                                                    @endif
 
-                                </tbody>
-                            </table>
+                                                    @if ($share_role_auth['auth_update'])
+                                                        <a class="btn btn-info btn-sm"
+                                                            href="{{ route('supplier.edit', $supplier->id) }}">
+                                                            <i class="fa-solid fa-pencil"></i>
+                                                            編輯
+                                                        </a>
+                                                    @endif
+                                                </td>
+                                                <td>{{ $supplier->display_number }}</td>
+                                                <td>{{ $supplier->company_number }}</td>
+                                                <td>{{ $supplier->short_name }}</td>
+                                                <td>{{ $supplier->name }}</td>
+                                                <td>
+                                                    @if ($supplier->active)
+                                                        啟用
+                                                    @else
+                                                        關閉
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @isset($supplier->paymentTerm)
+                                                        {{ $supplier->paymentTerm->description }}
+                                                    @endisset
+                                                </td>
+                                                <td>{{ $supplier->telephone }}</td>
+                                                <td>{{ $supplier->address }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-@section('js')
 @endsection
+
+@section('js')
+    <script>
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                form: {
+                    supplierTypeId: null,
+                    displayNumberOrName: "",
+                    companyNumber: "",
+                    active: null,
+                },
+                supplierTypes: [],
+                activeOptions: [],
+            },
+            created() {
+                let supplierTypes = @json($supplierTypes);
+                let activeOptions = @json($activeOptions);
+
+                if (supplierTypes) {
+                    supplierTypes.forEach(supplierType => {
+                        this.supplierTypes.push({
+                            text: supplierType.name,
+                            id: supplierType.id,
+                        });
+                    });
+                }
+
+                if (activeOptions) {
+                    Object.entries(activeOptions).forEach(([key, activeOption]) => {
+                        this.activeOptions.push({
+                            text: activeOption,
+                            id: parseInt(key),
+                        });
+                    });
+                }
+
+                this.form.supplierTypeId = "{{ request()->input('supplier_type_id') }}";
+                this.form.supplierTypeId = this.form.supplierTypeId ? parseInt(this.form.supplierTypeId) : null;
+                this.form.displayNumberOrName = "{{ request()->input('display_number_or_name') }}";
+                this.form.companyNumber = "{{ request()->input('company_number') }}";
+                this.form.active = "{{ request()->input('active') }}";
+                this.form.active = this.form.active ? parseInt(this.form.active) : null;
+            },
+            methods: {
+                resetForm() {
+                    let self = this;
+
+                    Object.keys(self.form).forEach(function(value, index) {
+                        self.form[value] = "";
+                    });
+                },
+            },
+        });
+    </script>
 @endsection

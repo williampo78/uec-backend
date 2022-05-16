@@ -78,6 +78,13 @@ class WebCategoryProductsController extends Controller
         $in = [];
         $in['id'] = $id;
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents($in)[0];
+        //原生sql不加入RomotionalCampaigns join - 另外撈取 活動名稱
+        if($result['category_hierarchy_content']->promotion_campaign_id !== null){
+            $getRomotionalCampaigns = $this->webCategoryHierarchyService->getRomotionalCampaigns(['id' => $result['category_hierarchy_content']->promotion_campaign_id])[0] ?? null;
+            $result['category_hierarchy_content']->campaign_name = $getRomotionalCampaigns->campaign_name ;
+        }else{
+            $result['category_hierarchy_content']->campaign_name = '' ;
+        }
 
         // 網頁標題為空值時，預設為分類名稱的最小階層名稱
         if (empty($result['category_hierarchy_content']->meta_title)) {
@@ -140,6 +147,8 @@ class WebCategoryProductsController extends Controller
                 $result['data']['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents($in)[0];
                 $result['data']['category_products_list'] = $this->webCategoryHierarchyService->categoryProductsHierarchyId($in['id']);
                 break;
+            case 'promotionalCampaignsGetAjax':
+                $result['data'] = $this->webCategoryHierarchyService->getRomotionalCampaigns($in) ;
             default:
                 # code...
                 break;

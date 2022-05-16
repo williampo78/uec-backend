@@ -175,6 +175,6 @@ class UserController extends Controller
         $input = $request->input();
         $this->userService->updateProfile($input);
 
-        return view('backend.example');
+        return view('backend.home');
     }
 }
