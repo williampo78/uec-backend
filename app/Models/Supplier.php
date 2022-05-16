@@ -51,4 +51,12 @@ class Supplier extends Model
     {
         return $this->hasOne(SupplierContract::class, 'supplier_id');
     }
+
+    /**
+     * 建立與商品的關聯
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'supplier_id');
+    }
 }

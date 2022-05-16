@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\OrderCampaignDiscount;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -341,5 +342,116 @@ class OrderService
         }
 
         return true;
+    }
+    /**
+     * 取得該訂單有使用到的折扣
+     *
+     * @param string $orderId
+     * @return Model|null
+     * order_campaign_discounts
+     */
+    public function orderCampaignDiscountsByOrderId(string $orderId)
+    {
+        return OrderCampaignDiscount::with([
+        'promotionalCampaign',
+        'promotionalCampaign.promotionalCampaignThresholds',
+        'product',
+        'product.productPhotos'=> function ($query) {
+            $query->orderBy('sort', 'asc');
+        },
+        ])->where('order_id', $orderId)->get();
+    }
+    /**
+     * 新增有折扣商品到該商品 && 折扣優惠的商品
+     * @param [type] $orders
+     * @return void
+     */
+    public function addDiscountsToOrder($orders)
+    {
+        $order_details = $orders['results']['order_details'];
+        $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']);
+        $void_id = [];
+        foreach ($discount as $obj) {
+            switch ($obj->level_code) {
+                case 'PRD':
+                    //主商品 且有折扣金額
+                    if ($obj->record_identity == 'M' && $obj->discount !== 0.0) {
+                        // dump($obj->id);
+                        foreach ($order_details as $key => $val) {
+                            if (!in_array($obj->id, $void_id)) {
+                                $void_id[] = $obj->id;
+                                if ($val['id'] == $obj->order_detail_id) {
+                                    $order_details[$key]['discount_content'][$obj->group_seq] = [
+                                        'campaignName' => $obj->promotionalCampaign->campaign_name,
+                                        'discount' => $obj->discount ,
+                                        'campaignProdList' => [],
+                                    ];
+                                };
+                            }
+                        }
+                    }
+                    //贈品
+                    if ($obj->record_identity == 'G') {
+                        foreach ($order_details as $key => $val) {
+                            if (!in_array($obj->id, $void_id)) {
+                                if (!isset($order_details[$key]['discount_content'][$obj->group_seq])) {
+                                    $order_details[$key]['discount_content'][$obj->group_seq] = [
+                                        'campaignName' => $obj->promotionalCampaign->campaign_name,
+                                        'campaignProdList' => [
+                                            [
+                                                'productId' => $obj->product->id,
+                                                'productName' => $obj->product->product_name,
+                                            ],
+                                        ],
+                                    ];
+                                } else {
+                                    $order_details[$key]['discount_content'][$obj->group_seq]['products'][]= [
+                                        'productId' => $obj->product->id,
+                                        'productName' => $obj->product->product_name,
+                                    ];
+                                }
+                                $void_id[] = $obj->id;
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                    //送禮
+                    if($obj->promotionalCampaign->category_code == 'GIFT'){
+                        $cart['gift'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
+                        $cart['gift'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
+                        $cart['gift'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
+                        if(!isset($cart['gift'][$obj->group_seq]['campaignNvalue'])){
+                            $cart['gift'][$obj->group_seq]['campaignNvalue'] = 0;
+                        }
+                        // $cart['gift'][$obj->group_seq]['campaignNvalue'] =$cart['gift'][$obj->group_seq]['campaignNvalue'] == 0 ? 1 :  $cart['gift'][$obj->group_seq]['campaignNvalue'] += 1  ;
+                        // $cart['gift'][$obj->group_seq]['campaignXvalue'] = 0.00 ; //贈品不會有折扣金額
+                        if(!isset($cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'])){
+                            $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'] = 0 ;
+                        }
+                        $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
+                            'productPhoto'=> config('filesystems.disks.s3.url') .$obj->product->productPhotos[0]->photo_name,
+                            'productId'=>$obj->product->id,
+                            'productName'=>$obj->product->product_name,
+                            'count'=> $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'] += 1  ,
+                        ] ;//贈送的商品列表
+                    }
+                    //折扣
+                    if($obj->discount < 0){
+                        if(!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])){
+                            $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0 ;
+                        }
+                        $cart['discount'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
+                        $cart['discount'][$obj->group_seq]['campaignDiscount'] = $obj->discount;
+                    }
+                    break;
+            }
+
+        }
+        $orders['results']['order_details'] = $order_details;
+        $orders['results']['thresholdDiscount'] = $cart['discount'] ?? []; //折扣
+        $orders['results']['thresholdGiftAway'] = $cart['gift'] ?? []; //送禮,
+        return $orders ;
     }
 }

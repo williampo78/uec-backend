@@ -262,7 +262,6 @@ class MemberController extends Controller
     {
         // 取得訂單
         $order = $this->orderService->getMemberOrderDetailByOrderNo($request->order_no);
-
         // 沒有任何訂單
         if (!isset($order)) {
             return response()->json([
@@ -277,6 +276,7 @@ class MemberController extends Controller
         $payload = [
             'message' => '取得成功',
             'results' => [
+                'order_id'=>$order->id,
                 'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s'),
                 'paid_at' => null,
                 'prepared_shipment_at' => null,
@@ -350,10 +350,10 @@ class MemberController extends Controller
             $payload['results']['cancelled_at'] = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i:s');
         }
 
-        // 訂單明細
-        if ($order->orderDetails->isNotEmpty()) {
-            $order->orderDetails->each(function ($orderDetail) use (&$payload) {
+        $order->orderDetails->each(function ($orderDetail) use (&$payload) {
+            if($orderDetail->record_identity == 'M'){
                 $orderDetailPayload = [
+                    'id'=>$orderDetail->id,
                     'photo_url' => null,
                     'product_name' => $orderDetail->product->product_name,
                     'spec_1_value' => $orderDetail->productItem->spec_1_value,
@@ -364,19 +364,17 @@ class MemberController extends Controller
                     'product_id' => $orderDetail->product_id,
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
+                    'discount_content'=>[],
                 ];
 
-                // 商品圖片
                 if ($orderDetail->product->productPhotos->isNotEmpty()) {
                     $productPhoto = $orderDetail->product->productPhotos->first();
-
-                    // 圖片網址
                     $orderDetailPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
                 }
-
                 $payload['results']['order_details'][] = $orderDetailPayload;
-            });
-        }
+            }
+        });
+        $payload = $this->orderService->addDiscountsToOrder($payload);
 
         // 出貨單
         if ($order->shipments->isNotEmpty()) {
