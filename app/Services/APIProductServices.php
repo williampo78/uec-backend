@@ -457,7 +457,8 @@ class APIProductServices
                             'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
                             'collections' => $collection,
                             'cart' => $cart,
-                            'selling_channel'=> $product->selling_channel
+                            'selling_channel' => $product->selling_channel,
+                            'start_selling' => $product->start_selling_at
                         );
 
                         $product_id = $product->id;
@@ -748,7 +749,8 @@ class APIProductServices
                 "payment" => $payment_method,
                 "brand" => $brand[0]->brand_name,
                 "promotion_label" => $promotional,
-                "selling_channel"=>$product[$id]->selling_channel
+                "selling_channel" => $product[$id]->selling_channel,
+                "start_selling" => $product[$id]->start_selling_at
             );
             $data['productInfo'] = $product_info;
 
@@ -918,7 +920,8 @@ class APIProductServices
                         'promotion_desc' => $promotion_desc,
                         "promotion_label" => $promotional,
                         "collection" => $collection,
-                        "selling_channel"=>$products[$rel->related_product_id]->selling_channel
+                        "selling_channel" => $products[$rel->related_product_id]->selling_channel,
+                        "start_selling" => $products[$rel->related_product_id]->start_selling_at
                     );
 
                 }
@@ -1285,7 +1288,8 @@ class APIProductServices
                 "product_name" => $product[$id]->product_name,
                 "selling_price" => intval($product[$id]->selling_price),
                 "list_price" => intval($product[$id]->list_price),
-                "selling_channel"=>$product[$id]->selling_channel
+                "selling_channel" => $product[$id]->selling_channel,
+                "start_selling" => $product[$id]->start_selling_at
             );
             $data['productInfo'] = $product_info;
 
