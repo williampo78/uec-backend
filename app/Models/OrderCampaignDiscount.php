@@ -47,7 +47,7 @@ class OrderCampaignDiscount extends Model
     /**
      * 建立與活動門檻的關聯
      */
-    public function promotionalCampaignThreshold()
+    public function promotionalCampaignThresholds()
     {
         return $this->belongsTo(PromotionalCampaignThreshold::class, 'campaign_threshold_id');
     }

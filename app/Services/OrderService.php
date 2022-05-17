@@ -354,7 +354,7 @@ class OrderService
     {
         return OrderCampaignDiscount::with([
         'promotionalCampaign',
-        'promotionalCampaignThreshold',
+        'promotionalCampaignThresholds',
         'product',
         'product.productPhotos'=> function ($query) {
             $query->orderBy('sort', 'asc');
@@ -443,7 +443,7 @@ class OrderService
                         if(!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])){
                             $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0 ;
                         }
-                        $cart['discount'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
+                        $cart['discount'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaignThresholds ? $obj->promotionalCampaignThresholds->threshold_brief : '';
                         $cart['discount'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                         $cart['discount'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
                         $cart['discount'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
