@@ -122,7 +122,12 @@ class ProductController extends Controller
         $category = $request['category'];
         $selling_price_min = $request['price_min'];
         $selling_price_max = $request['price_max'];
-        $result = $this->apiProductService->getSearchResultForCategory($category, $selling_price_min, $selling_price_max, $keyword);
+        $attribute = '';
+        $attribute .= ($request['group'] ? $request['group'] : '');
+        $attribute .= ($attribute != '' && $request['ingredient'] != '' ? ', ' : '') . ($request['ingredient'] ? $request['ingredient'] : '');
+        $attribute .= ($attribute != '' && $request['dosage_form'] != '' ? ', ' : '') . ($request['dosage_form'] ? $request['dosage_form'] : '');
+        $attribute .= ($attribute != '' && $request['certificate'] != '' ? ', ' : '') . ($request['certificate'] ? $request['certificate'] : '');
+        $result = $this->apiProductService->getSearchResultForCategory($category, $selling_price_min, $selling_price_max, $keyword, $attribute);
         if ($result == '404') {
             $status = false;
             $err = '404';

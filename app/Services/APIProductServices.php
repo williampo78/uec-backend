@@ -303,9 +303,6 @@ class APIProductServices
                     (SELECT photo_name
                     FROM product_photos
                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto";
-        if ($attribute) {//進階篩選條件
-            $strSQL .= " , group_concat(product_attributes.`id`) attr_id ";
-        }
         $strSQL .= " from web_category_products
                     inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
@@ -390,10 +387,10 @@ class APIProductServices
         $sort_flag = ($input['sort'] ? $input['sort'] : 'DESC');
         //$sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC;
         $attribute = '';
-        $attribute .= ($input['GROUP'] ? $input['GROUP'] : '');
-        $attribute .= ($attribute != '' && $input['INGREDIENT'] != '' ? ', ' : '') . ($input['INGREDIENT'] ? $input['INGREDIENT'] : '');
-        $attribute .= ($attribute != '' && $input['DOSAGE_FORM'] != '' ? ', ' : '') . ($input['DOSAGE_FORM'] ? $input['DOSAGE_FORM'] : '');
-        $attribute .= ($attribute != '' && $input['CERTIFICATE'] != '' ? ', ' : '') . ($input['CERTIFICATE'] ? $input['CERTIFICATE'] : '');
+        $attribute .= ($input['group'] ? $input['group'] : '');
+        $attribute .= ($attribute != '' && $input['ingredient'] != '' ? ', ' : '') . ($input['ingredient'] ? $input['ingredient'] : '');
+        $attribute .= ($attribute != '' && $input['dosage_form'] != '' ? ', ' : '') . ($input['dosage_form'] ? $input['dosage_form'] : '');
+        $attribute .= ($attribute != '' && $input['certificate'] != '' ? ', ' : '') . ($input['certificate'] ? $input['certificate'] : '');
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute);
         if ($products) {
             $promotion = self::getPromotion('product_card');
@@ -541,7 +538,7 @@ class APIProductServices
     /*
      * 取得搜尋結果的上方分類
      */
-    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
+    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $attribute = null)
     {
 
         //分類總覽階層
@@ -558,8 +555,13 @@ class APIProductServices
                     inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
+
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
+        }
+
+        if ($attribute) {//進階篩選條件
+            $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
         }
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
@@ -584,12 +586,20 @@ class APIProductServices
         if ($category) {//依分類搜尋
             $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
         }
-        $strSQL .= " group by cate1.id";
+
+        if ($attribute) {//進階篩選條件
+            $strSQL .= " and product_attributes.id in (" . $attribute . ") ";
+            $strSQL .= " group by web_category_products.web_category_hierarchy_id,cate1.category_name , cate2.category_name , p.id";
+        } else {
+            $strSQL .= " group by cate1.id";
+        }
+
         if ($config_levels == 2) {
             $strSQL .= " order by cate2.sort, cate1.sort";
         } else {
             $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
         }
+
         $products = DB::select($strSQL);
 
         if ($products) {
