@@ -397,9 +397,6 @@ class OrderService
                         $cart['gift'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                         $cart['gift'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                         $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaignThresholds ? $obj->promotionalCampaignThresholds->threshold_brief : '';
-                        if (!isset($cart['gift'][$obj->group_seq]['campaignNvalue'])) {
-                            $cart['gift'][$obj->group_seq]['campaignNvalue'] = 0;
-                        }
                         if (!isset($cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'])) {
                             $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['assignedQty'] = 0;
                         }
