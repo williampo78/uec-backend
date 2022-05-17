@@ -276,7 +276,7 @@ class OrderService
                 $query->orderBy('id', 'desc');
             },
         ])->where('revision_no', 0)
-        // ->where('member_id', $member->member_id)
+        ->where('member_id', $member->member_id)
             ->where('order_no', $orderNo)
             ->select()
             ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
