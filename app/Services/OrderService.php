@@ -276,7 +276,7 @@ class OrderService
                 $query->orderBy('id', 'desc');
             },
         ])->where('revision_no', 0)
-        ->where('member_id', $member->member_id)
+        // ->where('member_id', $member->member_id)
             ->where('order_no', $orderNo)
             ->select()
             ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
@@ -429,25 +429,34 @@ class OrderService
                     ->where('level_code', 'PRD')
                     ->where('record_identity' ,'M')
                     ->where('discount' ,0.0)
-                    ->get();
-        foreach($findProductPRD_M as $PRD){
-            if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
-                $order_details[$key]['discount_content'][$PRD->group_seq] = [
-                    'campaignName' => $PRD->promotionalCampaign->campaign_name,
-                    'campaignProdList' => [
-                        [
-                            'productId' => $PRD->product->id,
-                            'productName' => $PRD->product->product_name,
+                    ->first();
+        if($findProductPRD_M !== null)
+        {
+            $findProductPRD_G = OrderCampaignDiscount::where('order_detail_id', '<>', $val['id'])
+            ->where('group_seq',$findProductPRD_M->group_seq)
+            ->where('order_id', $orders['results']['order_id'])
+            ->where('level_code', 'PRD')
+            ->where('record_identity' ,'G')
+            ->get();
+            foreach($findProductPRD_G as $PRD){
+                if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
+                    $order_details[$key]['discount_content'][$PRD->group_seq] = [
+                        'campaignName' => $PRD->promotionalCampaign->campaign_name,
+                        'campaignProdList' => [
+                            [
+                                'productId' => $PRD->product->id,
+                                'productName' => $PRD->product->product_name,
+                            ],
                         ],
-                    ],
-                ];
-            } else {
-                $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][]= [
-                    'productId' => $PRD->product->id,
-                    'productName' => $PRD->product->product_name,
-                ];
-            }
+                    ];
+                } else {
+                    $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][]= [
+                        'productId' => $PRD->product->id,
+                        'productName' => $PRD->product->product_name,
+                    ];
+                }
 
+            }
         }
     }
     if (isset($cart['discount'])) {
