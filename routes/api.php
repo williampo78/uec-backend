@@ -37,6 +37,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('/product/category', [ProductController::class, 'getCategory']);
     Route::get('/product/{id}', [ProductController::class, 'getProduct']);
+    Route::get('/productSpec/{id}', [ProductController::class, 'getProductItem']);
     Route::get('/campaign/{id}', [ProductController::class, 'getCampaignGift']);
     Route::get('/campaignDiscount/{id}', [ProductController::class, 'getCampaignDiscount']);
 

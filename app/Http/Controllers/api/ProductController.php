@@ -309,4 +309,37 @@ class ProductController extends Controller
         return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
     }
 
+    /*
+     * 取得產品規格
+     * @param  int  $id
+     */
+    public function getProductItem($id)
+    {
+        $err = false;
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductService->getProductItem($id);
+
+        if ($result == '903') {
+            $status = false;
+            $err = '901';
+            $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "商品不存在", 'result' => $list]);
+        } else if ($result == '901') {
+            $status = false;
+            $err = '901';
+            $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品沒有前台分類", 'result' => $list]);
+        } else if ($result == '902') {
+            $status = false;
+            $err = '901';
+            $list = [];
+            return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => "此商品已被下架", 'result' => $list]);
+        } else {
+            $status = true;
+            $err = '';
+            $list = json_decode($result, true);
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+    }
+
 }
