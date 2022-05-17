@@ -31,7 +31,7 @@ class OrderCampaignDiscount extends Model
     {
         return $this->belongsTo(PromotionalCampaign::class, 'promotion_campaign_id');
     }
-    public function promotionalCampaignThresholds()
+    public function promotionalCampaignThreshold()
     {
         return $this->belongsTo(PromotionalCampaignThreshold::class, 'campaign_threshold_id');
     }
