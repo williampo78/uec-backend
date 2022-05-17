@@ -22,7 +22,7 @@ class ProductAttributeLovService
      */
     public function getProductFilter()
     {
-        $condition = ['GROUP', 'INGREDIENT', 'DOSAGE_FORM'];
+        $condition = ['GROUP', 'INGREDIENT', 'DOSAGE_FORM', 'CERTIFICATE'];
         $result = ProductAttributeLov::select('id', 'attribute_type', 'code', 'description')
             ->where('active', 1)
             ->whereIn('attribute_type', $condition)

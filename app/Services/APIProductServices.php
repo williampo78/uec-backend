@@ -288,7 +288,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null)
     {
 
         //分類總覽階層
@@ -302,14 +302,22 @@ class APIProductServices
         $strSQL .= ",p.*,
                     (SELECT photo_name
                     FROM product_photos
-                    WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
-                    from web_category_products
+                    WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto";
+        if ($attribute) {//進階篩選條件
+            $strSQL .= " , group_concat(product_attributes.`id`) attr_id ";
+        }
+        $strSQL .= " from web_category_products
                     inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
                     inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
+
+        if ($attribute) {//進階篩選條件
+            $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        }
+
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
         if ($keyword) {//依關鍵字搜尋
@@ -337,6 +345,11 @@ class APIProductServices
         if ($id) {//依產品編號找相關分類
             $strSQL .= " and web_category_products.product_id=" . $id;
             $strSQL .= " order by web_category_products.sort ";
+        }
+
+        if ($attribute) {//進階篩選條件
+            $strSQL .= " and product_attributes.id in (" . $attribute . ") ";
+            $strSQL .= " group by web_category_products.web_category_hierarchy_id,cate1.category_name , cate2.category_name , p.id";
         }
 
         if ($order_by == 'launched') {
@@ -376,7 +389,12 @@ class APIProductServices
         $order_by = ($input['order_by'] ? $input['order_by'] : 'launched');
         $sort_flag = ($input['sort'] ? $input['sort'] : 'DESC');
         //$sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC;
-        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag);
+        $attribute = '';
+        $attribute .= ($input['GROUP'] ? $input['GROUP'] : '');
+        $attribute .= ($attribute != '' && $input['INGREDIENT'] != '' ? ', ' : '') . ($input['INGREDIENT'] ? $input['INGREDIENT'] : '');
+        $attribute .= ($attribute != '' && $input['DOSAGE_FORM'] != '' ? ', ' : '') . ($input['DOSAGE_FORM'] ? $input['DOSAGE_FORM'] : '');
+        $attribute .= ($attribute != '' && $input['CERTIFICATE'] != '' ? ', ' : '') . ($input['CERTIFICATE'] ? $input['CERTIFICATE'] : '');
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             foreach ($promotion as $k => $v) {
