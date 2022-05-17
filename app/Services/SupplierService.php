@@ -7,32 +7,33 @@ use App\Models\Supplier;
 use App\Models\SupplierContract;
 use App\Models\SupplierContractTerm;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SupplierService
 {
-    public function getSuppliers($query_data = [])
+    /**
+     * 取得所有供應商
+     *
+     * @param array $queryData
+     * @return Collection
+     */
+    public function getSuppliers(array $queryData = []): Collection
     {
-        $agent_id = Auth::user()->agent_id;
-        $result = [];
+        $user = auth()->user();
+        $suppliers = Supplier::where('agent_id', $user->agent_id);
 
-        $result = Supplier::where('agent_id', $agent_id);
-
-        if (isset($query_data['active'])) {
-            if ($query_data['active'] == 1) {
-                $result = $result->where('active', 1);
-            } else {
-                $result = $result->where('active', 0);
+        // 檢查使用者是否為供應商
+        if (!empty($queryData['check_user_is_supplier'])) {
+            if (isset($user->supplier_id)) {
+                $suppliers = $suppliers->where('id', $user->supplier_id);
             }
         }
 
-        $result = $result->get();
-
-        return $result;
+        return $suppliers->get();
     }
 
     public function createSupplier(array $inputData): bool

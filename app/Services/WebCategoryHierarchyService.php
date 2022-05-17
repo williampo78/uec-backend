@@ -115,7 +115,7 @@ class WebCategoryHierarchyService
         return $sort;
     }
     //取得開關分類判斷輸出內容
-    public function category_hierarchy_content($input = array())
+    public function getCategoryHierarchyContents($input = [])
     {
         $confi_levels = config('uec.web_category_hierarchy_levels');
         $keyword = '';

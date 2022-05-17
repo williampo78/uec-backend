@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\AdvertisementService;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 
@@ -16,7 +16,7 @@ class AdvertisementLaunchController extends Controller
     public function __construct(
         AdvertisementService $advertisement_service,
         WebCategoryHierarchyService $web_category_hierarchy_service,
-        ProductsService $product_service
+        ProductService $product_service
     ) {
         $this->advertisement_service = $advertisement_service;
         $this->web_category_hierarchy_service = $web_category_hierarchy_service;
@@ -56,7 +56,7 @@ class AdvertisementLaunchController extends Controller
     public function create()
     {
         $ad_slots = $this->advertisement_service->getSlots();
-        $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
+        $product_category = $this->web_category_hierarchy_service->getCategoryHierarchyContents();
         $products = $this->product_service->getProducts([
             'product_type' => 'N',
         ]);
@@ -92,7 +92,7 @@ class AdvertisementLaunchController extends Controller
     public function show($id)
     {
         // 取得商品分類
-        $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
+        $product_category = $this->web_category_hierarchy_service->getCategoryHierarchyContents();
         $product_category_format = array_column($product_category, 'name', 'id');
 
         // 取得商品
@@ -218,7 +218,7 @@ class AdvertisementLaunchController extends Controller
             ]);
         }
 
-        $product_category = $this->web_category_hierarchy_service->category_hierarchy_content();
+        $product_category = $this->web_category_hierarchy_service->getCategoryHierarchyContents();
         $products = $this->product_service->getProducts([
             'product_type' => 'N',
         ]);

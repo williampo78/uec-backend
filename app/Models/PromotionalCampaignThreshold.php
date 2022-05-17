@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PromotionalCampaignThreshold extends Model
 {
     use HasFactory;
+
     protected $table = 'promotional_campaign_thresholds';
     protected $guarded = [];
 

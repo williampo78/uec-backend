@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\SupplierService;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 
@@ -13,10 +13,10 @@ class WebCategoryProductsController extends Controller
     private $supplierService;
     public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService,
         SupplierService $supplierService,
-        ProductsService $productsService) {
+        ProductService $productService) {
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
         $this->supplierService = $supplierService;
-        $this->productsService = $productsService;
+        $this->productService = $productService;
     }
     /**
      * Display a listing of the resource.
@@ -26,7 +26,7 @@ class WebCategoryProductsController extends Controller
     public function index(Request $request)
     {
         $request = $request->input();
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($request);
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents($request);
         foreach ($result['category_hierarchy_content'] as $content) {
             $content->product_counts = $this->webCategoryHierarchyService->categoryProductsHierarchyId($content->id)->count();
         }
@@ -77,7 +77,7 @@ class WebCategoryProductsController extends Controller
         $result = [];
         $in = [];
         $in['id'] = $id;
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents($in)[0];
         //原生sql不加入RomotionalCampaigns join - 另外撈取 活動名稱
         if($result['category_hierarchy_content']->promotion_campaign_id !== null){
             $getRomotionalCampaigns = $this->webCategoryHierarchyService->getRomotionalCampaigns(['id' => $result['category_hierarchy_content']->promotion_campaign_id])[0] ?? null;
@@ -134,8 +134,8 @@ class WebCategoryProductsController extends Controller
         $result = [];
         switch ($in['type']) {
             case 'getProductsList':
-                $result['data'] = $this->productsService->getProducts($in) ;
-                $this->productsService->restructureProducts($result['data']);
+                $result['data'] = $this->productService->getProducts($in) ;
+                $this->productService->restructureProducts($result['data']);
                 foreach ($result['data'] as $key => $val) {
                     $result['data'][$key]->check_use = 0;
                 };
@@ -144,7 +144,7 @@ class WebCategoryProductsController extends Controller
                 $result['data'] = $this->webCategoryHierarchyService->del_category_hierarchy_content($in['id']);
                 break;
             case 'show_category_products':
-                $result['data']['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content($in)[0];
+                $result['data']['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents($in)[0];
                 $result['data']['category_products_list'] = $this->webCategoryHierarchyService->categoryProductsHierarchyId($in['id']);
                 break;
             case 'promotionalCampaignsGetAjax':

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\LookupValuesVService;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\PromotionalCampaignService;
 use App\Services\RoleService;
 use App\Services\SupplierService;
@@ -15,7 +15,7 @@ class PromotionalCampaignPrdController extends Controller
     private $lookup_values_v_service;
     private $role_service;
     private $supplier_service;
-    private $products_service;
+    private $productService;
     private const LEVEL_CODE = 'PRD';
 
     public function __construct(
@@ -23,13 +23,13 @@ class PromotionalCampaignPrdController extends Controller
         LookupValuesVService $lookup_values_v_service,
         RoleService $role_service,
         SupplierService $supplier_service,
-        ProductsService $products_service
+        ProductService $productService
     ) {
         $this->promotional_campaign_service = $promotional_campaign_service;
         $this->lookup_values_v_service = $lookup_values_v_service;
         $this->role_service = $role_service;
         $this->supplier_service = $supplier_service;
-        $this->products_service = $products_service;
+        $this->productService = $productService;
     }
 
     /**
@@ -143,7 +143,7 @@ class PromotionalCampaignPrdController extends Controller
         $suppliers = $this->supplier_service->getSuppliers();
 
         if (isset($promotional_campaign->products)) {
-            $this->products_service->restructureProducts($promotional_campaign->products);
+            $this->productService->restructureProducts($promotional_campaign->products);
             $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
                 return [
                     $product->product_id => $product->only([
@@ -160,7 +160,7 @@ class PromotionalCampaignPrdController extends Controller
         }
 
         if (isset($promotional_campaign->giveaways)) {
-            $this->products_service->restructureProducts($promotional_campaign->giveaways);
+            $this->productService->restructureProducts($promotional_campaign->giveaways);
             $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
                 return [
                     $giveaway->product_id => $giveaway->only([

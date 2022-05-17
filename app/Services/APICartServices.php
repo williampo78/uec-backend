@@ -205,7 +205,7 @@ class APICartServices
                     foreach ($items as $product_id => $data) {
                         $campaignThreshold_brief = [];
                         $campaignThreshold_item = [];
-                        $campaignThresholds = PromotionalCampaign::find($data->id)->campaignThreshold;
+                        $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $data->id)->orderBy('n_value')->get();
                         foreach ($campaignThresholds as $threshold) {
                             $campaignThreshold_brief[] = $threshold->threshold_brief;
                             $campaignThreshold_item[] = $threshold;

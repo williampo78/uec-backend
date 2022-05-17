@@ -14,6 +14,7 @@ import flatpickr from "flatpickr";
 import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
 import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
 import Croppie from "Croppie";
+import moment from "moment";
 
 import Vue from "vue";
 
@@ -101,6 +102,11 @@ flatpickr.setDefaults({
     //     }
     // },
 });
+
+/**
+ * moment
+ */
+window.moment = moment;
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening

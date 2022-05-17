@@ -270,7 +270,7 @@
             renderPrdModalSupplier(suppliers);
             renderGiftModalSupplier(suppliers);
 
-            let product_types = @json(config('uec.product_type_option'));
+            let product_types = @json(config('uec.product_type_options'));
             renderPrdModalProductType(product_types);
             renderGiftModalProductType(product_types);
 

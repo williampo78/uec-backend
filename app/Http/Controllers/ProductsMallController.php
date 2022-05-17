@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Services\BrandsService;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\SupplierService;
 use App\Services\ProductAttributesService;
 use App\Services\ProductAttributeLovService;
@@ -18,14 +18,14 @@ class ProductsMallController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    private $productsService;
-    public function __construct(ProductsService $productsService,
+    private $productService;
+    public function __construct(ProductService $productService,
         SupplierService $supplierService,
         BrandsService $brandsService,
         WebCategoryHierarchyService $webCategoryHierarchyService,
         ProductAttributeLovService $productAttributeLovService,
         ProductAttributesService $productAttributesService) {
-        $this->productsService = $productsService;
+        $this->productService = $productService;
         $this->supplierService = $supplierService;
         $this->brandsService = $brandsService;
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
@@ -42,12 +42,12 @@ class ProductsMallController extends Controller
         ];
 
         if (count($in) !== 0) {
-            $result['products'] = $this->productsService->getProducts($in);
-            $this->productsService->restructureProducts($result['products']);
+            $result['products'] = $this->productService->getProducts($in);
+            $this->productService->restructureProducts($result['products']);
         }
 
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content(); //供應商
+        $result['pos'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents(); //供應商
 
         return view('backend.products_mall.list', $result);
     }
@@ -82,16 +82,16 @@ class ProductsMallController extends Controller
     public function show($id)
     {
         $result = [];
-        $result['products'] =  $this->arrangeProduct($this->productsService->showProducts($id));
-        $result['products_item'] = $this->productsService->getProductItems($id);
+        $result['products'] =  $this->arrangeProduct($this->productService->showProducts($id));
+        $result['products_item'] = $this->productService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content();
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents();
         $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id); //前台分類
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
-        $result['spac_list'] = $this->productsService->getProductSpac($id);
-        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
-        $result['related_products'] = $this->productsService->getRelatedProducts($id);
+        $result['product_photos'] = $this->productService->getProductsPhoto($id);
+        $result['spac_list'] = $this->productService->getProductSpac($id);
+        $result['product_spec_info'] = $this->productService->getProduct_spec_info($id);
+        $result['related_products'] = $this->productService->getRelatedProducts($id);
         return view('backend.products_mall.show', $result);
     }
 
@@ -104,17 +104,17 @@ class ProductsMallController extends Controller
     public function edit($id)
     {
         $result = [];
-        $result['products'] = $this->arrangeProduct($this->productsService->showProducts($id)) ;
-        $result['products_item'] = $this->productsService->getProductItems($id);
+        $result['products'] = $this->arrangeProduct($this->productService->showProducts($id)) ;
+        $result['products_item'] = $this->productService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
-        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->category_hierarchy_content(array("exclude_content_type"=>"'M'"));
+        $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents(array("exclude_content_type"=>"'M'"));
         $result['web_category_hierarchy'] = $this->webCategoryHierarchyService->categoryProductsId($id); //前台分類
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
+        $result['product_photos'] = $this->productService->getProductsPhoto($id);
         $result['product_photos_count'] =  $result['product_photos']->count();
-        $result['spac_list'] = $this->productsService->getProductSpac($id);
-        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
-        $result['related_products'] = $this->productsService->getRelatedProducts($id);
+        $result['spac_list'] = $this->productService->getProductSpac($id);
+        $result['product_spec_info'] = $this->productService->getProduct_spec_info($id);
+        $result['related_products'] = $this->productService->getRelatedProducts($id);
         $result['product_attribute_lov'] = $this->productAttributeLovService->getProductAttributeLov(['attribute_type' => 'CERTIFICATE']); //取checkbox 設定
         $result['product_attributes'] = $this->productAttributesService->getProductAttributes([
             'product_id' => $id,
@@ -136,7 +136,7 @@ class ProductsMallController extends Controller
         $result = [] ;
         $in = $request->input();
         $file = $request->file();
-        $execution =  $this->productsService->updateProductSmall($in, $file, $id);
+        $execution =  $this->productService->updateProductSmall($in, $file, $id);
         $result['status'] = $execution['status'] ;
         $result['route_name'] = 'products_mall';
         $result['act'] = 'upd';
@@ -181,14 +181,14 @@ class ProductsMallController extends Controller
                 break;
             case 'DelGoogleShopPhoto':
                 try {
-                    $this->productsService->delGoogleShopPhoto($in['id']);
+                    $this->productService->delGoogleShopPhoto($in['id']);
                 } catch (\Throwable $th) {
                     $status = false;
                 }
                 break;
             case 'DelItemPhotos':
                 // try {
-                $this->productsService->delItemPhotos($in['item_id']);
+                $this->productService->delItemPhotos($in['item_id']);
                 // } catch (\Throwable $th) {
                 //     $status = false;
                 // }
@@ -235,7 +235,7 @@ class ProductsMallController extends Controller
         if($products->mata_keywords == null){
             $cp = $this->webCategoryHierarchyService->categoryProductsId($products->id) ;
             if($cp->count() > 0){
-                $cpName = $this->webCategoryHierarchyService->category_hierarchy_content(['id' => $cp[0]->web_category_hierarchy_id]);
+                $cpName = $this->webCategoryHierarchyService->getCategoryHierarchyContents(['id' => $cp[0]->web_category_hierarchy_id]);
                 if(count($cpName) > 0){
                     $products->mata_keywords = $cpName[0]->name ;
                 }

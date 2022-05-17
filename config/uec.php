@@ -41,11 +41,26 @@ return [
         0 => '失效',
     ],
 
+    // 上下架狀態
+    'launch_status_options' => [
+        'prepare_to_launch' => '待上架',
+        'launched' => '已上架',
+        'no_launch' => '下架',
+        'disabled' => '關閉',
+    ],
+
     // 商品類型
-    'product_type_option' => [
+    'product_type_options' => [
         'N' => '一般品',
         'G' => '贈品',
         'A' => '加購品',
+    ],
+
+    // 庫存類型
+    'stock_type_options' => [
+        'A' => '買斷',
+        'B' => '寄售',
+        'T' => '轉單',
     ],
 
     // 訂單狀態

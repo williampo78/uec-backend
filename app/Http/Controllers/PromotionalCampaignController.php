@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\PromotionalCampaignService;
 
 class PromotionalCampaignController extends Controller
 {
     private $promotional_campaign_service;
-    private $products_service;
+    private $productService;
 
     public function __construct(
         PromotionalCampaignService $promotional_campaign_service,
-        ProductsService $products_service
+        ProductService $productService
     ) {
         $this->promotional_campaign_service = $promotional_campaign_service;
-        $this->products_service = $products_service;
+        $this->productService = $productService;
     }
 
     /**
@@ -28,7 +28,7 @@ class PromotionalCampaignController extends Controller
     public function getProducts(Request $request)
     {
         $input_data = $request->input();
-        $products = $this->products_service->getProducts($input_data);
+        $products = $this->productService->getProducts($input_data);
 
         if (!empty($input_data['exist_products'])) {
             // 過濾已存在的商品
@@ -37,7 +37,7 @@ class PromotionalCampaignController extends Controller
             });
         }
 
-        $this->products_service->restructureProducts($products);
+        $this->productService->restructureProducts($products);
 
         $products = $products->mapWithKeys(function ($product) {
             return [
@@ -67,7 +67,7 @@ class PromotionalCampaignController extends Controller
         ])->first();
 
         if (isset($promotional_campaign->products)) {
-            $this->products_service->restructureProducts($promotional_campaign->products);
+            $this->productService->restructureProducts($promotional_campaign->products);
             $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
                 return [
                     $product->product_id => $product->only([
@@ -84,7 +84,7 @@ class PromotionalCampaignController extends Controller
         }
 
         if (isset($promotional_campaign->giveaways)) {
-            $this->products_service->restructureProducts($promotional_campaign->giveaways);
+            $this->productService->restructureProducts($promotional_campaign->giveaways);
             $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
                 return [
                     $giveaway->product_id => $giveaway->only([

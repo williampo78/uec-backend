@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\LookupValuesV;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class LookupValuesVService

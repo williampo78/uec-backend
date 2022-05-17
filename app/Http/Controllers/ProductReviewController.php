@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\SupplierService ;
 use App\Services\BrandsService ;
 use App\Services\WebCategoryHierarchyService ;
 
 class ProductReviewController extends Controller
 {
-    public function __construct(ProductsService $productsService,
+    public function __construct(ProductService $productService,
     SupplierService $supplierService ,
     BrandsService $brandsService,
     WebCategoryHierarchyService $webCategoryHierarchyService)
     {
-        $this->productsService = $productsService;
+        $this->productService = $productService;
         $this->supplierService = $supplierService;
         $this->brandsService = $brandsService ;
         $this->webCategoryHierarchyService = $webCategoryHierarchyService ;
@@ -33,10 +33,10 @@ class ProductReviewController extends Controller
             'products' => [],
         ] ;
         $in = array_merge($in , ['approval_status' => 'REVIEWING']) ;  // 固定撈出未審核狀態
-        $result['products'] = $this->productsService->getProducts($in) ;
-        $this->productsService->restructureProducts($result['products']);
+        $result['products'] = $this->productService->getProducts($in) ;
+        $this->productService->restructureProducts($result['products']);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content();//供應商
+        $result['pos'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents();//供應商
         return view('backend.product_review.list',$result);
     }
 
@@ -80,7 +80,7 @@ class ProductReviewController extends Controller
      */
     public function edit($id)
     {
-        $products = $this->productsService->showProducts($id);
+        $products = $this->productService->showProducts($id);
         switch ($products->product_type) {
             case 'N':
                 $products->product_type_cn = '一般品';
@@ -94,8 +94,8 @@ class ProductReviewController extends Controller
                 $products->product_type_cn = '加購品';
                 break;
         }
-        $result['products']  = $products;                 
-        $result['product_review_log'] = $this->productsService->getProductReviewLog($id);
+        $result['products']  = $products;
+        $result['product_review_log'] = $this->productService->getProductReviewLog($id);
         return view('backend.product_review.input', $result);
     }
 
@@ -110,7 +110,7 @@ class ProductReviewController extends Controller
     {
         $result = [] ;
         $in = $request->input();
-        $result['status'] = $this->productsService->addProductReview($in , $id) ;
+        $result['status'] = $this->productService->addProductReview($in , $id) ;
         $act = 'review_success';
         $route_name = 'product_review';
         return view('backend.success', compact('route_name', 'act'));

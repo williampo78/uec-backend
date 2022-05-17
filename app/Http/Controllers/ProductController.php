@@ -5,29 +5,37 @@ namespace App\Http\Controllers;
 use App\Exports\ReportExport;
 use App\Services\BrandsService;
 use App\Services\CategoriesSerivce;
-use App\Services\ProductsService;
+use App\Services\OrderSupplierService;
+use App\Services\ProductService;
 use App\Services\SupplierService;
-use App\Services\OrderSupplierService ;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
-class ProductsController extends Controller
+class ProductController extends Controller
 {
-    private $productsService;
-    public function __construct(ProductsService $productsService,
+    private $productService;
+    private $supplierService;
+    private $brandsService;
+    private $webCategoryHierarchyService;
+    private $categoriesSerivce;
+    private $orderSupplierService;
+
+    public function __construct(
+        ProductService $productService,
         SupplierService $supplierService,
         BrandsService $brandsService,
         WebCategoryHierarchyService $webCategoryHierarchyService,
-        CategoriesSerivce $categoriesSerivce ,
-        OrderSupplierService $orderSupplierService) {
-        $this->productsService = $productsService;
+        CategoriesSerivce $categoriesSerivce,
+        OrderSupplierService $orderSupplierService
+    ) {
+        $this->productService = $productService;
         $this->supplierService = $supplierService;
         $this->brandsService = $brandsService;
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
         $this->categoriesSerivce = $categoriesSerivce;
-        $this->orderSupplierService = $orderSupplierService ;
+        $this->orderSupplierService = $orderSupplierService;
     }
     /**
      * Display a listing of the resource.
@@ -43,8 +51,8 @@ class ProductsController extends Controller
         ];
 
         if (count($in) !== 0) {
-            $result['products'] = $this->productsService->getProducts($in);
-            $this->productsService->restructureProducts($result['products']);
+            $result['products'] = $this->productService->getProducts($in);
+            $this->productService->restructureProducts($result['products']);
 
         }
         $q = empty($in) ? '?' : '&';
@@ -53,7 +61,7 @@ class ProductsController extends Controller
             return $this->export($in);
         }
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        $result['pos'] = $this->webCategoryHierarchyService->category_hierarchy_content(); //供應商
+        $result['pos'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents(); //供應商
 
         return view('backend.products.list', $result);
     }
@@ -81,7 +89,7 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $result = [];
-        $execution = $this->productsService->addProducts($request->input(), $request->file());
+        $execution = $this->productService->addProducts($request->input(), $request->file());
         $result['status'] = $execution['status'];
         $result['route_name'] = 'products';
         $result['act'] = 'add';
@@ -105,14 +113,14 @@ class ProductsController extends Controller
     public function show($id)
     {
         $result = [];
-        $result['products'] = $this->productsService->showProducts($id);
-        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id);
-        $result['products_item'] = $this->productsService->getProductItems($id);
+        $result['products'] = $this->productService->showProducts($id);
+        $result['product_audit_log'] = $this->productService->getProductAuditLog($id);
+        $result['products_item'] = $this->productService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
         $result['pos'] = $this->categoriesSerivce->getPosCategories();
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
-        $result['spac_list'] = $this->productsService->getProductSpac($id);
+        $result['product_photos'] = $this->productService->getProductsPhoto($id);
+        $result['spac_list'] = $this->productService->getProductSpac($id);
         $result['finallyOrderSupplier'] = $this->orderSupplierService->getFinallyOrderSupplier($id);
         // dump($result['spac_list']) ; exit ;
         return view('backend.products.show', $result);
@@ -127,7 +135,7 @@ class ProductsController extends Controller
     public function edit($id)
     {
         $result = [];
-        $products = $this->productsService->showProducts($id);
+        $products = $this->productService->showProducts($id);
         $products->launched_status = '';
         $products->launched_at = ($products->start_launched_at || $products->end_launched_at) ? "{$products->start_launched_at} ~ {$products->end_launched_at}" : '';
         switch ($products->approval_status) {
@@ -157,14 +165,14 @@ class ProductsController extends Controller
                 break;
         }
         $result['products'] = $products;
-        $result['product_audit_log'] = $this->productsService->getProductAuditLog($id);
-        $result['products_item'] = $this->productsService->getProductItems($id);
+        $result['product_audit_log'] = $this->productService->getProductAuditLog($id);
+        $result['products_item'] = $this->productService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
         $result['pos'] = $this->categoriesSerivce->getPosCategories();
-        $result['product_photos'] = $this->productsService->getProductsPhoto($id);
-        $result['spac_list'] = $this->productsService->getProductSpac($id);
-        $result['product_spec_info'] = $this->productsService->getProduct_spec_info($id);
+        $result['product_photos'] = $this->productService->getProductsPhoto($id);
+        $result['spac_list'] = $this->productService->getProductSpac($id);
+        $result['product_spec_info'] = $this->productService->getProduct_spec_info($id);
         $result['finallyOrderSupplier'] = $this->orderSupplierService->getFinallyOrderSupplier($id);
 
         return view('backend.products.update', $result);
@@ -180,7 +188,7 @@ class ProductsController extends Controller
     public function update(Request $request, $id)
     {
         $result = [];
-        $execution = $this->productsService->editProducts($request->input(), $request->file());
+        $execution = $this->productService->editProducts($request->input(), $request->file());
         $result['status'] = $execution['status'];
         $result['route_name'] = 'products';
         $result['act'] = 'upd';
@@ -211,7 +219,7 @@ class ProductsController extends Controller
         switch ($in['type']) {
             case 'checkPosItemNo':
                 if ($in['pos_item_no'] !== '') {
-                    $result = $this->productsService->checkPosItemNo($in['pos_item_no'], $in['item_no']);
+                    $result = $this->productService->checkPosItemNo($in['pos_item_no'], $in['item_no']);
                 } else {
                     $result = false;
                 }
@@ -227,9 +235,9 @@ class ProductsController extends Controller
     }
     public function export($in)
     {
-        $data = $this->productsService->getItemsJoinProducts($in);
+        $data = $this->productService->getItemsJoinProducts($in);
         $pos = $this->categoriesSerivce->getPosCategories()->keyBy('id');
-        $this->productsService->restructureItemsProducts($data, $pos);
+        $this->productService->restructureItemsProducts($data, $pos);
         $title = [
             "stock_type_cn" => "庫存類型",
             "product_no" => "商品序號",
@@ -286,4 +294,51 @@ class ProductsController extends Controller
         return Excel::download($export, '商品主檔' . date('Y-m-d') . '.xlsx');
     }
 
+    /**
+     * 取得商品modal下拉選項
+     *
+     * @return void
+     */
+    public function getModalOptions()
+    {
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
+        // 商品類型
+        $result['product_type_options'] = config('uec.product_type_options');
+        // 前台分類
+        $result['web_category_hierarchies'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents();
+
+        return response()->json($result);
+    }
+
+    /**
+     * 取得modal的商品
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function getModalProducts(Request $request)
+    {
+        $queryData = $request->only([
+            'supplier_id',
+            'product_no',
+            'product_name',
+            'selling_price_min',
+            'selling_price_max',
+            'created_at_start',
+            'created_at_end',
+            'start_launched_at_start',
+            'start_launched_at_end',
+            'product_type',
+            'web_category_hierarchy_id',
+            'limit',
+            'stock_types',
+            'exclude_product_ids',
+        ]);
+
+        $products = $this->productService->getModalProducts($queryData);
+        $products = $this->productService->formatModalProducts($products);
+
+        return response()->json($products);
+    }
 }

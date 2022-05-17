@@ -6,7 +6,7 @@ use App\Models\Quotation;
 use Illuminate\Http\Request;
 use App\Models\QuotationDetail;
 use App\Services\BrandsService;
-use App\Services\ProductsService;
+use App\Services\ProductService;
 use App\Services\SupplierService;
 use App\Services\QuotationService;
 use App\Services\UniversalService;
@@ -28,13 +28,13 @@ class QuotationController extends Controller
         UniversalService $universalService,
         WarehouseService $warehouseService,
         SupplierService $supplierService,
-        ProductsService $productsService,
+        ProductService $productService,
         BrandsService $brandsService) {
         $this->quotationService = $quotationService;
         $this->universalService = $universalService;
         $this->warehouseService = $warehouseService;
         $this->supplierService = $supplierService;
-        $this->productsService = $productsService;
+        $this->productService = $productService;
         $this->brandsService = $brandsService;
     }
     public function index(Request $request)
@@ -57,7 +57,7 @@ class QuotationController extends Controller
     {
         $result['supplier'] = $this->supplierService->getSuppliers();
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productsService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
+        $result['products_item'] = $this->productService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
         });
@@ -110,7 +110,7 @@ class QuotationController extends Controller
         $result['quotation'] = $this->quotationService->getQuotationById($id);
         $result['quotation_details'] = $this->quotationService->getQuotationDetail($id);
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productsService->getItemsAndProduct(['supplier_id' => $result['quotation']->supplier_id]);
+        $result['products_item'] = $this->productService->getItemsAndProduct(['supplier_id' => $result['quotation']->supplier_id]);
         $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'upd';
         $result['id'] = $id;
@@ -186,7 +186,7 @@ class QuotationController extends Controller
                 break;
             //供應商取得商品
             case 'supplierGetProducts':
-               $products =  $this->productsService->getItemsAndProduct([
+               $products =  $this->productService->getItemsAndProduct([
                     'supplier_id' => $in['supplier_id'],
                     'stock_type'=> 'A'
                 ]);
