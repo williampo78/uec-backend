@@ -1185,7 +1185,9 @@ class APIProductServices
                                 'promotion_desc' => $promotion_desc,
                                 'promotion_label' => (isset($promotional[$product_id]) ? $promotional[$product_id] : null),
                                 "collection" => $collection,
-                                'cart' => $cart
+                                'cart' => $cart,
+                                "selling_channel" => $products[$product_id]->selling_channel,
+                                "start_selling" => $products[$product_id]->start_selling_at
                             );
                         }
                     }
