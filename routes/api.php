@@ -87,6 +87,7 @@ Route::group(['middleware' => 'jwt.verify'], function () {
         Route::post('/shoppingCartData', [ShoppingController::class, 'getShoppingCartData']);
         Route::post('/batchSetCart', [ShoppingController::class, 'setBatchCart']);
         Route::post('/addGoodsQty', [ShoppingController::class, 'addGoodsQty']);
+        Route::post('/displayCartData', [ShoppingController::class, 'displayCartData']);
     });
 
     Route::group(['prefix' => 'checkout'], function () {

@@ -199,4 +199,31 @@ class ShoppingController extends Controller
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
 
     }
+
+    /*
+     * 查詢會員購物車內容
+     * @param
+     */
+    public function displayCartData()
+    {
+        $member_id = Auth::guard('api')->user()->member_id;
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiCartService->getCartInfo($member_id);
+        $results = $response;
+        unset($results['items']);
+        foreach ($results as $id=>$result) {
+            $data[] = $id;
+        }
+        if (count($data) > 0) {
+            $status = true;
+            $list = $data;
+        } else {
+            $status = false;
+            $err = '404';
+            $list = [];
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+
+    }
 }
