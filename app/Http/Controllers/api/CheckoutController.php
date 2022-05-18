@@ -107,7 +107,7 @@ class CheckoutController extends Controller
                 } else {
                     $point_discount = 0;
                 }
-                if (($response['result']['totalPrice'] - $response['result']['discount'] - $point_discount) < $response['result']['feeInfo']['free_threshold']) {
+                if (($response['result']['totalPrice'] - ($response['result']['discount'] + $response['result']['thresholdAmount']) - $point_discount) < $response['result']['feeInfo']['free_threshold']) {
                     $shipping_fee = $response['result']['feeInfo']['shipping_fee'];
                 } else {
                     $shipping_fee = 0;
@@ -266,7 +266,7 @@ class CheckoutController extends Controller
                     $points_discount = 0;
                 }
 
-                if (($response['result']['totalPrice'] - $response['result']['discount'] - abs($points_discount)) < $response['result']['feeInfo']['free_threshold']) {
+                if (($response['result']['totalPrice'] - $response['result']['discount'] - abs($points_discount) + $response['result']['thresholdAmount']) < $response['result']['feeInfo']['free_threshold']) {
                     $shipping_fee = $response['result']['feeInfo']['shipping_fee'];
                 } else {
                     $shipping_fee = 0;
