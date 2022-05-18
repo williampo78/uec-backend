@@ -836,44 +836,41 @@ class APICartServices
                             if ($calc_qty[$campaign_id] < $item->n_value) continue;
                             if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
                         }
-                        $threshold_id = 0;
-                        foreach ($campaignThresholdGift[$campaign_id] as $key => $giftawayInfo) {
-                            foreach ($giftawayInfo as $giftInfo) {
-                                foreach ($giftInfo as $k => $v) {
-                                    if ($threshold_id != $v->threshold_id)
-                                    $prods[$v['product_id']] = array(
-                                        "productPhoto" => $threshold_prod[$v['product_id']]->photo,
-                                        "productId" => $v['product_id'],
-                                        "productName" => $threshold_prod[$v['product_id']]->product_name,
-                                        "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
-                                        "assignedQty" => $v->assigned_qty,
-                                    );
-                                    $threshold_id = $v->threshold_id;
-                                }
+
+                        foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
+                            foreach ($giftawayInfo as $giftInfo=>$v) {
+                                $prods[$v['product_id']] = array(
+                                    "productPhoto" => $threshold_prod[$v['product_id']]->photo,
+                                    "productId" => $v['product_id'],
+                                    "productName" => $threshold_prod[$v['product_id']]->product_name,
+                                    "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
+                                    "assignedQty" => $v->assigned_qty,
+                                );
                             }
                         }
                         $compare_n_value = $item->n_value;
-                    }
 
-                    $prods_display = [];//重新調整結構for前端使用
-                    if (isset($prods)) {
-                        foreach ($prods as $prod) {
-                            $prods_display[] = $prod;
+                        $prods_display = [];//重新調整結構for前端使用
+                        if (isset($prods)) {
+                            foreach ($prods as $prod) {
+                                $prods_display[] = $prod;
+                            }
+                        }
+                        if (isset($prods)) {
+                            $thresholdGiftAway[$campaign_id] = array(
+                                "thresholdID" => $item->id,
+                                "campaignID" => $campaign_id,
+                                "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
+                                "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
+                                "campaignBrief" => $item->threshold_brief,
+                                "campaignNvalue" => $item->n_value,
+                                "campaignXvalue" => $item->x_value,
+                                "campaignProdList" => $prods_display,
+                                "products" => $pid,
+                                "productAmount" => $subAmount
+                            );
                         }
                     }
-
-                    $thresholdGiftAway[$campaign_id] = array(
-                        "thresholdID" => $item->id,
-                        "campaignID" => $campaign_id,
-                        "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
-                        "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
-                        "campaignBrief" => $item->threshold_brief,
-                        "campaignNvalue" => $item->n_value,
-                        "campaignXvalue" => $item->x_value,
-                        "campaignProdList" => $prods_display,
-                        "products" => $pid,
-                        "productAmount" => $subAmount
-                    );
                 }
 
                 $thresholdGiftAway_display = []; //重新調整結構for前端使用
