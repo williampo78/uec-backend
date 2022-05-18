@@ -757,7 +757,6 @@ class APICartServices
             $calc_qty[] = 0;
             $price = 0;
             $quantity = 0;
-            $cartDiscount = 0;
             $thresholdDiscount_display = [];
             $thresholdAmount = 0;
             //滿額折扣 CART_P01 & CART_P02
@@ -783,19 +782,20 @@ class APICartServices
                             $prodDiscount = $item->x_value;
                         }
 
-                        $thresholdDiscount[$campaign_id] = array(
-                            "thresholdID" => $item->id,
-                            "campaignID" => $campaign_id,
-                            "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
-                            "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
-                            "campaignBrief" => $item->threshold_brief,
-                            "campaignNvalue" => $item->n_value,
-                            "campaignXvalue" => $item->x_value,
-                            "campaignDiscount" => ($prodDiscount * -1),
-                            "products" => $pid,
-                            "productAmount" => $subAmount
-                        );
-                        $cartDiscount += ($prodDiscount);
+                        foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
+                            $thresholdDiscount[$campaign_id] = array(
+                                "thresholdID" => $item->id,
+                                "campaignID" => $campaign_id,
+                                "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
+                                "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
+                                "campaignBrief" => $item->threshold_brief,
+                                "campaignNvalue" => $item->n_value,
+                                "campaignXvalue" => $item->x_value,
+                                "campaignDiscount" => ($prodDiscount * -1),
+                                "products" => $pid,
+                                "productAmount" => $subAmount
+                            );
+                        }
                         $compare_n_value = $item->n_value;
                     }
                 }
@@ -882,15 +882,13 @@ class APICartServices
             }
             //滿額送贈 CART_P03 & CART_P04
 
-
             //全車滿額贈
-            //$cartDiscount = 0;
+            $cartDiscount = 0;
             $compare_n_value = 0;
             foreach ($campaign_discount as $items => $item) {
                 if ($compare_n_value > $item->n_value) {
                     continue;
                 }
-
                 if ($cartTotal >= $item->n_value) {
                     if ($item->campaign_type == 'CART01') { //﹝滿額﹞購物車滿N元，打X折
                         $cartDiscount += $cartTotal - ($cartTotal * $item->x_value); //打折10000-(10000*0.85)
@@ -900,7 +898,9 @@ class APICartServices
                     $compare_n_value = $item->n_value;
                 }
             }
-
+            if ($cartDiscount > 0) {
+                $cartDiscount = $cartDiscount + $thresholdAmount;
+            }
             $total_amount = ($cartTotal - $cartDiscount);
             if (isset($campaign_gift['CART'])) {
                 $compare_value = 0;
