@@ -333,7 +333,7 @@
                                             <button type="button" class="btn btn-primary" @click="exchange_promotional_campaigns(promotional_campaigns)" data-dismiss="modal">帶入</button>
                                         </div>
                                     </td>
-                                    <td>@{{ promotional_campaigns.campaign_name }}</td>
+                                    <td>@{{ promotional_campaigns.campaign_brief }}</td>
                                     <td>@{{promotional_campaigns.start_at}} ~ @{{ promotional_campaigns.end_at }} </td>
                                     <td>@{{ promotional_campaigns.id }}</td>
                                 </tr>

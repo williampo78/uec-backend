@@ -266,7 +266,7 @@ class AdvertisementService
             ->where('lookup_values_v.type_code', 'APPLICABLE_PAGE')
             ->find($id);
 
-        $result['details'] = AdSlotContentDetail::select('ad_slot_content_details.*',DB::raw('promotional_campaigns.campaign_name as campaign_name'))
+        $result['details'] = AdSlotContentDetail::select('ad_slot_content_details.*',DB::raw('promotional_campaigns.campaign_brief as campaign_brief'))
             ->where('ad_slot_content_id', $id)
             ->leftJoin('promotional_campaigns', 'ad_slot_content_details.target_campaign_id', '=', 'promotional_campaigns.id')
             ->orderBy('sort', 'ASC')

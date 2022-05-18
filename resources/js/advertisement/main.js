@@ -268,7 +268,7 @@ window.init = (datas = {}) => {
                     .val("")
                     .trigger("change");
                 form_group_element
-                    .find('[name^="target_campaign_name"]')
+                    .find('[name^="target_campaign_brief"]')
                     .val("");
                 form_group_element
                     .find('[name^="target_campaign_id"]')
@@ -281,7 +281,7 @@ window.init = (datas = {}) => {
                     .val("")
                     .trigger("change");
                 form_group_element
-                    .find('[name^="target_campaign_name"]')
+                    .find('[name^="target_campaign_brief"]')
                     .val("");
                 form_group_element
                     .find('[name^="target_campaign_id"]')
@@ -293,7 +293,7 @@ window.init = (datas = {}) => {
                     .find('[name^="image_block_target_url"]')
                     .val("");
                 form_group_element
-                    .find('[name^="target_campaign_name"]')
+                    .find('[name^="target_campaign_brief"]')
                     .val("");
                 form_group_element
                     .find('[name^="target_campaign_id"]')
@@ -328,7 +328,7 @@ window.init = (datas = {}) => {
                     .val("")
                     .trigger("change");
                 form_group_element
-                    .find('[name^="target_campaign_name"]')
+                    .find('[name^="target_campaign_brief"]')
                     .val("");
                 form_group_element
                     .find('[name^="target_campaign_id"]')
@@ -341,7 +341,7 @@ window.init = (datas = {}) => {
                     .val("")
                     .trigger("change");
                 form_group_element
-                    .find('[name^="target_campaign_name"]')
+                    .find('[name^="target_campaign_brief"]')
                     .val("");
                 form_group_element
                     .find('[name^="target_campaign_id"]')
@@ -353,7 +353,7 @@ window.init = (datas = {}) => {
                     .find('[name^="text_block_target_url"]')
                     .val("");
                 form_group_element
-                    .find('[name^="target_campaign_name"]')
+                    .find('[name^="target_campaign_brief"]')
                     .val("");
                 form_group_element
                     .find('[name^="target_campaign_id"]')
@@ -471,11 +471,11 @@ window.init = (datas = {}) => {
                         `<tr>
                             <td>
                                 <button type="button" class="btn btn-primary btn_add_promotion_campaign"
-                                data-id="${value.id}" data-name="${value.campaign_name}"
+                                data-id="${value.id}" data-name="${value.campaign_brief}"
                                 data-dismiss="modal">帶入
                                 </button>
                             </td>
-                            <td>${value.campaign_name}</td>
+                            <td>${value.campaign_brief}</td>
                             <td>${value.start_at} ~ ${value.end_at}</td>
                             <td>${value.id}</td>
                         </tr>`
@@ -491,7 +491,7 @@ window.init = (datas = {}) => {
 
     $(document).on("click" , ".btn_add_promotion_campaign",function(){
         let now_row_num = $('#now_row_num').val();
-        $('.target_campaign_name_'+now_row_num).val($(this).data('name'));
+        $('.target_campaign_brief_'+now_row_num).val($(this).data('name'));
         $('.target_campaign_id_'+now_row_num).val($(this).data('id'));
     });
     // 刪除圖片區的圖片
@@ -556,7 +556,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
     let image_title = datas.image_title ? datas.image_title : "";
     let image_abstract = datas.image_abstract ? datas.image_abstract : "";
     let target_url = datas.target_url ? datas.target_url : "";
-    let target_campaign_name = datas.campaign_name ? datas.campaign_name : "";
+    let target_campaign_brief = datas.campaign_brief ? datas.campaign_brief : "";
     let target_campaign_id = datas.target_campaign_id ? datas.target_campaign_id : "";
     let target_campaign_btn_show = datas.target_campaign_id ? "" : "display:none";
     $("#image-block table > tbody").append(`
@@ -651,7 +651,7 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
                         </div>
                         <div class="col-sm-8">
                             <div class="form-group">
-                                <input type="text" class="form-control target_campaign_name_${image_block_row_no}" name="target_campaign_name[${image_block_row_no}]" value="${target_campaign_name}" readonly/>
+                                <input type="text" class="form-control target_campaign_brief_${image_block_row_no}" name="target_campaign_brief[${image_block_row_no}]" value="${target_campaign_brief}" readonly/>
                                 <input type="hidden" class="form-control target_campaign_id_${image_block_row_no}" name="target_campaign_id[${image_block_row_no}]" value="${target_campaign_id}" readonly/>
                             </div>
                         </div>
@@ -703,7 +703,7 @@ window.addTextBlock = (product_category_select_options, datas = {}) => {
     let sort = datas.sort != null ? datas.sort : "";
     let texts = datas.texts ? datas.texts : "";
     let target_url = datas.target_url ? datas.target_url : "";
-    let target_campaign_name = datas.campaign_name ? datas.campaign_name : "";
+    let target_campaign_brief = datas.campaign_brief ? datas.campaign_brief : "";
     let target_campaign_id = datas.target_campaign_id ? datas.target_campaign_id : "";
     let target_campaign_btn_show = datas.target_campaign_id ? "" : "display:none";
     $("#text-block table > tbody").append(`
@@ -771,7 +771,7 @@ window.addTextBlock = (product_category_select_options, datas = {}) => {
                         </div>
                         <div class="col-sm-8">
                             <div class="form-group">
-                                <input type="text" class="form-control target_campaign_name_${text_block_row_no}" name="target_campaign_name[${text_block_row_no}]" value="${target_campaign_name}" readonly/>
+                                <input type="text" class="form-control target_campaign_brief_${text_block_row_no}" name="target_campaign_brief[${text_block_row_no}]" value="${target_campaign_brief}" readonly/>
                                 <input type="hidden" class="form-control target_campaign_id_${text_block_row_no}" name="target_campaign_id[${text_block_row_no}]" value="${target_campaign_id}" readonly/>
                             </div>
                         </div>

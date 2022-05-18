@@ -59,7 +59,7 @@
                             data-target="#promotion_campaign_model">挑選賣場</button>
                     </div>
                     <div class="col-sm-5">
-                        <input type="text" id="campaign_name" name="campaign_name" v-model="category_hierarchy_content.campaign_name" class="form-control" readonly>
+                        <input type="text" id="campaign_brief" name="campaign_brief" v-model="category_hierarchy_content.campaign_brief" class="form-control" readonly>
                         <input type="hidden" name="promotion_campaign_id" v-model="category_hierarchy_content.promotion_campaign_id" class="form-control" readonly>
                     </div>
                     <div class="col-sm-1" v-show="category_hierarchy_content.promotion_campaign_id !== null">

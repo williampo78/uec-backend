@@ -213,7 +213,7 @@ class AdvertisementLaunchController extends Controller
                 'web_category_hierarchy_id',
                 'target_url',
                 'target_cate_hierarchy_id',
-                'campaign_name',
+                'campaign_brief',
                 'target_campaign_id',
             ]);
         }

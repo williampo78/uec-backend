@@ -282,14 +282,14 @@
                 },
                 exchange_promotional_campaigns(promotional_campaigns_data){
 
-                    this.category_hierarchy_content.campaign_name = promotional_campaigns_data.campaign_name;
+                    this.category_hierarchy_content.campaign_brief = promotional_campaigns_data.campaign_brief;
                     this.category_hierarchy_content.promotion_campaign_id = promotional_campaigns_data.id;
-                    $('#campaign_name').rules("add", {required: true,});
+                    $('#campaign_brief').rules("add", {required: true,});
                 },
                 del_promotion_campaign_id(){
                     var check_alert = confirm('你確定要刪除賣場嗎?');
                     if (check_alert) {
-                        this.category_hierarchy_content.campaign_name = null;
+                        this.category_hierarchy_content.campaign_brief = null;
                         this.category_hierarchy_content.promotion_campaign_id = null;
                     }
                 },
@@ -347,7 +347,7 @@
                         active: {
                             required: true,
                         },
-                        campaign_name:{
+                        campaign_brief:{
                             required: true,
                         }
                     },

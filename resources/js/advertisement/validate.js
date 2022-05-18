@@ -44,7 +44,7 @@ export let validateImageBlock = (row_no) => {
             }
         },
     });
-    $(`#image-block table > tbody [name="target_campaign_name[${row_no}]"]`).rules("add", {
+    $(`#image-block table > tbody [name="target_campaign_brief[${row_no}]"]`).rules("add", {
         required: {
             depends: function (element) {
                 return $(
@@ -81,7 +81,7 @@ export let validateTextBlock = (row_no) => {
         },
         url: true,
     });
-    $(`#text-block table > tbody [name="target_campaign_name[${row_no}]"]`).rules("add", {
+    $(`#text-block table > tbody [name="target_campaign_brief[${row_no}]"]`).rules("add", {
         required: {
             depends: function (element) {
                 return $(
