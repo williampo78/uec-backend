@@ -118,7 +118,7 @@ class APIOrderService
             $webData['cart_campaign_discount'] = $cart_campaign_discount; //原C002滿額折抵
             $webData['cart_p_discount'] = $cart_p_discount;//新C003滿額折抵
             $webData['point_discount'] = $order['point_discount'];
-            $webData['paid_amount'] = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee']);
+            $webData['paid_amount'] = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee'] + $cart_p_discount);
             $webData['points'] = $order['points'];
             $webData['is_paid'] = 0;
             $webData['pay_status'] = 'PENDING';
