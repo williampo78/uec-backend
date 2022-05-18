@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <br>
-                    <div class="row" v-show="addCategory.category_level == UecConfig.web_category_hierarchy_levels ">
+                    <div class="row" style="display: none;">
                         <div class="col-sm-2 "><label> 內容類型</label></div>
                         <div class="col-sm-4 ">
                             <select class="form-control js-select2" disabled name="content_type" id="content_type" v-model="addCategory.content_type">
