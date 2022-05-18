@@ -585,7 +585,7 @@ window.init = function () {
         }).then(function (response) {
           var html = '';
           $.each(response.data.data, function (key, value) {
-            html += "<tr>\n                            <td>\n                                <button type=\"button\" class=\"btn btn-primary btn_add_promotion_campaign\"\n                                data-id=\"".concat(value.id, "\" data-name=\"").concat(value.campaign_name, "\"\n                                data-dismiss=\"modal\">\u5E36\u5165\n                                </button>\n                            </td>\n                            <td>").concat(value.campaign_name, "</td>\n                            <td>").concat(value.start_at, " ~ ").concat(value.end_at, "\u4E0A\u67B6\u6642\u9593</td>\n                            <td>").concat(value.id, "</td>\n                        </tr>");
+            html += "<tr>\n                            <td>\n                                <button type=\"button\" class=\"btn btn-primary btn_add_promotion_campaign\"\n                                data-id=\"".concat(value.id, "\" data-name=\"").concat(value.campaign_name, "\"\n                                data-dismiss=\"modal\">\u5E36\u5165\n                                </button>\n                            </td>\n                            <td>").concat(value.campaign_name, "</td>\n                            <td>").concat(value.start_at, " ~ ").concat(value.end_at, "</td>\n                            <td>").concat(value.id, "</td>\n                        </tr>");
           });
           $('#promotion_campaign_model_list').append(html);
         })["catch"](function (error) {

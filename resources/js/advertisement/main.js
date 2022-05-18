@@ -450,7 +450,7 @@ window.init = (datas = {}) => {
                                 </button>
                             </td>
                             <td>${value.campaign_name}</td>
-                            <td>${value.start_at} ~ ${value.end_at}上架時間</td>
+                            <td>${value.start_at} ~ ${value.end_at}</td>
                             <td>${value.id}</td>
                         </tr>`
                     });
