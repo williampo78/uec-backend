@@ -287,8 +287,11 @@
                     $('#campaign_name').rules("add", {required: true,});
                 },
                 del_promotion_campaign_id(){
-                    this.category_hierarchy_content.campaign_name = null;
-                    this.category_hierarchy_content.promotion_campaign_id = null;
+                    var check_alert = confirm('你確定要刪除賣場嗎?');
+                    if (check_alert) {
+                        this.category_hierarchy_content.campaign_name = null;
+                        this.category_hierarchy_content.promotion_campaign_id = null;
+                    }
                 },
             },
             mounted: function() {
