@@ -254,6 +254,16 @@ __webpack_require__.r(__webpack_exports__);
 
 window.init = function () {
   var datas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  var isToday = function isToday(date) {
+    var today = new Date();
+    return date.getDate() == today.getDate() && date.getMonth() == today.getMonth() && date.getFullYear() == today.getFullYear();
+  };
+
+  var isSameDay = function isSameDay(date1, date2) {
+    return date1.getDate() == date2.getDate() && date1.getMonth() == date2.getMonth() && date1.getFullYear() == date2.getFullYear();
+  };
+
   var ad_slot_select_options = datas.ad_slot_select_options ? datas.ad_slot_select_options : "";
   var product_category_select_options = datas.product_category_select_options ? datas.product_category_select_options : "";
   var product_select_options = datas.product_select_options ? datas.product_select_options : "";
@@ -265,6 +275,7 @@ window.init = function () {
   }
 
   $(".js-select2-slot-id").select2();
+  var startLaunchedAtLastSelectedDates;
   var start_at_flatpickr = flatpickr("#start_at_flatpickr", {
     dateFormat: "Y-m-d H:i:S",
     maxDate: $("#end_at").val(),
@@ -274,13 +285,27 @@ window.init = function () {
     defaultMinute: 0,
     defaultSeconds: 0,
     onChange: function onChange(selectedDates, dateStr, instance) {
-      end_at_flatpickr.set('minDate', dateStr);
+      var selectedDate = selectedDates[0];
+
+      if (!startLaunchedAtLastSelectedDates || !isSameDay(startLaunchedAtLastSelectedDates[0], selectedDates[0])) {
+        if (isToday(selectedDates[0])) {
+          selectedDate = new Date(new Date().getTime() + 5 * 60 * 1000).setSeconds(0);
+          this.setDate(selectedDate);
+        } else {
+          selectedDate = selectedDate.setHours(0, 0, 0);
+          this.setDate(selectedDate);
+        }
+      }
+
+      end_at_flatpickr.set('minDate', selectedDate);
 
       if (!end_at_flatpickr.input.value) {
         end_at_flatpickr.hourElement.value = 23;
         end_at_flatpickr.minuteElement.value = 59;
         end_at_flatpickr.secondElement.value = 59;
       }
+
+      startLaunchedAtLastSelectedDates = selectedDates;
     }
   });
   var end_at_flatpickr = flatpickr("#end_at_flatpickr", {
