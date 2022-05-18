@@ -825,7 +825,7 @@ class APICartServices
                         $pid[] = $product_id;
                         $subAmount[] = $prod_amount[$product_id];
                     }
-                    $calc_amount[$campaign_id] = $price;
+                    $calc_amount[$campaign_id] = ($price-$thresholdAmount);
                     $calc_qty[$campaign_id] = $quantity;
                     $compare_n_value = 0;
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
