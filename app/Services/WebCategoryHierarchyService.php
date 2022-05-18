@@ -269,16 +269,20 @@ class WebCategoryHierarchyService
     {
         $now = Carbon::now();
         $promotionalCampaigns = DB::table('promotional_campaigns')->where('level_code', 'CART_P');
+
         if (!empty($in['promotional_campaigns_time_type'])) {
-            if ($in['promotional_campaigns_time_type'] == 'all') {
-            }
+            // if ($in['promotional_campaigns_time_type'] == 'all') {
+            // }
             if ($in['promotional_campaigns_time_type'] == 'not_expired') {
-                $promotionalCampaigns->where('start_at', '<=', $now)->where('end_at', '>=', $now);
+                $promotionalCampaigns->where('end_at', '>=', $now);
             }
         }
+
         if (!empty($in['promotional_campaigns_key_word'])) {
-            $promotionalCampaigns->whereLike('campaign_name', $in['promotional_campaigns_key_word'])->orWhereLike('campaign_brief', $in['promotional_campaigns_key_word']);
+            $promotionalCampaigns->Where('campaign_name', 'like', '%' . $in['promotional_campaigns_key_word'] . '%')
+            ->orWhere('campaign_brief', 'like', '%' . $in['promotional_campaigns_key_word'] . '%');
         }
+
         if (!empty($in['id'])) {
             $promotionalCampaigns->where('id', $in['id']);
         };
