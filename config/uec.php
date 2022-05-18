@@ -86,6 +86,7 @@ return [
     'payment_method_options' => [
         'TAPPAY_CREDITCARD' => '信用卡一次付清',
         'TAPPAY_LINEPAY' => 'LINE Pay',
+        'TAPPAY_JKOPAY' => '街口支付',
     ],
 
     // 物流方式

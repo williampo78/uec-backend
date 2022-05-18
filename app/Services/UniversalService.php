@@ -154,6 +154,7 @@ class UniversalService
         $data = [
             'TAPPAY_CREDITCARD' => '信用卡',
             'TAPPAY_LINEPAY' => 'LINE Pay',
+            'TAPPAY_JKOPAY' => '街口支付',
         ];
 
         return $data;
