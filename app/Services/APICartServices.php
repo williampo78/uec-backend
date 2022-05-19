@@ -92,7 +92,7 @@ class APICartServices
             $webData = [];
             if ($act == 'add') {
                 $webData['member_id'] = $member_id;
-                $webData['product_id'] =  $item[0]['product_id'];
+                $webData['product_id'] = $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
                 $webData['status_code'] = $input['status_code'];
                 $webData['qty'] = $input['item_qty'];
@@ -110,7 +110,7 @@ class APICartServices
                 }
                 $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
-                $webData['product_id'] =  $item[0]['product_id'];
+                $webData['product_id'] = $item[0]['product_id'];
                 $webData['qty'] = ($input['status_code'] == 0 ? $input['item_qty'] : 0);
                 $webData['status_code'] = $input['status_code'];
                 $webData['updated_by'] = $member_id;
@@ -781,7 +781,7 @@ class APICartServices
                         } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
                             $prodDiscount = $item->x_value;
                         }
-
+                        $thresholdDiscount = [];
                         foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
                             $thresholdDiscount[$campaign_id] = array(
                                 "thresholdID" => $item->id,
@@ -836,9 +836,9 @@ class APICartServices
                             if ($calc_qty[$campaign_id] < $item->n_value) continue;
                             if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
                         }
-
+                        $prods = [];
                         foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
-                            foreach ($giftawayInfo as $giftInfo=>$v) {
+                            foreach ($giftawayInfo as $giftInfo => $v) {
                                 $prods[$v['product_id']] = array(
                                     "productPhoto" => $threshold_prod[$v['product_id']]->photo,
                                     "productId" => $v['product_id'],
@@ -964,7 +964,7 @@ class APICartServices
                 "point" => $info->data->point,
                 "discountRate" => $info->data->discountRate,
                 "exchangeRate" => $info->data->exchangeRate,
-                "discountMax" => ($info->data->point > 0 ? floor($total_amount * $info->data->discountRate) : 0),
+                "discountMax" => ($info->data->point > 0 ? floor(($total_amount + $thresholdAmount) * $info->data->discountRate) : 0),
             );
 
             //運費規則
@@ -983,7 +983,7 @@ class APICartServices
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
                 "thresholdDiscount" => isset($thresholdDiscount_display) ? $thresholdDiscount_display : [],
-                "thresholdAmount"=> round($thresholdAmount),
+                "thresholdAmount" => round($thresholdAmount),
                 "thresholdGiftAway" => isset($thresholdGiftAway_display) ? $thresholdGiftAway_display : [],
                 "discount" => round($cartDiscount),
                 "giftAway" => $cartGift,
@@ -1121,7 +1121,7 @@ class APICartServices
             $webData = [];
             if ($act == 'add') {
                 $webData['member_id'] = $member_id;
-                $webData['product_id'] =  $item[0]['product_id'];
+                $webData['product_id'] = $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
                 $webData['status_code'] = $input['status_code'];
                 $webData['qty'] = $input['item_qty'];
@@ -1139,7 +1139,7 @@ class APICartServices
                 }
                 $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
-                $webData['product_id'] =  $item[0]['product_id'];
+                $webData['product_id'] = $item[0]['product_id'];
                 $webData['qty'] = $qty;
                 $webData['status_code'] = $input['status_code'];
                 $webData['utm_source'] = $input['utm_source'];

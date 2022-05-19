@@ -81,7 +81,7 @@ class APIOrderService
             foreach ($threshold['products'] as $k => $product_id) {
                 $threshold_prod['value'][$product_id] = $threshold['campaignXvalue']; //折數、折價金額
                 $threshold_prod['price'][$product_id] = $threshold['productAmount'][$k]; //單品小計
-                $threshold_prod['threshold'][$product_id] = $threshold['thresholdID']; //門檻ID
+                $threshold_prod['thresholdDiscount'][$product_id] = $threshold['thresholdID']; //門檻ID
                 $total += $threshold['productAmount'][$k]; //單品金額加總
                 $campaign_group[$product_id][$threshold['campaignID']] = $group_i;
             }
@@ -92,6 +92,7 @@ class APIOrderService
             $group_i++;
             foreach ($threshold['products'] as $k => $product_id) {
                 $campaign_group[$product_id][$threshold['campaignID']] = $group_i;
+                $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //門檻ID
             }
         }
         DB::beginTransaction();
@@ -190,7 +191,7 @@ class APIOrderService
                             $cart_p_discount_prod[$products['productID']] = round($item['amount'] - round($item['amount'] * $threshold_prod['value'][$products['productID']])) * -1;
                         } else {
                             //500*(1800/1800)
-                            $cart_p_discount_prod[$products['productID']] = round($threshold_prod['value'][$products['productID']] * ($item['amount'] / $threshold_discount['price'][$threshold_prod['threshold'][$products['productID']]])) * -1;
+                            $cart_p_discount_prod[$products['productID']] = round($threshold_prod['value'][$products['productID']] * ($item['amount'] / $threshold_discount['price'][$threshold_prod['thresholdDiscount'][$products['productID']]])) * -1;
                         }
                     } else {
                         $cart_p_discount_prod[$products['productID']] = 0;
@@ -457,11 +458,12 @@ class APIOrderService
 
             //滿額折扣 C003
             if (isset($cart['thresholdDiscount'])) {
+                $seq1 = 0;
                 foreach ($cart['thresholdDiscount'] as $key => $threshold) {
                     foreach ($threshold['products'] as $k => $product_id) {
-                        $seq++;
+                        $seq1++;
                         //寫入折扣資訊
-                        $campaign_details[$seq] = [
+                        $campaign_details[$seq1] = [
                             "order_id" => $newOrder->id,
                             "level_code" => 'CART_P',
                             "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
@@ -472,13 +474,13 @@ class APIOrderService
                             "item_no" => null,
                             "discount" => $cart_p_discount_prod[$product_id],
                             "record_identity" => 'M',
-                            "campaign_threshold_id" => $threshold_prod['threshold'][$product_id],
+                            "campaign_threshold_id" => $threshold_prod['thresholdDiscount'][$product_id],
                             "created_by" => $member_id,
                             "updated_by" => $member_id,
                             "created_at" => now(),
                             "updated_at" => now(),
                         ];
-                        OrderCampaignDiscount::insert($campaign_details[$seq]);
+                        OrderCampaignDiscount::insert($campaign_details[$seq1]);
                         $threshold_discount['discount'][$threshold['thresholdID']] -= $cart_p_discount_prod[$product_id];
                     }
                     $discountData = [];
@@ -494,7 +496,7 @@ class APIOrderService
             if (isset($cart['thresholdGiftAway'])) {
                 foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
                     foreach ($threshold['products'] as $k => $product_id) {
-                        $seq++;
+                        //$seq++;
                         //寫入折扣資訊
                         $campaign_details[$seq] = [
                             "order_id" => $newOrder->id,
@@ -507,7 +509,7 @@ class APIOrderService
                             "item_no" => null,
                             "discount" => 0,
                             "record_identity" => 'M',
-                            "campaign_threshold_id" => $threshold_prod['threshold'][$product_id],
+                            "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
                             "created_by" => $member_id,
                             "updated_by" => $member_id,
                             "created_at" => now(),
@@ -559,7 +561,7 @@ class APIOrderService
                                 "item_no" => $prod_info[$gift['productId']]['item_no'],
                                 "discount" => 0,
                                 "record_identity" => "G",
-                                "campaign_threshold_id" => $threshold_prod['threshold'][$product_id],
+                                "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
                                 "created_by" => $member_id,
                                 "updated_by" => $member_id,
                                 "created_at" => now(),
