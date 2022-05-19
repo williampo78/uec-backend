@@ -755,8 +755,6 @@ class APICartServices
 
             $calc_amount = [];
             $calc_qty[] = 0;
-            $price = 0;
-            $quantity = 0;
             $thresholdDiscount_display = [];
             $thresholdAmount = 0;
             //滿額折扣 CART_P01 & CART_P02
@@ -764,6 +762,8 @@ class APICartServices
                 foreach ($prod_campaign['DISCOUNT'] as $campaign_id => $product_in_campaign) {
                     $pid = [];
                     $subAmount = [];
+                    $price = 0;
+                    $quantity = 0;
                     foreach ($product_in_campaign as $key => $product_id) {
                         $price += $prod_amount[$product_id];
                         $quantity += $prod_qty[$product_id];
@@ -812,13 +812,13 @@ class APICartServices
             //滿額折扣CART_P01 & CART_P02
             $calc_amount = [];
             $calc_qty[] = 0;
-            $price = 0;
-            $quantity = 0;
             //滿額送贈 CART_P03 & CART_P04
             if (isset($prod_campaign['GIFT'])) {
                 foreach ($prod_campaign['GIFT'] as $campaign_id => $product_in_campaign) {
                     $pid = [];
                     $subAmount = [];
+                    $price = 0;
+                    $quantity = 0;
                     foreach ($product_in_campaign as $key => $product_id) {
                         $price += $prod_amount[$product_id];
                         $quantity += $prod_qty[$product_id];
@@ -872,7 +872,6 @@ class APICartServices
                         }
                     }
                 }
-
                 $thresholdGiftAway_display = []; //重新調整結構for前端使用
                 if (isset($thresholdGiftAway)) {
                     foreach ($thresholdGiftAway as $campaign_id => $data) {
