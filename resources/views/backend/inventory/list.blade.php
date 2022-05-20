@@ -2,10 +2,6 @@
 
 @section('title', '庫存彙總表')
 
-@section('style')
-
-@endsection
-
 @section('content')
     <!--新增-->
     <div id="page-wrapper">

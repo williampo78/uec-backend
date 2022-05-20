@@ -2,7 +2,7 @@
 
 @section('title', '新增廣告上架')
 
-@section('style')
+@section('css')
     <link rel="stylesheet" href="{{ mix('css/advertisement.css') }}">
 @endsection
 

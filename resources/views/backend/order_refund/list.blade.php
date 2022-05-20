@@ -2,7 +2,7 @@
 
 @section('title', '退貨申請單管理')
 
-@section('style')
+@section('css')
     <style>
         .modal-dialog {
             max-width: 100%;

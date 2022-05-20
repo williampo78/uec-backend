@@ -2,7 +2,7 @@
 
 @section('title', '銷售訂單管理')
 
-@section('style')
+@section('css')
     <style>
         .modal-dialog {
             max-width: 100%;

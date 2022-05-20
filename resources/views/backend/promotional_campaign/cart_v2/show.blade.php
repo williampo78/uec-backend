@@ -2,7 +2,7 @@
 
 @section('title', '購物車滿額活動 檢視資料')
 
-@section('style')
+@section('css')
     <style>
         .modal-dialog {
             max-width: 100%;

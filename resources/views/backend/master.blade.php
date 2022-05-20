@@ -21,19 +21,12 @@
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/editor.css') }}">
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
-    <style>
-        [v-cloak] {
-            display: none;
-        }
 
-    </style>
-
-    @yield('style')
+    @yield('css')
 </head>
 
 <body>
     @auth
-
         @include('backend.menu')
 
         @if (session()->has('message'))
@@ -64,6 +57,8 @@
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
 
     <script>
+        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
         @isset($share_role_auth)
             var RoleAuthJson = @json($share_role_auth);
         @endisset
@@ -72,13 +67,13 @@
 
         $(function() {
             //檢查使用平台的權限機制　如果沒有使用權限，則回另一個平台
-            var inDradviceUse = @json(session('inDradviceUse')) ;
-            var swithBackendUrl = @json(config('uec.swithBackendUrl')) ; //另一個平台的 url
-            function checkingBackendUse(){
+            var inDradviceUse = @json(session('inDradviceUse'));
+            var swithBackendUrl = @json(config('uec.swithBackendUrl')); //另一個平台的 url
+            function checkingBackendUse() {
                 alert('沒有權限，請聯絡管理人員');
-                return location.href=swithBackendUrl ;
+                return location.href = swithBackendUrl;
             }
-            if(inDradviceUse == 0){
+            if (inDradviceUse == 0) {
                 checkingBackendUse();
             }
 
