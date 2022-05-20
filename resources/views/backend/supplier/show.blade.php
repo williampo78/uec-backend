@@ -206,7 +206,7 @@
                             <h4>聯絡人</h4>
                             <div class="well" v-for="(contact, index) in form.contacts" :key="index"
                                 style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
-                                <input type="hidden" :name="`contacts[${index}][contact_id]`" :value="contact.contactId">
+                                <input type="hidden" :name="`contacts[${index}][id]`" :value="contact.id">
                                 <div class="row">
                                     <div class="col-sm-2">
                                         <label>姓名 <span style="color: red;">*</span></label>
@@ -214,27 +214,27 @@
                                             :name="`contacts[${index}][name]`">
                                     </div>
                                     <div class="col-sm-2">
-                                        <label>電話 <span style="color: red;">*</span></label>
+                                        <label>電話</label>
                                         <input type="text" class="form-control" v-model="contact.telephone"
                                             :name="`contacts[${index}][telephone]`">
                                     </div>
                                     <div class="col-sm-2">
-                                        <label>手機 <span style="color: red;">*</span></label>
+                                        <label>手機</label>
                                         <input type="text" class="form-control" v-model="contact.cellPhone"
                                             :name="`contacts[${index}][cell_phone]`">
                                     </div>
                                     <div class="col-sm-2">
-                                        <label>傳真 <span style="color: red;">*</span></label>
+                                        <label>傳真</label>
                                         <input type="text" class="form-control" v-model="contact.fax"
                                             :name="`contacts[${index}][fax]`">
                                     </div>
                                     <div class="col-sm-2">
-                                        <label>信箱 <span style="color: red;">*</span></label>
+                                        <label>信箱</label>
                                         <input type="text" class="form-control" v-model="contact.email"
                                             :name="`contacts[${index}][email]`">
                                     </div>
                                     <div class="col-sm-2">
-                                        <label>備註 <span style="color: red;">*</span></label>
+                                        <label>備註</label>
                                         <input type="text" class="form-control" v-model="contact.remark"
                                             :name="`contacts[${index}][remark]`">
                                     </div>
@@ -247,7 +247,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="date_from">合約起日 <span style="color: red;">*</span></label>
+                                        <label for="date_from">合約起日</label>
                                         <div class="input-group" id="date_from_flatpickr">
                                             <input type="text" class="form-control" name="date_from" id="date_from"
                                                 autocomplete="off" data-input v-model="form.contract.dateFrom">
@@ -261,7 +261,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="date_to">合約訖日 <span style="color: red;">*</span></label>
+                                        <label for="date_to">合約訖日</label>
                                         <div class="input-group" id="date_to_flatpickr">
                                             <input type="text" class="form-control" name="date_to" id="date_to"
                                                 autocomplete="off" data-input v-model="form.contract.dateTo">
@@ -275,7 +275,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="status_code">合約狀態 <span style="color: red;">*</span></label>
+                                        <label for="status_code">合約狀態</label>
                                         <select2 class="form-control" :options="supplierContractStatusCodeOptions" v-model="form.contract.statusCode" name="status_code">
                                             <option disabled value=""></option>
                                         </select2>
@@ -286,7 +286,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label">結帳週期 <span style="color: red;">*</span></label>
+                                        <label class="control-label">結帳週期</label>
                                         <div class="row">
                                             <div class="col-sm-1">
                                                 <label class="radio-inline">
@@ -499,7 +499,7 @@
 
                         supplier.contacts.forEach(contact => {
                             this.form.contacts.push({
-                                contactId: contact.id,
+                                id: contact.id,
                                 name: contact.name,
                                 telephone: contact.telephone,
                                 cellPhone: contact.cell_phone,
