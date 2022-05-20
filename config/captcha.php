@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'characters' => ['2', '3', '4', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'm', 'n', 'p', 'q', 'r', 't', 'u', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'M', 'N', 'P', 'Q', 'R', 'T', 'U', 'X', 'Y', 'Z'],
+    'characters' =>  ['2', '3', '4', '6', '7', '8', 'a', 'b', 'c', 'd', 'e', 'f', 'h', 'm', 'n', 'p', 'r', 't', 'u', 'x', 'z'],
     'default' => [
         'length' => 4,
         'width' => 180,
@@ -24,11 +24,12 @@ return [
         'width' => 180,
         'height' => 40,
         'quality' => 90,
-        'lines' => 6,
+        'lines' => 4,
         'bgImage' => false,
         'bgColor' => '#ecf2f4',
         'fontColors' => ['#2c3e50', '#c0392b', '#16a085', '#c0392b', '#8e44ad', '#303f9f', '#f57c00', '#795548'],
         'contrast' => -5,
+        'expire'    => 300,
     ],
     'mini' => [
         'length' => 3,
