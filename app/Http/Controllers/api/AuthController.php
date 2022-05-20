@@ -52,6 +52,7 @@ class AuthController extends Controller
         $credentials['password'] = $credentials['pwd'];
         unset($credentials['pwd']);
         unset($credentials['captcha']);
+        unset($credentials['key']);
         $fields = json_encode($credentials);
         $response = $this->apiService->memberLogin($fields);
         $result = json_decode($response, true);
