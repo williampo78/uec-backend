@@ -79,11 +79,13 @@ class SupplierService
                         'table_name' => 'Supplier',
                         'table_id' => $createdSupplier->id,
                         'name' => $contact['name'],
-                        'email' => $contact['email'],
-                        'telephone' => $contact['telephone'],
-                        'fax' => $contact['fax'],
-                        'cell_phone' => $contact['cell_phone'],
-                        'remark' => $contact['remark'],
+                        'email' => $contact['email'] ?? null,
+                        'telephone' => $contact['telephone'] ?? null,
+                        'fax' => $contact['fax'] ?? null,
+                        'cell_phone' => $contact['cell_phone'] ?? null,
+                        'remark' => $contact['remark'] ?? null,
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
                     ]);
                 }
             }
@@ -91,10 +93,10 @@ class SupplierService
             // 新增供應商合約
             $createdSupplierContract = SupplierContract::create([
                 'supplier_id' => $createdSupplier->id,
-                'date_from' => $inputData['date_from'],
-                'date_to' => $inputData['date_to'],
-                'status_code' => $inputData['status_code'],
-                'billing_cycle' => $inputData['billing_cycle'],
+                'date_from' => $inputData['date_from'] ?? null,
+                'date_to' => $inputData['date_to'] ?? null,
+                'status_code' => $inputData['status_code'] ?? null,
+                'billing_cycle' => $inputData['billing_cycle'] ?? null,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
@@ -184,33 +186,51 @@ class SupplierService
             $updatedContactIds = [];
             // 新增或更新聯絡人
             if (isset($inputData['contacts'])) {
+                $originContactIds = Contact::where('table_name', 'Supplier')->where('table_id', $inputData['id'])->pluck('id');
                 foreach ($inputData['contacts'] as $contact) {
-                    $updatedContact = Contact::updateOrCreate([
-                        'id' => $contact['contact_id'],
-                        'table_name' => 'Supplier',
-                        'table_id' => $inputData['id'],
-                    ], [
-                        'name' => $contact['name'],
-                        'email' => $contact['email'],
-                        'telephone' => $contact['telephone'],
-                        'fax' => $contact['fax'],
-                        'cell_phone' => $contact['cell_phone'],
-                        'remark' => $contact['remark'],
-                    ]);
+                    // 新增
+                    if (!$originContactIds->contains($contact['id'])) {
+                        $createdContact = Contact::create([
+                            'table_name' => 'Supplier',
+                            'table_id' => $inputData['id'],
+                            'name' => $contact['name'],
+                            'email' => $contact['email'] ?? null,
+                            'telephone' => $contact['telephone'] ?? null,
+                            'fax' => $contact['fax'] ?? null,
+                            'cell_phone' => $contact['cell_phone'] ?? null,
+                            'remark' => $contact['remark'] ?? null,
+                            'created_by' => $user->id,
+                            'updated_by' => $user->id,
+                        ]);
 
-                    $updatedContactIds[] = $updatedContact->id;
+                        $updatedContactIds[] = $createdContact->id;
+                    }
+                    // 更新
+                    else {
+                        Contact::findOrFail($contact['id'])->update([
+                            'name' => $contact['name'],
+                            'email' => $contact['email'] ?? null,
+                            'telephone' => $contact['telephone'] ?? null,
+                            'fax' => $contact['fax'] ?? null,
+                            'cell_phone' => $contact['cell_phone'] ?? null,
+                            'remark' => $contact['remark'] ?? null,
+                            'updated_by' => $user->id,
+                        ]);
+
+                        $updatedContactIds[] = $contact['id'];
+                    }
                 }
             }
 
             // 刪除聯絡人
-            Contact::where('table_id', $inputData['id'])->whereNotIn('id', $updatedContactIds)->delete();
+            Contact::where('table_name', 'Supplier')->where('table_id', $inputData['id'])->whereNotIn('id', $updatedContactIds)->delete();
 
             // 更新供應商合約
             SupplierContract::findOrFail($inputData['supplier_contract_id'])->update([
-                'date_from' => $inputData['date_from'],
-                'date_to' => $inputData['date_to'],
-                'status_code' => $inputData['status_code'],
-                'billing_cycle' => $inputData['billing_cycle'],
+                'date_from' => $inputData['date_from'] ?? null,
+                'date_to' => $inputData['date_to'] ?? null,
+                'status_code' => $inputData['status_code'] ?? null,
+                'billing_cycle' => $inputData['billing_cycle'] ?? null,
                 'updated_by' => $user->id,
             ]);
 

@@ -227,35 +227,35 @@
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="control-label">電話 <span style="color: red;">*</span></label>
+                                                <label class="control-label">電話</label>
                                                 <input type="text" class="form-control contact-telephone"
                                                     v-model="contact.telephone" :name="`contacts[${index}][telephone]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="control-label">手機 <span style="color: red;">*</span></label>
+                                                <label class="control-label">手機</label>
                                                 <input type="text" class="form-control contact-cellPhone"
                                                     v-model="contact.cellPhone" :name="`contacts[${index}][cell_phone]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="control-label">傳真 <span style="color: red;">*</span></label>
+                                                <label class="control-label">傳真</label>
                                                 <input type="text" class="form-control contact-fax" v-model="contact.fax"
                                                     :name="`contacts[${index}][fax]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="control-label">信箱 <span style="color: red;">*</span></label>
+                                                <label class="control-label">信箱</label>
                                                 <input type="text" class="form-control contact-email"
                                                     v-model="contact.email" :name="`contacts[${index}][email]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
-                                                <label class="control-label">備註 <span style="color: red;">*</span></label>
+                                                <label class="control-label">備註</label>
                                                 <input type="text" class="form-control contact-remark"
                                                     v-model="contact.remark" :name="`contacts[${index}][remark]`">
                                             </div>
@@ -279,7 +279,7 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label class="control-label" for="date_from">合約起日 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="date_from">合約起日</label>
                                             <div class="input-group" id="date_from_flatpickr">
                                                 <input type="text" class="form-control" name="date_from" id="date_from"
                                                     autocomplete="off" data-input v-model="form.contract.dateFrom">
@@ -293,7 +293,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label class="control-label" for="date_to">合約訖日 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="date_to">合約訖日</label>
                                             <div class="input-group" id="date_to_flatpickr">
                                                 <input type="text" class="form-control" name="date_to" id="date_to"
                                                     autocomplete="off" data-input v-model="form.contract.dateTo">
@@ -307,7 +307,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label class="control-label" for="status_code">合約狀態 <span style="color: red;">*</span></label>
+                                            <label class="control-label" for="status_code">合約狀態</label>
                                             <select2 class="form-control" :options="supplierContractStatusCodeOptions" v-model="form.contract.statusCode" name="status_code">
                                                 <option disabled value=""></option>
                                             </select2>
@@ -318,7 +318,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label class="control-label">結帳週期 <span style="color: red;">*</span></label>
+                                            <label class="control-label">結帳週期</label>
                                             <div class="row">
                                                 <div class="col-sm-1">
                                                     <label class="radio-inline">
@@ -573,18 +573,6 @@
                         short_name: {
                             required: true,
                         },
-                        date_from: {
-                            required: true,
-                        },
-                        date_to: {
-                            required: true,
-                        },
-                        billing_cycle: {
-                            required: true,
-                        },
-                        status_code: {
-                            required: true,
-                        },
                     },
                     messages: {
                         display_number: {
@@ -632,36 +620,6 @@
                 },
                 submitForm() {
                     $(`.contact-name`).each(function() {
-                        $(this).rules("add", {
-                            required: true,
-                        });
-                    });
-
-                    $(`.contact-telephone`).each(function() {
-                        $(this).rules("add", {
-                            required: true,
-                        });
-                    });
-
-                    $(`.contact-cellPhone`).each(function() {
-                        $(this).rules("add", {
-                            required: true,
-                        });
-                    });
-
-                    $(`.contact-fax`).each(function() {
-                        $(this).rules("add", {
-                            required: true,
-                        });
-                    });
-
-                    $(`.contact-email`).each(function() {
-                        $(this).rules("add", {
-                            required: true,
-                        });
-                    });
-
-                    $(`.contact-remark`).each(function() {
                         $(this).rules("add", {
                             required: true,
                         });
