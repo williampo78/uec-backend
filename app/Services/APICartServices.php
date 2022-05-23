@@ -839,13 +839,15 @@ class APICartServices
                         $prods = [];
                         foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
                             foreach ($giftawayInfo as $giftInfo => $v) {
-                                $prods[$v['product_id']] = array(
-                                    "productPhoto" => $threshold_prod[$v['product_id']]->photo,
-                                    "productId" => $v['product_id'],
-                                    "productName" => $threshold_prod[$v['product_id']]->product_name,
-                                    "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
-                                    "assignedQty" => $v->assigned_qty,
-                                );
+                                if (isset($threshold_prod[$v['product_id']])) {
+                                    $prods[$v['product_id']] = array(
+                                        "productPhoto" => $threshold_prod[$v['product_id']]->photo,
+                                        "productId" => $v['product_id'],
+                                        "productName" => $threshold_prod[$v['product_id']]->product_name,
+                                        "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
+                                        "assignedQty" => $v->assigned_qty,
+                                    );
+                                }
                             }
                         }
                         $compare_n_value = $item->n_value;
@@ -1096,10 +1098,18 @@ class APICartServices
      */
     public function setGoodsQty($input)
     {
+        //商城倉庫代碼
+        $warehouseCode = $this->stockService->getWarehouseConfig();
         $member_id = Auth::guard('api')->user()->member_id;
         $now = Carbon::now();
         //確認是否有該品項
         $item = ProductItem::where('id', $input['item_id'])->get()->toArray();
+
+        $stock_info = $this->stockService->getStockByItem($warehouseCode, $item->item_id);
+        $stock = 0;
+        if ($stock_info) {
+            $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+        }
         if (count($item) > 0) {
             $data = ShoppingCartDetail::where('product_item_id', $input['item_id'])->where('member_id', $member_id)->get()->toArray();
             if (count($data) > 0) {
@@ -1123,7 +1133,7 @@ class APICartServices
                 $webData['product_id'] = $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
                 $webData['status_code'] = $input['status_code'];
-                $webData['qty'] = $input['item_qty'];
+                $webData['qty'] = ($input['item_qty']>$stock?$stock:$input['item_qty']);
                 $webData['utm_source'] = $input['utm_source'];
                 $webData['utm_medium'] = $input['utm_medium'];
                 $webData['utm_campaign'] = $input['utm_campaign'];
@@ -1139,7 +1149,7 @@ class APICartServices
                 $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
                 $webData['product_id'] = $item[0]['product_id'];
-                $webData['qty'] = $qty;
+                $webData['qty'] = ($qty > $stock ?$stock :$qty);
                 $webData['status_code'] = $input['status_code'];
                 $webData['utm_source'] = $input['utm_source'];
                 $webData['utm_medium'] = $input['utm_medium'];
