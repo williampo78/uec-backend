@@ -486,7 +486,7 @@ class APIOrderService
                     $discountData = [];
                     //把最後一筆資料的比例做修正
                     if ($threshold_discount['discount'][$threshold['thresholdID']] != 0) {
-                        $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->where('order_detail_id', $order_detail_temp[$product_id])->orderBy('seq', 'DESC')->first();
+                        $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->where('id', $order_detail_temp[$product_id])->orderBy('seq', 'DESC')->first();
                         $discountData['discount'] = $detail->discount + $threshold_discount['discount'][$threshold['thresholdID']];
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
                     }
