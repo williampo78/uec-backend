@@ -2,10 +2,6 @@
 
 @section('title', '金流對帳單')
 
-@section('style')
-
-@endsection
-
 @section('content')
     <!--新增-->
     <div id="page-wrapper">

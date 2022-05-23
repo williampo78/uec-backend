@@ -2,7 +2,7 @@
 
 @section('title', '購物車滿額活動 檢視資料')
 
-@section('style')
+@section('css')
     <style>
         .modal-dialog {
             max-width: 100%;
@@ -71,20 +71,14 @@
                                                 <label class="control-label">狀態 <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
-                                                <div class="row">
-                                                    <div class="col-sm-1">
-                                                        <label class="radio-inline">
-                                                            <input type="radio" name="active" value="1"
-                                                                v-model="form.active">生效
-                                                        </label>
-                                                    </div>
-                                                    <div class="col-sm-1">
-                                                        <label class="radio-inline">
-                                                            <input type="radio" name="active" value="0"
-                                                                v-model="form.active">失效
-                                                        </label>
-                                                    </div>
-                                                </div>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="active" value="1"
+                                                        v-model="form.active">生效
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="active" value="0"
+                                                        v-model="form.active">失效
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -168,22 +162,16 @@
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
-                                                <div class="row">
-                                                    <div class="col-sm-1">
-                                                        <label class="radio-inline">
-                                                            <input type="radio" name="stock_type" value="A_B"
-                                                                v-model="form.stockType" @click="clickStockType"
-                                                                :disabled="isNowGreaterThanOrEqualToStartAt">買斷 / 寄售
-                                                        </label>
-                                                    </div>
-                                                    <div class="col-sm-1">
-                                                        <label class="radio-inline">
-                                                            <input type="radio" name="stock_type" value="T"
-                                                                v-model="form.stockType" @click="clickStockType"
-                                                                :disabled="isNowGreaterThanOrEqualToStartAt">轉單
-                                                        </label>
-                                                    </div>
-                                                </div>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="stock_type" value="A_B"
+                                                        v-model="form.stockType" @click="clickStockType"
+                                                        :disabled="isNowGreaterThanOrEqualToStartAt">買斷 / 寄售
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="stock_type" value="T"
+                                                        v-model="form.stockType" @click="clickStockType"
+                                                        :disabled="isNowGreaterThanOrEqualToStartAt">轉單
+                                                </label>
                                             </div>
                                         </div>
                                     </div>

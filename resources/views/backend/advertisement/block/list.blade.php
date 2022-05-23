@@ -2,7 +2,7 @@
 
 @section('title', '廣告版位管理')
 
-@section('style')
+@section('css')
     <style>
         td .fa-solid.fa-check,
         .form-group .fa-solid.fa-check {

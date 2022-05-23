@@ -2,10 +2,6 @@
 
 @section('title', '外倉(秋雨)庫存日報表')
 
-@section('style')
-
-@endsection
-
 @section('content')
     <!--新增-->
     <div id="page-wrapper">

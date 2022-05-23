@@ -1310,7 +1310,7 @@ class ProductService
         $products = Product::with([
             'supplier',
             'webCategoryHierarchies' => function ($query) {
-                return $query->oldest('sort');
+                return $query->oldest('web_category_products.sort')->oldest('web_category_products.id');
             },
             'productItems.warehouses' => function ($query) use ($warehouseNumber) {
                 return $query->where('number', $warehouseNumber);

@@ -16,9 +16,6 @@
 /* croppie */
 @import "~croppie/croppie.css";
 
-/* vue-select */
-@import "~vue-select/dist/vue-select.css";
-
 body {
     font-family: Segoe UI Light, 微軟正黑體;
     /* font-weight: bold; */
@@ -157,4 +154,8 @@ span .errorMsg {
 .sysinfo-activie {
     color: #138cde;
     border-left: solid 4px #138cde;
+}
+
+[v-cloak] {
+    display: none;
 }

@@ -901,7 +901,7 @@ class PromotionalCampaignService
             'promotionalCampaignProducts',
             'promotionalCampaignProducts.product',
             'promotionalCampaignProducts.product.webCategoryHierarchies' => function ($query) {
-                return $query->oldest('sort');
+                return $query->oldest('web_category_products.sort')->oldest('web_category_products.id');
             },
         ])
             ->where('agent_id', $user->agent_id)
