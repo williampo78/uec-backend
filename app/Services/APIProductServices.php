@@ -1145,8 +1145,8 @@ class APIProductServices
             foreach ($campaigns as $product_id => $campaign) {
                 foreach ($campaign as $item) {
                     if ($now >= $item->start_at && $now <= $item->end_at) {
-                        $photoDesktop = $item->banner_photo_desktop;
-                        $photoMobile = $item->banner_photo_mobile;
+                        $photoDesktop = ($item->banner_photo_desktop ? $s3 . $item->banner_photo_desktop : null);
+                        $photoMobile = ($item->banner_photo_mobile ? $s3 . $item->banner_photo_mobile : null);
                         $campaignName = $item->campaign_name;
                         $campaignBrief = $item->campaign_brief;
                         $product_check = $this->getWebCategoryProducts('', '', '', '', $product_id, '', '');
