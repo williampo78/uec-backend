@@ -1105,7 +1105,7 @@ class APICartServices
         //確認是否有該品項
         $item = ProductItem::where('id', $input['item_id'])->get()->toArray();
 
-        $stock_info = $this->stockService->getStockByItem($warehouseCode, $item->item_id);
+        $stock_info = $this->stockService->getStockByItem($warehouseCode, $input['item_id']);
         $stock = 0;
         if ($stock_info) {
             $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
