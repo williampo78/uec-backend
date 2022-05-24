@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\RoleService;
-use App\Services\ProductService;
-use App\Services\SupplierService;
 use App\Services\LookupValuesVService;
 use App\Services\PromotionalCampaignService;
+use App\Services\SupplierService;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PromotionalCampaignCartV2Controller extends Controller
@@ -15,19 +13,16 @@ class PromotionalCampaignCartV2Controller extends Controller
     private $promotionalCampaignService;
     private $lookupValuesVService;
     private $supplierService;
-    private $productService;
     private const LEVEL_CODE = 'CART_P';
 
     public function __construct(
         PromotionalCampaignService $promotionalCampaignService,
         LookupValuesVService $lookupValuesVService,
-        SupplierService $supplierService,
-        ProductService $productService
+        SupplierService $supplierService
     ) {
         $this->promotionalCampaignService = $promotionalCampaignService;
         $this->lookupValuesVService = $lookupValuesVService;
         $this->supplierService = $supplierService;
-        $this->productService = $productService;
     }
 
     /**
@@ -204,7 +199,7 @@ class PromotionalCampaignCartV2Controller extends Controller
 
         return response()->json([
             'result' => false,
-            'conflict_campaigns' => $result['conflict_campaigns'],
+            'conflict_contents' => $result['conflict_contents'],
         ]);
     }
 }
