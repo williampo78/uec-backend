@@ -241,24 +241,26 @@ class APIOrderService
                     $campaign_id = 0;
                     //有單品滿額贈時，正貨也寫入discount
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])) {
-                        $campaign_details[$seq] = [
-                            "order_id" => $newOrder->id,
-                            "level_code" => 'PRD',
-                            "group_seq" => $campaign_group[$products['productID']][$campaign['PRD']['GIFT'][$products['productID']]->id],
-                            "order_detail_id" => $order_detail_id_M,
-                            "promotion_campaign_id" => $campaign['PRD']['GIFT'][$products['productID']]->id,
-                            "product_id" => $products['productID'],
-                            "product_item_id" => $item['itemId'],
-                            "item_no" => $item['itemNo'],
-                            "discount" => 0,
-                            "record_identity" => "M",
-                            "created_by" => $member_id,
-                            "updated_by" => $member_id,
-                            "created_at" => now(),
-                            "updated_at" => now(),
-                        ];
-                        OrderCampaignDiscount::insert($campaign_details[$seq]);
-                        $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
+                        if ($item['campaignGiftAway']['campaignGiftStatus']) {
+                            $campaign_details[$seq] = [
+                                "order_id" => $newOrder->id,
+                                "level_code" => 'PRD',
+                                "group_seq" => $campaign_group[$products['productID']][$campaign['PRD']['GIFT'][$products['productID']]->id],
+                                "order_detail_id" => $order_detail_id_M,
+                                "promotion_campaign_id" => $campaign['PRD']['GIFT'][$products['productID']]->id,
+                                "product_id" => $products['productID'],
+                                "product_item_id" => $item['itemId'],
+                                "item_no" => $item['itemNo'],
+                                "discount" => 0,
+                                "record_identity" => "M",
+                                "created_by" => $member_id,
+                                "updated_by" => $member_id,
+                                "created_at" => now(),
+                                "updated_at" => now(),
+                            ];
+                            OrderCampaignDiscount::insert($campaign_details[$seq]);
+                            $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
+                        }
                     }
 
                     //訂單明細建立後，更新購物車中的商品狀態為 - 已轉為訂單
@@ -268,6 +270,7 @@ class APIOrderService
                     //有單品滿額贈品時先新增單身
                     if (isset($item['campaignGiftAway']['campaignProdList'])) {
                         //符合條件
+
                         if ($item['campaignGiftAway']['campaignGiftStatus']) {
                             //同商品不累贈
                             if ($productID != $products['productID']) {
