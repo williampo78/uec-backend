@@ -366,12 +366,13 @@ class OrderService
      * @param [type] $orders
      * @return void
      */
-    public function addDiscountsToOrder($orders)
+    public function addDiscountsToOrder($orders,$giveaway_qty = [] )
     {
     $order_details = $orders['results']['order_details'];
     $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']); // order_campaign_discounts
     $void_group_seq = [];
     $thresholdAmount = 0;
+    // dd($giveaway_qty);
     foreach ($discount as $obj) {
         switch ($obj->level_code) {
             case 'PRD':
@@ -397,14 +398,11 @@ class OrderService
                     $cart['gift'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                     $cart['gift'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                     $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
-                    if (!isset($cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['count'])) {
-                        $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['assignedQty'] = 0;
-                    }
                     $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
                         'productPhoto' => config('filesystems.disks.s3.url') . $obj->product->productPhotos[0]->photo_name,
                         'productId' => $obj->product->id,
                         'productName' => $obj->product->product_name,
-                        'assignedQty' => $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id]['assignedQty'] += 1,
+                        'assignedQty' => $giveaway_qty[$obj->order_detail_id] ?? 0 ,
                     ]; //贈送的商品列表
                 }
                 //折扣

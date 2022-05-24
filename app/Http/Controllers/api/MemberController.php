@@ -349,8 +349,9 @@ class MemberController extends Controller
         if (isset($order->cancelled_at)) {
             $payload['results']['cancelled_at'] = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i:s');
         }
+        $giveaway_qty = [] ;
 
-        $order->orderDetails->each(function ($orderDetail) use (&$payload) {
+        $order->orderDetails->each(function ($orderDetail) use (&$payload , &$giveaway_qty) {
             if($orderDetail->record_identity == 'M'){
                 $orderDetailPayload = [
                     'id'=>$orderDetail->id,
@@ -366,15 +367,17 @@ class MemberController extends Controller
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'discount_content'=>[],
                 ];
-
                 if ($orderDetail->product->productPhotos->isNotEmpty()) {
                     $productPhoto = $orderDetail->product->productPhotos->first();
                     $orderDetailPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
                 }
                 $payload['results']['order_details'][] = $orderDetailPayload;
+            }else{
+                //order_details 非商品的數量
+                $giveaway_qty[$orderDetail->id] = $orderDetail->qty ;
             }
         });
-        $payload = $this->orderService->addDiscountsToOrder($payload);
+        $payload = $this->orderService->addDiscountsToOrder($payload , $giveaway_qty);
 
         // 出貨單
         if ($order->shipments->isNotEmpty()) {
