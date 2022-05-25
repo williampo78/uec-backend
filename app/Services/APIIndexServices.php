@@ -55,6 +55,7 @@ class APIIndexServices
         foreach ($promotion as $k => $v) {
             $promotion_txt = '';
             foreach ($v as $label) {
+                if ($label->promotional_label=='') continue;
                 if ($promotion_txt != $label->promotional_label) {
                     $promotional[$k][] = $label->promotional_label;
                     $promotion_txt = $label->promotional_label;
