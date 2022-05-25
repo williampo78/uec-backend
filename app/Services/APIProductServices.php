@@ -756,8 +756,13 @@ class APIProductServices
 
 
                     if (isset($promotion[$rel->related_product_id])) {
+                        $promotion_txt = '';
                         foreach ($promotion[$rel->related_product_id] as $k => $Label) { //取活動標籤
-                            $promotional[] = $Label->promotional_label;
+                            if ($Label->promotional_label=='') continue;
+                            if ($promotion_txt != $Label->promotional_label) {
+                                $promotional[] = $Label->promotional_label;
+                                $promotion_txt = $Label->promotional_label;
+                            }
                         }
                     }
 
