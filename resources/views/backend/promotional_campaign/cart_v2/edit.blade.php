@@ -1220,7 +1220,8 @@
                     switch (this.form.campaignType) {
                         case "CART_P01":
                             if (threshold.nValue && threshold.xValue) {
-                                let discount = Math.round(threshold.xValue * 100);
+                                let discount = this.roundDown(Number(threshold.xValue), 2);
+                                discount = discount.toString().substring(2);
                                 thresholdBrief = `指定商品達$${threshold.nValue}，打${discount}折`;
                             }
                             break;
@@ -1401,6 +1402,10 @@
                     this.bannerPhotoMobile.showInputFile = true;
                     this.bannerPhotoMobile.isDeleteFile = true;
                     this.$refs.bannerPhotoMobile.value = "";
+                },
+                // 無條件捨去
+                roundDown(num, decimal) {
+                    return Math.floor((num + Number.EPSILON) * Math.pow(10, decimal)) / Math.pow(10, decimal);
                 },
             },
         });
