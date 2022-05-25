@@ -2,18 +2,18 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use App\Models\PromotionalCampaign;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Builder;
-use App\Models\PromotionalCampaignProduct;
 use App\Models\PromotionalCampaignGiveaway;
+use App\Models\PromotionalCampaignProduct;
 use App\Models\PromotionalCampaignThreshold;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PromotionalCampaignService
 {
@@ -714,7 +714,11 @@ class PromotionalCampaignService
          * 查詢上架開始、結束時間，是否在已存在的上下架時間範圍內，且狀態為啟用
          * 如果要更新資料，則需排除要更新的該筆資料檢查
          */
-        $promotionalCampaigns = PromotionalCampaign::where('agent_id', $user->agent_id)
+        $promotionalCampaigns = PromotionalCampaign::with([
+            'promotionalCampaignProducts',
+            'promotionalCampaignProducts.product',
+        ])
+            ->where('agent_id', $user->agent_id)
             ->where('active', 1)
             ->where('level_code', 'CART_P')
             ->where(function ($query) use ($startAt, $endAt) {
@@ -752,9 +756,32 @@ class PromotionalCampaignService
             ];
         }
 
+        // 衝突的內容
+        $conflictContents = [];
+        foreach ($promotionalCampaigns as $campaign) {
+            $conflictContent = [
+                'campaign_name' => $campaign->campaign_name,
+                'product_no' => null,
+            ];
+
+            if ($campaign->promotionalCampaignProducts->isNotEmpty()) {
+                $productNos = [];
+
+                foreach ($campaign->promotionalCampaignProducts as $campaignProduct) {
+                    if (isset($campaignProduct->product) && in_array($campaignProduct->product_id, $productIds)) {
+                        $productNos[] = $campaignProduct->product->product_no;
+                    }
+                }
+
+                $conflictContent['product_no'] = implode(', ', $productNos);
+            }
+
+            $conflictContents[] = $conflictContent;
+        }
+
         return [
             'status' => false,
-            'conflict_campaigns' => $promotionalCampaigns->implode('campaign_name', '、'),
+            'conflict_contents' => $conflictContents,
         ];
     }
 
@@ -955,7 +982,7 @@ class PromotionalCampaignService
 
                 // ﹝指定商品滿N元，打X折﹞、﹝指定商品滿N元，折X元﹞
                 if (in_array($cartCampaign->campaign_type, ['CART_P01', 'CART_P02'])) {
-                    $tmpThreshold['x_value'] = $threshold->x_value;
+                    $tmpThreshold['x_value'] = $threshold->x_value * 100 / 100;
                 }
                 // ﹝指定商品滿N件，送贈品﹞、﹝指定商品滿N元，送贈品﹞
                 elseif (in_array($cartCampaign->campaign_type, ['CART_P03', 'CART_P04'])) {
@@ -1207,12 +1234,58 @@ class PromotionalCampaignService
         DB::beginTransaction();
         try {
             if (now()->greaterThanOrEqualTo($originPromotionalCampaign->start_at)) {
-                PromotionalCampaign::findOrFail($id)->update([
+                $promotionalCampaignData = [
                     'campaign_name' => $data['campaign_name'],
                     'active' => $data['active'],
                     'end_at' => $data['end_at'],
                     'updated_by' => $user->id,
-                ]);
+                ];
+
+                // Banner圖檔路徑-Desktop版
+                if (isset($data['banner_photo_desktop'])) {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
+                    }
+
+                    // 上傳新圖片
+                    $promotionalCampaignData['banner_photo_desktop'] = $data['banner_photo_desktop']->storePublicly(self::CART_UPLOAD_PATH_PREFIX . $id, 's3');
+                } elseif (isset($data['is_delete_banner_photo_desktop']) && $data['is_delete_banner_photo_desktop'] == 'true') {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
+                    }
+
+                    $promotionalCampaignData['banner_photo_desktop'] = null;
+                }
+
+                // Banner圖檔路徑-Mobile版
+                if (isset($data['banner_photo_mobile'])) {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
+                    }
+
+                    // 上傳新圖片
+                    $promotionalCampaignData['banner_photo_mobile'] = $data['banner_photo_mobile']->storePublicly(self::CART_UPLOAD_PATH_PREFIX . $id, 's3');
+                } elseif (isset($data['is_delete_banner_photo_mobile']) && $data['is_delete_banner_photo_mobile'] == 'true') {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
+                    }
+
+                    $promotionalCampaignData['banner_photo_mobile'] = null;
+                }
+
+                PromotionalCampaign::findOrFail($id)->update($promotionalCampaignData);
             } else {
                 $promotionalCampaignData = [
                     'campaign_name' => $data['campaign_name'],
