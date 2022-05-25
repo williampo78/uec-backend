@@ -1234,12 +1234,58 @@ class PromotionalCampaignService
         DB::beginTransaction();
         try {
             if (now()->greaterThanOrEqualTo($originPromotionalCampaign->start_at)) {
-                PromotionalCampaign::findOrFail($id)->update([
+                $promotionalCampaignData = [
                     'campaign_name' => $data['campaign_name'],
                     'active' => $data['active'],
                     'end_at' => $data['end_at'],
                     'updated_by' => $user->id,
-                ]);
+                ];
+
+                // Banner圖檔路徑-Desktop版
+                if (isset($data['banner_photo_desktop'])) {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
+                    }
+
+                    // 上傳新圖片
+                    $promotionalCampaignData['banner_photo_desktop'] = $data['banner_photo_desktop']->storePublicly(self::CART_UPLOAD_PATH_PREFIX . $id, 's3');
+                } elseif (isset($data['is_delete_banner_photo_desktop']) && $data['is_delete_banner_photo_desktop'] == 'true') {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
+                    }
+
+                    $promotionalCampaignData['banner_photo_desktop'] = null;
+                }
+
+                // Banner圖檔路徑-Mobile版
+                if (isset($data['banner_photo_mobile'])) {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
+                    }
+
+                    // 上傳新圖片
+                    $promotionalCampaignData['banner_photo_mobile'] = $data['banner_photo_mobile']->storePublicly(self::CART_UPLOAD_PATH_PREFIX . $id, 's3');
+                } elseif (isset($data['is_delete_banner_photo_mobile']) && $data['is_delete_banner_photo_mobile'] == 'true') {
+                    // 移除舊圖片
+                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                        && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
+                    ) {
+                        Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
+                    }
+
+                    $promotionalCampaignData['banner_photo_mobile'] = null;
+                }
+
+                PromotionalCampaign::findOrFail($id)->update($promotionalCampaignData);
             } else {
                 $promotionalCampaignData = [
                     'campaign_name' => $data['campaign_name'],

@@ -548,7 +548,7 @@
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為1200*150</p>
                                                         <img v-show="bannerPhotoDesktop.url" :src="bannerPhotoDesktop.url"
                                                             width="100%" height="150">
-                                                        <div v-show="bannerPhotoDesktop.showInputFile && !isNowGreaterThanOrEqualToStartAt"
+                                                        <div v-show="bannerPhotoDesktop.showInputFile"
                                                             class="form-group">
                                                             <input type="file" name="banner_photo_desktop"
                                                                 :data-image-width="bannerPhotoDesktop.width"
@@ -560,7 +560,7 @@
                                                         <input type="hidden" name="is_delete_banner_photo_desktop"
                                                             :value="bannerPhotoDesktop.isDeleteFile">
                                                         <button
-                                                            v-show="bannerPhotoDesktop.showDeleteButton && !isNowGreaterThanOrEqualToStartAt"
+                                                            v-show="bannerPhotoDesktop.showDeleteButton"
                                                             type="button" class="btn btn-danger"
                                                             @click="deleteDesktopFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
@@ -576,7 +576,7 @@
                                                         <p>(1) size不可超過1MB、(2) 副檔名須為JPG、JPEG、PNG、(3) 寬*高至少須為345*180</p>
                                                         <img v-show="bannerPhotoMobile.url" :src="bannerPhotoMobile.url"
                                                             width="100%" height="180">
-                                                        <div v-show="bannerPhotoMobile.showInputFile && !isNowGreaterThanOrEqualToStartAt"
+                                                        <div v-show="bannerPhotoMobile.showInputFile"
                                                             class="form-group">
                                                             <input type="file" name="banner_photo_mobile"
                                                                 :data-image-width="bannerPhotoMobile.width"
@@ -588,7 +588,7 @@
                                                         <input type="hidden" name="is_delete_banner_photo_mobile"
                                                             :value="bannerPhotoMobile.isDeleteFile">
                                                         <button
-                                                            v-show="bannerPhotoMobile.showDeleteButton && !isNowGreaterThanOrEqualToStartAt"
+                                                            v-show="bannerPhotoMobile.showDeleteButton"
                                                             type="button" class="btn btn-danger" @click="deleteMobileFile">
                                                             <i class="fa-solid fa-trash-can"></i> 刪除
                                                         </button>
