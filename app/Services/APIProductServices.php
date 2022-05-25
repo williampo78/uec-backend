@@ -565,8 +565,7 @@ class APIProductServices
 
             //付款方式
             $payment_method = [];
-            //$payment_way = "TAPPAY_CREDITCARD,TAPPAY_LINEPAY";//本階段沒有欄位寫固定的付款方式
-            $payment_way = "TAPPAY_CREDITCARD";//來不及申請LINE Pay店號，付款方式請暫時先移除LINE Pay
+            $payment_way = "TAPPAY_CREDITCARD,TAPPAY_LINEPAY";//本階段沒有欄位寫固定的付款方式
             //if ($product[$id]->payment_method != '') {
             $methods = explode(',', $payment_way);
             foreach ($methods as $method) {
