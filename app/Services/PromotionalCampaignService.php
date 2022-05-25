@@ -982,7 +982,7 @@ class PromotionalCampaignService
 
                 // ﹝指定商品滿N元，打X折﹞、﹝指定商品滿N元，折X元﹞
                 if (in_array($cartCampaign->campaign_type, ['CART_P01', 'CART_P02'])) {
-                    $tmpThreshold['x_value'] = $threshold->x_value;
+                    $tmpThreshold['x_value'] = $threshold->x_value * 100 / 100;
                 }
                 // ﹝指定商品滿N件，送贈品﹞、﹝指定商品滿N元，送贈品﹞
                 elseif (in_array($cartCampaign->campaign_type, ['CART_P03', 'CART_P04'])) {
