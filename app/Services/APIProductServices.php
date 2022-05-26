@@ -397,6 +397,7 @@ class APIProductServices
             foreach ($promotion as $k => $v) {
                 $promotion_txt = '';
                 foreach ($v as $label) {
+                    if ($label->promotional_label=='') continue;
                     if ($promotion_txt != $label->promotional_label) {
                         $promotional[$k][] = $label->promotional_label;
                         $promotion_txt = $label->promotional_label;
@@ -540,7 +541,7 @@ class APIProductServices
     /*
      * 取得搜尋結果的上方分類
      */
-    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $attribute = null)
+    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
     {
 
         //分類總覽階層
@@ -637,8 +638,8 @@ class APIProductServices
                 foreach ($products as $category) {
                     if ($subCate == $category->L2) continue;
                     $main[] = array(
-                        'id' => $category->L1,
-                        'name' => $category->L1_Name,
+                        'id' => $category->L2,
+                        'name' => $category->L2_Name,
                         'sub' => $sub[$category->L1][$category->L2]
                     );
                     $subCate = $category->L2;
@@ -646,9 +647,9 @@ class APIProductServices
                 foreach ($products as $category) {
                     if ($cate == $category->L1) continue;
                     $data[] = array(
-                        'id' => $category->L1,
-                        'name' => $category->L1_Name,
-                        'sub' => $main
+                        'id' => $category->L2,
+                        'name' => $category->L2_Name,
+                        'sub' => $main[$category->L1]
                     );
                     $cate = $category->L1;
                 }
@@ -896,8 +897,13 @@ class APIProductServices
 
 
                     if (isset($promotion[$rel->related_product_id])) {
+                        $promotion_txt = '';
                         foreach ($promotion[$rel->related_product_id] as $k => $Label) { //取活動標籤
-                            $promotional[] = $Label->promotional_label;
+                            if ($Label->promotional_label=='') continue;
+                            if ($promotion_txt != $Label->promotional_label) {
+                                $promotional[] = $Label->promotional_label;
+                                $promotion_txt = $Label->promotional_label;
+                            }
                         }
                     }
 

@@ -56,14 +56,13 @@ class APIIndexServices
         $product_info = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
         foreach ($promotion as $k => $v) {
+            $promotion_txt = '';
             foreach ($v as $label) {
-                $promotional_array[$k][$label->promotional_label] = $label->promotional_label;
-            }
-        }
-
-        foreach ($promotional_array as $product_id => $label) {
-            foreach ($label as $k=>$v){
-                $promotional[$product_id][] = $v;
+                if ($label->promotional_label=='') continue;
+                if ($promotion_txt != $label->promotional_label) {
+                    $promotional[$k][] = $label->promotional_label;
+                    $promotion_txt = $label->promotional_label;
+                }
             }
         }
 
