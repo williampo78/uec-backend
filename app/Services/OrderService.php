@@ -414,7 +414,7 @@ class OrderService
                     $cart['discount'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                     $cart['discount'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
                     $cart['discount'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
-                    $cart['discount'][$obj->group_seq]['campaignDiscount'] = $obj->discount;
+                    $cart['discount'][$obj->group_seq]['campaignDiscount'] += $obj->discount;
                     $thresholdAmount += $obj->discount;
                 }
                 break;
