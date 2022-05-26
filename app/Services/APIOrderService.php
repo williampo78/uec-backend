@@ -53,8 +53,10 @@ class APIOrderService
 
         $product_items = ProductItem::all();
         $prod_info = [];
+        $prod_items = [];
         foreach ($product_items as $product_item) {
             $prod_info[$product_item->product_id] = $product_item;
+            $prod_items[$product_item->product_id][$product_item->id] = $product_item;
         }
 
         //行銷活動
@@ -176,8 +178,12 @@ class APIOrderService
             $point_rate = 0;
             $discount_group = 0;
             $productID = 0;
+            $prod_info_detail = [];
             foreach ($cart['list'] as $products) {
                 foreach ($products['itemList'] as $item) {
+                    if ($prod_items[$products['productID']][$item['itemId']]) {
+                        $prod_info_detail[$products['productID']] = $prod_items[$products['productID']][$item['itemId']];
+                    }
                     $seq++;
                     //有活動折扣
                     if ($item['campaignDiscountStatus']) {
@@ -475,8 +481,8 @@ class APIOrderService
                             "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
                             "promotion_campaign_id" => $threshold['campaignID'],
                             "product_id" => $product_id,
-                            "product_item_id" => $prod_info[$product_id]['id'],
-                            "item_no" => $prod_info[$product_id]['item_no'],
+                            "product_item_id" => $prod_info_detail[$product_id]['id'],
+                            "item_no" => $prod_info_detail[$product_id]['item_no'],
                             "discount" => $cart_p_discount_prod[$product_id],
                             "record_identity" => 'M',
                             "campaign_threshold_id" => $threshold_prod['thresholdDiscount'][$product_id],
@@ -511,8 +517,8 @@ class APIOrderService
                             "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
                             "promotion_campaign_id" => $threshold['campaignID'],
                             "product_id" => $product_id,
-                            "product_item_id" => $prod_info[$product_id]['id'],
-                            "item_no" => $prod_info[$product_id]['item_no'],
+                            "product_item_id" => $prod_info_detail[$product_id]['id'],
+                            "item_no" => $prod_info_detail[$product_id]['item_no'],
                             "discount" => 0,
                             "record_identity" => 'M',
                             "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
