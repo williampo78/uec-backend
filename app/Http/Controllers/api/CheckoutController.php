@@ -274,12 +274,14 @@ class CheckoutController extends Controller
 
                 if ($shipping_fee == $request->shipping_fee) {
                     //Stet2, 產生訂單
-                    $dataOrder = $this->apiOrderService->setOrders($response['result'], $request, $campaign, $campaign_gift, $campaign_discount);
+                    $token = $request->bearerToken();
+                    $dataOrder = $this->apiOrderService->setOrders($response['result'], $request, $campaign, $campaign_gift, $campaign_discount, $token);
                     switch ($dataOrder['status']) {
                         case 200:
                             $status = true;
                             $err = '200';
-                            $data = $dataOrder['payment_url'];
+                            unset($dataOrder['status']);
+                            $data = $dataOrder;
                             break;
 
                         case 401:

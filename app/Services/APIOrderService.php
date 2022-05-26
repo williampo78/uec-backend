@@ -14,6 +14,7 @@ use App\Services\APIService;
 use App\Services\APITapPayService;
 use App\Services\StockService;
 use Carbon\Carbon;
+use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -37,7 +38,7 @@ class APIOrderService
      * @param 購物車清單, 前端的訂單資料
      * @return string
      */
-    public function setOrders($cart, $order, $campaigns, $campaign_gift, $campaign_discount)
+    public function setOrders($cart, $order, $campaigns, $campaign_gift, $campaign_discount, $token = null)
     {
         $member_id = Auth::guard('api')->user()->member_id;
         $random = Str::random(6);
@@ -485,20 +486,22 @@ class APIOrderService
                 $webData['prime'] = $order['tappay_prime'];
                 $tapPay = $this->apiTapPayService->payByPrime($webData);
                 $tapPayResult = json_decode($tapPay, true);
-
                 if ($tapPayResult['status'] == 0) {
                     $payment = OrderPayment::where('id', $newOrderPayment->id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => now()]);
                     if ($payment) {
                         $result['status'] = 200;
                         $result['payment_url'] = $tapPayResult['payment_url'];
+                        $result['payment_token'] = $token;
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
+                        $result['payment_token'] = null;
                         Log::channel('tappay_api_log')->error('597:tappay error!' . json_encode($tapPayResult));
                     }
                 } else {
                     $result['status'] = $tapPayResult['status'];
                     $result['payment_url'] = null;
+                    $result['payment_token'] = null;
                     Log::channel('tappay_api_log')->error('602:tappay error!' . json_encode($tapPayResult));
                 }
             }
