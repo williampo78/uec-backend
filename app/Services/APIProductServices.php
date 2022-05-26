@@ -541,7 +541,7 @@ class APIProductServices
     /*
      * 取得搜尋結果的上方分類
      */
-    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null)
+    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $attribute = null)
     {
 
         //分類總覽階層
