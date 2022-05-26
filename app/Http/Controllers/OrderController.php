@@ -428,10 +428,9 @@ class OrderController extends Controller
                     'is_voided' => null,
                 ];
 
-                if (isset($orderCampaignDiscount->promotionalCampaign->campaign_brief)) {
-
-                    $orderCampaignDiscounts['campaign_name'] = $orderCampaignDiscount->promotionalCampaign->campaign_brief." | ".$orderCampaignDiscount->promotionalCampaign->campaign_name;
-                }
+                // if (isset($orderCampaignDiscount->promotionalCampaign->campaign_brief)) {
+                //     $orderCampaignDiscounts['campaign_name'] = $orderCampaignDiscount->promotionalCampaign->campaign_brief." | ".$orderCampaignDiscount->promotionalCampaign->campaign_name;
+                // }
 
                 // 活動階層
                 $orderCampaignDiscounts['level_code'] = config('uec.campaign_level_code_options')[$orderCampaignDiscount->promotionalCampaign->level_code] ?? null;
