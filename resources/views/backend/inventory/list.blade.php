@@ -263,8 +263,9 @@
                             stock_type: $('#stock_type').val(),
                             stock_status: $('#stock_status').val(),
                             item_no_start: $('#item_no_start').val(),
-                            ordered_date_end: $('#ordered_date_end').val(),
+                            item_no_end: $('#item_no_end').val(),
                             product_name: $('#product_name').val(),
+                            supplier: $('#supplier').val(),
                         },
                         responseType: 'blob',
                     })
