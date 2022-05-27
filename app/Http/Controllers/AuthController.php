@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use App\Services\RoleService;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -22,11 +22,17 @@ class AuthController extends Controller
         $this->userService = $userService;
     }
 
+    /**
+     * 登入頁
+     */
     public function showLoginPage()
     {
         return view('login');
     }
 
+    /**
+     * 登入
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -45,22 +51,26 @@ class AuthController extends Controller
             ->first();
 
         if (!$user) {
-            return redirect('/')
-                ->withErrors('帳號或密碼錯誤')
+            return back()
+                ->withErrors(['帳號或密碼錯誤'])
                 ->withInput();
         }
 
         Auth::login($user);
         $this->roleService->putUserRolesSession();
         $this->roleService->setUrlSsoSwitchBtn();
-        return redirect()->route('backend_home');
+
+        return redirect()->intended(route('backend_home'));
     }
 
+    /**
+     * 登出
+     */
     public function logout()
     {
         Session::flush();
         Auth::logout();
 
-        return Redirect('/');
+        return redirect()->route('login.show');
     }
 }
