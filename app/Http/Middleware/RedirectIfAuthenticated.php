@@ -22,8 +22,9 @@ class RedirectIfAuthenticated
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+            // 已登入，跳轉頁面
+            if (auth($guard)->check()) {
+                return redirect()->intended(route('backend_home'));
             }
         }
 

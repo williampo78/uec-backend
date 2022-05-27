@@ -58,10 +58,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('backend_home');
 });
-Route::get('/login', [AuthController::class, 'showLoginPage'])->name('login.show');
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+// 未登入的user才能造訪
+Route::group(['middleware' => ['guest']], function () {
+    Route::get('/login', [AuthController::class, 'showLoginPage'])->name('login.show');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+});
 
 Route::any('/ckfinder/connector', [CKFinderController::class, 'requestAction'])->name('ckfinder_connector');
+
+// 已登入的user才能造訪
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/', AdminController::class, ['names' => ['index' => 'backend_home']]);
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -177,9 +183,9 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/roles', RoleController::class, ['names' => ['index' => 'roles']]);
 
     // 使用者管理
-    Route::resource('/profile', UserController::class, ['names' => ['index' => 'profile']]);
     Route::resource('/users', UserController::class, ['names' => ['index' => 'users']]);
-    Route::post('/users/ajax/is-user-account-repeat', [UserController::class, 'isUserAccountRepeat']); //驗證使用者帳號是否重複
+    // 驗證使用者帳號是否重複
+    Route::post('/users/ajax/is-user-account-repeat', [UserController::class, 'isUserAccountRepeat']);
     Route::get('/user_profile', [UserController::class, 'profile']);
     Route::put('/user_profile', [UserController::class, 'updateProfile'])->name('user_profile.update');
 

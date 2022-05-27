@@ -13,11 +13,6 @@ class SupplierController extends Controller
     private $supplierTypeService;
     private $lookupValuesVService;
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function __construct(
         SupplierService $supplierService,
         SupplierTypeService $supplierTypeService,
@@ -28,6 +23,11 @@ class SupplierController extends Controller
         $this->lookupValuesVService = $lookupValuesVService;
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         $queryData = $request->query();

@@ -148,7 +148,7 @@ class UserService
     }
 
     /**
-     * 設定導覽頁session
+     * 設定導覽列session
      *
      * @return void
      */
@@ -219,6 +219,7 @@ class UserService
                 ];
             }
         });
+
         session(['dradvice_menu' => $menu]);
     }
 }
