@@ -662,7 +662,7 @@ class ProductService
                 $upd = Batch::update($productItemsInstance, $ProductsItemUpdate, 'id');
             }
             foreach ($CategoryHierarchyProducts as $key => $val) {
-                if ($val['status'] == 'new') {
+                if (isset($val['status']) && $val['status'] == 'new') {
                     CategoryProduct::create([
                         'web_category_hierarchy_id' => $val['web_category_hierarchy_id'],
                         'product_id' => $id,
