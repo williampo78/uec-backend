@@ -40,12 +40,12 @@ class InventoryService
             ->orderBy('w.name');
 
         //倉庫
-        if (empty($request['warehouse']) === false) {
+        if (!empty($request['warehouse'])) {
             $builder = $builder->where('w.id', $request['warehouse']);
         }
 
         //庫存類型
-        if (empty($request['stock_type']) === false) {
+        if (!empty($request['stock_type'])) {
             $builder = $builder->where('p.stock_type', $request['stock_type']);
         }
 
@@ -55,22 +55,22 @@ class InventoryService
         }
 
         //Item編號 開始
-        if (empty($request['item_no_start']) === false) {
+        if (!empty($request['item_no_start'])) {
             $builder = $builder->where('pi.item_no', '>=', $request['item_no_start']);
         }
 
         //Item編號 結束
-        if (empty($request['item_no_end']) === false) {
+        if (!empty($request['item_no_end'])) {
             $builder = $builder->where('pi.item_no', '<=', $request['item_no_end']);
         }
 
         //商品名稱
-        if (empty($request['product_name']) === false) {
+        if (!empty($request['product_name'])) {
             $builder = $builder->where('p.product_name', 'like', sprintf('%%%s%%', $request['product_name']));
         }
 
         //供應商
-        if (empty($request['supplier']) === false) {
+        if (!empty($request['supplier'])) {
             $builder = $builder->where('p.supplier_id', $request['supplier']);
         }
 
