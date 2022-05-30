@@ -941,7 +941,7 @@ class PromotionalCampaignService
     /**
      * 整理滿額活動
      *
-     * @param Model $cartCampaigns
+     * @param Model $cartCampaign
      * @return array
      */
     public function formatPromotionalCampaignCart(Model $cartCampaign): array
@@ -1498,6 +1498,210 @@ class PromotionalCampaignService
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
+        }
+
+        return $result;
+    }
+
+    /**
+     * 取得單品活動table列表
+     *
+     * @param array $queryData
+     * @return Collection
+     */
+    public function getPrdTableList(array $queryData = []): Collection
+    {
+        $user = auth()->user();
+        $prdCampaigns = PromotionalCampaign::with(['campaignType'])
+            ->where('agent_id', $user->agent_id)
+            ->where('level_code', 'PRD');
+
+        // 活動名稱 or 前台文案
+        if (!empty($queryData['campaign_name_or_campaign_brief'])) {
+            $prdCampaigns = $prdCampaigns->where(function ($query) use ($queryData) {
+                $query->where('campaign_name', 'LIKE', '%' . $queryData['campaign_name_or_campaign_brief'] . '%')
+                    ->orWhere('campaign_brief', 'LIKE', '%' . $queryData['campaign_name_or_campaign_brief'] . '%');
+            });
+        }
+
+        // 狀態
+        if (isset($queryData['active'])) {
+            $prdCampaigns = $prdCampaigns->where('active', $queryData['active']);
+        }
+
+        // 活動類型
+        if (isset($queryData['campaign_type'])) {
+            $prdCampaigns = $prdCampaigns->where('campaign_type', $queryData['campaign_type']);
+        }
+
+        // 上架開始時間-起始日
+        if (!empty($queryData['start_at_start'])) {
+            $prdCampaigns = $prdCampaigns->whereDate('start_at', '>=', $queryData['start_at_start']);
+        }
+
+        // 上架開始時間-結束日
+        if (!empty($queryData['start_at_end'])) {
+            $prdCampaigns = $prdCampaigns->whereDate('start_at', '<=', $queryData['start_at_end']);
+        }
+
+        // 商品序號查詢
+        if (!empty($queryData['product_no'])) {
+            $prdCampaigns = $prdCampaigns->where(function ($query) use ($queryData) {
+                return $query->whereHas('promotionalCampaignProducts.product', function (Builder $query) use ($queryData) {
+                    $query->where('product_no', $queryData['product_no']);
+                })
+                    ->orWhereHas('promotionalCampaignGiveaways.product', function (Builder $query) use ($queryData) {
+                        $query->where('product_no', $queryData['product_no']);
+                    });
+            });
+        }
+
+        return $prdCampaigns->latest('start_at')->get();
+    }
+
+    /**
+     * 整理單品活動table列表
+     *
+     * @param Collection $cartCampaigns
+     * @return array
+     */
+    public function formatPrdTableList(Collection $prdCampaigns): array
+    {
+        $result = [];
+
+        foreach ($prdCampaigns as $campaign) {
+            $tmpCampaign = [
+                'id' => $campaign->id,
+                'campaign_name' => $campaign->campaign_name,
+                'campaign_brief' => $campaign->campaign_brief,
+                'campaign_type' => null,
+                'active' => config('uec.active2_options')[$campaign->active] ?? null,
+                'start_at' => Carbon::parse($campaign->start_at)->format('Y-m-d H:i:s'),
+                'end_at' => Carbon::parse($campaign->end_at)->format('Y-m-d H:i:s'),
+            ];
+
+            // 活動類型
+            if (isset($campaign->campaignType)) {
+                $tmpCampaign['campaign_type'] = $campaign->campaignType->description;
+            }
+
+            $result[] = $tmpCampaign;
+        }
+
+        return $result;
+    }
+
+    /**
+     * 取得單品活動
+     *
+     * @param integer $id
+     * @return Model
+     */
+    public function getPrdCampaignForShowPage(int $id): Model
+    {
+        $user = auth()->user();
+        $prdCampaign = PromotionalCampaign::with([
+            'campaignType',
+            'promotionalCampaignGiveaways',
+            'promotionalCampaignGiveaways.product',
+            'promotionalCampaignProducts',
+            'promotionalCampaignProducts.product',
+        ])
+            ->where('agent_id', $user->agent_id)
+            ->where('level_code', 'PRD')
+            ->find($id);
+
+        return $prdCampaign;
+    }
+
+    /**
+     * 整理單品活動
+     *
+     * @param Model $prdCampaign
+     * @return array
+     */
+    public function formatPrdCampaignForShowPage(Model $prdCampaign): array
+    {
+        $result = [
+            'id' => $prdCampaign->id,
+            'campaign_name' => $prdCampaign->campaign_name,
+            'active' => config('uec.active2_options')[$prdCampaign->active] ?? null,
+            'campaign_type' => $prdCampaign->campaign_type,
+            'display_campaign_type' => null,
+            'n_value' => $prdCampaign->n_value,
+            'x_value' => null,
+            'start_at' => Carbon::parse($prdCampaign->start_at)->format('Y-m-d H:i:s'),
+            'end_at' => Carbon::parse($prdCampaign->end_at)->format('Y-m-d H:i:s'),
+            'campaign_brief' => $prdCampaign->campaign_brief,
+            'giveaways' => null,
+            'products' => null,
+        ];
+
+        // 活動類型
+        if (isset($prdCampaign->campaignType)) {
+            $result['display_campaign_type'] = $prdCampaign->campaignType->description;
+        }
+
+        // x值(折扣)
+        if (isset($prdCampaign->x_value) && in_array($prdCampaign->campaign_type, ['PRD01', 'PRD02', 'PRD03', 'PRD04'])) {
+            $result['x_value'] = $prdCampaign->x_value * 100 / 100;
+        }
+
+        // 活動贈品
+        if ($prdCampaign->promotionalCampaignGiveaways->isNotEmpty()) {
+            foreach ($prdCampaign->promotionalCampaignGiveaways as $giveaway) {
+                $tmpGiveaway = [
+                    'id' => $giveaway->id,
+                    'product_no' => null,
+                    'product_name' => null,
+                    'assigned_qty' => $giveaway->assigned_qty,
+                ];
+
+                // 商品
+                if (isset($giveaway->product)) {
+                    $tmpGiveaway['product_no'] = $giveaway->product->product_no;
+                    $tmpGiveaway['product_name'] = $giveaway->product->product_name;
+                }
+
+                $result['giveaways'][] = $tmpGiveaway;
+            }
+        }
+
+        // 活動主商品
+        if ($prdCampaign->promotionalCampaignProducts->isNotEmpty()) {
+            foreach ($prdCampaign->promotionalCampaignProducts as $campaignProduct) {
+                $tmpCampaignProduct = [
+                    'id' => $campaignProduct->id,
+                    'product_no' => null,
+                    'product_name' => null,
+                    'selling_price' => null,
+                    'start_launched_at' => null,
+                    'end_launched_at' => null,
+                    'launch_status' => null,
+                    'gross_margin' => null,
+                ];
+
+                // 商品
+                if (isset($campaignProduct->product)) {
+                    $tmpCampaignProduct['product_no'] = $campaignProduct->product->product_no;
+                    $tmpCampaignProduct['product_name'] = $campaignProduct->product->product_name;
+                    $tmpCampaignProduct['selling_price'] = number_format($campaignProduct->product->selling_price);
+                    $tmpCampaignProduct['launch_status'] = $campaignProduct->product->launch_status;
+                    $tmpCampaignProduct['gross_margin'] = $campaignProduct->product->gross_margin;
+
+                    // 上架時間起
+                    if (isset($campaignProduct->product->start_launched_at)) {
+                        $tmpCampaignProduct['start_launched_at'] = Carbon::parse($campaignProduct->product->start_launched_at)->format('Y-m-d H:i:s');
+                    }
+
+                    // 上架時間訖
+                    if (isset($campaignProduct->product->end_launched_at)) {
+                        $tmpCampaignProduct['end_launched_at'] = Carbon::parse($campaignProduct->product->end_launched_at)->format('Y-m-d H:i:s');
+                    }
+                }
+
+                $result['products'][] = $tmpCampaignProduct;
+            }
         }
 
         return $result;

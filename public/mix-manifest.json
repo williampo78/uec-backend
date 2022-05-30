@@ -7,6 +7,7 @@
     "/js/order_payments_report.js": "/js/order_payments_report.js",
     "/js/order_refund.js": "/js/order_refund.js",
     "/js/promotional_campaign/cart/main.js": "/js/promotional_campaign/cart/main.js",
+    "/js/promotional_campaign/prd/main.js": "/js/promotional_campaign/prd/main.js",
     "/css/app.css": "/css/app.css",
     "/css/advertisement.css": "/css/advertisement.css",
     "/datatables.net-plugins/i18n/af.json": "/datatables.net-plugins/i18n/af.json",

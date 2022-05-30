@@ -22,6 +22,7 @@ mix.js("resources/js/app.js", "public/js")
     .js("resources/js/order_payments_report/*.js", "public/js/order_payments_report.js")
     .js("resources/js/order_refund/*.js", "public/js/order_refund.js")
     .js("resources/js/promotional_campaign/cart/*.js", "public/js/promotional_campaign/cart/main.js")
+    .js("resources/js/promotional_campaign/prd/*.js", "public/js/promotional_campaign/prd/main.js")
     .vue();
 
 mix.copyDirectory(

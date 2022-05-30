@@ -25,7 +25,8 @@
                                                 <label class="control-label">活動名稱/文案</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="campaign_name_or_campaign_brief"
+                                                <input type="text" class="form-control"
+                                                    name="campaign_name_or_campaign_brief"
                                                     v-model="form.campaignNameOrCampaignBrief" placeholder="模糊查詢" />
                                             </div>
                                         </div>
@@ -37,7 +38,8 @@
                                                 <label class="control-label">上下架狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select2 class="form-control" :options="launchStatusOptions" v-model="form.launchStatus" name="launch_status">
+                                                <select2 class="form-control" :options="launchStatusOptions"
+                                                    v-model="form.launchStatus" name="launch_status">
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -50,7 +52,8 @@
                                                 <label class="control-label">活動類型</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select2 class="form-control" :options="campaignTypes" v-model="form.campaignType" name="campaign_type">
+                                                <select2 class="form-control" :options="campaignTypes"
+                                                    v-model="form.campaignType" name="campaign_type">
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -60,38 +63,36 @@
 
                                 <div class="row">
                                     <div class="col-sm-4">
-                                        <div class="row">
+                                        <div class="form-group">
                                             <div class="col-sm-3">
                                                 <label class="control-label">上架時間起</label>
                                             </div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group">
-                                                    <div class="input-group" id="start_at_start_flatpickr">
-                                                        <input type="text" class="form-control" name="start_at_start"
-                                                            id="start_at_start"
-                                                            autocomplete="off" data-input v-model="form.startAtStart">
-                                                        <span class="input-group-btn" data-toggle>
-                                                            <button class="btn btn-default" type="button">
-                                                                <i class="fa-solid fa-calendar-days"></i>
-                                                            </button>
-                                                        </span>
+                                            <div class="col-sm-9">
+                                                <div class="row">
+                                                    <div class="col-sm-5">
+                                                        <div class="input-group" id="start_at_start_flatpickr">
+                                                            <input type="text" class="form-control" name="start_at_start"
+                                                                autocomplete="off" data-input v-model="form.startAtStart">
+                                                            <span class="input-group-btn" data-toggle>
+                                                                <button class="btn btn-default" type="button">
+                                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                                </button>
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1 text-center">
-                                                <label class="control-label">～</label>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group">
-                                                    <div class="input-group" id="start_at_end_flatpickr">
-                                                        <input type="text" class="form-control" name="start_at_end"
-                                                            id="start_at_end"
-                                                            autocomplete="off" data-input v-model="form.startAtEnd" />
-                                                        <span class="input-group-btn" data-toggle>
-                                                            <button class="btn btn-default" type="button">
-                                                                <i class="fa-solid fa-calendar-days"></i>
-                                                            </button>
-                                                        </span>
+                                                    <div class="col-sm-2 text-center">
+                                                        <label class="control-label">～</label>
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <div class="input-group" id="start_at_end_flatpickr">
+                                                            <input type="text" class="form-control" name="start_at_end"
+                                                                autocomplete="off" data-input v-model="form.startAtEnd" />
+                                                            <span class="input-group-btn" data-toggle>
+                                                                <button class="btn btn-default" type="button">
+                                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                                </button>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -104,7 +105,8 @@
                                                 <label class="control-label">商品序號</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="product_no" v-model="form.productNo">
+                                                <input type="text" class="form-control" name="product_no"
+                                                    v-model="form.productNo">
                                             </div>
                                         </div>
                                     </div>
@@ -118,7 +120,7 @@
                                                         <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                                     </button>
 
-                                                    <button type="button" class="btn btn-danger"  @click="resetForm">
+                                                    <button type="button" class="btn btn-danger" @click="resetForm">
                                                         <i class="fa-solid fa-eraser"></i> 清除
                                                     </button>
                                                 @endif
@@ -165,7 +167,8 @@
                                                     <td>
                                                         @if ($share_role_auth['auth_query'])
                                                             <a class="btn btn-info btn-sm"
-                                                                href="{{ route('promotional_campaign_cart_v2.show', $cartCampaign['id']) }}" title="檢視">
+                                                                href="{{ route('promotional_campaign_cart_v2.show', $cartCampaign['id']) }}"
+                                                                title="檢視">
                                                                 <i class="fa-solid fa-magnifying-glass"></i>
                                                             </a>
                                                         @endif
@@ -245,7 +248,7 @@
             mounted() {
                 let startAtStartFlatpickr = flatpickr("#start_at_start_flatpickr", {
                     dateFormat: "Y-m-d",
-                    maxDate: $("#start_at_end").val(),
+                    maxDate: this.form.startAtEnd,
                     onChange: function(selectedDates, dateStr, instance) {
                         startAtEndFlatpickr.set('minDate', dateStr);
                     },
@@ -253,7 +256,7 @@
 
                 let startAtEndFlatpickr = flatpickr("#start_at_end_flatpickr", {
                     dateFormat: "Y-m-d",
-                    minDate: $("#start_at_start").val(),
+                    minDate: this.form.startAtStart,
                     onChange: function(selectedDates, dateStr, instance) {
                         startAtStartFlatpickr.set('maxDate', dateStr);
                     },
@@ -268,7 +271,8 @@
                     });
                 },
                 setQueryParameters() {
-                    let campaignNameOrCampaignBrief = "{{ request()->input('campaign_name_or_campaign_brief') }}";
+                    let campaignNameOrCampaignBrief =
+                        "{{ request()->input('campaign_name_or_campaign_brief') }}";
                     let launchStatus = "{{ request()->input('launch_status') }}";
                     let campaignType = "{{ request()->input('campaign_type') }}";
                     let startAtStart = "{{ request()->input('start_at_start') }}";
