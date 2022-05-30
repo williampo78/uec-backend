@@ -52,12 +52,10 @@ class APIOrderService
         }
 
         $product_items = ProductItem::all();
-        $prod_main = [];
         $prod_info = [];
         $prod_items = [];
         $prod_gift = [];
         foreach ($product_items as $product_item) {
-            $prod_main[$product_item->product_id] = ProductItem::with('product_id')->find($product_item->product_id);
             $prod_info[$product_item->product_id] = $product_item;
             $prod_items[$product_item->product_id][$product_item->id] = $product_item;
             $stock = $this->stockService->getStockByItem($warehouseCode, $product_item->id);
@@ -67,7 +65,6 @@ class APIOrderService
                 }
             }
         }
-        dd($prod_main);
         //行銷活動
         $campaign_group = [];
         $group_i = 0;
