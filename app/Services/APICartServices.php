@@ -752,6 +752,7 @@ class APICartServices
             $calc_amount = [];
             $calc_qty[] = 0;
             $thresholdDiscount_display = [];
+            $thresholdDiscount = [];
             $thresholdAmount = 0;
             //滿額折扣 CART_P01 & CART_P02
             if (isset($prod_campaign['DISCOUNT'])) {
@@ -781,7 +782,6 @@ class APICartServices
                         } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
                             $prodDiscount = $item->x_value;
                         }
-                        $thresholdDiscount = [];
                         foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
                             $thresholdDiscount[$campaign_id] = array(
                                 "thresholdID" => $item->id,
