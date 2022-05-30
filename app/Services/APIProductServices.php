@@ -397,7 +397,7 @@ class APIProductServices
             foreach ($promotion as $k => $v) {
                 $promotion_txt = '';
                 foreach ($v as $label) {
-                    if ($label->promotional_label=='') continue;
+                    if ($label->promotional_label == '') continue;
                     if ($promotion_txt != $label->promotional_label) {
                         $promotional[$k][] = $label->promotional_label;
                         $promotion_txt = $label->promotional_label;
@@ -899,7 +899,7 @@ class APIProductServices
                     if (isset($promotion[$rel->related_product_id])) {
                         $promotion_txt = '';
                         foreach ($promotion[$rel->related_product_id] as $k => $Label) { //取活動標籤
-                            if ($Label->promotional_label=='') continue;
+                            if ($Label->promotional_label == '') continue;
                             if ($promotion_txt != $Label->promotional_label) {
                                 $promotional[] = $Label->promotional_label;
                                 $promotion_txt = $Label->promotional_label;
@@ -1119,18 +1119,17 @@ class APIProductServices
         $page = $input['page'];
         $size = $input['size'];
 
-        //取得目前滿額活動
-        $campaigns = $this->getPromotion('product_card', $id);
-        foreach ($campaigns as $product_id => $campaign) {
+        $promotion = $this->getPromotion('product_card');
+        foreach ($promotion as $product_id => $campaign) {
             $promotion_txt = '';
             foreach ($campaign as $label) {
+                if ($label->promotional_label == '') continue;
                 if ($promotion_txt != $label->promotional_label) {
                     $promotional[$product_id][] = $label->promotional_label;
                     $promotion_txt = $label->promotional_label;
                 }
             }
         }
-
         $login = Auth::guard('api')->check();
         $is_collection = [];
         $is_cart = [];
@@ -1146,6 +1145,9 @@ class APIProductServices
         }
 
         $product_info = [];
+
+        //取得目前滿額活動
+        $campaigns = $this->getPromotion('product_card', $id);
         if (count($campaigns) > 0) {
             //排列產品卡 - 並確認產品有分類
             foreach ($campaigns as $product_id => $campaign) {
