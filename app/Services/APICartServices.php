@@ -356,7 +356,6 @@ class APICartServices
                                         $productRow++;
                                     }
                                 }
-
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD02') { //﹝單品﹞第N件(含)以上，折X元
                                 $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後1件單價 1000-200
                                 //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
@@ -445,7 +444,6 @@ class APICartServices
                                         $productRow++;
                                     }
                                 }
-
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD03') { //﹝單品﹞滿N件，每件打X折
                                 $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000*0.85
                                 //找符合的item放
@@ -508,7 +506,6 @@ class APICartServices
                                         $productRow++;
                                     }
                                 }
-
                             } elseif ($campaign['PRD']['DISCOUNT'][$product_id]->campaign_type == 'PRD04') { //﹝單品﹞滿N件，每件折X元
                                 $price = $cartAmount[$product_id] - $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000-200
 
@@ -752,7 +749,6 @@ class APICartServices
                 );
 
             }
-
             $calc_amount = [];
             $calc_qty[] = 0;
             $thresholdDiscount_display = [];
@@ -764,11 +760,15 @@ class APICartServices
                     $subAmount = [];
                     $price = 0;
                     $quantity = 0;
+                    $tmp_product_id= 0;
                     foreach ($product_in_campaign as $key => $product_id) {
-                        $price += $prod_amount[$product_id];
-                        $quantity += $prod_qty[$product_id];
-                        $pid[] = $product_id;
-                        $subAmount[] = $prod_amount[$product_id];
+                        if ($tmp_product_id != $product_id) {
+                            $price += $prod_amount[$product_id];
+                            $quantity += $prod_qty[$product_id];
+                            $pid[] = $product_id;
+                            $subAmount[] = $prod_amount[$product_id];
+                            $tmp_product_id = $product_id;
+                        }
                     }
                     $calc_amount[$campaign_id] = $price;
                     $calc_qty[$campaign_id] = $quantity;
@@ -819,11 +819,15 @@ class APICartServices
                     $subAmount = [];
                     $price = 0;
                     $quantity = 0;
+                    $tmp_product_id= 0;
                     foreach ($product_in_campaign as $key => $product_id) {
-                        $price += $prod_amount[$product_id];
-                        $quantity += $prod_qty[$product_id];
-                        $pid[] = $product_id;
-                        $subAmount[] = $prod_amount[$product_id];
+                        if ($tmp_product_id !=$product_id) {
+                            $price += $prod_amount[$product_id];
+                            $quantity += $prod_qty[$product_id];
+                            $pid[] = $product_id;
+                            $subAmount[] = $prod_amount[$product_id];
+                            $tmp_product_id = $product_id;
+                        }
                     }
                     $calc_amount[$campaign_id] = ($price + $thresholdAmount);
                     $calc_qty[$campaign_id] = $quantity;
