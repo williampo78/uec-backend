@@ -522,7 +522,7 @@ class APIProductServices
         if ($event) {
             $strSQL .= " and pc.id=" . (int)$event;
         }
-        $strSQL .= " order by pcp.product_id";
+        $strSQL .= " order by pcp.product_id, pc.promotional_label";
 
         $promotional = DB::select($strSQL);
         $data = [];
