@@ -1,6 +1,6 @@
-import ProductModal from "../../components/ProductModal.vue";
+import CartV2CampaignProductModal from "../../components/CartV2CampaignProductModal.vue";
 
-Vue.component("product-modal", ProductModal);
+Vue.component("cart-v2-campaign-product-modal", CartV2CampaignProductModal);
 
 // 至少指定一組門檻
 jQuery.validator.addMethod(

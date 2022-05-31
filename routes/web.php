@@ -21,7 +21,6 @@ use App\Http\Controllers\ProductReviewRegisterController;
 use App\Http\Controllers\ProductsMallController;
 use App\Http\Controllers\PromotionalCampaignCartController;
 use App\Http\Controllers\PromotionalCampaignCartV2Controller;
-use App\Http\Controllers\PromotionalCampaignController;
 use App\Http\Controllers\PromotionalCampaignPrdController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\QAController;
@@ -84,8 +83,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
 
     // 商品主檔 - 基本資訊管理
     Route::post('/products/ajax', [ProductController::class, 'ajax']);
-    Route::get('/products/modal/options', [ProductController::class, 'getModalOptions']);
-    Route::get('/products/modal/products', [ProductController::class, 'getModalProducts']);
     Route::resource('/products', ProductController::class, ['names' => ['index' => 'products']]);
 
     // 商品主檔 - 商城資訊管理
@@ -217,14 +214,23 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     ]);
 
     // 滿額活動
-    Route::post('/promotional_campaign_cart/ajax/can-pass-active-validation', [PromotionalCampaignCartController::class, 'canPassActiveValidation']);
-    Route::resource('/promotional_campaign_cart', PromotionalCampaignCartController::class, [
+    Route::get('/promotional-campaign-cart/product-modal/options', [PromotionalCampaignCartController::class, 'getProductModalOptions']);
+    Route::get('/promotional-campaign-cart/product-modal/products', [PromotionalCampaignCartController::class, 'getProductModalProducts']);
+    Route::post('/promotional-campaign-cart/can-active', [PromotionalCampaignCartController::class, 'canActive']);
+    Route::resource('/promotional-campaign-cart', PromotionalCampaignCartController::class, [
         'names' => [
             'index' => 'promotional_campaign_cart',
+            'create' => 'promotional_campaign_cart.create',
+            'store' => 'promotional_campaign_cart.store',
+            'edit' => 'promotional_campaign_cart.edit',
+            'update' => 'promotional_campaign_cart.update',
+            'show' => 'promotional_campaign_cart.show',
         ],
     ]);
 
-    // 滿額活動新版
+    // 新版滿額活動
+    Route::get('/promotional-campaign-cart-v2/product-modal/options', [PromotionalCampaignCartV2Controller::class, 'getProductModalOptions']);
+    Route::get('/promotional-campaign-cart-v2/product-modal/products', [PromotionalCampaignCartV2Controller::class, 'getProductModalProducts']);
     Route::post('/promotional-campaign-cart-v2/can-active', [PromotionalCampaignCartV2Controller::class, 'canActive']);
     Route::resource('/promotional-campaign-cart-v2', PromotionalCampaignCartV2Controller::class, [
         'names' => [
@@ -251,10 +257,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'show' => 'promotional_campaign_prd.show',
         ],
     ]);
-
-    // 行銷活動
-    Route::post('/promotional_campaign/ajax/products', [PromotionalCampaignController::class, 'getProducts']);
-    Route::post('/promotional_campaign/ajax/detail', [PromotionalCampaignController::class, 'getDetail']);
 
     // 訂單管理
     Route::get('/order/excel', [OrderController::class, 'exportExcel']);

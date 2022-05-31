@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\ProductService;
-use App\Services\SupplierService;
 use App\Services\LookupValuesVService;
 use App\Services\PromotionalCampaignService;
+use App\Services\SupplierService;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PromotionalCampaignPrdController extends Controller
@@ -14,19 +13,16 @@ class PromotionalCampaignPrdController extends Controller
     private $promotionalCampaignService;
     private $lookupValuesVService;
     private $supplierService;
-    private $productService;
     private const LEVEL_CODE = 'PRD';
 
     public function __construct(
         PromotionalCampaignService $promotionalCampaignService,
         LookupValuesVService $lookupValuesVService,
-        SupplierService $supplierService,
-        ProductService $productService
+        SupplierService $supplierService
     ) {
         $this->promotionalCampaignService = $promotionalCampaignService;
         $this->lookupValuesVService = $lookupValuesVService;
         $this->supplierService = $supplierService;
-        $this->productService = $productService;
     }
 
     /**

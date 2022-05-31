@@ -539,7 +539,7 @@ export default {
         if (data.suppliers) {
             data.suppliers.forEach((supplier) => {
                 this.suppliers.push({
-                    text: supplier.name,
+                    text: `【${supplier.display_number}】 ${supplier.name}`,
                     id: supplier.id,
                 });
             });
@@ -657,7 +657,7 @@ export default {
         getOptions() {
             return axios({
                 method: "get",
-                url: "/backend/products/modal/options",
+                url: "/backend/promotional-campaign-cart-v2/product-modal/options",
             })
                 .then(function (response) {
                     return response.data;
@@ -710,7 +710,7 @@ export default {
         getProducts(data) {
             return axios({
                 method: "get",
-                url: "/backend/products/modal/products",
+                url: "/backend/promotional-campaign-cart-v2/product-modal/products",
                 params: data,
             })
                 .then(function (response) {

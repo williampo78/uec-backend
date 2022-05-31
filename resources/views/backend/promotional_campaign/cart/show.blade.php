@@ -1,15 +1,14 @@
-<div class="modal fade" id="promotional_campaign_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div class="modal fade" id="cart-campaign-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content modal-primary panel-primary">
-
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel"><i class="fa-solid fa-gear"></i> 滿額活動 檢視資料</h4>
             </div>
 
             <div class="modal-body">
-                <div id="campaign-block" class="form-horizontal">
+                <div class="form-horizontal">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
@@ -17,7 +16,7 @@
                                     <label class="control-label">活動名稱</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="form-control-static" id="modal-campaign-name"></p>
+                                    <p class="form-control-static">@{{ modal.campaignName }}</p>
                                 </div>
                             </div>
                         </div>
@@ -28,11 +27,12 @@
                                     <label class="control-label">狀態</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="form-control-static" id="modal-active"></p>
+                                    <p class="form-control-static">@{{ modal.active }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                     <div class="row">
                         <div class="col-sm-6">
@@ -41,7 +41,7 @@
                                     <label class="control-label">活動類型</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="form-control-static" id="modal-campaign-type"></p>
+                                    <p class="form-control-static">@{{ modal.campaignType }}</p>
                                 </div>
                             </div>
                         </div>
@@ -53,17 +53,17 @@
                                             <label class="control-label">N (滿額) = </label>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p class="form-control-static" id="modal-n-value"></p>
+                                            <p class="form-control-static">@{{ modal.nValue }}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6" v-if="modal.showXValue">
                                     <div class="form-group">
                                         <div class="col-sm-6">
                                             <label class="control-label">X (折扣) = </label>
                                         </div>
                                         <div class="col-sm-6">
-                                            <p class="form-control-static" id="modal-x-value"></p>
+                                            <p class="form-control-static">@{{ modal.xValue }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -78,7 +78,7 @@
                                     <label class="control-label">上架時間起</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="form-control-static" id="modal-start-at"></p>
+                                    <p class="form-control-static">@{{ modal.startAt }}</p>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
                                     <label class="control-label">上架時間訖</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="form-control-static" id="modal-end-at"></p>
+                                    <p class="form-control-static">@{{ modal.endAt }}</p>
                                 </div>
                             </div>
                         </div>
@@ -97,13 +97,16 @@
                     <hr style="border-top: 1px solid gray;" />
                 </div>
 
-                <div id="applicable-target-block">
-                    <div class="form-group">
-                        <label class="control-label">適用對象</label>
-
-                        <div class="row" style="margin-left: 1rem;">
-                            <div class="col-sm-2">
-                                <p id="modal-target-groups"></p>
+                <div class="form-horizontal">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="col-sm-3">
+                                    <label class="control-label">適用對象</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="form-control-static">@{{ modal.targetGroups }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,7 +114,7 @@
                     <hr style="border-top: 1px solid gray;" />
                 </div>
 
-                <div id="prd-block" style="display: none;">
+                <div v-if="modal.showProduct">
                     <div class="row">
                         <div class="col-sm-3">
                             <label class="control-label">單品清單</label>
@@ -119,7 +122,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class='table table-striped table-bordered table-hover' style='width:100%' id="prd-product-table">
+                        <table class='table table-striped table-bordered table-hover' style='width:100%'>
                             <thead>
                                 <tr>
                                     <th class="text-nowrap">項次</th>
@@ -132,13 +135,22 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-for="(product, index) in modal.products" :key="index">
+                                    <td>@{{ index + 1 }}</td>
+                                    <td>@{{ product.productNo }}</td>
+                                    <td>@{{ product.productName }}</td>
+                                    <td>@{{ product.sellingPrice }}</td>
+                                    <td>@{{ product.launchedAt }}</td>
+                                    <td>@{{ product.launchedStatus }}</td>
+                                    <td>@{{ product.grossMargin }}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                     <hr style="border-top: 1px solid gray;" />
                 </div>
 
-                <div id="gift-block" style="display: none;">
+                <div v-if="modal.showGiveaway">
                     <div class="row">
                         <div class="col-sm-3">
                             <label class="control-label">贈品清單</label>
@@ -146,7 +158,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class='table table-striped table-bordered table-hover' style='width:100%' id="gift-product-table">
+                        <table class='table table-striped table-bordered table-hover' style='width:100%'>
                             <thead>
                                 <tr>
                                     <th class="text-nowrap">項次</th>
@@ -156,6 +168,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-for="(giveaway, index) in modal.giveaways" :key="index">
+                                    <td>@{{ index + 1 }}</td>
+                                    <td>@{{ giveaway.productNo }}</td>
+                                    <td>@{{ giveaway.productName }}</td>
+                                    <td>@{{ giveaway.assignedQty }}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -168,10 +186,6 @@
                     <i class="fa-solid fa-xmark"></i> 關閉視窗
                 </button>
             </div>
-
         </div>
-        <!-- /.modal-content -->
     </div>
-    <!-- /.modal-dialog -->
 </div>
-<!-- /.modal -->
