@@ -589,7 +589,7 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/promotional_campaign/cart/main.js') }}"></script>
+    <script src="{{ mix('js/promotional_campaign/cart_v2/main.js') }}"></script>
     <script>
         let vm = new Vue({
             el: "#app",
@@ -746,7 +746,7 @@
                                     });
 
                                     return {
-                                        url: "/backend/promotional_campaign_cart_v2/can-active",
+                                        url: "/backend/promotional-campaign-cart-v2/can-active",
                                         type: "post",
                                         dataType: "json",
                                         cache: false,

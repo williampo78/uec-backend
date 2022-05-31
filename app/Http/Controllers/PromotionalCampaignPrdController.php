@@ -2,33 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\LookupValuesVService;
-use App\Services\ProductService;
-use App\Services\PromotionalCampaignService;
-use App\Services\RoleService;
-use App\Services\SupplierService;
 use Illuminate\Http\Request;
+use App\Services\ProductService;
+use App\Services\SupplierService;
+use App\Services\LookupValuesVService;
+use App\Services\PromotionalCampaignService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PromotionalCampaignPrdController extends Controller
 {
-    private $promotional_campaign_service;
-    private $lookup_values_v_service;
-    private $role_service;
-    private $supplier_service;
+    private $promotionalCampaignService;
+    private $lookupValuesVService;
+    private $supplierService;
     private $productService;
     private const LEVEL_CODE = 'PRD';
 
     public function __construct(
-        PromotionalCampaignService $promotional_campaign_service,
-        LookupValuesVService $lookup_values_v_service,
-        RoleService $role_service,
-        SupplierService $supplier_service,
+        PromotionalCampaignService $promotionalCampaignService,
+        LookupValuesVService $lookupValuesVService,
+        SupplierService $supplierService,
         ProductService $productService
     ) {
-        $this->promotional_campaign_service = $promotional_campaign_service;
-        $this->lookup_values_v_service = $lookup_values_v_service;
-        $this->role_service = $role_service;
-        $this->supplier_service = $supplier_service;
+        $this->promotionalCampaignService = $promotionalCampaignService;
+        $this->lookupValuesVService = $lookupValuesVService;
+        $this->supplierService = $supplierService;
         $this->productService = $productService;
     }
 
@@ -39,11 +36,9 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function index(Request $request)
     {
-        $promotional_campaigns = [];
-        $query_datas = [];
-
-        $query_datas = $request->only([
-            'campaign_name',
+        $queryData = [];
+        $queryData = $request->only([
+            'campaign_name_or_campaign_brief',
             'active',
             'campaign_type',
             'start_at_start',
@@ -51,28 +46,23 @@ class PromotionalCampaignPrdController extends Controller
             'product_no',
         ]);
 
+        $result = [];
         // 活動類型
-        $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+        $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'CAMPAIGN_TYPE',
             'udf_01' => self::LEVEL_CODE,
         ]);
 
-        // 沒有查詢權限、網址列參數不足，直接返回列表頁
-        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
-            return view(
-                'backend.promotional_campaign.prd.list',
-                compact('campaign_types')
-            );
+        // 狀態
+        $result['activeOptions'] = config('uec.active2_options');
+
+        // 網址列參數不足
+        if (count($queryData) > 0) {
+            $result['campaigns'] = $this->promotionalCampaignService->getPrdTableList($queryData);
+            $result['campaigns'] = $this->promotionalCampaignService->formatPrdTableList($result['campaigns']);
         }
 
-        $query_datas['level_code'] = self::LEVEL_CODE;
-
-        $promotional_campaigns = $this->promotional_campaign_service->getPromotionalCampaigns($query_datas);
-
-        return view(
-            'backend.promotional_campaign.prd.list',
-            compact('promotional_campaigns', 'campaign_types')
-        );
+        return view('backend.promotional_campaign.prd.list', $result);
     }
 
     /**
@@ -82,16 +72,14 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function create()
     {
-        $campaign_types = $this->lookup_values_v_service->getLookupValuesVs([
+        $result = [];
+        // 活動類型
+        $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'CAMPAIGN_TYPE',
             'udf_01' => self::LEVEL_CODE,
         ]);
-        $suppliers = $this->supplier_service->getSuppliers();
 
-        return view(
-            'backend.promotional_campaign.prd.add',
-            compact('campaign_types', 'suppliers')
-        );
+        return view('backend.promotional_campaign.prd.create', $result);
     }
 
     /**
@@ -102,19 +90,18 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function store(Request $request)
     {
-        $input_data = $request->except('_token');
+        $payload = $request->all();
 
-        if (!$this->promotional_campaign_service->addPromotionalCampaign($input_data)) {
+        if (!$this->promotionalCampaignService->createPrdCampaign($payload)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
-        $route_name = 'promotional_campaign_prd';
-        $act = 'add';
+        $result = [
+            'route_name' => 'promotional_campaign_prd',
+            'act' => 'add',
+        ];
 
-        return view(
-            'backend.success',
-            compact('route_name', 'act')
-        );
+        return view('backend.success', $result);
     }
 
     /**
@@ -125,7 +112,11 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function show($id)
     {
-        //
+        // 單品活動
+        $campaign = $this->promotionalCampaignService->getPrdCampaignForShowPage($id);
+        $campaign = $this->promotionalCampaignService->formatPrdCampaignForShowPage($campaign);
+
+        return response()->json($campaign);
     }
 
     /**
@@ -136,51 +127,18 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function edit($id)
     {
-        $promotional_campaign = $this->promotional_campaign_service->getPromotionalCampaigns([
-            'id' => $id,
-            'level_code' => self::LEVEL_CODE,
-        ])->first();
-        $suppliers = $this->supplier_service->getSuppliers();
+        $result = [];
+        // 活動類型
+        $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'CAMPAIGN_TYPE',
+            'udf_01' => self::LEVEL_CODE,
+        ]);
 
-        if (isset($promotional_campaign->products)) {
-            $this->productService->restructureProducts($promotional_campaign->products);
-            $promotional_campaign->products = $promotional_campaign->products->mapWithKeys(function ($product) {
-                return [
-                    $product->product_id => $product->only([
-                        'launched_at',
-                        'product_name',
-                        'product_no',
-                        'selling_price',
-                        'supplier_name',
-                        'launched_status',
-                        'gross_margin',
-                    ]),
-                ];
-            });
-        }
+        // 單品活動
+        $result['campaign'] = $this->promotionalCampaignService->getPrdCampaignForEditPage($id);
+        $result['campaign'] = $this->promotionalCampaignService->formatPrdCampaignForEditPage($result['campaign']);
 
-        if (isset($promotional_campaign->giveaways)) {
-            $this->productService->restructureProducts($promotional_campaign->giveaways);
-            $promotional_campaign->giveaways = $promotional_campaign->giveaways->mapWithKeys(function ($giveaway) {
-                return [
-                    $giveaway->product_id => $giveaway->only([
-                        'launched_at',
-                        'product_name',
-                        'product_no',
-                        'selling_price',
-                        'supplier_name',
-                        'launched_status',
-                        'gross_margin',
-                        'assigned_qty',
-                    ]),
-                ];
-            });
-        }
-
-        return view(
-            'backend.promotional_campaign.prd.update',
-            compact('promotional_campaign', 'suppliers')
-        );
+        return view('backend.promotional_campaign.prd.edit', $result);
     }
 
     /**
@@ -192,20 +150,18 @@ class PromotionalCampaignPrdController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input_data = $request->except('_token', '_method');
-        $input_data['promotional_campaign_id'] = $id;
+        $payload = $request->all();
 
-        if (!$this->promotional_campaign_service->updatePromotionalCampaign($input_data)) {
+        if (!$this->promotionalCampaignService->updatePrdCampaign($id, $payload)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
-        $route_name = 'promotional_campaign_prd';
-        $act = 'upd';
+        $result = [
+            'route_name' => 'promotional_campaign_prd',
+            'act' => 'upd',
+        ];
 
-        return view(
-            'backend.success',
-            compact('route_name', 'act')
-        );
+        return view('backend.success', $result);
     }
 
     /**
@@ -220,40 +176,68 @@ class PromotionalCampaignPrdController extends Controller
     }
 
     /**
-     * 是否可以通過單品活動的狀態驗證
+     * 是否可以生效
      *
      * @param Request $request
-     * @return boolean
+     * @return JsonResponse
      */
-    public function canPassActiveValidation(Request $request)
+    public function canActive(Request $request): JsonResponse
     {
-        $active = $request->input('active');
-        $campaign_type = $request->input('campaign_type');
-        $start_at = $request->input('start_at');
-        $end_at = $request->input('end_at');
-        $exist_products = $request->input('exist_products');
-        $promotional_campaign_id = $request->input('promotional_campaign_id');
+        $result = $this->promotionalCampaignService->canPrdCampaignActive($request->campaign_type, $request->start_at, $request->end_at, $request->product_ids, $request->exclude_promotional_campaign_id);
 
-        if ($active == 0) {
-            return response()->json(
-                ['status' => true]
-            );
+        if ($result) {
+            return response()->json([
+                'status' => true,
+            ]);
         }
 
-        if ($this->promotional_campaign_service->canPromotionalCampaignPrdActive(
-            $campaign_type,
-            $start_at,
-            $end_at,
-            $exist_products,
-            $promotional_campaign_id
-        )) {
-            return response()->json(
-                ['status' => true]
-            );
-        }
+        return response()->json([
+            'status' => false,
+        ]);
+    }
 
-        return response()->json(
-            ['status' => false]
-        );
+    /**
+     * 取得商品modal下拉選項
+     *
+     * @return void
+     */
+    public function getProductModalOptions()
+    {
+        $result = [];
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
+        // 商品類型
+        $result['product_type_options'] = config('uec.product_type_options');
+
+        return response()->json($result);
+    }
+
+    /**
+     * 取得商品modal的商品
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function getProductModalProducts(Request $request)
+    {
+        $payload = $request->only([
+            'supplier_id',
+            'product_no',
+            'product_name',
+            'selling_price_min',
+            'selling_price_max',
+            'created_at_start',
+            'created_at_end',
+            'start_launched_at_start',
+            'start_launched_at_end',
+            'product_type',
+            'limit',
+            'exclude_product_ids',
+        ]);
+
+        $products = $this->promotionalCampaignService->getProductModalProductsForPrdCampaign($payload);
+        $products = $this->promotionalCampaignService->formatProductModalProductsForPrdCampaign($products);
+
+        return response()->json($products);
     }
 }
