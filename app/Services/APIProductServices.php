@@ -1314,7 +1314,7 @@ class APIProductServices
 
             //產品規格
             $item_spec = [];
-            $ProductSpec = ProductItem::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            $ProductSpec = ProductItem::where('product_id', $id)->where('status', 1)->orderBy('sort', 'asc')->get();
             $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
             $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
             $spec_info = [];
@@ -1345,6 +1345,29 @@ class APIProductServices
             return json_encode($data);
         } else {
             return 903;
+        }
+    }
+
+    /*
+     * 取得上架期間內有庫存的商品
+     */
+    public function getProductInStock()
+    {
+        //商城倉庫代碼
+        $warehouseCode = $this->stockService->getWarehouseConfig();
+        $data = [];
+        $strSQL = "SELECT p.id product_id,p.product_no, p.product_name
+                ,(SELECT photo_name FROM product_photos WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS product_photo_name
+                ,p_item.id product_item_id, p_item.item_no product_item_no, p_item.spec_1_value product_item_spec1, p_item.spec_2_value product_item_spec2, p_item.photo_name product_item_photo_name
+                ,ws.stock_qty
+                FROM products AS p
+                inner join product_items p_item on p_item.product_id=p.id
+                inner join warehouse_stock ws on ws.product_item_id=p_item.id and ws.warehouse_id=" . $warehouseCode . " and ws.stock_qty >0
+                where p.approval_status = 'APPROVED'
+                and current_timestamp() between p.start_launched_at and p.end_launched_at";
+        $products = DB::select($strSQL);
+        foreach ($products as $product) {
+            $data[$product['product_id']] = $product;
         }
     }
 }

@@ -254,25 +254,27 @@ class APIOrderService
                     $campaign_id = 0;
                     //有單品滿額贈時，正貨也寫入discount
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])) {
-                        if ($item['campaignGiftAway']['campaignGiftStatus']) {
-                            $campaign_details[$seq] = [
-                                "order_id" => $newOrder->id,
-                                "level_code" => 'PRD',
-                                "group_seq" => $campaign_group[$products['productID']][$campaign['PRD']['GIFT'][$products['productID']]->id],
-                                "order_detail_id" => $order_detail_id_M,
-                                "promotion_campaign_id" => $campaign['PRD']['GIFT'][$products['productID']]->id,
-                                "product_id" => $products['productID'],
-                                "product_item_id" => $item['itemId'],
-                                "item_no" => $item['itemNo'],
-                                "discount" => 0,
-                                "record_identity" => "M",
-                                "created_by" => $member_id,
-                                "updated_by" => $member_id,
-                                "created_at" => now(),
-                                "updated_at" => now(),
-                            ];
-                            OrderCampaignDiscount::insert($campaign_details[$seq]);
-                            $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
+                        if (count($item['campaignGiftAway']) > 0) {
+                            if ($item['campaignGiftAway']['campaignGiftStatus']) {
+                                $campaign_details[$seq] = [
+                                    "order_id" => $newOrder->id,
+                                    "level_code" => 'PRD',
+                                    "group_seq" => $campaign_group[$products['productID']][$campaign['PRD']['GIFT'][$products['productID']]->id],
+                                    "order_detail_id" => $order_detail_id_M,
+                                    "promotion_campaign_id" => $campaign['PRD']['GIFT'][$products['productID']]->id,
+                                    "product_id" => $products['productID'],
+                                    "product_item_id" => $item['itemId'],
+                                    "item_no" => $item['itemNo'],
+                                    "discount" => 0,
+                                    "record_identity" => "M",
+                                    "created_by" => $member_id,
+                                    "updated_by" => $member_id,
+                                    "created_at" => now(),
+                                    "updated_at" => now(),
+                                ];
+                                OrderCampaignDiscount::insert($campaign_details[$seq]);
+                                $campaign_id = $campaign['PRD']['GIFT'][$products['productID']]->id;
+                            }
                         }
                     }
 
@@ -283,62 +285,63 @@ class APIOrderService
                     //有單品滿額贈品時先新增單身
                     if (isset($item['campaignGiftAway']['campaignProdList'])) {
                         //符合條件
-
-                        if ($item['campaignGiftAway']['campaignGiftStatus']) {
-                            //同商品不累贈
-                            if ($productID != $products['productID']) {
-                                foreach ($item['campaignGiftAway']['campaignProdList'] as $gifts => $gift) {
-                                    $seq++;
-                                    $details[$seq] = [
-                                        "order_id" => $newOrder->id,
-                                        "seq" => $seq,
-                                        "product_id" => $gift['productId'],
-                                        "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                                        "item_no" => $prod_gift[$gift['productId']]['item_no'],
-                                        "selling_price" => $gift['sellingPrice'],
-                                        "qty" => $gift['assignedQty'],
-                                        "unit_price" => 0,
-                                        "campaign_discount" => 0,
-                                        "subtotal" => 0,
-                                        "record_identity" => "G",
-                                        "point_discount" => 0,
-                                        "points" => 0,
-                                        "utm_source" => $utm_info[$item['itemId']]->utm_source,
-                                        "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
-                                        "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
-                                        "utm_sales" => $utm_info[$item['itemId']]->utm_sales,
-                                        "utm_time" => $utm_info[$item['itemId']]->utm_time,
-                                        "created_by" => $member_id,
-                                        "updated_by" => $member_id,
-                                        "created_at" => now(),
-                                        "updated_at" => now(),
-                                        "returned_qty" => 0,
-                                        "returned_campaign_discount" => 0,
-                                        "returned_subtotal" => 0,
-                                        "returned_point_discount" => 0,
-                                        "returned_points" => 0,
-                                    ];
-                                    $order_detail_id = OrderDetail::insertGetId($details[$seq]);
-                                    //寫入折扣資訊
-                                    $campaign_details[$seq] = [
-                                        "order_id" => $newOrder->id,
-                                        "level_code" => $campaign_gift['PROD'][$item['campaignGiftAway']['campaignGiftId']][$gift['productId']]['level_code'],
-                                        "group_seq" => $campaign_group[$products['productID']][$item['campaignGiftAway']['campaignGiftId']],
-                                        "order_detail_id" => $order_detail_id,
-                                        "promotion_campaign_id" => $item['campaignGiftAway']['campaignGiftId'],
-                                        "product_id" => $gift['productId'],
-                                        "product_item_id" => $prod_info[$gift['productId']]['id'],
-                                        "item_no" => $prod_info[$gift['productId']]['item_no'],
-                                        "discount" => 0,
-                                        "record_identity" => "G",
-                                        "created_by" => $member_id,
-                                        "updated_by" => $member_id,
-                                        "created_at" => now(),
-                                        "updated_at" => now(),
-                                    ];
-                                    OrderCampaignDiscount::insert($campaign_details[$seq]);
+                        if (count($item['campaignGiftAway']) > 0) {
+                            if ($item['campaignGiftAway']['campaignGiftStatus']) {
+                                //同商品不累贈
+                                if ($productID != $products['productID']) {
+                                    foreach ($item['campaignGiftAway']['campaignProdList'] as $gifts => $gift) {
+                                        $seq++;
+                                        $details[$seq] = [
+                                            "order_id" => $newOrder->id,
+                                            "seq" => $seq,
+                                            "product_id" => $gift['productId'],
+                                            "product_item_id" => $prod_gift[$gift['productId']]['id'],
+                                            "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                                            "selling_price" => $gift['sellingPrice'],
+                                            "qty" => $gift['assignedQty'],
+                                            "unit_price" => 0,
+                                            "campaign_discount" => 0,
+                                            "subtotal" => 0,
+                                            "record_identity" => "G",
+                                            "point_discount" => 0,
+                                            "points" => 0,
+                                            "utm_source" => $utm_info[$item['itemId']]->utm_source,
+                                            "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
+                                            "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
+                                            "utm_sales" => $utm_info[$item['itemId']]->utm_sales,
+                                            "utm_time" => $utm_info[$item['itemId']]->utm_time,
+                                            "created_by" => $member_id,
+                                            "updated_by" => $member_id,
+                                            "created_at" => now(),
+                                            "updated_at" => now(),
+                                            "returned_qty" => 0,
+                                            "returned_campaign_discount" => 0,
+                                            "returned_subtotal" => 0,
+                                            "returned_point_discount" => 0,
+                                            "returned_points" => 0,
+                                        ];
+                                        $order_detail_id = OrderDetail::insertGetId($details[$seq]);
+                                        //寫入折扣資訊
+                                        $campaign_details[$seq] = [
+                                            "order_id" => $newOrder->id,
+                                            "level_code" => $campaign_gift['PROD'][$item['campaignGiftAway']['campaignGiftId']][$gift['productId']]['level_code'],
+                                            "group_seq" => $campaign_group[$products['productID']][$item['campaignGiftAway']['campaignGiftId']],
+                                            "order_detail_id" => $order_detail_id,
+                                            "promotion_campaign_id" => $item['campaignGiftAway']['campaignGiftId'],
+                                            "product_id" => $gift['productId'],
+                                            "product_item_id" => $prod_info[$gift['productId']]['id'],
+                                            "item_no" => $prod_info[$gift['productId']]['item_no'],
+                                            "discount" => 0,
+                                            "record_identity" => "G",
+                                            "created_by" => $member_id,
+                                            "updated_by" => $member_id,
+                                            "created_at" => now(),
+                                            "updated_at" => now(),
+                                        ];
+                                        OrderCampaignDiscount::insert($campaign_details[$seq]);
+                                    }
+                                    $productID = $products['productID'];
                                 }
-                                $productID = $products['productID'];
                             }
                         }
                     }
@@ -514,83 +517,89 @@ class APIOrderService
                 foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
                     $campaignID = 0;
                     foreach ($threshold['products'] as $k => $product_id) {
-                        //$seq++;
-                        //寫入折扣資訊
-                        $campaign_details[$seq] = [
-                            "order_id" => $newOrder->id,
-                            "level_code" => 'CART_P',
-                            "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
-                            "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
-                            "promotion_campaign_id" => $threshold['campaignID'],
-                            "product_id" => $product_id,
-                            "product_item_id" => $prod_info_detail[$product_id]['id'],
-                            "item_no" => $prod_info_detail[$product_id]['item_no'],
-                            "discount" => 0,
-                            "record_identity" => 'M',
-                            "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
-                            "created_by" => $member_id,
-                            "updated_by" => $member_id,
-                            "created_at" => now(),
-                            "updated_at" => now(),
-                        ];
-                        OrderCampaignDiscount::insert($campaign_details[$seq]);
+                        foreach ($cart['list'] as $products) {
+                            if ($products['productID'] == $product_id) {
+                                foreach ($products['itemList'] as $item) {
+                                    //$seq++;
+                                    //寫入折扣資訊
+                                    $campaign_details[$seq] = [
+                                        "order_id" => $newOrder->id,
+                                        "level_code" => 'CART_P',
+                                        "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
+                                        "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
+                                        "promotion_campaign_id" => $threshold['campaignID'],
+                                        "product_id" => $product_id,
+                                        "product_item_id" => $item['itemId'],
+                                        "item_no" => $item['itemNo'],
+                                        "discount" => 0,
+                                        "record_identity" => 'M',
+                                        "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
+                                        "created_by" => $member_id,
+                                        "updated_by" => $member_id,
+                                        "created_at" => now(),
+                                        "updated_at" => now(),
+                                    ];
+                                    OrderCampaignDiscount::insert($campaign_details[$seq]);
 
-                        //同滿額活動不累贈
-                        if ($campaignID != $threshold['campaignID']) {
-                            foreach ($threshold['campaignProdList'] as $gift) {
-                                $seq++;
-                                $details[$seq] = [
-                                    "order_id" => $newOrder->id,
-                                    "seq" => $seq,
-                                    "product_id" => $gift['productId'],
-                                    "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                                    "item_no" => $prod_gift[$gift['productId']]['item_no'],
-                                    "selling_price" => $gift['sellingPrice'],
-                                    "qty" => $gift['assignedQty'],
-                                    "unit_price" => 0,
-                                    "campaign_discount" => 0,
-                                    "subtotal" => 0,
-                                    "record_identity" => "G",
-                                    "point_discount" => 0,
-                                    "points" => 0,
-                                    "utm_source" => isset($order['utm']['source']) ? $order['utm']['source'] : null,
-                                    "utm_medium" => isset($order['utm']['medium']) ? $order['utm']['medium'] : null,
-                                    "utm_campaign" => isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null,
-                                    "utm_sales" => isset($order['utm']['sales']) ? $order['utm']['sales'] : null,
-                                    "utm_time" => isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null,
-                                    "created_by" => $member_id,
-                                    "updated_by" => $member_id,
-                                    "created_at" => now(),
-                                    "updated_at" => now(),
-                                    "returned_qty" => 0,
-                                    "returned_campaign_discount" => 0,
-                                    "returned_subtotal" => 0,
-                                    "returned_point_discount" => 0,
-                                    "returned_points" => 0,
-                                ];
-                                $order_detail_id = OrderDetail::insertGetId($details[$seq]);
-                                //寫入折扣資訊
-                                $campaign_details[$seq] = [
-                                    "order_id" => $newOrder->id,
-                                    "level_code" => 'CART_P',
-                                    "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
-                                    "order_detail_id" => $order_detail_id,
-                                    "promotion_campaign_id" => $threshold['campaignID'],
-                                    "product_id" => $gift['productId'],
-                                    "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                                    "item_no" => $prod_gift[$gift['productId']]['item_no'],
-                                    "discount" => 0,
-                                    "record_identity" => "G",
-                                    "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
-                                    "created_by" => $member_id,
-                                    "updated_by" => $member_id,
-                                    "created_at" => now(),
-                                    "updated_at" => now(),
-                                ];
-                                OrderCampaignDiscount::insert($campaign_details[$seq]);
+                                    //同滿額活動不累贈
+                                    if ($campaignID != $threshold['campaignID']) {
+                                        foreach ($threshold['campaignProdList'] as $gift) {
+                                            $seq++;
+                                            $details[$seq] = [
+                                                "order_id" => $newOrder->id,
+                                                "seq" => $seq,
+                                                "product_id" => $gift['productId'],
+                                                "product_item_id" => $prod_gift[$gift['productId']]['id'],
+                                                "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                                                "selling_price" => $gift['sellingPrice'],
+                                                "qty" => $gift['assignedQty'],
+                                                "unit_price" => 0,
+                                                "campaign_discount" => 0,
+                                                "subtotal" => 0,
+                                                "record_identity" => "G",
+                                                "point_discount" => 0,
+                                                "points" => 0,
+                                                "utm_source" => isset($order['utm']['source']) ? $order['utm']['source'] : null,
+                                                "utm_medium" => isset($order['utm']['medium']) ? $order['utm']['medium'] : null,
+                                                "utm_campaign" => isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null,
+                                                "utm_sales" => isset($order['utm']['sales']) ? $order['utm']['sales'] : null,
+                                                "utm_time" => isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null,
+                                                "created_by" => $member_id,
+                                                "updated_by" => $member_id,
+                                                "created_at" => now(),
+                                                "updated_at" => now(),
+                                                "returned_qty" => 0,
+                                                "returned_campaign_discount" => 0,
+                                                "returned_subtotal" => 0,
+                                                "returned_point_discount" => 0,
+                                                "returned_points" => 0,
+                                            ];
+                                            $order_detail_id = OrderDetail::insertGetId($details[$seq]);
+                                            //寫入折扣資訊
+                                            $campaign_details[$seq] = [
+                                                "order_id" => $newOrder->id,
+                                                "level_code" => 'CART_P',
+                                                "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
+                                                "order_detail_id" => $order_detail_id,
+                                                "promotion_campaign_id" => $threshold['campaignID'],
+                                                "product_id" => $gift['productId'],
+                                                "product_item_id" => $prod_gift[$gift['productId']]['id'],
+                                                "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                                                "discount" => 0,
+                                                "record_identity" => "G",
+                                                "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
+                                                "created_by" => $member_id,
+                                                "updated_by" => $member_id,
+                                                "created_at" => now(),
+                                                "updated_at" => now(),
+                                            ];
+                                            OrderCampaignDiscount::insert($campaign_details[$seq]);
+                                        }
+                                    }
+                                    $campaignID = $threshold['campaignID'];
+                                }
                             }
                         }
-                        $campaignID = $threshold['campaignID'];
                     }
                 }
             }
@@ -608,6 +617,13 @@ class APIOrderService
             $order_details = OrderDetail::getOrderDetails($newOrder->id);
             foreach ($order_details as $detail) {
                 $stock = $this->stockService->getStockByItem($warehouseCode, $detail->product_item_id);
+                if ($stock['stockQty'] <= 0) {
+                    $result['status'] = 403;
+                    $result['payment_url'] = null;
+                    Log::channel('tappay_api_log')->error('庫存不足 ! product_item_id :' . $detail->product_item_id);
+                    DB::rollBack();
+                    return $result;
+                }
                 if (isset($stock['id'])) {
                     $updStock = WarehouseStock::where('id', '=', $stock['id'])->update(['stock_qty' => ($stock['stockQty'] - $detail->qty)]);
                     if ($updStock) {

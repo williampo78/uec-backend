@@ -296,6 +296,12 @@ class CheckoutController extends Controller
                             $data['message'] = "第三方支付異常，無法成立訂單";
                             break;
 
+                        case 403:
+                            $status = false;
+                            $err = '401';
+                            $data['message'] = "庫存不足，無法成立訂單";
+                            break;
+
                         default:
                             $status = false;
                             $err = '401';

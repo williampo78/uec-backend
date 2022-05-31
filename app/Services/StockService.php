@@ -3,11 +3,13 @@
 
 namespace App\Services;
 
+use App\Models\Product;
 use Carbon\Carbon;
 use App\Models\SysConfig;
 use App\Models\ProductItem;
 use App\Models\WarehouseStock;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StockService
 {
@@ -60,8 +62,8 @@ class StockService
     public function getStockByProd($number = null, $prod_id = null)
     {
         $stock = ProductItem::selectRaw("sum(warehouse_stock.stock_qty) as stock_qty")
-            ->join("warehouse_stock", "warehouse_stock.product_item_id","=","product_items.id")
-            ->join("warehouse","warehouse.id","=","warehouse_stock.warehouse_id")
+            ->join("warehouse_stock", "warehouse_stock.product_item_id", "=", "product_items.id")
+            ->join("warehouse", "warehouse.id", "=", "warehouse_stock.warehouse_id")
             ->where("warehouse.number", "=", $number)
             ->where("product_items.product_id", "=", $prod_id)
             ->groupBy('product_items.product_id')->first();
@@ -69,4 +71,40 @@ class StockService
         return $stock;
     }
 
+    /*
+     * 取得上架期間內有庫存的商品
+     */
+    public function getProductInStock($warehouseCode)
+    {
+        $now = Carbon::now();
+        $data = [];
+        $products = Product::select(
+            DB::raw('products.id as product_id'),
+            DB::raw('products.product_no'),
+            DB::raw('products.product_name'),
+            DB::raw('(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS product_photo_name'),
+            DB::raw('product_items.id as product_item_id'),
+            DB::raw('product_items.item_no as product_item_no'),
+            DB::raw('product_items.spec_1_value as product_item_spec1'),
+            DB::raw('product_items.spec_2_value as product_item_spec2'),
+            DB::raw('product_items.photo_name as product_item_photo_name'),
+            DB::raw('warehouse_stock.stock_qty')
+        )
+            ->join('product_items', 'product_items.product_id', '=', 'products.id')
+            ->join('warehouse_stock', 'warehouse_stock.product_item_id', '=', 'product_items.id')
+            ->join('warehouse', 'warehouse.id', '=', 'warehouse_stock.warehouse_id')
+            ->where('warehouse_stock.stock_qty', '>', 0)
+            ->where('warehouse.number', $warehouseCode)
+            ->where('products.approval_status', 'APPROVED')
+            ->where('products.start_launched_at', '<=', $now)
+            ->where('products.end_launched_at', '>=', $now)
+            ->where('product_items.status', 1)
+            ->orderBy('products.id')
+            ->orderBy('product_items.sort')
+            ->get();
+        foreach ($products as $product) {
+            $data[$product->product_id] = $product;
+        }
+        return $data;
+    }
 }
