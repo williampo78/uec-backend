@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use App\Services\SupplierService;
 use App\Services\LookupValuesVService;
 use App\Services\PromotionalCampaignService;
-use App\Services\SupplierService;
-use Illuminate\Http\Request;
+use App\Services\WebCategoryHierarchyService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PromotionalCampaignCartV2Controller extends Controller
@@ -13,16 +14,19 @@ class PromotionalCampaignCartV2Controller extends Controller
     private $promotionalCampaignService;
     private $lookupValuesVService;
     private $supplierService;
+    private $webCategoryHierarchyService;
     private const LEVEL_CODE = 'CART_P';
 
     public function __construct(
         PromotionalCampaignService $promotionalCampaignService,
         LookupValuesVService $lookupValuesVService,
-        SupplierService $supplierService
+        SupplierService $supplierService,
+        WebCategoryHierarchyService $webCategoryHierarchyService
     ) {
         $this->promotionalCampaignService = $promotionalCampaignService;
         $this->lookupValuesVService = $lookupValuesVService;
         $this->supplierService = $supplierService;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
     }
 
     /**
@@ -201,5 +205,54 @@ class PromotionalCampaignCartV2Controller extends Controller
             'result' => false,
             'conflict_contents' => $result['conflict_contents'],
         ]);
+    }
+
+    /**
+     * 取得商品modal下拉選項
+     *
+     * @return void
+     */
+    public function getProductModalOptions()
+    {
+        $result = [];
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
+        // 商品類型
+        $result['product_type_options'] = config('uec.product_type_options');
+        // 前台分類
+        $result['web_category_hierarchies'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents();
+
+        return response()->json($result);
+    }
+
+    /**
+     * 取得商品modal的商品
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function getProductModalProducts(Request $request)
+    {
+        $queryData = $request->only([
+            'supplier_id',
+            'product_no',
+            'product_name',
+            'selling_price_min',
+            'selling_price_max',
+            'created_at_start',
+            'created_at_end',
+            'start_launched_at_start',
+            'start_launched_at_end',
+            'product_type',
+            'web_category_hierarchy_id',
+            'limit',
+            'stock_types',
+            'exclude_product_ids',
+        ]);
+
+        $products = $this->promotionalCampaignService->getProductModalProductsForCartV2Campaign($queryData);
+        $products = $this->promotionalCampaignService->formatProductModalProductsForCartV2Campaign($products);
+
+        return response()->json($products);
     }
 }

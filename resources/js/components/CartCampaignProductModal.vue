@@ -573,7 +573,7 @@ export default {
         getOptions() {
             return axios({
                 method: "get",
-                url: "/backend/promotional-campaign-prd/product-modal/options",
+                url: "/backend/promotional-campaign-cart/product-modal/options",
             })
                 .then(function (response) {
                     return response.data;
@@ -618,7 +618,7 @@ export default {
         getProducts(data) {
             return axios({
                 method: "get",
-                url: "/backend/promotional-campaign-prd/product-modal/products",
+                url: "/backend/promotional-campaign-cart/product-modal/products",
                 params: data,
             })
                 .then(function (response) {

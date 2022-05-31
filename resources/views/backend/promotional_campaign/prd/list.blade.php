@@ -4,7 +4,6 @@
 
 @section('content')
     <div id="app">
-        <!--新增-->
         <div id="page-wrapper">
             <!-- 表頭名稱 -->
             <div class="row">

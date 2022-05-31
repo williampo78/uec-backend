@@ -583,8 +583,8 @@
             </div>
         </div>
 
-        <product-modal :modal="productModal" @save="saveProductModalProducts"></product-modal>
-        <product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></product-modal>
+        <cart-v2-campaign-product-modal :modal="productModal" @save="saveProductModalProducts"></cart-v2-campaign-product-modal>
+        <cart-v2-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></cart-v2-campaign-product-modal>
     </div>
 @endsection
 

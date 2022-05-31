@@ -615,7 +615,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getOptions: function getOptions() {
       return axios({
         method: "get",
-        url: "/backend/promotional-campaign-prd/product-modal/options"
+        url: "/backend/promotional-campaign-cart/product-modal/options"
       }).then(function (response) {
         return response.data;
       })["catch"](function (error) {
@@ -676,7 +676,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     getProducts: function getProducts(data) {
       return axios({
         method: "get",
-        url: "/backend/promotional-campaign-prd/product-modal/products",
+        url: "/backend/promotional-campaign-cart/product-modal/products",
         params: data
       }).then(function (response) {
         return response.data;
