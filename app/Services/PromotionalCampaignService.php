@@ -1700,15 +1700,11 @@ class PromotionalCampaignService
 
         DB::beginTransaction();
         try {
-            $categoryCode = null;
-            // ﹝指定商品滿N元，打X折﹞、﹝指定商品滿N元，折X元﹞
-            if (in_array($data['campaign_type'], ['CART_P01', 'CART_P02'])) {
-                $categoryCode = 'DISCOUNT';
-            }
-            // ﹝指定商品滿N件，送贈品﹞、﹝指定商品滿N元，送贈品﹞
-            elseif (in_array($data['campaign_type'], ['CART_P03', 'CART_P04'])) {
-                $categoryCode = 'GIFT';
-            }
+            $campaignType = $this->lookupValuesVService->getLookupValuesVsForBackend([
+                'type_code' => 'CAMPAIGN_TYPE',
+                'udf_01' => 'CART_P',
+                'code' => $data['campaign_type'],
+            ])->first();
 
             $shipFromWhs = null;
             // 買斷、寄售
@@ -1735,8 +1731,9 @@ class PromotionalCampaignService
                 'end_at' => $data['end_at'],
                 'campaign_brief' => $data['campaign_brief'],
                 'url_code' => $data['url_code'],
-                'level_code' => 'CART_P',
-                'category_code' => $categoryCode,
+                'level_code' => $campaignType->udf_01,
+                'category_code' => $campaignType->udf_03,
+                'promotional_label' => $campaignType->udf_02,
                 'banner_photo_desktop' => null,
                 'banner_photo_mobile' => null,
                 'ship_from_whs' => $shipFromWhs,
