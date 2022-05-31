@@ -196,6 +196,7 @@ class APICartServices
                     }
                 }
             }
+            dd($campaign['PRD']['GIFT']);
             //活動滿額門檻資料 (活動時間內才做)
             $campaignThreshold = [];
             $campaignThresholdItem = [];
