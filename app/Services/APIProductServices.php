@@ -1314,7 +1314,7 @@ class APIProductServices
 
             //產品規格
             $item_spec = [];
-            $ProductSpec = ProductItem::where('product_id', $id)->orderBy('sort', 'asc')->get();
+            $ProductSpec = ProductItem::where('product_id', $id)->where('status', 1)->orderBy('sort', 'asc')->get();
             $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
             $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
             $spec_info = [];

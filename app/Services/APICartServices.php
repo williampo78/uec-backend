@@ -858,13 +858,15 @@ class APICartServices
                         foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
                             foreach ($giftawayInfo as $giftInfo => $v) {
                                 if (isset($threshold_prod[$v['product_id']])) {
-                                    $prods[$v['product_id']] = array(
-                                        "productPhoto" => $threshold_prod[$v['product_id']]->photo,
-                                        "productId" => $v['product_id'],
-                                        "productName" => $threshold_prod[$v['product_id']]->product_name,
-                                        "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
-                                        "assignedQty" => $v->assigned_qty,
-                                    );
+                                    if (isset($stock_gift_check[$v['product_id']])) {
+                                        $prods[$v['product_id']] = array(
+                                            "productPhoto" => $threshold_prod[$v['product_id']]->photo,
+                                            "productId" => $v['product_id'],
+                                            "productName" => $threshold_prod[$v['product_id']]->product_name,
+                                            "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
+                                            "assignedQty" => $v->assigned_qty,
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -877,18 +879,20 @@ class APICartServices
                             }
                         }
                         if (isset($prods)) {
-                            $thresholdGiftAway[$campaign_id] = array(
-                                "thresholdID" => $item->id,
-                                "campaignID" => $campaign_id,
-                                "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
-                                "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
-                                "campaignBrief" => $item->threshold_brief,
-                                "campaignNvalue" => $item->n_value,
-                                "campaignXvalue" => $item->x_value,
-                                "campaignProdList" => $prods_display,
-                                "products" => $pid,
-                                "productAmount" => $subAmount
-                            );
+                            if (count($prods) >0) {
+                                $thresholdGiftAway[$campaign_id] = array(
+                                    "thresholdID" => $item->id,
+                                    "campaignID" => $campaign_id,
+                                    "campaignName" => $campaignThresholdMain[$campaign_id]->campaign_name,
+                                    "campaignUrlCode" => $campaignThresholdMain[$campaign_id]->url_code,
+                                    "campaignBrief" => $item->threshold_brief,
+                                    "campaignNvalue" => $item->n_value,
+                                    "campaignXvalue" => $item->x_value,
+                                    "campaignProdList" => $prods_display,
+                                    "products" => $pid,
+                                    "productAmount" => $subAmount
+                                );
+                            }
                         }
                     }
                 }

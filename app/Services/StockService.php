@@ -98,6 +98,7 @@ class StockService
             ->where('products.approval_status', 'APPROVED')
             ->where('products.start_launched_at', '<=', $now)
             ->where('products.end_launched_at', '>=', $now)
+            ->where('product_items.status', 1)
             ->orderBy('products.id')
             ->orderBy('product_items.sort')
             ->get();
