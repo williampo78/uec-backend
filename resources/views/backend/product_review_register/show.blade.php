@@ -242,6 +242,8 @@
                                 </table>
                             </div>
                         </div>
+                        <a class="btn btn-success" href="{{ URL::previous() }}"><i class="fa-solid fa-arrow-rotate-right"></i>
+                            返回</a>
                     </div>
                 </form>
             </div>
