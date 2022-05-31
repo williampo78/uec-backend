@@ -153,6 +153,7 @@ class APICartServices
         if (count($cartInfo) == 0) {
             return json_encode(array("status" => 404, "result" => $feeInfo));
         } else {
+            $stock_gift_check = $this->stockService->getProductInStock($warehouseCode);
             $cartQty = [];
             $cartAmount = [];
             $cartDetail = [];
@@ -196,7 +197,6 @@ class APICartServices
                     }
                 }
             }
-            dd($campaign['PRD']['GIFT']);
             //活動滿額門檻資料 (活動時間內才做)
             $campaignThreshold = [];
             $campaignThresholdItem = [];
@@ -253,17 +253,18 @@ class APICartServices
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
-                                $giftAway[] = array(
-                                    "productPhoto" => $giftInfo['photo'],
-                                    "productId" => $giftInfo->product_id,
-                                    "productName" => $giftInfo->product_name,
-                                    "sellingPrice" => $giftInfo->selling_price,
-                                    "assignedQty" => $giftInfo->assignedQty,
-                                );
+                                if (isset($stock_gift_check[$giftInfo->product_id])) {
+                                    $giftAway[] = array(
+                                        "productPhoto" => $giftInfo['photo'],
+                                        "productId" => $giftInfo->product_id,
+                                        "productName" => $giftInfo->product_name,
+                                        "sellingPrice" => $giftInfo->selling_price,
+                                        "assignedQty" => $giftInfo->assignedQty,
+                                    );
+                                }
                             }
                         }
                     }
-
                     //商品折扣
                     if (isset($campaign['PRD']['DISCOUNT'][$product_id])) { //在活動內 滿額折扣
                         //ex: n=2, x=0.85, qty=4, price = 1000
@@ -308,12 +309,14 @@ class APICartServices
 
                                     //找符合的item放
                                     if (isset($campaign['PRD']['GIFT'][$product_id]) && $return_type) {
-                                        $prod_gift = array(
-                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                            "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                            "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                            "campaignProdList" => $giftAway,
-                                        );
+                                        if (count($giftAway) > 0) {
+                                            $prod_gift = array(
+                                                "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                                "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                                "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                                "campaignProdList" => $giftAway,
+                                            );
+                                        }
                                     }
                                     $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
                                     $stock = 0;
@@ -395,12 +398,14 @@ class APICartServices
                                     }
                                     //找符合的item放
                                     if (isset($campaign['PRD']['GIFT'][$product_id]) && $return_type) {
-                                        $prod_gift = array(
-                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                            "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                            "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                            "campaignProdList" => $giftAway,
-                                        );
+                                        if (count($giftAway) > 0) {
+                                            $prod_gift = array(
+                                                "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                                "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                                "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                                "campaignProdList" => $giftAway,
+                                            );
+                                        }
                                     }
 
                                     $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
@@ -449,12 +454,14 @@ class APICartServices
                                 $price = $cartAmount[$product_id] * $campaign['PRD']['DISCOUNT'][$product_id]->x_value; //打折後每件單價 1000*0.85
                                 //找符合的item放
                                 if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                                    $prod_gift = array(
-                                        "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                        "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                        "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                        "campaignProdList" => $giftAway,
-                                    );
+                                    if (count($giftAway) > 0) {
+                                        $prod_gift = array(
+                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                            "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                            "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                            "campaignProdList" => $giftAway,
+                                        );
+                                    }
                                 }
 
                                 //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
@@ -512,12 +519,14 @@ class APICartServices
 
                                 //找符合的item放
                                 if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                                    $prod_gift = array(
-                                        "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                        "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                        "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                        "campaignProdList" => $giftAway,
-                                    );
+                                    if (count($giftAway) > 0) {
+                                        $prod_gift = array(
+                                            "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                            "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                            "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                            "campaignProdList" => $giftAway,
+                                        );
+                                    }
                                 }
 
                                 //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
@@ -573,12 +582,14 @@ class APICartServices
                         } else { //沒有打折的件數
                             //找符合的item放
                             if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                                $prod_gift = array(
-                                    "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                    "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                    "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                    "campaignProdList" => $giftAway,
-                                );
+                                if (count($giftAway) > 0) {
+                                    $prod_gift = array(
+                                        "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                        "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                        "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                        "campaignProdList" => $giftAway,
+                                    );
+                                }
                             }
                             //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             foreach ($cartDetail[$product_id] as $item_id => $item_info) {
@@ -630,12 +641,14 @@ class APICartServices
                         //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                         //找符合的item放
                         if (isset($campaign['PRD']['GIFT'][$product_id])) {
-                            $prod_gift = array(
-                                "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
-                                "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
-                                "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
-                                "campaignProdList" => $giftAway,
-                            );
+                            if (count($giftAway) > 0) {
+                                $prod_gift = array(
+                                    "campaignGiftId" => $campaign['PRD']['GIFT'][$product_id]->id,
+                                    "campaignGiftName" => $campaign['PRD']['GIFT'][$product_id]->campaign_name,
+                                    "campaignGiftStatus" => ($qty >= $campaign['PRD']['GIFT'][$product_id]->n_value ? true : false),
+                                    "campaignProdList" => $giftAway,
+                                );
+                            }
                         }
                         foreach ($cartDetail[$product_id] as $item_id => $item_info) {
                             $detail_qty = $item_info->item_qty;
