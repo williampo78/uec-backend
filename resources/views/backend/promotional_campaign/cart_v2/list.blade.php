@@ -161,13 +161,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @isset($cartCampaigns)
-                                            @foreach ($cartCampaigns as $cartCampaign)
+                                        @isset($campaigns)
+                                            @foreach ($campaigns as $campaign)
                                                 <tr>
                                                     <td>
                                                         @if ($share_role_auth['auth_query'])
                                                             <a class="btn btn-info btn-sm"
-                                                                href="{{ route('promotional_campaign_cart_v2.show', $cartCampaign['id']) }}"
+                                                                href="{{ route('promotional_campaign_cart_v2.show', $campaign['id']) }}"
                                                                 title="檢視">
                                                                 <i class="fa-solid fa-magnifying-glass"></i>
                                                             </a>
@@ -175,19 +175,19 @@
 
                                                         @if ($share_role_auth['auth_update'])
                                                             <a class="btn btn-info btn-sm"
-                                                                href="{{ route('promotional_campaign_cart_v2.edit', $cartCampaign['id']) }}">
+                                                                href="{{ route('promotional_campaign_cart_v2.edit', $campaign['id']) }}">
                                                                 編輯
                                                             </a>
                                                         @endif
                                                     </td>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $cartCampaign['id'] }}</td>
-                                                    <td>{{ $cartCampaign['campaign_name'] }}</td>
-                                                    <td>{{ $cartCampaign['campaign_brief'] }}</td>
-                                                    <td>{{ $cartCampaign['campaign_type'] }}</td>
-                                                    <td>{{ $cartCampaign['launch_status'] }}</td>
-                                                    <td>{{ $cartCampaign['start_at'] }}</td>
-                                                    <td>{{ $cartCampaign['end_at'] }}</td>
+                                                    <td>{{ $campaign['id'] }}</td>
+                                                    <td>{{ $campaign['campaign_name'] }}</td>
+                                                    <td>{{ $campaign['campaign_brief'] }}</td>
+                                                    <td>{{ $campaign['campaign_type'] }}</td>
+                                                    <td>{{ $campaign['launch_status'] }}</td>
+                                                    <td>{{ $campaign['start_at'] }}</td>
+                                                    <td>{{ $campaign['end_at'] }}</td>
                                                 </tr>
                                             @endforeach
                                         @endisset
@@ -198,9 +198,6 @@
                     </div>
                 </div>
             </div>
-            @include('backend.promotional_campaign.cart.detail')
-            <!-- /.modal -->
-
         </div>
     </div>
 @endsection

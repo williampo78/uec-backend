@@ -53,8 +53,8 @@ class PromotionalCampaignCartV2Controller extends Controller
         ]);
 
         if (count($queryData) > 0) {
-            $result['cartCampaigns'] = $this->promotionalCampaignService->getCartTableList($queryData);
-            $result['cartCampaigns'] = $this->promotionalCampaignService->formatCartTableList($result['cartCampaigns']);
+            $result['campaigns'] = $this->promotionalCampaignService->getCartV2TableList($queryData);
+            $result['campaigns'] = $this->promotionalCampaignService->formatCartV2TableList($result['campaigns']);
         }
 
         return view('backend.promotional_campaign.cart_v2.list', $result);
@@ -89,7 +89,7 @@ class PromotionalCampaignCartV2Controller extends Controller
     {
         $payload = $request->all();
 
-        if (!$this->promotionalCampaignService->createPromotionalCampaignCart($payload)) {
+        if (!$this->promotionalCampaignService->createCartV2Campaign($payload)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
@@ -118,8 +118,8 @@ class PromotionalCampaignCartV2Controller extends Controller
         // 供應商
         $result['suppliers'] = $this->supplierService->getSuppliers();
         // 滿額活動
-        $result['cartCampaign'] = $this->promotionalCampaignService->getPromotionalCampaignCartById($id);
-        $result['cartCampaign'] = $this->promotionalCampaignService->formatPromotionalCampaignCart($result['cartCampaign']);
+        $result['campaign'] = $this->promotionalCampaignService->getCartV2Campaign($id);
+        $result['campaign'] = $this->promotionalCampaignService->formatCartV2Campaign($result['campaign']);
 
         return view('backend.promotional_campaign.cart_v2.show', $result);
     }
@@ -141,8 +141,8 @@ class PromotionalCampaignCartV2Controller extends Controller
         // 供應商
         $result['suppliers'] = $this->supplierService->getSuppliers();
         // 滿額活動
-        $result['cartCampaign'] = $this->promotionalCampaignService->getPromotionalCampaignCartById($id);
-        $result['cartCampaign'] = $this->promotionalCampaignService->formatPromotionalCampaignCart($result['cartCampaign']);
+        $result['campaign'] = $this->promotionalCampaignService->getCartV2Campaign($id);
+        $result['campaign'] = $this->promotionalCampaignService->formatCartV2Campaign($result['campaign']);
 
         return view('backend.promotional_campaign.cart_v2.edit', $result);
     }
@@ -158,7 +158,7 @@ class PromotionalCampaignCartV2Controller extends Controller
     {
         $payload = $request->all();
 
-        if (!$this->promotionalCampaignService->updatePromotionalCampaignCart($id, $payload)) {
+        if (!$this->promotionalCampaignService->updateCartV2Campaign($id, $payload)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
@@ -182,14 +182,14 @@ class PromotionalCampaignCartV2Controller extends Controller
     }
 
     /**
-     * 是否可以通過滿額活動的狀態驗證
+     * 是否可以生效
      *
      * @param Request $request
      * @return JsonResponse
      */
     public function canActive(Request $request): JsonResponse
     {
-        $result = $this->promotionalCampaignService->canPromotionalCampaignCartV2Active($request->campaign_type, $request->start_at, $request->end_at, $request->product_ids, $request->exclude_cart_campaign_id);
+        $result = $this->promotionalCampaignService->canCartV2CampaignActive($request->campaign_type, $request->start_at, $request->end_at, $request->product_ids, $request->exclude_promotional_campaign_id);
 
         if ($result['status']) {
             return response()->json([

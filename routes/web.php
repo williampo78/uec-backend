@@ -217,25 +217,30 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     ]);
 
     // 滿額活動
+    Route::post('/promotional_campaign_cart/ajax/can-pass-active-validation', [PromotionalCampaignCartController::class, 'canPassActiveValidation']);
     Route::resource('/promotional_campaign_cart', PromotionalCampaignCartController::class, [
         'names' => [
             'index' => 'promotional_campaign_cart',
         ],
     ]);
-    Route::post('/promotional_campaign_cart/ajax/can-pass-active-validation', [PromotionalCampaignCartController::class, 'canPassActiveValidation']);
 
     // 滿額活動新版
-    Route::post('/promotional_campaign_cart_v2/can-active', [PromotionalCampaignCartV2Controller::class, 'canActive']);
-    Route::resource('/promotional_campaign_cart_v2', PromotionalCampaignCartV2Controller::class, [
+    Route::post('/promotional-campaign-cart-v2/can-active', [PromotionalCampaignCartV2Controller::class, 'canActive']);
+    Route::resource('/promotional-campaign-cart-v2', PromotionalCampaignCartV2Controller::class, [
         'names' => [
             'index' => 'promotional_campaign_cart_v2',
+            'create' => 'promotional_campaign_cart_v2.create',
+            'store' => 'promotional_campaign_cart_v2.store',
+            'edit' => 'promotional_campaign_cart_v2.edit',
+            'update' => 'promotional_campaign_cart_v2.update',
+            'show' => 'promotional_campaign_cart_v2.show',
         ],
     ]);
 
     // 單品活動
     Route::get('/promotional-campaign-prd/product-modal/options', [PromotionalCampaignPrdController::class, 'getProductModalOptions']);
     Route::get('/promotional-campaign-prd/product-modal/products', [PromotionalCampaignPrdController::class, 'getProductModalProducts']);
-    Route::post('/promotional-campaign-prd/ajax/can-pass-active-validation', [PromotionalCampaignPrdController::class, 'canPassActiveValidation']);
+    Route::post('/promotional-campaign-prd/can-active', [PromotionalCampaignPrdController::class, 'canActive']);
     Route::resource('/promotional-campaign-prd', PromotionalCampaignPrdController::class, [
         'names' => [
             'index' => 'promotional_campaign_prd',

@@ -75,8 +75,7 @@
                                                         </div>
                                                         <div class="col-sm-10">
                                                             <select2 class="form-control" :options="campaignTypes"
-                                                                v-model="form.campaignType" name="campaign_type"
-                                                                @select2-change="changeCampaignType">
+                                                                v-model="form.campaignType" name="campaign_type">
                                                                 <option disabled value=""></option>
                                                             </select2>
                                                         </div>
@@ -224,6 +223,24 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
+                                                        <tr v-for="(product, index) in form.products"
+                                                            :key="index">
+                                                            <input type="hidden" :name="`products[${index}][product_id]`"
+                                                                :value="product.productId">
+                                                            <td>@{{ index + 1 }}</td>
+                                                            <td>@{{ product.productNo }}</td>
+                                                            <td>@{{ product.productName }}</td>
+                                                            <td>@{{ product.sellingPrice }}</td>
+                                                            <td>@{{ product.launchedAt }}</td>
+                                                            <td>@{{ product.launchStatus }}</td>
+                                                            <td>@{{ product.grossMargin }}</td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger"
+                                                                    @click="deleteProduct(index)">
+                                                                    <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -258,13 +275,34 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
+                                                        <tr v-for="(giveaway, index) in form.giveaways"
+                                                            :key="index">
+                                                            <input type="hidden" :name="`giveaways[${index}][product_id]`"
+                                                                :value="giveaway.productId">
+                                                            <td>@{{ index + 1 }}</td>
+                                                            <td>@{{ giveaway.productNo }}</td>
+                                                            <td>@{{ giveaway.productName }}</td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="number"
+                                                                        class="form-control giveaway-assigned-qty"
+                                                                        :name="`giveaways[${index}][assigned_qty]`" min="1"
+                                                                        v-model="giveaway.assignedQty">
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger"
+                                                                    @click="deleteGiveaway(index)">
+                                                                    <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                </button>
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
 
                                             <hr style="border-top: 1px solid gray;" />
                                         </div>
-
 
                                         <div class="row">
                                             <div class="col-sm-12">
@@ -276,7 +314,7 @@
                                                         </button>
                                                     @endif
                                                     <a href="{{ route('promotional_campaign_prd') }}"
-                                                        class="btn btn-danger" type="button">
+                                                        class="btn btn-danger">
                                                         <i class="fa-solid fa-ban"></i> 取消
                                                     </a>
                                                 </div>
@@ -299,160 +337,6 @@
 @section('js')
     <script src="{{ asset('js/promotional_campaign/prd/main.js') }}"></script>
     <script>
-        // $(function() {
-        //     let suppliers = json($suppliers);
-        //     let product_types = json(config('uec.product_type_options'));
-        //     var prd_modal_product_list = {}; // 單品modal清單中的商品
-        //     var prd_product_list = {}; // 單品清單中的商品
-        //     var gift_modal_product_list = {}; // 贈品modal清單中的商品
-        //     var gift_product_list = {}; // 贈品清單中的商品
-
-        //     renderCampaignType(campaign_types);
-        //     renderPrdModalSupplier(suppliers);
-        //     renderGiftModalSupplier(suppliers);
-        //     renderPrdModalProductType(product_types);
-        //     renderGiftModalProductType(product_types);
-
-        //     $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove(); // 移除贈品、加購品
-        //     $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
-
-        //     $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
-        //     $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
-
-        //     init();
-
-        //     // 新增單品
-        //     $('#btn-new-prd').on('click', function() {
-        //         $('#prd-modal').modal('show');
-        //     });
-
-        //     // 單品modal商品全勾選
-        //     $('#prd-modal-btn-check-all').on('click', function() {
-        //         $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-        //     });
-
-        //     // 單品modal商品全取消
-        //     $('#prd-modal-btn-cancel-all').on('click', function() {
-        //         $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-        //     });
-
-        //     // 單品modal儲存、儲存並關閉
-        //     $('#prd-modal-btn-save, #prd-modal-btn-save-and-close').on('click', function() {
-        //         // 取得單品modal清單中有勾選的商品
-        //         $('#prd-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-        //             function() {
-        //                 let id = $(this).attr('data-id');
-
-        //                 prd_product_list[id] = prd_modal_product_list[id]; // 增加單品清單中的商品
-        //                 delete prd_modal_product_list[id]; // 移除單品modal清單中的商品
-        //             });
-
-        //         renderPrdProductList(prd_product_list);
-        //         renderPrdModalProductList(prd_modal_product_list);
-        //     });
-
-        //     // 刪除單品清單中的商品
-        //     $(document).on('click', '.btn-delete-prd', function() {
-        //         if (confirm('確定要刪除嗎?')) {
-        //             let id = $(this).closest('tr').attr('data-id');
-
-        //             delete prd_product_list[id]; // 移除單品清單中的商品
-
-        //             renderPrdProductList(prd_product_list);
-        //         }
-        //     });
-
-        //     // 單品modal搜尋
-        //     $('#prd-modal-btn-search').on('click', function() {
-        //         let query_datas = {
-        //             'supplier_id': $('#prd-modal-supplier-id').val(),
-        //             'product_no': $('#prd-modal-product-no').val(),
-        //             'product_name': $('#prd-modal-product-name').val(),
-        //             'selling_price_min': $('#prd-modal-selling-price-min').val(),
-        //             'selling_price_max': $('#prd-modal-selling-price-max').val(),
-        //             'start_created_at': $('#prd-modal-start-created-at').val(),
-        //             'end_created_at': $('#prd-modal-end-created-at').val(),
-        //             'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
-        //             'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
-        //             'product_type': $('#prd-modal-product-type').val(),
-        //             'limit': $('#prd-modal-limit').val(),
-        //             'exist_products': Object.keys(prd_product_list),
-        //         };
-
-        //         getProducts(query_datas).then(products => {
-        //             prd_modal_product_list = products;
-
-        //             renderPrdModalProductList(prd_modal_product_list);
-        //         });
-        //     });
-
-
-        //     // 新增贈品
-        //     $('#btn-new-gift').on('click', function() {
-        //         $('#gift-modal').modal('show');
-        //     });
-
-        //     // 贈品modal商品全勾選
-        //     $('#gift-modal-btn-check-all').on('click', function() {
-        //         $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-        //     });
-
-        //     // 贈品modal商品全取消
-        //     $('#gift-modal-btn-cancel-all').on('click', function() {
-        //         $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-        //     });
-
-        //     // 贈品modal儲存、儲存並關閉
-        //     $('#gift-modal-btn-save, #gift-modal-btn-save-and-close').on('click', function() {
-        //         // 取得贈品modal清單中有勾選的商品
-        //         $('#gift-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-        //             function() {
-        //                 let id = $(this).attr('data-id');
-
-        //                 gift_product_list[id] = gift_modal_product_list[id]; // 增加贈品清單中的商品
-        //                 delete gift_modal_product_list[id]; // 移除贈品modal清單中的商品
-        //             });
-
-        //         renderGiftProductList(gift_product_list);
-        //         renderGiftModalProductList(gift_modal_product_list);
-        //     });
-
-        //     // 刪除贈品清單中的商品
-        //     $(document).on('click', '.btn-delete-gift', function() {
-        //         if (confirm('確定要刪除嗎?')) {
-        //             let id = $(this).closest('tr').attr('data-id');
-
-        //             delete gift_product_list[id]; // 移除贈品清單中的商品
-
-        //             renderGiftProductList(gift_product_list);
-        //         }
-        //     });
-
-        //     // 贈品modal搜尋
-        //     $('#gift-modal-btn-search').on('click', function() {
-        //         let query_datas = {
-        //             'supplier_id': $('#gift-modal-supplier-id').val(),
-        //             'product_no': $('#gift-modal-product-no').val(),
-        //             'product_name': $('#gift-modal-product-name').val(),
-        //             'selling_price_min': $('#gift-modal-selling-price-min').val(),
-        //             'selling_price_max': $('#gift-modal-selling-price-max').val(),
-        //             'start_created_at': $('#gift-modal-start-created-at').val(),
-        //             'end_created_at': $('#gift-modal-end-created-at').val(),
-        //             'start_launched_at_start': $('#gift-modal-start-launched-at-start').val(),
-        //             'start_launched_at_end': $('#gift-modal-start-launched-at-end').val(),
-        //             'product_type': $('#gift-modal-product-type').val(),
-        //             'limit': $('#gift-modal-limit').val(),
-        //             'exist_products': Object.keys(gift_product_list),
-        //         };
-
-        //         getProducts(query_datas).then(products => {
-        //             gift_modal_product_list = products;
-
-        //             renderGiftModalProductList(gift_modal_product_list);
-        //         });
-        //     });
-        // });
-
         let vm = new Vue({
             el: "#app",
             data: {
@@ -491,7 +375,6 @@
                     },
                     excludeProductIds: [],
                 },
-                isNowGreaterThanOrEqualToStartAt: false,
                 showXValue: true,
                 showXValueHint: true,
                 showGiveaway: false,
@@ -517,7 +400,6 @@
 
                 let startAtFlatpickr = flatpickr("#start_at_flatpickr", {
                     dateFormat: "Y-m-d H:i:S",
-                    minDate: this.form.endAt,
                     enableTime: true,
                     enableSeconds: true,
                     defaultHour: 0,
@@ -536,7 +418,6 @@
 
                 let endAtFlatpickr = flatpickr("#end_at_flatpickr", {
                     dateFormat: "Y-m-d H:i:S",
-                    minDate: this.form.startAt,
                     enableTime: true,
                     enableSeconds: true,
                     defaultHour: 23,
@@ -568,7 +449,7 @@
                                     });
 
                                     return {
-                                        url: "/backend/promotional-campaign-prd/ajax/can-pass-active-validation",
+                                        url: "/backend/promotional-campaign-prd/can-active",
                                         type: "post",
                                         dataType: "json",
                                         cache: false,
@@ -582,7 +463,7 @@
                                             if (response) {
                                                 let data = JSON.parse(response);
 
-                                                if (data.result) {
+                                                if (data.status) {
                                                     return true;
                                                 }
                                             }
@@ -666,7 +547,8 @@
                         },
                         active: {
                             remote: function(element) {
-                                if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(self.form.campaignType)) {
+                                if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(self.form
+                                        .campaignType)) {
                                     return "同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動";
                                 } else if (['PRD05'].includes(self.form.campaignType)) {
                                     return '同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動';
@@ -716,6 +598,23 @@
                     },
                 });
             },
+            watch: {
+                "form.campaignType"(value) {
+                    if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(value)) {
+                        this.showXValue = true;
+                        this.showGiveaway = false;
+                    } else {
+                        this.showXValue = false;
+                        this.showGiveaway = true;
+                    }
+
+                    if (['PRD01', 'PRD03'].includes(value)) {
+                        this.showXValueHint = true;
+                    } else {
+                        this.showXValueHint = false;
+                    }
+                },
+            },
             methods: {
                 // 新增贈品
                 addGiveaway() {
@@ -759,22 +658,6 @@
 
                     $("#create-form").submit();
                 },
-                // 選擇活動類型
-                changeCampaignType(value) {
-                    if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(value)) {
-                        this.showXValue = true;
-                        this.showGiveaway = false;
-                    } else {
-                        this.showXValue = false;
-                        this.showGiveaway = true;
-                    }
-
-                    if (['PRD01', 'PRD03'].includes(value)) {
-                        this.showXValueHint = true;
-                    } else {
-                        this.showXValueHint = false;
-                    }
-                },
                 // 儲存商品modal的商品
                 saveProductModalProducts(products) {
                     products.forEach(product => {
@@ -783,25 +666,20 @@
                             productNo: product.productNo,
                             productName: product.productName,
                             sellingPrice: product.sellingPrice,
-                            startLaunchedAt: product.startLaunchedAt,
+                            launchedAt: product.launchedAt,
                             launchStatus: product.launchStatus,
                             grossMargin: product.grossMargin,
-                            webCategoryHierarchy: product.webCategoryHierarchy,
                         });
                     });
                 },
                 // 儲存贈品modal的商品
                 saveGiveawayModalProducts(products) {
                     products.forEach(product => {
-                        this.currentThreshold.giveaways.push({
+                        this.form.giveaways.push({
                             productId: product.id,
                             productNo: product.productNo,
                             productName: product.productName,
                             assignedQty: 1,
-                            stockType: product.stockType,
-                            productType: product.productType,
-                            supplier: product.supplier,
-                            stockQty: product.stockQty,
                         });
                     });
                 },

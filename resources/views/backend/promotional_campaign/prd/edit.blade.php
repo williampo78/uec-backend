@@ -12,489 +12,736 @@
 @endsection
 
 @section('content')
-    @if ($errors->any())
-        <div id="error-message" style="display: none;">
-            {{ $errors->first('message') }}
-        </div>
-    @endif
+    <div id="app" v-cloak>
+        @if ($errors->any())
+            <div ref="errorMessage" style="display: none;">
+                {{ $errors->first('message') }}
+            </div>
+        @endif
 
-    <div id="page-wrapper">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">請輸入下列欄位資料</div>
-                    <div class="panel-body">
-                        <form role="form" id="update-form" method="post"
-                            action="{{ route('promotional_campaign_prd.update', $promotional_campaign->id) }}">
-                            @method('PUT')
-                            @csrf
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">請輸入下列欄位資料</div>
+                        <div class="panel-body">
+                            <form id="edit-form" method="post"
+                                action="{{ route('promotional_campaign_prd.update', $campaign['id']) }}">
+                                @method('PUT')
+                                @csrf
+                                <div class="row">
+                                    <!-- 欄位 -->
+                                    <div class="col-sm-12">
+                                        <div class="form-horizontal">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">活動名稱 <span
+                                                                    style="color: red;">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control" name="campaign_name"
+                                                                v-model="form.campaignName">
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                            <div class="row">
-                                <!-- 欄位 -->
-                                <div class="col-sm-12">
-                                    @include('backend.promotional_campaign.campaign_block')
-                                    @include('backend.promotional_campaign.applicable_target_block')
-                                    @include('backend.promotional_campaign.prd_block')
-                                    @include('backend.promotional_campaign.gift_block')
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">狀態 <span
+                                                                    style="color: red;">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="active" value="1"
+                                                                    v-model="form.active">生效
+                                                            </label>
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="active" value="0"
+                                                                    v-model="form.active">失效
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
 
-                                    <div class="row">
-                                        <div class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">活動類型 <span
+                                                                    style="color: red;">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <select2 class="form-control" :options="campaignTypes"
+                                                                v-model="form.campaignType" name="campaign_type" disabled>
+                                                                <option disabled value=""></option>
+                                                            </select2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="row">
+                                                        <div class="col-sm-6">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-4">
+                                                                    <label class="control-label">N (滿額) = <span
+                                                                            style="color: red;">*</span></label>
+                                                                </div>
+                                                                <div class="col-sm-8">
+                                                                    <input type="number" class="form-control"
+                                                                        name="n_value" v-model="form.nValue" min="1" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6" v-if="showXValue">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-3">
+                                                                    <label class="control-label">X (折扣) = <span
+                                                                            style="color: red;">*</span></label>
+                                                                </div>
+                                                                <div class="col-sm-5">
+                                                                    <input type="number" class="form-control"
+                                                                        name="x_value" v-model="form.xValue" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                </div>
+                                                                <div class="col-sm-4" v-if="showXValueHint">
+                                                                    <p class="form-control-static">打85折，輸入0.85</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
+
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">上架時間起 <span
+                                                                    style="color: red;">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <div class="input-group" id="start_at_flatpickr">
+                                                                <input type="text" class="form-control" name="start_at"
+                                                                    autocomplete="off" data-input v-model="form.startAt" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                <span class="input-group-btn" data-toggle>
+                                                                    <button class="btn btn-default" type="button">
+                                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">上架時間訖 <span
+                                                                    style="color: red;">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <div class="input-group" id="end_at_flatpickr">
+                                                                <input type="text" class="form-control" name="end_at"
+                                                                    autocomplete="off" data-input v-model="form.endAt">
+                                                                <span class="input-group-btn" data-toggle>
+                                                                    <button class="btn btn-default" type="button">
+                                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br />
+
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">前台文案 <span
+                                                                    style="color: red;">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <input type="text" class="form-control" name="campaign_brief"
+                                                                v-model="form.campaignBrief" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <hr style="border-top: 1px solid gray;" />
+                                        </div>
+
+                                        <div>
                                             <div class="form-group">
-                                                @if ($share_role_auth['auth_update'])
-                                                    <button class="btn btn-success" type="button" id="btn-save">
-                                                        <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                                <label class="control-label">適用對象 <span
+                                                        style="color: red;">*</span></label>
+
+                                                <div class="row" style="margin-left: 1rem;">
+                                                    <div class="col-sm-2">
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="target_groups" value="all"
+                                                                v-model="form.targetGroups" :disabled="isNowGreaterThanOrEqualToStartAt">所有會員
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <hr style="border-top: 1px solid gray;" />
+                                        </div>
+
+                                        <div>
+                                            <div class="row">
+                                                <div class="col-sm-1">
+                                                    <p>單品清單</p>
+                                                </div>
+                                                <div class="col-sm-2" v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        @click="addProduct">
+                                                        <i class="fa-solid fa-plus"></i> 新增單品
                                                     </button>
-                                                @endif
-                                                <button class="btn btn-danger" type="button" id="btn-cancel">
-                                                    <i class="fa-solid fa-ban"></i> 取消
-                                                </button>
+                                                </div>
+                                            </div>
+                                            <br>
+
+                                            <div class="table-responsive">
+                                                <table class='table table-striped table-bordered table-hover'
+                                                    style='width:100%'>
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-nowrap">項次</th>
+                                                            <th class="text-nowrap">商品序號</th>
+                                                            <th class="text-nowrap">商品名稱</th>
+                                                            <th class="text-nowrap">售價(含稅)</th>
+                                                            <th class="text-nowrap">上架日期</th>
+                                                            <th class="text-nowrap">上架狀態</th>
+                                                            <th class="text-nowrap">毛利(%)</th>
+                                                            <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(product, index) in form.products"
+                                                            :key="index">
+                                                            <input type="hidden" :name="`products[${index}][id]`"
+                                                                :value="product.id">
+                                                            <input type="hidden" :name="`products[${index}][product_id]`"
+                                                                :value="product.productId">
+                                                            <td>@{{ index + 1 }}</td>
+                                                            <td>@{{ product.productNo }}</td>
+                                                            <td>@{{ product.productName }}</td>
+                                                            <td>@{{ product.sellingPrice }}</td>
+                                                            <td>@{{ product.launchedAt }}</td>
+                                                            <td>@{{ product.launchStatus }}</td>
+                                                            <td>@{{ product.grossMargin }}</td>
+                                                            <td v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                                <button type="button" class="btn btn-danger"
+                                                                    @click="deleteProduct(index)">
+                                                                    <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <hr style="border-top: 1px solid gray;" />
+                                        </div>
+
+                                        <div v-if="showGiveaway">
+                                            <div class="row">
+                                                <div class="col-sm-1">
+                                                    <p>贈品清單</p>
+                                                </div>
+                                                <div class="col-sm-2" v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        @click="addGiveaway">
+                                                        <i class="fa-solid fa-plus"></i> 新增贈品
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <br>
+
+                                            <div class="table-responsive">
+                                                <table class='table table-striped table-bordered table-hover'
+                                                    style='width:100%'>
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-nowrap">項次</th>
+                                                            <th class="text-nowrap">商品序號</th>
+                                                            <th class="text-nowrap">商品名稱</th>
+                                                            <th class="text-nowrap">贈品數量</th>
+                                                            <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(giveaway, index) in form.giveaways"
+                                                            :key="index">
+                                                            <input type="hidden" :name="`giveaways[${index}][id]`"
+                                                                :value="giveaway.id">
+                                                            <input type="hidden" :name="`giveaways[${index}][product_id]`"
+                                                                :value="giveaway.productId">
+                                                            <td>@{{ index + 1 }}</td>
+                                                            <td>@{{ giveaway.productNo }}</td>
+                                                            <td>@{{ giveaway.productName }}</td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="number"
+                                                                        class="form-control giveaway-assigned-qty"
+                                                                        :name="`giveaways[${index}][assigned_qty]`" min="1"
+                                                                        v-model="giveaway.assignedQty" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                </div>
+                                                            </td>
+                                                            <td v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                                <button type="button" class="btn btn-danger"
+                                                                    @click="deleteGiveaway(index)">
+                                                                    <i class="fa-solid fa-trash-can"></i> 刪除
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <hr style="border-top: 1px solid gray;" />
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                    @if ($share_role_auth['auth_update'])
+                                                        <button class="btn btn-success" type="button" @click="submitForm"
+                                                            :disabled="saveButton.isDisabled">
+                                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                                        </button>
+                                                    @endif
+                                                    <a href="{{ route('promotional_campaign_prd') }}"
+                                                        class="btn btn-danger">
+                                                        <i class="fa-solid fa-ban"></i> 取消
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    @include('backend.promotional_campaign.prd_modal')
-    @include('backend.promotional_campaign.gift_modal')
+        <prd-campaign-product-modal :modal="productModal" @save="saveProductModalProducts"></prd-campaign-product-modal>
+        <prd-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></prd-campaign-product-modal>
+    </div>
 @endsection
 
 @section('js')
-    <script src="{{ asset('asset/js/promotional-campaign/main.js') }}"></script>
-    <script src="{{ asset('asset/js/promotional-campaign/validate.js') }}"></script>
-
+    <script src="{{ asset('js/promotional_campaign/prd/main.js') }}"></script>
     <script>
-        $(function() {
-            let suppliers = @json($suppliers);
-            let product_types = @json(config('uec.product_type_options'));
-            let promotional_campaign = @json($promotional_campaign);
-            var prd_modal_product_list = {}; // 單品modal清單中的商品
-            var prd_product_list = {}; // 單品清單中的商品
-            var gift_modal_product_list = {}; // 贈品modal清單中的商品
-            var gift_product_list = {}; // 贈品清單中的商品
-
-            if ($('#error-message').length) {
-                alert($('#error-message').text().trim());
-            }
-
-            $('#btn-save').on('click', function() {
-                $("#update-form").submit();
-            });
-
-            $('#btn-cancel').on('click', function() {
-                location.href = "{{ route('promotional_campaign_prd') }}";
-            });
-
-            // 驗證表單
-            $("#update-form").validate({
-                // debug: true,
-                submitHandler: function(form) {
-                    $('#btn-save').prop('disabled', true);
-                    form.submit();
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                form: {
+                    campaignId: "",
+                    campaignName: "",
+                    active: "0",
+                    campaignType: "",
+                    nValue: "",
+                    xValue: "",
+                    startAt: "",
+                    endAt: "",
+                    campaignBrief: "",
+                    targetGroups: "all",
+                    giveaways: [],
+                    products: [],
                 },
-                rules: {
-                    campaign_name: {
-                        required: true,
-                        maxlength: 80,
+                saveButton: {
+                    isDisabled: false,
+                },
+                campaignTypes: [],
+                productModal: {
+                    id: "product-modal",
+                    title: "新增單品",
+                    productType: {
+                        id: "N",
+                        includeOptions: ["N"],
                     },
-                    active: {
-                        required: true,
-                        remote: {
-                            param: function() {
-                                return {
-                                    url: "/backend/promotional-campaign-prd/ajax/can-pass-active-validation",
-                                    type: "post",
-                                    dataType: "json",
-                                    cache: false,
-                                    data: {
-                                        campaign_type: $("#campaign_type").val(),
-                                        start_at: $('#start_at').val(),
-                                        end_at: $('#end_at').val(),
-                                        exist_products: Object.keys(prd_product_list),
-                                        promotional_campaign_id: promotional_campaign.id,
-                                    },
-                                    dataFilter: function(data, type) {
-                                        if (data) {
-                                            let json_data = $.parseJSON(data);
+                    excludeProductIds: [],
+                },
+                giveawayModal: {
+                    id: "giveaway-modal",
+                    title: "新增贈品",
+                    productType: {
+                        id: "G",
+                        includeOptions: ["N", "G"],
+                    },
+                    excludeProductIds: [],
+                },
+                showXValue: true,
+                showXValueHint: true,
+                showGiveaway: false,
+                isNowGreaterThanOrEqualToStartAt: false,
+            },
+            created() {
+                let campaignTypes = @json($campaignTypes);
+                let campaign = @json($campaign);
 
-                                            if (json_data.status) {
-                                                return true;
+                if (campaignTypes) {
+                    campaignTypes.forEach(campaignType => {
+                        this.campaignTypes.push({
+                            text: campaignType.description,
+                            id: campaignType.code,
+                        });
+                    });
+                }
+
+                if (campaign) {
+                    this.form.campaignId = campaign.id;
+                    this.form.campaignName = campaign.campaign_name;
+                    this.form.active = campaign.active;
+                    this.form.campaignType = campaign.campaign_type;
+                    this.form.nValue = campaign.n_value;
+                    this.form.xValue = campaign.x_value;
+                    this.form.startAt = campaign.start_at;
+                    this.form.endAt = campaign.end_at;
+                    this.form.campaignBrief = campaign.campaign_brief;
+
+                    if (Array.isArray(campaign.products) && campaign.products.length) {
+                        campaign.products.forEach(product => {
+                            this.form.products.push({
+                                id: product.id,
+                                productId: product.product_id,
+                                productNo: product.product_no,
+                                productName: product.product_name,
+                                sellingPrice: product.selling_price,
+                                launchedAt: product.start_launched_at || product.end_launched_at ?
+                                    `${product.start_launched_at} ~ ${product.end_launched_at}` :
+                                    '',
+                                launchStatus: product.launch_status,
+                                grossMargin: product.gross_margin,
+                            });
+                        });
+                    }
+
+                    if (Array.isArray(campaign.giveaways) && campaign.giveaways.length) {
+                        campaign.giveaways.forEach(giveaway => {
+                            this.form.giveaways.push({
+                                id: giveaway.id,
+                                productId: giveaway.product_id,
+                                productNo: giveaway.product_no,
+                                productName: giveaway.product_name,
+                                assignedQty: giveaway.assigned_qty,
+                            });
+                        });
+                    }
+                }
+
+                // 若當下時間 ≧ ﹝上架時間起﹞，僅開放﹝活動名稱﹞、﹝狀態﹞、﹝上架時間訖﹞供修改
+                if (moment().isSameOrAfter(this.form.startAt)) {
+                    this.isNowGreaterThanOrEqualToStartAt = true;
+                }
+            },
+            mounted() {
+                let self = this;
+
+                if (this.$refs.errorMessage) {
+                    alert(this.$refs.errorMessage.innerText.trim());
+                }
+
+                let startAtFlatpickr = flatpickr("#start_at_flatpickr", {
+                    dateFormat: "Y-m-d H:i:S",
+                    maxDate: this.form.endAt,
+                    enableTime: true,
+                    enableSeconds: true,
+                    defaultHour: 0,
+                    defaultMinute: 0,
+                    defaultSeconds: 0,
+                    onChange: function(selectedDates, dateStr, instance) {
+                        endAtFlatpickr.set('minDate', dateStr);
+
+                        if (!endAtFlatpickr.input.value) {
+                            endAtFlatpickr.hourElement.value = 23;
+                            endAtFlatpickr.minuteElement.value = 59;
+                            endAtFlatpickr.secondElement.value = 59;
+                        }
+                    },
+                });
+
+                let endAtFlatpickr = flatpickr("#end_at_flatpickr", {
+                    dateFormat: "Y-m-d H:i:S",
+                    minDate: this.form.startAt,
+                    enableTime: true,
+                    enableSeconds: true,
+                    defaultHour: 23,
+                    defaultMinute: 59,
+                    defaultSeconds: 59,
+                    onChange: function(selectedDates, dateStr, instance) {
+                        startAtFlatpickr.set('maxDate', dateStr);
+                    },
+                });
+
+                // 驗證表單
+                $("#edit-form").validate({
+                    // debug: true,
+                    submitHandler: function(form) {
+                        self.saveButton.isDisabled = true;
+                        form.submit();
+                    },
+                    rules: {
+                        campaign_name: {
+                            required: true,
+                            maxlength: 80,
+                        },
+                        active: {
+                            required: true,
+                            remote: {
+                                param: function() {
+                                    let productIds = self.form.products.map((product) => {
+                                        return product.productId;
+                                    });
+
+                                    return {
+                                        url: "/backend/promotional-campaign-prd/can-active",
+                                        type: "post",
+                                        dataType: "json",
+                                        cache: false,
+                                        data: {
+                                            campaign_type: self.form.campaignType,
+                                            start_at: self.form.startAt,
+                                            end_at: self.form.endAt,
+                                            product_ids: productIds,
+                                            exclude_promotional_campaign_id: self.form.campaignId,
+                                        },
+                                        dataFilter: function(response) {
+                                            if (response) {
+                                                let data = JSON.parse(response);
+
+                                                if (data.status) {
+                                                    return true;
+                                                }
                                             }
-                                        }
 
-                                        return false;
-                                    },
+                                            return false;
+                                        },
+                                    }
+                                },
+                                depends: function(element) {
+                                    return self.form.campaignType &&
+                                        self.form.startAt &&
+                                        self.form.endAt &&
+                                        self.form.products &&
+                                        self.form.products.length &&
+                                        self.form.active == 1;
                                 }
                             },
-                            depends: function(element) {
-                                return $("#campaign_type").val() &&
-                                    $('#start_at').val() &&
-                                    $('#end_at').val() &&
-                                    Object.keys(prd_product_list).length > 0;
-                            }
                         },
-                    },
-                    campaign_type: {
-                        required: true,
-                    },
-                    start_at: {
-                        required: true,
-                        // dateGreaterThanNow: true,
-                    },
-                    end_at: {
-                        required: true,
-                        greaterThan: function() {
-                            return $('#start_at').val();
+                        campaign_type: {
+                            required: true,
                         },
-                    },
-                    n_value: {
-                        required: true,
-                        digits: true,
-                        min: 1,
-                    },
-                    x_value: {
-                        required: true,
-                        min: function() {
-                            if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
-                                return 0.01;
-                            } else if (['PRD02', 'PRD04'].includes($('#campaign_type').val())) {
-                                return 1;
-                            }
-
-                            return 0;
+                        start_at: {
+                            required: true,
                         },
-                        max: {
-                            param: 0.99,
-                            depends: function(element) {
-                                if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
-                                    return true;
-                                }
-
-                                return false;
+                        end_at: {
+                            required: true,
+                            greaterThan: function() {
+                                return self.form.startAt;
                             },
                         },
-                        maxlength: {
-                            param: 4,
-                            depends: function(element) {
-                                if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
-                                    return true;
+                        n_value: {
+                            required: true,
+                            digits: true,
+                            min: 1,
+                        },
+                        x_value: {
+                            required: true,
+                            min: function() {
+                                if (['PRD01', 'PRD03'].includes(self.form.campaignType)) {
+                                    return 0.01;
+                                } else if (['PRD02', 'PRD04'].includes(self.form.campaignType)) {
+                                    return 1;
                                 }
 
-                                return false;
+                                return 0;
+                            },
+                            max: {
+                                param: 0.99,
+                                depends: function(element) {
+                                    return ['PRD01', 'PRD03'].includes(self.form.campaignType);
+                                },
+                            },
+                            maxlength: {
+                                param: 4,
+                                depends: function(element) {
+                                    return ['PRD01', 'PRD03'].includes(self.form.campaignType);
+                                },
+                            },
+                            digits: {
+                                depends: function(element) {
+                                    return ['PRD02', 'PRD04'].includes(self.form.campaignType);
+                                },
+                            },
+                            number: {
+                                depends: function(element) {
+                                    return ['PRD01', 'PRD03'].includes(self.form.campaignType);
+                                },
                             },
                         },
-                        digits: {
-                            depends: function(element) {
-                                if (['PRD02', 'PRD04'].includes($('#campaign_type').val())) {
-                                    return true;
+                        target_groups: {
+                            required: true,
+                        },
+                        campaign_brief: {
+                            required: true,
+                            maxlength: 20,
+                        },
+                    },
+                    messages: {
+                        end_at: {
+                            greaterThan: "結束時間必須大於開始時間",
+                        },
+                        active: {
+                            remote: function(element) {
+                                if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(self.form
+                                        .campaignType)) {
+                                    return "同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動";
+                                } else if (['PRD05'].includes(self.form.campaignType)) {
+                                    return '同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動';
+                                }
+                            },
+                        },
+                        n_value: {
+                            digits: "只可輸入正整數",
+                            min: "只可輸入正整數",
+                        },
+                        x_value: {
+                            digits: "只可輸入正整數",
+                            min: function() {
+                                if (['PRD02', 'PRD04'].includes(self.form.campaignType)) {
+                                    return '只可輸入正整數';
                                 }
 
-                                return false;
-                            },
-                        },
-                        number: {
-                            depends: function(element) {
-                                if (['PRD01', 'PRD03'].includes($('#campaign_type').val())) {
-                                    return true;
-                                }
-
-                                return false;
+                                return '請輸入不小於 0 的數值';
                             },
                         },
                     },
-                    target_groups: {
-                        required: true,
+                    errorClass: "help-block",
+                    errorElement: "span",
+                    errorPlacement: function(error, element) {
+                        if (element.closest(".input-group").length) {
+                            element.closest(".input-group").parent().append(error);
+                            return;
+                        }
+
+                        if (element.closest(".radio-inline").length) {
+                            element.closest(".radio-inline").parent().append(error);
+                            return;
+                        }
+
+                        if (element.is('select')) {
+                            element.parent().append(error);
+                            return;
+                        }
+
+                        error.insertAfter(element);
                     },
-                    campaign_brief: {
-                        required: true,
-                        maxlength: 20,
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").addClass("has-error");
                     },
-                },
-                messages: {
-                    end_at: {
-                        greaterThan: "結束時間必須大於開始時間",
+                    success: function(label, element) {
+                        $(element).closest(".form-group").removeClass("has-error");
                     },
-                    active: {
-                        remote: function(element) {
-                            if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes($("#campaign_type")
-                            .val())) {
-                                return "同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動";
-                            } else if (['PRD05'].includes($("#campaign_type").val())) {
-                                return '同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動';
-                            }
-                        },
-                    },
-                    n_value: {
-                        digits: "只可輸入正整數",
-                        min: "只可輸入正整數",
-                    },
-                    x_value: {
-                        digits: "只可輸入正整數",
-                        min: function() {
-                            if (['PRD02', 'PRD04'].includes($('#campaign_type').val())) {
-                                return '只可輸入正整數';
-                            }
-
-                            return '請輸入不小於 0 的數值';
-                        },
-                    },
-                },
-                errorClass: "help-block",
-                errorElement: "span",
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent());
-                        return;
-                    }
-
-                    if (element.is(':radio')) {
-                        element.parent().parent().parent().append(error);
-                        return;
-                    }
-
-                    if (element.is('select')) {
-                        element.parent().append(error);
-                        return;
-                    }
-
-                    error.insertAfter(element);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").addClass("has-error");
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-                success: function(label, element) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-            });
-
-
-            renderPrdModalSupplier(suppliers);
-            renderGiftModalSupplier(suppliers);
-            renderPrdModalProductType(product_types);
-            renderGiftModalProductType(product_types);
-
-            $('#prd-modal-product-type').find('option[value="G"], option[value="A"]').remove(); // 移除贈品、加購品
-            $('#prd-modal-product-type option[value="N"]').prop("selected", true); // 預設為一般品
-
-            $('#gift-modal-product-type option[value="A"]').remove(); // 移除加購品
-            $('#gift-modal-product-type option[value="G"]').prop("selected", true); // 預設為贈品
-
-
-            $('#campaign_name').val(promotional_campaign.campaign_name);
-
-            $('#campaign_brief').val(promotional_campaign.campaign_brief);
-
-            if (promotional_campaign.active == 1) {
-                $('#active_enabled').prop('checked', true);
-            } else {
-                $('#active_disabled').prop('checked', true);
-            }
-
-            $('#campaign_type').empty().append(
-                `<option value="${promotional_campaign.campaign_type}">${promotional_campaign.description}</option>`
-            ).prop('disabled', true);
-            $('#n_value').val(promotional_campaign.n_value);
-            $('#x_value').val(promotional_campaign.x_value);
-            $('#start_at').val(promotional_campaign.start_at);
-            $('#end_at').val(promotional_campaign.end_at);
-
-            // 當下時間>=上架時間起，僅開放修改活動名稱、狀態、上架時間訖
-            if (new Date() >= new Date($('#start_at').val())) {
-                $('#n_value, #x_value, #start_at').prop('disabled', true);
-                $('#btn-new-prd, #btn-new-gift').prop('disabled', true).hide();
-                $('#prd-product-table > thead th:last, #gift-product-table > thead th:last').hide();
-            }
-
-            if (promotional_campaign.products) {
-                $.each(promotional_campaign.products, function(id, product) {
-                    prd_product_list[id] = product;
                 });
+            },
+            watch: {
+                "form.campaignType"(value) {
+                    if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(value)) {
+                        this.showXValue = true;
+                        this.showGiveaway = false;
+                    } else {
+                        this.showXValue = false;
+                        this.showGiveaway = true;
+                    }
 
-                renderPrdProductList(prd_product_list);
-            }
-
-            if (promotional_campaign.giveaways) {
-                $.each(promotional_campaign.giveaways, function(id, product) {
-                    gift_product_list[id] = product;
-                });
-
-                renderGiftProductList(gift_product_list);
-            }
-
-            // 活動類型
-            switch (promotional_campaign.campaign_type) {
-                // ﹝單品﹞第N件(含)以上，打X折
-                case 'PRD01':
-                    $('#prd-block').show();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').show();
-                    break;
-                    // ﹝單品﹞第N件(含)以上，折X元
-                case 'PRD02':
-                    $('#prd-block').show();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').hide();
-                    break;
-                    // ﹝單品﹞滿N件，每件打X折
-                case 'PRD03':
-                    $('#prd-block').show();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').show();
-                    break;
-                    // ﹝單品﹞滿N件，每件折X元
-                case 'PRD04':
-                    $('#prd-block').show();
-                    $('#gift-block').hide();
-                    $('#x_value').closest('.form-group').show().find('div:last').hide();
-                    break;
-                    // ﹝單品﹞滿N件，送贈品
-                case 'PRD05':
-                    $('#prd-block').show();
-                    $('#gift-block').show();
-                    $('#x_value').closest('.form-group').hide();
-                    break;
-            }
-
-            init();
-
-            // 新增單品
-            $('#btn-new-prd').on('click', function() {
-                $('#prd-modal').modal('show');
-            });
-
-            // 單品modal商品全勾選
-            $('#prd-modal-btn-check-all').on('click', function() {
-                $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-            });
-
-            // 單品modal商品全取消
-            $('#prd-modal-btn-cancel-all').on('click', function() {
-                $('#prd-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-            });
-
-            // 單品modal儲存、儲存並關閉
-            $('#prd-modal-btn-save, #prd-modal-btn-save-and-close').on('click', function() {
-                // 取得單品modal清單中有勾選的商品
-                $('#prd-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-                    function() {
-                        let id = $(this).attr('data-id');
-
-                        prd_product_list[id] = prd_modal_product_list[id]; // 增加單品清單中的商品
-                        delete prd_modal_product_list[id]; // 移除單品modal清單中的商品
+                    if (['PRD01', 'PRD03'].includes(value)) {
+                        this.showXValueHint = true;
+                    } else {
+                        this.showXValueHint = false;
+                    }
+                },
+            },
+            methods: {
+                // 新增贈品
+                addGiveaway() {
+                    this.giveawayModal.excludeProductIds = [];
+                    this.form.giveaways.forEach(giveaway => {
+                        this.giveawayModal.excludeProductIds.push(giveaway.productId);
                     });
 
-                renderPrdProductList(prd_product_list);
-                renderPrdModalProductList(prd_modal_product_list);
-            });
-
-            // 刪除單品清單中的商品
-            $(document).on('click', '.btn-delete-prd', function() {
-                if (confirm('確定要刪除嗎?')) {
-                    let id = $(this).closest('tr').attr('data-id');
-
-                    delete prd_product_list[id]; // 移除單品清單中的商品
-
-                    renderPrdProductList(prd_product_list);
-                }
-            });
-
-            // 單品modal搜尋
-            $('#prd-modal-btn-search').on('click', function() {
-                let query_datas = {
-                    'supplier_id': $('#prd-modal-supplier-id').val(),
-                    'product_no': $('#prd-modal-product-no').val(),
-                    'product_name': $('#prd-modal-product-name').val(),
-                    'selling_price_min': $('#prd-modal-selling-price-min').val(),
-                    'selling_price_max': $('#prd-modal-selling-price-max').val(),
-                    'start_created_at': $('#prd-modal-start-created-at').val(),
-                    'end_created_at': $('#prd-modal-end-created-at').val(),
-                    'start_launched_at_start': $('#prd-modal-start-launched-at-start').val(),
-                    'start_launched_at_end': $('#prd-modal-start-launched-at-end').val(),
-                    'product_type': $('#prd-modal-product-type').val(),
-                    'limit': $('#prd-modal-limit').val(),
-                    'exist_products': Object.keys(prd_product_list),
-                };
-
-                getProducts(query_datas).then(products => {
-                    prd_modal_product_list = products;
-
-                    renderPrdModalProductList(prd_modal_product_list);
-                });
-            });
-
-
-            // 新增贈品
-            $('#btn-new-gift').on('click', function() {
-                $('#gift-modal').modal('show');
-            });
-
-            // 贈品modal商品全勾選
-            $('#gift-modal-btn-check-all').on('click', function() {
-                $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', true);
-            });
-
-            // 贈品modal商品全取消
-            $('#gift-modal-btn-cancel-all').on('click', function() {
-                $('#gift-modal-product-table > tbody [name="choose_product"]').prop('checked', false);
-            });
-
-            // 贈品modal儲存、儲存並關閉
-            $('#gift-modal-btn-save, #gift-modal-btn-save-and-close').on('click', function() {
-                // 取得贈品modal清單中有勾選的商品
-                $('#gift-modal-product-table > tbody [name="choose_product"]:checked').closest('tr').each(
-                    function() {
-                        let id = $(this).attr('data-id');
-
-                        gift_product_list[id] = gift_modal_product_list[id]; // 增加贈品清單中的商品
-                        delete gift_modal_product_list[id]; // 移除贈品modal清單中的商品
+                    $('#giveaway-modal').modal('show');
+                },
+                // 刪除贈品
+                deleteGiveaway(index) {
+                    if (confirm('確定要刪除嗎？')) {
+                        this.form.giveaways.splice(index, 1);
+                    }
+                },
+                // 新增商品
+                addProduct() {
+                    this.productModal.excludeProductIds = [];
+                    this.form.products.forEach(product => {
+                        this.productModal.excludeProductIds.push(product.productId);
                     });
 
-                renderGiftProductList(gift_product_list);
-                renderGiftModalProductList(gift_modal_product_list);
-            });
+                    $('#product-modal').modal('show');
+                },
+                // 刪除商品
+                deleteProduct(index) {
+                    if (confirm('確定要刪除嗎？')) {
+                        this.form.products.splice(index, 1);
+                    }
+                },
+                // 儲存
+                submitForm() {
+                    $(`.giveaway-assigned-qty`).each(function() {
+                        $(this).rules("add", {
+                            required: true,
+                            digits: true,
+                            min: 1,
+                        });
+                    });
 
-            // 刪除贈品清單中的商品
-            $(document).on('click', '.btn-delete-gift', function() {
-                if (confirm('確定要刪除嗎?')) {
-                    let id = $(this).closest('tr').attr('data-id');
-
-                    delete gift_product_list[id]; // 移除贈品清單中的商品
-
-                    renderGiftProductList(gift_product_list);
-                }
-            });
-
-            // 贈品modal搜尋
-            $('#gift-modal-btn-search').on('click', function() {
-                let query_datas = {
-                    'supplier_id': $('#gift-modal-supplier-id').val(),
-                    'product_no': $('#gift-modal-product-no').val(),
-                    'product_name': $('#gift-modal-product-name').val(),
-                    'selling_price_min': $('#gift-modal-selling-price-min').val(),
-                    'selling_price_max': $('#gift-modal-selling-price-max').val(),
-                    'start_created_at': $('#gift-modal-start-created-at').val(),
-                    'end_created_at': $('#gift-modal-end-created-at').val(),
-                    'start_launched_at_start': $('#gift-modal-start-launched-at-start').val(),
-                    'start_launched_at_end': $('#gift-modal-start-launched-at-end').val(),
-                    'product_type': $('#gift-modal-product-type').val(),
-                    'limit': $('#gift-modal-limit').val(),
-                    'exist_products': Object.keys(gift_product_list),
-                };
-
-                getProducts(query_datas).then(products => {
-                    gift_modal_product_list = products;
-
-                    renderGiftModalProductList(gift_modal_product_list);
-                });
-            });
+                    $("#edit-form").submit();
+                },
+                // 儲存商品modal的商品
+                saveProductModalProducts(products) {
+                    products.forEach(product => {
+                        this.form.products.push({
+                            productId: product.id,
+                            productNo: product.productNo,
+                            productName: product.productName,
+                            sellingPrice: product.sellingPrice,
+                            launchedAt: product.launchedAt,
+                            launchStatus: product.launchStatus,
+                            grossMargin: product.grossMargin,
+                        });
+                    });
+                },
+                // 儲存贈品modal的商品
+                saveGiveawayModalProducts(products) {
+                    products.forEach(product => {
+                        this.form.giveaways.push({
+                            productId: product.id,
+                            productNo: product.productNo,
+                            productName: product.productName,
+                            assignedQty: 1,
+                        });
+                    });
+                },
+            },
         });
     </script>
 @endsection

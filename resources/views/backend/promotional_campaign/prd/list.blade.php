@@ -161,14 +161,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @isset($prdCampaigns)
-                                            @foreach ($prdCampaigns as $campaign)
+                                        @isset($campaigns)
+                                            @foreach ($campaigns as $campaign)
                                                 <tr>
                                                     <td>
                                                         @if ($share_role_auth['auth_query'])
                                                             <button type="button"
                                                                 class="btn btn-info btn-sm" title="檢視"
-                                                                @click="showPrdCampaign('{{ $campaign['id'] }}')">
+                                                                @click="showCampaign('{{ $campaign['id'] }}')">
                                                                 <i class="fa-solid fa-magnifying-glass"></i>
                                                             </button>
                                                         @endif
@@ -315,10 +315,10 @@
                         this.form.productNo = productNo;
                     }
                 },
-                async showPrdCampaign(id) {
-                    let prdCampaign = await this.getPrdCampaign(id);
+                async showCampaign(id) {
+                    let campaign = await this.getCampaign(id);
 
-                    if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(prdCampaign.campaign_type)) {
+                    if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(campaign.campaign_type)) {
                         this.modal.showXValue = true;
                         this.modal.showGiveaway = false;
                     } else {
@@ -326,18 +326,18 @@
                         this.modal.showGiveaway = true;
                     }
 
-                    this.modal.campaignName = prdCampaign.campaign_name;
-                    this.modal.active = prdCampaign.active;
-                    this.modal.campaignType = prdCampaign.display_campaign_type;
-                    this.modal.nValue = prdCampaign.n_value;
-                    this.modal.xValue = prdCampaign.x_value;
-                    this.modal.startAt = prdCampaign.start_at;
-                    this.modal.endAt = prdCampaign.end_at;
-                    this.modal.campaignBrief = prdCampaign.campaign_brief;
+                    this.modal.campaignName = campaign.campaign_name;
+                    this.modal.active = campaign.active;
+                    this.modal.campaignType = campaign.display_campaign_type;
+                    this.modal.nValue = campaign.n_value;
+                    this.modal.xValue = campaign.x_value;
+                    this.modal.startAt = campaign.start_at;
+                    this.modal.endAt = campaign.end_at;
+                    this.modal.campaignBrief = campaign.campaign_brief;
 
                     this.modal.products = [];
-                    if (Array.isArray(prdCampaign.products) && prdCampaign.products.length) {
-                        prdCampaign.products.forEach(product => {
+                    if (Array.isArray(campaign.products) && campaign.products.length) {
+                        campaign.products.forEach(product => {
                             this.modal.products.push({
                                 productNo: product.product_no,
                                 productName: product.product_name,
@@ -350,8 +350,8 @@
                     }
 
                     this.modal.giveaways = [];
-                    if (Array.isArray(prdCampaign.giveaways) && prdCampaign.giveaways.length) {
-                        prdCampaign.giveaways.forEach(giveaway => {
+                    if (Array.isArray(campaign.giveaways) && campaign.giveaways.length) {
+                        campaign.giveaways.forEach(giveaway => {
                             this.modal.giveaways.push({
                                 productNo: giveaway.product_no,
                                 productName: giveaway.product_name,
@@ -362,7 +362,7 @@
 
                     $('#prd-campaign-modal').modal('show');
                 },
-                getPrdCampaign(id) {
+                getCampaign(id) {
                     return axios({
                             method: "get",
                             url: `/backend/promotional-campaign-prd/${id}`,

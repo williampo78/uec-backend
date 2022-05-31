@@ -39,7 +39,7 @@
                         <div class="panel-heading">請輸入下列欄位資料</div>
                         <div class="panel-body">
                             <form id="edit-form" method="post"
-                                action="{{ route('promotional_campaign_cart_v2.update', $cartCampaign['id']) }}"
+                                action="{{ route('promotional_campaign_cart_v2.update', $campaign['id']) }}"
                                 enctype="multipart/form-data">
                                 @method('PUT')
                                 @csrf
@@ -628,13 +628,13 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/promotional_campaign/cart/main.js') }}"></script>
+    <script src="{{ mix('js/promotional_campaign/cart_v2/main.js') }}"></script>
     <script>
         let vm = new Vue({
             el: "#app",
             data: {
                 form: {
-                    cartCampaignId: "",
+                    campaignId: "",
                     campaignName: "",
                     campaignType: "",
                     active: "0",
@@ -705,7 +705,7 @@
             created() {
                 let campaignTypes = @json($campaignTypes);
                 let suppliers = @json($suppliers);
-                let cartCampaign = @json($cartCampaign);
+                let campaign = @json($campaign);
 
                 if (campaignTypes) {
                     campaignTypes.forEach(campaignType => {
@@ -725,32 +725,32 @@
                     });
                 }
 
-                if (cartCampaign) {
-                    this.form.cartCampaignId = cartCampaign.id;
-                    this.form.campaignName = cartCampaign.campaign_name;
-                    this.form.campaignType = cartCampaign.campaign_type;
-                    this.form.active = cartCampaign.active;
-                    this.form.startAt = cartCampaign.start_at;
-                    this.form.endAt = cartCampaign.end_at;
-                    this.form.campaignBrief = cartCampaign.campaign_brief;
-                    this.form.urlCode = cartCampaign.url_code;
-                    this.form.stockType = cartCampaign.stock_type;
-                    this.form.supplierId = cartCampaign.supplier_id;
+                if (campaign) {
+                    this.form.campaignId = campaign.id;
+                    this.form.campaignName = campaign.campaign_name;
+                    this.form.campaignType = campaign.campaign_type;
+                    this.form.active = campaign.active;
+                    this.form.startAt = campaign.start_at;
+                    this.form.endAt = campaign.end_at;
+                    this.form.campaignBrief = campaign.campaign_brief;
+                    this.form.urlCode = campaign.url_code;
+                    this.form.stockType = campaign.stock_type;
+                    this.form.supplierId = campaign.supplier_id;
 
-                    if (cartCampaign.banner_photo_desktop_url) {
-                        this.bannerPhotoDesktop.url = cartCampaign.banner_photo_desktop_url;
+                    if (campaign.banner_photo_desktop_url) {
+                        this.bannerPhotoDesktop.url = campaign.banner_photo_desktop_url;
                         this.bannerPhotoDesktop.showInputFile = false;
                         this.bannerPhotoDesktop.showDeleteButton = true;
                     }
 
-                    if (cartCampaign.banner_photo_mobile_url) {
-                        this.bannerPhotoMobile.url = cartCampaign.banner_photo_mobile_url;
+                    if (campaign.banner_photo_mobile_url) {
+                        this.bannerPhotoMobile.url = campaign.banner_photo_mobile_url;
                         this.bannerPhotoMobile.showInputFile = false;
                         this.bannerPhotoMobile.showDeleteButton = true;
                     }
 
-                    if (cartCampaign.thresholds) {
-                        cartCampaign.thresholds.forEach(threshold => {
+                    if (campaign.thresholds) {
+                        campaign.thresholds.forEach(threshold => {
                             let giveaways = [];
 
                             if (threshold.giveaways) {
@@ -778,8 +778,8 @@
                         });
                     }
 
-                    if (cartCampaign.products) {
-                        cartCampaign.products.forEach(product => {
+                    if (campaign.products) {
+                        campaign.products.forEach(product => {
                             this.form.products.push({
                                 id: product.id,
                                 productId: product.product_id,
@@ -869,7 +869,7 @@
                                     });
 
                                     return {
-                                        url: "/backend/promotional_campaign_cart_v2/can-active",
+                                        url: "/backend/promotional-campaign-cart-v2/can-active",
                                         type: "post",
                                         dataType: "json",
                                         cache: false,
@@ -878,7 +878,7 @@
                                             start_at: self.form.startAt,
                                             end_at: self.form.endAt,
                                             product_ids: productIds,
-                                            exclude_cart_campaign_id: self.form.cartCampaignId,
+                                            exclude_promotional_campaign_id: self.form.campaignId,
                                         },
                                         dataFilter: function(response) {
                                             conflictContents = "";
