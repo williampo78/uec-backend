@@ -181,7 +181,7 @@ class MemberController extends Controller
                 'qty' => null,
                 'unit_price' => null,
                 'subtotal' => null,
-                'product_totals' => $order->orderDetails->count(),
+                'product_totals' => $order->orderDetails->where('record_identity','M')->count(),
                 'delivery_method' => null,
                 'shipped_at' => null,
                 'package_no' => null,
