@@ -295,7 +295,7 @@ class MemberController extends Controller
                 'return_no' => null,
                 'return_date' => null,
                 'order_details' => null,
-                'product_totals' => $order->orderDetails->count(),
+                'product_totals' => 0,
                 'delivery_method' => null,
                 'package_no' => null,
                 'total_amount' => $order->total_amount,
@@ -372,6 +372,7 @@ class MemberController extends Controller
                     $orderDetailPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
                 }
                 $payload['results']['order_details'][] = $orderDetailPayload;
+                $payload['results']['product_totals'] += 1 ;
             }else{
                 //order_details 非商品的數量
                 $giveaway_qty[$orderDetail->id] = $orderDetail->qty ;
