@@ -53,6 +53,8 @@ class APIIndexServices
         $img_H080B = [];
         $prd_H080A = [];
         $prd_H080B = [];
+        $H080A_seemore = [];
+        $H080B_seemore = [];
         $product_info = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
         foreach ($promotion as $k => $v) {
@@ -250,6 +252,10 @@ class APIIndexServices
                                 "start_selling" => $products[$ad_slot->product_id]->start_selling_at
                             );
                         }
+                        $H080A_seemore['see_more_action'] = $ad_slot->see_more_action;
+                        $H080A_seemore['see_more_url'] = $ad_slot->see_more_url;
+                        $H080A_seemore['see_more_cate_hierarchy_id'] = $ad_slot->see_more_cate_hierarchy_id;
+                        $H080A_seemore['see_more_target_blank'] = $ad_slot->see_more_target_blank;
                     }
                     if ($ad_slot->slot_code == 'H080B') {
                         if (count($product_check) > 0) {
@@ -270,6 +276,10 @@ class APIIndexServices
                                 "start_selling" => $products[$ad_slot->product_id]->start_selling_at
                             );
                         }
+                        $H080B_seemore['see_more_action'] = $ad_slot->see_more_action;
+                        $H080B_seemore['see_more_url'] = $ad_slot->see_more_url;
+                        $H080B_seemore['see_more_cate_hierarchy_id'] = $ad_slot->see_more_cate_hierarchy_id;
+                        $H080B_seemore['see_more_target_blank'] = $ad_slot->see_more_target_blank;
                     }
                 }
 
@@ -318,10 +328,10 @@ class APIIndexServices
             unset($data['H080A']);
         } else {
             $data['H080A'] = array(
-                'see_more_action'=> $ad_slot->see_more_action,
-                'see_more_url'=> $ad_slot->see_more_url,
-                'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
-                'see_more_target_blank'=> $ad_slot->see_more_target_blank,
+                'see_more_action'=> $H080A_seemore['see_more_action'],
+                'see_more_url'=> $H080A_seemore['see_more_url'],
+                'see_more_cate_hierarchy_id'=> $H080A_seemore['see_more_cate_hierarchy_id'],
+                'see_more_target_blank'=> $H080A_seemore['see_more_target_blank'],
                 'images' => $img_H080A,
                 'products' => $prd_H080A
             );
@@ -330,10 +340,10 @@ class APIIndexServices
             unset($data['H080B']);
         } else {
             $data['H080B'] = array(
-                'see_more_action'=> $ad_slot->see_more_action,
-                'see_more_url'=> $ad_slot->see_more_url,
-                'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
-                'see_more_target_blank'=> $ad_slot->see_more_target_blank,
+                'see_more_action'=> $H080B_seemore['see_more_action'],
+                'see_more_url'=> $H080B_seemore['see_more_url'],
+                'see_more_cate_hierarchy_id'=> $H080B_seemore['see_more_cate_hierarchy_id'],
+                'see_more_target_blank'=> $H080B_seemore['see_more_target_blank'],
                 'images' => $img_H080B,
                 'products' => $prd_H080B
             );
