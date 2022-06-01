@@ -44,6 +44,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
     Route::post('/advanceSearch', [ProductController::class, 'getProductSearchResult']);
     Route::post('/advanceSearchCategory', [ProductController::class, 'getProductSearchResultCategory']);
+    Route::post('/advanceFilter', [ProductController::class, 'getFilter']);
 
     Route::get('/stock', [StockController::class, 'getItemStock']);
 
@@ -52,9 +53,6 @@ Route::group(['prefix' => 'v1'], function () {
 
     //UTM
     Route::get('/utm', [IndexController::class, 'getUTM']);
-
-    //filter
-    Route::get('/filter', [ProductController::class, 'getFilter']);
 
     //Event
     Route::post('/event', [ProductController::class, 'getEvent']);

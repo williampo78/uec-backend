@@ -294,19 +294,44 @@ class ProductController extends Controller
     /*
      * 取得進階搜尋篩選器 (產品搜尋結果頁用)
      */
-    public function getFilter()
+    public function getFilter(Request $request)
     {
         $error_code = $this->apiService->getErrorCode();
-        $result = $this->apiProductAttributeLovService->getProductFilter();
-        if ($result['status'] == '200') {
-            $status = true;
-            $msg = null;
-        } else {
-            $status = false;
-            $msg = $error_code[$result['status']];
+        $messages = [
+            'price_min.numeric' => '最低價必須是數字',
+            'price_max.numeric' => '最高價必須是數字',
+        ];
+
+        $in = '';
+        if ($request['price_min'] > 0 && $request['price_max'] > 0) {//價格區間
+            if ($request['price_max'] < $request['price_min']) {
+                $messages = [
+                    'price_max.in' => '最高價不得低於最低價',
+                ];
+                $in = '|in';
+            }
         }
 
-        return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
+        $v = Validator::make($request->all(), [
+            'price_min' => 'numeric',
+            'price_max' => 'numeric' . $in,
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+        $result = $this->apiProductService->getProductFilter($request);
+
+        if ($result == '404') {
+            $status = false;
+            $err = '404';
+            $list = [];
+        } else {
+            $status = true;
+            $err = null;
+            $list = $result;
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
     }
 
     /*

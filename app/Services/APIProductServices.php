@@ -33,7 +33,8 @@ class APIProductServices
         BrandsService $brandsService,
         ShippingFeeRulesService $shippingFeeService,
         UniversalService $universalService,
-        WebShippingInfoService $webShippingInfoService
+        WebShippingInfoService $webShippingInfoService,
+        ProductAttributeLovService $attributeLovService
     )
     {
         $this->apiWebCategory = $apiWebCategory;
@@ -43,6 +44,7 @@ class APIProductServices
         $this->shippingFeeService = $shippingFeeService;
         $this->universalService = $universalService;
         $this->webShippingInfoService = $webShippingInfoService;
+        $this->ProductAttributeLovService = $attributeLovService;
     }
 
     public function getCategory($keyword = null)
@@ -311,9 +313,9 @@ class APIProductServices
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
 
-        if ($attribute) {//進階篩選條件
-            $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
-        }
+        //if ($attribute) {//進階篩選條件
+        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        //}
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
@@ -345,8 +347,8 @@ class APIProductServices
         }
 
         if ($attribute) {//進階篩選條件
-            $strSQL .= " and product_attributes.id in (" . $attribute . ") ";
-            $strSQL .= " group by web_category_products.web_category_hierarchy_id,cate1.category_name , cate2.category_name , p.id";
+            $strSQL .= " and product_attributes.product_attribute_lov_id in (" . $attribute . ") ";
+            $strSQL .= " group by web_category_products.web_category_hierarchy_id,cate1.category_name , cate2.category_name , p.id, product_attributes.product_attribute_lov_id";
         }
 
         if ($order_by == 'launched') {
@@ -563,9 +565,9 @@ class APIProductServices
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
 
-        if ($attribute) {//進階篩選條件
-            $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
-        }
+        //if ($attribute) {//進階篩選條件
+        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        //}
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
@@ -591,12 +593,10 @@ class APIProductServices
         }
 
         if ($attribute) {//進階篩選條件
-            $strSQL .= " and product_attributes.id in (" . $attribute . ") ";
-            $strSQL .= " group by web_category_products.web_category_hierarchy_id,cate1.category_name , cate2.category_name , p.id";
-        } else {
-            $strSQL .= " group by cate1.id";
+            $strSQL .= " and product_attributes.product_attribute_lov_id in (" . $attribute . ") ";
         }
 
+        $strSQL .= " group by cate1.id";
         if ($config_levels == 2) {
             $strSQL .= " order by cate2.sort, cate1.sort";
         } else {
@@ -1370,5 +1370,114 @@ class APIProductServices
         foreach ($products as $product) {
             $data[$product['product_id']] = $product;
         }
+    }
+
+    /*
+     * 進階搜尋商品欄位
+     */
+    public function getProductFilter($request)
+    {
+
+        $keyword = $request['keyword'];
+        $category = $request['category'];
+        $selling_price_min = $request['price_min'];
+        $selling_price_max = $request['price_max'];
+        $attribute = '';
+        $attribute .= ($request['group'] ? $request['group'] : '');
+        $attribute .= ($attribute != '' && $request['ingredient'] != '' ? ', ' : '') . ($request['ingredient'] ? $request['ingredient'] : '');
+        $attribute .= ($attribute != '' && $request['dosage_form'] != '' ? ', ' : '') . ($request['dosage_form'] ? $request['dosage_form'] : '');
+        $attribute .= ($attribute != '' && $request['certificate'] != '' ? ', ' : '') . ($request['certificate'] ? $request['certificate'] : '');
+        $brand = '';
+        $brand .= ($request['brand'] ? $request['brand'] : '');
+
+        $brands = $this->brandsService->getBrandForSearch();
+        $attributeLov = $this->ProductAttributeLovService->getAttributeForSearch();
+        $merge = array_merge($brands, $attributeLov);
+        $filter = [];
+        foreach ($merge as $data) {
+            $filter[$data['attribute_type']][$data['id']] = array(
+                'id' => $data['id'],
+                'code' => $data['code'],
+                'name' => $data['description'],
+                'count' => 0
+            );
+        }
+
+        //分類總覽階層
+        $config_levels = config('uec.web_category_hierarchy_levels');
+
+        $strSQL = "select product_attribute_lov.* ,count(product_attributes.product_attribute_lov_id) as count, count(`brands`.`id`) as countBrand ";
+        $strSQL .= "from web_category_products
+                    inner join frontend_products_v p on p.id=web_category_products.product_id
+                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
+                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
+
+        if ($config_levels == 3) {
+            $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
+        }
+
+        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " left join `product_attribute_lov` on `product_attribute_lov`.`id`=`product_attributes`.`product_attribute_lov_id`";
+
+        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
+
+        if ($keyword) {//依關鍵字搜尋
+            $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.product_no like '%" . $keyword . "%'";
+            $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.keywords like '%" . $keyword . "%'";
+            $strSQL .= " or p.supplier_name like '%" . $keyword . "%'";
+            $strSQL .= " or p.brand_name like '%" . $keyword . "%'";
+            if ($config_levels == 3) {
+                $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
+            }
+            $strSQL .= ")";
+        }
+        if ($selling_price_min >= 0 && $selling_price_max > 0) {//價格區間
+            $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
+        }
+
+        if ($category) {//依分類搜尋
+            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+        }
+
+        if ($attribute) {//進階篩選條件
+            $strSQL .= " and product_attributes.product_attribute_lov_id in (" . $attribute . ") ";
+        }
+
+        if ($brand) { //品牌
+            $strSQL .= " and p.brand_id in (" . $brand . ") ";
+        }
+
+        $strSQL .= " group by product_attributes.product_attribute_lov_id";
+        $strSQL .= " order by product_attribute_lov.attribute_type, product_attribute_lov.sort";
+
+        $lov = DB::select($strSQL);
+        if ($lov) {
+            foreach ($lov as $data) {
+                $filter[$data->attribute_type][$data->id]['count'] = ($data->attribute_type=='BRAND'?$data->countBrand:$data->count);
+            }
+        }
+        $filter_display = [];
+
+        foreach ($filter as $type => $data) {
+            foreach ($data as $info) {
+                $filter_display[$type][] = array(
+                    'id' => $info['id'],
+                    'code' => $info['code'],
+                    'name' => $info['name'],
+                    'count' => $info['count']
+                );
+            }
+        }
+        if ($filter) {
+            $result['status'] = 200;
+            $result['result'] = $filter_display;
+        } else {
+            $result['status'] = 401;
+            $result['result'] = null;
+        }
+        return $result;
     }
 }
