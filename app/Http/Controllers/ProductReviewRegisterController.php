@@ -32,7 +32,7 @@ class ProductReviewRegisterController extends Controller
             'products' => [],
         ];
 
-        if (count($in) !== 0) {
+        if (count($in) > 1) {
             $result['products'] = $this->productService->getProducts($in);
             $this->productService->restructureProducts($result['products']);
         }
