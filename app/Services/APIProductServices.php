@@ -1464,7 +1464,7 @@ class APIProductServices
 
         $strSQL .= " group by product_attributes.product_attribute_lov_id";
         $strSQL .= " order by product_attribute_lov.attribute_type, product_attribute_lov.sort";
-dd($strSQL);
+
         $lov = DB::select($strSQL);
         if ($lov) {
             foreach ($lov as $data) {
