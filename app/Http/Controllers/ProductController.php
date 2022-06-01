@@ -224,6 +224,9 @@ class ProductController extends Controller
                     $result = false;
                 }
                 break;
+            case 'checkItemQty':
+                $result = $this->productService->checkItemQty($in['item_id']);
+                break;
             default:
                 break;
         }
