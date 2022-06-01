@@ -290,7 +290,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null)
     {
 
         //分類總覽階層
@@ -314,7 +314,8 @@ class APIProductServices
         }
 
         //if ($attribute) {//進階篩選條件
-        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " inner join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
         //}
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
@@ -344,6 +345,10 @@ class APIProductServices
         if ($id) {//依產品編號找相關分類
             $strSQL .= " and web_category_products.product_id=" . $id;
             $strSQL .= " order by web_category_products.sort ";
+        }
+
+        if ($brand) { //品牌
+            $strSQL .= " and p.brand_id in (" . $brand . ") ";
         }
 
         if ($attribute) {//進階篩選條件
@@ -393,7 +398,9 @@ class APIProductServices
         $attribute .= ($attribute != '' && $input['ingredient'] != '' ? ', ' : '') . ($input['ingredient'] ? $input['ingredient'] : '');
         $attribute .= ($attribute != '' && $input['dosage_form'] != '' ? ', ' : '') . ($input['dosage_form'] ? $input['dosage_form'] : '');
         $attribute .= ($attribute != '' && $input['certificate'] != '' ? ', ' : '') . ($input['certificate'] ? $input['certificate'] : '');
-        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute);
+        $brand = '';
+        $brand .= ($input['brand'] ? $input['brand'] : '');
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             foreach ($promotion as $k => $v) {
@@ -1406,7 +1413,7 @@ class APIProductServices
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
 
-        $strSQL = "select product_attribute_lov.* ,count(product_attributes.product_attribute_lov_id) as count, count(`brands`.`id`) as countBrand ";
+        $strSQL = "select product_attribute_lov.* ,count(product_attributes.`product_id`) as count, count(`brands`.`id`) as countBrand ";
         $strSQL .= "from web_category_products
                     inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
@@ -1415,9 +1422,14 @@ class APIProductServices
         if ($config_levels == 3) {
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
-
+/*
         $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
         $strSQL .= " left join `product_attribute_lov` on `product_attribute_lov`.`id`=`product_attributes`.`product_attribute_lov_id`";
+        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
+*/
+
+        $strSQL .= " inner join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
@@ -1452,7 +1464,7 @@ class APIProductServices
 
         $strSQL .= " group by product_attributes.product_attribute_lov_id";
         $strSQL .= " order by product_attribute_lov.attribute_type, product_attribute_lov.sort";
-
+dd($strSQL);
         $lov = DB::select($strSQL);
         if ($lov) {
             foreach ($lov as $data) {
