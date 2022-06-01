@@ -31,7 +31,8 @@
                                         <div class="form-group">
                                             <label class="control-label" for="supplier_type">供應商類別 <span
                                                     style="color: red;">*</span></label>
-                                            <select2 class="form-control" :options="supplierTypes" v-model="form.supplierTypeId" name="supplier_type_id">
+                                            <select2 class="form-control" :options="supplierTypes"
+                                                v-model="form.supplierTypeId" name="supplier_type_id">
                                                 <option disabled value=""></option>
                                             </select2>
                                         </div>
@@ -74,7 +75,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label" for="payment_term">付款條件</label>
-                                            <select2 class="form-control" :options="paymentTerms" v-model="form.paymentTerm" name="payment_term">
+                                            <select2 class="form-control" :options="paymentTerms"
+                                                v-model="form.paymentTerm" name="payment_term">
                                                 <option disabled value=""></option>
                                             </select2>
                                         </div>
@@ -133,7 +135,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label" for="tax_type">稅別</label>
-                                            <select2 class="form-control" :options="taxTypeOptions" v-model="form.taxType" name="tax_type" :allow-clear="false">
+                                            <select2 class="form-control" :options="taxTypeOptions" v-model="form.taxType"
+                                                name="tax_type" :allow-clear="false">
                                                 <option disabled value=""></option>
                                             </select2>
                                         </div>
@@ -185,7 +188,8 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label class="control-label" for="active">狀態</label>
-                                            <select2 class="form-control" :options="activeOptions" v-model="form.active" name="active" :allow-clear="false">
+                                            <select2 class="form-control" :options="activeOptions" v-model="form.active"
+                                                name="active" :allow-clear="false">
                                                 <option disabled value=""></option>
                                             </select2>
                                         </div>
@@ -223,28 +227,27 @@
                                 <div class="well" v-for="(contact, index) in form.contacts"
                                     :key="index"
                                     style="border-left-width: 8px; border-left-color: #1b809e; background:#f9f9f9;">
-                                    <input type="hidden" :name="`contacts[${index}][id]`"
-                                        :value="contact.id">
+                                    <input type="hidden" :name="`contacts[${index}][id]`" :value="contact.id">
                                     <div class="row">
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label class="control-label">姓名 <span style="color: red;">*</span></label>
-                                                <input type="text" class="form-control  contact-name" v-model="contact.name"
+                                                <input type="text" class="form-control contact-name" v-model="contact.name"
                                                     :name="`contacts[${index}][name]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label class="control-label">電話</label>
-                                                <input type="text" class="form-control contact-telephone" v-model="contact.telephone"
-                                                    :name="`contacts[${index}][telephone]`">
+                                                <input type="text" class="form-control contact-telephone"
+                                                    v-model="contact.telephone" :name="`contacts[${index}][telephone]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label class="control-label">手機</label>
-                                                <input type="text" class="form-control contact-cellPhone" v-model="contact.cellPhone"
-                                                    :name="`contacts[${index}][cell_phone]`">
+                                                <input type="text" class="form-control contact-cell-phone"
+                                                    v-model="contact.cellPhone" :name="`contacts[${index}][cell_phone]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
@@ -257,15 +260,15 @@
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label class="control-label">信箱</label>
-                                                <input type="text" class="form-control contact-email" v-model="contact.email"
-                                                    :name="`contacts[${index}][email]`">
+                                                <input type="text" class="form-control contact-email"
+                                                    v-model="contact.email" :name="`contacts[${index}][email]`">
                                             </div>
                                         </div>
                                         <div class="col-sm-2">
                                             <div class="form-group">
                                                 <label class="control-label">備註</label>
-                                                <input type="text" class="form-control contact-remark" v-model="contact.remark"
-                                                    :name="`contacts[${index}][remark]`">
+                                                <input type="text" class="form-control contact-remark"
+                                                    v-model="contact.remark" :name="`contacts[${index}][remark]`">
                                             </div>
                                         </div>
                                     </div>
@@ -317,7 +320,8 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label" for="status_code">合約狀態</label>
-                                            <select2 class="form-control" :options="supplierContractStatusCodeOptions" v-model="form.contract.statusCode" name="status_code">
+                                            <select2 class="form-control" :options="supplierContractStatusCodeOptions"
+                                                v-model="form.contract.statusCode" name="status_code">
                                                 <option disabled value=""></option>
                                             </select2>
                                         </div>
@@ -654,6 +658,37 @@
                         short_name: {
                             required: true,
                         },
+                        email: {
+                            email: true,
+                            maxlength: 30,
+                        },
+                        telephone: {
+                            maxlength: 25,
+                        },
+                        fax: {
+                            maxlength: 25,
+                        },
+                        cell_phone: {
+                            maxlength: 25,
+                        },
+                        address: {
+                            maxlength: 150,
+                        },
+                        address2: {
+                            maxlength: 150,
+                        },
+                        address3: {
+                            maxlength: 150,
+                        },
+                        address4: {
+                            maxlength: 150,
+                        },
+                        address5: {
+                            maxlength: 150,
+                        },
+                        remark: {
+                            maxlength: 100,
+                        },
                     },
                     messages: {
                         display_number: {
@@ -703,6 +738,32 @@
                     $(`.contact-name`).each(function() {
                         $(this).rules("add", {
                             required: true,
+                            maxlength: 30,
+                        });
+                    });
+
+                    $(`.contact-telephone`).each(function() {
+                        $(this).rules("add", {
+                            maxlength: 25,
+                        });
+                    });
+
+                    $(`.contact-cell-phone`).each(function() {
+                        $(this).rules("add", {
+                            maxlength: 25,
+                        });
+                    });
+
+                    $(`.contact-fax`).each(function() {
+                        $(this).rules("add", {
+                            maxlength: 25,
+                        });
+                    });
+
+                    $(`.contact-email`).each(function() {
+                        $(this).rules("add", {
+                            email: true,
+                            maxlength: 30,
                         });
                     });
 
