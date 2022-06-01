@@ -1289,4 +1289,21 @@ class ProductService
             return $obj;
         });
     }
+
+    /**
+     * itemListCheckStatus function
+     *
+     * @param [int] $product_id
+     * @return bool
+     */
+    public function itemListCheckStatus($product_id){
+        $items = ProductItem::where('product_id',$product_id )->where('status',true)->get();
+        $itemsCount = $items->count() ;
+        if($itemsCount > 0){
+            return true ;
+        }else{
+            return false;
+        }
+
+    }
 }

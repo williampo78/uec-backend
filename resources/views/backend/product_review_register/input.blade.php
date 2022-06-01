@@ -201,6 +201,10 @@
                         </button>
                         <a class="btn btn-danger" href="{{ URL::previous() }}"><i class="fa-solid fa-ban"></i>
                             取消</a>
+                        <div class="item_error_msg" style="display: none;">
+                            <br>
+                            <b style="color: red">商品Item皆為失效狀態，不允許申請上架！</b>
+                        </div>
                         <hr>
                         <div class="row">
                             <div class="col-sm-2">
@@ -269,6 +273,12 @@
 @section('js')
     <script>
         $(document).ready(function() {
+            var itemListCheckStatus = @json($itemListCheckStatus) ;
+            if(!itemListCheckStatus){
+                $('#save_data').attr('disabled', true);
+                $('.item_error_msg').css("display", "block");
+                alert('商品Item皆為失效狀態，不允許申請上架！');
+            }
             let startLaunchedAtLastSelectedDates;
 
             let start_launched_at_flatpickr = flatpickr("#start_launched_at_flatpickr", {
