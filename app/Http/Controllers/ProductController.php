@@ -50,7 +50,7 @@ class ProductController extends Controller
             'products' => [],
         ];
 
-        if (count($in) !== 0) {
+        if (count($in) > 1) {
             $result['products'] = $this->productService->getProducts($in);
             $this->productService->restructureProducts($result['products']);
 
@@ -223,6 +223,9 @@ class ProductController extends Controller
                 } else {
                     $result = false;
                 }
+                break;
+            case 'checkItemQty':
+                $result = $this->productService->checkItemQty($in['item_id']);
                 break;
             default:
                 break;

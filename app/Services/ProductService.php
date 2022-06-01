@@ -13,10 +13,10 @@ use App\Models\ProductReviewLog;
 use App\Models\Products;
 use App\Models\ProductSpecInfo;
 use App\Models\RelatedProduct;
+use App\Models\WarehouseStock;
 use App\Services\UniversalService;
 use Batch;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1288,5 +1288,38 @@ class ProductService
             }
             return $obj;
         });
+    }
+
+    /**
+     * itemListCheckStatus function
+     *
+     * @param [int] $product_id
+     * @return bool
+     */
+    public function itemListCheckStatus($product_id)
+    {
+        $items = ProductItem::where('product_id', $product_id)->where('status', true)->get();
+        $itemsCount = $items->count();
+        if ($itemsCount > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+    /**
+     * checkItemQty function
+     *
+     * @param [type] $item_id
+     * @return bool
+     */
+    public function checkItemQty($item_id)
+    {
+        $stock = WarehouseStock::where('product_item_id', $item_id)->where('warehouse_id', '9')->first();
+        if ($stock == null || $stock->stock_qty !== 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

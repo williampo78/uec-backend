@@ -40,8 +40,7 @@ class ProductsMallController extends Controller
         $result = [
             'products' => [],
         ];
-
-        if (count($in) !== 0) {
+        if (count($in) > 1) {
             $result['products'] = $this->productService->getProducts($in);
             $this->productService->restructureProducts($result['products']);
         }

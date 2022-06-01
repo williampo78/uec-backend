@@ -104,11 +104,11 @@
                                         <label class="control-label">前台分類</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="category_id" id="category_id">
+                                        <select class="form-control js-select2" name="web_category_hierarchy_id" id="web_category_hierarchy_id">
                                             <option value="">全部</option>
                                             @foreach ($pos as $val)
                                                 <option value="{{ $val->id }}"
-                                                    {{ request()->input('category_id') == $val->id ? 'selected' : '' }}>
+                                                    {{ request()->input('web_category_hierarchy_id') == $val->id ? 'selected' : '' }}>
                                                     {{ $val->name }}
                                                 </option>
                                             @endforeach
@@ -373,7 +373,7 @@
             $("#lgst_method").select2();
             $("#product_type").select2();
             $("#supplier_id").select2();
-            $("#category_id").select2();
+            $("#web_category_hierarchy_id").select2();
             $('#approval_status').select2();
 
             let start_launched_at_start_flatpickr = flatpickr("#start_launched_at_start_flatpickr", {
