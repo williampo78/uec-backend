@@ -965,7 +965,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="form-control js-select2" v-model="Sku.status"
+                                        <select class="form-control js-select2" v-model="Sku.status" @change="checkItemQty($event,Sku,SkuKey)"
                                             {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                             <option value="1">啟用</option>
                                             <option value="0">停用</option>
@@ -1231,6 +1231,23 @@
                         }
                     }
                 },
+                checkItemQty(event,item,key){
+                    if(event.target.value == 0){
+                        axios.post('/backend/products/ajax', {
+                        item_id:item.id,
+                        type: 'checkItemQty',
+                    })
+                    .then(function(response) {
+                        if(!response.data.result){
+                            this.SkuList[key].status = 1 ;
+                            alert('Item編號'+item.item_no+'仍有庫存，不允許停用')
+                        }
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+                    }
+                }
 
             },
             watch: {
@@ -1246,7 +1263,7 @@
                         return this.change_spec_dimension(val);
                     },
                     deep: true
-                }
+                },
             },
         });
         new SkuComponent().$mount('#SkuComponent');
