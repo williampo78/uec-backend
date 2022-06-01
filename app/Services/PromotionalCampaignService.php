@@ -1472,7 +1472,7 @@ class PromotionalCampaignService
                 case 'prepare_to_launch':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
-                            ->whereDate('start_at', '>', now());
+                            ->where('start_at', '>', now());
                     });
                     break;
 
@@ -1480,8 +1480,8 @@ class PromotionalCampaignService
                 case 'launched':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
-                            ->whereDate('start_at', '<=', now())
-                            ->whereDate('end_at', '>=', now());
+                            ->where('start_at', '<=', now())
+                            ->where('end_at', '>=', now());
                     });
                     break;
 
@@ -1489,7 +1489,7 @@ class PromotionalCampaignService
                 case 'no_launch':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
-                            ->whereDate('end_at', '<', now());
+                            ->where('end_at', '<', now());
                     });
                     break;
 
