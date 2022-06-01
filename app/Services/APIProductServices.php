@@ -304,7 +304,9 @@ class APIProductServices
         $strSQL .= ",p.*,
                     (SELECT photo_name
                     FROM product_photos
-                    WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto";
+                    WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
+                    , product_attribute_lov.*, product_attribute_lov.id as attribute_id
+                    ";
         $strSQL .= " from web_category_products
                     inner join frontend_products_v p on p.id=web_category_products.product_id
                     inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
@@ -315,6 +317,7 @@ class APIProductServices
 
         //if ($attribute) {//進階篩選條件
         $strSQL .= " inner join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " inner join `product_attribute_lov` on product_attribute_lov.id= product_attributes.product_attribute_lov_id";
         $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
         //}
 
@@ -353,13 +356,14 @@ class APIProductServices
 
         if ($attribute) {//進階篩選條件
             $strSQL .= " and product_attributes.product_attribute_lov_id in (" . $attribute . ") ";
-            $strSQL .= " group by web_category_products.web_category_hierarchy_id,cate1.category_name , cate2.category_name , p.id, product_attributes.product_attribute_lov_id";
         }
 
         if ($order_by == 'launched') {
             $strSQL .= " order by p.start_launched_at " . $sort_flag . ", p.id";
         } else if ($order_by == 'price') {
             $strSQL .= " order by p.selling_price " . $sort_flag . ", p.id";
+        } else if ($order_by == 'attribute') {
+            $strSQL .= " order by brands.id, product_attribute_lov.id, p.id";
         }
         $products = DB::select($strSQL);
         $data = [];
@@ -1389,6 +1393,8 @@ class APIProductServices
         $category = $request['category'];
         $selling_price_min = $request['price_min'];
         $selling_price_max = $request['price_max'];
+        $order_by = 'attribute';
+        $sort_flag = 'ASC';
         $attribute = '';
         $attribute .= ($request['group'] ? $request['group'] : '');
         $attribute .= ($attribute != '' && $request['ingredient'] != '' ? ', ' : '') . ($request['ingredient'] ? $request['ingredient'] : '');
@@ -1409,66 +1415,33 @@ class APIProductServices
                 'count' => 0
             );
         }
-
-        //分類總覽階層
-        $config_levels = config('uec.web_category_hierarchy_levels');
-
-        $strSQL = "select product_attribute_lov.* ,count(product_attributes.`product_id`) as count, count(`brands`.`id`) as countBrand ";
-        $strSQL .= "from web_category_products
-                    inner join frontend_products_v p on p.id=web_category_products.product_id
-                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=web_category_products.`web_category_hierarchy_id`
-                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id` ";
-
-        if ($config_levels == 3) {
-            $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
+        $condition = ['BRAND', 'GROUP', 'INGREDIENT', 'CERTIFICATE'];
+        foreach ($condition as $key) {
+            $attribute_array[$key] = [];
         }
-/*
-        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
-        $strSQL .= " left join `product_attribute_lov` on `product_attribute_lov`.`id`=`product_attributes`.`product_attribute_lov_id`";
-        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
-*/
-
-        $strSQL .= " inner join `product_attributes` on product_attributes.`product_id`= p.`id`";
-        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
-
-        $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
-
-        if ($keyword) {//依關鍵字搜尋
-            $strSQL .= " and (p.product_name like '%" . $keyword . "%'";
-            $strSQL .= " or p.product_no like '%" . $keyword . "%'";
-            $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
-            $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
-            $strSQL .= " or p.keywords like '%" . $keyword . "%'";
-            $strSQL .= " or p.supplier_name like '%" . $keyword . "%'";
-            $strSQL .= " or p.brand_name like '%" . $keyword . "%'";
-            if ($config_levels == 3) {
-                $strSQL .= " or cate3.category_name like '%" . $keyword . "%'";
+        $tmp_brand = 0;
+        $tmp_attribute = '';
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
+        if ($products) {
+            foreach ($products as $cateID => $prod) {
+                foreach ($prod as $product) {
+                    if ($tmp_brand != $product->brand_id) {
+                        if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id] = 0;
+                        $attribute_array['BRAND'][$product->brand_id]++;
+                        $tmp_brand = $product->brand_id;
+                    }
+                    if ($tmp_attribute != $product->attribute_id) {
+                        if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id] = 0;
+                        $attribute_array[$product->attribute_type][$product->attribute_id]++;
+                        $tmp_attribute = $product->attribute_id;
+                    }
+                }
             }
-            $strSQL .= ")";
-        }
-        if ($selling_price_min >= 0 && $selling_price_max > 0) {//價格區間
-            $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
         }
 
-        if ($category) {//依分類搜尋
-            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
-        }
-
-        if ($attribute) {//進階篩選條件
-            $strSQL .= " and product_attributes.product_attribute_lov_id in (" . $attribute . ") ";
-        }
-
-        if ($brand) { //品牌
-            $strSQL .= " and p.brand_id in (" . $brand . ") ";
-        }
-
-        $strSQL .= " group by product_attributes.product_attribute_lov_id";
-        $strSQL .= " order by product_attribute_lov.attribute_type, product_attribute_lov.sort";
-
-        $lov = DB::select($strSQL);
-        if ($lov) {
-            foreach ($lov as $data) {
-                $filter[$data->attribute_type][$data->id]['count'] = ($data->attribute_type=='BRAND'?$data->countBrand:$data->count);
+        foreach ($attribute_array as $data => $item) {
+            foreach ($item as $id => $count) {
+                $filter[$data][$id]['count'] = $count;
             }
         }
         $filter_display = [];
