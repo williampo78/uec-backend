@@ -559,8 +559,7 @@ class APIProductServices
 
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
-
-        $strSQL = "select cate1.id , cate1.category_name ,0 as count, p.id as prod_id";
+        $strSQL = "select cate1.id , cate1.category_name ,count(cate1.id) as count, p.id as prod_id";
         if ($config_levels == 3) {
             $strSQL .= ",cate2.id as L2, cate2.category_name as L2_Name,cate3.id as L1, cate3.category_name as L1_Name ";
         } else {
@@ -617,30 +616,42 @@ class APIProductServices
         } else {
             $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
         }
+        //dd($strSQL);
         $products = DB::select($strSQL);
 
         foreach ($products as $cateID => $product) {
+            $category_count[$product->id] = 0;
             $category_array[$product->id][$product->prod_id] = 0;
         }
         foreach ($products as $cateID => $product) {
             $category_array[$product->id][$product->prod_id]++;
         }
-
+        foreach ($category_array as $cate_id => $prod){
+            foreach ($prod as $prod_id => $count) {
+                $category_count[$cate_id]++;
+            }
+        }
         if ($products) {
             $data = [];
+            $cate = 0;
+            $subCate = 0;
             foreach ($products as $category) {
                 if ($config_levels == 2) {
+                    if ($cate == $category->L1) continue;
                     $sub[$category->L1][] = array(
                         'id' => $category->id,
                         'name' => $category->category_name,
-                        'count' => $category_array[$product->id][$product->prod_id]
+                        'count' => $category_count[$product->id]
                     );
+                    $cate = $category->L1;
                 } elseif ($config_levels == 3) {
+                    if ($subCate == $category->L2) continue;
                     $sub[$category->L1][$category->L2][] = array(
                         'id' => $category->id,
                         'name' => $category->category_name,
-                        'count' => $category_array[$product->id][$product->prod_id]
+                        'count' => $category_count[$product->id]
                     );
+                    $subCate = $category->L2;
                 }
             }
             $cate = 0;
