@@ -305,7 +305,7 @@ class APIProductServices
                     (SELECT photo_name
                     FROM product_photos
                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
-                    , product_attribute_lov.*, product_attribute_lov.id as attribute_id
+                    , product_attribute_lov.id as attribute_id, product_attribute_lov.attribute_type
                     ";
         $strSQL .= " from web_category_products
                     inner join frontend_products_v p on p.id=web_category_products.product_id
@@ -617,7 +617,6 @@ class APIProductServices
         } else {
             $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
         }
-
         $products = DB::select($strSQL);
 
         if ($products) {
