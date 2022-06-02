@@ -585,7 +585,7 @@
                         },
                         email: {
                             email: true,
-                            maxlength: 30,
+                            maxlength: 50,
                         },
                         telephone: {
                             maxlength: 25,
@@ -612,7 +612,7 @@
                             maxlength: 150,
                         },
                         remark: {
-                            maxlength: 100,
+                            maxlength: 150,
                         },
                     },
                     messages: {
@@ -688,7 +688,7 @@
                     $(`.contact-email`).each(function() {
                         $(this).rules("add", {
                             email: true,
-                            maxlength: 30,
+                            maxlength: 50,
                         });
                     });
 
