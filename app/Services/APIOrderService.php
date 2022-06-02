@@ -329,8 +329,8 @@ class APIOrderService
                                             "order_detail_id" => $order_detail_id,
                                             "promotion_campaign_id" => $item['campaignGiftAway']['campaignGiftId'],
                                             "product_id" => $gift['productId'],
-                                            "product_item_id" => $prod_info[$gift['productId']]['id'],
-                                            "item_no" => $prod_info[$gift['productId']]['item_no'],
+                                            "product_item_id" => $prod_gift[$gift['productId']]['id'],
+                                            "item_no" => $prod_gift[$gift['productId']]['item_no'],
                                             "discount" => 0,
                                             "record_identity" => "G",
                                             "created_by" => $member_id,
@@ -690,12 +690,17 @@ class APIOrderService
                         $result['payment_url'] = null;
                         $result['payment_token'] = null;
                         Log::channel('tappay_api_log')->error('597:tappay error!' . json_encode($tapPayResult));
+                        DB::rollBack();
+                        return $result;
                     }
                 } else {
-                    $result['status'] = $tapPayResult['status'];
+                    $result['status'] = 402;
                     $result['payment_url'] = null;
                     $result['payment_token'] = null;
-                    Log::channel('tappay_api_log')->error('602:tappay error!' . json_encode($tapPayResult));
+                    $result['tappay_msg'] = $tapPayResult['status'].":".$tapPayResult['msg'];
+                    Log::channel('tappay_api_log')->error($tapPayResult['status'].':tappay error!' . json_encode($tapPayResult));
+                    DB::rollBack();
+                    return $result;
                 }
             }
 

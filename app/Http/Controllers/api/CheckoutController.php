@@ -30,7 +30,8 @@ class CheckoutController extends Controller
         APICartServices $apiCartService,
         APIOrderService $apiOrderService,
         APITapPayService $apiTapPay
-    ) {
+    )
+    {
         $this->universalService = $universalService;
         $this->apiService = $apiService;
         $this->apiProductServices = $apiProductServices;
@@ -293,7 +294,7 @@ class CheckoutController extends Controller
                         case 402:
                             $status = false;
                             $err = '401';
-                            $data['message'] = "第三方支付異常，無法成立訂單";
+                            $data['message'] = "第三方支付異常，無法成立訂單，" . $dataOrder['tappay_msg'];
                             break;
 
                         case 403:
