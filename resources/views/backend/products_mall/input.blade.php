@@ -538,6 +538,11 @@
     <script>
         // Get all sections that have an ID defined
         $(document).ready(function () {
+            $('#supplier').select2({
+                allowClear: true,
+                theme: "bootstrap",
+                placeholder: "請選擇"
+            });
             let product_photos_count = @json($product_photos_count) ;
             if(product_photos_count == 0){
                 alert('尚無商品圖檔，請先到「商品基本資料維護」上傳圖檔！') ;
@@ -1013,9 +1018,14 @@
             created() {
                 let vm = this;
                 this.CategoryHierarchyProducts.map(function (value, key) {
-                    isset = vm.CategoryHierarchyContent.filter(data => data.id === value
-                        .web_category_hierarchy_id);
-                    value.category_name = isset[0].name;
+                    isset = vm.CategoryHierarchyContent.filter(data => data.id === value.web_category_hierarchy_id);
+                    value.status = true ;
+                    if(isset.length == 0){
+                        value.category_name = '分類ID:'+value.web_category_hierarchy_id+'已被關閉或被刪除';
+                        value.status = false ;
+                    }else{
+                        value.category_name = isset[0].name;
+                    }
                     value.status = 'old';
                 })
                 this.CategoryListFilter(); // 先將原先的分類拔除
@@ -1262,10 +1272,6 @@
             },
         })
         new CategoryHierarchyContentInput().$mount('#CategoryHierarchyContentInput');
-        $('#supplier').select2({
-                allowClear: true,
-                theme: "bootstrap",
-                placeholder: "請選擇"
-            });
+
     </script>
 @endsection
