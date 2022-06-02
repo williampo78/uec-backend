@@ -127,7 +127,9 @@ class ProductController extends Controller
         $attribute .= ($attribute != '' && $request['ingredient'] != '' ? ', ' : '') . ($request['ingredient'] ? $request['ingredient'] : '');
         $attribute .= ($attribute != '' && $request['dosage_form'] != '' ? ', ' : '') . ($request['dosage_form'] ? $request['dosage_form'] : '');
         $attribute .= ($attribute != '' && $request['certificate'] != '' ? ', ' : '') . ($request['certificate'] ? $request['certificate'] : '');
-        $result = $this->apiProductService->getSearchResultForCategory($category, $selling_price_min, $selling_price_max, $keyword, $attribute);
+        $brand = '';
+        $brand .= ($request['brand'] ? $request['brand'] : '');
+        $result = $this->apiProductService->getSearchResultForCategory($category, $selling_price_min, $selling_price_max, $keyword, $attribute, $brand);
         if ($result == '404') {
             $status = false;
             $err = '404';
