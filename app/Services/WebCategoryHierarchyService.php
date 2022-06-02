@@ -166,10 +166,11 @@ class WebCategoryHierarchyService
     }
     public function categoryProductsId($id)
     {
+        $confi_levels = config('uec.web_category_hierarchy_levels');
         $result = CategoryProduct::where('web_category_products.product_id', $id)
             ->leftJoin('web_category_hierarchy', 'web_category_hierarchy.id', '=', 'web_category_products.web_category_hierarchy_id')
             ->select('web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.category_name', 'web_category_products.sort','web_category_hierarchy.active')
-            ->where('web_category_hierarchy.active','1')
+            ->where('web_category_hierarchy.category_level',$confi_levels)
             ->orderBy('web_category_products.sort', 'ASC')
             ->get();
         return $result;

@@ -1021,7 +1021,7 @@
                     isset = vm.CategoryHierarchyContent.filter(data => data.id === value.web_category_hierarchy_id);
                     value.status = true ;
                     if(isset.length == 0){
-                        value.category_name = '分類ID:'+value.web_category_hierarchy_id+'已被關閉或被刪除';
+                        value.category_name = 'error';
                         value.status = false ;
                     }else{
                         value.category_name = isset[0].name;
