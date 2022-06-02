@@ -554,7 +554,7 @@ class APIProductServices
     /*
      * 取得搜尋結果的上方分類
      */
-    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $attribute = null)
+    public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $attribute = null, $brand = null)
     {
 
         //分類總覽階層
@@ -576,9 +576,9 @@ class APIProductServices
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
 
-        //if ($attribute) {//進階篩選條件
-        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
-        //}
+        $strSQL .= " inner join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " inner join `product_attribute_lov` on product_attribute_lov.id= product_attributes.product_attribute_lov_id";
+        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
@@ -605,6 +605,10 @@ class APIProductServices
 
         if ($attribute) {//進階篩選條件
             $strSQL .= " and product_attributes.product_attribute_lov_id in (" . $attribute . ") ";
+        }
+
+        if ($brand) { //品牌
+            $strSQL .= " and p.brand_id in (" . $brand . ") ";
         }
 
         $strSQL .= " group by cate1.id";
