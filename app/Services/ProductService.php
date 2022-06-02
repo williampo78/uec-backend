@@ -1316,7 +1316,7 @@ class ProductService
     public function checkItemQty($item_id)
     {
         $stock = WarehouseStock::where('product_item_id', $item_id)->where('warehouse_id', '9')->first();
-        if ($stock == null || $stock->stock_qty !== 0) {
+        if ($stock == null || $stock->stock_qty == 0) {
             return true;
         } else {
             return false;

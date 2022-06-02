@@ -1232,6 +1232,7 @@
                     }
                 },
                 checkItemQty(event,item,key){
+                    var vm = this;
                     if(event.target.value == 0){
                         axios.post('/backend/products/ajax', {
                         item_id:item.id,
@@ -1239,7 +1240,7 @@
                     })
                     .then(function(response) {
                         if(!response.data.result){
-                            this.SkuList[key].status = 1 ;
+                            vm.SkuList[key].status = 1 ;
                             alert('Item編號'+item.item_no+'仍有庫存，不允許停用')
                         }
                     })
