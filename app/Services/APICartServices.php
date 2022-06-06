@@ -775,7 +775,7 @@ class APICartServices
                     $subAmount = [];
                     $price = 0;
                     $quantity = 0;
-                    $tmp_product_id= 0;
+                    $tmp_product_id = 0;
                     foreach ($product_in_campaign as $key => $product_id) {
                         if ($tmp_product_id != $product_id) {
                             $price += $prod_amount[$product_id];
@@ -783,7 +783,11 @@ class APICartServices
                             $pid[] = $product_id;
                             $subAmount[] = $prod_amount[$product_id];
                             $tmp_product_id = $product_id;
+                            $calc_discount[$product_id] = $prod_amount[$product_id];
                         }
+                    }
+                    foreach ($pid as $pid_k=>$pid_v){
+                        $tmp_calc[$pid_v] = [];
                     }
                     $calc_amount[$campaign_id] = $price;
                     $calc_qty[$campaign_id] = $quantity;
@@ -793,8 +797,16 @@ class APICartServices
                         if ($compare_n_value >= $calc_amount[$campaign_id]) continue;
                         if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
                             $prodDiscount = $calc_amount[$campaign_id] - round($calc_amount[$campaign_id] * $item->x_value); //打折3000-(3000*0.95)
+                            foreach ($pid as $pid_k=>$pid_v){
+                                if (isset($calc_discount[$pid_v])) {
+                                    $tmp_calc[$pid_v] = ($calc_discount[$pid_v] - round($calc_discount[$pid_v] * $item->x_value)) * -1;
+                                }
+                            }
                         } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
                             $prodDiscount = $item->x_value;
+                            foreach ($pid as $pid_k=>$pid_v){
+                                $tmp_calc[$pid_v] = $item->x_value * -1;
+                            }
                         }
                         foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
                             $thresholdDiscount[$campaign_id] = array(
@@ -833,17 +845,20 @@ class APICartServices
                     $subAmount = [];
                     $price = 0;
                     $quantity = 0;
-                    $tmp_product_id= 0;
+                    $tmp_product_id = 0;
+                    $tmp_thresholdDiscount[$campaign_id] = 0;
                     foreach ($product_in_campaign as $key => $product_id) {
-                        if ($tmp_product_id !=$product_id) {
+                        //$tmp_thresholdDiscount[$campaign_id] = 0;
+                        if ($tmp_product_id != $product_id) {
                             $price += $prod_amount[$product_id];
                             $quantity += $prod_qty[$product_id];
                             $pid[] = $product_id;
                             $subAmount[] = $prod_amount[$product_id];
                             $tmp_product_id = $product_id;
+                            $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
                         }
                     }
-                    $calc_amount[$campaign_id] = ($price + $thresholdAmount);
+                    $calc_amount[$campaign_id] = ($price + $tmp_thresholdDiscount[$campaign_id]);
                     $calc_qty[$campaign_id] = $quantity;
                     $compare_n_value = 0;
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
@@ -879,7 +894,7 @@ class APICartServices
                             }
                         }
                         if (isset($prods)) {
-                            if (count($prods) >0) {
+                            if (count($prods) > 0) {
                                 $thresholdGiftAway[$campaign_id] = array(
                                     "thresholdID" => $item->id,
                                     "campaignID" => $campaign_id,
@@ -1155,7 +1170,7 @@ class APICartServices
                 $webData['product_id'] = $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
                 $webData['status_code'] = $input['status_code'];
-                $webData['qty'] = ($input['item_qty']>$stock?$stock:$input['item_qty']);
+                $webData['qty'] = ($input['item_qty'] > $stock ? $stock : $input['item_qty']);
                 $webData['utm_source'] = $input['utm_source'];
                 $webData['utm_medium'] = $input['utm_medium'];
                 $webData['utm_campaign'] = $input['utm_campaign'];
@@ -1171,7 +1186,7 @@ class APICartServices
                 $new_id = ShoppingCartDetail::insertGetId($webData);
             } else if ($act == 'upd') {
                 $webData['product_id'] = $item[0]['product_id'];
-                $webData['qty'] = ($qty > $stock ?$stock :$qty);
+                $webData['qty'] = ($qty > $stock ? $stock : $qty);
                 $webData['status_code'] = $input['status_code'];
                 $webData['utm_source'] = $input['utm_source'];
                 $webData['utm_medium'] = $input['utm_medium'];
