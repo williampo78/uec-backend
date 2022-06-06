@@ -316,9 +316,9 @@ class APIProductServices
         }
 
         //if ($attribute) {//進階篩選條件
-        $strSQL .= " inner join `product_attributes` on product_attributes.`product_id`= p.`id`";
-        $strSQL .= " inner join `product_attribute_lov` on product_attribute_lov.id= product_attributes.product_attribute_lov_id";
-        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
+        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " left join `product_attribute_lov` on product_attribute_lov.id= product_attributes.product_attribute_lov_id";
+        $strSQL .= " left join `brands` on `brands`.`id`=`p`.`brand_id`";
         //}
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
@@ -575,9 +575,9 @@ class APIProductServices
             $strSQL .= " inner join `web_category_hierarchy` cate3 on cate3.`id`=cate2.`parent_id` ";
         }
 
-        $strSQL .= " inner join `product_attributes` on product_attributes.`product_id`= p.`id`";
-        $strSQL .= " inner join `product_attribute_lov` on product_attribute_lov.id= product_attributes.product_attribute_lov_id";
-        $strSQL .= " inner join `brands` on `brands`.`id`=`p`.`brand_id`";
+        $strSQL .= " left join `product_attributes` on product_attributes.`product_id`= p.`id`";
+        $strSQL .= " left join `product_attribute_lov` on product_attribute_lov.id= product_attributes.product_attribute_lov_id";
+        $strSQL .= " left join `brands` on `brands`.`id`=`p`.`brand_id`";
 
         $strSQL .= " where p.approval_status = 'APPROVED' and current_timestamp() between p.start_launched_at and p.end_launched_at and p.product_type = 'N' and cate1.active=1 ";
 
