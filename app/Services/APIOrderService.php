@@ -663,7 +663,7 @@ class APIOrderService
                 if ($order_payment && $pointStatus['status'] == '200') {
                     $isTapPay = 1;
                 } else {
-                    $result['status'] = 401;
+                    $result['status'] = 404;
                     $result['payment_url'] = null;
                     Log::channel('changepoint')->error('扣點異常 ! webdata :' . json_encode($webData) . 'req:' . json_encode($pointData) . 'rep:' . json_encode($pointStatus));
                     DB::rollBack();
