@@ -257,7 +257,7 @@ class CheckoutController extends Controller
             //超過最大可點數折抵
             if (abs($points) > $response['result']['point']['discountMax']) {
                 $status = false;
-                $err = '401';
+                $err = '905';
                 $data['points'] = "點數折抵超出本次可抵用點數";
             } elseif ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->cart_campaign_discount) {
                 //檢核使用點數折抵後，是否要運費
@@ -287,19 +287,19 @@ class CheckoutController extends Controller
 
                         case 404:
                             $status = false;
-                            $err = $dataOrder['status'];
+                            $err = '904';
                             $data['message'] = "會員點數扣點異常，無法成立訂單";
                             break;
 
                         case 402:
                             $status = false;
-                            $err = $dataOrder['status'];
+                            $err = '902';
                             $data['message'] = "第三方支付異常，無法成立訂單，" . $dataOrder['tappay_msg'];
                             break;
 
                         case 403:
                             $status = false;
-                            $err = $dataOrder['status'];
+                            $err = '903';
                             $data['message'] = "庫存不足，無法成立訂單";
                             break;
 
