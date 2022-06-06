@@ -626,9 +626,11 @@ class APIProductServices
         foreach ($products as $cateID => $product) {
             $category_array[$product->id][$product->prod_id]++;
         }
-        foreach ($category_array as $cate_id => $prod){
-            foreach ($prod as $prod_id => $count) {
-                $category_count[$cate_id]++;
+        if (isset($category_array)) {
+            foreach ($category_array as $cate_id => $prod) {
+                foreach ($prod as $prod_id => $count) {
+                    $category_count[$cate_id]++;
+                }
             }
         }
         if ($products) {
