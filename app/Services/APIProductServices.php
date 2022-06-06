@@ -711,13 +711,16 @@ class APIProductServices
             $product_categorys = self::getWebCategoryProducts('', '', '', '', $id, '', '');
             $rel_category = [];
             if (sizeof($product_categorys) > 0) {
+                $web_category_hierarchy_id = 0;
                 foreach ($product_categorys as $key => $category) {
                     foreach ($category as $kk => $vv) {
-                        $rel_category[] = array(
-                            "category_id" => $vv->web_category_hierarchy_id,
-                            "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
-                        );
-
+                        if ($web_category_hierarchy_id != $vv->web_category_hierarchy_id) {
+                            $rel_category[] = array(
+                                "category_id" => $vv->web_category_hierarchy_id,
+                                "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
+                            );
+                            $web_category_hierarchy_id = $vv->web_category_hierarchy_id;
+                        }
                     }
                 }
             }
