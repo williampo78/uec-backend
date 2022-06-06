@@ -285,21 +285,21 @@ class CheckoutController extends Controller
                             $data = $dataOrder;
                             break;
 
-                        case 401:
+                        case 404:
                             $status = false;
-                            $err = '401';
+                            $err = $dataOrder['status'];
                             $data['message'] = "會員點數扣點異常，無法成立訂單";
                             break;
 
                         case 402:
                             $status = false;
-                            $err = '401';
+                            $err = $dataOrder['status'];
                             $data['message'] = "第三方支付異常，無法成立訂單，" . $dataOrder['tappay_msg'];
                             break;
 
                         case 403:
                             $status = false;
-                            $err = '401';
+                            $err = $dataOrder['status'];
                             $data['message'] = "庫存不足，無法成立訂單";
                             break;
 
