@@ -800,6 +800,8 @@ class APICartServices
                             foreach ($pid as $pid_k=>$pid_v){
                                 if (isset($calc_discount[$pid_v])) {
                                     $tmp_calc[$pid_v] = ($calc_discount[$pid_v] - round($calc_discount[$pid_v] * $item->x_value)) * -1;
+                                } else {
+                                    $tmp_calc[$pid_v] = 0;
                                 }
                             }
                         } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
@@ -834,7 +836,6 @@ class APICartServices
                     }
                 }
             }
-
             //滿額折扣CART_P01 & CART_P02
             $calc_amount = [];
             $calc_qty[] = 0;
@@ -848,14 +849,17 @@ class APICartServices
                     $tmp_product_id = 0;
                     $tmp_thresholdDiscount[$campaign_id] = 0;
                     foreach ($product_in_campaign as $key => $product_id) {
-                        //$tmp_thresholdDiscount[$campaign_id] = 0;
                         if ($tmp_product_id != $product_id) {
                             $price += $prod_amount[$product_id];
                             $quantity += $prod_qty[$product_id];
                             $pid[] = $product_id;
                             $subAmount[] = $prod_amount[$product_id];
                             $tmp_product_id = $product_id;
-                            $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
+                            if (is_array($tmp_calc[$product_id])){
+                                $tmp_thresholdDiscount[$campaign_id] += 0;
+                            } else {
+                                $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
+                            }
                         }
                     }
                     $calc_amount[$campaign_id] = ($price + $tmp_thresholdDiscount[$campaign_id]);
