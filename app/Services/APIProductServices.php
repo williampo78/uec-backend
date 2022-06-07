@@ -639,21 +639,21 @@ class APIProductServices
             $subCate = 0;
             foreach ($products as $category) {
                 if ($config_levels == 2) {
-                    if ($cate == $category->L1) continue;
+                    if ($cate == $category->id) continue;
                     $sub[$category->L1][] = array(
                         'id' => $category->id,
                         'name' => $category->category_name,
-                        'count' => $category_count[$product->id]
+                        'count' => $category_count[$category->id]
                     );
-                    $cate = $category->L1;
+                    $cate = $category->id;
                 } elseif ($config_levels == 3) {
-                    if ($subCate == $category->L2) continue;
+                    if ($subCate == $category->id) continue;
                     $sub[$category->L1][$category->L2][] = array(
                         'id' => $category->id,
                         'name' => $category->category_name,
-                        'count' => $category_count[$product->id]
+                        'count' => $category_count[$category->id]
                     );
-                    $subCate = $category->L2;
+                    $subCate = $category->id;
                 }
             }
             $cate = 0;
