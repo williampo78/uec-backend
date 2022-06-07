@@ -855,10 +855,12 @@ class APICartServices
                             $pid[] = $product_id;
                             $subAmount[] = $prod_amount[$product_id];
                             $tmp_product_id = $product_id;
-                            if (is_array($tmp_calc[$product_id])){
-                                $tmp_thresholdDiscount[$campaign_id] += 0;
-                            } else {
-                                $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
+                            if (isset($tmp_calc)) {
+                                if (!key_exists($product_id, $tmp_calc)) {
+                                    $tmp_thresholdDiscount[$campaign_id] += 0;
+                                } else {
+                                    $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
+                                }
                             }
                         }
                     }
