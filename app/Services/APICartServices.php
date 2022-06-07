@@ -787,7 +787,7 @@ class APICartServices
                         }
                     }
                     foreach ($pid as $pid_k=>$pid_v){
-                        $tmp_calc[$pid_v] = [];
+                        $tmp_calc[$pid_v] = 0;
                     }
                     $calc_amount[$campaign_id] = $price;
                     $calc_qty[$campaign_id] = $quantity;
