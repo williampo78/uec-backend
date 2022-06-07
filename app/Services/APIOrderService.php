@@ -203,18 +203,18 @@ class APIOrderService
                     if (isset($threshold_prod['value'][$products['productID']])) {
                         if ($threshold_prod['value'][$products['productID']] < 1) { //折數
                             //1800-(1800*0.9)
-                            $cart_p_discount_prod[$products['productID']] = round($item['amount'] - round($item['amount'] * $threshold_prod['value'][$products['productID']])) * -1;
+                            $cart_p_discount_prod[$products['productID']][$item['itemId']] = round($item['amount'] - round($item['amount'] * $threshold_prod['value'][$products['productID']])) * -1;
                         } else {
                             //500*(1800/1800)
-                            $cart_p_discount_prod[$products['productID']] = round($threshold_prod['value'][$products['productID']] * ($item['amount'] / $threshold_discount['price'][$threshold_prod['thresholdDiscount'][$products['productID']]])) * -1;
+                            $cart_p_discount_prod[$products['productID']][$item['itemId']] = round($threshold_prod['value'][$products['productID']] * ($item['amount'] / $threshold_discount['price'][$threshold_prod['thresholdDiscount'][$products['productID']]])) * -1;
                         }
                     } else {
-                        $cart_p_discount_prod[$products['productID']] = 0;
+                        $cart_p_discount_prod[$products['productID']][$item['itemId']] = 0;
                     }
 
                     //有用點數折現金
                     if ($order['point_discount'] < 0) {
-                        $discount_rate[$seq] = (($item['amount'] + $cart_p_discount_prod[$products['productID']]) / ($order['total_price'] + $cart_p_discount));
+                        $discount_rate[$seq] = (($item['amount'] + $cart_p_discount_prod[$products['productID']][$item['itemId']]) / ($order['total_price'] + $cart_p_discount));
                         $point_rate += $discount_rate[$seq];
                     } else {
                         $discount_rate[$seq] = 0;
@@ -230,7 +230,7 @@ class APIOrderService
                         "qty" => $item['itemQty'],
                         "unit_price" => $item['itemPrice'],
                         "campaign_discount" => $discount,
-                        "cart_p_discount" => $cart_p_discount_prod[$products['productID']],
+                        "cart_p_discount" => $cart_p_discount_prod[$products['productID']][$item['itemId']],
                         "subtotal" => $item['amount'],
                         "record_identity" => "M",
                         "point_discount" => round($discount_rate[$seq] * $order['points']),
@@ -497,7 +497,7 @@ class APIOrderService
                                         "product_id" => $product_id,
                                         "product_item_id" => $item['itemId'],
                                         "item_no" => $item['itemNo'],
-                                        "discount" => $cart_p_discount_prod[$product_id],
+                                        "discount" => $cart_p_discount_prod[$product_id][$item['itemId']],
                                         "record_identity" => 'M',
                                         "campaign_threshold_id" => $threshold_prod['thresholdDiscount'][$product_id],
                                         "created_by" => $member_id,
@@ -506,7 +506,7 @@ class APIOrderService
                                         "updated_at" => now(),
                                     ];
                                     OrderCampaignDiscount::insert($campaign_details[$seq1]);
-                                    $threshold_discount['discount'][$threshold['thresholdID']] -= $cart_p_discount_prod[$product_id];
+                                    $threshold_discount['discount'][$threshold['thresholdID']] -= $cart_p_discount_prod[$product_id][$item['itemId']];
                                 }
                             }
                         }
@@ -614,7 +614,7 @@ class APIOrderService
 
             $pointData = [];
             //點數比例加總不等於1時，把最後一筆資料的比例做修正
-            if ($point_rate != 1) {
+            if ($point_rate != 1 || ($order['points'] - $point_discount) != 0) {
                 $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
                 if ($order['points'] > $point_discount) {
                     $pointData['point_discount'] = $detail->point_discount + ($order['points'] - $point_discount);
