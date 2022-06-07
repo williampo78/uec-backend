@@ -186,6 +186,7 @@ class APIOrderService
             $productID = 0;
             $prod_info_detail = [];
             $point_discount = 0;
+            $detail_p_discount = 0;
             foreach ($cart['list'] as $products) {
                 foreach ($products['itemList'] as $item) {
                     if ($prod_items[$products['productID']][$item['itemId']]) {
@@ -251,6 +252,7 @@ class APIOrderService
                         "returned_points" => 0,
                     ];
                     $point_discount += round($discount_rate[$seq] * $order['points']);
+                    $detail_p_discount += $cart_p_discount_prod[$products['productID']][$item['itemId']];
                     $order_detail_id_M = OrderDetail::insertGetId($details[$seq]);
                     $order_detail_temp[$products['productID']] = $order_detail_id_M;
                     $campaign_id = 0;
@@ -612,6 +614,19 @@ class APIOrderService
                 }
             }
             $pointData = [];
+
+            //購物車滿額折抵把最後一筆資料做修正
+            if (($cart_p_discount - $detail_p_discount) != 0) {//購物車的滿額折抵 - 訂單明總的滿額折抵加總 != 0
+                $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
+
+                if ($cart_p_discount > $detail_p_discount) {
+                    $discountData['cart_p_discount'] = $detail->cart_p_discount + ($cart_p_discount - $detail_p_discount);
+                } else {
+                    $discountData['cart_p_discount'] = $detail->cart_p_discount - ($detail_p_discount - $cart_p_discount);
+                }
+                OrderDetail::where('id', $detail->id)->update($discountData);
+            }
+
             //點數比例加總不等於1時，把最後一筆資料的比例做修正
             if ($point_rate != 1 || ($order['points'] - $point_discount) != 0) {
                 $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
