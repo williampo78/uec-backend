@@ -185,6 +185,7 @@ class APIOrderService
             $discount_group = 0;
             $productID = 0;
             $prod_info_detail = [];
+            $point_discount = 0;
             foreach ($cart['list'] as $products) {
                 foreach ($products['itemList'] as $item) {
                     if ($prod_items[$products['productID']][$item['itemId']]) {
@@ -213,7 +214,7 @@ class APIOrderService
 
                     //有用點數折現金
                     if ($order['point_discount'] < 0) {
-                        $discount_rate[$seq] = (($item['amount'] + $cart_p_discount_prod[$products['productID']]) / ($order['total_price']+$cart_p_discount));
+                        $discount_rate[$seq] = (($item['amount'] + $cart_p_discount_prod[$products['productID']]) / ($order['total_price'] + $cart_p_discount));
                         $point_rate += $discount_rate[$seq];
                     } else {
                         $discount_rate[$seq] = 0;
@@ -249,6 +250,7 @@ class APIOrderService
                         "returned_point_discount" => 0,
                         "returned_points" => 0,
                     ];
+                    $point_discount += round($discount_rate[$seq] * $order['points']);
                     $order_detail_id_M = OrderDetail::insertGetId($details[$seq]);
                     $order_detail_temp[$products['productID']] = $order_detail_id_M;
                     $campaign_id = 0;
@@ -481,27 +483,33 @@ class APIOrderService
                 $seq1 = 0;
                 foreach ($cart['thresholdDiscount'] as $key => $threshold) {
                     foreach ($threshold['products'] as $k => $product_id) {
-                        $seq1++;
-                        //寫入折扣資訊
-                        $campaign_details[$seq1] = [
-                            "order_id" => $newOrder->id,
-                            "level_code" => 'CART_P',
-                            "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
-                            "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
-                            "promotion_campaign_id" => $threshold['campaignID'],
-                            "product_id" => $product_id,
-                            "product_item_id" => $prod_info_detail[$product_id]['id'],
-                            "item_no" => $prod_info_detail[$product_id]['item_no'],
-                            "discount" => $cart_p_discount_prod[$product_id],
-                            "record_identity" => 'M',
-                            "campaign_threshold_id" => $threshold_prod['thresholdDiscount'][$product_id],
-                            "created_by" => $member_id,
-                            "updated_by" => $member_id,
-                            "created_at" => now(),
-                            "updated_at" => now(),
-                        ];
-                        OrderCampaignDiscount::insert($campaign_details[$seq1]);
-                        $threshold_discount['discount'][$threshold['thresholdID']] -= $cart_p_discount_prod[$product_id];
+                        foreach ($cart['list'] as $products) {
+                            if ($products['productID'] == $product_id) {
+                                foreach ($products['itemList'] as $item) {
+                                    $seq1++;
+                                    //寫入折扣資訊
+                                    $campaign_details[$seq1] = [
+                                        "order_id" => $newOrder->id,
+                                        "level_code" => 'CART_P',
+                                        "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
+                                        "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
+                                        "promotion_campaign_id" => $threshold['campaignID'],
+                                        "product_id" => $product_id,
+                                        "product_item_id" => $item['itemId'],
+                                        "item_no" => $item['itemNo'],
+                                        "discount" => $cart_p_discount_prod[$product_id],
+                                        "record_identity" => 'M',
+                                        "campaign_threshold_id" => $threshold_prod['thresholdDiscount'][$product_id],
+                                        "created_by" => $member_id,
+                                        "updated_by" => $member_id,
+                                        "created_at" => now(),
+                                        "updated_at" => now(),
+                                    ];
+                                    OrderCampaignDiscount::insert($campaign_details[$seq1]);
+                                    $threshold_discount['discount'][$threshold['thresholdID']] -= $cart_p_discount_prod[$product_id];
+                                }
+                            }
+                        }
                     }
                     $discountData = [];
                     //把最後一筆資料的比例做修正
@@ -608,7 +616,11 @@ class APIOrderService
             //點數比例加總不等於1時，把最後一筆資料的比例做修正
             if ($point_rate != 1) {
                 $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
-                $pointData['point_discount'] = $detail->point_discount - 1 + $point_rate;
+                if ($order['points'] > $point_discount) {
+                    $pointData['point_discount'] = $detail->point_discount + ($order['points'] - $point_discount);
+                } else {
+                    $pointData['point_discount'] = $detail->point_discount - ($point_discount - $order['points']);
+                }
                 $pointData['points'] = ($pointData['point_discount'] / $cart['point']['exchangeRate']);
                 OrderDetail::where('id', $detail->id)->update($pointData);
             }
@@ -697,8 +709,8 @@ class APIOrderService
                     $result['status'] = 402;
                     $result['payment_url'] = null;
                     $result['payment_token'] = null;
-                    $result['tappay_msg'] = $tapPayResult['status'].":".$tapPayResult['msg'];
-                    Log::channel('tappay_api_log')->error($tapPayResult['status'].':tappay error!' . json_encode($tapPayResult));
+                    $result['tappay_msg'] = $tapPayResult['status'] . ":" . $tapPayResult['msg'];
+                    Log::channel('tappay_api_log')->error($tapPayResult['status'] . ':tappay error!' . json_encode($tapPayResult));
                     DB::rollBack();
                     return $result;
                 }
