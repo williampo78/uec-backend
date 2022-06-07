@@ -860,7 +860,7 @@ class APIProductServices
                     $item_spec['spec_2'][] = $item['spec_2_value'];//規格2
                 }
                 $spec_info[] = array(
-                    "itme_id" => $item['id'],
+                    "item_id" => $item['id'],
                     "item_no" => $item['item_no'],
                     "item_photo" => ($item['photo_name'] ? $s3 . $item['photo_name'] : null),
                     "item_spec1" => $item['spec_1_value'],
@@ -1366,7 +1366,7 @@ class APIProductServices
                     $item_spec['spec_2'][] = $item['spec_2_value'];//規格2
                 }
                 $spec_info[] = array(
-                    "itme_id" => $item['id'],
+                    "item_id" => $item['id'],
                     "item_no" => $item['item_no'],
                     "item_photo" => ($item['photo_name'] ? $s3 . $item['photo_name'] : null),
                     "item_spec1" => $item['spec_1_value'],
