@@ -611,10 +611,6 @@ class APIOrderService
                     }
                 }
             }
-            echo "加總:".$point_discount;
-            echo '<br>';
-            echo "扣點:".$order['points'];
-            dd();
             $pointData = [];
             //點數比例加總不等於1時，把最後一筆資料的比例做修正
             if ($point_rate != 1) {
