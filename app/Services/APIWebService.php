@@ -126,10 +126,23 @@ class APIWebService
     public function createMemberNote($input)
     {
         $memberId = Auth::guard('api')->user()->member_id;
-        $result = false;
 
         DB::beginTransaction();
         try {
+
+            $memberNote = MemberNote::where('member_id', $memberId)
+                ->where('note_type', $input['note_type'])
+                ->where('name', $input['name'])
+                ->where('mobile', $input['mobile'])
+                ->where('zip_code', $input['zip_code'])
+                ->where('city_name', $input['city_name'])
+                ->where('city_id', $input['city_id'])
+                ->where('district_name', $input['district_name'])
+                ->where('district_id', $input['district_id'])
+                ->where('address', $input['address'])
+                ->first();
+            if ($memberNote) return 405; //重覆收件人不新增
+
             if (isset($input['is_default']) && $input['is_default'] == 1) {
                 $defaultMemberNote = $this->getDefaultMemberNote($memberId, $input['note_type']);
 
@@ -160,12 +173,12 @@ class APIWebService
                 'created_by' => $memberId,
                 'updated_by' => $memberId,
             ]);
-
             DB::commit();
-            $result = true;
+            $result = 200;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
+            $result = 401;
         }
 
         return $result;

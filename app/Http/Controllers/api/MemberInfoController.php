@@ -16,7 +16,8 @@ class MemberInfoController extends Controller
     public function __construct(
         APIService $apiService,
         APIWebService $apiWebService
-    ) {
+    )
+    {
         $this->apiService = $apiService;
         $this->apiWebService = $apiWebService;
     }
@@ -324,13 +325,17 @@ class MemberInfoController extends Controller
 
         $response = $this->apiWebService->createMemberNote($request);
 
-        if ($response) {
+        if ($response == 200) {
             $status = true;
             $data = '新增成功';
+        } elseif ($response == 405) {
+            $status = false;
+            $err = '405';
+            $data = '新增失敗';
         } else {
             $status = false;
             $err = '401';
-            $data = '';
+            $data = '新增失敗';
         }
 
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
