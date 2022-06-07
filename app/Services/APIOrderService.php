@@ -213,7 +213,7 @@ class APIOrderService
 
                     //有用點數折現金
                     if ($order['point_discount'] < 0) {
-                        $discount_rate[$seq] = (($item['amount'] + $cart_p_discount_prod[$products['productID']]) / $order['total_price']);
+                        $discount_rate[$seq] = (($item['amount'] + $cart_p_discount_prod[$products['productID']]) / ($order['total_price']+$cart_p_discount));
                         $point_rate += $discount_rate[$seq];
                     } else {
                         $discount_rate[$seq] = 0;
