@@ -455,6 +455,34 @@ class OrderService
                 }
 
             }
+        }else{
+            $findProductPRD_DISCOUNT = OrderCampaignDiscount::where('order_detail_id', '=', $val['id'])
+            ->where('order_id', $orders['results']['order_id'])
+            ->where('level_code', 'PRD')
+            ->where('record_identity' ,'M')
+            ->where('discount','<>' ,0.0)
+            ->get();
+            if($findProductPRD_DISCOUNT !== null){
+                foreach($findProductPRD_DISCOUNT as $discount){
+                    if (!isset($order_details[$key]['discount_content'][$discount->group_seq])) {
+                        $order_details[$key]['discount_content'][$discount->group_seq] = [
+                            'campaignName' => $discount->promotionalCampaign->campaign_name,
+                            'campaignProdList' => [
+                                [
+                                    'productId' => $discount->product->id,
+                                    'productName' => $discount->product->product_name,
+                                ],
+                            ],
+                        ];
+                    } else {
+                        $order_details[$key]['discount_content'][$discount->group_seq]['campaignProdList'][]= [
+                            'productId' => $discount->product->id,
+                            'productName' => $discount->product->product_name,
+                        ];
+                    }
+
+                }
+            }
         }
     }
     if (isset($cart['discount'])) {
