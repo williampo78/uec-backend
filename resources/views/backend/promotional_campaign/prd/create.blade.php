@@ -398,6 +398,7 @@
                     alert(this.$refs.errorMessage.innerText.trim());
                 }
 
+                let startAtLastSelectedDate;
                 let startAtFlatpickr = flatpickr("#start_at_flatpickr", {
                     dateFormat: "Y-m-d H:i:S",
                     enableTime: true,
@@ -406,7 +407,20 @@
                     defaultMinute: 0,
                     defaultSeconds: 0,
                     onChange: function(selectedDates, dateStr, instance) {
-                        endAtFlatpickr.set('minDate', dateStr);
+                        let selectedDate = selectedDates[0];
+
+                        // 沒有選過日期 或 選到的日期和上一次選到的日期不同天
+                        if (!startAtLastSelectedDate || !moment(selectedDate).isSame(startAtLastSelectedDate, 'day')) {
+                            // 判斷選到的日期是否為當天日期
+                            if (moment(selectedDate).isSame(moment(), 'day')) {
+                                selectedDate = moment().add(5, 'minutes').seconds(0).toDate();
+                                this.setDate(selectedDate);
+                            }
+                        }
+
+                        startAtLastSelectedDate = selectedDate;
+
+                        endAtFlatpickr.set('minDate', selectedDate);
 
                         if (!endAtFlatpickr.input.value) {
                             endAtFlatpickr.hourElement.value = 23;
