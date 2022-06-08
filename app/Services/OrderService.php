@@ -373,7 +373,7 @@ class OrderService
     $void_group_seq = [];
     $thresholdAmount = 0;
     foreach ($discount as $obj) {
-        switch ($obj->level_code) {
+        switch ($obj->promotionalCampaign->level_code) {
             case 'PRD':
                 //主商品 且有折扣金額
                 foreach ($order_details as $key => $val) {
@@ -405,7 +405,7 @@ class OrderService
                     ]; //贈送的商品列表
                 }
                 //折扣
-                if ($obj->discount < 0 && $obj->order_detail_id !== null && $obj->level_code == 'CART_P') {
+                if ($obj->discount < 0 && $obj->order_detail_id !== null && $obj->promotionalCampaign->level_code == 'CART_P') {
                     if (!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])) {
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0;
                     }
