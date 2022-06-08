@@ -372,7 +372,6 @@ class OrderService
     $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']); // order_campaign_discounts
     $void_group_seq = [];
     $thresholdAmount = 0;
-    // dd($giveaway_qty);
     foreach ($discount as $obj) {
         switch ($obj->level_code) {
             case 'PRD':
@@ -406,7 +405,7 @@ class OrderService
                     ]; //贈送的商品列表
                 }
                 //折扣
-                if ($obj->discount < 0 && $obj->order_detail_id !== null && $obj->promotionalCampaign->level_code == 'CART_P') {
+                if ($obj->discount < 0 && $obj->order_detail_id !== null && $obj->level_code == 'CART_P') {
                     if (!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])) {
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0;
                     }
@@ -454,34 +453,6 @@ class OrderService
                     ];
                 }
 
-            }
-        }else{
-            $findProductPRD_DISCOUNT = OrderCampaignDiscount::where('order_detail_id', '=', $val['id'])
-            ->where('order_id', $orders['results']['order_id'])
-            ->where('level_code', 'PRD')
-            ->where('record_identity' ,'M')
-            ->where('discount','<>' ,0.0)
-            ->get();
-            if($findProductPRD_DISCOUNT !== null){
-                foreach($findProductPRD_DISCOUNT as $discount){
-                    if (!isset($order_details[$key]['discount_content'][$discount->group_seq])) {
-                        $order_details[$key]['discount_content'][$discount->group_seq] = [
-                            'campaignName' => $discount->promotionalCampaign->campaign_name,
-                            'campaignProdList' => [
-                                [
-                                    'productId' => $discount->product->id,
-                                    'productName' => $discount->product->product_name,
-                                ],
-                            ],
-                        ];
-                    } else {
-                        $order_details[$key]['discount_content'][$discount->group_seq]['campaignProdList'][]= [
-                            'productId' => $discount->product->id,
-                            'productName' => $discount->product->product_name,
-                        ];
-                    }
-
-                }
             }
         }
     }
