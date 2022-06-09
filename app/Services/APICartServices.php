@@ -250,17 +250,34 @@ class APICartServices
                     $qty = array_sum($prodQty[$product_id]); //合併不同規格但同一商品的數量
                     //商品贈品
                     $giftAway = [];
+                    $giftCount = 0;
+                    $giftCheck = 0;
+                    $giftCalc = 0;
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                $giftCount++; //計算滿額贈禮數
                                 if (isset($stock_gift_check[$giftInfo->product_id])) {
-                                    $giftAway[] = array(
-                                        "productPhoto" => $giftInfo['photo'],
-                                        "productId" => $giftInfo->product_id,
-                                        "productName" => $giftInfo->product_name,
-                                        "sellingPrice" => $giftInfo->selling_price,
-                                        "assignedQty" => $giftInfo->assignedQty,
-                                    );
+                                    $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
+                                    if ($giftCalc > 0) {
+                                        $giftCheck++;//計算滿額贈禮有庫存的
+                                    }
+                                }
+                            }
+                            if ($giftCheck > 0 && $giftCount == $giftCheck) {
+                                foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                    if (isset($stock_gift_check[$giftInfo->product_id])) {
+                                        $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
+                                        if ($giftCalc > 0) {
+                                            $giftAway[] = array(
+                                                "productPhoto" => $giftInfo['photo'],
+                                                "productId" => $giftInfo->product_id,
+                                                "productName" => $giftInfo->product_name,
+                                                "sellingPrice" => $giftInfo->selling_price,
+                                                "assignedQty" => $giftInfo->assignedQty,
+                                            );
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -786,7 +803,7 @@ class APICartServices
                             $calc_discount[$product_id] = $prod_amount[$product_id];
                         }
                     }
-                    foreach ($pid as $pid_k=>$pid_v){
+                    foreach ($pid as $pid_k => $pid_v) {
                         $tmp_calc[$pid_v] = 0;
                     }
                     $calc_amount[$campaign_id] = $price;
@@ -797,7 +814,7 @@ class APICartServices
                         if ($compare_n_value >= $calc_amount[$campaign_id]) continue;
                         if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P01') { //﹝滿額﹞指定商品滿N元，打X折
                             $prodDiscount = $calc_amount[$campaign_id] - round($calc_amount[$campaign_id] * $item->x_value); //打折3000-(3000*0.95)
-                            foreach ($pid as $pid_k=>$pid_v){
+                            foreach ($pid as $pid_k => $pid_v) {
                                 if (isset($calc_discount[$pid_v])) {
                                     $tmp_calc[$pid_v] = ($calc_discount[$pid_v] - round($calc_discount[$pid_v] * $item->x_value)) * -1;
                                 } else {
@@ -806,7 +823,7 @@ class APICartServices
                             }
                         } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P02') { //﹝滿額﹞指定商品滿N元，折X元
                             $prodDiscount = $item->x_value;
-                            foreach ($pid as $pid_k=>$pid_v){
+                            foreach ($pid as $pid_k => $pid_v) {
                                 $tmp_calc[$pid_v] = $item->x_value * -1;
                             }
                         }
@@ -859,7 +876,7 @@ class APICartServices
                                 if (!key_exists($product_id, $tmp_calc)) {
                                     $tmp_thresholdDiscount[$campaign_id] += 0;
                                 } else {
-                                    if (is_array($tmp_calc[$product_id])){
+                                    if (is_array($tmp_calc[$product_id])) {
                                         $tmp_thresholdDiscount[$campaign_id] += 0;
                                     } else {
                                         $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
@@ -880,17 +897,38 @@ class APICartServices
                             if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
                         }
                         $prods = [];
+                        $giftCount = 0;
+                        $prd = 0;
                         foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
+                            $giftCount = count($giftawayInfo);
+                            $giftCheck = 0;
                             foreach ($giftawayInfo as $giftInfo => $v) {
+                                $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                 if (isset($threshold_prod[$v['product_id']])) {
                                     if (isset($stock_gift_check[$v['product_id']])) {
-                                        $prods[$v['product_id']] = array(
-                                            "productPhoto" => $threshold_prod[$v['product_id']]->photo,
-                                            "productId" => $v['product_id'],
-                                            "productName" => $threshold_prod[$v['product_id']]->product_name,
-                                            "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
-                                            "assignedQty" => $v->assigned_qty,
-                                        );
+                                        if ($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd > 0) {
+                                            $giftCheck++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if ($giftCheck > 0 && $giftCount == $giftCheck) {
+                            foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
+                                foreach ($giftawayInfo as $giftInfo => $v) {
+                                    $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
+                                    if (isset($threshold_prod[$v['product_id']])) {
+                                        if (isset($stock_gift_check[$v['product_id']])) {
+                                            if ($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd > 0) {
+                                                $prods[$v['product_id']] = array(
+                                                    "productPhoto" => $threshold_prod[$v['product_id']]->photo,
+                                                    "productId" => $v['product_id'],
+                                                    "productName" => $threshold_prod[$v['product_id']]->product_name,
+                                                    "sellingPrice" => $threshold_prod[$v['product_id']]->selling_price,
+                                                    "assignedQty" => $v->assigned_qty,
+                                                );
+                                            }
+                                        }
                                     }
                                 }
                             }
