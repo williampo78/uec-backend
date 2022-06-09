@@ -53,50 +53,50 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
         $count = 1;
         foreach ($this->orders as $order) {
             $row = [
-                'count' => $count, //a
-                'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i'),//b
-                'order_no' => $order->order_no,//c
-                'status_code' => config('uec.order_status_code_options')[$order->status_code] ?? null,//d
-                'member_account' => $order->member_account,//e
-                'lgst_method' => config('uec.lgst_method_options')[$order->lgst_method] ?? null,//f
-                'shipping_fee' => $order->shipping_fee,//g
-                'is_shipping_free' => $order->is_shipping_free == 1 ? 'Y' : 'N',//h
-                'cart_campaign_discount' => $order->cart_campaign_discount,//i
-                'cancelled_voided_at' => null,//j
-                'shipped_at' => null,//k
-                'arrived_store_at' => null,//l
-                'home_dilivered_at' => null,//m
-                'cvs_completed_at' => null,//n
-                'payment_method' => config('uec.payment_method_options')[$order->payment_method] ?? null,//o
-                'number_of_installments' => null,//p
-                'invoice_date' => null,//q
-                'invoice_no' => $order->invoice_no,//r
-                'paid_amount' => $order->paid_amount,//s
-                'product_no' => null,//t
-                'item_no' => null,//u
-                'pos_item_no' => null,//v
-                'product_name' => null,//w
-                'spec_1_value' => null,//x
-                'spec_2_value' => null,//y
-                'selling_price' => null,//z
-                'unit_price' => null,//aa
-                'original_qty' => null,//ab
-                'original_campaign_discount' => null,//ac
-                'original_subtotal' => null,//ad
-                'original_cart_p_discount' => null,//ae
-                'original_point_discount' => null,//af
-                'original_actual_subtotal' => null,//ag
-                'returned_qty' => null,//ah
-                'returned_campaign_discount' => null,//ai
-                'returned_subtotal' => null,//aj
-                'returned_cart_p_discount' => null,//ak
-                'returned_point_discount' => null,//al
-                'qty' => null,//am
-                'campaign_discount' => null,//an
-                'subtotal' => null,//ao
-                'cart_p_discount' => null,//ap
-                'point_discount' => null,//aq
-                'package_no' => null,//ar
+                'count' => $count,
+                'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i'),
+                'order_no' => $order->order_no,
+                'status_code' => config('uec.order_status_code_options')[$order->status_code] ?? null,
+                'member_account' => $order->member_account,
+                'lgst_method' => config('uec.lgst_method_options')[$order->lgst_method] ?? null,
+                'shipping_fee' => $order->shipping_fee,
+                'is_shipping_free' => $order->is_shipping_free == 1 ? 'Y' : 'N',
+                'cart_campaign_discount' => $order->cart_campaign_discount,
+                'cancelled_voided_at' => null,
+                'shipped_at' => null,
+                'arrived_store_at' => null,
+                'home_dilivered_at' => null,
+                'cvs_completed_at' => null,
+                'payment_method' => config('uec.payment_method_options')[$order->payment_method] ?? null,
+                'number_of_installments' => null,
+                'invoice_date' => null,
+                'invoice_no' => $order->invoice_no,
+                'paid_amount' => $order->paid_amount,
+                'product_no' => null,
+                'item_no' => null,
+                'pos_item_no' => null,
+                'product_name' => null,
+                'spec_1_value' => null,
+                'spec_2_value' => null,
+                'selling_price' => null,
+                'unit_price' => null,
+                'original_qty' => null,
+                'original_campaign_discount' => null,
+                'original_subtotal' => null,
+                'original_point_discount' => null,
+                'original_actual_subtotal' => null,
+                'original_cart_p_discount' => null,
+                'returned_qty' => null,
+                'returned_campaign_discount' => null,
+                'returned_subtotal' => null,
+                'returned_cart_p_discount' => null,
+                'returned_point_discount' => null,
+                'qty' => null,
+                'campaign_discount' => null,
+                'subtotal' => null,
+                'cart_p_discount' => null,
+                'point_discount' => null,
+                'package_no' => null,
             ];
 
             // 取消 / 作廢時間
@@ -136,30 +136,30 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
 
                 $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body) {
                     $row['count'] = $count;
-                    $row['product_no'] = $orderDetail->product->product_no;//t
-                    $row['item_no'] = $orderDetail->item_no;//u
-                    $row['pos_item_no'] = $orderDetail->productItem->pos_item_no;//v
-                    $row['product_name'] = $orderDetail->product->product_name;//w
-                    $row['spec_1_value'] = $orderDetail->productItem->spec_1_value;//x
-                    $row['spec_2_value'] = $orderDetail->productItem->spec_2_value;//y
-                    $row['selling_price'] = $orderDetail->selling_price;//z
-                    $row['unit_price'] = $orderDetail->unit_price;//aa
-                    $row['original_qty'] = $orderDetail->qty + $orderDetail->returned_qty;//ab
-                    $row['original_campaign_discount'] = $orderDetail->campaign_discount + $orderDetail->returned_campaign_discount;//ac
-                    $row['original_subtotal'] = $orderDetail->subtotal + $orderDetail->returned_subtotal;//ad小計
-                    $row['original_cart_p_discount'] = $orderDetail->cart_p_discount + $orderDetail->returned_cart_p_discount;//ae
-                    $row['original_point_discount'] = $orderDetail->point_discount + $orderDetail->returned_point_discount;//af
-                    $row['original_actual_subtotal'] = $row['original_subtotal'] + $row['original_point_discount'];//ag
-                    $row['returned_qty'] = $orderDetail->returned_qty;//ah
-                    $row['returned_campaign_discount'] = $orderDetail->returned_campaign_discount;//ai
-                    $row['returned_subtotal'] = $orderDetail->returned_subtotal;//aj
-                    $row['returned_cart_p_discount'] = $orderDetail->returned_cart_p_discount;//ak
-                    $row['returned_point_discount'] = $orderDetail->returned_point_discount;//al
-                    $row['qty'] = $orderDetail->qty;//am
-                    $row['campaign_discount'] = $orderDetail->campaign_discount;//an
-                    $row['subtotal'] = $orderDetail->subtotal;//ao
-                    $row['cart_p_discount'] = $orderDetail->cart_p_discount;//ap
-                    $row['point_discount'] = $orderDetail->point_discount;//aq
+                    $row['product_no'] = $orderDetail->product->product_no;
+                    $row['item_no'] = $orderDetail->item_no;
+                    $row['pos_item_no'] = $orderDetail->productItem->pos_item_no;
+                    $row['product_name'] = $orderDetail->product->product_name;
+                    $row['spec_1_value'] = $orderDetail->productItem->spec_1_value;
+                    $row['spec_2_value'] = $orderDetail->productItem->spec_2_value;
+                    $row['selling_price'] = $orderDetail->selling_price;
+                    $row['unit_price'] = $orderDetail->unit_price;
+                    $row['original_qty'] = $orderDetail->qty - $orderDetail->returned_qty;
+                    $row['original_campaign_discount'] = $orderDetail->campaign_discount - $orderDetail->returned_campaign_discount;
+                    $row['original_subtotal'] = $orderDetail->subtotal - $orderDetail->returned_subtotal;
+                    $row['original_point_discount'] = $orderDetail->point_discount - $orderDetail->returned_point_discount;
+                    $row['original_actual_subtotal'] = $row['original_subtotal'] + $row['original_point_discount'];
+                    $row['original_cart_p_discount'] = $orderDetail->cart_p_discount - $orderDetail->returned_cart_p_discount;
+                    $row['returned_qty'] = $orderDetail->returned_qty;
+                    $row['returned_campaign_discount'] = $orderDetail->returned_campaign_discount;
+                    $row['returned_subtotal'] = $orderDetail->returned_subtotal;
+                    $row['returned_cart_p_discount'] = $orderDetail->returned_cart_p_discount;
+                    $row['returned_point_discount'] = $orderDetail->returned_point_discount;
+                    $row['qty'] = $orderDetail->qty;
+                    $row['campaign_discount'] = $orderDetail->campaign_discount;
+                    $row['subtotal'] = $orderDetail->subtotal;
+                    $row['cart_p_discount'] = $orderDetail->cart_p_discount;
+                    $row['point_discount'] = $orderDetail->point_discount;
 
                     // 託運單號
                     if (isset($orderDetail->shipmentDetail)) {
@@ -190,50 +190,50 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
         $this->totalRows++;
 
         return [
-            '項次',//a
-            '訂單時間',//b
-            '訂單編號',//c
-            '訂單狀態',//d
-            '會員帳號',//e
-            '物流方式',//f
-            '運費',//g
-            '訂單成立時免運',//h
-            '滿額折抵',//i
-            '取消/作廢時間',//j
-            '出貨時間',//k
-            '到店時間',//l
-            '(宅配)配達時間',//m
-            '(超取)取件時間',//n
-            '付款方式',//o
-            '分期期數',//p
-            '發票日期',//q
-            '發票號碼',//r
-            '發票金額',//s
-            '商品序號',//t
-            'Item編號',//u
-            'POS品號',//v
-            '商品名稱',//w
-            '規格一',//x
-            '規格二',//y
-            '售價',//z
-            '商品活動價',//aa
-            '數量',//ab
-            '單品折抵',//ac
-            '小計',//ad
-            '購物車滿額折抵',//ae
-            '點數折抵',//af
-            '實收金額',//ag
-            '已退數量',//ah
-            '已退單品折抵',//ai
-            '已退小計',//aj
-            '已退購物車滿額折抵',//ak
-            '已退點數折抵',//al
-            '未退數量',//am
-            '未退單品折抵',//an
-            '未退小計',//ao
-            '未退購物車滿額折抵',//ap
-            '未退點數折抵',//aq
-            '託運單號',//ar
+            '項次',
+            '訂單時間',
+            '訂單編號',
+            '訂單狀態',
+            '會員帳號',
+            '物流方式',
+            '運費',
+            '訂單成立時免運',
+            '滿額折抵',
+            '取消/作廢時間',
+            '出貨時間',
+            '到店時間',
+            '(宅配)配達時間',
+            '(超取)取件時間',
+            '付款方式',
+            '分期期數',
+            '發票日期',
+            '發票號碼',
+            '發票金額',
+            '商品序號',
+            'Item編號',
+            'POS品號',
+            '商品名稱',
+            '規格一',
+            '規格二',
+            '售價',
+            '商品活動價',
+            '數量',
+            '單品折抵',
+            '小計',
+            '點數折抵',
+            '實收金額',
+            '購物車滿額折抵',
+            '已退數量',
+            '已退單品折抵',
+            '已退小計',
+            '已退購物車滿額折抵',
+            '已退點數折抵',
+            '未退數量',
+            '未退單品折抵',
+            '未退小計',
+            '未退購物車滿額折抵',
+            '未退點數折抵',
+            '託運單號',
         ];
     }
 
