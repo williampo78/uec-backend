@@ -902,6 +902,14 @@ class APICartServices
                     }
                     $prods = [];
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
+                        if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P03') { //﹝滿額﹞指定商品滿N元，送贈
+                            if ($calc_amount[$campaign_id] < $item->n_value) continue;
+                            if ($compare_n_value >= $calc_amount[$campaign_id]) continue;
+                        } elseif ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P04') { //﹝滿額﹞指定商品滿N件送贈
+                            if ($calc_qty[$campaign_id] < $item->n_value) continue;
+                            if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
+                        }
+                        $compare_n_value = $item->n_value;
                         if ($item->id == $campaign_threshold) {
                             $prd = 0;
                             foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
