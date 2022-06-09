@@ -293,7 +293,8 @@
                                         <th class="text-nowrap">備註</th>
                                         <th class="text-nowrap">託運單號</th>
                                         <th class="text-nowrap">已退數量</th>
-                                        <th class="text-nowrap">已退活動折抵</th>
+                                        <th class="text-nowrap">已退單品活動折抵</th>
+                                        <th class="text-nowrap">已退購物車滿額折抵</th>
                                         <th class="text-nowrap">已退小計</th>
                                         <th class="text-nowrap">已退點數折抵</th>
                                     </tr>

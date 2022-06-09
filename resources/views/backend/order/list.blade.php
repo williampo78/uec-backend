@@ -477,6 +477,7 @@
                                         <td>${package_no}</td>
                                         <td>${order_detail.returned_qty}</td>
                                         <td>${order_detail.returned_campaign_discount}</td>
+                                        <td>${order_detail.returned_cart_p_discount}</td>
                                         <td>${order_detail.returned_subtotal}</td>
                                         <td>${order_detail.returned_point_discount}</td>
                                     </tr>
