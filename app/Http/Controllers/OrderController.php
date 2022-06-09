@@ -325,7 +325,7 @@ class OrderController extends Controller
                             $invoiceDetails = [
                                 'seq' => $invoiceDetail->seq,
                                 'item_name' => $invoiceDetail->item_name,
-                                'unit_price' => number_format($invoiceDetail->unit_price),
+                                'unit_price' => $invoiceDetail->unit_price,
                                 'qty' => $invoiceDetail->qty,
                                 'amount' => number_format($invoiceDetail->amount),
                             ];
