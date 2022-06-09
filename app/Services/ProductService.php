@@ -114,24 +114,18 @@ class ProductService
                 case 'APPROVED_STATUS_ON':
                     $products = $products->where(function ($query) use ($now) {
                         $query->where('products.approval_status', '=', 'APPROVED')
-                        // ->whereRaw('current_timestamp between products.start_launched_at  and products.end_launched_at');
                             ->where('products.start_launched_at', '<=', $now)
                             ->where('products.end_launched_at', '>=', $now);
                     });
-                    // products.approval_status = 'APPROVED' and current_timestamp between products.start_launched_at  and products.end_launched_at
                     break;
                 //商品下架
                 case 'APPROVED_STATUS_OFF':
                     $products = $products->where(function ($query) use ($now) {
                         $query->where('products.approval_status', '=', 'APPROVED')
                             ->where('products.start_launched_at', '>', $now)
-                            ->orWhere('products.end_launched_at', '<', $now);
+                            ->orWhere('products.end_launched_at', '<', $now)
+                            ->orWhere('products.approval_status', '=', 'CANCELLED');
                     });
-                    $products = $products->where(function ($query) {
-                        $query->orWhere('products.approval_status', '=', 'CANCELLED');
-                    });
-                    // 狀況1 (  products.approval_status = 'CANCELLED'  )
-                    // 狀況2 (  products.approval_status = 'APPROVED' and (current_timestamp < start_launched_at or current_timestamp > end_launched_at)  )
                     break;
                 default:
                     $products->where('products.approval_status', '=', $input_data['approval_status']);
@@ -1039,10 +1033,8 @@ class ProductService
                     $query = $query->where(function ($query) use ($now) {
                         $query->where('products.approval_status', '=', 'APPROVED')
                             ->where('products.start_launched_at', '>', $now)
-                            ->orWhere('products.end_launched_at', '<', $now);
-                    });
-                    $query = $query->where(function ($query) {
-                        $query->orWhere('products.approval_status', '=', 'CANCELLED');
+                            ->orWhere('products.end_launched_at', '<', $now)
+                            ->orWhere('products.approval_status', '=', 'CANCELLED');
                     });
                     break;
                 default:
