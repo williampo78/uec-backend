@@ -900,9 +900,9 @@ class APICartServices
                         $compare_n_value = $item->n_value;
                         $campaign_threshold = $item->id;
                     }
+                    $prods = [];
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
                         if ($item->id == $campaign_threshold) {
-                            $prods = [];
                             $prd = 0;
                             foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
                                 $gift_array[$item->id] = 0;
