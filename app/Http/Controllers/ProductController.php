@@ -45,7 +45,6 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $in = $request->input();
-        // dd(URL::current() ,  ,) ;
         $result = [
             'products' => [],
         ];
