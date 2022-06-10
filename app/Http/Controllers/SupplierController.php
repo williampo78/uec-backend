@@ -161,9 +161,8 @@ class SupplierController extends Controller
     public function update(Request $request, $id)
     {
         $inputData = $request->input();
-        $inputData['id'] = $id;
 
-        if (!$this->supplierService->updateSupplier($inputData)) {
+        if (!$this->supplierService->updateSupplier($id, $inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 

@@ -21,7 +21,8 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="supplier_type">供應商類別 <span style="color: red;">*</span></label>
-                                        <select2 class="form-control" :options="supplierTypes" v-model="form.supplierTypeId" name="supplier_type_id">
+                                        <select2 class="form-control" :options="supplierTypes"
+                                            v-model="form.supplierTypeId" name="supplier_type_id">
                                             <option disabled value=""></option>
                                         </select2>
                                     </div>
@@ -59,7 +60,8 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="payment_term">付款條件</label>
-                                        <select2 class="form-control" :options="paymentTerms" v-model="form.paymentTerm" name="payment_term">
+                                        <select2 class="form-control" :options="paymentTerms" v-model="form.paymentTerm"
+                                            name="payment_term">
                                             <option disabled value=""></option>
                                         </select2>
                                     </div>
@@ -116,8 +118,9 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <label for="tax_type">稅別</label>
-                                        <select2 class="form-control" :options="taxTypeOptions" v-model="form.taxType" name="tax_type" :allow-clear="false">
+                                        <label for="tax_type">稅別 <span style="color: red;">*</span></label>
+                                        <select2 class="form-control" :options="taxTypeOptions" v-model="form.taxType"
+                                            name="tax_type" :allow-clear="false">
                                             <option disabled value=""></option>
                                         </select2>
                                     </div>
@@ -169,7 +172,8 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="active">狀態</label>
-                                        <select2 class="form-control" :options="activeOptions" v-model="form.active" name="active" :allow-clear="false">
+                                        <select2 class="form-control" :options="activeOptions" v-model="form.active"
+                                            name="active" :allow-clear="false">
                                             <option disabled value=""></option>
                                         </select2>
                                     </div>
@@ -276,7 +280,8 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label for="status_code">合約狀態</label>
-                                        <select2 class="form-control" :options="supplierContractStatusCodeOptions" v-model="form.contract.statusCode" name="status_code">
+                                        <select2 class="form-control" :options="supplierContractStatusCodeOptions"
+                                            v-model="form.contract.statusCode" name="status_code">
                                             <option disabled value=""></option>
                                         </select2>
                                     </div>
