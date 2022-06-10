@@ -35,11 +35,11 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="col-sm-3">
-                                                <label class="control-label">狀態</label>
+                                                <label class="control-label">上下架狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select2 class="form-control" :options="activeOptions"
-                                                    v-model="form.active" name="active">
+                                                <select2 class="form-control" :options="launchStatusOptions"
+                                                    v-model="form.launchStatus" name="launch_status">
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -154,7 +154,7 @@
                                             <th class="text-nowrap">活動名稱</th>
                                             <th class="text-nowrap">前台文案</th>
                                             <th class="text-nowrap">活動類型</th>
-                                            <th class="text-nowrap">狀態</th>
+                                            <th class="text-nowrap">上下架狀態</th>
                                             <th class="text-nowrap">上架時間起</th>
                                             <th class="text-nowrap">上架時間訖</th>
                                         </tr>
@@ -183,7 +183,7 @@
                                                     <td>{{ $campaign['campaign_name'] }}</td>
                                                     <td>{{ $campaign['campaign_brief'] ?? '' }}</td>
                                                     <td>{{ $campaign['campaign_type'] ?? '' }}</td>
-                                                    <td>{{ $campaign['active'] ?? '' }}</td>
+                                                    <td>{{ $campaign['launch_status'] ?? '' }}</td>
                                                     <td>{{ $campaign['start_at'] }}</td>
                                                     <td>{{ $campaign['end_at'] }}</td>
                                                 </tr>
@@ -208,7 +208,7 @@
             data: {
                 form: {
                     campaignNameOrCampaignBrief: "",
-                    active: "",
+                    launchStatus: "",
                     campaignType: "",
                     startAtStart: "",
                     startAtEnd: "",
@@ -229,17 +229,17 @@
                     showXValue: true,
                     showGiveaway: true,
                 },
-                activeOptions: [],
+                launchStatusOptions: [],
                 campaignTypes: [],
             },
             created() {
-                let activeOptions = @json($activeOptions);
+                let launchStatusOptions = @json($launchStatusOptions);
                 let campaignTypes = @json($campaignTypes);
 
-                if (activeOptions) {
-                    Object.entries(activeOptions).forEach(([key, activeOption]) => {
-                        this.activeOptions.push({
-                            text: activeOption,
+                if (launchStatusOptions) {
+                    Object.entries(launchStatusOptions).forEach(([key, launchStatusOption]) => {
+                        this.launchStatusOptions.push({
+                            text: launchStatusOption,
                             id: key,
                         });
                     });
@@ -284,7 +284,7 @@
                 setQueryParameters() {
                     let campaignNameOrCampaignBrief =
                         "{{ request()->input('campaign_name_or_campaign_brief') }}";
-                    let active = "{{ request()->input('active') }}";
+                    let launchStatus = "{{ request()->input('launch_status') }}";
                     let campaignType = "{{ request()->input('campaign_type') }}";
                     let startAtStart = "{{ request()->input('start_at_start') }}";
                     let startAtEnd = "{{ request()->input('start_at_end') }}";
@@ -294,8 +294,8 @@
                         this.form.campaignNameOrCampaignBrief = campaignNameOrCampaignBrief;
                     }
 
-                    if (active) {
-                        this.form.active = active;
+                    if (launchStatus) {
+                        this.form.launchStatus = launchStatus;
                     }
 
                     if (campaignType) {

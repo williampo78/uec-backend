@@ -7,7 +7,6 @@
         .modal-dialog {
             max-width: 100%;
         }
-
     </style>
 @endsection
 
@@ -93,7 +92,8 @@
                                                                 </div>
                                                                 <div class="col-sm-8">
                                                                     <input type="number" class="form-control"
-                                                                        name="n_value" v-model="form.nValue" min="1" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                        name="n_value" v-model="form.nValue" min="1"
+                                                                        :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -105,7 +105,8 @@
                                                                 </div>
                                                                 <div class="col-sm-5">
                                                                     <input type="number" class="form-control"
-                                                                        name="x_value" v-model="form.xValue" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                        name="x_value" v-model="form.xValue"
+                                                                        :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                 </div>
                                                                 <div class="col-sm-4" v-if="showXValueHint">
                                                                     <p class="form-control-static">打85折，輸入0.85</p>
@@ -127,7 +128,8 @@
                                                         <div class="col-sm-10">
                                                             <div class="input-group" id="start_at_flatpickr">
                                                                 <input type="text" class="form-control" name="start_at"
-                                                                    autocomplete="off" data-input v-model="form.startAt" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                    autocomplete="off" data-input v-model="form.startAt"
+                                                                    :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                 <span class="input-group-btn" data-toggle>
                                                                     <button class="btn btn-default" type="button">
                                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -168,7 +170,7 @@
                                                         </div>
                                                         <div class="col-sm-10">
                                                             <input type="text" class="form-control" name="campaign_brief"
-                                                                v-model="form.campaignBrief" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                v-model="form.campaignBrief">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -186,7 +188,8 @@
                                                     <div class="col-sm-2">
                                                         <label class="radio-inline">
                                                             <input type="radio" name="target_groups" value="all"
-                                                                v-model="form.targetGroups" :disabled="isNowGreaterThanOrEqualToStartAt">所有會員
+                                                                v-model="form.targetGroups"
+                                                                :disabled="isNowGreaterThanOrEqualToStartAt">所有會員
                                                         </label>
                                                     </div>
                                                 </div>
@@ -221,7 +224,8 @@
                                                             <th class="text-nowrap">上架日期</th>
                                                             <th class="text-nowrap">上架狀態</th>
                                                             <th class="text-nowrap">毛利(%)</th>
-                                                            <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
+                                                            <th class="text-nowrap"
+                                                                v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -275,7 +279,8 @@
                                                             <th class="text-nowrap">商品序號</th>
                                                             <th class="text-nowrap">商品名稱</th>
                                                             <th class="text-nowrap">贈品數量</th>
-                                                            <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
+                                                            <th class="text-nowrap"
+                                                                v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -293,7 +298,8 @@
                                                                     <input type="number"
                                                                         class="form-control giveaway-assigned-qty"
                                                                         :name="`giveaways[${index}][assigned_qty]`" min="1"
-                                                                        v-model="giveaway.assignedQty" :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                                        v-model="giveaway.assignedQty"
+                                                                        :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                 </div>
                                                             </td>
                                                             <td v-if="!isNowGreaterThanOrEqualToStartAt">
@@ -466,7 +472,8 @@
                         let selectedDate = selectedDates[0];
 
                         // 沒有選過日期 或 選到的日期和上一次選到的日期不同天
-                        if (!startAtLastSelectedDate || !moment(selectedDate).isSame(startAtLastSelectedDate, 'day')) {
+                        if (!startAtLastSelectedDate || !moment(selectedDate).isSame(
+                                startAtLastSelectedDate, 'day')) {
                             // 判斷選到的日期是否為當天日期
                             if (moment(selectedDate).isSame(moment(), 'day')) {
                                 selectedDate = moment().add(5, 'minutes').seconds(0).toDate();
@@ -499,6 +506,7 @@
                     },
                 });
 
+                let conflictContents = '';
                 // 驗證表單
                 $("#edit-form").validate({
                     // debug: true,
@@ -532,11 +540,25 @@
                                             exclude_promotional_campaign_id: self.form.campaignId,
                                         },
                                         dataFilter: function(response) {
+                                            conflictContents = "";
                                             if (response) {
                                                 let data = JSON.parse(response);
 
                                                 if (data.status) {
                                                     return true;
+                                                }
+
+                                                if (data.conflict_contents) {
+                                                    conflictContents += "衝突的活動名稱: ";
+                                                    data.conflict_contents.forEach((content, index,
+                                                        array) => {
+                                                        conflictContents +=
+                                                            `${content.campaign_name} (商品${content.product_no})`;
+
+                                                        if (index != array.length - 1) {
+                                                            conflictContents += "、";
+                                                        }
+                                                    });
                                                 }
                                             }
 
@@ -621,9 +643,11 @@
                             remote: function(element) {
                                 if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(self.form
                                         .campaignType)) {
-                                    return "同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動";
+                                    return `同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動<br/>
+                                        ${conflictContents}`;
                                 } else if (['PRD05'].includes(self.form.campaignType)) {
-                                    return '同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動';
+                                    return `同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動<br/>
+                                        ${conflictContents}`;
                                 }
                             },
                         },

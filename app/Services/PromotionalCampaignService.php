@@ -762,9 +762,41 @@ class PromotionalCampaignService
             });
         }
 
-        // 狀態
-        if (isset($queryData['active'])) {
-            $campaigns = $campaigns->where('active', $queryData['active']);
+        // 上下架狀態
+        if (isset($queryData['launch_status'])) {
+            switch ($queryData['launch_status']) {
+                // 待上架
+                case 'prepare_to_launch':
+                    $campaigns = $campaigns->where(function ($query) {
+                        $query->where('active', 1)
+                            ->where('start_at', '>', now());
+                    });
+                    break;
+
+                // 已上架
+                case 'launched':
+                    $campaigns = $campaigns->where(function ($query) {
+                        $query->where('active', 1)
+                            ->where('start_at', '<=', now())
+                            ->where('end_at', '>=', now());
+                    });
+                    break;
+
+                // 下架
+                case 'no_launch':
+                    $campaigns = $campaigns->where(function ($query) {
+                        $query->where('active', 1)
+                            ->where('end_at', '<', now());
+                    });
+                    break;
+
+                // 關閉
+                case 'disabled':
+                    $campaigns = $campaigns->where(function ($query) {
+                        $query->where('active', 0);
+                    });
+                    break;
+            }
         }
 
         // 活動類型
@@ -813,7 +845,7 @@ class PromotionalCampaignService
                 'campaign_name' => $campaign->campaign_name,
                 'campaign_brief' => $campaign->campaign_brief,
                 'campaign_type' => null,
-                'active' => config('uec.active2_options')[$campaign->active] ?? null,
+                'launch_status' => $campaign->launch_status,
                 'start_at' => Carbon::parse($campaign->start_at)->format('Y-m-d H:i:s'),
                 'end_at' => Carbon::parse($campaign->end_at)->format('Y-m-d H:i:s'),
             ];
@@ -1196,9 +1228,9 @@ class PromotionalCampaignService
      * @param string $endAt
      * @param array $productIds
      * @param integer|null $excludePromotionalCampaignId
-     * @return boolean
+     * @return array
      */
-    public function canPrdCampaignActive(string $campaignType, string $startAt, string $endAt, array $productIds, int $excludePromotionalCampaignId = null): bool
+    public function canPrdCampaignActive(string $campaignType, string $startAt, string $endAt, array $productIds, int $excludePromotionalCampaignId = null): array
     {
         $user = auth()->user();
 
@@ -1206,7 +1238,11 @@ class PromotionalCampaignService
          * 查詢上架開始、結束時間，是否在已存在的上下架時間範圍內，且狀態為啟用
          * 如果要更新資料，則需排除要更新的該筆資料檢查
          */
-        $promotionalCampaigns = PromotionalCampaign::where('agent_id', $user->agent_id)
+        $promotionalCampaigns = PromotionalCampaign::with([
+            'promotionalCampaignProducts',
+            'promotionalCampaignProducts.product',
+        ])
+            ->where('agent_id', $user->agent_id)
             ->where('active', 1)
             ->where('level_code', 'PRD')
             ->where(function ($query) use ($startAt, $endAt) {
@@ -1233,16 +1269,44 @@ class PromotionalCampaignService
         }
 
         $promotionalCampaigns = $promotionalCampaigns->whereHas('promotionalCampaignProducts', function (Builder $query) use ($productIds) {
-            return $query->whereIn('product_id', $productIds);
+            $query->whereIn('product_id', $productIds);
         });
 
         $promotionalCampaigns = $promotionalCampaigns->get();
 
         if ($promotionalCampaigns->count() < 1) {
-            return true;
+            return [
+                'status' => true,
+            ];
         }
 
-        return false;
+        // 衝突的內容
+        $conflictContents = [];
+        foreach ($promotionalCampaigns as $campaign) {
+            $conflictContent = [
+                'campaign_name' => $campaign->campaign_name,
+                'product_no' => null,
+            ];
+
+            if ($campaign->promotionalCampaignProducts->isNotEmpty()) {
+                $productNos = [];
+
+                foreach ($campaign->promotionalCampaignProducts as $campaignProduct) {
+                    if (isset($campaignProduct->product) && in_array($campaignProduct->product_id, $productIds)) {
+                        $productNos[] = $campaignProduct->product->product_no;
+                    }
+                }
+
+                $conflictContent['product_no'] = implode(', ', $productNos);
+            }
+
+            $conflictContents[] = $conflictContent;
+        }
+
+        return [
+            'status' => false,
+            'conflict_contents' => $conflictContents,
+        ];
     }
 
     /**
@@ -1352,6 +1416,7 @@ class PromotionalCampaignService
                     'campaign_name' => $data['campaign_name'],
                     'active' => $data['active'],
                     'end_at' => $data['end_at'],
+                    'campaign_brief' => $data['campaign_brief'],
                     'updated_by' => $user->id,
                 ]);
             } else {
