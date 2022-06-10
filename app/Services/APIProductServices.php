@@ -414,7 +414,7 @@ class APIProductServices
                 $promotion_txt = '';
                 foreach ($v as $label) {
                     if ($label->promotional_label == '') continue;
-                    if ($label->level_code == 'CART_P') { //檢查多門檻的商品是否為正常上架
+                    if ($label->campaign_type == 'CART_P03' || $label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
                         if (isset($promotion_threshold[$k])) {
                             if ($promotion_threshold[$k]) {
                                 if ($promotion_txt != $label->promotional_label) {
@@ -831,7 +831,7 @@ class APIProductServices
             foreach ($promotions as $category => $promotion) {
                 foreach ($promotion as $item) {
                     if ($item->product_id == $id) {
-                        if ($item->level_code == 'CART_P') { //檢查多門檻的商品是否為正常上架
+                        if ($item->campaign_type == 'CART_P03' || $item->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
                             if (isset($promotion_threshold[$item->product_id])) {
                                 if ($promotion_threshold[$item->product_id]) {
                                     $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
@@ -1203,7 +1203,7 @@ class APIProductServices
             $promotion_txt = '';
             foreach ($campaign as $label) {
                 if ($label->promotional_label == '') continue;
-                if ($label->level_code == 'CART_P') { //檢查多門檻的商品是否為正常上架
+                if ($label->campaign_type == 'CART_P03' || $label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
                     if (isset($promotion_threshold[$product_id])) {
                         if ($promotion_threshold[$product_id]) {
                             if ($promotion_txt != $label->promotional_label) {
@@ -1545,7 +1545,7 @@ class APIProductServices
     }
 
     /**
-     * 多門檻活動產品狀態
+     * 多門檻活動贈品狀態
      */
     public function getPromotionThreshold()
     {

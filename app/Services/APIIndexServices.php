@@ -62,7 +62,7 @@ class APIIndexServices
             $promotion_txt = '';
             foreach ($v as $label) {
                 if ($label->promotional_label=='') continue;
-                if ($label->level_code == 'CART_P') { //檢查多門檻的商品是否為正常上架
+                if ($label->campaign_type == 'CART_P03' || $label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
                     if (isset($promotion_threshold[$k])) {
                         if ($promotion_threshold[$k]) {
                             if ($promotion_txt != $label->promotional_label) {
