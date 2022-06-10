@@ -57,13 +57,25 @@ class APIIndexServices
         $H080B_seemore = [];
         $product_info = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
+        $promotion_threshold = $this->apiProductService->getPromotionThreshold();
         foreach ($promotion as $k => $v) {
             $promotion_txt = '';
             foreach ($v as $label) {
                 if ($label->promotional_label=='') continue;
-                if ($promotion_txt != $label->promotional_label) {
-                    $promotional[$k][] = $label->promotional_label;
-                    $promotion_txt = $label->promotional_label;
+                if ($label->level_code == 'CART_P') { //檢查多門檻的商品是否為正常上架
+                    if (isset($promotion_threshold[$k])) {
+                        if ($promotion_threshold[$k]) {
+                            if ($promotion_txt != $label->promotional_label) {
+                                $promotional[$k][] = $label->promotional_label;
+                                $promotion_txt = $label->promotional_label;
+                            }
+                        }
+                    }
+                } else {
+                    if ($promotion_txt != $label->promotional_label) {
+                        $promotional[$k][] = $label->promotional_label;
+                        $promotion_txt = $label->promotional_label;
+                    }
                 }
             }
         }
