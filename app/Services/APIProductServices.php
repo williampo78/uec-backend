@@ -1124,14 +1124,23 @@ class APIProductServices
         $now = Carbon::now();
         $giftAway = [];
         foreach ($explode_campaign as $k => $campaign_id) {
+            $away = 0;
             if (isset($gifts['PROD'][$campaign_id])) {
+                dd($gifts['PROD'][121]);
                 foreach ($gifts['PROD'][$campaign_id] as $gift) {
                     if ($now >= $gift->start_at && $now <= $gift->end_at) {
-                        $giftAway[] = array(
-                            "productName" => $gift->product_name,
-                            "productPhoto" => ($gift->photo ? $gift->photo : null),
-                            "assignedQty" => $gift->assignedQty,
-                        );
+                        $away ++;
+                    }
+                }
+                if (count($gifts['PROD'][$campaign_id]) == $away) {
+                    foreach ($gifts['PROD'][$campaign_id] as $gift) {
+                        if ($now >= $gift->start_at && $now <= $gift->end_at) {
+                            $giftAway[] = array(
+                                "productName" => $gift->product_name,
+                                "productPhoto" => ($gift->photo ? $gift->photo : null),
+                                "assignedQty" => $gift->assignedQty,
+                            );
+                        }
                     }
                 }
             }
