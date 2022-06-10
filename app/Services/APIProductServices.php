@@ -423,6 +423,14 @@ class APIProductServices
                                 }
                             }
                         }
+                    } elseif ($label->campaign_type == 'PRD05') { //單品
+                        $campaign_gift = $this->getCampaignGiftByID($label->id);
+                        if ($campaign_gift['result']) {
+                            if ($promotion_txt != $label->promotional_label) {
+                                $promotional[$k][] = $label->promotional_label;
+                                $promotion_txt = $label->promotional_label;
+                            }
+                        }
                     } else {
                         if ($promotion_txt != $label->promotional_label) {
                             $promotional[$k][] = $label->promotional_label;
@@ -841,6 +849,15 @@ class APIProductServices
                                     );
                                 }
                             }
+                        } elseif ($item->campaign_type == 'PRD05') { //單品
+                            $campaign_gift = $this->getCampaignGiftByID($item->id);
+                            if ($campaign_gift['result']) {
+                                $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
+                                    "campaign_id" => $item->id,
+                                    "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
+                                    "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
+                                );
+                            }
                         } else {
                             $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
                                 "campaign_id" => $item->id,
@@ -967,13 +984,21 @@ class APIProductServices
                         $promotion_txt = '';
                         foreach ($promotion[$rel->related_product_id] as $k => $Label) { //取活動標籤
                             if ($Label->promotional_label == '') continue;
-                            if ($Label->level_code == 'CART_P') { //檢查多門檻的商品是否為正常上架
+                            if ($Label->campaign_type == 'CART_P03' || $Label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
                                 if (isset($promotion_threshold[$rel->related_product_id])) {
                                     if ($promotion_threshold[$rel->related_product_id]) {
                                         if ($promotion_txt != $Label->promotional_label) {
                                             $promotional[] = $Label->promotional_label;
                                             $promotion_txt = $Label->promotional_label;
                                         }
+                                    }
+                                }
+                            } elseif ($Label->campaign_type == 'PRD05') { //單品
+                                $campaign_gift = $this->getCampaignGiftByID($Label->id);
+                                if ($campaign_gift['result']) {
+                                    if ($promotion_txt != $Label->promotional_label) {
+                                        $promotional[] = $Label->promotional_label;
+                                        $promotion_txt = $Label->promotional_label;
                                     }
                                 }
                             } else {
@@ -1210,6 +1235,14 @@ class APIProductServices
                                 $promotional[$product_id][] = $label->promotional_label;
                                 $promotion_txt = $label->promotional_label;
                             }
+                        }
+                    }
+                } elseif ($label->campaign_type == 'PRD05') { //單品
+                    $campaign_gift = $this->getCampaignGiftByID($label->id);
+                    if ($campaign_gift['result']) {
+                        if ($promotion_txt != $label->promotional_label) {
+                            $promotional[$product_id][] = $label->promotional_label;
+                            $promotion_txt = $label->promotional_label;
                         }
                     }
                 } else {
