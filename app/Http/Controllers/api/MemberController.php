@@ -16,7 +16,6 @@ use App\Models\Shipment;
 use App\Models\StockTransactionLog;
 use App\Models\WarehouseStock;
 use App\Services\APIService;
-use App\Services\LookupValuesVService;
 use App\Services\OrderService;
 use App\Services\ReturnRequestService;
 use App\Services\SysConfigService;
@@ -181,7 +180,7 @@ class MemberController extends Controller
                 'qty' => null,
                 'unit_price' => null,
                 'subtotal' => null,
-                'product_totals' => $order->orderDetails->where('record_identity','M')->count(),
+                'product_totals' => $order->orderDetails->where('record_identity', 'M')->count(),
                 'delivery_method' => null,
                 'shipped_at' => null,
                 'package_no' => null,
@@ -270,13 +269,12 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $sysConfig = $this->sysConfigService->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
-        $cancelLimitMins = isset($sysConfig) ? (int) $sysConfig->config_value : null;
+        $cancelLimitMins = (int) $this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
         $payload = [
             'message' => '取得成功',
             'results' => [
-                'order_id'=>$order->id,
+                'order_id' => $order->id,
                 'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s'),
                 'paid_at' => null,
                 'prepared_shipment_at' => null,
@@ -349,12 +347,12 @@ class MemberController extends Controller
         if (isset($order->cancelled_at)) {
             $payload['results']['cancelled_at'] = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i:s');
         }
-        $giveaway_qty = [] ;
+        $giveaway_qty = [];
 
-        $order->orderDetails->each(function ($orderDetail) use (&$payload , &$giveaway_qty) {
-            if($orderDetail->record_identity == 'M'){
+        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty) {
+            if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
-                    'id'=>$orderDetail->id,
+                    'id' => $orderDetail->id,
                     'photo_url' => null,
                     'product_name' => $orderDetail->product->product_name,
                     'spec_1_value' => $orderDetail->productItem->spec_1_value,
@@ -365,20 +363,20 @@ class MemberController extends Controller
                     'product_id' => $orderDetail->product_id,
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
-                    'discount_content'=>[],
+                    'discount_content' => [],
                 ];
                 if ($orderDetail->product->productPhotos->isNotEmpty()) {
                     $productPhoto = $orderDetail->product->productPhotos->first();
                     $orderDetailPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
                 }
                 $payload['results']['order_details'][] = $orderDetailPayload;
-                $payload['results']['product_totals'] += 1 ;
-            }else{
+                $payload['results']['product_totals'] += 1;
+            } else {
                 //order_details 非商品的數量
-                $giveaway_qty[$orderDetail->id] = $orderDetail->qty ;
+                $giveaway_qty[$orderDetail->id] = $orderDetail->qty;
             }
         });
-        $payload = $this->orderService->addDiscountsToOrder($payload , $giveaway_qty);
+        $payload = $this->orderService->addDiscountsToOrder($payload, $giveaway_qty);
 
         // 出貨單
         if ($order->shipments->isNotEmpty()) {
@@ -429,8 +427,7 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $sysConfig = $this->sysConfigService->getSysConfigByConfigKey('CANCEL_LIMIT_MINS');
-        $cancelLimitMins = isset($sysConfig) ? (int) $sysConfig->config_value : null;
+        $cancelLimitMins = (int) $this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
         // 是否可以取消訂單
         if (!$this->orderService->canCancelOrder($order->status_code, $order->ordered_date, $cancelLimitMins)) {
@@ -440,8 +437,7 @@ class MemberController extends Controller
         }
 
         // 商城良品倉
-        $sysConfig = $this->sysConfigService->getSysConfigByConfigKey('EC_WAREHOUSE_GOODS');
-        $ecWarehouseGoods = isset($sysConfig) ? $sysConfig->config_value : null;
+        $ecWarehouseGoods = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
 
         // 取得倉庫
         $warehouse = $this->warehouseService->getWarehouseByNumber($ecWarehouseGoods);
@@ -454,7 +450,6 @@ class MemberController extends Controller
         }
 
         DB::beginTransaction();
-
         try {
             // (-)退款
             $amount = $order->paid_amount == 0 ? $order->paid_amount : $order->paid_amount * -1;

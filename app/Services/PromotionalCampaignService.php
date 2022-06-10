@@ -1573,7 +1573,7 @@ class PromotionalCampaignService
     public function getCartV2Campaign(int $id): Model
     {
         $user = auth()->user();
-        $warehouseNumber = $this->sysConfigService->getConfigValueByConfigKey('EC_WAREHOUSE_GOODS');
+        $warehouseNumber = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
         $campaign = PromotionalCampaign::with([
             'promotionalCampaignThresholds',
             'promotionalCampaignThresholds.promotionalCampaignGiveaways',
@@ -1750,7 +1750,7 @@ class PromotionalCampaignService
     public function getProductModalProductsForCartV2Campaign(array $data = []): Collection
     {
         $user = auth()->user();
-        $warehouseNumber = $this->sysConfigService->getConfigValueByConfigKey('EC_WAREHOUSE_GOODS');
+        $warehouseNumber = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
 
         $products = Product::with([
             'supplier',
