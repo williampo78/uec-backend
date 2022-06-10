@@ -133,7 +133,8 @@
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label class="control-label" for="tax_type">稅別</label>
+                                            <label class="control-label" for="tax_type">稅別 <span
+                                                    style="color: red;">*</span></label>
                                             <select2 class="form-control" :options="taxTypeOptions" v-model="form.taxType"
                                                 name="tax_type" :allow-clear="false">
                                                 <option disabled value=""></option>
@@ -595,6 +596,9 @@
                         },
                         cell_phone: {
                             maxlength: 25,
+                        },
+                        tax_type: {
+                            required: true,
                         },
                         address: {
                             maxlength: 150,
