@@ -36,7 +36,13 @@ class SupplierService
         return $suppliers->get();
     }
 
-    public function createSupplier(array $inputData): bool
+    /**
+     * 新增供應商
+     *
+     * @param array $data
+     * @return boolean
+     */
+    public function createSupplier(array $data): bool
     {
         $user = auth()->user();
         $result = false;
@@ -46,35 +52,35 @@ class SupplierService
             // 新增供應商
             $createdSupplier = Supplier::create([
                 'agent_id' => $user->agent_id,
-                'supplier_type_id' => $inputData['supplier_type_id'],
-                'payment_term' => $inputData['payment_term'] ?? null,
-                'display_number' => $inputData['display_number'],
-                'company_number' => $inputData['company_number'],
-                'name' => $inputData['name'],
-                'short_name' => $inputData['short_name'],
-                'tax_type' => $inputData['tax_type'],
-                'contact_name' => $inputData['contact_name'] ?? null,
-                'email' => $inputData['email'] ?? null,
-                'telephone' => $inputData['telephone'] ?? null,
-                'fax' => $inputData['fax'] ?? null,
-                'cell_phone' => $inputData['cell_phone'] ?? null,
-                'postal_code' => $inputData['postal_code'] ?? null,
-                'address' => $inputData['address'] ?? null,
-                'address2' => $inputData['address2'] ?? null,
-                'address3' => $inputData['address3'] ?? null,
-                'address4' => $inputData['address4'] ?? null,
-                'address5' => $inputData['address5'] ?? null,
-                'bank_name' => $inputData['bank_name'] ?? null,
-                'bank_branch' => $inputData['bank_branch'] ?? null,
-                'remark' => $inputData['remark'] ?? null,
-                'active' => $inputData['active'],
+                'supplier_type_id' => $data['supplier_type_id'],
+                'payment_term' => $data['payment_term'] ?? null,
+                'display_number' => $data['display_number'],
+                'company_number' => $data['company_number'],
+                'name' => $data['name'],
+                'short_name' => $data['short_name'],
+                'tax_type' => $data['tax_type'],
+                'contact_name' => $data['contact_name'] ?? null,
+                'email' => $data['email'] ?? null,
+                'telephone' => $data['telephone'] ?? null,
+                'fax' => $data['fax'] ?? null,
+                'cell_phone' => $data['cell_phone'] ?? null,
+                'postal_code' => $data['postal_code'] ?? null,
+                'address' => $data['address'] ?? null,
+                'address2' => $data['address2'] ?? null,
+                'address3' => $data['address3'] ?? null,
+                'address4' => $data['address4'] ?? null,
+                'address5' => $data['address5'] ?? null,
+                'bank_name' => $data['bank_name'] ?? null,
+                'bank_branch' => $data['bank_branch'] ?? null,
+                'remark' => $data['remark'] ?? null,
+                'active' => $data['active'],
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
 
             // 新增聯絡人
-            if (isset($inputData['contacts'])) {
-                foreach ($inputData['contacts'] as $contact) {
+            if (isset($data['contacts'])) {
+                foreach ($data['contacts'] as $contact) {
                     Contact::create([
                         'table_name' => 'Supplier',
                         'table_id' => $createdSupplier->id,
@@ -93,17 +99,17 @@ class SupplierService
             // 新增供應商合約
             $createdSupplierContract = SupplierContract::create([
                 'supplier_id' => $createdSupplier->id,
-                'date_from' => $inputData['date_from'] ?? null,
-                'date_to' => $inputData['date_to'] ?? null,
-                'status_code' => $inputData['status_code'] ?? null,
-                'billing_cycle' => $inputData['billing_cycle'] ?? null,
+                'date_from' => $data['date_from'] ?? null,
+                'date_to' => $data['date_to'] ?? null,
+                'status_code' => $data['status_code'] ?? null,
+                'billing_cycle' => $data['billing_cycle'] ?? null,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
 
             // 新增供應商合約條款明細
-            if (isset($inputData['contract_terms'])) {
-                foreach ($inputData['contract_terms'] as $contactTerm) {
+            if (isset($data['contract_terms'])) {
+                foreach ($data['contract_terms'] as $contactTerm) {
                     SupplierContractTerm::create([
                         'supplier_contract_id' => $createdSupplierContract->id,
                         'term_code' => $contactTerm['term_code'],
@@ -149,7 +155,14 @@ class SupplierService
         return true;
     }
 
-    public function updateSupplier(array $inputData): bool
+    /**
+     * 更新供應商
+     *
+     * @param integer $id
+     * @param array $data
+     * @return boolean
+     */
+    public function updateSupplier(int $id, array $data): bool
     {
         $user = auth()->user();
         $result = false;
@@ -157,42 +170,42 @@ class SupplierService
         DB::beginTransaction();
         try {
             // 更新供應商
-            Supplier::findOrFail($inputData['id'])->update([
-                'supplier_type_id' => $inputData['supplier_type_id'],
-                'payment_term' => $inputData['payment_term'] ?? null,
-                'display_number' => $inputData['display_number'],
-                'company_number' => $inputData['company_number'],
-                'name' => $inputData['name'],
-                'short_name' => $inputData['short_name'],
-                'tax_type' => $inputData['tax_type'],
-                'contact_name' => $inputData['contact_name'] ?? null,
-                'email' => $inputData['email'] ?? null,
-                'telephone' => $inputData['telephone'] ?? null,
-                'fax' => $inputData['fax'] ?? null,
-                'cell_phone' => $inputData['cell_phone'] ?? null,
-                'postal_code' => $inputData['postal_code'] ?? null,
-                'address' => $inputData['address'] ?? null,
-                'address2' => $inputData['address2'] ?? null,
-                'address3' => $inputData['address3'] ?? null,
-                'address4' => $inputData['address4'] ?? null,
-                'address5' => $inputData['address5'] ?? null,
-                'bank_name' => $inputData['bank_name'] ?? null,
-                'bank_branch' => $inputData['bank_branch'] ?? null,
-                'remark' => $inputData['remark'] ?? null,
-                'active' => $inputData['active'],
+            Supplier::findOrFail($id)->update([
+                'supplier_type_id' => $data['supplier_type_id'],
+                'payment_term' => $data['payment_term'] ?? null,
+                'display_number' => $data['display_number'],
+                'company_number' => $data['company_number'],
+                'name' => $data['name'],
+                'short_name' => $data['short_name'],
+                'tax_type' => $data['tax_type'],
+                'contact_name' => $data['contact_name'] ?? null,
+                'email' => $data['email'] ?? null,
+                'telephone' => $data['telephone'] ?? null,
+                'fax' => $data['fax'] ?? null,
+                'cell_phone' => $data['cell_phone'] ?? null,
+                'postal_code' => $data['postal_code'] ?? null,
+                'address' => $data['address'] ?? null,
+                'address2' => $data['address2'] ?? null,
+                'address3' => $data['address3'] ?? null,
+                'address4' => $data['address4'] ?? null,
+                'address5' => $data['address5'] ?? null,
+                'bank_name' => $data['bank_name'] ?? null,
+                'bank_branch' => $data['bank_branch'] ?? null,
+                'remark' => $data['remark'] ?? null,
+                'active' => $data['active'],
                 'updated_by' => $user->id,
             ]);
 
             $updatedContactIds = [];
             // 新增或更新聯絡人
-            if (isset($inputData['contacts'])) {
-                $originContactIds = Contact::where('table_name', 'Supplier')->where('table_id', $inputData['id'])->pluck('id');
-                foreach ($inputData['contacts'] as $contact) {
+            if (isset($data['contacts'])) {
+                $originContactIds = Contact::where('table_name', 'Supplier')->where('table_id', $id)->pluck('id');
+                foreach ($data['contacts'] as $contact) {
                     // 新增
                     if (!$originContactIds->contains($contact['id'])) {
                         $createdContact = Contact::create([
                             'table_name' => 'Supplier',
-                            'table_id' => $inputData['id'],
+                            'table_id' => $id,
                             'name' => $contact['name'],
                             'email' => $contact['email'] ?? null,
                             'telephone' => $contact['telephone'] ?? null,
@@ -223,28 +236,44 @@ class SupplierService
             }
 
             // 刪除聯絡人
-            Contact::where('table_name', 'Supplier')->where('table_id', $inputData['id'])->whereNotIn('id', $updatedContactIds)->delete();
+            Contact::where('table_name', 'Supplier')->where('table_id', $id)->whereNotIn('id', $updatedContactIds)->delete();
 
-            // 更新供應商合約
-            SupplierContract::findOrFail($inputData['supplier_contract_id'])->update([
-                'date_from' => $inputData['date_from'] ?? null,
-                'date_to' => $inputData['date_to'] ?? null,
-                'status_code' => $inputData['status_code'] ?? null,
-                'billing_cycle' => $inputData['billing_cycle'] ?? null,
-                'updated_by' => $user->id,
-            ]);
+            $supplierContractId = null;
+            if (isset($data['supplier_contract_id'])) {
+                // 更新供應商合約
+                SupplierContract::findOrFail($data['supplier_contract_id'])->update([
+                    'date_from' => $data['date_from'] ?? null,
+                    'date_to' => $data['date_to'] ?? null,
+                    'status_code' => $data['status_code'] ?? null,
+                    'billing_cycle' => $data['billing_cycle'] ?? null,
+                    'updated_by' => $user->id,
+                ]);
+                $supplierContractId = $data['supplier_contract_id'];
+            } else {
+                // 新增供應商合約
+                $createdSupplierContract = SupplierContract::create([
+                    'supplier_id' => $id,
+                    'date_from' => $data['date_from'] ?? null,
+                    'date_to' => $data['date_to'] ?? null,
+                    'status_code' => $data['status_code'] ?? null,
+                    'billing_cycle' => $data['billing_cycle'] ?? null,
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                ]);
+                $supplierContractId = $createdSupplierContract->id;
+            }
 
             $updatedSupplierContractTermIds = [];
             // 新增或更新供應商合約條款明細
-            if (isset($inputData['contract_terms'])) {
-                foreach ($inputData['contract_terms'] as $contactTerm) {
-                    $supplierContractTerm = SupplierContractTerm::where('supplier_contract_id', $inputData['supplier_contract_id'])
+            if (isset($data['contract_terms'])) {
+                foreach ($data['contract_terms'] as $contactTerm) {
+                    $supplierContractTerm = SupplierContractTerm::where('supplier_contract_id', $supplierContractId)
                         ->where('term_code', $contactTerm['term_code'])
                         ->first();
 
                     if (!isset($supplierContractTerm)) {
                         $createdSupplierContractTerm = SupplierContractTerm::create([
-                            'supplier_contract_id' => $inputData['supplier_contract_id'],
+                            'supplier_contract_id' => $supplierContractId,
                             'term_code' => $contactTerm['term_code'],
                             'term_value' => $contactTerm['term_value'] ?? null,
                             'created_by' => $user->id,
@@ -264,7 +293,7 @@ class SupplierService
             }
 
             // 刪除供應商合約條款明細
-            SupplierContractTerm::where('supplier_contract_id', $inputData['supplier_contract_id'])->whereNotIn('id', $updatedSupplierContractTermIds)->delete();
+            SupplierContractTerm::where('supplier_contract_id', $supplierContractId)->whereNotIn('id', $updatedSupplierContractTermIds)->delete();
 
             DB::commit();
             $result = true;
