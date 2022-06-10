@@ -35,7 +35,7 @@ class PromotionalCampaignPrdController extends Controller
         $queryData = [];
         $queryData = $request->only([
             'campaign_name_or_campaign_brief',
-            'active',
+            'launch_status',
             'campaign_type',
             'start_at_start',
             'start_at_end',
@@ -43,14 +43,13 @@ class PromotionalCampaignPrdController extends Controller
         ]);
 
         $result = [];
+        // 上下架狀態
+        $result['launchStatusOptions'] = config('uec.launch_status_options');
         // 活動類型
         $result['campaignTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'CAMPAIGN_TYPE',
             'udf_01' => self::LEVEL_CODE,
         ]);
-
-        // 狀態
-        $result['activeOptions'] = config('uec.active2_options');
 
         // 網址列參數不足
         if (count($queryData) > 0) {
@@ -181,7 +180,7 @@ class PromotionalCampaignPrdController extends Controller
     {
         $result = $this->promotionalCampaignService->canPrdCampaignActive($request->campaign_type, $request->start_at, $request->end_at, $request->product_ids, $request->exclude_promotional_campaign_id);
 
-        if ($result) {
+        if ($result['status']) {
             return response()->json([
                 'status' => true,
             ]);
@@ -189,6 +188,7 @@ class PromotionalCampaignPrdController extends Controller
 
         return response()->json([
             'status' => false,
+            'conflict_contents' => $result['conflict_contents'],
         ]);
     }
 
