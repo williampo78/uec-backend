@@ -7,7 +7,6 @@
         .modal-dialog {
             max-width: 100%;
         }
-
     </style>
 @endsection
 
@@ -410,7 +409,8 @@
                         let selectedDate = selectedDates[0];
 
                         // 沒有選過日期 或 選到的日期和上一次選到的日期不同天
-                        if (!startAtLastSelectedDate || !moment(selectedDate).isSame(startAtLastSelectedDate, 'day')) {
+                        if (!startAtLastSelectedDate || !moment(selectedDate).isSame(
+                                startAtLastSelectedDate, 'day')) {
                             // 判斷選到的日期是否為當天日期
                             if (moment(selectedDate).isSame(moment(), 'day')) {
                                 selectedDate = moment().add(5, 'minutes').seconds(0).toDate();
@@ -442,6 +442,7 @@
                     },
                 });
 
+                let conflictContents = '';
                 // 驗證表單
                 $("#create-form").validate({
                     // debug: true,
@@ -474,11 +475,25 @@
                                             product_ids: productIds,
                                         },
                                         dataFilter: function(response) {
+                                            conflictContents = "";
                                             if (response) {
                                                 let data = JSON.parse(response);
 
                                                 if (data.status) {
                                                     return true;
+                                                }
+
+                                                if (data.conflict_contents) {
+                                                    conflictContents += "衝突的活動名稱: ";
+                                                    data.conflict_contents.forEach((content, index,
+                                                        array) => {
+                                                        conflictContents +=
+                                                            `${content.campaign_name} (商品${content.product_no})`;
+
+                                                        if (index != array.length - 1) {
+                                                            conflictContents += "、";
+                                                        }
+                                                    });
                                                 }
                                             }
 
@@ -563,9 +578,11 @@
                             remote: function(element) {
                                 if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(self.form
                                         .campaignType)) {
-                                    return "同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動";
+                                    return `同一時間點、同一單品不可存在其他生效的﹝第N件(含)以上打X折﹞、﹝第N件(含)以上折X元﹞、﹝滿N件，每件打X折﹞、﹝滿N件，每件折X元﹞的行銷活動<br/>
+                                        ${conflictContents}`;
                                 } else if (['PRD05'].includes(self.form.campaignType)) {
-                                    return '同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動';
+                                    return `同一時間點、同一單品不可存在其他生效的﹝買N件，送贈品﹞的行銷活動<br/>
+                                        ${conflictContents}`;
                                 }
                             },
                         },
