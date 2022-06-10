@@ -120,11 +120,12 @@ class ProductService
                     break;
                 //商品下架
                 case 'APPROVED_STATUS_OFF':
-                    $products = $products->where(function ($query) use ($now) {
-                        $query->where('products.approval_status', '=', 'APPROVED')
-                            ->where('products.start_launched_at', '>', $now)
-                            ->orWhere('products.end_launched_at', '<', $now)
-                            ->orWhere('products.approval_status', '=', 'CANCELLED');
+                    $products = $products->where(function ($query) {
+                        $query->whereIn('products.approval_status', ['APPROVED', 'CANCELLED'])
+                            ->where(function ($query) {
+                                $query->where('products.start_launched_at', '>', now())
+                                    ->orWhere('products.end_launched_at', '<', now());
+                            });
                     });
                     break;
                 default:
@@ -1030,11 +1031,12 @@ class ProductService
                     break;
                 //商品下架
                 case 'APPROVED_STATUS_OFF':
-                    $query = $query->where(function ($query) use ($now) {
-                        $query->where('products.approval_status', '=', 'APPROVED')
-                            ->where('products.start_launched_at', '>', $now)
-                            ->orWhere('products.end_launched_at', '<', $now)
-                            ->orWhere('products.approval_status', '=', 'CANCELLED');
+                    $query = $query->where(function ($query) {
+                        $query->whereIn('products.approval_status', ['APPROVED', 'CANCELLED'])
+                            ->where(function ($query) {
+                                $query->where('products.start_launched_at', '>', now())
+                                    ->orWhere('products.end_launched_at', '<', now());
+                            });
                     });
                     break;
                 default:
