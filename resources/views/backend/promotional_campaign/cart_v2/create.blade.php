@@ -14,7 +14,6 @@
             border-bottom: 1px solid #ddd;
             padding: 30px;
         }
-
     </style>
 @endsection
 
@@ -583,8 +582,10 @@
             </div>
         </div>
 
-        <cart-v2-campaign-product-modal :modal="productModal" @save="saveProductModalProducts"></cart-v2-campaign-product-modal>
-        <cart-v2-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></cart-v2-campaign-product-modal>
+        <cart-v2-campaign-product-modal :modal="productModal" @save="saveProductModalProducts">
+        </cart-v2-campaign-product-modal>
+        <cart-v2-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts">
+        </cart-v2-campaign-product-modal>
     </div>
 @endsection
 
@@ -702,7 +703,8 @@
                         let selectedDate = selectedDates[0];
 
                         // 沒有選過日期 或 選到的日期和上一次選到的日期不同天
-                        if (!startAtLastSelectedDate || !moment(selectedDate).isSame(startAtLastSelectedDate, 'day')) {
+                        if (!startAtLastSelectedDate || !moment(selectedDate).isSame(
+                                startAtLastSelectedDate, 'day')) {
                             // 判斷選到的日期是否為當天日期
                             if (moment(selectedDate).isSame(moment(), 'day')) {
                                 selectedDate = moment().add(5, 'minutes').seconds(0).toDate();
@@ -739,6 +741,7 @@
                 // 驗證表單
                 $("#create-form").validate({
                     // debug: true,
+                    ignore: "",
                     submitHandler: function(form) {
                         self.saveButton.isDisabled = true;
                         form.submit();
@@ -924,6 +927,24 @@
                         }
 
                         $(element).closest(".form-group").removeClass("has-error");
+                    },
+                    invalidHandler: function(event, validator) {
+                        if (validator.errorList.length) {
+                            let errorElement = $(validator.errorList[0].element);
+                            let classNames = [];
+
+                            if (errorElement.attr('class')) {
+                                classNames = errorElement.attr('class').split(' ');
+                            }
+
+                            if (['threshold-n-value', 'threshold-x-value', 'giveaway-assigned-qty']
+                                .some((item, index, array) => classNames.includes(item)) ||
+                                ['banner_photo_desktop', 'banner_photo_mobile'].includes(errorElement
+                                    .attr('name'))) {
+                                let tabId = errorElement.closest(".tab-pane").attr('id');
+                                $(`ul.nav-tabs a[href="#${tabId}"]`).tab('show');
+                            }
+                        }
                     },
                 });
             },
