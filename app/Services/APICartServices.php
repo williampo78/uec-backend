@@ -257,6 +257,8 @@ class APICartServices
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftCount++; //計算滿額贈禮數
+                                $dataCount = PromotionalCampaign::find($campaign['PRD']['GIFT'][$product_id]->id)->promotionalCampaignGiveaways; //單品有幾個贈品
+
                                 if (isset($stock_gift_check[$giftInfo->product_id])) {
                                     $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
                                     if ($giftCalc > 0) {
@@ -264,7 +266,8 @@ class APICartServices
                                     }
                                 }
                             }
-                            if ($giftCheck > 0 && $giftCount == $giftCheck) {
+
+                            if ($giftCheck > 0 && $giftCount == $giftCheck && $giftCount == count($dataCount)) {
                                 foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                     if (isset($stock_gift_check[$giftInfo->product_id])) {
                                         $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
