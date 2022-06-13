@@ -136,7 +136,7 @@ return [
     |
     */
 
-    'enforce_ssl' => (bool) env('APP_ENFORCE_SSL', false),
+    'enforce_ssl' => (bool) env('ENFORCE_SSL', false),
 
     /*
     |--------------------------------------------------------------------------
