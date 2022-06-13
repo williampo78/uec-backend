@@ -484,6 +484,7 @@ class APIOrderService
             if (isset($cart['thresholdDiscount'])) {
                 $seq1 = 0;
                 foreach ($cart['thresholdDiscount'] as $key => $threshold) {
+                    $threshold_discount['discount'][$threshold['thresholdID']] = 0;
                     foreach ($threshold['products'] as $k => $product_id) {
                         foreach ($cart['list'] as $products) {
                             if ($products['productID'] == $product_id) {
@@ -508,16 +509,24 @@ class APIOrderService
                                         "updated_at" => now(),
                                     ];
                                     OrderCampaignDiscount::insert($campaign_details[$seq1]);
-                                    $threshold_discount['discount'][$threshold['thresholdID']] -= $cart_p_discount_prod[$product_id][$item['itemId']];
+                                    $threshold_discount['discount'][$threshold['thresholdID']] += $cart_p_discount_prod[$product_id][$item['itemId']];
                                 }
                             }
                         }
                     }
                     $discountData = [];
-                    //把最後一筆資料的比例做修正
-                    if ($threshold_discount['discount'][$threshold['thresholdID']] != 0) {
-                        $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->where('id', $order_detail_temp[$product_id])->orderBy('seq', 'DESC')->first();
-                        $discountData['discount'] = $detail->discount + $threshold_discount['discount'][$threshold['thresholdID']];
+                    //把最後一筆資料campaignDiscount的比例做修正
+                    if (($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]) != 0) {
+                        $detail = OrderCampaignDiscount::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')
+                            ->where('level_code', 'CART_P')
+                            ->where('campaign_threshold_id',$threshold['thresholdID'])
+                            ->orderBy('id', 'DESC')->first();
+
+                        if (($threshold['campaignDiscount'] > $threshold_discount['discount'][$threshold['thresholdID']])) {
+                            $discountData['discount'] = $detail->discount + ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
+                        } else {
+                            $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
+                        }
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
                     }
                 }
