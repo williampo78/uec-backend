@@ -904,6 +904,7 @@ class APICartServices
                         $campaign_threshold = $item->id;
                     }
                     $prods = [];
+                    $compare_n_value = 0;
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
                         if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P03') { //﹝滿額﹞指定商品滿N元，送贈
                             if ($calc_amount[$campaign_id] < $item->n_value) continue;
