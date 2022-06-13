@@ -1132,13 +1132,15 @@ class APIProductServices
                         $giftCount++;
                     }
                 }
-                if ($giftCount == $giveaways) {
-                    $giftAway[] = array(
-                        "productId" => $gift->product_id,
-                        "productName" => $gift->product_name,
-                        "productPhoto" => ($gift->photo ? $gift->photo : null),
-                        "assignedQty" => $gift->assignedQty,
-                    );
+                if ($giftCount == count($giveaways)) {
+                    foreach ($gifts['PROD'][$campaign_id] as $gift) {
+                        $giftAway[] = array(
+                            "productId" => $gift->product_id,
+                            "productName" => $gift->product_name,
+                            "productPhoto" => ($gift->photo ? $gift->photo : null),
+                            "assignedQty" => $gift->assignedQty,
+                        );
+                    }
                 }
             }
         }
@@ -1147,7 +1149,7 @@ class APIProductServices
             $result['status'] = 200;
             $result['result'] = $giftAway;
         } else {
-            $result['status'] = 401;
+            $result['status'] = 404;
             $result['result'] = null;
         }
 
