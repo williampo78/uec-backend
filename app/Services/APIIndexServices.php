@@ -71,6 +71,14 @@ class APIIndexServices
                             }
                         }
                     }
+                } elseif ($label->campaign_type == 'PRD05') { //單品
+                    $campaign_gift = $this->apiProductService->getCampaignGiftByID($label->id);
+                    if ($campaign_gift['result']) {
+                        if ($promotion_txt != $label->promotional_label) {
+                            $promotional[$k][] = $label->promotional_label;
+                            $promotion_txt = $label->promotional_label;
+                        }
+                    }
                 } else {
                     if ($promotion_txt != $label->promotional_label) {
                         $promotional[$k][] = $label->promotional_label;
