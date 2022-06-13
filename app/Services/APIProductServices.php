@@ -1124,24 +1124,21 @@ class APIProductServices
         $now = Carbon::now();
         $giftAway = [];
         foreach ($explode_campaign as $k => $campaign_id) {
-            $away = 0;
             if (isset($gifts['PROD'][$campaign_id])) {
-                dd($gifts['PROD'][121]);
+                $giftCount = 0;
+                $giveaways = $this->promotionalCampaignGiveaways($campaign_id);
                 foreach ($gifts['PROD'][$campaign_id] as $gift) {
                     if ($now >= $gift->start_at && $now <= $gift->end_at) {
-                        $away ++;
+                        $giftCount++;
                     }
                 }
-                if (count($gifts['PROD'][$campaign_id]) == $away) {
-                    foreach ($gifts['PROD'][$campaign_id] as $gift) {
-                        if ($now >= $gift->start_at && $now <= $gift->end_at) {
-                            $giftAway[] = array(
-                                "productName" => $gift->product_name,
-                                "productPhoto" => ($gift->photo ? $gift->photo : null),
-                                "assignedQty" => $gift->assignedQty,
-                            );
-                        }
-                    }
+                if ($giftCount == $giveaways) {
+                    $giftAway[] = array(
+                        "productId" => $gift->product_id,
+                        "productName" => $gift->product_name,
+                        "productPhoto" => ($gift->photo ? $gift->photo : null),
+                        "assignedQty" => $gift->assignedQty,
+                    );
                 }
             }
         }
@@ -1618,5 +1615,17 @@ class APIProductServices
         }
         return $data;
 
+    }
+
+    /*
+     * 活動贈品相關
+     */
+    public function promotionalCampaignGiveaways($campaign_id)
+    {
+        $data = PromotionalCampaign::find($campaign_id)->promotionalCampaignGiveaways;
+        foreach ($data as $item) {
+            $result[] = $item->product_id;
+        }
+        return $result;
     }
 }
