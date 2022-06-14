@@ -528,6 +528,8 @@ class APIOrderService
                             $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
                         }
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
+                        //同時把同門檻訂單明細的比例做修正
+                        OrderDetail::where('id', $detail->order_detail_id)->update(['cart_p_discount'=>$discountData['discount']]);
                     }
                 }
             }
@@ -621,19 +623,6 @@ class APIOrderService
                         }
                     }
                 }
-            }
-
-            //購物車滿額折抵把最後一筆資料做修正
-            $discountData = [];
-            if (($cart_p_discount - $detail_p_discount) != 0) {//購物車的滿額折抵 - 訂單明總的滿額折抵加總 != 0
-                $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
-
-                if ($cart_p_discount > $detail_p_discount) {
-                    $discountData['cart_p_discount'] = $detail->cart_p_discount + ($cart_p_discount - $detail_p_discount);
-                } else {
-                    $discountData['cart_p_discount'] = $detail->cart_p_discount - ($detail_p_discount - $cart_p_discount);
-                }
-                OrderDetail::where('id', $detail->id)->update($discountData);
             }
 
             //點數比例加總不等於1時，把最後一筆資料的比例做修正
