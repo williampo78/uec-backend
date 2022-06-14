@@ -1596,23 +1596,24 @@ class APIProductServices
                     inner join promotional_campaigns pc on pc.id=pcg.promotional_campaign_id
                     inner join  promotional_campaign_products pcp on pcp.promotional_campaign_id=pc.id
                     where current_timestamp() between pc.start_at and pc.end_at and pc.active=1";
-        $strSQL .= " order by pcg.promotional_campaign_id, pcg.threshold_id, pcg.sort;";
+        $strSQL .= " order by pcg.promotional_campaign_id, pcg.threshold_id,p.approval_status, pcg.sort;";
 
         $promotional = DB::select($strSQL);
         $data = [];
-        $campaign_id = 0;
-        $threshold_id = 0;
+        $result = [];
         foreach ($promotional as $promotion) {
-            if ($campaign_id != $promotion->promotional_campaign_id) {
-                if ($threshold_id != $promotion->threshold_id) {
-                    if ($promotion->approval_status == 'APPROVED') {
-                        $data[$promotion->product_id] = true;
-                    } else {
-                        $data[$promotion->product_id] = false;
-                    }
-                    $threshold_id = $promotion->threshold_id;
-                }
-                $campaign_id = $promotion->promotional_campaign_id;
+            //取得在活動門檻中的贈品是否有效上架(同活動門檻最後一筆不是APPROVED該活動門檻就不算有效)
+            if ($promotion->approval_status == 'APPROVED') {
+                $result[$promotion->promotional_campaign_id][$promotion->threshold_id] = true;
+            } else {
+                $result[$promotion->promotional_campaign_id][$promotion->threshold_id] = false;
+            }
+        }
+        array_multisort(array_column($promotional, 'product_id'), SORT_ASC, $promotional);
+        foreach ($promotional as $promotion) {
+            //指定單品的活動門檻如果是有效的就回傳
+            if ($result[$promotion->promotional_campaign_id][$promotion->threshold_id]){
+                $data[$promotion->product_id] = true;
             }
         }
         return $data;
