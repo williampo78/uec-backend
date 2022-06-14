@@ -37,7 +37,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label class="control-label">活動名稱 <span
+                                                <label class="control-label text-nowrap">活動名稱 <span
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
@@ -51,7 +51,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label for="campaign_type" class="control-label">活動類型 <span
+                                                <label for="campaign_type" class="control-label text-nowrap">活動類型 <span
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
@@ -68,7 +68,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label class="control-label">狀態 <span style="color: red;">*</span></label>
+                                                <label class="control-label text-nowrap">狀態 <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
                                                 <label class="radio-inline">
@@ -87,7 +87,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label class="control-label">上架時間 <span
+                                                <label class="control-label text-nowrap">上架時間 <span
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
@@ -129,7 +129,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label class="control-label">前台文案 <span
+                                                <label class="control-label text-nowrap">前台文案 <span
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
@@ -144,7 +144,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label class="control-label">前台URL <span
+                                                <label class="control-label text-nowrap">前台URL <span
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
@@ -158,7 +158,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label class="control-label">庫存類型 <span
+                                                <label class="control-label text-nowrap">庫存類型 <span
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
@@ -180,7 +180,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <div class="col-sm-1">
-                                                <label for="campaign_type" class="control-label">供應商 <span
+                                                <label for="campaign_type" class="control-label text-nowrap">供應商 <span
                                                         style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-11">
