@@ -44,6 +44,7 @@ class APICartServices
             $query->where('products.approval_status', '=', 'APPROVED'); //核準上架
             $query->orWhere('products.approval_status', '=', 'CANCELLED'); //被下架
         });
+        $result = $result->orderBy('shopping_cart_details.updated_at', 'desc');
         $result = $result->orderBy('product_items.sort', 'asc')->get();
         $data = [];
         foreach ($result as $datas) {
