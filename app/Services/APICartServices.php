@@ -877,9 +877,9 @@ class APICartServices
                             $tmp_product_id = $product_id;
                             if (isset($tmp_calc)) {
                                 if (array_key_exists($product_id, $tmp_calc)) {
-                                    $tmp_thresholdDiscount[$campaign_id] += 0;
-                                } else {
-                                    $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
+                                    if ($tmp_thresholdDiscount[$campaign_id] == 0) {
+                                        $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
+                                    }
                                 }
                             }
                         }
