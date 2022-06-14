@@ -30,7 +30,8 @@ class ImageUploadService
                             $img = Image::make($obj);
                             $img->resize('480', '480');
                             $resource = $img->stream()->detach();
-                            $imageName = '480X480_' . uniqid(date('YmdHis')) . $obj->getClientOriginalName();
+                            $typeName = '.'.explode(".",$obj->getClientOriginalName())[1] ?? '';
+                            $imageName = '480X480_'.uniqid(date('YmdHis')).$typeName;
                             Storage::disk('s3')->put('/'.$path.'/' . $imageName, $resource, 'public');
                             $result['image'][$key] = $path.'/' . $imageName;
                         }
@@ -38,7 +39,8 @@ class ImageUploadService
                         $img = Image::make($file);
                         $img->resize('480', '480');
                         $resource = $img->stream()->detach();
-                        $imageName = '480X480_' . uniqid(date('YmdHis')) . $file->getClientOriginalName();
+                        $typeName = '.'.explode(".",$file->getClientOriginalName())[1] ?? '';
+                        $imageName = '480X480_' . uniqid(date('YmdHis')) . $typeName;
                         Storage::disk('s3')->put('/'.$path.'/' . $imageName, $resource, 'public');
                         $result['image'] = $path.'/' . $imageName;
                     }
