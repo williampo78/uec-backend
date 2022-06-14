@@ -197,9 +197,20 @@
                                     <div class="col-sm-2 ">
                                         <label class="control-label">商品通路<span class="redtext">*</span></label>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-3">
                                         <label class="radio-inline">
-                                            <input type="radio" name="selling_channel" value="WHOLE" checked> 全通路
+                                            <input type="radio" name="selling_channel" value="EC"> 網路獨賣
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="selling_channel" value="WHOLE"> 全通路
+                                        </label>
+
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+                                        <input type="radio" name="selling_channel" value="STORE"> 門市限定
                                         </label>
                                     </div>
                                 </div>

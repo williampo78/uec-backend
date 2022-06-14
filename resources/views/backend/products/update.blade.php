@@ -3,8 +3,8 @@
 @section('content')
     <style>
         /* .no-pa {
-                    padding: 0px;
-            } */
+                            padding: 0px;
+                    } */
         .ondragover {
             background: #b7e0fb !important;
             transition: background-color 0.5s;
@@ -81,7 +81,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -200,9 +199,9 @@
                                     </div>
                                     <div class="col-sm-9">
                                         @if ($products->tax_type == 'TAXABLE')
-                                            <input class="form-control" value="應稅(5%)">
+                                            <input class="form-control" value="應稅(5%)" readonly>
                                         @elseif($products->tax_type == 'NON_TAXABLE')
-                                            <input class="form-control" value="免稅">
+                                            <input class="form-control" value="免稅" readonly>
                                         @endif
                                         <input type="hidden" class="form-control" id="tax_type" name="tax_type"
                                             value="{{ $products->tax_type }}">
@@ -235,8 +234,7 @@
                                         <label class="control-label">品牌<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control brand_id" name="brand_id" id="brand_id"
-                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
+                                        <select class="form-control brand_id" name="brand_id" id="brand_id">
                                             <option value=""></option>
                                             @foreach ($brands as $val)
                                                 <option value="{{ $val->id }}"
@@ -253,7 +251,8 @@
                                         <label class="control-label">商品型號</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="model" value=" {{ $products->model }}">
+                                        <input class="form-control" name="model" value=" {{ $products->model }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -264,24 +263,49 @@
                                     <div class="col-sm-2 ">
                                         <label class="control-label">商品通路<span class="redtext">*</span></label>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-3">
                                         <label class="radio-inline">
-                                            <input type="radio" name="selling_channel" value="WHOLE"
-                                                {{ $products->selling_channel == 'WHOLE' ? 'checked' : '' }}> 全通路
+                                            <input type="radio" name="selling_channel" value="EC"
+                                                {{ $products->selling_channel == 'EC' ? 'checked' : '' }}
+                                                {{ $products->edit_readonly == '1' && $products->selling_channel !== 'EC' ? 'disabled' : '' }}>
+                                            網路獨賣
                                         </label>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+
+                                            <input type="radio" name="selling_channel" value="WHOLE"
+                                                {{ $products->selling_channel == 'WHOLE' ? 'checked' : '' }}
+                                                {{ $products->edit_readonly == '1' && $products->selling_channel !== 'WHOLE' ? 'disabled' : '' }}>
+                                            全通路
+                                        </label>
+
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="radio-inline">
+
+                                            <input type="radio" name="selling_channel" value="STORE"
+                                                {{ $products->selling_channel == 'STORE' ? 'checked' : '' }}
+                                                {{ $products->edit_readonly == '1' && $products->selling_channel !== 'STORE' ? 'disabled' : '' }}>
+                                            門市限定
+                                        </label>
+
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                <div class="col-sm-2 ">
-                                    <label class="control-label">溫層<span class="redtext">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="lgst_temperature" value="NORMAL"
-                                            {{ $products->lgst_temperature == 'NORMAL' ? 'checked' : '' }}>
-                                        常溫
-                                    </label>
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">溫層<span class="redtext">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="lgst_temperature" value="NORMAL"
+                                                {{ $products->lgst_temperature == 'NORMAL' ? 'checked' : '' }}
+                                                {{ $products->edit_readonly == '1' && $products->lgst_temperature !== 'NORMAL' ? 'disabled' : '' }}>
+                                            常溫
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +318,8 @@
                                     <div class="col-sm-9">
                                         <label class="radio-inline">
                                             <input type="radio" name="lgst_method" value="HOME"
-                                                {{ $products->lgst_method == 'HOME' ? 'checked' : '' }}>
+                                                {{ $products->lgst_method == 'HOME' ? 'checked' : '' }}
+                                                {{ $products->edit_readonly == '1' && $products->lgst_method !== 'HOME' ? 'disabled' : '' }}>
                                             宅配
                                         </label>
                                     </div>
@@ -308,7 +333,8 @@
                                     <div class="col-sm-9">
                                         <label class="radio-inline">
                                             <input type="radio" name="delivery_type" value="IN_STOCK"
-                                                {{ $products->delivery_type == 'IN_STOCK' ? 'checked' : 'disabled' }}>
+                                                {{ $products->delivery_type == 'IN_STOCK' ? 'checked' : 'disabled' }}
+                                                {{ $products->edit_readonly == '1' && $products->delivery_type !== 'IN_STOCK' ? 'disabled' : '' }}>
                                             現貨
                                         </label>
                                     </div>
@@ -322,7 +348,7 @@
                                         <label class="control-label">單位<span class="redtext">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="uom" value="{{ $products->uom }}">
+                                        <input class="form-control" name="uom" value="{{ $products->uom }}" {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -332,8 +358,7 @@
                                         <label class="control-label">最小採購量</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="min_purchase_qty" type="number" min="0"
-                                            value="{{ $products->min_purchase_qty }}">
+                                        <input class="form-control" name="min_purchase_qty" type="number" min="0" value="{{ $products->min_purchase_qty }}" {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -360,7 +385,7 @@
                                     <div class="col-sm-3">
                                         <input class="form-control" name="expiry_days"
                                             value=" {{ $products->expiry_days }}"
-                                            {{ $products->has_expiry_date == '1' ? 'checked' : 'readonly' }}>
+                                            {{ $products->has_expiry_date == '1' ? 'checked' : '' }} readonly>
                                     </div>
                                 </div>
                             </div>
@@ -370,9 +395,11 @@
                                         <label class="control-label">允收期(天)</label>
                                     </div>
                                     <div class="col-sm-3">
-                                        <input type="number" class="form-control" name="expiry_receiving_days" min="0"
-                                            value="{{ $products->expiry_receiving_days }}" readonly>
+                                        <input type="number" class="form-control" id="expiry_receiving_days"
+                                            name="expiry_receiving_days" min="0"
+                                            value="{{ $products->expiry_receiving_days }}"  {{ $products->edit_readonly == '1' ? '' : 'readonly' }}>
                                     </div>
+                                    <p style="color:red;">新增請購紀錄</p>
                                 </div>
                             </div>
                         </div>
@@ -424,6 +451,7 @@
                                             否
                                         </label>
                                     </div>
+                                    <p style="color:red;">商品若要停售，須先下架，不可直接修改</p>
                                 </div>
                             </div>
                         </div>
@@ -438,21 +466,24 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <input class="form-control" name="length" type="number" min="0"
-                                            value="{{ $products->length }}">
+                                            value="{{ $products->length }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">寬</label>
                                     </div>
                                     <div class="col-sm-2 ">
                                         <input class="form-control" name="width" type="number" min="0"
-                                            value="{{ $products->width }}">
+                                            value="{{ $products->width }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">高</label>
                                     </div>
                                     <div class="col-sm-2">
                                         <input class="form-control" name="height" type="number" min="0"
-                                            value="{{ $products->height }}">
+                                            value="{{ $products->height }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -463,7 +494,8 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <input class="form-control" name="weight" type="number" min="0"
-                                            value="{{ $products->weight }}">
+                                            value="{{ $products->weight }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -476,7 +508,8 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="list_price" type="number" min="0"
-                                            value="{{ $products->list_price }}">
+                                            value="{{ $products->list_price }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -487,7 +520,8 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="selling_price" type="number" min="0"
-                                            value="{{ $products->selling_price }}">
+                                            value="{{ $products->selling_price }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -680,8 +714,7 @@
                                         <label class="control-label">保固範圍</label>
                                     </div>
                                     <div class="col-sm-11">
-                                        <textarea class="form-control" rows="10" cols="10"
-                                            name="warranty_scope">{{ $products->warranty_scope }}</textarea>
+                                        <textarea class="form-control" rows="10" cols="10" name="warranty_scope">{{ $products->warranty_scope }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -696,10 +729,9 @@
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                             <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
-                                            <input type="file" @change="fileSelected" multiple
-                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
-                                            <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
-                                                multiple>
+                                            <input type="file" @change="fileSelected" multiple>
+                                            <input style="display: none" type="file" :ref="'images_files'"
+                                                name="filedata[]" multiple>
                                         </div>
                                         <textarea style="display:none;" name="imgJson" id="" cols="30" rows="10">@{{ images }}</textarea>
                                     </div>
@@ -719,8 +751,7 @@
                                             <p>
                                                 排序: @{{ key + 1 }}
                                                 <button class="btn btn-danger pull-right btn-events-none" type="button"
-                                                    @click="delImages(key)" style="pointer-events: auto;"
-                                                    {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
+                                                    @click="delImages(key)" style="pointer-events: auto;">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </p>
@@ -741,7 +772,7 @@
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="0"
                                             v-model="products.spec_dimension"
-                                            :disabled="products.spec_dimension !== 0 || edit_readonly == 1">
+                                            :disabled="products.spec_dimension !== 0">
                                         單規格
                                     </label>
                                 </div>
@@ -749,14 +780,14 @@
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="1"
                                             v-model="products.spec_dimension"
-                                            :disabled="products.spec_dimension == 2 || edit_readonly == 1">
+                                            :disabled="products.spec_dimension == 2">
                                         一維多規格
                                     </label>
                                 </div>
                                 <div class="col-sm-2">
                                     <label class="radio-inline">
                                         <input type="radio" name="spec_dimension" value="2"
-                                            v-model="products.spec_dimension" :disabled="edit_readonly == 1">
+                                            v-model="products.spec_dimension" >
                                         二維多規格
                                     </label>
                                 </div>
@@ -795,7 +826,6 @@
                                         <tr>
                                             <th>
                                                 <button class="btn btn-primary btn-sm" type="button"
-                                                    {{ $products->edit_readonly == '1' ? 'disabled' : '' }}
                                                     @click="AddSpecToSkuList('1')">新增項目
                                                 </button>
                                             </th>
@@ -815,15 +845,15 @@
                                                     <div v-if="spec_1.old_spec">
                                                         <div class="form-group">
                                                             <input class="form-control spec_1_va"
-                                                                :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name"
-                                                                data-va="spec_1_va">
+                                                                :name="'spec_1_va[' + spec_1_key + ']'"
+                                                                v-model="spec_1.name" data-va="spec_1_va">
                                                         </div>
                                                     </div>
                                                     <div v-else>
                                                         <div class="form-group">
                                                             <input class="form-control spec_1_va"
-                                                                :name="'spec_1_va['+spec_1_key+']'" v-model="spec_1.name"
-                                                                data-va="spec_1_va">
+                                                                :name="'spec_1_va[' + spec_1_key + ']'"
+                                                                v-model="spec_1.name" data-va="spec_1_va">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -850,7 +880,6 @@
                                         <tr>
                                             <th>
                                                 <button class="btn btn-primary btn-sm" type="button"
-                                                    {{ $products->edit_readonly == '1' ? 'disabled' : '' }}
                                                     @click="AddSpecToSkuList('2')">新增項目
                                                 </button>
                                             </th>
@@ -870,15 +899,16 @@
                                                     <div v-if="spec_2.old_spec">
                                                         <div class="form-group">
                                                             <input class="form-control spec_2_va"
-                                                                :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name"
-                                                                data-va="spec_2_va">
+                                                                :name="'spec_2_va[' + spec_2_key + ']'"
+                                                                v-model="spec_2.name" data-va="spec_2_va">
                                                         </div>
                                                     </div>
                                                     <div v-else>
                                                         <div class="form-group">
                                                             <input class="form-control spec_2_va"
-                                                                :name="'spec_2_va['+spec_2_key+']'" v-model="spec_2.name"
-                                                                data-va="spec_2_va">
+                                                                :name="'spec_2_va[' + spec_2_key + ']'"
+                                                                v-model="spec_2.name" data-va="spec_2_va"
+                                                                >
                                                         </div>
 
                                                     </div>
@@ -910,13 +940,11 @@
                                         v-model="safty_qty_all">
                                 </div>
                                 <div class="cola-sm-2">
-                                    <button class="btn btn-primary btn-sm" type="button" @click="change_safty_qty_all"
-                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>套用</button>
+                                    <button class="btn btn-primary btn-sm" type="button" @click="change_safty_qty_all">套用</button>
                                 </div>
                             </div>
                         </div>
-                        <textarea style="display: none;" id="SkuListdata" name="SkuListdata" cols="30"
-                            rows="10">@{{ SkuList }}</textarea>
+                        <textarea style="display: none;" id="SkuListdata" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
 
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
@@ -937,24 +965,28 @@
                                     <td v-if="products.spec_dimension >= 1">@{{ Sku.spec_1_value }}</td>
                                     <td v-if="products.spec_dimension == 2">@{{ Sku.spec_2_value }}</td>
                                     <td><input class="form-control" v-model="Sku.item_no" readonly></td>
-                                    <td><input class="form-control" v-model="Sku.supplier_item_no"></td>
+                                    <td><input class="form-control" v-model="Sku.supplier_item_no"
+                                        :disabled="Sku.id !== '' && edit_readonly == 1"></td>
                                     <td>
                                         <div class="form-group" style="margin-right:0px;margin-left:0px;">
                                             <input class="form-control ean_va" v-model="Sku.ean"
-                                                :name="'ean_va['+SkuKey+']'">
+                                                :name="'ean_va[' + SkuKey + ']'"
+                                                :disabled="Sku.id !== '' && edit_readonly == 1"
+                                                >
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group" style="margin-right:0px;margin-left:0px;">
                                             <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
-                                                :name="'pos_item_no['+SkuKey+']'" :data-item_no="Sku.item_no"
-                                                data-va="pos_item_no">
+                                                :name="'pos_item_no[' + SkuKey + ']'" :data-item_no="Sku.item_no"
+                                                data-va="pos_item_no" :disabled="Sku.id !== '' && edit_readonly == 1">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group" style="margin-right:0px;margin-left:0px;">
                                             <input class="form-control safty_qty_va" type="number" min="0"
-                                                v-model="Sku.safty_qty" :name="'safty_qty_va['+SkuKey+']'">
+                                                v-model="Sku.safty_qty" :name="'safty_qty_va[' + SkuKey + ']'"
+                                                :disabled="Sku.id !== '' && edit_readonly == 1">
                                         </div>
                                     </td>
                                     <td>
@@ -965,7 +997,8 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <select class="form-control js-select2" v-model="Sku.status" @change="checkItemQty($event,Sku,SkuKey)"
+                                        <select class="form-control js-select2" v-model="Sku.status"
+                                            @change="checkItemQty($event,Sku,SkuKey)"
                                             {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                             <option value="1">啟用</option>
                                             <option value="0">停用</option>
@@ -1031,8 +1064,16 @@
             methods: {
                 change_safty_qty_all() {
                     let change_num = this.safty_qty_all;
+                    let edit_readonly = this.edit_readonly;
+
                     this.SkuList.map(function(value, key) {
-                        value.safty_qty = change_num;
+                        if(edit_readonly == 1 ){
+                            if(value.id == ''){
+                                value.safty_qty = change_num;
+                            }
+                        }else{
+                            value.safty_qty = change_num;
+                        }
                     });
                 },
                 AddSpecToSkuList(spec_type) {
@@ -1231,22 +1272,22 @@
                         }
                     }
                 },
-                checkItemQty(event,item,key){
+                checkItemQty(event, item, key) {
                     var vm = this;
-                    if(event.target.value == 0){
+                    if (event.target.value == 0) {
                         axios.post('/backend/products/ajax', {
-                        item_id:item.id,
-                        type: 'checkItemQty',
-                    })
-                    .then(function(response) {
-                        if(!response.data.result){
-                            vm.SkuList[key].status = 1 ;
-                            alert('Item編號'+item.item_no+'仍有庫存，不允許停用')
-                        }
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                    });
+                                item_id: item.id,
+                                type: 'checkItemQty',
+                            })
+                            .then(function(response) {
+                                if (!response.data.result) {
+                                    vm.SkuList[key].status = 1;
+                                    alert('Item編號' + item.item_no + '仍有庫存，不允許停用')
+                                }
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                            });
                     }
                 }
 
@@ -1497,11 +1538,6 @@
                 theme: "bootstrap",
                 placeholder: "請選擇",
             });
-            if ($('#edit_readonly').val() === '1') {
-                $("#new-form :input").attr("readonly", true);
-                $("#product_name").attr("readonly", false);
-                $(".product_brief").attr("readonly", false);
-            }
             $(document).on("click", "#save_data", function() {
                 $(".ean_va").each(function() {
                     var text = $(this).val();
