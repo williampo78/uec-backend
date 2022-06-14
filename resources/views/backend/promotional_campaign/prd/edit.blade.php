@@ -238,7 +238,7 @@
                                                             <td>@{{ index + 1 }}</td>
                                                             <td>@{{ product.productNo }}</td>
                                                             <td>@{{ product.productName }}</td>
-                                                            <td>@{{ product.sellingPrice }}</td>
+                                                            <td>@{{ product.sellingPriceForDisplay }}</td>
                                                             <td>@{{ product.launchedAt }}</td>
                                                             <td>@{{ product.launchStatus }}</td>
                                                             <td>@{{ product.grossMargin }}</td>
@@ -425,6 +425,7 @@
                                 productNo: product.product_no,
                                 productName: product.product_name,
                                 sellingPrice: product.selling_price,
+                                sellingPriceForDisplay: product.selling_price.toLocaleString('en-US'),
                                 launchedAt: product.start_launched_at || product.end_launched_at ?
                                     `${product.start_launched_at} ~ ${product.end_launched_at}` :
                                     '',
@@ -626,6 +627,14 @@
                                     return ['PRD01', 'PRD03'].includes(self.form.campaignType);
                                 },
                             },
+                            compareDiscountAndSellingPrice: {
+                                param: function() {
+                                    return self.form.products;
+                                },
+                                depends: function(element) {
+                                    return ['PRD02', 'PRD04'].includes(self.form.campaignType);
+                                },
+                            },
                         },
                         target_groups: {
                             required: true,
@@ -762,6 +771,7 @@
                             productNo: product.productNo,
                             productName: product.productName,
                             sellingPrice: product.sellingPrice,
+                            sellingPriceForDisplay: product.sellingPriceForDisplay,
                             launchedAt: product.launchedAt,
                             launchStatus: product.launchStatus,
                             grossMargin: product.grossMargin,
