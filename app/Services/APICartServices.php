@@ -257,6 +257,8 @@ class APICartServices
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftCount++; //計算滿額贈禮數
+                                $dataCount = PromotionalCampaign::find($campaign['PRD']['GIFT'][$product_id]->id)->promotionalCampaignGiveaways; //單品有幾個贈品
+
                                 if (isset($stock_gift_check[$giftInfo->product_id])) {
                                     $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
                                     if ($giftCalc > 0) {
@@ -264,7 +266,8 @@ class APICartServices
                                     }
                                 }
                             }
-                            if ($giftCheck > 0 && $giftCount == $giftCheck) {
+
+                            if ($giftCheck > 0 && $giftCount == $giftCheck && $giftCount == count($dataCount)) {
                                 foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                     if (isset($stock_gift_check[$giftInfo->product_id])) {
                                         $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
@@ -873,12 +876,8 @@ class APICartServices
                             $subAmount[] = $prod_amount[$product_id];
                             $tmp_product_id = $product_id;
                             if (isset($tmp_calc)) {
-                                if (!key_exists($product_id, $tmp_calc)) {
-                                    $tmp_thresholdDiscount[$campaign_id] += 0;
-                                } else {
-                                    if (is_array($tmp_calc[$product_id])) {
-                                        $tmp_thresholdDiscount[$campaign_id] += 0;
-                                    } else {
+                                if (array_key_exists($product_id, $tmp_calc)) {
+                                    if ($tmp_thresholdDiscount[$campaign_id] == 0) {
                                         $tmp_thresholdDiscount[$campaign_id] += $tmp_calc[$product_id];
                                     }
                                 }
@@ -901,6 +900,7 @@ class APICartServices
                         $campaign_threshold = $item->id;
                     }
                     $prods = [];
+                    $compare_n_value = 0;
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
                         if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P03') { //﹝滿額﹞指定商品滿N元，送贈
                             if ($calc_amount[$campaign_id] < $item->n_value) continue;

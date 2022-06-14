@@ -409,13 +409,33 @@ class APIProductServices
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
         if ($products) {
             $promotion = self::getPromotion('product_card');
+            $promotion_threshold = self::getPromotionThreshold();
             foreach ($promotion as $k => $v) {
                 $promotion_txt = '';
                 foreach ($v as $label) {
                     if ($label->promotional_label == '') continue;
-                    if ($promotion_txt != $label->promotional_label) {
-                        $promotional[$k][] = $label->promotional_label;
-                        $promotion_txt = $label->promotional_label;
+                    if ($label->campaign_type == 'CART_P03' || $label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
+                        if (isset($promotion_threshold[$k])) {
+                            if ($promotion_threshold[$k]) {
+                                if ($promotion_txt != $label->promotional_label) {
+                                    $promotional[$k][] = $label->promotional_label;
+                                    $promotion_txt = $label->promotional_label;
+                                }
+                            }
+                        }
+                    } elseif ($label->campaign_type == 'PRD05') { //單品
+                        $campaign_gift = $this->getCampaignGiftByID($label->id);
+                        if ($campaign_gift['result']) {
+                            if ($promotion_txt != $label->promotional_label) {
+                                $promotional[$k][] = $label->promotional_label;
+                                $promotion_txt = $label->promotional_label;
+                            }
+                        }
+                    } else {
+                        if ($promotion_txt != $label->promotional_label) {
+                            $promotional[$k][] = $label->promotional_label;
+                            $promotion_txt = $label->promotional_label;
+                        }
                     }
                 }
             }
@@ -529,10 +549,12 @@ class APIProductServices
      */
     public function getPromotion($type = null, $event = null)
     {
-        $strSQL = "select pcp.product_id, pc.*
+        $strSQL = "select pcp.product_id, p.approval_status, pc.*
                 from promotional_campaigns pc
                 inner join  promotional_campaign_products pcp on pcp.promotional_campaign_id=pc.id
-                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1 ";
+                inner join frontend_products_v p on p.id=pcp.product_id
+                where current_timestamp() between pc.start_at and pc.end_at and pc.active=1
+                and current_timestamp() between p.start_launched_at and p.end_launched_at and p.approval_status='APPROVED' ";
 
         if ($event) {
             $strSQL .= " and pc.id=" . (int)$event;
@@ -813,14 +835,36 @@ class APIProductServices
             //行銷促案資訊
             $promotion_type = [];
             $promotions = self::getPromotion('product_content');
+            $promotion_threshold = self::getPromotionThreshold();
             foreach ($promotions as $category => $promotion) {
                 foreach ($promotion as $item) {
                     if ($item->product_id == $id) {
-                        $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
-                            "campaign_id" => $item->id,
-                            "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
-                            "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
-                        );
+                        if ($item->campaign_type == 'CART_P03' || $item->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
+                            if (isset($promotion_threshold[$item->product_id])) {
+                                if ($promotion_threshold[$item->product_id]) {
+                                    $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
+                                        "campaign_id" => $item->id,
+                                        "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
+                                        "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
+                                    );
+                                }
+                            }
+                        } elseif ($item->campaign_type == 'PRD05') { //單品
+                            $campaign_gift = $this->getCampaignGiftByID($item->id);
+                            if ($campaign_gift['result']) {
+                                $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
+                                    "campaign_id" => $item->id,
+                                    "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
+                                    "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
+                                );
+                            }
+                        } else {
+                            $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
+                                "campaign_id" => $item->id,
+                                "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
+                                "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
+                            );
+                        }
                     }
                 }
             }
@@ -940,9 +984,28 @@ class APIProductServices
                         $promotion_txt = '';
                         foreach ($promotion[$rel->related_product_id] as $k => $Label) { //取活動標籤
                             if ($Label->promotional_label == '') continue;
-                            if ($promotion_txt != $Label->promotional_label) {
-                                $promotional[] = $Label->promotional_label;
-                                $promotion_txt = $Label->promotional_label;
+                            if ($Label->campaign_type == 'CART_P03' || $Label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
+                                if (isset($promotion_threshold[$rel->related_product_id])) {
+                                    if ($promotion_threshold[$rel->related_product_id]) {
+                                        if ($promotion_txt != $Label->promotional_label) {
+                                            $promotional[] = $Label->promotional_label;
+                                            $promotion_txt = $Label->promotional_label;
+                                        }
+                                    }
+                                }
+                            } elseif ($Label->campaign_type == 'PRD05') { //單品
+                                $campaign_gift = $this->getCampaignGiftByID($Label->id);
+                                if ($campaign_gift['result']) {
+                                    if ($promotion_txt != $Label->promotional_label) {
+                                        $promotional[] = $Label->promotional_label;
+                                        $promotion_txt = $Label->promotional_label;
+                                    }
+                                }
+                            } else {
+                                if ($promotion_txt != $Label->promotional_label) {
+                                    $promotional[] = $Label->promotional_label;
+                                    $promotion_txt = $Label->promotional_label;
+                                }
                             }
                         }
                     }
@@ -1062,9 +1125,17 @@ class APIProductServices
         $giftAway = [];
         foreach ($explode_campaign as $k => $campaign_id) {
             if (isset($gifts['PROD'][$campaign_id])) {
+                $giftCount = 0;
+                $giveaways = $this->promotionalCampaignGiveaways($campaign_id);
                 foreach ($gifts['PROD'][$campaign_id] as $gift) {
                     if ($now >= $gift->start_at && $now <= $gift->end_at) {
+                        $giftCount++;
+                    }
+                }
+                if ($giftCount == count($giveaways)) {
+                    foreach ($gifts['PROD'][$campaign_id] as $gift) {
                         $giftAway[] = array(
+                            "productId" => $gift->product_id,
                             "productName" => $gift->product_name,
                             "productPhoto" => ($gift->photo ? $gift->photo : null),
                             "assignedQty" => $gift->assignedQty,
@@ -1078,7 +1149,7 @@ class APIProductServices
             $result['status'] = 200;
             $result['result'] = $giftAway;
         } else {
-            $result['status'] = 401;
+            $result['status'] = 404;
             $result['result'] = null;
         }
 
@@ -1160,13 +1231,33 @@ class APIProductServices
         $size = $input['size'];
 
         $promotion = $this->getPromotion('product_card');
+        $promotion_threshold = $this->getPromotionThreshold();
         foreach ($promotion as $product_id => $campaign) {
             $promotion_txt = '';
             foreach ($campaign as $label) {
                 if ($label->promotional_label == '') continue;
-                if ($promotion_txt != $label->promotional_label) {
-                    $promotional[$product_id][] = $label->promotional_label;
-                    $promotion_txt = $label->promotional_label;
+                if ($label->campaign_type == 'CART_P03' || $label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
+                    if (isset($promotion_threshold[$product_id])) {
+                        if ($promotion_threshold[$product_id]) {
+                            if ($promotion_txt != $label->promotional_label) {
+                                $promotional[$product_id][] = $label->promotional_label;
+                                $promotion_txt = $label->promotional_label;
+                            }
+                        }
+                    }
+                } elseif ($label->campaign_type == 'PRD05') { //單品
+                    $campaign_gift = $this->getCampaignGiftByID($label->id);
+                    if ($campaign_gift['result']) {
+                        if ($promotion_txt != $label->promotional_label) {
+                            $promotional[$product_id][] = $label->promotional_label;
+                            $promotion_txt = $label->promotional_label;
+                        }
+                    }
+                } else {
+                    if ($promotion_txt != $label->promotional_label) {
+                        $promotional[$product_id][] = $label->promotional_label;
+                        $promotion_txt = $label->promotional_label;
+                    }
                 }
             }
         }
@@ -1490,6 +1581,53 @@ class APIProductServices
         } else {
             $result['status'] = 401;
             $result['result'] = null;
+        }
+        return $result;
+    }
+
+    /**
+     * 多門檻活動贈品狀態
+     */
+    public function getPromotionThreshold()
+    {
+        $strSQL = "select pcg.promotional_campaign_id,pcg.threshold_id, p.approval_status, p.id gift_id, pcp.product_id
+                    from frontend_products_v p
+                    inner join promotional_campaign_giveaways pcg on pcg.product_id=p.id
+                    inner join promotional_campaigns pc on pc.id=pcg.promotional_campaign_id
+                    inner join  promotional_campaign_products pcp on pcp.promotional_campaign_id=pc.id
+                    where current_timestamp() between pc.start_at and pc.end_at and pc.active=1";
+        $strSQL .= " order by pcg.promotional_campaign_id, pcg.threshold_id,p.approval_status, pcg.sort;";
+
+        $promotional = DB::select($strSQL);
+        $data = [];
+        $result = [];
+        foreach ($promotional as $promotion) {
+            //取得在活動門檻中的贈品是否有效上架(同活動門檻最後一筆不是APPROVED該活動門檻就不算有效)
+            if ($promotion->approval_status == 'APPROVED') {
+                $result[$promotion->promotional_campaign_id][$promotion->threshold_id] = true;
+            } else {
+                $result[$promotion->promotional_campaign_id][$promotion->threshold_id] = false;
+            }
+        }
+        array_multisort(array_column($promotional, 'product_id'), SORT_ASC, $promotional);
+        foreach ($promotional as $promotion) {
+            //指定單品的活動門檻如果是有效的就回傳
+            if ($result[$promotion->promotional_campaign_id][$promotion->threshold_id]){
+                $data[$promotion->product_id] = true;
+            }
+        }
+        return $data;
+
+    }
+
+    /*
+     * 活動贈品相關
+     */
+    public function promotionalCampaignGiveaways($campaign_id)
+    {
+        $data = PromotionalCampaign::find($campaign_id)->promotionalCampaignGiveaways;
+        foreach ($data as $item) {
+            $result[] = $item->product_id;
         }
         return $result;
     }
