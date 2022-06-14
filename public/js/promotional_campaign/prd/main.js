@@ -658,6 +658,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     productNo: product.product_no,
                     productName: product.product_name,
                     sellingPrice: product.selling_price,
+                    sellingPriceForDisplay: product.selling_price.toLocaleString('en-US'),
                     launchedAt: product.start_launched_at || product.end_launched_at ? "".concat(product.start_launched_at, " ~ ").concat(product.end_launched_at) : '',
                     launchStatus: product.launch_status,
                     grossMargin: product.gross_margin,
@@ -2219,7 +2220,9 @@ var render = function () {
                             _vm._v(" "),
                             _c("td", [_vm._v(_vm._s(product.productName))]),
                             _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(product.sellingPrice))]),
+                            _c("td", [
+                              _vm._v(_vm._s(product.sellingPriceForDisplay)),
+                            ]),
                             _vm._v(" "),
                             _c("td", [
                               _vm._v(
@@ -2681,7 +2684,34 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_PrdCampaignProductModal_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/PrdCampaignProductModal.vue */ "./resources/js/components/PrdCampaignProductModal.vue");
 
-Vue.component("prd-campaign-product-modal", _components_PrdCampaignProductModal_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
+Vue.component("prd-campaign-product-modal", _components_PrdCampaignProductModal_vue__WEBPACK_IMPORTED_MODULE_0__["default"]); // 比較商品售價與折扣
+
+jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, element, products) {
+  var productNo = '';
+  var errorCount = 0;
+  products.forEach(function (product) {
+    if (product.sellingPrice <= value) {
+      if (errorCount >= 10) {
+        productNo += '...';
+        return;
+      }
+
+      if (errorCount > 0 && errorCount < 10) {
+        productNo += ', ';
+      }
+
+      productNo += product.productNo;
+      errorCount++;
+    }
+  });
+
+  if (!errorCount) {
+    return true;
+  }
+
+  $.validator.messages.compareDiscountAndSellingPrice = "\u4E0D\u53EF\u5927\u65BC\u7B49\u65BC\u5546\u54C1\u552E\u50F9 (".concat(productNo, ")");
+  return false;
+}, $.validator.messages.compareDiscountAndSellingPrice);
 })();
 
 /******/ })()
