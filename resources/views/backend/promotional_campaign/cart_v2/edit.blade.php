@@ -226,15 +226,12 @@
                                             <div class="tab-pane fade in active" id="tab-threshold">
                                                 <div v-if="form.campaignType === 'CART_P01'">
                                                     <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
                                                             </button>
-                                                        </div>
-                                                        <div class="col-sm-11">
-                                                            <p class="text-primary form-control-static">※ 打「85折」時，折數輸入「0.85」
-                                                            </p>
+                                                            <span class="text-primary" style="margin-left: 2rem;">※ 打「85折」時，折數輸入「0.85」</span>
                                                         </div>
                                                     </div>
                                                     <br>
@@ -297,7 +294,7 @@
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P02'">
                                                     <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
@@ -364,7 +361,7 @@
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P03'">
                                                     <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
@@ -425,7 +422,7 @@
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P04'">
                                                     <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
