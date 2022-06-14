@@ -408,7 +408,7 @@
                                             </td>
                                             <td>{{ product.productNo }}</td>
                                             <td>{{ product.productName }}</td>
-                                            <td>{{ product.sellingPrice }}</td>
+                                            <td>{{ product.sellingPriceForDisplay }}</td>
                                             <td>
                                                 {{ product.launchedAt }}
                                             </td>
@@ -608,6 +608,7 @@ export default {
                     productNo: product.product_no,
                     productName: product.product_name,
                     sellingPrice: product.selling_price,
+                    sellingPriceForDisplay: product.selling_price.toLocaleString('en-US'),
                     launchedAt: product.start_launched_at || product.end_launched_at ? `${product.start_launched_at} ~ ${product.end_launched_at}` : '',
                     launchStatus: product.launch_status,
                     grossMargin: product.gross_margin,

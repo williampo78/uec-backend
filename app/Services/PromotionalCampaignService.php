@@ -1191,7 +1191,7 @@ class PromotionalCampaignService
                 'id' => $product->id,
                 'product_no' => $product->product_no,
                 'product_name' => $product->product_name,
-                'selling_price' => number_format($product->selling_price),
+                'selling_price' => $product->selling_price,
                 'start_launched_at' => null,
                 'end_launched_at' => null,
                 'launch_status' => $product->launch_status,
