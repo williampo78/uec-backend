@@ -9,8 +9,7 @@
                 <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 編輯資料</h1>
             </div>
         </div>
-        <!-- /.row -->
-        <form id="update-form" method="post" action="{{ route('users.update', $user->id) }}">
+        <form id="edit-form" method="post" action="{{ route('users.update', $user->id) }}">
             @method('PUT')
             @csrf
             <div class="row">
@@ -59,7 +58,7 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="user_password">密碼 <span
-                                                        style="color: red;">*不需變更請留空白</span></label>
+                                                        style="color: red;">(不需變更請留空白)</span></label>
                                                 <input class="form-control" name="user_password" id="user_password"
                                                     type="password" autocomplete="off">
                                             </div>
@@ -121,12 +120,15 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-success" id="btn-save">
-                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
-                                        </button>
-                                        <button type="button" class="btn btn-danger" id="btn-cancel">
+                                        @if ($share_role_auth['auth_update'])
+                                            <button type="button" class="btn btn-success" id="btn-save">
+                                                <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                            </button>
+                                        @endif
+
+                                        <a href="{{ route('users') }}" class="btn btn-danger">
                                             <i class="fa-solid fa-ban"></i> 取消
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -142,11 +144,7 @@
     <script>
         $(function() {
             $("#btn-save").on('click', function() {
-                $("#update-form").submit();
-            });
-
-            $("#btn-cancel").on('click', function() {
-                window.location.href = '{{ route('users') }}';
+                $("#edit-form").submit();
             });
 
             // 有選取供應商專用
@@ -167,7 +165,7 @@
             });
 
             // 驗證表單
-            $("#update-form").validate({
+            $("#edit-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
                     $('#btn-save').prop('disabled', true);
@@ -197,11 +195,6 @@
                                     .length > 0;
                             }
                         },
-                    },
-                },
-                messages: {
-                    user_password: {
-                        drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
                 },
                 errorClass: "help-block",

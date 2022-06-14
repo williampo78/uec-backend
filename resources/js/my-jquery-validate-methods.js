@@ -2,9 +2,11 @@
 jQuery.validator.addMethod(
     "drowssapCheck",
     function (value, element, params) {
-        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(value);
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\!\@\#\$\%\^\&\*\(\)\.\-\=\_\~]{8,100}$/.test(
+            value
+        );
     },
-    "密碼格式錯誤"
+    "至少需輸入一個小寫英文、大寫英文和數字，且介於8~100個字元，可輸入: 英文大小寫、數字、符號!@#$%^&*().-=_~"
 );
 
 // 比較輸入的兩個日期或兩個數字
@@ -21,6 +23,7 @@ jQuery.validator.addMethod(
     },
     "必須大於 {0}"
 );
+
 // 比較輸入的兩個日期或兩個數字
 jQuery.validator.addMethod(
     "greaterSameThan",
@@ -34,6 +37,7 @@ jQuery.validator.addMethod(
     },
     "必須大於 {0}"
 );
+
 // 比較輸入的日期和當前時間
 jQuery.validator.addMethod(
     "dateGreaterThanNow",
@@ -161,6 +165,7 @@ jQuery.validator.addMethod(
         return `起訖最多不可超過 ${params.monthNum} 個月`;
     }
 );
+
 // 比較大於等於時間
 jQuery.validator.addMethod(
     "dateGreaterEqualThan",

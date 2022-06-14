@@ -28,7 +28,7 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="pwd">更改密碼(不需變更請留空白)</label>
+                                                <label for="pwd">密碼 <span style="color: red;">(不需變更請留空白)</span></label>
                                                 <input class="form-control" name="pwd" id="pwd" type="password"
                                                     autocomplete="off">
                                             </div>
@@ -106,9 +106,6 @@
                 messages: {
                     user_email: {
                         required: "信箱不得為空",
-                    },
-                    pwd: {
-                        drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
                 },
                 errorClass: "help-block",
