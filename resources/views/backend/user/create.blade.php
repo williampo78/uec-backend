@@ -9,8 +9,7 @@
                 <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 新增資料</h1>
             </div>
         </div>
-        <!-- /.row -->
-        <form id="new-form" method="post" action="{{ route('users.store') }}">
+        <form id="create-form" method="post" action="{{ route('users.store') }}">
             @csrf
             <div class="row">
                 <div class="col-sm-12">
@@ -112,12 +111,15 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-success" id="btn-save">
-                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
-                                        </button>
-                                        <button type="button" class="btn btn-danger" id="btn-cancel">
+                                        @if ($share_role_auth['auth_create'])
+                                            <button type="button" class="btn btn-success" id="btn-save">
+                                                <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                            </button>
+                                        @endif
+
+                                        <a href="{{ route('users') }}" class="btn btn-danger">
                                             <i class="fa-solid fa-ban"></i> 取消
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -133,11 +135,7 @@
     <script>
         $(function() {
             $("#btn-save").on('click', function() {
-                $("#new-form").submit();
-            });
-
-            $("#btn-cancel").on('click', function() {
-                window.location.href = '{{ route('users') }}';
+                $("#create-form").submit();
             });
 
             // 有選取供應商專用
@@ -158,7 +156,7 @@
             });
 
             // 驗證表單
-            $("#new-form").validate({
+            $("#create-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
                     $('#btn-save').prop('disabled', true);
@@ -214,9 +212,6 @@
                 messages: {
                     user_account: {
                         remote: "此帳號名稱已經被其他人使用",
-                    },
-                    user_password: {
-                        drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
                 },
                 errorClass: "help-block",

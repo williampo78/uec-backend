@@ -5,7 +5,6 @@
 @section('content')
     <!--列表-->
     <div id="page-wrapper">
-
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
@@ -16,8 +15,6 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default">
-
-                    <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
                         <form id="search-form" class="form-horizontal" method="GET" action="">
                             <div class="row">

@@ -36,7 +36,7 @@ class UserController extends Controller
         $getData = $request->all();
         $data['users'] = ($getData ? $this->userService->getUsers($getData) : []);
 
-        return view('backend.user.index', $data);
+        return view('backend.user.list', $data);
     }
 
     /**
