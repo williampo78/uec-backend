@@ -9,5 +9,9 @@ class RequisitionsPurchaseDetail extends Model
 {
     use HasFactory;
     protected $table = 'requisitions_purchase_detail';
-    public $timestamps = true;
+
+    public function requisitionsPurchase()
+    {
+        return $this->belongsTo(RequisitionsPurchase::class, 'requisitions_purchase_id');
+    }
 }
