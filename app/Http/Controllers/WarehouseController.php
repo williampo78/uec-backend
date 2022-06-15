@@ -47,9 +47,8 @@ class WarehouseController extends Controller
     {
         $route_name = 'warehouse';
         $act = 'add';
-        $data = $request->all();
+        $data = $request->only(['number','name']);
         $data['agent_id'] = Auth::user()->agent_id;
-        unset($data['_token']);
         $rs = Warehouse::insert($data);
 
         return view('backend.success' , compact('route_name','act'));
@@ -88,9 +87,8 @@ class WarehouseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token' , '_method');
+        $data = $request->only(['number','name']);
         $data['updated_by'] = Auth::user()->id;
-
         Warehouse::where('id' ,$id)->update($data);
         $route_name = 'warehouse';
         $act = 'upd';

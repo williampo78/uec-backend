@@ -104,12 +104,10 @@ class QuotationReviewController extends Controller
         $route_name = 'quotation_review';
         $act = 'review';
 
-        $data = $request->except('_token' , '_method');
+        $data = $request->only(['review_result' , 'review_remark',]);
         $data['id'] = $id;
         $data['created_by'] = $this->quotationService->getQuotationById($id)->created_by;
         $this->reviewService->updateReview($data , 'QUOTATION');
-
-
         return view('backend.success', compact('route_name' , 'act'));
     }
 

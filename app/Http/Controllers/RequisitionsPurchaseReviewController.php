@@ -133,7 +133,7 @@ class RequisitionsPurchaseReviewController extends Controller
     {
         $route_name = 'requisitions_purchase_review';
         $act = 'review';
-        $data = $request->except('_token', '_method');
+        $data = $request->only(['review_result','review_remark']);
         $data['id'] = $id;
         $this->review_service->updateReview($data, 'REQUISITION_PUR');
 

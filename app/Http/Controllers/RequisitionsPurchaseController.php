@@ -86,10 +86,25 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->input()); //創建請購單
+        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->only([
+            'id',
+            'supplier_id',
+            'trade_date',
+            'number',
+            'warehouse_id',
+            'currency_code',
+            'currency_price',
+            'original_total_tax_price',
+            'original_total_price',
+            'tax',
+            'total_tax_price',
+            'total_price',
+            'remark',
+            'status',
+            'requisitions_purchase_detail',
+        ])); //創建請購單
         $result['route_name'] = 'requisitions_purchase';
         $result['act'] = 'add';
-
         if ($result['status']) {
             return view('backend.success', $result);
         } else {
@@ -176,7 +191,26 @@ class RequisitionsPurchaseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dump($request->input());
+        $request->only([
+            'id',
+            'supplier_id',
+            'old_supplier_id',
+            'trade_date',
+            'number',
+            'warehouse_id',
+            'currency_code',
+            'currency_price',
+            'original_total_tax_price',
+            'original_total_price',
+            'tax',
+            'total_tax_price',
+            'total_price',
+            'remark',
+            'status',
+            'requisitions_purchase_detail',
+            'item_price',
+            'item_qty',
+        ]);
         $result = $this->requisitionsPurchaseService->updateRequisitionsPurchase($request->input()); //創建請購單
         $result['route_name'] = 'requisitions_purchase';
         $result['act'] = 'upd';
