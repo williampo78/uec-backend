@@ -55,7 +55,7 @@ class CategoryController extends Controller
     {
         $route_name = 'category';
         $act = 'add';
-        $data = $request->except('_token');
+        $data = $request->only(['number','name','primary_category_id']);
         $data['agent_id'] = Auth::user()->agent_id;
         $data['created_by'] = Auth::user()->id;
         $data['created_at'] = Carbon::now();
@@ -105,7 +105,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token', '_method');
+        $data = $request->only(['number','name','primary_category_id']);
         $data['updated_by'] = Auth::user()->id;
         $data['updated_at'] = Carbon::now();
 

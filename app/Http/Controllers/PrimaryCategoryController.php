@@ -46,7 +46,7 @@ class PrimaryCategoryController extends Controller
     {
         $route_name = 'primary_category';
         $act = 'add';
-        $data = $request->except('_token');
+        $data = $request->only(['number','name']);
         $data['agent_id'] = Auth::user()->agent_id;
         $data['created_by'] = Auth::user()->id;
         $data['created_at'] = Carbon::now();
@@ -95,7 +95,7 @@ class PrimaryCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->except('_token', '_method');
+        $data = $request->only(['number','name']);
         $data['updated_by'] = Auth::user()->id;
 
         try {
