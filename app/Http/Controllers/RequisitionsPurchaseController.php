@@ -86,7 +86,23 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
-        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->except(['share_role_auth'])); //創建請購單
+        $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->only([
+            'id',
+            'supplier_id',
+            'trade_date',
+            'number',
+            'warehouse_id',
+            'currency_code',
+            'currency_price',
+            'original_total_tax_price',
+            'original_total_price',
+            'tax',
+            'total_tax_price',
+            'total_price',
+            'remark',
+            'status',
+            'requisitions_purchase_detail',
+        ])); //創建請購單
         $result['route_name'] = 'requisitions_purchase';
         $result['act'] = 'add';
         if ($result['status']) {

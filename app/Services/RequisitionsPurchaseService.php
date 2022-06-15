@@ -140,10 +140,6 @@ class RequisitionsPurchaseService
         $result = [];
         $requisitions_purchase_detail = json_decode($input['requisitions_purchase_detail'], true);
         unset($input['requisitions_purchase_detail']); // 移除json
-        unset($input['item_price']); // 移除json
-        unset($input['_token']);
-        unset($input['item_qty']);
-        unset($input['old_supplier_id']);
         $requisitions_purchase = $input;
         $user_id = Auth::user()->id;
         $agent_id = Auth::user()->agent_id;
