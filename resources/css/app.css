@@ -109,7 +109,7 @@ span .errorMsg {
     margin-left: 10px;
 }
 
-.redtext {
+.text-red {
     color: red;
 }
 
@@ -117,6 +117,7 @@ span .errorMsg {
     width: 25px;
     height: 25px;
 }
+
 .theme-color {
     color: #138cde;
 }

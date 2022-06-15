@@ -2,6 +2,17 @@
 
 @section('title', '使用者管理')
 
+@section('css')
+    <style>
+        #password-title {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div id="page-wrapper">
         <div class="row">
@@ -21,19 +32,19 @@
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_account">帳號 <span style="color: red;">*</span></label>
+                                                <label for="user_account">帳號 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="user_account" id="user_account">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_name">名稱 <span style="color: red;">*</span></label>
+                                                <label for="user_name">名稱 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="user_name" id="user_name">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label>狀態 <span style="color: red;">*</span></label>
+                                                <label>狀態 <span class="text-red">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
@@ -53,21 +64,27 @@
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_password">密碼 <span style="color: red;">*</span></label>
+                                                <div id="password-title">
+                                                    <label for="user_password">密碼 <span
+                                                            class="text-red">*</span></label>
+                                                    <span class="text-primary" id="password-tooltip">
+                                                        <i class="fa-solid fa-circle-info"></i> 格式說明
+                                                    </span>
+                                                </div>
                                                 <input class="form-control" name="user_password" id="user_password"
                                                     type="password" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_email">信箱 <span style="color: red;">*</span></label>
+                                                <label for="user_email">信箱 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="user_email" id="user_email">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="supplier_id">供應商 <span
-                                                        class="text-primary">*供應商專用的帳號才指定供應商</span></label>
+                                                        class="text-red">*供應商專用的帳號才指定供應商</span></label>
                                                 <select name="supplier_id" id="supplier_id" class="select2-default">
                                                     <option value=""></option>
                                                     @foreach ($suppliers as $supplier)
@@ -97,7 +114,7 @@
                                                     </div>
                                                     <div class="col-sm-2">
                                                         @if ($role->is_for_supplier == 1)
-                                                            <span style="color: red;">供應商專用</span>
+                                                            <span class="text-red">供應商專用</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -134,6 +151,10 @@
 @section('js')
     <script>
         $(function() {
+            $('#password-tooltip').tooltip({
+                title: "需包含英文和數字，且介於8~20個字元，符號可輸入：!@#$%^&*().-=_~",
+            });
+
             $("#btn-save").on('click', function() {
                 $("#create-form").submit();
             });
