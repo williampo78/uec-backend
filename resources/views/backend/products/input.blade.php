@@ -73,7 +73,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">庫存類型</label><span class="redtext">*</span>
+                                        <label class="control-label">庫存類型</label><span class="text-red">*</span>
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
@@ -98,7 +98,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label ">商品序號</label><span class="redtext">*</span>
+                                        <label class="control-label ">商品序號</label><span class="text-red">*</span>
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="product_no" readonly>
@@ -110,7 +110,7 @@
                             <div class="col-sm-6">
                                 <div class=" form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">供應商<span class="redtext">*</span></label>
+                                        <label class="control-label">供應商<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control supplier_id" name="supplier_id">
@@ -125,7 +125,7 @@
                             <div class="col-sm-6">
                                 <div class=" form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">商品名稱<span class="redtext">*</span></label>
+                                        <label class="control-label">商品名稱<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="product_name" value="">
@@ -138,7 +138,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">課稅別<span class="redtext">*</span></label>
+                                        <label class="control-label">課稅別<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control tax_type" name="tax_type">
@@ -151,7 +151,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">POS分類<span class="redtext">*</span></label>
+                                        <label class="control-label">POS分類<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control category_id" name="category_id">
@@ -168,7 +168,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">品牌<span class="redtext">*</span></label>
+                                        <label class="control-label">品牌<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <select class="form-control brand_id" name="brand_id" id="brand_id">
@@ -195,7 +195,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">商品通路<span class="redtext">*</span></label>
+                                        <label class="control-label">商品通路<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
@@ -218,7 +218,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">溫層<span class="redtext">*</span></label>
+                                        <label class="control-label">溫層<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <label class="radio-inline">
@@ -232,7 +232,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">配送方式<span class="redtext">*</span></label>
+                                        <label class="control-label">配送方式<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <label class="radio-inline">
@@ -244,7 +244,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">商品交期<span class="redtext">*</span></label>
+                                        <label class="control-label">商品交期<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <label class="radio-inline">
@@ -258,7 +258,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
-                                        <label class="control-label">單位<span class="redtext">*</span></label>
+                                        <label class="control-label">單位<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="uom">
@@ -281,7 +281,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">效期控管<span class="redtext">*</span></label>
+                                        <label class="control-label">效期控管<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
@@ -319,7 +319,7 @@
                                 <div class="form-group">
 
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">商品類型<span class="redtext">*</span></label>
+                                        <label class="control-label">商品類型<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3 ">
                                         <label class="radio-inline">
@@ -341,7 +341,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">停售<span class="redtext">*</span></label>
+                                        <label class="control-label">停售<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
@@ -361,7 +361,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">材積(公分) <span class="redtext">*</span></label>
+                                        <label class="control-label">材積(公分) <span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">長</label>
@@ -386,7 +386,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">重量(公克)<span class="redtext">*</span></label>
+                                        <label class="control-label">重量(公克)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
                                         <input class="form-control" name="weight" type="number" min="0" value="">
@@ -398,7 +398,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">市價(含稅)<span class="redtext">*</span></label>
+                                        <label class="control-label">市價(含稅)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="list_price" type="number" min="0" value="">
@@ -409,7 +409,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">售價(含稅)<span class="redtext">*</span></label>
+                                        <label class="control-label">售價(含稅)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <input class="form-control" name="selling_price" type="number" min="0" value="">
@@ -566,7 +566,7 @@
                                 <div class="form-group">
 
                                     <div class="col-sm-1 ">
-                                        <label class="control-label">保固期限<span class="redtext">*</span></label>
+                                        <label class="control-label">保固期限<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="radio-inline">

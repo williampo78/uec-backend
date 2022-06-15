@@ -186,7 +186,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
-                                        <label class="control-label">上架時間起<span class="redtext">*</span></label>
+                                        <label class="control-label">上架時間起<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group" id="start_launched_at_flatpickr">
@@ -203,7 +203,7 @@
                             <div class="col-sm-6">
                                 <div class=" form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">上架時間訖<span class="redtext">*</span></label>
+                                        <label class="control-label">上架時間訖<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group" id="end_launched_at_flatpickr">

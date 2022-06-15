@@ -66,7 +66,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <div class="col-sm-2 ">
-                                            <label class="control-label">庫存類型</label><span class="redtext">*</span>
+                                            <label class="control-label">庫存類型</label><span class="text-red">*</span>
                                         </div>
                                         <div class="col-sm-3">
                                             <label class="radio-inline">
@@ -96,7 +96,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <div class="col-sm-2 ">
-                                            <label class="control-label ">商品序號</label><span class="redtext">*</span>
+                                            <label class="control-label ">商品序號</label><span class="text-red">*</span>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no"
@@ -109,7 +109,7 @@
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <div class="col-sm-2 ">
-                                            <label class="control-label">供應商<span class="redtext">*</span></label>
+                                            <label class="control-label">供應商<span class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="supplier_name"
@@ -120,7 +120,7 @@
                                 <div class="col-sm-6">
                                     <div class=" form-group">
                                         <div class="col-sm-2 ">
-                                            <label class="control-label">商品名稱<span class="redtext">*</span></label>
+                                            <label class="control-label">商品名稱<span class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_name"
@@ -145,7 +145,7 @@
                                 <div class="col-sm-12" id="category_products">
                                     <div class="form-group">
                                         <div class="col-sm-1">
-                                            <label class="control-label">前台分類<span class="redtext">*</span></label>
+                                            <label class="control-label">前台分類<span class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-11">
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
@@ -184,7 +184,7 @@
                                             </tbody>
                                         </table>
                                         <span id="CategoryHierarchyProducts_error_msg" style="display: none"
-                                              class="redtext">必須填寫</span>
+                                              class="text-red">必須填寫</span>
                                     </div>
                                     <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
                                               rows="10">@{{ CategoryHierarchyProducts }}</textarea>
@@ -278,7 +278,7 @@
                                     <div class="form-group">
                                         <div class="col-sm-2 ">
                                             <label class="control-label ">商品序號</label><span
-                                                class="redtext">*</span>
+                                                class="text-red">*</span>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no"
@@ -292,7 +292,7 @@
                                     <div class="form-group">
                                         <div class="col-sm-1">
                                             <label class="control-label">每單限購數量<span
-                                                    class="redtext">*</span></label>
+                                                    class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-2">
                                             <input class="form-control" name="order_limited_qty"
@@ -356,13 +356,13 @@
                                     <div class="form-group">
                                         <div class="col-sm-1">
                                             <label class="control-label">商品內容<span
-                                                    class="redtext">*</span></label>
+                                                    class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-11">
                                             <textarea id="description" name="description"
                                                       placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
                                             <span id="description_error_msg" style="display: none"
-                                                  class="redtext">必須填寫</span>
+                                                  class="text-red">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -372,13 +372,13 @@
                                     <div class="form-group">
                                         <div class="col-sm-1">
                                             <label class="control-label">商品規格<span
-                                                    class="redtext">*</span></label>
+                                                    class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-11">
                                             <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
                                                       accept=".jpg,.jpeg,.png">{{ $products->specification }}</textarea>
                                             <span id="specification_error_msg" style="display: none"
-                                                  class="redtext">必須填寫</span>
+                                                  class="text-red">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -418,7 +418,7 @@
                                     <div class="form-group">
                                         <div class="col-sm-1">
                                             <label class="control-label">Item圖示<span
-                                                    class="redtext">*</span></label>
+                                                    class="text-red">*</span></label>
                                             {{-- product_items --}}
                                         </div>
                                         <div class="col-sm-8">
