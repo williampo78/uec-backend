@@ -45,7 +45,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label class="control-label">活動名稱 <span
+                                                    <label class="control-label text-nowrap">活動名稱 <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -59,7 +59,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label for="campaign_type" class="control-label">活動類型 <span
+                                                    <label for="campaign_type" class="control-label text-nowrap">活動類型 <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -76,7 +76,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label class="control-label">狀態 <span
+                                                    <label class="control-label text-nowrap">狀態 <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -94,7 +94,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label class="control-label">上架時間 <span
+                                                    <label class="control-label text-nowrap">上架時間 <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -135,7 +135,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label class="control-label">前台文案 <span
+                                                    <label class="control-label text-nowrap">前台文案 <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -149,7 +149,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label class="control-label">前台URL <span
+                                                    <label class="control-label text-nowrap">前台URL <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -163,7 +163,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label class="control-label">庫存類型 <span
+                                                    <label class="control-label text-nowrap">庫存類型 <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -183,7 +183,7 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-1">
-                                                    <label for="campaign_type" class="control-label">供應商 <span
+                                                    <label for="campaign_type" class="control-label text-nowrap">供應商 <span
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
@@ -219,15 +219,12 @@
                                             <div class="tab-pane fade in active" id="tab-threshold">
                                                 <div v-if="form.campaignType === 'CART_P01'">
                                                     <div class="row">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
                                                             </button>
-                                                        </div>
-                                                        <div class="col-sm-11">
-                                                            <p class="text-primary form-control-static">※ 打「85折」時，折數輸入「0.85」
-                                                            </p>
+                                                            <span class="text-primary" style="margin-left: 2rem;">※ 打「85折」時，折數輸入「0.85」</span>
                                                         </div>
                                                     </div>
                                                     <br>
@@ -284,7 +281,7 @@
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P02'">
                                                     <div class="row">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
@@ -345,7 +342,7 @@
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P03'">
                                                     <div class="row">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
@@ -401,7 +398,7 @@
                                                 </div>
                                                 <div v-else-if="form.campaignType === 'CART_P04'">
                                                     <div class="row">
-                                                        <div class="col-sm-1">
+                                                        <div class="col-sm-12">
                                                             <button type="button" class="btn btn-warning"
                                                                 @click="addThreshold">
                                                                 <i class="fa-solid fa-plus"></i> 新增門檻
