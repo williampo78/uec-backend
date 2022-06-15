@@ -298,7 +298,7 @@
                                     <div class="col-sm-2 ">
                                         <label class="control-label">溫層<span class="redtext">*</span></label>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-3">
                                         <label class="radio-inline">
                                             <input type="radio" name="lgst_temperature" value="NORMAL"
                                                 {{ $products->lgst_temperature == 'NORMAL' ? 'checked' : '' }}
@@ -330,7 +330,7 @@
                                     <div class="col-sm-2 ">
                                         <label class="control-label">商品交期<span class="redtext">*</span></label>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-3">
                                         <label class="radio-inline">
                                             <input type="radio" name="delivery_type" value="IN_STOCK"
                                                 {{ $products->delivery_type == 'IN_STOCK' ? 'checked' : 'disabled' }}
@@ -399,7 +399,11 @@
                                             name="expiry_receiving_days" min="0"
                                             value="{{ $products->expiry_receiving_days }}"  {{ $products->edit_readonly == '1' ? '' : 'readonly' }}>
                                     </div>
-                                    <p style="color:red;">新增請購紀錄</p>
+                                    <div class="col-sm-3">
+                                        <label class="control-label">
+                                            <a href="#" data-toggle="modal" data-target="#model_requisitions_log">請購紀錄</a>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -440,18 +444,24 @@
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="is_discontinued" id="inlineRadio1" value="1"
-                                                {{ $products->is_discontinued == '1' ? 'checked' : 'disabled' }}>
+                                                {{ $products->is_discontinued == '1' ? 'checked' : '' }}
+                                                {{ $products->edit_readonly == '1' && $products->is_discontinued != '1' ? 'disabled' : '' }}>
                                             是
                                         </label>
                                     </div>
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="is_discontinued" id="inlineRadio3" value="0"
-                                                {{ $products->is_discontinued == '0' ? 'checked' : 'disabled' }}>
+                                                {{ $products->is_discontinued == '0' ? 'checked' : '' }}
+                                                {{ $products->edit_readonly == '1' && $products->is_discontinued != '0' ? 'disabled' : '' }}>
                                             否
                                         </label>
                                     </div>
-                                    <p style="color:red;">商品若要停售，須先下架，不可直接修改</p>
+                                    @if($products->edit_readonly == 1)
+                                    <div class="col-sm-6">
+                                        <label class="control-label" style="color:red;">商品若要停售，須先下架，不可直接修改</label>
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -542,8 +552,13 @@
                                     <div class="col-sm-2 ">
                                         <label class="control-label">毛利(%)</label>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-6">
                                         <input class="form-control" value="{{ $products->gross_margin }}" readonly>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label class="control-label">
+                                            <a href="#" data-toggle="modal" data-target="#model_promotional">促銷活動</a>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -1018,7 +1033,9 @@
                 </a>
             </form>
             {{-- 修改紀錄 --}}
-            @include('backend.products.model_update_log')
+            @include('backend.products.models.model_update_log')
+            @include('backend.products.models.model_requisitions_log')
+            @include('backend.products.models.model_promotional')
         </div>
     </div>
     </div>

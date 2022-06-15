@@ -35,4 +35,10 @@ class ProductItem extends Model
     {
         return $this->belongsToMany(Warehouse::class, 'warehouse_stock', 'product_item_id', 'warehouse_id')->withTimestamps()->withPivot('stock_qty');
     }
+    /**
+     *  建立與請購單的Detail關聯
+     */
+    public function requisitionsPurchaseDetails(){
+        return $this->hasMany(RequisitionsPurchaseDetail::class, 'product_item_id');
+    }
 }

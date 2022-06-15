@@ -9,5 +9,9 @@ class RequisitionsPurchase extends Model
 {
     use HasFactory;
     protected $table = 'requisitions_purchase';
-    public $timestamps = true;
+
+    public function orderSupplier()
+    {
+        return $this->hasOne(OrderSupplier::class, 'requisitions_purchase_id');
+    }
 }

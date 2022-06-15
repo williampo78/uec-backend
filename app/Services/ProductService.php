@@ -12,6 +12,7 @@ use App\Models\ProductPhoto;
 use App\Models\ProductReviewLog;
 use App\Models\Products;
 use App\Models\ProductSpecInfo;
+use App\Models\PromotionalCampaignProduct;
 use App\Models\RelatedProduct;
 use App\Models\WarehouseStock;
 use App\Services\UniversalService;
@@ -1315,5 +1316,68 @@ class ProductService
         } else {
             return false;
         }
+    }
+    /**
+     * getProductRequisitionsLog function
+     *
+     * @param [int] $id
+     * @return collect
+     */
+    public function getProductRequisitionsLog($id)
+    {
+        $result = collect();
+        $numberCheck = [];
+        $product_items = ProductItem::with([
+            'requisitionsPurchaseDetails',
+            'requisitionsPurchaseDetails.requisitionsPurchase' => function ($query) {
+                $query->orderBy('trade_date');
+            },
+            'requisitionsPurchaseDetails.requisitionsPurchase.orderSupplier',
+        ])->where('product_items.product_id', $id)
+            ->get();
+        foreach ($product_items as $product) {
+            foreach ($product->requisitionsPurchaseDetails as $RPDetail) {
+                $add = collect();
+                if (!in_array($RPDetail->requisitionsPurchase->number, $numberCheck)) {
+                    $numberCheck[] = $RPDetail->requisitionsPurchase->number;
+                    $add->rp_number = $RPDetail->requisitionsPurchase->number;
+                    $add->rp_trade_date = $RPDetail->requisitionsPurchase->trade_date;
+                    $add->os_trade_date = '';
+                    $add->os_number = '';
+                    if ($RPDetail->requisitionsPurchase->orderSupplier !== null) {
+                        $add->os_trade_date = $RPDetail->requisitionsPurchase->orderSupplier->trade_date;
+                        $add->os_number = $RPDetail->requisitionsPurchase->orderSupplier->number;
+                    }
+                    $result->push($add);
+                }
+            }
+        }
+        $result = $result->sortBy([
+            ['rp_trade_date', 'desc'],
+        ]);
+        return $result;
+    }
+    /**
+     * getProductPromotionalLog function
+     *
+     * @param [int] $id
+     * @return collect
+     */
+    public function getProductPromotionalLog($id)
+    {
+        $promotionalCampaignProduct = PromotionalCampaignProduct::with(['promotionalCampaign'])->where('product_id', $id)->get();
+        $result = collect();
+        foreach ($promotionalCampaignProduct as $obj) {
+            $pushData = collect();
+            $pushData->id = $obj->promotionalCampaign->id;
+            $pushData->campaign_name = $obj->promotionalCampaign->campaign_name;
+            $pushData->start_at = $obj->promotionalCampaign->start_at;
+            $pushData->end_at = $obj->promotionalCampaign->end_at;
+            $result->push($pushData);
+        }
+        $result = $result->sortBy([
+            ['start_at', 'desc'],
+        ]);
+        return $result ;
     }
 }

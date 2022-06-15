@@ -121,7 +121,8 @@ class ProductController extends Controller
         $result['product_photos'] = $this->productService->getProductsPhoto($id);
         $result['spac_list'] = $this->productService->getProductSpac($id);
         $result['finallyOrderSupplier'] = $this->orderSupplierService->getFinallyOrderSupplier($id);
-        // dump($result['spac_list']) ; exit ;
+        $result['requisitions_log'] = $this->productService->getProductRequisitionsLog($id);
+        $result['promotional_log'] = $this->productService->getProductPromotionalLog($id);
         return view('backend.products.show', $result);
     }
 
@@ -165,6 +166,8 @@ class ProductController extends Controller
         }
         $result['products'] = $products;
         $result['product_audit_log'] = $this->productService->getProductAuditLog($id);
+        $result['requisitions_log'] = $this->productService->getProductRequisitionsLog($id);
+        $result['promotional_log'] = $this->productService->getProductPromotionalLog($id);
         $result['products_item'] = $this->productService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands(); // 廠牌
