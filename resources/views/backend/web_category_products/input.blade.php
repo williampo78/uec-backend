@@ -46,7 +46,7 @@
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group" id="div_doc_number">
-                                                <label for="doc_number">分類 <span class="redtext">*</span></label>
+                                                <label for="doc_number">分類 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="id" id="id"
                                                     value="{{ $category_hierarchy_content->name }}" readonly>
                                             </div>
@@ -56,7 +56,7 @@
                                                 <div class="row">
                                                     <div class="col-sm-12">
                                                         <label for="doc_number">狀態 <span
-                                                                class="redtext">*</span></label>
+                                                                class="text-red">*</span></label>
                                                     </div>
                                                     <div class="col-sm-4">
                                                         <label class="radio-inline">

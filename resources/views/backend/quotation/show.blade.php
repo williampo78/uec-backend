@@ -23,7 +23,7 @@
                                 已駁回
                             @break
                             @default
-                                
+
                         @endswitch
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                                 <td>{{ $val->product_items_no }}</td>
                                 <td>
                                     @if (!$val->combination_name)
-                                        <span class="redtext">該商品異常</span>
+                                        <span class="text-red">該商品異常</span>
                                     @else
                                         {{ $val->combination_name }}
                                     @endif

@@ -28,7 +28,7 @@
                                 <div class="col-sm-4">
                                     <div class="form-group" id="supplier">
                                         <label for="supplier">供應商
-                                            <span class="redtext">*</span></label>
+                                            <span class="text-red">*</span></label>
                                         <select class="form-control select2-vue-js" name="supplier_id" id="supplier_id">
                                             @foreach ($supplier as $obj)
                                                 @if (!isset($requisitionsPurchase->supplier_id))
@@ -46,7 +46,7 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_trade_date">
-                                        <label for="trade_date">請購日期 <span class="redtext">*</span></label>
+                                        <label for="trade_date">請購日期 <span class="text-red">*</span></label>
                                         <div class="input-group" id="trade_date_flatpickr">
                                             <input type="text" class="form-control" name="trade_date" id="trade_date" value="{{ $requisitionsPurchase->trade_date ?? date('Y-m-d') }}" autocomplete="off" data-input />
                                             <span class="input-group-btn" data-toggle>
@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_doc_number">
-                                        <label for="doc_number">請購單號 <span class="redtext">*</span></label>
+                                        <label for="doc_number">請購單號 <span class="text-red">*</span></label>
                                         <input class="form-control" name="number" id="number"
                                             value="{{ $requisitionsPurchase->number ?? '' }}" readonly>
                                     </div>
@@ -69,7 +69,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group" id="warehouse">
-                                        <label for="warehouse">倉庫 <span class="redtext">*</span></label>
+                                        <label for="warehouse">倉庫 <span class="text-red">*</span></label>
                                         <select class="form-control select2-vue-js" name="warehouse_id">
                                             @foreach ($warehouse as $obj)
                                                 @if (!isset($requisitionsPurchase->warehouse_id))
@@ -90,7 +90,7 @@
                             <div class="row">
                                 <div class="col-sm-2">
                                     <div class="form-group" id="div_currency_code">
-                                        <label for="currency_code">幣別 <span class="redtext">*</span></label>
+                                        <label for="currency_code">幣別 <span class="text-red">*</span></label>
                                         <select class="form-control select2-vue-js" name="currency_code" id="currency_code">
                                             <option value='TWD'>新台幣</option>
                                         </select>
@@ -98,14 +98,14 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>匯率 <span class="redtext">*</span></label>
+                                        <label>匯率 <span class="text-red">*</span></label>
                                         <input class="form-control" name="currency_price" id="currency_price" value="1"
                                             readonly>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>原幣稅額 <span class="redtext">*</span></label>
+                                        <label>原幣稅額 <span class="text-red">*</span></label>
                                         <input class="form-control" name="original_total_tax_price"
                                             id="original_total_tax_price"
                                             v-model="requisitions_purchase.original_total_tax_price" readonly>
@@ -113,7 +113,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>原幣總金額 <span class="redtext">*</span></label>
+                                        <label>原幣總金額 <span class="text-red">*</span></label>
                                         <input class="form-control" name="original_total_price" id="original_total_price"
                                             v-model="requisitions_purchase.original_total_price" readonly>
                                     </div>
@@ -122,7 +122,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_currency_code">
-                                        <label for="currency_code">稅別<span class="redtext">*</span></label>
+                                        <label for="currency_code">稅別<span class="text-red">*</span></label>
                                         <select class="form-control select2-vue-js" name="tax" id="tax"
                                             v-model="requisitions_purchase.tax" @change="getItemLastPrice">
                                             @foreach ($taxList as $id => $tax)
@@ -133,14 +133,14 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>稅額 <span class="redtext">*</span></label>
+                                        <label>稅額 <span class="text-red">*</span></label>
                                         <input class="form-control" name="total_tax_price" id="total_tax_price"
                                             v-model="requisitions_purchase.total_tax_price" readonly>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>總金額 <span class="redtext">*</span></label>
+                                        <label>總金額 <span class="text-red">*</span></label>
                                         <input class="form-control" name="total_price" id="total_price"
                                             v-model="requisitions_purchase.total_price" readonly>
                                     </div>
@@ -163,13 +163,13 @@
                             <div id="ItemDiv">
                                 <div class="add_row">
                                     <div class="row">
-                                        <div class="col-sm-5 text-left">品項<span class="redtext">*</span></div>
+                                        <div class="col-sm-5 text-left">品項<span class="text-red">*</span></div>
                                         <div class="col-sm-1 text-left">贈品</div>
-                                        <div class="col-sm-1 text-left">單價<span class="redtext">*</span></div>
-                                        <div class="col-sm-1 text-left">數量<span class="redtext">*</span></div>
+                                        <div class="col-sm-1 text-left">單價<span class="text-red">*</span></div>
+                                        <div class="col-sm-1 text-left">數量<span class="text-red">*</span></div>
                                         <div class="col-sm-1 text-left">單位</div>
                                         <div class="col-sm-1 text-left">最小採購量</div>
-                                        <div class="col-sm-1 text-left">原幣小計<span class="redtext">*</span></div>
+                                        <div class="col-sm-1 text-left">原幣小計<span class="text-red">*</span></div>
                                         <div class="col-sm-1 text-left">功能</div>
                                     </div>
                                 </div>

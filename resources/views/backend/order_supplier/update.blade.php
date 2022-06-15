@@ -28,7 +28,7 @@
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group" id="div_trade_date">
-                                                <label for="trade_date">採購日期<span class="redtext">*</span></label>
+                                                <label for="trade_date">採購日期<span class="text-red">*</span></label>
                                                 <div class="input-group" id="trade_date_flatpickr">
                                                     <input type="text" class="form-control" name="trade_date" id="trade_date" value="{{ $order_supplier['trade_date'] ?? '' }}" autocomplete="off" data-input />
                                                     <span class="input-group-btn" data-toggle>
@@ -238,18 +238,18 @@
                                     <div id="ItemDiv">
                                         <div class="add_row">
                                             <div class="row">
-                                                <div class="col-sm-5 text-left">品項<span class="redtext">*</span>
+                                                <div class="col-sm-5 text-left">品項<span class="text-red">*</span>
                                                 </div>
                                                 <div class="col-sm-1 text-left">贈品</div>
-                                                <div class="col-sm-1 text-left">單價<span class="redtext">*</span>
+                                                <div class="col-sm-1 text-left">單價<span class="text-red">*</span>
                                                 </div>
-                                                <div class="col-sm-1 text-left">請購量<span class="redtext">*</span>
+                                                <div class="col-sm-1 text-left">請購量<span class="text-red">*</span>
                                                 </div>
-                                                <div class="col-sm-1 text-left">採購量<span class="redtext">*</span>
+                                                <div class="col-sm-1 text-left">採購量<span class="text-red">*</span>
                                                 </div>
                                                 <div class="col-sm-1 text-left">單位</div>
                                                 <div class="col-sm-1 text-left">最小採購量</div>
-                                                <div class="col-sm-1 text-left">原幣小計<span class="redtext">*</span>
+                                                <div class="col-sm-1 text-left">原幣小計<span class="text-red">*</span>
                                                 </div>
                                             </div>
                                         </div>
