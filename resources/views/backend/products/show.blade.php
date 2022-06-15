@@ -192,10 +192,22 @@
                                 <div class="col-sm-2 no-pa">
                                     <label class="control-label">商品通路<span class="redtext">*</span></label>
                                 </div>
-                                <div class="col-sm-9">
+                                <div class="col-sm-3">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="selling_channel" value="WHOLE"
+                                            {{ $products->selling_channel == 'EC' ? 'checked' : 'disabled' }}> 網路獨賣
+                                    </label>
+                                </div>
+                                <div class="col-sm-3">
                                     <label class="radio-inline">
                                         <input type="radio" name="selling_channel" value="WHOLE"
                                             {{ $products->selling_channel == 'WHOLE' ? 'checked' : 'disabled' }}> 全通路
+                                    </label>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="selling_channel" value="WHOLE"
+                                            {{ $products->selling_channel == 'STORE' ? 'checked' : 'disabled' }}> 門市限定
                                     </label>
                                 </div>
                             </div>
@@ -285,6 +297,11 @@
                                 <div class="col-sm-3">
                                     <input type="number" class="form-control" name="expiry_receiving_days" min="0"
                                         value="{{ $products->expiry_receiving_days }}" disabled>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="control-label">
+                                        <a href="#" data-toggle="modal" data-target="#model_requisitions_log">請購紀錄</a>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -400,8 +417,13 @@
                                 <div class="col-sm-2 no-pa">
                                     <label class="control-label">毛利(%)</label>
                                 </div>
-                                <div class="col-sm-9">
+                                <div class="col-sm-6">
                                     <input class="form-control" value="{{ $products->gross_margin }}" readonly>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="control-label">
+                                        <a href="#" data-toggle="modal" data-target="#model_promotional">促銷活動</a>
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -786,7 +808,9 @@
                         {{-- 二維多規格結束 --}}
                         {{-- <button class="btn btn-large btn-primary" type="submit">儲存</button> --}}
                 </form>
-                @include('backend.products.model_update_log')
+                @include('backend.products.models.model_update_log')
+                @include('backend.products.models.model_requisitions_log')
+                @include('backend.products.models.model_promotional')
             </div>
         </div>
     </div>
