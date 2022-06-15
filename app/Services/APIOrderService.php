@@ -484,6 +484,7 @@ class APIOrderService
             if (isset($cart['thresholdDiscount'])) {
                 $seq1 = 0;
                 foreach ($cart['thresholdDiscount'] as $key => $threshold) {
+                    $threshold_discount['discount'][$threshold['thresholdID']] = 0;
                     foreach ($threshold['products'] as $k => $product_id) {
                         foreach ($cart['list'] as $products) {
                             if ($products['productID'] == $product_id) {
@@ -508,17 +509,28 @@ class APIOrderService
                                         "updated_at" => now(),
                                     ];
                                     OrderCampaignDiscount::insert($campaign_details[$seq1]);
-                                    $threshold_discount['discount'][$threshold['thresholdID']] -= $cart_p_discount_prod[$product_id][$item['itemId']];
+                                    $threshold_discount['discount'][$threshold['thresholdID']] += $cart_p_discount_prod[$product_id][$item['itemId']];
                                 }
                             }
                         }
                     }
                     $discountData = [];
-                    //把最後一筆資料的比例做修正
-                    if ($threshold_discount['discount'][$threshold['thresholdID']] != 0) {
-                        $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->where('id', $order_detail_temp[$product_id])->orderBy('seq', 'DESC')->first();
-                        $discountData['discount'] = $detail->discount + $threshold_discount['discount'][$threshold['thresholdID']];
+                    //把最後一筆資料campaignDiscount的比例做修正
+                    //$threshold_discount['discount'][$threshold['thresholdID']]
+                    if (($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]) != 0) {
+                        $detail = OrderCampaignDiscount::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')
+                            ->where('level_code', 'CART_P')
+                            ->where('campaign_threshold_id',$threshold['thresholdID'])
+                            ->orderBy('id', 'DESC')->first();
+
+                        if (($threshold['campaignDiscount'] > $threshold_discount['discount'][$threshold['thresholdID']])) {
+                            $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
+                        } else {
+                            $discountData['discount'] = $detail->discount + ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
+                        }
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
+                        //同時把同門檻訂單明細的比例做修正
+                        OrderDetail::where('id', $detail->order_detail_id)->update(['cart_p_discount'=>$discountData['discount']]);
                     }
                 }
             }
@@ -613,20 +625,6 @@ class APIOrderService
                     }
                 }
             }
-
-            //購物車滿額折抵把最後一筆資料做修正
-            $discountData = [];
-            if (($cart_p_discount - $detail_p_discount) != 0) {//購物車的滿額折抵 - 訂單明總的滿額折抵加總 != 0
-                $detail = OrderDetail::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')->orderBy('seq', 'DESC')->first();
-
-                if ($cart_p_discount > $detail_p_discount) {
-                    $discountData['cart_p_discount'] = $detail->cart_p_discount + ($cart_p_discount - $detail_p_discount);
-                } else {
-                    $discountData['cart_p_discount'] = $detail->cart_p_discount - ($detail_p_discount - $cart_p_discount);
-                }
-                OrderDetail::where('id', $detail->id)->update($discountData);
-            }
-
             //點數比例加總不等於1時，把最後一筆資料的比例做修正
             $pointData = [];
             if ($point_rate != 1 || ($order['points'] - $point_discount) != 0) {
