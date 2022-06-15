@@ -516,6 +516,7 @@ class APIOrderService
                     }
                     $discountData = [];
                     //把最後一筆資料campaignDiscount的比例做修正
+                    //$threshold_discount['discount'][$threshold['thresholdID']]
                     if (($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]) != 0) {
                         $detail = OrderCampaignDiscount::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')
                             ->where('level_code', 'CART_P')
@@ -523,9 +524,9 @@ class APIOrderService
                             ->orderBy('id', 'DESC')->first();
 
                         if (($threshold['campaignDiscount'] > $threshold_discount['discount'][$threshold['thresholdID']])) {
-                            $discountData['discount'] = $detail->discount + ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
-                        } else {
                             $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
+                        } else {
+                            $discountData['discount'] = $detail->discount + ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
                         }
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
                         //同時把同門檻訂單明細的比例做修正
@@ -624,7 +625,6 @@ class APIOrderService
                     }
                 }
             }
-
             //點數比例加總不等於1時，把最後一筆資料的比例做修正
             $pointData = [];
             if ($point_rate != 1 || ($order['points'] - $point_discount) != 0) {
