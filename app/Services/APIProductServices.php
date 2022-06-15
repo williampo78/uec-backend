@@ -1550,9 +1550,11 @@ class APIProductServices
                         $tmp_brand = $product->brand_id;
                     }
                     if ($tmp_attribute != $product->attribute_id) {
-                        if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id] = 0;
-                        $attribute_array[$product->attribute_type][$product->attribute_id]++;
-                        $tmp_attribute = $product->attribute_id;
+                        if (isset($attribute_array[$product->attribute_type])) {
+                            if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id] = 0;
+                            $attribute_array[$product->attribute_type][$product->attribute_id]++;
+                            $tmp_attribute = $product->attribute_id;
+                        }
                     }
                 }
             }
