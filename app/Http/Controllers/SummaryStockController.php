@@ -24,7 +24,7 @@ class SummaryStockController extends Controller
     public function index(Request $request)
     {
         //
-        $getData = $request->input();
+        $getData = $request->only(['smonth', 'item_id_start', 'item_id_end', 'product_name']);
         $data['info'] = ($getData ? $this->summaryStock->getSummaryStock($getData) : []);
         $data['sum'] = ($getData ? $this->summaryStock->getSummarySum($getData) : []);
         if (count($getData) > 0) {

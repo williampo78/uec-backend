@@ -26,7 +26,7 @@ class SummaryStockService
             DB::raw("0 as adj_qty"),
             DB::raw("0 as adj_amount"),
             DB::raw("0 as shift_qty"),
-            DB::raw("0 as shift_amount"),
+            DB::raw("0 as shift_amount")
             )
             ->join("products", "products.id", "=", "stock_monthly_summary.product_id")
             ->where("stock_monthly_summary.transaction_month", $data['smonth'])
