@@ -2,25 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\RoleService;
 use App\Models\TertiaryCategory;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use App\Services\TertiaryCategoryService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TertiaryCategoryController extends Controller
 {
-    private $role_service;
     private $tertiaryCategoryService;
 
     public function __construct(
-        TertiaryCategoryService $tertiaryCategoryService,
-        RoleService $role_service
+        TertiaryCategoryService $tertiaryCategoryService
     ) {
         $this->tertiaryCategoryService = $tertiaryCategoryService;
-        $this->role_service = $role_service;
+    }
+
+    /**
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @Author: Eric
+     * @DateTime: 2022/1/19 上午 09:27
+     */
+    public function index()
+    {
+        $params = [];
+        $params['tertiaryCategories'] = $this->tertiaryCategoryService->getIndex();
+
+        return view('backend.tertiary_category.list', $params);
     }
 
     /**
@@ -30,11 +39,6 @@ class TertiaryCategoryController extends Controller
      */
     public function create()
     {
-        //無權限
-        if ($this->role_service->getOtherRoles()['auth_create'] == false) {
-            App::abort(403);
-        }
-
         $params = [];
         $params['parentCategories'] = $this->tertiaryCategoryService->getPrimaryCategoryAndCategory();
 
@@ -49,11 +53,6 @@ class TertiaryCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //無權限
-        if ($this->role_service->getOtherRoles()['auth_create'] == false) {
-            App::abort(403);
-        }
-
         try {
             TertiaryCategory::create([
                 'agent_id' => Auth::user()->agent_id,
@@ -77,19 +76,6 @@ class TertiaryCategoryController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     * @Author: Eric
-     * @DateTime: 2022/1/19 上午 09:27
-     */
-    public function index()
-    {
-        $params = [];
-        $params['tertiaryCategories'] = $this->tertiaryCategoryService->getIndex();
-
-        return view('backend.tertiary_category.list', $params);
-    }
-
-    /**
      * @param int $id
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      * @Author: Eric
@@ -97,11 +83,6 @@ class TertiaryCategoryController extends Controller
      */
     public function edit(int $id)
     {
-        //無權限
-        if ($this->role_service->getOtherRoles()['auth_update'] == false) {
-            App::abort(403);
-        }
-
         $tertiaryCategory = TertiaryCategory::findOrFail($id);
 
         $params = [];
@@ -120,10 +101,6 @@ class TertiaryCategoryController extends Controller
      */
     public function update(int $id, Request $request)
     {
-        if ($this->role_service->getOtherRoles()['auth_update'] == false) {
-            App::abort(403);
-        }
-
         try {
             $tertiaryCategory = TertiaryCategory::findOrFail($id);
 

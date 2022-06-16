@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseService
 {
-    public function __construct()
-    {
-    }
     public function getPurchase($in)
     {
         $purchase = Purchase::select(
@@ -23,29 +20,39 @@ class PurchaseService
             ->leftJoin('supplier', 'supplier.id', '=', 'purchase.supplier_id')
             ->leftJoin('order_supplier', 'order_supplier.id', '=', 'purchase.order_supplier_id');
 
-        if (isset($in['supplier']) && $in['supplier']) { //供應商
+        // 供應商
+        if (isset($in['supplier']) && $in['supplier']) {
             $purchase->where('purchase.supplier_id', $in['supplier']);
         }
 
-        if (isset($in['company_number']) && $in['company_number']) { //供應商統編
+        // 供應商統編
+        if (isset($in['company_number']) && $in['company_number']) {
             $purchase->where('supplier.company_number', $in['company_number']);
         }
 
-        if (isset($in['order_supplier_number']) && $in['order_supplier_number']) { //採購單單號
+        // 採購單單號
+        if (isset($in['order_supplier_number']) && $in['order_supplier_number']) {
             $purchase->where('order_supplier.number', $in['order_supplier_number']);
         }
-        if (isset($in['trade_date_start']) && $in['trade_date_start'] && isset($in['trade_date_end']) && $in['trade_date_end']) { //進貨日期
-            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'] .' 00:00:00', $in['trade_date_end'] .' 23:59:59']);
+
+        // 進貨日期
+        if (isset($in['trade_date_start']) && $in['trade_date_start'] && isset($in['trade_date_end']) && $in['trade_date_end']) {
+            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'] . ' 00:00:00', $in['trade_date_end'] . ' 23:59:59']);
         }
-        if (isset($in['number']) && $in['number']) { //進貨單號
+
+        // 進貨單號
+        if (isset($in['number']) && $in['number']) {
             $purchase->where('purchase.number', $in['number']);
         }
+
         if (isset($in['id']) && $in['id']) {
             $purchase->where('purchase.id', $in['id']);
             return $purchase->first();
         }
+
         return $purchase->get();
     }
+
     public function getPurchaseDetail($in)
     {
         $purchase = PurchaseDetail::select(
@@ -71,6 +78,7 @@ class PurchaseService
 
         return $purchase->get();
     }
+
     public function updateInvoice($in)
     {
         $user_id = Auth::user()->id;
@@ -80,6 +88,7 @@ class PurchaseService
             'invoice_date' => $in['invoice_date'],
         ]);
     }
+
     /**
      * 取得 買斷商品對帳單
      *
@@ -109,7 +118,7 @@ class PurchaseService
             ->leftJoin('order_supplier', 'order_supplier.id', '=', 'purchase.order_supplier_id'); //採購單
 
         if (isset($in['trade_date_start']) && $in['trade_date_start'] && isset($in['trade_date_end']) && $in['trade_date_end']) { //進貨日期
-            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'] .' 00:00:00', $in['trade_date_end'] .' 23:59:59']);
+            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'] . ' 00:00:00', $in['trade_date_end'] . ' 23:59:59']);
         }
         if (isset($in['supplier']) && $in['supplier']) { //供應商
             $purchase->where('purchase.supplier_id', $in['supplier']);

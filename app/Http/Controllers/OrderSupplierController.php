@@ -27,7 +27,8 @@ class OrderSupplierController extends Controller
     public function __construct(UniversalService $universalService,
         OrderSupplierService $orderSupplierService,
         RequisitionsPurchaseService $requisitionsPurchaseService,
-        BrandsService $brandsService) {
+        BrandsService $brandsService
+    ) {
         $this->universalService = $universalService;
         $this->orderSupplierService = $orderSupplierService;
         $this->requisitionsPurchaseService = $requisitionsPurchaseService;

@@ -84,7 +84,7 @@ class InventoryService
      * @Author: Eric
      * @DateTime: 2022/1/20 上午 10:34
      */
-    public function handleInventories(collection $inventories)
+    public function handleInventories(Collection $inventories)
     {
         return $inventories->map(function ($inventory) {
 
@@ -125,7 +125,7 @@ class InventoryService
      * @Author: Eric
      * @DateTime: 2022/1/20 上午 10:34
      */
-    public function handleExcelData(collection $inventories)
+    public function handleExcelData(Collection $inventories)
     {
         return $inventories->map(function ($inventory) {
 

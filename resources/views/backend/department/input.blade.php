@@ -21,18 +21,14 @@
                     <div class="panel-body">
                         @if(isset($department))
                             <form role="form" id="new-form" method="post"
-                                  action="{{ route('department.update', $department->id) }}"
-                                  enctype="multipart/form-data">
+                                  action="{{ route('department.update', $department->id) }}">
                                 @method('PUT')
                                 @csrf
                         @else
-                            <form role="form" id="new-form" method="post" action="{{route('department')}}"
-                                  enctype="multipart/form-data">
+                            <form role="form" id="new-form" method="post" action="{{route('department')}}">
                         @endif
                         @csrf
                                 <div class="row">
-                                    <input type="hidden" name="agent_id"
-                                           value="{{ Auth::user()->agent_id }}">
                                     <!-- 欄位 -->
                                     <div class="col-sm-12">
                                         <div class="row">
@@ -60,9 +56,9 @@
                                                     <button class="btn btn-success" id="btn-save" type="button">
                                                         <i class="fa-solid fa-floppy-disk"></i> 儲存
                                                     </button>
-                                                    <button class="btn btn-danger" id="btn-cancel" type="button">
+                                                    <a class="btn btn-danger" href="{{ route("department") }}">
                                                         <i class="fa-solid fa-ban"></i> 取消
-                                                    </button>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -83,9 +79,6 @@
             $("#new-form").validationEngine();
             $("#btn-save").click(function () {
                 $("#new-form").submit();
-            });
-            $("#btn-cancel").click(function () {
-                window.location.href = '{{route("department")}}';
             });
         })
     </script>

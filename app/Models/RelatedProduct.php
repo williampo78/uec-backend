@@ -9,7 +9,6 @@ class RelatedProduct extends Model
 {
     use HasFactory;
     protected $table = 'related_products';
-    public $timestamps = true;
     protected $guarded = [];
 
     static public function getRelated($product_id)

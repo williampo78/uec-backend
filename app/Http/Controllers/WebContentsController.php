@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\WebContent;
-use Illuminate\Http\Request;
 use App\Services\UniversalService;
 use App\Services\WebContentsService;
+use Illuminate\Http\Request;
 
 class WebContentsController extends Controller
 {
     private $webContentsService;
+    private $universalService;
 
-    public function __construct(WebContentsService $webContentsService, UniversalService $universalService)
-    {
+    public function __construct(
+        WebContentsService $webContentsService,
+        UniversalService $universalService
+    ) {
         $this->webContentsService = $webContentsService;
         $this->universalService = $universalService;
     }
@@ -24,7 +27,6 @@ class WebContentsController extends Controller
      */
     public function index(Request $request)
     {
-        //
         $getData = $request->all();
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['footer'] = ($getData ? $this->webContentsService->getFooter($getData, 'FOOTER') : []);
@@ -42,7 +44,6 @@ class WebContentsController extends Controller
      */
     public function create()
     {
-        //
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
         return view('backend.web_contents.add', compact('data'));
@@ -56,7 +57,6 @@ class WebContentsController extends Controller
      */
     public function store(Request $request)
     {
-        //
         $input = $request->input();
         unset($input['_token']);
         $act = 'add';
@@ -74,7 +74,6 @@ class WebContentsController extends Controller
      */
     public function show($id)
     {
-        //
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
         $data['webcontent'] = WebContent::find($id);
@@ -89,7 +88,6 @@ class WebContentsController extends Controller
      */
     public function edit($id)
     {
-        //
         $data['category'] = $this->webContentsService->getCategory('FOOTER_CATEGORY');
         $data['target'] = $this->universalService->getFooterContentTarget();
         $data['webcontent'] = WebContent::find($id);
@@ -105,9 +103,8 @@ class WebContentsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
         $input = $request->input();
-        $input = $request->except('_token' , '_method');
+        $input = $request->except('_token', '_method');
         $act = 'upd';
         $route_name = 'webcontents';
         $input['id'] = $id;

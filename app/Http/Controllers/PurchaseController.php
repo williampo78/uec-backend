@@ -9,12 +9,6 @@ use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
     public function __construct(
         SupplierService $supplierService,
         PurchaseService $purchaseService,
@@ -24,14 +18,29 @@ class PurchaseController extends Controller
         $this->purchaseService = $purchaseService;
         $this->brandsService = $brandsService;
     }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
+        $payload = $request->only([
+            'supplier',
+            'company_number',
+            'order_supplier_number',
+            'trade_date_start',
+            'trade_date_end',
+            'number',
+        ]);
         $result = [];
-        $in = $request->input();
         $result['supplier'] = $this->supplierService->getSuppliers();
-        if (!empty($in)) {
-            $result['purchase'] = $this->purchaseService->getPurchase($in);
+
+        if (!empty($payload)) {
+            $result['purchase'] = $this->purchaseService->getPurchase($payload);
         }
+
         return view('backend.purchase.list', $result);
     }
 
@@ -100,6 +109,7 @@ class PurchaseController extends Controller
     {
         //
     }
+
     public function ajax(Request $request)
     {
         $req = $request->input();
@@ -129,13 +139,15 @@ class PurchaseController extends Controller
                 });
                 return view('backend.purchase.show', $data);
                 break;
+
             case 'update_invoice':
-                $result = $this->purchaseService->updateInvoice($req) ;
+                $result = $this->purchaseService->updateInvoice($req);
                 return response()->json([
                     'in' => $req,
-                    'status' => $result ,
+                    'status' => $result,
                 ]);
                 break;
+
             default:
                 # code...
                 break;

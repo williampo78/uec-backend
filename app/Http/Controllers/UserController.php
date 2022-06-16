@@ -33,7 +33,11 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $getData = $request->all();
+        $getData = $request->only([
+            'user_account',
+            'user_name',
+            'active',
+        ]);
         $data['users'] = ($getData ? $this->userService->getUsers($getData) : []);
 
         return view('backend.user.index', $data);

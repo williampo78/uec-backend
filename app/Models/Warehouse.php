@@ -10,6 +10,7 @@ class Warehouse extends Model
     use HasFactory;
 
     protected $table = 'warehouse';
+    protected $guarded = [];
 
     /**
      * 建立與商品品項的關聯

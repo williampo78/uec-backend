@@ -9,5 +9,4 @@ class QuotationDetail extends Model
 {
     use HasFactory;
     protected $table = 'quotation_details';
-    public $timestamps = true;
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ReportExport;
-use Illuminate\Http\Request;
 use App\Services\SummaryStockService;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SummaryStockController extends Controller
@@ -23,12 +23,16 @@ class SummaryStockController extends Controller
      */
     public function index(Request $request)
     {
-        //
-        $getData = $request->input();
+        $getData = $request->only([
+            'smonth',
+            'item_id_start',
+            'item_id_end',
+            'product_name',
+        ]);
         $data['info'] = ($getData ? $this->summaryStock->getSummaryStock($getData) : []);
         $data['sum'] = ($getData ? $this->summaryStock->getSummarySum($getData) : []);
         if (count($getData) > 0) {
-            $data['excel_url'] = url("/").$request->getRequestUri() . '&export=true';
+            $data['excel_url'] = url("/") . $request->getRequestUri() . '&export=true';
         }
         if (isset($getData['export'])) { //匯出報表
             return $this->export($data['info']);
@@ -125,17 +129,15 @@ class SummaryStockController extends Controller
             "shift_qty" => "調撥數量",
             "shift_amount" => "調撥金額",
             "end_qty" => "期末數量",
-            "end_amount_display" => "期末金額"
+            "end_amount_display" => "期末金額",
         ];
         $data = $data->toArray();
         $export = new ReportExport($title, $data);
         return Excel::download($export, '進耗存彙總表' . date('Y-m-d') . '.xlsx');
     }
 
-
     public function ajaxDetail(Request $request)
     {
-
         $getData = $request->input();
         $rs = $this->summaryStock->setSummaryCost($getData['smonth']);
 

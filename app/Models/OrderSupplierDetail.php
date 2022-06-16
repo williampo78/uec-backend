@@ -9,5 +9,4 @@ class OrderSupplierDetail extends Model
 {
     use HasFactory;
     protected $table = 'order_supplier_detail';
-    public $timestamps = true;
 }

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warehouse;
-use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class WarehouseController extends Controller
 {
@@ -14,13 +14,6 @@ class WarehouseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-
-    private $roleService;
-    public function __construct(RoleService $roleService)
-    {
-        $this->roleService = $roleService;
-
-    }
     public function index()
     {
         $data = Warehouse::all();
@@ -45,13 +38,24 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
+        $data = $request->only(['number', 'name']);
+        $user = auth()->user();
+
+        try {
+            $createdWarehouse = Warehouse::create([
+                'agent_id' => $user->agent_id,
+                'number' => $data['number'],
+                'name' => $data['name'],
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+
         $route_name = 'warehouse';
         $act = 'add';
-        $data = $request->only(['number','name']);
-        $data['agent_id'] = Auth::user()->agent_id;
-        $rs = Warehouse::insert($data);
-
-        return view('backend.success' , compact('route_name','act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -87,12 +91,22 @@ class WarehouseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->only(['number','name']);
-        $data['updated_by'] = Auth::user()->id;
-        Warehouse::where('id' ,$id)->update($data);
+        $data = $request->only(['number', 'name']);
+        $user = auth()->user();
+
+        try {
+            Warehouse::findOrFail($id)->update([
+                'number' => $data['number'],
+                'name' => $data['name'],
+                'updated_by' => $user->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+
         $route_name = 'warehouse';
         $act = 'upd';
-        return view('backend.success', compact('route_name' , 'act'));
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

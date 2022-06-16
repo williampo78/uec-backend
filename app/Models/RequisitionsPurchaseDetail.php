@@ -9,5 +9,4 @@ class RequisitionsPurchaseDetail extends Model
 {
     use HasFactory;
     protected $table = 'requisitions_purchase_detail';
-    public $timestamps = true;
 }

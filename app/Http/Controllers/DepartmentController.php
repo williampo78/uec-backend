@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Services\DepartmentService;
+use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
     private $departmentService;
-    public function __construct(DepartmentService $DepartmentService)
+
+    public function __construct(DepartmentService $departmentService)
     {
-        $this->departmentService = $DepartmentService;
+        $this->departmentService = $departmentService;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,11 +21,10 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-
         $data = [];
         $data['department'] = $this->departmentService->getDepartment();
-        return view('backend.department.list', compact('data'), compact('data'));
 
+        return view('backend.department.list', compact('data'));
     }
 
     /**
@@ -36,7 +35,6 @@ class DepartmentController extends Controller
     public function create()
     {
         return view('backend.department.input');
-
     }
 
     /**
@@ -47,15 +45,16 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->input();
-        unset($input['_token']);
-        $input['created_by'] = Auth::user()->id;
-        $input['created_at'] = Carbon::now();
+        $input = $request->only([
+            'number',
+            'name',
+        ]);
         $this->departmentService->addDepartment($input);
+
         $act = 'add';
         $route_name = 'department';
-        return view('backend.success' , compact('route_name','act'));
 
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**
@@ -90,16 +89,16 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input = $request->input();
-        unset($input['_token']);
-        unset($input['_method']);
-        $input['updated_by'] = Auth::user()->id;
-        $this->departmentService->updateDepartment($input, $id);
+        $input = $request->only([
+            'number',
+            'name',
+        ]);
+        $this->departmentService->updateDepartment($id, $input);
+
         $act = 'upd';
         $route_name = 'department';
-        return view('backend.success' , compact('route_name','act'));
 
-
+        return view('backend.success', compact('route_name', 'act'));
     }
 
     /**

@@ -10,11 +10,17 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class BuyoutProductsReportController extends Controller
 {
-    public function __construct(SupplierService $supplierService,
-        PurchaseService $purchaseService) {
+    private $supplierService;
+    private $purchaseService;
+
+    public function __construct(
+        SupplierService $supplierService,
+        PurchaseService $purchaseService
+    ) {
         $this->supplierService = $supplierService;
         $this->purchaseService = $purchaseService;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +28,15 @@ class BuyoutProductsReportController extends Controller
      */
     public function index(Request $request)
     {
-        $in = $request->input();
+        $in = $request->only([
+            'trade_date_start',
+            'trade_date_end',
+            'supplier',
+            'order_supplier_number',
+            'POS_start_number',
+            'POS_end_number',
+            'product_name',
+        ]);
         $result = [];
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         if (count($in) > 1) { //是否開始搜尋

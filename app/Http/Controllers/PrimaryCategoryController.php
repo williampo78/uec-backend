@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\PrimaryCategory;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -15,10 +14,6 @@ class PrimaryCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct()
-    {
-
-    }
     public function index()
     {
         $data = PrimaryCategory::all();
@@ -44,20 +39,25 @@ class PrimaryCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'primary_category';
-        $act = 'add';
-        $data = $request->only(['number','name']);
-        $data['agent_id'] = Auth::user()->agent_id;
-        $data['created_by'] = Auth::user()->id;
-        $data['created_at'] = Carbon::now();
+        $data = $request->only(['number', 'name']);
+        $user = auth()->user();
 
         try {
-            $rs = PrimaryCategory::insert($data);
+            $createdPrimaryCategory = PrimaryCategory::create([
+                'agent_id' => $user->agent_id,
+                'number' => $data['number'],
+                'name' => $data['name'],
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+            ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
 
             return back()->withErrors(['message' => '儲存失敗']);
         }
+
+        $route_name = 'primary_category';
+        $act = 'add';
 
         return view('backend.success', compact('route_name', 'act'));
     }
@@ -95,11 +95,15 @@ class PrimaryCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->only(['number','name']);
-        $data['updated_by'] = Auth::user()->id;
+        $data = $request->only(['number', 'name']);
+        $user = auth()->user();
 
         try {
-            PrimaryCategory::findOrFail($id)->update($data);
+            PrimaryCategory::findOrFail($id)->update([
+                'number' => $data['number'],
+                'name' => $data['name'],
+                'updated_by' => $user->id,
+            ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
 

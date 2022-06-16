@@ -11,6 +11,7 @@ use App\Services\WebContentsService;
 class QAController extends Controller
 {
     private $webContentsService;
+    private $universalService;
 
     public function __construct(
         WebContentsService $webContentsService,
@@ -19,6 +20,7 @@ class QAController extends Controller
         $this->webContentsService = $webContentsService;
         $this->universalService = $universalService;
     }
+
     /**
      * Display a listing of the resource.
      *
