@@ -9,6 +9,5 @@ class ProductReviewLog extends Model
 {
     use HasFactory;
     protected $table = 'product_review_log';
-    public $timestamps = true;
-    protected $guarded = []; 
+    protected $guarded = [];
 }

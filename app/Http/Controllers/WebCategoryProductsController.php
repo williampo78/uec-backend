@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\SupplierService;
 use App\Services\ProductService;
+use App\Services\SupplierService;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
 
@@ -11,13 +11,18 @@ class WebCategoryProductsController extends Controller
 {
     private $webCategoryHierarchyService;
     private $supplierService;
-    public function __construct(WebCategoryHierarchyService $webCategoryHierarchyService,
+    private $productService;
+
+    public function __construct(
+        WebCategoryHierarchyService $webCategoryHierarchyService,
         SupplierService $supplierService,
-        ProductService $productService) {
+        ProductService $productService
+    ) {
         $this->webCategoryHierarchyService = $webCategoryHierarchyService;
         $this->supplierService = $supplierService;
         $this->productService = $productService;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -79,11 +84,11 @@ class WebCategoryProductsController extends Controller
         $in['id'] = $id;
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents($in)[0];
         //原生sql不加入RomotionalCampaigns join - 另外撈取 活動名稱
-        if($result['category_hierarchy_content']->promotion_campaign_id !== null){
+        if ($result['category_hierarchy_content']->promotion_campaign_id !== null) {
             $getRomotionalCampaigns = $this->webCategoryHierarchyService->getRomotionalCampaigns(['id' => $result['category_hierarchy_content']->promotion_campaign_id])[0] ?? null;
-            $result['category_hierarchy_content']->campaign_brief = $getRomotionalCampaigns->campaign_brief ;
-        }else{
-            $result['category_hierarchy_content']->campaign_brief = '' ;
+            $result['category_hierarchy_content']->campaign_brief = $getRomotionalCampaigns->campaign_brief;
+        } else {
+            $result['category_hierarchy_content']->campaign_brief = '';
         }
 
         // 網頁標題為空值時，預設為分類名稱的最小階層名稱
@@ -134,7 +139,7 @@ class WebCategoryProductsController extends Controller
         $result = [];
         switch ($in['type']) {
             case 'getProductsList':
-                $result['data'] = $this->productService->getProducts($in) ;
+                $result['data'] = $this->productService->getProducts($in);
                 $this->productService->restructureProducts($result['data']);
                 foreach ($result['data'] as $key => $val) {
                     $result['data'][$key]->check_use = 0;
@@ -148,7 +153,7 @@ class WebCategoryProductsController extends Controller
                 $result['data']['category_products_list'] = $this->webCategoryHierarchyService->categoryProductsHierarchyId($in['id']);
                 break;
             case 'promotionalCampaignsGetAjax':
-                $result['data'] = $this->webCategoryHierarchyService->getRomotionalCampaigns($in) ;
+                $result['data'] = $this->webCategoryHierarchyService->getRomotionalCampaigns($in);
             default:
                 # code...
                 break;

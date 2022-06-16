@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Exports\InventoryExport;
 use App\Services\InventoryService;
-use App\Services\RoleService;
 use App\Services\SupplierService;
 use App\Services\WarehouseService;
 use Illuminate\Http\Request;
@@ -16,18 +15,15 @@ class InventoryController extends Controller
     private $supplierService;
     private $warehouseService;
     private $inventoryService;
-    private $roleService;
 
     public function __construct(
         SupplierService $supplierService,
         WarehouseService $warehouseService,
-        InventoryService $inventoryService,
-        RoleService $roleService
+        InventoryService $inventoryService
     ) {
         $this->supplierService = $supplierService;
         $this->warehouseService = $warehouseService;
         $this->inventoryService = $inventoryService;
-        $this->roleService = $roleService;
     }
 
     /**
@@ -39,11 +35,21 @@ class InventoryController extends Controller
     {
         $inventories = collect();
 
-        //有權限
-        if ($this->roleService->getOtherRoles()['auth_query']) {
-            //有搜尋條件才會進行處理
-            if (!empty($request->all())) {
-                $inventories = $this->inventoryService->getInventories($request->all());
+        // 有權限
+        if ($request->share_role_auth['auth_query']) {
+            $payload = $request->only([
+                'warehouse',
+                'stock_type',
+                'stock_status',
+                'item_no_start',
+                'item_no_end',
+                'product_name',
+                'supplier',
+            ]);
+
+            // 有搜尋條件才會進行處理
+            if (!empty($payload)) {
+                $inventories = $this->inventoryService->getInventories($payload);
                 $inventories = $this->inventoryService->handleInventories($inventories);
             }
         }
@@ -65,12 +71,22 @@ class InventoryController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        //無權限
-        if ($this->roleService->getOtherRoles()['auth_export'] == false) {
+        // 無權限
+        if (!$request->share_role_auth['auth_export']) {
             return response('Forbidden', 403);
         }
 
-        $inventories = $this->inventoryService->getInventories($request->all());
+        $payload = $request->only([
+            'warehouse',
+            'stock_type',
+            'stock_status',
+            'item_no_start',
+            'item_no_end',
+            'product_name',
+            'supplier',
+        ]);
+
+        $inventories = $this->inventoryService->getInventories($payload);
         $inventories = $this->inventoryService->handleExcelData($inventories);
 
         return Excel::download(new InventoryExport($inventories), 'inventories.xlsx');

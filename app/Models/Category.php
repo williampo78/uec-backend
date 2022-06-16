@@ -11,5 +11,4 @@ class Category extends Model
 
     protected $table = 'category';
     protected $guarded = [];
-    public $timestamps = true;
 }

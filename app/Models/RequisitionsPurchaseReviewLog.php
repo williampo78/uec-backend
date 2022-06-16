@@ -9,5 +9,4 @@ class RequisitionsPurchaseReviewLog extends Model
 {
     use HasFactory;
     protected $table = 'requisitions_pur_review_log';
-    public $timestamps = true;
 }

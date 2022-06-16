@@ -2,22 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\RoleService;
 use App\Services\ShipmentService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ShipmentController extends Controller
 {
-    private $shipment_service;
-    private $role_service;
+    private $shipmentService;
 
     public function __construct(
-        ShipmentService $shipment_service,
-        RoleService $role_service
+        ShipmentService $shipmentService
     ) {
-        $this->shipment_service = $shipment_service;
-        $this->role_service = $role_service;
+        $this->shipmentService = $shipmentService;
     }
 
     /**
@@ -27,15 +23,24 @@ class ShipmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query_datas = [];
-        $query_datas = $request->query();
+        $payload = $request->only([
+            'created_at_start',
+            'created_at_end',
+            'shipment_no',
+            'member_account',
+            'order_no',
+            'status_code',
+            'payment_method',
+            'product_no',
+            'product_name',
+        ]);
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
-        if (!$this->role_service->getOtherRoles()['auth_query'] || count($query_datas) < 1) {
+        if (!$request->share_role_auth['auth_query'] || empty($payload)) {
             return view('backend.shipment.list');
         }
 
-        $shipments = $this->shipment_service->getShipments($query_datas);
+        $shipments = $this->shipmentService->getShipments($payload);
 
         // 整理給前端的資料
         $shipments = $shipments->map(function ($shipment) {
@@ -81,10 +86,7 @@ class ShipmentController extends Controller
         })
             ->toArray();
 
-        return view(
-            'backend.shipment.list',
-            compact('shipments')
-        );
+        return view('backend.shipment.list', compact('shipments'));
     }
 
     /**
@@ -116,7 +118,7 @@ class ShipmentController extends Controller
      */
     public function show($id)
     {
-        $shipment = $this->shipment_service->getShipments([
+        $shipment = $this->shipmentService->getShipments([
             'shipment_id' => $id,
         ])->first();
 

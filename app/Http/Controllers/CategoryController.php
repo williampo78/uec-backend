@@ -5,19 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\PrimaryCategory;
 use App\Services\CategoryService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
     private $categoryService;
 
     public function __construct(CategoryService $categoryService)
@@ -25,6 +18,11 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $data = Category::all();
@@ -53,20 +51,26 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $route_name = 'category';
-        $act = 'add';
-        $data = $request->only(['number','name','primary_category_id']);
-        $data['agent_id'] = Auth::user()->agent_id;
-        $data['created_by'] = Auth::user()->id;
-        $data['created_at'] = Carbon::now();
+        $data = $request->only(['number', 'name', 'primary_category_id']);
+        $user = auth()->user();
 
         try {
-            $rs = Category::insert($data);
+            $createdCategory = Category::create([
+                'agent_id' => $user->agent_id,
+                'primary_category_id' => $data['primary_category_id'],
+                'number' => $data['number'],
+                'name' => $data['name'],
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+            ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
 
             return back()->withErrors(['message' => '儲存失敗']);
         }
+
+        $route_name = 'category';
+        $act = 'add';
 
         return view('backend.success', compact('route_name', 'act'));
     }
@@ -105,12 +109,16 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->only(['number','name','primary_category_id']);
-        $data['updated_by'] = Auth::user()->id;
-        $data['updated_at'] = Carbon::now();
+        $data = $request->only(['number', 'name', 'primary_category_id']);
+        $user = auth()->user();
 
         try {
-            Category::findOrFail($id)->update($data);
+            Category::findOrFail($id)->update([
+                'primary_category_id' => $data['primary_category_id'],
+                'number' => $data['number'],
+                'name' => $data['name'],
+                'updated_by' => $user->id,
+            ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
 
@@ -119,6 +127,7 @@ class CategoryController extends Controller
 
         $route_name = 'category';
         $act = 'upd';
+
         return view('backend.success', compact('route_name', 'act'));
     }
 

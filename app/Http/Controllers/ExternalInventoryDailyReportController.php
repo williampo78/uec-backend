@@ -9,24 +9,21 @@ use App\Services\SupplierService;
 use App\Services\WarehouseService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+
 class ExternalInventoryDailyReportController extends Controller
 {
     private $supplierService;
     private $warehouseService;
     private $externalInventoryDailyReportService;
-    private $role_service;
 
     public function __construct(
         SupplierService $supplierService,
         WarehouseService $warehouseService,
-        ExternalInventoryDailyReportService $externalInventoryDailyReportService,
-        RoleService $role_service
-    )
-    {
+        ExternalInventoryDailyReportService $externalInventoryDailyReportService
+    ) {
         $this->supplierService = $supplierService;
         $this->warehouseService = $warehouseService;
         $this->externalInventoryDailyReportService = $externalInventoryDailyReportService;
-        $this->role_service = $role_service;
     }
 
     /**
@@ -39,11 +36,22 @@ class ExternalInventoryDailyReportController extends Controller
     {
         $dailyReports = collect();
 
-        //有權限
-        if($this->role_service->getOtherRoles()['auth_query']) {
-            //有搜尋條件才會進行處理
-            if (empty($request->toArray()) === false) {
-                $dailyReports = $this->externalInventoryDailyReportService->getIndexData($request->toArray());
+        // 有權限
+        if ($request->share_role_auth['auth_query']) {
+            $payload = $request->only([
+                'counting_date',
+                'warehouse',
+                'stock_type',
+                'item_no_start',
+                'item_no_end',
+                'product_name',
+                'is_dangerous',
+                'supplier_id',
+            ]);
+
+            // 有搜尋條件才會進行處理
+            if (!empty($payload)) {
+                $dailyReports = $this->externalInventoryDailyReportService->getIndexData($payload);
                 $dailyReports = $this->externalInventoryDailyReportService->handleIndexData($dailyReports);
             }
         }
@@ -64,12 +72,23 @@ class ExternalInventoryDailyReportController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        //無權限
-        if($this->role_service->getOtherRoles()['auth_export'] == false) {
+        // 無權限
+        if (!$request->share_role_auth['auth_export']) {
             return response('Forbidden', 403);
         }
 
-        $dailyReports = $this->externalInventoryDailyReportService->getIndexData($request->toArray());
+        $payload = $request->only([
+            'counting_date',
+            'warehouse',
+            'stock_type',
+            'item_no_start',
+            'item_no_end',
+            'product_name',
+            'is_dangerous',
+            'supplier_id',
+        ]);
+
+        $dailyReports = $this->externalInventoryDailyReportService->getIndexData($payload);
         $dailyReports = $this->externalInventoryDailyReportService->handleExcelData($dailyReports);
 
         return Excel::download(new ExternalInventoryDailyReportExport($dailyReports), 'external_inventory_daily_reports.xlsx');

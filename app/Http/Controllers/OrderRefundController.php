@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Exports\OrderRefundExport;
 use App\Services\OrderRefundService;
-use App\Services\RoleService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
@@ -12,14 +11,11 @@ use Maatwebsite\Excel\Facades\Excel;
 class OrderRefundController extends Controller
 {
     private $orderRefundService;
-    private $role_service;
 
     public function __construct(
-        OrderRefundService $OrderRefundService,
-        RoleService $role_service
+        OrderRefundService $OrderRefundService
     ) {
         $this->orderRefundService = $OrderRefundService;
-        $this->role_service = $role_service;
     }
 
     /**
@@ -32,11 +28,21 @@ class OrderRefundController extends Controller
     {
         $orderRefunds = collect();
 
-        //有權限
-        if ($this->role_service->getOtherRoles()['auth_query']) {
-            //有搜尋條件才會進行處理
-            if (empty($request->toArray()) === false) {
-                $orderRefunds = $this->orderRefundService->getOrderRefunds($request->toArray());
+        // 有權限
+        if ($request->share_role_auth['auth_query']) {
+            $payload = $request->only([
+                'order_refund_date_start',
+                'order_refund_date_end',
+                'request_no',
+                'member_account',
+                'status_code',
+                'order_no',
+                'member_name',
+            ]);
+
+            // 有搜尋條件才會進行處理
+            if (!empty($payload)) {
+                $orderRefunds = $this->orderRefundService->getOrderRefunds($payload);
                 $orderRefunds = $this->orderRefundService->handleOrderRefunds($orderRefunds);
             }
         }
@@ -88,12 +94,22 @@ class OrderRefundController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        //無權限
-        if ($this->role_service->getOtherRoles()['auth_export'] == false) {
+        // 無權限
+        if (!$request->share_role_auth['auth_export']) {
             return response('Forbidden', 403);
         }
 
-        $orderRefunds = $this->orderRefundService->getExcelData($request->toArray());
+        $payload = $request->only([
+            'order_refund_date_start',
+            'order_refund_date_end',
+            'request_no',
+            'member_account',
+            'status_code',
+            'order_no',
+            'member_name',
+        ]);
+
+        $orderRefunds = $this->orderRefundService->getExcelData($payload);
         $orderRefunds = $this->orderRefundService->handleExcelData($orderRefunds);
 
         return Excel::download(new OrderRefundExport($orderRefunds), 'orderRefunds.xlsx');

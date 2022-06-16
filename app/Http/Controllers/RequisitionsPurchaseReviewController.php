@@ -13,23 +13,19 @@ use Illuminate\Support\Facades\Auth;
 
 class RequisitionsPurchaseReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
     private $requisition_purchase_service;
     private $quotation_service;
     private $review_service;
     private $universal_service;
     private $brandsService;
 
-    public function __construct(RequisitionsPurchaseService $requisitionsPurchaseService,
+    public function __construct(
+        RequisitionsPurchaseService $requisitionsPurchaseService,
         QuotationService $quotationService,
         ReviewService $reviewService,
         UniversalService $universalService,
-        BrandsService $brandsService) {
+        BrandsService $brandsService
+    ) {
         $this->requisition_purchase_service = $requisitionsPurchaseService;
         $this->quotation_service = $quotationService;
         $this->review_service = $reviewService;
@@ -38,6 +34,11 @@ class RequisitionsPurchaseReviewController extends Controller
 
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         $data = [];
@@ -133,7 +134,7 @@ class RequisitionsPurchaseReviewController extends Controller
     {
         $route_name = 'requisitions_purchase_review';
         $act = 'review';
-        $data = $request->only(['review_result','review_remark']);
+        $data = $request->only(['review_result', 'review_remark']);
         $data['id'] = $id;
         $this->review_service->updateReview($data, 'REQUISITION_PUR');
 

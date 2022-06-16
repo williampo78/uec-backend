@@ -111,7 +111,7 @@ class ExternalInventoryDailyReportService
      * @Author: Eric
      * @DateTime: 2022/1/20 上午 09:26
      */
-    public function handleIndexData(collection $collection)
+    public function handleIndexData(Collection $collection)
     {
         return $collection->map(function ($item) {
 
@@ -156,7 +156,7 @@ class ExternalInventoryDailyReportService
      * @Author: Eric
      * @DateTime: 2022/1/20 上午 10:08
      */
-    public function handleExcelData(collection $collection)
+    public function handleExcelData(Collection $collection)
     {
         return $collection->map(function ($item) {
 

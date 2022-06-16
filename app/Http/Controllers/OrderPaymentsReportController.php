@@ -7,30 +7,32 @@ use App\Services\OrderPaymentsReportService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Services\RoleService;
 
 class OrderPaymentsReportController extends Controller
 {
     private $orderPaymentsReportService;
-    private $role_service;
 
     public function __construct(
-        OrderPaymentsReportService $OrderPaymentsReportService,
-        RoleService $role_service
-    )
-    {
+        OrderPaymentsReportService $OrderPaymentsReportService
+    ) {
         $this->orderPaymentsReportService = $OrderPaymentsReportService;
-        $this->role_service = $role_service;
     }
 
     public function index(Request $request): view
     {
         $orderPaymentsReports = collect();
         //有權限
-        if($this->role_service->getOtherRoles()['auth_query']){
-            //有搜尋條件才會進行處理
-            if (empty($request->toArray()) === false) {
-                $orderPaymentsReports = $this->orderPaymentsReportService->getOrderPaymentsReports($request->toArray());
+        if ($request->share_role_auth['auth_query']) {
+            $payload = $request->only([
+                'date_start',
+                'date_end',
+                'payment_method',
+                'payment_status',
+            ]);
+
+            // 有搜尋條件才會進行處理
+            if (!empty($payload)) {
+                $orderPaymentsReports = $this->orderPaymentsReportService->getOrderPaymentsReports($payload);
                 $orderPaymentsReports = $this->orderPaymentsReportService->handleOrderPaymentsReports($orderPaymentsReports);
             }
         }
@@ -50,21 +52,20 @@ class OrderPaymentsReportController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        //無權限
-        if($this->role_service->getOtherRoles()['auth_export'] == false) {
+        // 無權限
+        if (!$request->share_role_auth['auth_export']) {
             return response('Forbidden', 403);
         }
 
-        $orderPaymentsReports = collect();
-        $request = $request->toArray();
+        $payload = $request->only([
+            'date_start',
+            'date_end',
+            'payment_method',
+            'payment_status',
+        ]);
 
-        $request_is_empty = empty($request['date_start']) && empty($request['date_end']) && empty($request['payment_method']) && empty($request['payment_status']);
-
-        //有搜尋條件才會進行處理
-        if ($request_is_empty === false) {
-            $orderPaymentsReports = $this->orderPaymentsReportService->getOrderPaymentsReports($request);
-            $orderPaymentsReports = $this->orderPaymentsReportService->handleExcelData($orderPaymentsReports);
-        }
+        $orderPaymentsReports = $this->orderPaymentsReportService->getOrderPaymentsReports($payload);
+        $orderPaymentsReports = $this->orderPaymentsReportService->handleExcelData($orderPaymentsReports);
 
         return Excel::download(new OrderPaymentsReportExport($orderPaymentsReports), 'order_payments_reports.xlsx');
     }

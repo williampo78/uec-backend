@@ -7,22 +7,14 @@ use App\Services\ProductService;
 use App\Services\QuotationService;
 use App\Services\RequisitionsPurchaseService;
 use App\Services\SupplierService;
-use App\Services\UniversalService;
 use App\Services\WarehouseService;
 use Illuminate\Http\Request;
 
 class RequisitionsPurchaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
     private $requisitionsPurchaseService;
     private $warehouseService;
     private $supplierService;
-    private $universalService;
     private $quotationService;
     private $productService;
 
@@ -31,26 +23,38 @@ class RequisitionsPurchaseController extends Controller
         WarehouseService $warehouseService,
         SupplierService $supplierService,
         ProductService $productService,
-        UniversalService $universalService,
         QuotationService $quotationService,
         BrandsService $brandsService
     ) {
         $this->requisitionsPurchaseService = $requisitionsPurchaseService; //請購單
         $this->warehouseService = $warehouseService; // 倉庫
         $this->supplierService = $supplierService; //供應商
-        $this->universalService = $universalService; // 共用服務
         $this->quotationService = $quotationService; //報價單服務
         $this->productService = $productService;
         $this->brandsService = $brandsService;
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index(Request $request)
     {
         $params['active'] = 0;
-        $input = $request->input();
-        $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
-        if (count($input) !== 0) {
-            $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($input);
+        $payload = $request->only([
+            'supplier_id',
+            'company_number',
+            'status',
+            'select_start_date',
+            'select_end_date',
+            'doc_number',
+        ]);
+        // 供應商
+        $result['supplier'] = $this->supplierService->getSuppliers();
+
+        if (!empty($payload)) {
+            $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($payload);
         }
 
         return view('backend.requisitions_purchase.list', $result);
@@ -86,6 +90,7 @@ class RequisitionsPurchaseController extends Controller
      */
     public function store(Request $request)
     {
+        //創建請購單
         $result = $this->requisitionsPurchaseService->createRequisitionsPurchase($request->only([
             'id',
             'supplier_id',
@@ -102,7 +107,7 @@ class RequisitionsPurchaseController extends Controller
             'remark',
             'status',
             'requisitions_purchase_detail',
-        ])); //創建請購單
+        ]));
         $result['route_name'] = 'requisitions_purchase';
         $result['act'] = 'add';
         if ($result['status']) {
@@ -124,7 +129,6 @@ class RequisitionsPurchaseController extends Controller
      */
     public function show($id, Request $request)
     {
-
         $requisitionsPurchase = $this->requisitionsPurchaseService->getAjaxRequisitionsPurchase($id); //請購單
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
         $requisitionsPurchaseDetail = $this->requisitionsPurchaseService->getRequisitionPurchaseDetail($id)->transform(function ($obj, $key) use ($brands) {
@@ -149,7 +153,7 @@ class RequisitionsPurchaseController extends Controller
         });
 
         $getRequisitionPurchaseReviewLog = $this->requisitionsPurchaseService->getRequisitionPurchaseReviewLog($id); //簽核紀錄
-        // dd($requisitionsPurchaseDetail) ;
+
         return response()->json([
             'requisitionsPurchase' => json_encode($requisitionsPurchase),
             'requisitionsPurchaseDetail' => json_encode($requisitionsPurchaseDetail),
@@ -268,6 +272,7 @@ class RequisitionsPurchaseController extends Controller
                 break;
         }
     }
+
     public function ajaxDelPurchaseDetail(Request $request)
     {
         $data = json_encode($request->input());
@@ -277,6 +282,7 @@ class RequisitionsPurchaseController extends Controller
         ]);
 
     }
+
     //用請購單ID 帶出 請購單內的品項以及 簽核紀錄
     public function getItemLastPrice(Request $request)
     {
@@ -294,5 +300,4 @@ class RequisitionsPurchaseController extends Controller
         };
 
     }
-
 }

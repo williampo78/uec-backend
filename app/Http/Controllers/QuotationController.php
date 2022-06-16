@@ -14,29 +14,28 @@ use App\Services\WarehouseService;
 
 class QuotationController extends Controller
 {
+    private $quotationService;
+    private $supplierService;
+    private $productService;
+    private $brandsService;
+
+    public function __construct(
+        QuotationService $quotationService,
+        SupplierService $supplierService,
+        ProductService $productService,
+        BrandsService $brandsService
+    ) {
+        $this->quotationService = $quotationService;
+        $this->supplierService = $supplierService;
+        $this->productService = $productService;
+        $this->brandsService = $brandsService;
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-
-    private $quotationService;
-    private $universalService;
-    private $warehouseService;
-
-    public function __construct(QuotationService $quotationService,
-        UniversalService $universalService,
-        WarehouseService $warehouseService,
-        SupplierService $supplierService,
-        ProductService $productService,
-        BrandsService $brandsService) {
-        $this->quotationService = $quotationService;
-        $this->universalService = $universalService;
-        $this->warehouseService = $warehouseService;
-        $this->supplierService = $supplierService;
-        $this->productService = $productService;
-        $this->brandsService = $brandsService;
-    }
     public function index(Request $request)
     {
         $in = $request->input();

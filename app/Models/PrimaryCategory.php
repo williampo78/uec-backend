@@ -11,6 +11,5 @@ class PrimaryCategory extends Model
 
     protected $table = 'primary_category';
     protected $guarded = [];
-    public $timestamps = true;
 
 }
