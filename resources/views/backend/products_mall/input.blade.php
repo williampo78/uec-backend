@@ -149,8 +149,7 @@
                                         </div>
                                         <div class="col-sm-11">
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                    data-toggle="modal" data-target="#model_category"
-                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增分類
+                                                    data-toggle="modal" data-target="#model_category">新增分類
                                             </button>
                                         </div>
                                     </div>
@@ -175,8 +174,7 @@
                                                 <td>
                                                     <button type="button" class="btn btn-danger"
                                                             @click="Del(Category,CategoryKey,'Category')"
-                                                            v-show="RoleAuthJson.auth_delete"
-                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
+                                                            v-show="RoleAuthJson.auth_delete">刪除
                                                     </button>
                                                 </td>
                                             </tr>
@@ -212,8 +210,7 @@
                                         <div class="col-sm-10">
                                             {{-- related_products table --}}
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                    data-toggle="modal" data-target="#model_related_products"
-                                                {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>新增商品
+                                                    data-toggle="modal" data-target="#model_related_products">新增商品
                                             </button>
                                         </div>
                                     </div>
@@ -239,8 +236,7 @@
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger"
-                                                            @click="Del(Product ,key ,'Products')"
-                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
+                                                            @click="Del(Product ,key ,'Products')">刪除
                                                     </button>
                                                 </td>
                                             </tr>
@@ -257,23 +253,79 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <div class="col-sm-12">
-                                            <label class="control-label">認證</label>：
+                                            <label class="control-label">認證：</label>
                                         </div>
-                                        @foreach ($product_attribute_lov as $key => $obj)
-                                            <div class="col-sm-2">
-                                                <label class="radio-inline">
-                                                    <input class="product_attributes" type="checkbox"
-                                                           name="product_attributes[]" value="{{ $obj->id }}"
-                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}
-                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
-                                                    {{ $obj->description }}
-                                                </label>
-                                            </div>
-                                        @endforeach
-                                        <input class="product_attributes_change" type="hidden" value="false"
-                                               name="product_attributes_change">
+                                        @foreach ($product_attribute_lov['CERTIFICATE'] as $key => $obj)
+                                        <div class="col-sm-2">
+                                            <label class="radio-inline">
+                                                <input class="CERTIFICATE" type="checkbox" name="CERTIFICATE[]"
+                                                    value="{{ $obj->id }}"
+                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                {{ $obj->description }}
+                                            </label>
+                                        </div>
+                                    @endforeach
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <label class="control-label">成分：</label>
+                                        </div>
+                                        @foreach ($product_attribute_lov['INGREDIENT'] as $key => $obj)
+                                        <div class="col-sm-2">
+                                            <label class="radio-inline">
+                                                <input class="INGREDIENT" type="checkbox" name="INGREDIENT[]"
+                                                    value="{{ $obj->id }}"
+                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                {{ $obj->description }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <label class="control-label">適用族群：</label>
+                                        </div>
+                                        @foreach ($product_attribute_lov['GROUP'] as $key => $obj)
+                                        <div class="col-sm-2">
+                                            <label class="radio-inline">
+                                                <input class="GROUP" type="checkbox" name="GROUP[]"
+                                                    value="{{ $obj->id }}"
+                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                {{ $obj->description }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <label class="control-label">劑型：</label>
+                                        </div>
+                                        @foreach ($product_attribute_lov['DOSAGE_FORM'] as $key => $obj)
+                                        <div class="col-sm-2">
+                                            <label class="radio-inline">
+                                                <input class="DOSAGE_FORM" type="checkbox" name="DOSAGE_FORM[]"
+                                                    value="{{ $obj->id }}"
+                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                {{ $obj->description }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <div class="col-sm-2 ">
@@ -295,9 +347,7 @@
                                                     class="redtext">*</span></label>
                                         </div>
                                         <div class="col-sm-2">
-                                            <input class="form-control" name="order_limited_qty"
-                                                   {{ $products->edit_readonly == '1' ? 'readonly' : '' }}
-                                                   value="{{ $products->order_limited_qty }}">
+                                            <input class="form-control" name="order_limited_qty" value="{{ $products->order_limited_qty }}">
                                         </div>
                                     </div>
                                 </div>
@@ -455,13 +505,11 @@
                                                         <button type="button" data-toggle="modal"
                                                                 data-target="#item_photo_list"
                                                                 class="btn btn-large btn-warning btn-sm"
-                                                                @click="frombtn(Item,key)"
-                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>選擇圖片
+                                                                @click="frombtn(Item,key)">選擇圖片
                                                         </button>
                                                         <button type="button" v-if="Item.photo_name"
                                                                 class="btn btn-large btn-danger btn-sm"
-                                                                @click="DelItemPhotos(Item,key)"
-                                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>刪除
+                                                                @click="DelItemPhotos(Item,key)">刪除
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -611,11 +659,6 @@
                     promotion_start_at_flatpickr.set('maxDate', dateStr);
                 },
             });
-
-            $('.product_attributes').on('change', function () { // on change of state
-                $('.product_attributes_change').val('true');
-            })
-
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
