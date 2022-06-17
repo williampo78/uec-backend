@@ -419,6 +419,7 @@ class OrderController extends Controller
                     'group_seq' => $orderCampaignDiscount->group_seq,
                     'level_code' => null,
                     'campaign_name' => $orderCampaignDiscount->promotionalCampaign->campaign_name ,
+                    'campaign_brief' => $orderCampaignDiscount->promotionalCampaign->campaign_brief ,
                     'item_no' => $orderCampaignDiscount->item_no,
                     'product_name' => null,
                     'spec_1_value' => null,
