@@ -7,7 +7,7 @@ use App\Models\ProductAttributeLov;
 class ProductAttributeLovService
 {
 
-    public function getProductAttributeLov($in)
+    public function getProductAttributeLov($in=[])
     {
         $result = new ProductAttributeLov;
         if (isset($in['attribute_type']) && $in['attribute_type'] !== '') {
@@ -32,5 +32,13 @@ class ProductAttributeLovService
             ->get()
             ->toArray();
         return $result;
+    }
+    public function assembleAttributeLov(){
+        $attributeLov = $this->getProductAttributeLov();
+        $result = [] ;
+        foreach ($attributeLov as $key => $value) {
+            $result[$value['attribute_type']][] = $value ;
+        }
+        return $result ;
     }
 }

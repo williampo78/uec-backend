@@ -706,22 +706,37 @@ class ProductService
                     );
                 };
             }
-            if (isset($in['product_attributes_change']) && $in['product_attributes_change'] == 'true') {
-                ProductAttribute::where('attribute_type', 'CERTIFICATE')->where('product_id', $id)->delete();
-                $add_product_attributes = [];
-                if (isset($in['product_attributes'])) {
-                    foreach ($in['product_attributes'] as $key => $val) {
-                        $add_product_attributes[$key]['attribute_type'] = 'CERTIFICATE';
-                        $add_product_attributes[$key]['product_attribute_lov_id'] = $val;
-                        $add_product_attributes[$key]['product_id'] = $id;
-                        $add_product_attributes[$key]['created_by'] = $user_id;
-                        $add_product_attributes[$key]['updated_by'] = $user_id;
-                        $add_product_attributes[$key]['created_at'] = $now;
-                        $add_product_attributes[$key]['updated_at'] = $now;
-                    }
-                    ProductAttribute::insert($add_product_attributes);
-                }
+            // array_merge
+            $change_product_attributes = [] ;
+            //證書
+            if(isset($in['CERTIFICATE'])){
+                $change_product_attributes = array_merge($change_product_attributes,$in['CERTIFICATE']);
             }
+            //成分
+            if(isset($in['INGREDIENT'])){
+               $change_product_attributes  = array_merge($change_product_attributes,$in['INGREDIENT']);
+            }
+            //族群
+            if(isset($in['GROUP'])){
+                $change_product_attributes = array_merge($change_product_attributes,$in['GROUP']);
+            }
+            //劑型
+            if(isset($in['DOSAGE_FORM'])){
+                $change_product_attributes = array_merge($change_product_attributes,$in['DOSAGE_FORM']);
+            }
+            ProductAttribute::whereIn('attribute_type', ['CERTIFICATE','INGREDIENT','GROUP','DOSAGE_FORM'])->where('product_id', $id)->delete();
+            $add_product_attributes = [];
+            foreach ($change_product_attributes as $key => $val) {
+                $add_product_attributes[$key]['attribute_type'] = 'CERTIFICATE';
+                $add_product_attributes[$key]['product_attribute_lov_id'] = $val;
+                $add_product_attributes[$key]['product_id'] = $id;
+                $add_product_attributes[$key]['created_by'] = $user_id;
+                $add_product_attributes[$key]['updated_by'] = $user_id;
+                $add_product_attributes[$key]['created_at'] = $now;
+                $add_product_attributes[$key]['updated_at'] = $now;
+            }
+            ProductAttribute::insert($add_product_attributes);
+
             $result['status'] = true;
             DB::commit();
         } catch (\Exception $e) {
@@ -730,6 +745,7 @@ class ProductService
             $result['status'] = false;
             $result['error_code'] = $e->getMessage();
         }
+
         return $result;
     }
 
