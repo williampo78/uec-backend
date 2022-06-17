@@ -15,7 +15,7 @@ class WebCategoryHierarchy extends Model
     /**
      * 建立與商品的關聯
      */
-    public function webCategoryHierarchies()
+    public function products()
     {
         return $this->belongsToMany(Product::class, 'web_category_products', 'web_category_hierarchy_id', 'product_id')->withTimestamps();
     }

@@ -80,27 +80,7 @@ flatpickr.setDefaults({
     clickOpens: false,
     time_24hr: true,
     locale: MandarinTraditional,
-    // onOpen: function(selectedDates, dateStr, instance) {
-    //     let defaultDate = new Date();
-    //     let minDate = instance.config.minDate;
-    //     let maxDate = instance.config.maxDate;
-
-    //     if (dateStr == '') {
-    //         if (minDate) {
-    //             if (minDate.getTime() > defaultDate.getTime()) {
-    //                 defaultDate = minDate;
-    //             }
-    //         }
-
-    //         if (maxDate) {
-    //             if (maxDate.getTime() < defaultDate.getTime()) {
-    //                 defaultDate = maxDate;
-    //             }
-    //         }
-
-    //         instance.setDate(defaultDate, true);
-    //     }
-    // },
+    disableMobile: "true",
 });
 
 /**

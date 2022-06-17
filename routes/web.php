@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ExternalInventoryDailyReportController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\MiscStockRequestController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderPaymentsReportController;
 use App\Http\Controllers\OrderRefundController;
@@ -282,4 +283,18 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     // 進銷存彙總表
     Route::post('/summary_stock/ajax', [SummaryStockController::class, 'ajaxDetail']);
     Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
+
+    // 進貨退出單
+    // Route::get('/buyout-stock-in-requests/product-items', [MiscStockRequestController::class, 'getProductItems']);
+    Route::resource('/misc-stock-requests', MiscStockRequestController::class, [
+        'names' => [
+            'index' => 'misc_stock_requests',
+            'create' => 'misc_stock_requests.create',
+            'store' => 'misc_stock_requests.store',
+            'edit' => 'misc_stock_requests.edit',
+            'update' => 'misc_stock_requests.update',
+            'show' => 'misc_stock_requests.show',
+            'destroy' => 'misc_stock_requests.destroy',
+        ],
+    ]);
 });
