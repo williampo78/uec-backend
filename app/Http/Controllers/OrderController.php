@@ -420,6 +420,7 @@ class OrderController extends Controller
                     'level_code' => null,
                     'campaign_name' => $orderCampaignDiscount->promotionalCampaign->campaign_name ,
                     'campaign_brief' => $orderCampaignDiscount->promotionalCampaign->campaign_brief ,
+                    'campaign_brief' => $orderCampaignDiscount->promotionalCampaign->campaign_brief ,
                     'item_no' => $orderCampaignDiscount->item_no,
                     'product_name' => null,
                     'spec_1_value' => null,
@@ -431,7 +432,9 @@ class OrderController extends Controller
                 // 活動階層
                 $orderCampaignDiscounts['level_code'] = config('uec.campaign_level_code_options')[$orderCampaignDiscount->promotionalCampaign->level_code] ?? null;
                 if($orderCampaignDiscount->promotionalCampaignThreshold !== null){
-                    $orderCampaignDiscounts['campaign_name'] = "{$orderCampaignDiscount->promotionalCampaign->campaign_name}-{$orderCampaignDiscount->PromotionalCampaignThreshold->threshold_brief}";
+                    $orderCampaignDiscounts['show_campaign_name'] = "{$orderCampaignDiscount->promotionalCampaign->campaign_brief} - {$orderCampaignDiscount->promotionalCampaignThreshold->threshold_brief}";
+                }else{
+                    $orderCampaignDiscounts['show_campaign_name'] = "{$orderCampaignDiscount->promotionalCampaign->campaign_brief}";
                 }
                 if (isset($orderCampaignDiscount->product)) {
                     $orderCampaignDiscounts['product_name'] = $orderCampaignDiscount->product->product_name;

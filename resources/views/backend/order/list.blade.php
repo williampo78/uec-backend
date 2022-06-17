@@ -562,7 +562,7 @@
                                     <tr>
                                         <td>${order_campaign_discount.group_seq}</td>
                                         <td>${order_campaign_discount.level_code}</td>
-                                        <td>${order_campaign_discount.campaign_brief}</td>
+                                        <td>${order_campaign_discount.show_campaign_name}</td>
                                         <td>${item_no}</td>
                                         <td>${product_name}</td>
                                         <td>${spec_1_value}</td>
