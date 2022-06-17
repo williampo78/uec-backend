@@ -784,6 +784,7 @@ class ProductService
             Product::where('id', $product_id)->update([
                 'start_launched_at' => $in['start_launched_at'],
                 'end_launched_at' => $in['end_launched_at'],
+                'start_selling_at' => $in['start_selling_at'],
                 'approval_status' => 'REVIEWING',
                 'updated_by' => $user_id,
             ]);
