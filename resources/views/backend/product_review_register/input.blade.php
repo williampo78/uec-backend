@@ -173,6 +173,26 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2">
+                                        <label class="control-label">開賣時間<span class="text-red">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="input-group" id="start_selling_at_flatpickr">
+                                            <input type="text" class="form-control" name="start_selling_at"
+                                                id="start_selling_at" value="" autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <div class="col-sm-12">
@@ -223,6 +243,7 @@
                                     <thead>
                                         <tr>
                                             <th>上架時間</th>
+                                            <th>開賣時間</th>
                                             <th>售價</th>
                                             <th>上架審核時間</th>
                                             <th>上架審核結果</th>
@@ -235,6 +256,7 @@
                                         @foreach ($product_review_log as $val)
                                             <tr>
                                                 <td>{{ $val->start_launched_at }} ~ {{ $val->end_launched_at }}</td>
+                                                <td>{{ $val->start_selling_at }}</td>
                                                 <td>{{ $val->selling_price }}</td>
                                                 <td>{{ $val->review_at }}</td>
                                                 <td>
@@ -327,6 +349,13 @@
                 },
             });
 
+            let start_selling_at_flatpickr = flatpickr("#start_selling_at_flatpickr", {
+                dateFormat: "Y-m-d H:i:S",
+                defaultHour: 0,
+                defaultMinute: 0,
+                defaultSeconds: 0,
+            });
+
             $(document).on("click", "#save_data", function() {
                 $("#new-form").submit();
             })
@@ -373,6 +402,10 @@
                             return $('#start_launched_at').val();
                         },
                     },
+                    start_selling_at:{
+                        required: true,
+                        dateGreaterThanNow: true,
+                    }
                 },
                 messages: {
                     end_launched_at: {
