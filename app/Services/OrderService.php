@@ -381,6 +381,8 @@ class OrderService
                         if ($val['id'] == $obj->order_detail_id) {
                             $order_details[$key]['discount_content'][$obj->group_seq] = [
                                 'campaignName' => $obj->promotionalCampaign->campaign_name,
+                                'campaignBrief' => $obj->promotionalCampaign->campaign_brief,
+                                'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '',
                                 'discount' => $obj->discount,
                                 'campaignProdList' => [],
                             ];
@@ -396,7 +398,8 @@ class OrderService
                     $cart['gift'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
                     $cart['gift'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                     $cart['gift'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
-                    $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
+                    $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaign->campaign_brief;
+                    $cart['gift'][$obj->group_seq]['thresholdCampaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
                     $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
                         'productPhoto' => config('filesystems.disks.s3.url') . $obj->product->productPhotos[0]->photo_name,
                         'productId' => $obj->product->id,
@@ -409,7 +412,8 @@ class OrderService
                     if (!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])) {
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0;
                     }
-                    $cart['discount'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
+                    $cart['discount'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaign->campaign_brief;
+                    $cart['discount'][$obj->group_seq]['thresholdCampaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
                     $cart['discount'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                     $cart['discount'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
                     $cart['discount'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
@@ -429,7 +433,12 @@ class OrderService
                     ->first();
         if($findProductPRD_M !== null)
         {
-            $findProductPRD_G = OrderCampaignDiscount::where('order_detail_id', '<>', $val['id'])
+            $findProductPRD_G = OrderCampaignDiscount::with([
+                'promotionalCampaign',
+                'promotionalCampaignThreshold',
+                'product',
+            ])
+            ->where('order_detail_id', '<>', $val['id'])
             ->where('group_seq',$findProductPRD_M->group_seq)
             ->where('order_id', $orders['results']['order_id'])
             ->where('level_code', 'PRD')
@@ -439,6 +448,8 @@ class OrderService
                 if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
                     $order_details[$key]['discount_content'][$PRD->group_seq] = [
                         'campaignName' => $PRD->promotionalCampaign->campaign_name,
+                        'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
+                        'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
                         'campaignProdList' => [
                             [
                                 'productId' => $PRD->product->id,
