@@ -29,7 +29,7 @@
                         <div class="col-sm-6">
                             <div class="form-group">
 
-                                <div class="col-sm-3"><label class="control-label"> 發票號碼</label> <span class="redtext">*</span></div>
+                                <div class="col-sm-3"><label class="control-label"> 發票號碼</label> <span class="text-red">*</span></div>
                                 <div class="col-sm-9">
                                         <input type='text' class="form-control" name="invoice_number" id="invoice_number" onkeyup="value=value.replace(/[^\w=@#]|_/ig,'')" value="" />
 
@@ -43,7 +43,7 @@
                             <div class="form-group">
 
                                 <div class="col-sm-3">
-                                    <label class="control-label"> 發票日期 </label><span class="redtext">*</span>
+                                    <label class="control-label"> 發票日期 </label><span class="text-red">*</span>
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="input-group" id="invoice_date_flatpickr">

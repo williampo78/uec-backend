@@ -40,7 +40,7 @@ class UserController extends Controller
         ]);
         $data['users'] = ($getData ? $this->userService->getUsers($getData) : []);
 
-        return view('backend.user.index', $data);
+        return view('backend.user.list', $data);
     }
 
     /**

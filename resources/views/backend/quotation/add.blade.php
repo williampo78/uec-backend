@@ -21,7 +21,7 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group" id="supplier">
-                                            <label for="supplier">供應商<span class="redtext">*</span></label>
+                                            <label for="supplier">供應商<span class="text-red">*</span></label>
                                             <select class="form-control js-select2-department" name="supplier_id"
                                                 id="supplier_id">
                                                 @if(!isset($quotation['supplier_id']))
@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group" id="div_trade_date">
-                                            <label for="trade_date">報價日期<span class="redtext">*</span></label>
+                                            <label for="trade_date">報價日期<span class="text-red">*</span></label>
                                             <div class="input-group" id="trade_date_flatpickr">
                                                 <input type="text" class="form-control" name="trade_date" id="trade_date" value="{{ $quotation['trade_date'] ?? date('Y-m-d') }}" autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
@@ -77,7 +77,7 @@
                                 <div class="row">
                                     <div class="col-sm-3">
                                         <div class="form-group" id="tax_div">
-                                            <label for="tax_div">稅別<span class="redtext">*</span></label>
+                                            <label for="tax_div">稅別<span class="text-red">*</span></label>
                                             <select class="form-control js-select2-department" name="tax" id="tax">
                                                 @foreach ($taxList as $key => $tax)
                                                     <option value="{{ $key }}"
@@ -92,7 +92,7 @@
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
-                                        <label for="tax_div">報價含稅否<span class="redtext">*</span></label>
+                                        <label for="tax_div">報價含稅否<span class="text-red">*</span></label>
                                         <div class="radio">
                                             <div class="col-sm-6">
                                                 <label>
@@ -129,8 +129,8 @@
                                     <input type="hidden" name="rowNo" id="rowNo" value="0">
                                     <div class='add_row'>
                                         <div class='row'>
-                                            <div class='col-sm-6 text-left'>品項<span class='redtext'>*</span></div>
-                                            <div class='col-sm-2 text-left'>進貨成本<span class='redtext'>*</span></div>
+                                            <div class='col-sm-6 text-left'>品項<span class='text-red'>*</span></div>
+                                            <div class='col-sm-2 text-left'>進貨成本<span class='text-red'>*</span></div>
                                             <div class='col-sm-3 text-left'>最小採購量</div>
                                             <div class='col-sm-1 text-left'>功能</div>
                                         </div>

@@ -28,7 +28,7 @@
         <div class="row form-group">
             <div class="col-sm-6" v-if="products.spec_dimension >= 1">
                 <div class="col-sm-2 no-pa">
-                    <label class="control-label">規格一<span class="redtext">*</span></label>
+                    <label class="control-label">規格一<span class="text-red">*</span></label>
                 </div>
                 <div class="col-sm-9">
                     <div class="form-group">
@@ -38,7 +38,7 @@
             </div>
             <div class="col-sm-6" v-if="products.spec_dimension == 2">
                 <div class="col-sm-2 no-pa">
-                    <label class="control-label">規格二<span class="redtext">*</span></label>
+                    <label class="control-label">規格二<span class="text-red">*</span></label>
                 </div>
                 <div class="col-sm-9">
                     <div class="form-group">
@@ -146,10 +146,10 @@
                 <th style="width: 15%">Item編號</th>
                 <th style="width: 10%">廠商貨號</th>
                 <th style="width: 10%">國際條碼</th>
-                <th style="width: 10%">POS品號<span class="stock_type_list redtext">*</span></th>
-                <th style="width: 10%">安全庫存量<span class="redtext">*</span></th>
-                <th style="width: 10%">是否追加<span class="redtext">*</span></th>
-                <th style="width: 10%">狀態<span class="redtext">*</span></th>
+                <th style="width: 10%">POS品號<span class="stock_type_list text-red">*</span></th>
+                <th style="width: 10%">安全庫存量<span class="text-red">*</span></th>
+                <th style="width: 10%">是否追加<span class="text-red">*</span></th>
+                <th style="width: 10%">狀態<span class="text-red">*</span></th>
             </tr>
         </thead>
         <tbody>

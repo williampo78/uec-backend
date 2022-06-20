@@ -2,6 +2,17 @@
 
 @section('title', '使用者管理')
 
+@section('css')
+    <style>
+        #password-title {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div id="page-wrapper">
         <div class="row">
@@ -9,8 +20,7 @@
                 <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 編輯資料</h1>
             </div>
         </div>
-        <!-- /.row -->
-        <form id="update-form" method="post" action="{{ route('users.update', $user->id) }}">
+        <form id="edit-form" method="post" action="{{ route('users.update', $user->id) }}">
             @method('PUT')
             @csrf
             <div class="row">
@@ -23,21 +33,21 @@
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_account">帳號 <span style="color: red;">*</span></label>
+                                                <label for="user_account">帳號 <span class="text-red">*</span></label>
                                                 <input class="form-control" disabled name="user_account" id="user_account"
                                                     value="{{ $user->user_account }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_name">名稱 <span style="color: red;">*</span></label>
+                                                <label for="user_name">名稱 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="user_name" id="user_name"
                                                     value="{{ $user->user_name }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label>狀態 <span style="color: red;">*</span></label>
+                                                <label>狀態 <span class="text-red">*</span></label>
                                                 <div class="row">
                                                     <div class="col-sm-3">
                                                         <label class="radio-inline">
@@ -58,15 +68,20 @@
                                     <div class="row">
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_password">密碼 <span
-                                                        style="color: red;">*不需變更請留空白</span></label>
+                                                <div id="password-title">
+                                                    <label for="user_password">密碼 <span
+                                                            class="text-red">(不需變更請留空白)</span></label>
+                                                    <span class="text-primary" id="password-tooltip">
+                                                        <i class="fa-solid fa-circle-info"></i> 格式說明
+                                                    </span>
+                                                </div>
                                                 <input class="form-control" name="user_password" id="user_password"
                                                     type="password" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label for="user_email">信箱 <span style="color: red;">*</span></label>
+                                                <label for="user_email">信箱 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="user_email" id="user_email"
                                                     value="{{ $user->user_email }}">
                                             </div>
@@ -74,7 +89,7 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <label for="supplier_id">供應商 <span
-                                                        class="text-primary">*供應商專用的帳號才指定供應商</span></label>
+                                                        class="text-red">*供應商專用的帳號才指定供應商</span></label>
                                                 <select name="supplier_id" id="supplier_id" class="select2-default">
                                                     <option value="">請選擇</option>
                                                     @foreach ($suppliers as $supplier)
@@ -107,7 +122,7 @@
                                                     </div>
                                                     <div class="col-sm-2">
                                                         @if ($role->is_for_supplier == 1)
-                                                            <span style="color: red;">供應商專用</span>
+                                                            <span class="text-red">供應商專用</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -121,12 +136,15 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-success" id="btn-save">
-                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
-                                        </button>
-                                        <button type="button" class="btn btn-danger" id="btn-cancel">
+                                        @if ($share_role_auth['auth_update'])
+                                            <button type="button" class="btn btn-success" id="btn-save">
+                                                <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                            </button>
+                                        @endif
+
+                                        <a href="{{ route('users') }}" class="btn btn-danger">
                                             <i class="fa-solid fa-ban"></i> 取消
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -141,12 +159,12 @@
 @section('js')
     <script>
         $(function() {
-            $("#btn-save").on('click', function() {
-                $("#update-form").submit();
+            $('#password-tooltip').tooltip({
+                title: "需包含英文和數字，且介於8~20個字元，符號可輸入：!@#$%^&*().-=_~",
             });
 
-            $("#btn-cancel").on('click', function() {
-                window.location.href = '{{ route('users') }}';
+            $("#btn-save").on('click', function() {
+                $("#edit-form").submit();
             });
 
             // 有選取供應商專用
@@ -167,7 +185,7 @@
             });
 
             // 驗證表單
-            $("#update-form").validate({
+            $("#edit-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
                     $('#btn-save').prop('disabled', true);
@@ -197,11 +215,6 @@
                                     .length > 0;
                             }
                         },
-                    },
-                },
-                messages: {
-                    user_password: {
-                        drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
                 },
                 errorClass: "help-block",

@@ -1,5 +1,18 @@
 @extends('backend.master')
+
 @section('title', '個人資料編修')
+
+@section('css')
+    <style>
+        #password-title {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div id="page-wrapper">
         <div class="row">
@@ -28,7 +41,13 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="pwd">更改密碼(不需變更請留空白)</label>
+                                                <div id="password-title">
+                                                    <label for="pwd">密碼 <span
+                                                            class="text-red">(不需變更請留空白)</span></label>
+                                                    <span class="text-primary" id="password-tooltip">
+                                                        <i class="fa-solid fa-circle-info"></i> 格式說明
+                                                    </span>
+                                                </div>
                                                 <input class="form-control" name="pwd" id="pwd" type="password"
                                                     autocomplete="off">
                                             </div>
@@ -37,14 +56,14 @@
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="user_name">姓名 <span style="color:red;">*</span></label>
+                                                <label for="user_name">姓名 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="user_name" id="user_name"
                                                     value="{{ $user->user_name }}">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="user_email">信箱 <span style="color:red;">*</span></label>
+                                                <label for="user_email">信箱 <span class="text-red">*</span></label>
                                                 <input class="form-control" name="user_email" id="user_email"
                                                     value="{{ $user->user_email }}">
                                             </div>
@@ -74,6 +93,10 @@
 @section('js')
     <script>
         $(function() {
+            $('#password-tooltip').tooltip({
+                title: "需包含英文和數字，且介於8~20個字元，符號可輸入：!@#$%^&*().-=_~",
+            });
+
             $('#btn-save').on('click', function() {
                 $('#update-form').submit();
             });
@@ -106,9 +129,6 @@
                 messages: {
                     user_email: {
                         required: "信箱不得為空",
-                    },
-                    pwd: {
-                        drowssapCheck: "請輸入大小寫英文加數字，且密碼字元不得小於8位",
                     },
                 },
                 errorClass: "help-block",

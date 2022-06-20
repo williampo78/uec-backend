@@ -53,7 +53,7 @@
         <div class="panel-body">
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label class="col-sm-1">行銷活動<span class="redtext">*</span></label>
+                    <label class="col-sm-1">行銷活動<span class="text-red">*</span></label>
                     <div class="col-sm-2">
                         <button type="button" class="btn btn-block btn-warning btn-sm" data-toggle="modal"
                             data-target="#promotion_campaign_model">挑選賣場</button>
