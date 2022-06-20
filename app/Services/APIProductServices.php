@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Models\PromotionalCampaignThreshold;
 use Carbon\Carbon;
 use App\Models\ProductItem;
 use App\Models\ProductPhoto;
@@ -862,7 +863,7 @@ class APIProductServices
                             $promotion_type[($category == 'GIFT' ? '贈品' : '優惠')][] = array(
                                 "campaign_id" => $item->id,
                                 "campaign_name" => $item->campaign_brief ? $item->campaign_brief : $item->campaign_name,
-                                "more_detail" => ($category == 'GIFT' && $item->level_code == 'CART_P' ? false : true)
+                                "more_detail" => true
                             );
                         }
                     }
@@ -1368,8 +1369,13 @@ class APIProductServices
             $discount[$promotion->id] = $promotion;
         }
         $discountArray = [];
+        $campaignThreshold_brief = [];
         foreach ($explode_campaign as $k => $campaign_id) {
             if (isset($discount[$campaign_id])) {
+                $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $campaign_id)->orderBy('n_value')->get();
+                foreach ($campaignThresholds as $threshold) {
+                    $campaignThreshold_brief[$campaign_id][] = $threshold->threshold_brief;
+                }
                 $discountArray[] = array(
                     "campaignID" => $campaign_id,
                     "campaignUrlCode" => $discount[$campaign_id]['url_code'],
@@ -1377,6 +1383,7 @@ class APIProductServices
                     "campaignName" => $discount[$campaign_id]['campaign_name'],
                     "expireDate" => $discount[$campaign_id]['end_at'],
                     "gotoEvent" => ($discount[$campaign_id]['level_code'] == 'CART_P' ? true : false),
+                    "campaignThreshold" => (isset($campaignThreshold_brief[$campaign_id]) ? $campaignThreshold_brief[$campaign_id] : [])
                 );
             }
         }
@@ -1614,7 +1621,7 @@ class APIProductServices
         array_multisort(array_column($promotional, 'product_id'), SORT_ASC, $promotional);
         foreach ($promotional as $promotion) {
             //指定單品的活動門檻如果是有效的就回傳
-            if ($result[$promotion->promotional_campaign_id][$promotion->threshold_id]){
+            if ($result[$promotion->promotional_campaign_id][$promotion->threshold_id]) {
                 $data[$promotion->product_id] = true;
             }
         }
