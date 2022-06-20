@@ -224,23 +224,43 @@ return [
 
     // 各種選項
     'options' => [
-        // 庫存申請單-申請狀態
-        'misc_stock_request_status_codes' => [
-            // 入庫
-            'in' => [
-                'DRAFTED' => '草稿',
-                'REVIEWING' => '審核中',
-                'APPROVED' => '已核准',
-                'REJECTED' => '已駁回',
-                'CLOSED' => '已入庫',
+        // 庫存申請單
+        'misc_stock_requests' => [
+            // 申請單狀態
+            'request_statuses' => [
+                // 入庫
+                'in' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'COMPLETED' => '審核完成',
+                    'CLOSED' => '已入庫',
+                ],
+                // 出庫
+                'out' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'COMPLETED' => '審核完成',
+                    'CLOSED' => '已出庫',
+                ],
             ],
-            // 出庫
-            'out' => [
-                'DRAFTED' => '草稿',
-                'REVIEWING' => '審核中',
-                'APPROVED' => '已核准',
-                'REJECTED' => '已駁回',
-                'CLOSED' => '已出庫',
+            // 供應商申請狀態
+            'status_codes' => [
+                // 入庫
+                'in' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'APPROVED' => '已核准',
+                    'REJECTED' => '已駁回',
+                    'CLOSED' => '已入庫',
+                ],
+                // 出庫
+                'out' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'APPROVED' => '已核准',
+                    'REJECTED' => '已駁回',
+                    'CLOSED' => '已出庫',
+                ],
             ],
         ],
     ],

@@ -3894,7 +3894,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 
@@ -3904,12 +3903,22 @@ __webpack_require__.r(__webpack_exports__);
   },
   name: "VueFlatPickr",
   props: {
-    name: String,
-    value: String
+    setting: {
+      type: Object,
+      "default": function _default() {
+        return {
+          name: "",
+          date: "",
+          config: {}
+        };
+      }
+    }
   },
   data: function data() {
     return {
-      defaultConfig: {
+      name: "date",
+      date: "",
+      config: {
         allowInput: true,
         wrap: true,
         clickOpens: false,
@@ -3920,16 +3929,31 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   created: function created() {
-    console.log('created');
-    console.log(this.value);
+    if (this.setting) {
+      if (this.setting.name) {
+        this.name = this.setting.name;
+      }
+    }
+  },
+  watch: {
+    "setting.date": {
+      handler: function handler(date) {
+        this.date = date;
+      },
+      immediate: true
+    },
+    "setting.config": {
+      handler: function handler(config) {
+        this.config = Object.assign({}, this.config, config);
+      },
+      deep: true,
+      immediate: true
+    }
   },
   methods: {
-    onChange: function onChange(selectedDates, dateStr, instance) {// console.log(selectedDates, dateStr);
-      // console.log(this.value);
-      // this.$emit("on-change", this.value);
-    },
-    test: function test() {
-      console.log($event.target.value); // this.$emit('input', $event.target.value)
+    onChange: function onChange(selectedDates, dateStr, instance) {
+      this.setting.date = dateStr;
+      this.$emit("on-change", selectedDates, dateStr, instance);
     }
   }
 });
@@ -4136,7 +4160,48 @@ window.Vue = vue__WEBPACK_IMPORTED_MODULE_17__["default"];
 // 驗證密碼格式
 jQuery.validator.addMethod("drowssapCheck", function (value, element, params) {
   return /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d\!\@\#\$\%\^\&\*\(\)\.\-\=\_\~]{8,20}$/.test(value);
-}, "需包含英文和數字，且介於8~20個字元，符號可輸入：!@#$%^&*().-=_~"); // 比較輸入的兩個日期或兩個數字
+}, "需包含英文和數字，且介於8~20個字元，符號可輸入：!@#$%^&*().-=_~"); // 比較日期
+
+jQuery.validator.addMethod("compareDates", function (date1, element, params) {
+  var defaultParams = {
+    date2: moment(),
+    sign: ">",
+    unit: ""
+  };
+  var result;
+  var errorMessage = '';
+  params = Object.assign({}, defaultParams, params);
+
+  switch (params.sign) {
+    case "<":
+      result = moment(date1).isBefore(params.date2, params.unit);
+      errorMessage = "\u5FC5\u9700\u5C0F\u65BC ".concat(params.date2);
+      break;
+
+    case "<=":
+      result = moment(date1).isSameOrBefore(params.date2, params.unit);
+      errorMessage = "\u5FC5\u9700\u5C0F\u65BC\u7B49\u65BC ".concat(params.date2);
+      break;
+
+    case "=":
+      result = moment(date1).isSame(params.date2, params.unit);
+      errorMessage = "\u5FC5\u9700\u7B49\u65BC ".concat(params.date2);
+      break;
+
+    case ">":
+      result = moment(date1).isAfter(params.date2, params.unit);
+      errorMessage = "\u5FC5\u9700\u5927\u65BC ".concat(params.date2);
+      break;
+
+    case ">=":
+      result = moment(date1).isSameOrAfter(params.date2, params.unit);
+      errorMessage = "\u5FC5\u9700\u5927\u65BC\u7B49\u65BC ".concat(params.date2);
+      break;
+  }
+
+  $.validator.messages.compareDates = errorMessage;
+  return result;
+}, $.validator.messages.compareDates); // 比較輸入的兩個日期或兩個數字
 
 jQuery.validator.addMethod("greaterThan", function (value, element, params) {
   if (!/Invalid|NaN/.test(new Date(value))) {
@@ -88153,13 +88218,19 @@ var render = function () {
       _c("flat-pickr", {
         staticClass: "form-control",
         attrs: {
-          config: _vm.defaultConfig,
-          name: _vm.name,
-          autocomplete: "off",
           "data-input": "",
-          value: _vm.value,
+          autocomplete: "off",
+          name: _vm.name,
+          config: _vm.config,
         },
-        on: { input: _vm.test, "on-change": _vm.onChange },
+        on: { "on-change": _vm.onChange },
+        model: {
+          value: _vm.date,
+          callback: function ($$v) {
+            _vm.date = $$v
+          },
+          expression: "date",
+        },
       }),
       _vm._v(" "),
       _vm._m(0),

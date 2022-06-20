@@ -1,13 +1,12 @@
 <template>
     <div class="input-group">
         <flat-pickr
-            :config="defaultConfig"
-            class="form-control"
-            :name="name"
-            autocomplete="off"
             data-input
-            :value="value"
-            @input="test"
+            class="form-control"
+            autocomplete="off"
+            :name="name"
+            v-model="date"
+            :config="config"
             @on-change="onChange"
         >
         </flat-pickr>
@@ -30,12 +29,20 @@ export default {
     },
     name: "VueFlatPickr",
     props: {
-        name: String,
-        value: String,
+        setting: {
+            type: Object,
+            default: () => ({
+                name: "",
+                date: "",
+                config: {},
+            }),
+        },
     },
     data() {
         return {
-            defaultConfig: {
+            name: "date",
+            date: "",
+            config: {
                 allowInput: true,
                 wrap: true,
                 clickOpens: false,
@@ -46,18 +53,31 @@ export default {
         };
     },
     created() {
-        console.log('created');
-        console.log(this.value);
+        if (this.setting) {
+            if (this.setting.name) {
+                this.name = this.setting.name;
+            }
+        }
+    },
+    watch: {
+        "setting.date": {
+            handler(date) {
+                this.date = date;
+            },
+            immediate: true,
+        },
+        "setting.config": {
+            handler(config) {
+                this.config = Object.assign({}, this.config, config);
+            },
+            deep: true,
+            immediate: true,
+        },
     },
     methods: {
         onChange(selectedDates, dateStr, instance) {
-            // console.log(selectedDates, dateStr);
-            // console.log(this.value);
-            // this.$emit("on-change", this.value);
-        },
-        test() {
-            console.log($event.target.value);
-            // this.$emit('input', $event.target.value)
+            this.setting.date = dateStr;
+            this.$emit("on-change", selectedDates, dateStr, instance);
         },
     },
 };

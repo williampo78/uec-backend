@@ -39,7 +39,7 @@ class MiscStockRequestController extends Controller
         ]);
 
         $responsePayload = [
-            'statusCodes' => config('uec.options.misc_stock_request_status_codes.out'),
+            'statusCodes' => config('uec.options.misc_stock_requests.request_statuses.out'),
             'suppliers' => $this->supplierService->getSuppliers(),
         ];
         // 進貨退出單

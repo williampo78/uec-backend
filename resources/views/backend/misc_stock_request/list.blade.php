@@ -24,31 +24,13 @@
                                             <div class="col-sm-9">
                                                 <div class="row">
                                                     <div class="col-sm-5">
-                                                        <div class="input-group" id="requestDateStartFlatpickr">
-                                                            <input type="text" class="form-control"
-                                                                name="requestDateStart" autocomplete="off" data-input
-                                                                v-model="form.requestDateStart">
-                                                            <span class="input-group-btn" data-toggle>
-                                                                <button class="btn btn-default" type="button">
-                                                                    <i class="fa-solid fa-calendar-days"></i>
-                                                                </button>
-                                                            </span>
-                                                        </div>
+                                                        <vue-flat-pickr :setting="form.requestDateStart" @on-change="onRequestDateStartChange"></vue-flat-pickr>
                                                     </div>
                                                     <div class="col-sm-2 text-center">
                                                         <label class="control-label">～</label>
                                                     </div>
                                                     <div class="col-sm-5">
-                                                        <div class="input-group" id="requestDateEndFlatpickr">
-                                                            <input type="text" class="form-control"
-                                                                name="requestDateEnd" autocomplete="off" data-input
-                                                                v-model="form.requestDateEnd">
-                                                            <span class="input-group-btn" data-toggle>
-                                                                <button class="btn btn-default" type="button">
-                                                                    <i class="fa-solid fa-calendar-days"></i>
-                                                                </button>
-                                                            </span>
-                                                        </div>
+                                                        <vue-flat-pickr :setting="form.requestDateEnd" @on-change="onRequestDateEndChange"></vue-flat-pickr>
                                                     </div>
                                                 </div>
                                             </div>
@@ -90,13 +72,13 @@
                                             <div class="col-sm-9">
                                                 <div class="row">
                                                     <div class="col-sm-5">
-                                                        <vue-flat-pickr name="actualDateStart" v-model="form.actualDateStart" @on-change="onActualDateStartChange"></vue-flat-pickr>
+                                                        <vue-flat-pickr :setting="form.actualDateStart" @on-change="onActualDateStartChange"></vue-flat-pickr>
                                                     </div>
                                                     <div class="col-sm-2 text-center">
                                                         <label class="control-label">～</label>
                                                     </div>
                                                     <div class="col-sm-5">
-                                                        {{-- <vue-flat-pickr name="actualDateEnd" v-model="form.actualDateEnd" @on-change="onActualDateEndChange"></vue-flat-pickr> --}}
+                                                        <vue-flat-pickr :setting="form.actualDateEnd" @on-change="onActualDateEndChange"></vue-flat-pickr>
                                                     </div>
                                                 </div>
                                             </div>
@@ -136,7 +118,7 @@
                                                 <label class="control-label">查詢筆數上限</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="limit" v-model="form.limit">
+                                                <input type="text" class="form-control" name="limit" v-model="form.limit" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -247,12 +229,28 @@
             el: "#app",
             data: {
                 form: {
-                    requestDateStart: moment().subtract(2, 'months').format("YYYY-MM-DD"),
-                    requestDateEnd: moment().format("YYYY-MM-DD"),
+                    requestDateStart: {
+                        name: "requestDateStart",
+                        date: moment().subtract(2, 'months').format("YYYY-MM-DD"),
+                        config: {},
+                    },
+                    requestDateEnd: {
+                        name: "requestDateEnd",
+                        date: moment().format("YYYY-MM-DD"),
+                        config: {},
+                    },
                     requestNo: "",
                     statusCode: "",
-                    actualDateStart: moment().format("YYYY-MM-DD"),
-                    actualDateEnd: "",
+                    actualDateStart: {
+                        name: "actualDateStart",
+                        date: "",
+                        config: {},
+                    },
+                    actualDateEnd: {
+                        name: "actualDateEnd",
+                        date: "",
+                        config: {},
+                    },
                     productNo: "",
                     supplierId: "",
                     limit: 500,
@@ -294,192 +292,35 @@
                     });
                 }
 
+                this.initFlatPickrConfigs();
                 this.setQueryParameters();
             },
             mounted() {
-                let requestDateStartFlatpickr = flatpickr("#request_date_start_flatpickr", {
-                    dateFormat: "Y-m-d",
-                    maxDate: this.form.requestDateEnd,
-                    onChange: function(selectedDates, dateStr, instance) {
-                        requestDateEndFlatpickr.set('minDate', dateStr);
-                    },
-                });
-
-                let requestDateEndFlatpickr = flatpickr("#request_date_end_flatpickr", {
-                    dateFormat: "Y-m-d",
-                    minDate: this.form.requestDateStart,
-                    onChange: function(selectedDates, dateStr, instance) {
-                        requestDateStartFlatpickr.set('maxDate', dateStr);
-                    },
-                });
-
-                let expectedDateStartFlatpickr = flatpickr("#expected_date_start_flatpickr", {
-                    dateFormat: "Y-m-d",
-                    maxDate: this.form.expectedDateEnd,
-                    onChange: function(selectedDates, dateStr, instance) {
-                        expectedDateEndFlatpickr.set('minDate', dateStr);
-                    },
-                });
-
-                let expectedDateEndFlatpickr = flatpickr("#expected_date_end_flatpickr", {
-                    dateFormat: "Y-m-d",
-                    minDate: this.form.expectedDateStart,
-                    onChange: function(selectedDates, dateStr, instance) {
-                        expectedDateStartFlatpickr.set('maxDate', dateStr);
-                    },
-                });
+                let self = this;
 
                 // 驗證表單
                 $("#search-form").validate({
-                    // debug: true,
+                    debug: true,
                     submitHandler: function(form) {
                         form.submit();
                     },
                     rules: {
-                        campaign_name: {
-                            required: true,
-                            maxlength: 80,
-                        },
-                        campaign_type: {
-                            required: true,
-                        },
-                        active: {
-                            required: true,
-                            remote: {
+                        requestDateEnd: {
+                            compareDates: {
                                 param: function() {
-                                    let productIds = self.form.products.map((product) => {
-                                        return product.productId;
-                                    });
-
                                     return {
-                                        url: "/backend/promotional-campaign-cart-v2/can-active",
-                                        type: "post",
-                                        dataType: "json",
-                                        cache: false,
-                                        data: {
-                                            campaign_type: self.form.campaignType,
-                                            start_at: self.form.startAt,
-                                            end_at: self.form.endAt,
-                                            product_ids: productIds,
-                                        },
-                                        dataFilter: function(response) {
-                                            conflictContents = "";
-                                            if (response) {
-                                                let data = JSON.parse(response);
-
-                                                if (data.result) {
-                                                    return true;
-                                                }
-
-                                                if (data.conflict_contents) {
-                                                    conflictContents += "衝突的活動名稱: ";
-                                                    data.conflict_contents.forEach((content, index,
-                                                        array) => {
-                                                        conflictContents +=
-                                                            `${content.campaign_name} (商品${content.product_no})`;
-
-                                                        if (index != array.length - 1) {
-                                                            conflictContents += "、";
-                                                        }
-                                                    });
-                                                }
-                                            }
-
-                                            return false;
-                                        },
-                                    }
+                                        date2: moment(self.form.requestDateStart.date).add(3, 'months'),
+                                        sign: "<=",
+                                    };
                                 },
                                 depends: function(element) {
-                                    return self.form.campaignType &&
-                                        self.form.startAt &&
-                                        self.form.endAt &&
-                                        self.form.products &&
-                                        self.form.products.length &&
-                                        self.form.active == 1;
+                                    return self.form.requestDateStart.date;
                                 },
                             },
-                            atLeastOneThreshold: {
-                                param: function() {
-                                    return self.form.thresholds;
-                                },
-                                depends: function(element) {
-                                    return self.form.active == 1;
-                                },
-                            },
-                            atLeastOneProduct: {
-                                param: function() {
-                                    return self.form.products;
-                                },
-                                depends: function(element) {
-                                    return self.form.active == 1;
-                                },
-                            },
-                            eachThresholdAtLeastOneGiveaway: {
-                                param: function() {
-                                    return self.form.thresholds;
-                                },
-                                depends: function(element) {
-                                    return self.form.active == 1 && ['CART_P03', 'CART_P04'].includes(
-                                        self.form.campaignType);
-                                },
-                            },
-                        },
-                        start_at: {
-                            required: true,
-                            dateGreaterThanNow: true,
-                        },
-                        end_at: {
-                            required: true,
-                            dateGreaterThanNow: true,
-                            greaterThan: function() {
-                                return self.form.startAt;
-                            },
-                        },
-                        campaign_brief: {
-                            required: true,
-                            maxlength: 20,
-                        },
-                        url_code: {
-                            required: true,
-                            isAlphaNumericUnderscoreHyphen: true,
-                        },
-                        stock_type: {
-                            required: true,
-                        },
-                        supplier_id: {
-                            required: true,
-                        },
-                        banner_photo_desktop: {
-                            accept: "image/*",
-                            filesize: [1, 'MB'],
-                            minImageWidth: 1200,
-                            minImageHeight: 150,
-                        },
-                        banner_photo_mobile: {
-                            accept: "image/*",
-                            filesize: [1, 'MB'],
-                            minImageWidth: 345,
-                            minImageHeight: 180,
                         },
                     },
                     messages: {
-                        active: {
-                            remote: function(element) {
-                                if (['CART_P01', 'CART_P02'].includes(self.form.campaignType)) {
-                                    return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N元，打X折」、「指定商品滿N元，折X元」類型的生效活動<br/>
-                                    ${conflictContents}`;
-                                } else if (['CART_P03', 'CART_P04'].includes(self.form.campaignType)) {
-                                    return `同一個商品，同一時間點不可同時出現於多個「指定商品滿N件，送贈品」、「指定商品滿N元，送贈品」類型的生效活動<br/>
-                                    ${conflictContents}`;
-                                }
-                            },
-                        },
-                        end_at: {
-                            greaterThan: "結束時間必須大於開始時間",
-                        },
-                        banner_photo_desktop: {
-                            accept: "檔案類型錯誤",
-                        },
+
                     },
                     errorClass: "help-block",
                     errorElement: "span",
@@ -516,24 +357,6 @@
                         }
 
                         $(element).closest(".form-group").removeClass("has-error");
-                    },
-                    invalidHandler: function(event, validator) {
-                        if (validator.errorList.length) {
-                            let errorElement = $(validator.errorList[0].element);
-                            let classNames = [];
-
-                            if (errorElement.attr('class')) {
-                                classNames = errorElement.attr('class').split(' ');
-                            }
-
-                            if (['threshold-n-value', 'threshold-x-value', 'giveaway-assigned-qty']
-                                .some((item, index, array) => classNames.includes(item)) ||
-                                ['banner_photo_desktop', 'banner_photo_mobile'].includes(errorElement
-                                    .attr('name'))) {
-                                let tabId = errorElement.closest(".tab-pane").attr('id');
-                                $(`ul.nav-tabs a[href="#${tabId}"]`).tab('show');
-                            }
-                        }
                     },
                 });
             },
@@ -647,11 +470,38 @@
                             console.log(error);
                         });
                 },
-                onActualDateStartChange() {
-                    console.log('ggg');
+                initFlatPickrConfigs() {
+                    this.form.requestDateStart.config = {
+                        dateFormat: "Y-m-d",
+                        maxDate: this.form.requestDateEnd.date,
+                    };
+
+                    this.form.requestDateEnd.config = {
+                        dateFormat: "Y-m-d",
+                        minDate: this.form.requestDateStart.date,
+                    };
+
+                    this.form.actualDateStart.config = {
+                        dateFormat: "Y-m-d",
+                        maxDate: this.form.actualDateEnd.date,
+                    };
+
+                    this.form.actualDateEnd.config = {
+                        dateFormat: "Y-m-d",
+                        minDate: this.form.actualDateStart.date,
+                    };
                 },
-                onActualDateEndChange() {
-                    // console.log('ggg');
+                onRequestDateStartChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.requestDateEnd.config, 'minDate', dateStr);
+                },
+                onRequestDateEndChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.requestDateStart.config, 'maxDate', dateStr);
+                },
+                onActualDateStartChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.actualDateEnd.config, 'minDate', dateStr);
+                },
+                onActualDateEndChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.actualDateStart.config, 'maxDate', dateStr);
                 },
             },
         });
