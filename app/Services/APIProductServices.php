@@ -1599,13 +1599,13 @@ class APIProductServices
         }
         foreach ($gifts as $campaign_id => $item) {
             $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $campaign_id)->orderBy('n_value')->get();
-            if (count($campaignThresholds) >0){
+            if (count($campaignThresholds) > 0) {
                 foreach ($campaignThresholds as $threshold) {
                     $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
-                    foreach ($thresholdGift as $k=>$v){
+                    foreach ($thresholdGift as $k => $v) {
                         $giftArray[$campaign_id][$threshold->id][] = array(
                             "productName" => $data[$campaign_id][$v->product_id]->product_name,
-                            "productPhoto" => $s3.$data[$campaign_id][$v->product_id]->displayPhoto,
+                            "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
                             "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
                         );
                     }
@@ -1618,12 +1618,15 @@ class APIProductServices
                     );
                 }
             } else {
-                $campaignGift = PromotionalCampaignGiveaway::where("promotional_campaign_id", $campaign_id)->where('threshold_id',0)->get();
-                foreach ($campaignGift as $k=>$v){
-                    $campaignGive[$campaign_id][] = array(
+                $campaignGift = PromotionalCampaignGiveaway::where("promotional_campaign_id", $campaign_id)->where('threshold_id', 0)->get();
+                foreach ($campaignGift as $k => $v) {
+                    $giftArray[$campaign_id][] = array(
                         "productName" => $data[$campaign_id][$v->product_id]->product_name,
-                        "productPhoto" => $s3.$data[$campaign_id][$v->product_id]->displayPhoto,
+                        "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
                         "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
+                    );
+                    $campaignGive[$campaign_id][] = array(
+                        "giveList" => $giftArray[$campaign_id]
                     );
                 }
             }
