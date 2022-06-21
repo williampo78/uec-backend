@@ -39,6 +39,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/product/{id}', [ProductController::class, 'getProduct']);
     Route::get('/productSpec/{id}', [ProductController::class, 'getProductItem']);
     Route::get('/campaign/{id}', [ProductController::class, 'getCampaignGift']);
+    Route::get('/campaignGift/{id}', [ProductController::class, 'getCampaignThresholdGift']);
     Route::get('/campaignDiscount/{id}', [ProductController::class, 'getCampaignDiscount']);
 
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
