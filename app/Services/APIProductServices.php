@@ -1126,6 +1126,7 @@ class APIProductServices
                 "campaignName" => $item->campaign_name,
                 "expireDate" => $item->end_at,
                 "gotoEvent" => ($item->level_code == 'CART_P' ? true : false),
+                "qualified" => $item->is_qualified_to_sent == 1 ? true : false,
                 "campaignGive" => (isset($campaignGive[$campaign_id]) ? $campaignGive[$campaign_id] : [])
             );
         }
