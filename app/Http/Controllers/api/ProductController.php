@@ -369,4 +369,24 @@ class ProductController extends Controller
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
     }
 
+    /*
+     * 取得活動贈品內容(含門檻)
+     * @param int $id
+     */
+    public function getCampaignThresholdGift($id)
+    {
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductService->getCampaignGiftByIDWithThreshold($id);
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => true, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
+
+    }
+
 }
