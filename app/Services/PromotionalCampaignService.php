@@ -2278,6 +2278,7 @@ class PromotionalCampaignService
                     'campaign_name' => $data['campaign_name'],
                     'active' => $data['active'],
                     'end_at' => $data['end_at'],
+                    'campaign_brief' => $data['campaign_brief'],
                     'updated_by' => $user->id,
                 ];
 

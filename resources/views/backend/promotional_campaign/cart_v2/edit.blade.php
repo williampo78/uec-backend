@@ -143,8 +143,7 @@
                                                 </div>
                                                 <div class="col-sm-11">
                                                     <input type="text" class="form-control" name="campaign_brief"
-                                                        v-model="form.campaignBrief"
-                                                        :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                        v-model="form.campaignBrief">
                                                 </div>
                                             </div>
                                         </div>
