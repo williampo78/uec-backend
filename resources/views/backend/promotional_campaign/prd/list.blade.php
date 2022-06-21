@@ -355,6 +355,8 @@
                                 productNo: giveaway.product_no,
                                 productName: giveaway.product_name,
                                 assignedQty: giveaway.assigned_qty,
+                                stockQty: giveaway.stock_qty,
+                                launchStatus: giveaway.launch_status,
                             });
                         });
                     }

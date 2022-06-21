@@ -662,7 +662,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     launchedAt: product.start_launched_at || product.end_launched_at ? "".concat(product.start_launched_at, " ~ ").concat(product.end_launched_at) : '',
                     launchStatus: product.launch_status,
                     grossMargin: product.gross_margin,
-                    supplier: product.supplier
+                    supplier: product.supplier,
+                    stockQty: product.stock_qty
                   });
                 });
 

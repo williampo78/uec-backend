@@ -870,10 +870,14 @@ class PromotionalCampaignService
     public function getPrdCampaignForShowPage(int $id): Model
     {
         $user = auth()->user();
+        $warehouseNumber = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
         $campaign = PromotionalCampaign::with([
             'campaignType',
             'promotionalCampaignGiveaways',
             'promotionalCampaignGiveaways.product',
+            'promotionalCampaignGiveaways.product.productItems.warehouses' => function ($query) use ($warehouseNumber) {
+                $query->where('number', $warehouseNumber);
+            },
             'promotionalCampaignProducts',
             'promotionalCampaignProducts.product',
         ])
@@ -925,12 +929,27 @@ class PromotionalCampaignService
                     'product_no' => null,
                     'product_name' => null,
                     'assigned_qty' => $giveaway->assigned_qty,
+                    'stock_qty' => 0,
+                    'launch_status' => null,
                 ];
 
                 // 商品
                 if (isset($giveaway->product)) {
                     $tmpGiveaway['product_no'] = $giveaway->product->product_no;
                     $tmpGiveaway['product_name'] = $giveaway->product->product_name;
+                    $tmpGiveaway['launch_status'] = $giveaway->product->launch_status;
+
+                    // 合計各個商品品項的庫存數
+                    $stockQty = 0;
+                    if ($giveaway->product->productItems->isNotEmpty()) {
+                        foreach ($giveaway->product->productItems as $productItem) {
+                            $warehouse = $productItem->warehouses->first();
+                            if (isset($warehouse)) {
+                                $stockQty += $warehouse->pivot->stock_qty;
+                            }
+                        }
+                    }
+                    $tmpGiveaway['stock_qty'] = $stockQty;
                 }
 
                 $result['giveaways'][] = $tmpGiveaway;
@@ -986,9 +1005,13 @@ class PromotionalCampaignService
     public function getPrdCampaignForEditPage(int $id): Model
     {
         $user = auth()->user();
+        $warehouseNumber = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
         $campaign = PromotionalCampaign::with([
             'promotionalCampaignGiveaways',
             'promotionalCampaignGiveaways.product',
+            'promotionalCampaignGiveaways.product.productItems.warehouses' => function ($query) use ($warehouseNumber) {
+                $query->where('number', $warehouseNumber);
+            },
             'promotionalCampaignProducts',
             'promotionalCampaignProducts.product',
         ])
@@ -1035,12 +1058,27 @@ class PromotionalCampaignService
                     'product_no' => null,
                     'product_name' => null,
                     'assigned_qty' => $giveaway->assigned_qty,
+                    'stock_qty' => 0,
+                    'launch_status' => null,
                 ];
 
                 // 商品
                 if (isset($giveaway->product)) {
                     $tmpGiveaway['product_no'] = $giveaway->product->product_no;
                     $tmpGiveaway['product_name'] = $giveaway->product->product_name;
+                    $tmpGiveaway['launch_status'] = $giveaway->product->launch_status;
+
+                    // 合計各個商品品項的庫存數
+                    $stockQty = 0;
+                    if ($giveaway->product->productItems->isNotEmpty()) {
+                        foreach ($giveaway->product->productItems as $productItem) {
+                            $warehouse = $productItem->warehouses->first();
+                            if (isset($warehouse)) {
+                                $stockQty += $warehouse->pivot->stock_qty;
+                            }
+                        }
+                    }
+                    $tmpGiveaway['stock_qty'] = $stockQty;
                 }
 
                 $result['giveaways'][] = $tmpGiveaway;
@@ -1097,8 +1135,12 @@ class PromotionalCampaignService
     public function getProductModalProductsForPrdCampaign(array $data = []): Collection
     {
         $user = auth()->user();
+        $warehouseNumber = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
         $products = Product::with([
             'supplier',
+            'productItems.warehouses' => function ($query) use ($warehouseNumber) {
+                return $query->where('number', $warehouseNumber);
+            },
         ])
             ->where('agent_id', $user->agent_id)
         // 不可選到<門市限定>的商品
@@ -1197,6 +1239,7 @@ class PromotionalCampaignService
                 'launch_status' => $product->launch_status,
                 'gross_margin' => $product->gross_margin,
                 'supplier' => null,
+                'stock_qty' => 0,
             ];
 
             // 上架時間起
@@ -1213,6 +1256,18 @@ class PromotionalCampaignService
             if (isset($product->supplier)) {
                 $tmpProduct['supplier'] = $product->supplier->name;
             }
+
+            // 合計各個商品品項的庫存數
+            $stockQty = 0;
+            if ($product->productItems->isNotEmpty()) {
+                foreach ($product->productItems as $productItem) {
+                    $warehouse = $productItem->warehouses->first();
+                    if (isset($warehouse)) {
+                        $stockQty += $warehouse->pivot->stock_qty;
+                    }
+                }
+            }
+            $tmpProduct['stock_qty'] = $stockQty;
 
             $result[] = $tmpProduct;
         }
@@ -1721,12 +1776,14 @@ class PromotionalCampaignService
                                 'product_type' => null,
                                 'supplier' => null,
                                 'stock_qty' => 0,
+                                'launch_status' => null,
                             ];
 
                             if (isset($giveaway->product)) {
                                 $tmpGiveaway['product_no'] = $giveaway->product->product_no;
                                 $tmpGiveaway['product_name'] = $giveaway->product->product_name;
                                 $tmpGiveaway['stock_type'] = config('uec.stock_type_options')[$giveaway->product->stock_type] ?? null;
+                                $tmpGiveaway['launch_status'] = $giveaway->product->launch_status;
 
                                 // 商品類型
                                 if (isset($giveaway->product->product_type)) {
@@ -2221,6 +2278,7 @@ class PromotionalCampaignService
                     'campaign_name' => $data['campaign_name'],
                     'active' => $data['active'],
                     'end_at' => $data['end_at'],
+                    'campaign_brief' => $data['campaign_brief'],
                     'updated_by' => $user->id,
                 ];
 

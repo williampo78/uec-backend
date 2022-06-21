@@ -27,7 +27,6 @@
                             <form id="create-form" method="post" action="{{ route('promotional_campaign_prd.store') }}">
                                 @csrf
                                 <div class="row">
-                                    <!-- 欄位 -->
                                     <div class="col-sm-12">
                                         <div class="form-horizontal">
                                             <div class="row">
@@ -270,6 +269,8 @@
                                                             <th class="text-nowrap">商品序號</th>
                                                             <th class="text-nowrap">商品名稱</th>
                                                             <th class="text-nowrap">贈品數量</th>
+                                                            <th class="text-nowrap">庫存數</th>
+                                                            <th class="text-nowrap">上架狀態</th>
                                                             <th class="text-nowrap">功能</th>
                                                         </tr>
                                                     </thead>
@@ -289,6 +290,8 @@
                                                                         v-model="giveaway.assignedQty">
                                                                 </div>
                                                             </td>
+                                                            <td>@{{ giveaway.stockQty }}</td>
+                                                            <td>@{{ giveaway.launchStatus }}</td>
                                                             <td>
                                                                 <button type="button" class="btn btn-danger"
                                                                     @click="deleteGiveaway(index)">
@@ -720,6 +723,8 @@
                             productNo: product.productNo,
                             productName: product.productName,
                             assignedQty: 1,
+                            stockQty: product.stockQty,
+                            launchStatus: product.launchStatus,
                         });
                     });
                 },
