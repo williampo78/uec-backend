@@ -4175,31 +4175,31 @@ jQuery.validator.addMethod("compareDates", function (date1, element, params) {
   switch (params.sign) {
     case "<":
       result = moment(date1).isBefore(params.date2, params.unit);
-      errorMessage = "\u5FC5\u9700\u5C0F\u65BC ".concat(params.date2);
+      errorMessage = "\u5FC5\u9700\u5C0F\u65BC";
       break;
 
     case "<=":
       result = moment(date1).isSameOrBefore(params.date2, params.unit);
-      errorMessage = "\u5FC5\u9700\u5C0F\u65BC\u7B49\u65BC ".concat(params.date2);
+      errorMessage = "\u5FC5\u9700\u5C0F\u65BC\u7B49\u65BC";
       break;
 
     case "=":
       result = moment(date1).isSame(params.date2, params.unit);
-      errorMessage = "\u5FC5\u9700\u7B49\u65BC ".concat(params.date2);
+      errorMessage = "\u5FC5\u9700\u7B49\u65BC";
       break;
 
     case ">":
       result = moment(date1).isAfter(params.date2, params.unit);
-      errorMessage = "\u5FC5\u9700\u5927\u65BC ".concat(params.date2);
+      errorMessage = "\u5FC5\u9700\u5927\u65BC";
       break;
 
     case ">=":
       result = moment(date1).isSameOrAfter(params.date2, params.unit);
-      errorMessage = "\u5FC5\u9700\u5927\u65BC\u7B49\u65BC ".concat(params.date2);
+      errorMessage = "\u5FC5\u9700\u5927\u65BC\u7B49\u65BC";
       break;
   }
 
-  $.validator.messages.compareDates = errorMessage;
+  $.validator.messages.compareDates = "".concat(errorMessage, " ").concat(moment(params.date2).format("YYYY-MM-DD HH:mm:ss"));
   return result;
 }, $.validator.messages.compareDates); // 比較輸入的兩個日期或兩個數字
 

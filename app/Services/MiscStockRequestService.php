@@ -70,7 +70,7 @@ class MiscStockRequestService
         // 供應商
         if (isset($data['supplierId'])) {
             $miscStockRequests = $miscStockRequests->whereHas('suppliers', function (Builder $query) use ($data) {
-                $query->where('idd', $data['supplierId']);
+                $query->where('supplier.id', $data['supplierId']);
             });
         }
 

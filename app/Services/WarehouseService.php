@@ -4,14 +4,22 @@ namespace App\Services;
 
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class WarehouseService
 {
-    public function getWarehouseList()
+    /**
+     * 取得倉庫列表
+     *
+     * @return Collection
+     */
+    public function getWarehouseList(): Collection
     {
-        $agent_id = Auth::user()->agent_id;
-        return Warehouse::where('agent_id', $agent_id)->orderBy('id')->get();
+        $user = auth()->user();
+        return Warehouse::where('agent_id', $user->agent_id)
+            ->where('delete', 0)
+            ->get();
     }
 
     /**

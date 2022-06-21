@@ -3,7 +3,7 @@
 @section('title', '進貨退出單')
 
 @section('content')
-    <div id="app">
+    <div id="app" v-cloak>
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-sm-12">
@@ -178,14 +178,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(stockRequest, index) in form.miscStockRequests" :key="index">
+                                        <tr v-for="(stockRequest, index) in miscStockRequests" :key="index">
                                             {{-- <td>
-                                                @if ($share_role_auth['auth_query'])
+                                                <div v-if="auth">
                                                     <button type="button" class="btn btn-info btn-sm" title="檢視"
                                                         @click="showRequest('{{ $buyoutStockInRequest['id'] }}')">
                                                         <i class="fa-solid fa-magnifying-glass"></i>
                                                     </button>
-                                                @endif
+                                                </div>
+
 
                                                 @if ($share_role_auth['auth_update'] && $buyoutStockInRequest['status_code'] == 'DRAFTED')
                                                     <a class="btn btn-warning btn-sm"
@@ -269,10 +270,12 @@
                 },
                 statusCodes: [],
                 suppliers: [],
+                miscStockRequests: [],
+                auth: {},
             },
             created() {
                 let payload = @json($payload);
-                console.log(payload);
+                // console.log(payload);
 
                 if (payload.statusCodes) {
                     Object.entries(payload.statusCodes).forEach(([key, statusCode]) => {
@@ -292,6 +295,14 @@
                     });
                 }
 
+                if (payload.auth) {
+                    this.auth = Object.assign({}, this.auth, payload.auth);
+                }
+
+                if (Array.isArray(payload.miscStockRequests) && payload.miscStockRequests.length) {
+
+                }
+
                 this.initFlatPickrConfigs();
                 this.setQueryParameters();
             },
@@ -300,7 +311,7 @@
 
                 // 驗證表單
                 $("#search-form").validate({
-                    debug: true,
+                    // debug: true,
                     submitHandler: function(form) {
                         form.submit();
                     },
@@ -318,9 +329,27 @@
                                 },
                             },
                         },
+                        actualDateEnd: {
+                            compareDates: {
+                                param: function() {
+                                    return {
+                                        date2: moment(self.form.actualDateStart.date).add(3, 'months'),
+                                        sign: "<=",
+                                    };
+                                },
+                                depends: function(element) {
+                                    return self.form.actualDateStart.date;
+                                },
+                            },
+                        },
                     },
                     messages: {
-
+                        requestDateEnd: {
+                            compareDates: "「申請日期」起訖最多不可超過3個月",
+                        },
+                        actualDateEnd: {
+                            compareDates: "「實際出庫日」起訖最多不可超過3個月",
+                        },
                     },
                     errorClass: "help-block",
                     errorElement: "span",
@@ -361,62 +390,72 @@
                 });
             },
             methods: {
+                initFlatPickrConfigs() {
+                    this.form.requestDateStart.config = {
+                        dateFormat: "Y-m-d",
+                        maxDate: this.form.requestDateEnd.date,
+                    };
+
+                    this.form.requestDateEnd.config = {
+                        dateFormat: "Y-m-d",
+                        minDate: this.form.requestDateStart.date,
+                    };
+
+                    this.form.actualDateStart.config = {
+                        dateFormat: "Y-m-d",
+                        maxDate: this.form.actualDateEnd.date,
+                    };
+
+                    this.form.actualDateEnd.config = {
+                        dateFormat: "Y-m-d",
+                        minDate: this.form.actualDateStart.date,
+                    };
+                },
+                onRequestDateStartChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.requestDateEnd.config, 'minDate', dateStr);
+                },
+                onRequestDateEndChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.requestDateStart.config, 'maxDate', dateStr);
+                },
+                onActualDateStartChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.actualDateEnd.config, 'minDate', dateStr);
+                },
+                onActualDateEndChange(selectedDates, dateStr, instance) {
+                    this.$set(this.form.actualDateStart.config, 'maxDate', dateStr);
+                },
                 search() {
                     $("#search-form").submit();
                 },
                 resetForm() {
                     let self = this;
 
-                    Object.keys(self.form).forEach(function(value, index) {
-                        self.form[value] = "";
+                    Object.keys(self.form).forEach(function(key) {
+                        if (['limit'].includes(key)) {
+                            return;
+                        }
+
+                        if (['requestDateStart', 'requestDateEnd', 'actualDateStart', 'actualDateEnd'].includes(key)) {
+                            self.form[key].date = "";
+                        } else {
+                            self.form[key] = "";
+                        }
                     });
                 },
                 setQueryParameters() {
-                    let requestDateStart = "{{ request()->input('request_date_start') }}";
-                    let requestDateEnd = "{{ request()->input('request_date_end') }}";
-                    let statusCode = "{{ request()->input('status_code') }}";
-                    let expectedDateStart = "{{ request()->input('expected_date_start') }}";
-                    let expectedDateEnd = "{{ request()->input('expected_date_end') }}";
-                    let supplierId = "{{ request()->input('supplier_id') }}";
+                    const urlSearchParams = new URLSearchParams(window.location.search);
+                    const params = Object.fromEntries(urlSearchParams.entries());
 
-                    if (requestDateStart) {
-                        this.form.requestDateStart = requestDateStart;
-                    }
+                    urlSearchParams.forEach((value, key) => {
+                        if (!this.form.hasOwnProperty(key)) {
+                            return;
+                        }
 
-                    if (requestDateEnd) {
-                        this.form.requestDateEnd = requestDateEnd;
-                    }
-
-                    if (statusCode) {
-                        this.form.statusCode = statusCode;
-                    }
-
-                    if (expectedDateStart) {
-                        this.form.expectedDateStart = expectedDateStart;
-                    }
-
-                    if (expectedDateEnd) {
-                        this.form.expectedDateEnd = expectedDateEnd;
-                    }
-
-                    if (supplierId) {
-                        this.form.supplierId = supplierId;
-                    }
-                },
-                deleteRequest(id, requestNo, event) {
-                    if (confirm(`確定要刪除申請單《${requestNo}》？`)) {
-                        axios({
-                                method: "delete",
-                                url: `/backend/buyout-stock-in-requests/${id}`,
-                            })
-                            .then(function(response) {
-                                let dataTable = $('#table_list').DataTable();
-                                dataTable.row(event.target.closest("tr")).remove().draw();
-                            })
-                            .catch(function(error) {
-                                console.log(error);
-                            });
-                    }
+                        if (['requestDateStart', 'requestDateEnd', 'actualDateStart', 'actualDateEnd'].includes(key)) {
+                            this.form[key].date = value;
+                        } else {
+                            this.form[key] = value;
+                        }
+                    });
                 },
                 async showRequest(id) {
                     let buyoutStockInRequest = await this.getBuyoutStockInRequest(id);
@@ -470,38 +509,20 @@
                             console.log(error);
                         });
                 },
-                initFlatPickrConfigs() {
-                    this.form.requestDateStart.config = {
-                        dateFormat: "Y-m-d",
-                        maxDate: this.form.requestDateEnd.date,
-                    };
-
-                    this.form.requestDateEnd.config = {
-                        dateFormat: "Y-m-d",
-                        minDate: this.form.requestDateStart.date,
-                    };
-
-                    this.form.actualDateStart.config = {
-                        dateFormat: "Y-m-d",
-                        maxDate: this.form.actualDateEnd.date,
-                    };
-
-                    this.form.actualDateEnd.config = {
-                        dateFormat: "Y-m-d",
-                        minDate: this.form.actualDateStart.date,
-                    };
-                },
-                onRequestDateStartChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.requestDateEnd.config, 'minDate', dateStr);
-                },
-                onRequestDateEndChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.requestDateStart.config, 'maxDate', dateStr);
-                },
-                onActualDateStartChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.actualDateEnd.config, 'minDate', dateStr);
-                },
-                onActualDateEndChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.actualDateStart.config, 'maxDate', dateStr);
+                deleteRequest(id, requestNo, event) {
+                    if (confirm(`確定要刪除申請單《${requestNo}》？`)) {
+                        axios({
+                                method: "delete",
+                                url: `/backend/buyout-stock-in-requests/${id}`,
+                            })
+                            .then(function(response) {
+                                let dataTable = $('#table_list').DataTable();
+                                dataTable.row(event.target.closest("tr")).remove().draw();
+                            })
+                            .catch(function(error) {
+                                console.log(error);
+                            });
+                    }
                 },
             },
         });

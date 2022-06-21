@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\MiscStockRequestService;
-use App\Services\SupplierService;
 use Illuminate\Http\Request;
+use App\Services\SupplierService;
+use App\Services\WarehouseService;
+use App\Services\MiscStockRequestService;
 
 class MiscStockRequestController extends Controller
 {
     private $miscStockRequestService;
     private $supplierService;
+    private $warehouseService;
 
     public function __construct(
         MiscStockRequestService $miscStockRequestService,
-        SupplierService $supplierService
+        SupplierService $supplierService,
+        WarehouseService $warehouseService
     ) {
         $this->miscStockRequestService = $miscStockRequestService;
         $this->supplierService = $supplierService;
+        $this->warehouseService = $warehouseService;
     }
 
     /**
@@ -41,6 +45,7 @@ class MiscStockRequestController extends Controller
         $responsePayload = [
             'statusCodes' => config('uec.options.misc_stock_requests.request_statuses.out'),
             'suppliers' => $this->supplierService->getSuppliers(),
+            'auth' => $request->share_role_auth,
         ];
         // 進貨退出單
         $responsePayload['miscStockRequests'] = $this->miscStockRequestService->getStockRequestTableList($requestPayload);
@@ -57,7 +62,13 @@ class MiscStockRequestController extends Controller
      */
     public function create()
     {
-        //
+        $responsePayload = [
+            'warehouses' => $this->warehouseService->getWarehouseList(),
+            'taxes' => config('uec.options.taxes'),
+        ];
+        $response['payload'] = $responsePayload;
+
+        return view('backend.misc_stock_request.create', $response);
     }
 
     /**
@@ -68,7 +79,7 @@ class MiscStockRequestController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
@@ -79,7 +90,7 @@ class MiscStockRequestController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
@@ -90,7 +101,7 @@ class MiscStockRequestController extends Controller
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**
@@ -102,7 +113,7 @@ class MiscStockRequestController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
     }
 
     /**
@@ -113,6 +124,6 @@ class MiscStockRequestController extends Controller
      */
     public function destroy($id)
     {
-        //
+
     }
 }

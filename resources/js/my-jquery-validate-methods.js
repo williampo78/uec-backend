@@ -26,31 +26,31 @@ jQuery.validator.addMethod(
         switch (params.sign) {
             case "<":
                 result = moment(date1).isBefore(params.date2, params.unit);
-                errorMessage = `必需小於 ${params.date2}`;
+                errorMessage = `必需小於`;
                 break;
 
             case "<=":
                 result = moment(date1).isSameOrBefore(params.date2, params.unit);
-                errorMessage = `必需小於等於 ${params.date2}`;
+                errorMessage = `必需小於等於`;
                 break;
 
             case "=":
                 result = moment(date1).isSame(params.date2, params.unit);
-                errorMessage = `必需等於 ${params.date2}`;
+                errorMessage = `必需等於`;
                 break;
 
             case ">":
                 result = moment(date1).isAfter(params.date2, params.unit);
-                errorMessage = `必需大於 ${params.date2}`;
+                errorMessage = `必需大於`;
                 break;
 
             case ">=":
                 result = moment(date1).isSameOrAfter(params.date2, params.unit);
-                errorMessage = `必需大於等於 ${params.date2}`;
+                errorMessage = `必需大於等於`;
                 break;
         }
 
-        $.validator.messages.compareDates = errorMessage;
+        $.validator.messages.compareDates = `${errorMessage} ${moment(params.date2).format("YYYY-MM-DD HH:mm:ss")}`;
 
         return result;
     },
