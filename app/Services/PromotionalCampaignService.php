@@ -1721,12 +1721,14 @@ class PromotionalCampaignService
                                 'product_type' => null,
                                 'supplier' => null,
                                 'stock_qty' => 0,
+                                'launch_status' => null,
                             ];
 
                             if (isset($giveaway->product)) {
                                 $tmpGiveaway['product_no'] = $giveaway->product->product_no;
                                 $tmpGiveaway['product_name'] = $giveaway->product->product_name;
                                 $tmpGiveaway['stock_type'] = config('uec.stock_type_options')[$giveaway->product->stock_type] ?? null;
+                                $tmpGiveaway['launch_status'] = $giveaway->product->launch_status;
 
                                 // 商品類型
                                 if (isset($giveaway->product->product_type)) {
