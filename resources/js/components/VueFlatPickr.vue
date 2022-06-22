@@ -27,7 +27,7 @@ export default {
     components: {
         'flat-pickr': flatPickr,
     },
-    name: "VueFlatPickr",
+    name: "vue-flat-pickr",
     props: {
         setting: {
             type: Object,

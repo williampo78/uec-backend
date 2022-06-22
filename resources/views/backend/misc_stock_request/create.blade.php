@@ -2,6 +2,14 @@
 
 @section('title', '進貨退出單 新增資料')
 
+@section('css')
+    <style>
+        .modal-dialog {
+            max-width: 100%;
+        }
+    </style>
+@endsection
+
 @section('content')
     <div id="app" v-cloak>
         @if ($errors->any())
@@ -133,7 +141,7 @@
                                                 <td>@{{ item.itemNo }}</td>
                                                 <td>@{{ item.spec1Value }}</td>
                                                 <td>@{{ item.spec2Value }}</td>
-                                                <td>@{{ item.sellingPrice }}</td>
+                                                <td>@{{ item.unitPrice }}</td>
                                                 <td>@{{ item.stockQty }}</td>
                                                 <td>
                                                     <div class="form-group">
@@ -141,7 +149,7 @@
                                                             :name="`items[${index}][expectedQty]`" v-model="item.expectedQty" min="1">
                                                     </div>
                                                 </td>
-                                                <td>@{{ item.expectedSubtotal }}</td>
+                                                <td>@{{ expectedSubtotal(item) }}</td>
                                                 <td>@{{ item.supplierName }}</td>
                                                 <td>
                                                     <button type="button" class="btn btn-danger" @click="deleteItem(index)">
@@ -188,10 +196,12 @@
                 </div>
             </div>
         </div>
+        <product-item-modal :modal="modal.productItem" @save="saveProductItems"></product-item-modal>
     </div>
 @endsection
 
 @section('js')
+    <script src="{{ mix('js/misc-stock-request/main.js') }}"></script>
     <script>
         let vm = new Vue({
             el: "#app",
@@ -212,6 +222,14 @@
                 },
                 saveButton: {
                     isDisabled: false,
+                },
+                modal: {
+                    productItem: {
+                        id: "product-item-modal",
+                        title: "新增品項",
+                        excludeProductItemIds: [],
+                        warehouseId: "",
+                    },
                 },
                 warehouses: [],
                 taxes: [],
@@ -294,16 +312,41 @@
                     },
                 });
             },
+            watch: {
+                "form.warehouseId"(warehouseId) {
+                    this.modal.productItem.warehouseId = warehouseId;
+                },
+                "form.items": {
+                    handler(items) {
+                        let expectedQty = 0;
+                        let expectedTaxAmount = 0;
+                        let expectedAmount = 0;
+
+                        items.forEach(item => {
+                            if (item.expectedQty) {
+                                console.log(expectedQty);
+                                // let expectedQty;
+                                // expectedQty += _.toInteger(item.expectedQty);
+                                // expectedAmount +=
+                            }
+                        });
+                    },
+                    deep: true,
+                },
+            },
             methods: {
                 addItem() {
-                    this.form.items.push({
-                        productItemId: "",
-                        spec1Value: "",
-                        spec2Value: "",
-                        minPurchaseQty: "",
-                        qty: "",
-                        qtyStep: 1,
+                    if (!this.form.warehouseId) {
+                        alert("尚未指定「庫別」，不允許新增商品明細！");
+                        return;
+                    }
+
+                    this.modal.productItem.excludeProductItemIds = [];
+                    this.form.items.forEach(item => {
+                        this.modal.productItem.excludeProductItemIds.push(item.productItemId);
                     });
+
+                    $('#product-item-modal').modal('show');
                 },
                 deleteItem(index) {
                     if (confirm('確定要刪除嗎？')) {
@@ -344,31 +387,31 @@
                         $("#create-form").submit();
                     });
                 },
-                getProductItems(supplierId) {
-                    return axios({
-                        method: "get",
-                        url: "/backend/buyout-stock-in-requests/product-items/",
-                        params: {
-                            supplier_id: supplierId
-                        },
-                    })
-                    .then(function(response) {
-                        return response.data;
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                    });
+                expectedSubtotal(item) {
+                    let subtotal = 0;
+
+                    if (item.expectedQty) {
+                        subtotal = _.round(_.multiply(_.toNumber(item.unitPrice), _.toInteger(item.expectedQty)), 2);
+                    }
+
+                    return subtotal;
                 },
-                expectedQty() {
-                    let total = 0;
-
-                    this.form.items.forEach(item => {
-                        if (item.qty) {
-                            total += parseInt(item.qty);
-                        }
+                // 儲存商品明細
+                saveProductItems(productItems) {
+                    productItems.forEach(productItem => {
+                        this.form.items.push({
+                            productItemId: productItem.id,
+                            productNo: productItem.productNo,
+                            productName: productItem.productName,
+                            itemNo: productItem.itemNo,
+                            spec1Value: productItem.spec1Value,
+                            spec2Value: productItem.spec2Value,
+                            unitPrice: productItem.unitPrice,
+                            stockQty: productItem.stockQty,
+                            expectedQty: "",
+                            supplierName: productItem.supplierName,
+                        });
                     });
-
-                    return total;
                 },
             }
         });

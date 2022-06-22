@@ -1,7 +1,7 @@
 import "./bootstrap";
 import "./my-jquery-validate-methods";
-import Select2 from "./components/Select2.vue";
-import VueFlatPickr from "./components/VueFlatPickr.vue";
+import Select2 from "@components/Select2.vue";
+import VueFlatPickr from "@components/VueFlatPickr.vue";
 
 // selec2
 $(".select2-default").select2();

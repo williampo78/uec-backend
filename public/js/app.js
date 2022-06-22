@@ -3901,7 +3901,7 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     'flat-pickr': (vue_flatpickr_component__WEBPACK_IMPORTED_MODULE_0___default())
   },
-  name: "VueFlatPickr",
+  name: "vue-flat-pickr",
   props: {
     setting: {
       type: Object,
@@ -3971,8 +3971,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _bootstrap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 /* harmony import */ var _my_jquery_validate_methods__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./my-jquery-validate-methods */ "./resources/js/my-jquery-validate-methods.js");
 /* harmony import */ var _my_jquery_validate_methods__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_my_jquery_validate_methods__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_Select2_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/Select2.vue */ "./resources/js/components/Select2.vue");
-/* harmony import */ var _components_VueFlatPickr_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/VueFlatPickr.vue */ "./resources/js/components/VueFlatPickr.vue");
+/* harmony import */ var _components_Select2_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @components/Select2.vue */ "./resources/js/components/Select2.vue");
+/* harmony import */ var _components_VueFlatPickr_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @components/VueFlatPickr.vue */ "./resources/js/components/VueFlatPickr.vue");
 
 
 

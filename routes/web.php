@@ -285,7 +285,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
 
     // 進貨退出單
-    // Route::get('/buyout-stock-in-requests/product-items', [MiscStockRequestController::class, 'getProductItems']);
+    Route::get('/misc-stock-requests/product-item-modal/options', [MiscStockRequestController::class, 'getProductItemModalOptions']);
+    Route::get('/misc-stock-requests/product-item-modal/list', [MiscStockRequestController::class, 'getProductItemModalList']);
     Route::resource('/misc-stock-requests', MiscStockRequestController::class, [
         'names' => [
             'index' => 'misc_stock_requests',

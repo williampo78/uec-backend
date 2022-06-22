@@ -126,4 +126,46 @@ class MiscStockRequestController extends Controller
     {
 
     }
+
+    /**
+     * 取得品項modal下拉選項
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getProductItemModalOptions()
+    {
+        $responsePayload = [
+            'suppliers' => $this->supplierService->getSuppliers(),
+        ];
+        $response['payload'] = $responsePayload;
+
+        return response()->json($response);
+    }
+
+    /**
+     * 取得品項modal的列表
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getProductItemModalList(Request $request)
+    {
+        $requestPayload = $request->only([
+            'productNo',
+            'productName',
+            'supplierId',
+            'limit',
+            'excludeProductItemIds',
+            'warehouseId',
+        ]);
+
+        $list = $this->miscStockRequestService->getProductItemModalList($requestPayload);
+        $list = $this->miscStockRequestService->formatProductItemModalList($list);
+        $responsePayload = [
+            'list' => $list,
+        ];
+        $response['payload'] = $responsePayload;
+
+        return response()->json($response);
+    }
 }
