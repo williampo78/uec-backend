@@ -1623,10 +1623,10 @@ class APIProductServices
                         "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
                         "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
                     );
-                    $campaignGive[$campaign_id][] = array(
-                        "giveList" => $giftArray[$campaign_id]
-                    );
                 }
+                $campaignGive[$campaign_id][] = array(
+                    "giveList" => $giftArray[$campaign_id]
+                );
             }
             $giveArray[] = array(
                 "campaignID" => $campaign_id,
