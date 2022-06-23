@@ -256,23 +256,21 @@ class APICartServices
                     $giftCalc = 0;
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
+                            $dataCount = PromotionalCampaign::find($campaign['PRD']['GIFT'][$product_id]->id)->promotionalCampaignGiveaways; //單品有幾個贈品
                             foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                 $giftCount++; //計算滿額贈禮數
-                                $dataCount = PromotionalCampaign::find($campaign['PRD']['GIFT'][$product_id]->id)->promotionalCampaignGiveaways; //單品有幾個贈品
-
                                 if (isset($stock_gift_check[$giftInfo->product_id])) {
-                                    $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
-                                    if ($giftCalc > 0) {
+                                    $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
+                                    if ($giftCalc >= 0) {
                                         $giftCheck++;//計算滿額贈禮有庫存的
                                     }
                                 }
                             }
-
-                            if ($giftCheck > 0 && $giftCount == $giftCheck && $giftCount == count($dataCount)) {
+                            if ($giftCheck >= 0 && $giftCount == $giftCheck && $giftCount == count($dataCount)) {
                                 foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
                                     if (isset($stock_gift_check[$giftInfo->product_id])) {
-                                        $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - $qty);
-                                        if ($giftCalc > 0) {
+                                        $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
+                                        if ($giftCalc >= 0) {
                                             $giftAway[] = array(
                                                 "productPhoto" => $giftInfo['photo'],
                                                 "productId" => $giftInfo->product_id,
@@ -935,7 +933,7 @@ class APICartServices
                                     if (isset($threshold_prod[$v['product_id']])) {
                                         $gift_array[$item->id]++;
                                         if (isset($stock_gift_check[$v['product_id']])) {
-                                            if ($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd > 0) {
+                                            if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
                                                 $gift_check[$item->id]++;
                                             }
                                         }
@@ -950,7 +948,7 @@ class APICartServices
                                             $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                             if (isset($threshold_prod[$v['product_id']])) {
                                                 if (isset($stock_gift_check[$v['product_id']])) {
-                                                    if ($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd > 0) {
+                                                    if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
                                                         $prods[$v['product_id']] = array(
                                                             "productPhoto" => $threshold_prod[$v['product_id']]->photo,
                                                             "productId" => $v['product_id'],
@@ -1059,7 +1057,7 @@ class APICartServices
                 if ($assigned_qty >= $CART04_n[$campaign_id]) {
                     foreach ($campaign_gift['PROD'][$campaign_id] as $prod_id => $value) {
                         if ($value->assignedQty > 0) {
-                            if ($this->stockService->getStockByProd($warehouseCode, $prod_id)->stock_qty > 0) { //有足夠庫存
+                            if (($this->stockService->getStockByProd($warehouseCode, $prod_id)->stock_qty - $value->assignedQty) >= 0) { //有足夠庫存
                                 $cartGift[] = array(
                                     "campaignId" => $value->promotional_campaign_id,
                                     "campaignName" => $value->campaign_name,
