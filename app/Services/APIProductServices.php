@@ -407,6 +407,9 @@ class APIProductServices
         $brand = '';
         $brand .= ($input['brand'] ? $input['brand'] : '');
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
+
+        $product = $this->getProducts();
+        $gtm = $this->getProductItemForGTM($product);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             $promotion_threshold = self::getPromotionThreshold();
@@ -494,7 +497,8 @@ class APIProductServices
                             'collections' => $collection,
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
-                            'start_selling' => $product->start_selling_at
+                            'start_selling' => $product->start_selling_at,
+                            "gtm"=>$gtm[$product->id]
                         );
 
                         $product_id = $product->id;
@@ -1226,6 +1230,7 @@ class APIProductServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->getProducts();
+        $gtm = $this->getProductItemForGTM($products);
         $id = $input['event'];
         $page = $input['page'];
         $size = $input['size'];
@@ -1325,7 +1330,8 @@ class APIProductServices
                                 "collection" => $collection,
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
-                                "start_selling" => $products[$product_id]->start_selling_at
+                                "start_selling" => $products[$product_id]->start_selling_at,
+                                "gtm"=>$gtm[$product_id]
                             );
                         }
                     }
@@ -1612,7 +1618,7 @@ class APIProductServices
         array_multisort(array_column($promotional, 'product_id'), SORT_ASC, $promotional);
         foreach ($promotional as $promotion) {
             //指定單品的活動門檻如果是有效的就回傳
-            if ($result[$promotion->promotional_campaign_id][$promotion->threshold_id]){
+            if ($result[$promotion->promotional_campaign_id][$promotion->threshold_id]) {
                 $data[$promotion->product_id] = true;
             }
         }
@@ -1630,5 +1636,77 @@ class APIProductServices
             $result[] = $item->product_id;
         }
         return $result;
+    }
+
+    /*
+     * 取得商品資料(GTM)
+     */
+    public function getProductItemForGTM($products)
+    {
+        $config_levels = config('uec.web_category_hierarchy_levels');
+        $now = Carbon::now();
+        $data = [];
+        //產品主檔基本資訊
+        $gtm = [];
+        $data = [];
+        if (sizeof($products) > 0) {
+            foreach ($products as $product) {
+                if (strtotime($now) > strtotime($product->end_launched_at)) continue;
+                $product_categorys = self::getWebCategoryProducts('', '', '', '', $product->id, '', '');
+                $rel_category = [];
+                if (sizeof($product_categorys) > 0) {
+                    foreach ($product_categorys as $key => $category) {
+                        foreach ($category as $kk => $vv) {
+                            $rel_category[] = array(
+                                "category_id" => $vv->web_category_hierarchy_id,
+                                "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
+                            );
+
+                        }
+                    }
+                }
+                if (!$rel_category) continue;
+
+                //產品規格
+                $item_spec = [];
+                $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
+                $gtm['item_id'] = $ProductSpec[0]['item_no'];
+                $gtm['item_name'] = $product->product_name;
+                $gtm['currency'] = "TWD";
+                $gtm['discount'] = "0";
+                $item_spec['spec_dimension'] = $product->spec_dimension; //維度
+                $spec_info = "";
+                foreach ($ProductSpec as $item) {
+                    if ($spec_info != "") {
+                        $spec_info .= "、";
+                    }
+                    $spec_info .= $item['spec_1_value'] . ($item['spec_2_value'] ? "_" . $item['spec_2_value'] : "");
+                }
+                if ($item_spec['spec_dimension'] > 0) {
+                    $gtm['item_variant'] = $spec_info;
+                } else {
+                    $gtm['item_variant'] = "";
+                }
+
+                //品牌
+                $item_brand = $this->brandsService->getBrand($product->brand_id);
+                $gtm['item_brand'] = $item_brand[0]->brand_name;
+
+                //分類
+                $item_category = $this->getBreadcrumbCategory($rel_category[0]['category_id']);
+                $gtm['item_category'] = $item_category['level1']['name'];
+                $gtm['item_category2'] = $item_category['level2']['name'];
+                $gtm['item_category3'] = isset($item_category['level3']['name']) ? $item_category['level3']['name'] : "";
+                $gtm['item_category4'] = "";
+                $gtm['item_category5'] = "";
+                $gtm['price'] = intval($product->selling_price);
+                $gtm['quantity'] = 1;
+                $data[$product->id] = $gtm;
+            }
+
+            return $data;
+        } else {
+            return 903;
+        }
     }
 }
