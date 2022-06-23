@@ -391,6 +391,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     itemNo: item.itemNo,
                     spec1Value: item.spec1Value,
                     spec2Value: item.spec2Value,
+                    supplierId: item.supplierId,
                     supplierName: item.supplierName,
                     stockQty: item.stockQty,
                     unitPrice: item.unitPrice,

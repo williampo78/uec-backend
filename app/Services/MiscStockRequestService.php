@@ -4,9 +4,11 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use App\Models\ProductItem;
+use Illuminate\Support\Str;
 use App\Models\MiscStockRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Builder;
 
 class MiscStockRequestService
@@ -202,6 +204,7 @@ class MiscStockRequestService
                 'itemNo' => $item->item_no,
                 'spec1Value' => $item->spec_1_value,
                 'spec2Value' => $item->spec_2_value,
+                'supplierId' => null,
                 'supplierName' => null,
                 'stockQty' => null,
                 'unitPrice' => null,
@@ -215,6 +218,7 @@ class MiscStockRequestService
                 $tmpItem['uom'] = $item->product->uom;
 
                 if (isset($item->product->supplier)) {
+                    $tmpItem['supplierId'] = $item->product->supplier->id;
                     $tmpItem['supplierName'] = $item->product->supplier->name;
                 }
             }
@@ -228,5 +232,137 @@ class MiscStockRequestService
         }
 
         return $result;
+    }
+
+    /**
+     * 建立進貨退出單
+     *
+     * @param array $data
+     * @return boolean
+     */
+    public function createStockRequest(array $data): bool
+    {
+        $user = auth()->user();
+        $result = false;
+
+        DB::beginTransaction();
+        try {
+            $requestData = [
+                'request_no' => $this->generateNumber(),
+                'request_type' => 'TODO',
+                'request_date' => now(),
+                'warehouse_id' => $data['warehouseId'],
+                'expected_qty' => 0,
+                'tax' => $data['tax'],
+                'expected_amount' => 0,
+                'expected_tax_amount' => 0,
+                'total_sup_count' => 0,
+                'approved_sup_count' => 0,
+                'rejected_sup_count' => 0,
+                'ship_to_name' => $data['shipToName'] ?? null,
+                'ship_to_mobile' => $data['shipToMobile'] ?? null,
+                'ship_to_address' => $data['shipToAddress'] ?? null,
+                'remark' => $data['remark'] ?? null,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+            ];
+
+            // 儲存類型
+            if ($data['saveType'] == 'draft') {
+                $requestData['request_status'] = 'DRAFTED';
+            } else {
+                $requestData['request_status'] = 'REVIEWING';
+                $requestData['submitted_at'] = now();
+            }
+
+            $createdMiscStockRequest = MiscStockRequest::create($requestData);
+
+            $totalExpectedQty = 0;
+            if (isset($data['items'])) {
+                $supplierGroups = collect($data['items'])->groupBy('supplierId');
+                foreach ($supplierGroups as $supplierId => $items) {
+                    foreach ($items as $item) {
+                        
+                    }
+                }
+                // dd($supplierGroup);
+                // foreach ($data['items'] as $item) {
+                //     BuyoutStockReqDetail::create([
+                //         'buyout_stock_request_id' => $createdBuyoutStockRequest->id,
+                //         'seq_no' => $item['seq_no'],
+                //         'product_item_id' => $item['product_item_id'],
+                //         'expected_qty' => $item['qty'],
+                //         'created_by' => $user->id,
+                //         'updated_by' => $user->id,
+                //     ]);
+
+                //     $totalExpectedQty += $item['qty'];
+                // }
+            }
+
+            // 更新預計出入庫總量
+            // MiscStockRequest::findOrFail($createdMiscStockRequest->id)->update([
+            //     'expected_qty' => $totalExpectedQty,
+            // ]);
+
+            // DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+        }
+
+        return $result;
+    }
+
+    /**
+     * 產生單號
+     *
+     * @return string
+     */
+    public function generateNumber(): string
+    {
+        $numberHead = 'RS' . now()->format('ymd');
+
+        do {
+            $lastNumber = $this->getTodayLastNumber($numberHead);
+
+            if (isset($lastNumber)) {
+                $lastNumberTail = (string) Str::of($lastNumber)->substr(8);
+                $newNumberTail = (int) $lastNumberTail + 1;
+                $newNumber = $numberHead . Str::of($newNumberTail)->padLeft(6, '0');
+            } else {
+                $newNumberTail = Str::of('1')->padLeft(6, '0');
+                $newNumber = $numberHead . $newNumberTail;
+            }
+        } while ($this->numberExists($newNumber));
+
+        return $newNumber;
+    }
+
+    /**
+     * 單號是否已存在
+     *
+     * @param string $number
+     * @return boolean
+     */
+    public function numberExists(string $number): bool
+    {
+        return MiscStockRequest::where('request_no', $number)->count() > 0 ? true : false;
+    }
+
+    /**
+     * 取得今天最後一筆單號
+     *
+     * @param string $numberHead
+     * @return string|null
+     */
+    public function getTodayLastNumber(string $numberHead): ?string
+    {
+        $request = MiscStockRequest::where('request_no', 'like', "{$numberHead}%")
+            ->latest('request_no')
+            ->first();
+
+        return isset($request) ? $request->request_no : null;
     }
 }

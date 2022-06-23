@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\SupplierService;
+use App\Services\SysConfigService;
 use App\Services\WarehouseService;
 use App\Services\MiscStockRequestService;
 
@@ -12,15 +13,18 @@ class MiscStockRequestController extends Controller
     private $miscStockRequestService;
     private $supplierService;
     private $warehouseService;
+    private $sysConfigService;
 
     public function __construct(
         MiscStockRequestService $miscStockRequestService,
         SupplierService $supplierService,
-        WarehouseService $warehouseService
+        WarehouseService $warehouseService,
+        SysConfigService $sysConfigService
     ) {
         $this->miscStockRequestService = $miscStockRequestService;
         $this->supplierService = $supplierService;
         $this->warehouseService = $warehouseService;
+        $this->sysConfigService = $sysConfigService;
     }
 
     /**
@@ -65,6 +69,9 @@ class MiscStockRequestController extends Controller
         $responsePayload = [
             'warehouses' => $this->warehouseService->getWarehouseList(),
             'taxes' => config('uec.options.taxes'),
+            'shipToName' => $this->sysConfigService->getConfigValue('LGST_REC_NAME'),
+            'shipToMobile' => $this->sysConfigService->getConfigValue('LGST_REC_PHONE'),
+            'shipToAddress' => $this->sysConfigService->getConfigValue('LGST_REC_ADDR'),
         ];
         $response['payload'] = $responsePayload;
 
@@ -79,7 +86,24 @@ class MiscStockRequestController extends Controller
      */
     public function store(Request $request)
     {
+        $resquestPayload = $request->only([
+            'saveType',
+            'warehouseId',
+            'tax',
+            'remark',
+            'shipToName',
+            'shipToMobile',
+            'shipToAddress',
+            'items',
+        ]);
+// dd($resquestPayload);
+        if (!$this->miscStockRequestService->createStockRequest($resquestPayload)) {
+            return response()->json(['message' => '儲存失敗'], 500);
+        }
 
+        return response()->json([
+            'message' => '儲存成功',
+        ]);
     }
 
     /**

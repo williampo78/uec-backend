@@ -42,7 +42,7 @@
                                         <div class="form-group">
                                             <label class="control-label">庫別 <span class="text-red">*</span></label>
                                             <select2 class="form-control" :options="warehouses"
-                                                v-model="form.warehouseId" name="warehouseId">
+                                                v-model="form.warehouseId" name="warehouseId" @select2-selecting="onWarehouseSelecting">
                                                 <option disabled value=""></option>
                                             </select2>
                                         </div>
@@ -146,7 +146,7 @@
                                                 <td>
                                                     <div class="form-group">
                                                         <input type="number" class="form-control item-expected-qty"
-                                                            :name="`items[${index}][expectedQty]`" v-model="item.expectedQty" min="1">
+                                                            :name="`items[${index}][expectedQty]`" v-model="item.expectedQty" min="1" :max="item.stockQty">
                                                     </div>
                                                 </td>
                                                 <td>@{{ expectedSubtotal(item) }}</td>
@@ -254,6 +254,10 @@
                         });
                     });
                 }
+
+                this.form.shipToName = payload.shipToName;
+                this.form.shipToMobile = payload.shipToMobile;
+                this.form.shipToAddress = payload.shipToAddress;
             },
             mounted() {
                 let self = this;
@@ -267,7 +271,8 @@
                     // debug: true,
                     submitHandler: function(form) {
                         self.saveButton.isDisabled = true;
-                        form.submit();
+                        // form.submit();
+                        self.createRequest();
                     },
                     rules: {
                         warehouseId: {
@@ -319,19 +324,26 @@
                 "form.items": {
                     handler(items) {
                         let expectedQty = 0;
-                        let expectedTaxAmount = 0;
                         let expectedAmount = 0;
 
                         items.forEach(item => {
                             if (item.expectedQty) {
-                                console.log(expectedQty);
-                                // let expectedQty;
-                                // expectedQty += _.toInteger(item.expectedQty);
-                                // expectedAmount +=
+                                let itemUnitPrice = parseFloat(item.unitPrice);
+                                let itemExpectedQty = parseInt(item.expectedQty);
+
+                                expectedQty += itemExpectedQty;
+                                expectedAmount += _.round(itemUnitPrice * itemExpectedQty, 2);
                             }
                         });
+
+                        this.form.expectedQty = expectedQty;
+                        this.form.expectedTaxAmount = this.calculateTaxAmount(this.form.tax, expectedAmount);
+                        this.form.expectedAmount = expectedAmount;
                     },
                     deep: true,
+                },
+                "form.tax"(tax) {
+                    this.form.expectedTaxAmount = this.calculateTaxAmount(tax, this.form.expectedAmount);
                 },
             },
             methods: {
@@ -375,6 +387,9 @@
                         $(this).rules("add", {
                             required: true,
                             digits: true,
+                            max: function (element) {
+                                return parseInt(element.getAttribute("max"));
+                            },
                             min: 1,
                             messages: {
                                 min: "只可輸入正整數",
@@ -387,11 +402,12 @@
                         $("#create-form").submit();
                     });
                 },
+                // 計算申請小計
                 expectedSubtotal(item) {
                     let subtotal = 0;
 
                     if (item.expectedQty) {
-                        subtotal = _.round(_.multiply(_.toNumber(item.unitPrice), _.toInteger(item.expectedQty)), 2);
+                        subtotal = _.round(parseFloat(item.unitPrice) * parseInt(item.expectedQty), 2);
                     }
 
                     return subtotal;
@@ -409,8 +425,89 @@
                             unitPrice: productItem.unitPrice,
                             stockQty: productItem.stockQty,
                             expectedQty: "",
+                            supplierId: productItem.supplierId,
                             supplierName: productItem.supplierName,
                         });
+                    });
+                },
+                // 計算稅額
+                calculateTaxAmount(tax, amount) {
+                    if (!tax || !amount) {
+                        return;
+                    }
+
+                    let nontaxAmount = 0;
+
+                    // 計算未稅金額
+                    switch (tax) {
+                        // 免稅
+                        case '0':
+                            nontaxAmount = amount;
+                            break;
+
+                        // 應稅
+                        // case '1':
+                        //     break;
+
+                        // 應稅內含
+                        case '2':
+                            nontaxAmount = _.round(amount / ((100 + 5) / 100), 2);
+                            break;
+
+                        // 零稅率
+                        case '3':
+                            nontaxAmount = _.round(amount / ((100 + 0) / 100), 2);
+                            break;
+
+                        default:
+                            nontaxAmount = amount;
+                            break;
+                    }
+
+                    return _.round(amount - nontaxAmount, 2);
+                },
+                // 選擇庫別
+                onWarehouseSelecting(event) {
+                    let errorMessage = "";
+                    // 已有商品明細
+                    if (this.form.items.length) {
+                        errorMessage += "請先刪除「商品明細」，才能切換「庫別」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
+                createRequest() {
+                    axios({
+                        method: "post",
+                        url: `/backend/misc-stock-requests`,
+                        data: {
+                            saveType: this.form.saveType,
+                            warehouseId: this.form.warehouseId,
+                            tax: this.form.tax,
+                            remark: this.form.remark,
+                            shipToName: this.form.shipToName,
+                            shipToMobile: this.form.shipToMobile,
+                            shipToAddress: this.form.shipToAddress,
+                            items: this.form.items,
+                        },
+                    })
+                    .then((response) => {
+                        console.log(response.data);
+
+                        // if (this.form.saveType == 'draft') {
+
+                        // } else {
+
+                        // }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                    .finally(() => {
+                        this.saveButton.isDisabled = false;
                     });
                 },
             }
