@@ -28,6 +28,7 @@ class APIIndexServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->apiProductService->getProducts();
+        $gtm = $this->apiProductService->getProductItemForGTM($products);
 
         $categoryProducts = $this->apiProductService->getWebCategoryProducts('', '', '', '', '', '', '');
 
@@ -146,7 +147,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $product->selling_channel,
-                                "start_selling" => $product->start_selling_at
+                                "start_selling" => $product->start_selling_at,
+                                "gtm"=>$gtm[$product->id]
                             );
                         }
 
@@ -197,7 +199,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
-                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at
+                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
+                                "gtm"=>$gtm[$ad_slot->product_id]
                             );
                         }
                         if (isset($product_info[$ad_slot->slot_code])) {
@@ -249,7 +252,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
-                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at
+                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
+                                "gtm"=>$gtm[$ad_slot->product_id]
                             );
                         }
                         $H080A_seemore['see_more_action'] = $ad_slot->see_more_action;
@@ -273,7 +277,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
-                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at
+                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
+                                "gtm"=>$gtm[$ad_slot->product_id]
                             );
                         }
                         $H080B_seemore['see_more_action'] = $ad_slot->see_more_action;
