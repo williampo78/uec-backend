@@ -136,7 +136,7 @@ class APICartServices
      * 取得購物車內容
      *
      */
-    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount)
+    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm=null)
     {
         $now = Carbon::now();
         //購物車內容
@@ -792,6 +792,7 @@ class APICartServices
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product,
                     "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
+                    "gtm"=>$gtm[$product_id]
                 );
 
             }
@@ -1119,8 +1120,14 @@ class APICartServices
      */
     public function getProducts()
     {
+        $strSQL = "SELECT p.*,
+                    (SELECT photo_name
+                     FROM product_photos
+                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
+                    FROM products AS p
+                    where p.approval_status = 'APPROVED' ";
+        $products = DB::select($strSQL);
         $data = [];
-        $products = Product::all();
         foreach ($products as $product) {
             $data[$product->id] = $product;
         }
