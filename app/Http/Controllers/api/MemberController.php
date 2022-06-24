@@ -45,7 +45,8 @@ class MemberController extends Controller
         WarehouseStockService $warehouseStockService,
         ReturnRequestService $returnRequestService,
         APIProductServices $apiProductServices
-    ) {
+    )
+    {
         $this->apiService = $apiService;
         $this->sysConfigService = $sysConfigService;
         $this->orderService = $orderService;
@@ -273,7 +274,7 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $cancelLimitMins = (int) $this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
+        $cancelLimitMins = (int)$this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
         $payload = [
             'message' => '取得成功',
@@ -371,7 +372,7 @@ class MemberController extends Controller
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'discount_content' => [],
-                    'gtm'=>$gtm[$orderDetail->product_id]
+                    'gtm' => $gtm[$orderDetail->product_id]
                 ];
                 if ($orderDetail->product->productPhotos->isNotEmpty()) {
                     $productPhoto = $orderDetail->product->productPhotos->first();
@@ -435,7 +436,7 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $cancelLimitMins = (int) $this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
+        $cancelLimitMins = (int)$this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
         // 是否可以取消訂單
         if (!$this->orderService->canCancelOrder($order->status_code, $order->ordered_date, $cancelLimitMins)) {
@@ -494,8 +495,7 @@ class MemberController extends Controller
                     'created_by' => -1,
                     'updated_by' => -1,
                 ]);
-            }
-            // 未付款
+            } // 未付款
             else {
                 // 更新訂單
                 Order::findOrFail($order->id)
@@ -576,8 +576,7 @@ class MemberController extends Controller
                             'created_by' => -1,
                             'updated_by' => -1,
                         ]);
-                    }
-                    // 更新庫存
+                    } // 更新庫存
                     else {
                         WarehouseStock::findOrFail($warehouseStock->id)
                             ->update([
