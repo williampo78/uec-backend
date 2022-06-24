@@ -613,6 +613,7 @@ export default {
                     launchStatus: product.launch_status,
                     grossMargin: product.gross_margin,
                     supplier: product.supplier,
+                    stockQty: product.stock_qty,
                 });
             });
         },

@@ -29,7 +29,6 @@
                                 @method('PUT')
                                 @csrf
                                 <div class="row">
-                                    <!-- 欄位 -->
                                     <div class="col-sm-12">
                                         <div class="form-horizontal">
                                             <div class="row">
@@ -279,6 +278,8 @@
                                                             <th class="text-nowrap">商品序號</th>
                                                             <th class="text-nowrap">商品名稱</th>
                                                             <th class="text-nowrap">贈品數量</th>
+                                                            <th class="text-nowrap">庫存數</th>
+                                                            <th class="text-nowrap">上架狀態</th>
                                                             <th class="text-nowrap"
                                                                 v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
                                                         </tr>
@@ -302,6 +303,8 @@
                                                                         :disabled="isNowGreaterThanOrEqualToStartAt">
                                                                 </div>
                                                             </td>
+                                                            <td>@{{ giveaway.stockQty }}</td>
+                                                            <td>@{{ giveaway.launchStatus }}</td>
                                                             <td v-if="!isNowGreaterThanOrEqualToStartAt">
                                                                 <button type="button" class="btn btn-danger"
                                                                     @click="deleteGiveaway(index)">
@@ -443,6 +446,8 @@
                                 productNo: giveaway.product_no,
                                 productName: giveaway.product_name,
                                 assignedQty: giveaway.assigned_qty,
+                                stockQty: giveaway.stock_qty,
+                                launchStatus: giveaway.launch_status,
                             });
                         });
                     }
@@ -786,6 +791,8 @@
                             productNo: product.productNo,
                             productName: product.productName,
                             assignedQty: 1,
+                            stockQty: product.stockQty,
+                            launchStatus: product.launchStatus,
                         });
                     });
                 },

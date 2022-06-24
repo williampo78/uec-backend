@@ -1230,6 +1230,7 @@
                             productType: product.productType,
                             supplier: product.supplier,
                             stockQty: product.stockQty,
+                            launchStatus: product.launchStatus,
                         });
                     });
                 },
