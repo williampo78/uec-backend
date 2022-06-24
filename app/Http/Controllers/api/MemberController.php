@@ -15,6 +15,7 @@ use App\Models\ReturnRequestDetail;
 use App\Models\Shipment;
 use App\Models\StockTransactionLog;
 use App\Models\WarehouseStock;
+use App\Services\APIProductServices;
 use App\Services\APIService;
 use App\Services\OrderService;
 use App\Services\ReturnRequestService;
@@ -25,6 +26,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 
 class MemberController extends Controller
 {
@@ -41,7 +43,8 @@ class MemberController extends Controller
         OrderService $orderService,
         WarehouseService $warehouseService,
         WarehouseStockService $warehouseStockService,
-        ReturnRequestService $returnRequestService
+        ReturnRequestService $returnRequestService,
+        APIProductServices $apiProductServices
     ) {
         $this->apiService = $apiService;
         $this->sysConfigService = $sysConfigService;
@@ -49,6 +52,7 @@ class MemberController extends Controller
         $this->warehouseService = $warehouseService;
         $this->warehouseStockService = $warehouseStockService;
         $this->returnRequestService = $returnRequestService;
+        $this->apiProductServices = $apiProductServices;
     }
 
     /**
@@ -349,7 +353,10 @@ class MemberController extends Controller
         }
         $giveaway_qty = [];
 
-        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty) {
+        $products = $this->apiProductServices->getProducts();
+        $gtm = $this->apiProductServices->getProductItemForGTM($products);
+
+        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
                     'id' => $orderDetail->id,
@@ -364,6 +371,7 @@ class MemberController extends Controller
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'discount_content' => [],
+                    'gtm'=>$gtm[$orderDetail->product_id]
                 ];
                 if ($orderDetail->product->productPhotos->isNotEmpty()) {
                     $productPhoto = $orderDetail->product->productPhotos->first();
