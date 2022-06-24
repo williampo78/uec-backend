@@ -407,9 +407,8 @@ class APIProductServices
         $brand = '';
         $brand .= ($input['brand'] ? $input['brand'] : '');
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
-
-        $product = $this->getProducts();
-        $gtm = $this->getProductItemForGTM($product);
+        $product_info = $this->getProducts();
+        $gtm = $this->getProductItemForGTM($product_info);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             $promotion_threshold = self::getPromotionThreshold();
@@ -452,8 +451,6 @@ class APIProductServices
                 if ($member_id > 0) {
                     $response = $this->apiWebService->getMemberCollections();
                     $is_collection = json_decode($response, true);
-                    //$response = $this->apiCartService->getCartInfo($member_id);
-                    //$is_cart = json_decode($response, true);
                 }
             }
             $product_id = 0;
@@ -474,16 +471,6 @@ class APIProductServices
                             }
                         }
                     }
-                    /*加入購物車未定版，待確認後資料要改成取 shopping_cart_details => item_id
-                    if (isset($is_cart)) {
-                        foreach ($is_cart as $k => $v) {
-                            if ($v['product_id'] == $product->id) {
-                                $cart = true;
-                            } else {
-                                $cart = false;
-                            }
-                        }
-                    }*/
                     if ($product->id != $product_id) {
                         $data[$product->id] = array(
                             'product_id' => $product->id,
@@ -498,7 +485,7 @@ class APIProductServices
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
                             'start_selling' => $product->start_selling_at,
-                            "gtm"=>$gtm[$product->id]
+                            'gtm' => $gtm[$product->id]
                         );
 
                         $product_id = $product->id;
@@ -1331,7 +1318,7 @@ class APIProductServices
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
                                 "start_selling" => $products[$product_id]->start_selling_at,
-                                "gtm"=>$gtm[$product_id]
+                                "gtm" => $gtm[$product_id]
                             );
                         }
                     }
