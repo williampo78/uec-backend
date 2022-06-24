@@ -12,12 +12,6 @@
 
 @section('content')
     <div id="app" v-cloak>
-        @if ($errors->any())
-            <div ref="errorMessage" style="display: none;">
-                {{ $errors->first('message') }}
-            </div>
-        @endif
-
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-sm-12">
@@ -184,9 +178,9 @@
                                                 </button>
                                             @endif
 
-                                            <a href="{{ route('misc_stock_requests') }}" class="btn btn-danger">
+                                            <button class="btn btn-danger" type="button" @click="cancel">
                                                 <i class="fa-solid fa-ban"></i> 取消
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -203,6 +197,8 @@
 @section('js')
     <script src="{{ mix('js/misc-stock-request/main.js') }}"></script>
     <script>
+        const BASE_URI = '/backend/misc-stock-requests';
+
         let vm = new Vue({
             el: "#app",
             data: {
@@ -261,10 +257,6 @@
             },
             mounted() {
                 let self = this;
-
-                if (this.$refs.errorMessage) {
-                    alert(this.$refs.errorMessage.innerText.trim());
-                }
 
                 // 驗證表單
                 $("#create-form").validate({
@@ -332,7 +324,7 @@
                                 let itemExpectedQty = parseInt(item.expectedQty);
 
                                 expectedQty += itemExpectedQty;
-                                expectedAmount += _.round(itemUnitPrice * itemExpectedQty, 2);
+                                expectedAmount += _.round(itemUnitPrice * itemExpectedQty);
                             }
                         });
 
@@ -402,12 +394,17 @@
                         $("#create-form").submit();
                     });
                 },
+                cancel() {
+                    if (confirm("確定放棄存檔？")) {
+                        window.location.href = BASE_URI;
+                    }
+                },
                 // 計算申請小計
                 expectedSubtotal(item) {
                     let subtotal = 0;
 
                     if (item.expectedQty) {
-                        subtotal = _.round(parseFloat(item.unitPrice) * parseInt(item.expectedQty), 2);
+                        subtotal = _.round(parseFloat(item.unitPrice) * parseInt(item.expectedQty));
                     }
 
                     return subtotal;
@@ -451,12 +448,12 @@
 
                         // 應稅內含
                         case '2':
-                            nontaxAmount = _.round(amount / ((100 + 5) / 100), 2);
+                            nontaxAmount = _.round(amount / ((100 + 5) / 100));
                             break;
 
                         // 零稅率
                         case '3':
-                            nontaxAmount = _.round(amount / ((100 + 0) / 100), 2);
+                            nontaxAmount = _.round(amount / ((100 + 0) / 100));
                             break;
 
                         default:
@@ -464,7 +461,7 @@
                             break;
                     }
 
-                    return _.round(amount - nontaxAmount, 2);
+                    return _.round(amount - nontaxAmount);
                 },
                 // 選擇庫別
                 onWarehouseSelecting(event) {
@@ -482,7 +479,7 @@
                 createRequest() {
                     axios({
                         method: "post",
-                        url: `/backend/misc-stock-requests`,
+                        url: BASE_URI,
                         data: {
                             saveType: this.form.saveType,
                             warehouseId: this.form.warehouseId,
@@ -495,16 +492,21 @@
                         },
                     })
                     .then((response) => {
-                        console.log(response.data);
+                        if (this.form.saveType == 'draft') {
+                            alert('儲存草稿成功！');
+                        } else {
+                            alert('儲存成功，進貨退出單送審中！');
+                        }
 
-                        // if (this.form.saveType == 'draft') {
-
-                        // } else {
-
-                        // }
+                        window.location.href = BASE_URI;
                     })
                     .catch((error) => {
                         console.log(error);
+
+                        if (error.response) {
+                            let data = error.response.data;
+                            alert(data.message);
+                        }
                     })
                     .finally(() => {
                         this.saveButton.isDisabled = false;

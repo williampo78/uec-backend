@@ -96,7 +96,7 @@ class MiscStockRequestController extends Controller
             'shipToAddress',
             'items',
         ]);
-// dd($resquestPayload);
+
         if (!$this->miscStockRequestService->createStockRequest($resquestPayload)) {
             return response()->json(['message' => '儲存失敗'], 500);
         }

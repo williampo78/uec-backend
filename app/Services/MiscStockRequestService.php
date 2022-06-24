@@ -2,17 +2,26 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use App\Models\ProductItem;
-use Illuminate\Support\Str;
 use App\Models\MiscStockRequest;
+use App\Models\MiscStockRequestSupplier;
+use App\Models\ProductItem;
+use App\Services\MoneyAmountService;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class MiscStockRequestService
 {
+    private $moneyAmountService;
+
+    public function __construct(MoneyAmountService $moneyAmountService)
+    {
+        $this->moneyAmountService = $moneyAmountService;
+    }
+
     /**
      * 取得進貨退出單列表
      *
@@ -275,37 +284,81 @@ class MiscStockRequestService
                 $requestData['submitted_at'] = now();
             }
 
-            $createdMiscStockRequest = MiscStockRequest::create($requestData);
+            $createdRequest = MiscStockRequest::create($requestData);
 
-            $totalExpectedQty = 0;
+            $requestQty = 0;
+            $requestAmount = 0;
+            $totalSupCount = 0;
             if (isset($data['items'])) {
+                // 依供應商分群
                 $supplierGroups = collect($data['items'])->groupBy('supplierId');
                 foreach ($supplierGroups as $supplierId => $items) {
-                    foreach ($items as $item) {
-                        
-                    }
-                }
-                // dd($supplierGroup);
-                // foreach ($data['items'] as $item) {
-                //     BuyoutStockReqDetail::create([
-                //         'buyout_stock_request_id' => $createdBuyoutStockRequest->id,
-                //         'seq_no' => $item['seq_no'],
-                //         'product_item_id' => $item['product_item_id'],
-                //         'expected_qty' => $item['qty'],
-                //         'created_by' => $user->id,
-                //         'updated_by' => $user->id,
-                //     ]);
+                    $requestSupplierData = [
+                        'misc_stock_request_id' => $createdRequest->id,
+                        'supplier_id' => $supplierId,
+                        'expected_qty' => 0,
+                        'expected_amount' => 0,
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                    ];
 
-                //     $totalExpectedQty += $item['qty'];
-                // }
+                    // 儲存類型
+                    if ($data['saveType'] == 'draft') {
+                        $requestSupplierData['status_code'] = 'DRAFTED';
+                    } else {
+                        $requestSupplierData['status_code'] = 'REVIEWING';
+                    }
+
+                    // 建立申請單、供應商的中間表
+                    $createdRequestSupplier = MiscStockRequestSupplier::create($requestSupplierData);
+
+                    $requestSupplierQty = 0;
+                    $requestSupplierAmount = 0;
+                    foreach ($items as $item) {
+                        $expectedSubtotal = round($item['unitPrice'] * $item['expectedQty']);
+                        // 建立申請單明細
+                        $createdRequest->miscStockRequestDetails()->create([
+                            'misc_stock_request_sup_id' => $createdRequestSupplier->id,
+                            'product_item_id' => $item['productItemId'],
+                            'unit_price' => $item['unitPrice'],
+                            'expected_qty' => $item['expectedQty'],
+                            'expected_subtotal' => $expectedSubtotal,
+                            'onhand_qty' => $item['stockQty'],
+                            'created_by' => $user->id,
+                            'updated_by' => $user->id,
+                        ]);
+
+                        $requestSupplierQty += $item['expectedQty'];
+                        $requestSupplierAmount += $expectedSubtotal;
+                    }
+
+                    // 更新申請單、供應商的中間表數量、金額
+                    $createdRequestSupplier->update([
+                        'expected_qty' => $requestSupplierQty,
+                        'expected_amount' => $requestSupplierAmount,
+                    ]);
+
+                    $requestQty += $requestSupplierQty;
+                    $requestAmount += $requestSupplierAmount;
+                    $totalSupCount++;
+                }
             }
 
-            // 更新預計出入庫總量
-            // MiscStockRequest::findOrFail($createdMiscStockRequest->id)->update([
-            //     'expected_qty' => $totalExpectedQty,
-            // ]);
+            $this->moneyAmountService
+                ->setOriginalPrice($requestAmount)
+                ->setTaxType((int) $data['tax'])
+                ->calculateOriginalNontaxPrice()
+                ->calculateOriginalTaxPrice();
 
-            // DB::commit();
+            // 更新申請單數量、金額
+            $createdRequest->update([
+                'expected_qty' => $requestQty,
+                'expected_amount' => $requestAmount,
+                'expected_tax_amount' => $this->moneyAmountService->getOriginalTaxPrice(),
+                'total_sup_count' => $totalSupCount,
+            ]);
+
+            DB::commit();
             $result = true;
         } catch (\Exception $e) {
             DB::rollBack();
