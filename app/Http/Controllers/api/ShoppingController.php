@@ -9,6 +9,7 @@ use App\Services\APIProductServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
+
 class ShoppingController extends Controller
 {
 
@@ -101,7 +102,9 @@ class ShoppingController extends Controller
         $campaign = $this->apiProductServices->getPromotion('product_card');
         $campaign_gift = $this->apiProductServices->getCampaignGift();
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
-        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
+        $products = $this->apiProductServices->getProducts();
+        $gtm = $this->apiProductServices->getProductItemForGTM($products);
+        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, $gtm);
         $response = json_decode($response, true);
         if ($response['status'] == '200') {
             $status = true;
@@ -111,7 +114,7 @@ class ShoppingController extends Controller
             $err = '404';
             $data = $response['result'];
         }
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($response['status']=='200'?null:$error_code[$err]), 'result' => $data]);
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($response['status'] == '200' ? null : $error_code[$err]), 'result' => $data]);
     }
 
 
@@ -139,7 +142,7 @@ class ShoppingController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
-        if ( count($request->item_id) != count($request->item_qty)) {
+        if (count($request->item_id) != count($request->item_qty)) {
             $data = "商品編號與商品數量不符合";
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $data]);
         }
@@ -212,7 +215,7 @@ class ShoppingController extends Controller
         $response = $this->apiCartService->getCartInfo($member_id);
         $results = $response;
         unset($results['items']);
-        foreach ($results as $id=>$result) {
+        foreach ($results as $id => $result) {
             $data[] = $id;
         }
         if (count($data) > 0) {
