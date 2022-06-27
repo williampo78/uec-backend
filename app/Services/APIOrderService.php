@@ -525,9 +525,9 @@ class APIOrderService
                             ->orderBy('id', 'DESC')->first();
 
                         if (($threshold['campaignDiscount'] > $threshold_discount['discount'][$threshold['thresholdID']])) {
-                            $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
-                        } else {
                             $discountData['discount'] = $detail->discount + ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
+                        } else {
+                            $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
                         }
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
                         //同時把同門檻訂單明細的比例做修正
