@@ -103,7 +103,7 @@ class ShoppingController extends Controller
         $campaign_gift = $this->apiProductServices->getCampaignGift();
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
         $products = $this->apiProductServices->getProducts();
-        $gtm = $this->apiProductServices->getProductItemForGTM($products);
+        $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, $gtm);
         $response = json_decode($response, true);
         if ($response['status'] == '200') {
