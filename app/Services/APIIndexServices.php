@@ -58,13 +58,33 @@ class APIIndexServices
         $H080B_seemore = [];
         $product_info = [];
         $promotion = $this->apiProductService->getPromotion('product_card');
+        $promotion_threshold = $this->apiProductService->getPromotionThreshold();
         foreach ($promotion as $k => $v) {
             $promotion_txt = '';
             foreach ($v as $label) {
                 if ($label->promotional_label=='') continue;
-                if ($promotion_txt != $label->promotional_label) {
-                    $promotional[$k][] = $label->promotional_label;
-                    $promotion_txt = $label->promotional_label;
+                if ($label->campaign_type == 'CART_P03' || $label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
+                    if (isset($promotion_threshold[$k])) {
+                        if ($promotion_threshold[$k]) {
+                            if ($promotion_txt != $label->promotional_label) {
+                                $promotional[$k][] = $label->promotional_label;
+                                $promotion_txt = $label->promotional_label;
+                            }
+                        }
+                    }
+                } elseif ($label->campaign_type == 'PRD05') { //單品
+                    $campaign_gift = $this->apiProductService->getCampaignGiftByID($label->id);
+                    if ($campaign_gift['result']) {
+                        if ($promotion_txt != $label->promotional_label) {
+                            $promotional[$k][] = $label->promotional_label;
+                            $promotion_txt = $label->promotional_label;
+                        }
+                    }
+                } else {
+                    if ($promotion_txt != $label->promotional_label) {
+                        $promotional[$k][] = $label->promotional_label;
+                        $promotion_txt = $label->promotional_label;
+                    }
                 }
             }
         }
@@ -148,7 +168,7 @@ class APIIndexServices
                                 "collection" => $collection,
                                 "selling_channel" => $product->selling_channel,
                                 "start_selling" => $product->start_selling_at,
-                                "gtm"=>$gtm[$product->id]
+                                "gtm" => ($gtm ? $gtm[$product->id] : "")
                             );
                         }
 
@@ -200,7 +220,7 @@ class APIIndexServices
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
                                 "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
-                                "gtm"=>$gtm[$ad_slot->product_id]
+                                "gtm" => ($gtm ? $gtm[$ad_slot->product_id] : "")
                             );
                         }
                         if (isset($product_info[$ad_slot->slot_code])) {
@@ -253,7 +273,7 @@ class APIIndexServices
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
                                 "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
-                                "gtm"=>$gtm[$ad_slot->product_id]
+                                "gtm" => ($gtm ? $gtm[$ad_slot->product_id] : "")
                             );
                         }
                         $H080A_seemore['see_more_action'] = $ad_slot->see_more_action;
@@ -278,7 +298,7 @@ class APIIndexServices
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
                                 "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
-                                "gtm"=>$gtm[$ad_slot->product_id]
+                                "gtm" => ($gtm ? $gtm[$ad_slot->product_id] : "")
                             );
                         }
                         $H080B_seemore['see_more_action'] = $ad_slot->see_more_action;
