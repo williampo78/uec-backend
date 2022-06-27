@@ -537,18 +537,18 @@
                 //         });
                 // },
                 deleteRequest(id, requestNo, event) {
-                    if (confirm(`確定要刪除申請單《${requestNo}》？`)) {
+                    if (confirm(`確定要刪除《${requestNo}》？`)) {
                         axios({
-                                method: "delete",
-                                url: `/backend/buyout-stock-in-requests/${id}`,
-                            })
-                            .then(function(response) {
-                                let dataTable = $('#table_list').DataTable();
-                                dataTable.row(event.target.closest("tr")).remove().draw();
-                            })
-                            .catch(function(error) {
-                                console.log(error);
-                            });
+                            method: "delete",
+                            url: `${BASE_URI}/${id}`,
+                        })
+                        .then(function(response) {
+                            let dataTable = $('#table_list').DataTable();
+                            dataTable.row(event.target.closest("tr")).remove().draw();
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
                     }
                 },
             },

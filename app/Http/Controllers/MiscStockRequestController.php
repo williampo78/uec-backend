@@ -184,7 +184,13 @@ class MiscStockRequestController extends Controller
      */
     public function destroy($id)
     {
+        if (!$this->miscStockRequestService->deleteStockRequest($id)) {
+            return response()->json([
+                'message' => '刪除失敗'
+            ], 500);
+        }
 
+        return response()->noContent();
     }
 
     /**

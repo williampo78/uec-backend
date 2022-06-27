@@ -634,4 +634,34 @@ class MiscStockRequestService
 
         return $result;
     }
+
+    /**
+     * 刪除進貨退出單
+     *
+     * @param integer $id
+     * @return boolean
+     */
+    public function deleteStockRequest(int $id): bool
+    {
+        $result = false;
+
+        DB::beginTransaction();
+        try {
+            $request = MiscStockRequest::findOrFail($id);
+            // 移除申請單、供應商的中間表
+            $request->suppliers()->detach();
+            // 移除申請單明細
+            $request->miscStockRequestDetails()->delete();
+            // 移除申請單
+            $request->delete();
+
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+        }
+
+        return $result;
+    }
 }
