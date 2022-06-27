@@ -6,8 +6,8 @@ use App\Models\MiscStockRequest;
 use App\Models\MiscStockRequestSupplier;
 use App\Models\ProductItem;
 use App\Services\MoneyAmountService;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -30,9 +30,7 @@ class MiscStockRequestService
      */
     public function getStockRequestTableList(array $data = []): Collection
     {
-        $miscStockRequests = MiscStockRequest::with([
-            'suppliers',
-        ]);
+        $miscStockRequests = MiscStockRequest::latest('request_no');
 
         // 申請單時間-開始日期
         if (isset($data['requestDateStart'])) {
@@ -92,7 +90,7 @@ class MiscStockRequestService
             $miscStockRequests = $miscStockRequests->limit($data['limit']);
         }
 
-        return $miscStockRequests->latest('request_no')->get();
+        return $miscStockRequests->get();
     }
 
     /**
@@ -105,24 +103,21 @@ class MiscStockRequestService
     {
         $result = [];
 
-        foreach ($miscStockRequests as $stockRequest) {
+        foreach ($miscStockRequests as $request) {
             $tmpStockRequest = [
-                'id' => $stockRequest->id,
-                'request_no' => $stockRequest->request_no,
-                'request_date' => Carbon::parse($stockRequest->request_date)->format('Y-m-d H:i'),
-                'expected_date' => Carbon::parse($stockRequest->expected_date)->format('Y-m-d'),
-                'submitted_at' => isset($stockRequest->submitted_at) ? Carbon::parse($stockRequest->submitted_at)->format('Y-m-d H:i') : null,
-                'supplier_count' => 0,
-                'approved_supplier_count' => 0,
-                'rejected_supplier_count' => 0,
-                'approved_at' => isset($stockRequest->approved_at) ? Carbon::parse($stockRequest->approved_at)->format('Y-m-d H:i') : null,
-                'edi_exported_at' => isset($stockRequest->edi_exported_at) ? Carbon::parse($stockRequest->edi_exported_at)->format('Y-m-d H:i') : null,
-                'actual_date' => isset($stockRequest->actual_date) ? Carbon::parse($stockRequest->actual_date)->format('Y-m-d H:i') : null,
+                'id' => $request->id,
+                'requestNo' => $request->request_no,
+                'requestDate' => $request->request_date,
+                'expectedDate' => $request->expected_date,
+                'submittedAt' => $request->submitted_at,
+                'totalSupCount' => $request->total_sup_count,
+                'approvedSupCount' => $request->approved_sup_count,
+                'rejectedSupCount' => $request->rejected_sup_count,
+                'approvedAt' => $request->approved_at,
+                'ediExportedAt' => $request->edi_exported_at,
+                'actualDate' => $request->actual_date,
+                'requestStatus' => $request->request_status,
             ];
-
-            if ($stockRequest->suppliers->isNotEmpty()) {
-
-            }
 
             $result[] = $tmpStockRequest;
         }
@@ -149,8 +144,14 @@ class MiscStockRequestService
             },
         ])->where('agent_id', $user->agent_id);
 
+        // 庫存必需大於0
         $productItems = $productItems->whereHas('warehouses', function (Builder $query) use ($data) {
             $query->where('warehouse.id', $data['warehouseId'])->where('warehouse_stock.stock_qty', '>', 0);
+        });
+
+        // 庫存類型:買斷
+        $productItems = $productItems->whereHas('product', function (Builder $query) {
+            $query->where('stock_type', 'A');
         });
 
         // 商品序號
@@ -417,5 +418,220 @@ class MiscStockRequestService
             ->first();
 
         return isset($request) ? $request->request_no : null;
+    }
+
+    /**
+     * 取得編輯頁的進貨退出單
+     *
+     * @param integer $id
+     * @return Model
+     */
+    public function getStockRequestForEditPage(int $id): Model
+    {
+        $request = MiscStockRequest::with([
+            'miscStockRequestDetails',
+            'miscStockRequestDetails.productItem',
+            'miscStockRequestDetails.productItem.product' => function ($query) {
+                $query->select()->addSelect(DB::raw('get_latest_product_cost(id, TRUE) AS item_cost'));
+            },
+            'miscStockRequestDetails.productItem.product.supplier',
+        ])->find($id);
+
+        $request->loadMissing(['miscStockRequestDetails.productItem.warehouses' => function ($query) use ($request) {
+            $query->where('warehouse.id', $request->warehouse_id);
+        }]);
+
+        return $request;
+    }
+
+    /**
+     * 整理編輯頁的進貨退出單
+     *
+     * @param Model $miscStockRequest
+     * @return array
+     */
+    public function formatStockRequestForEditPage(Model $miscStockRequest): array
+    {
+        $result = [
+            'id' => $miscStockRequest->id,
+            'requestNo' => $miscStockRequest->request_no,
+            'warehouseId' => $miscStockRequest->warehouse_id,
+            'tax' => $miscStockRequest->tax,
+            'remark' => $miscStockRequest->remark,
+            'shipToName' => $miscStockRequest->ship_to_name,
+            'shipToMobile' => $miscStockRequest->ship_to_mobile,
+            'shipToAddress' => $miscStockRequest->ship_to_address,
+            'items' => null,
+        ];
+
+        if ($miscStockRequest->miscStockRequestDetails->isNotEmpty()) {
+            foreach ($miscStockRequest->miscStockRequestDetails as $detail) {
+                $tmpDetail = [
+                    'id' => $detail->id,
+                    'productItemId' => $detail->product_item_id,
+                    'productNo' => null,
+                    'productName' => null,
+                    'itemNo' => null,
+                    'spec1Value' => null,
+                    'spec2Value' => null,
+                    'unitPrice' => null,
+                    'stockQty' => null,
+                    'expectedQty' => $detail->expected_qty,
+                    'supplierId' => null,
+                    'supplierName' => null,
+                ];
+
+                if (isset($detail->productItem)) {
+                    $tmpDetail['itemNo'] = $detail->productItem->item_no;
+                    $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
+                    $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
+
+                    if (isset($detail->productItem->product)) {
+                        $tmpDetail['productNo'] = $detail->productItem->product->product_no;
+                        $tmpDetail['productName'] = $detail->productItem->product->product_name;
+                        $tmpDetail['unitPrice'] = $detail->productItem->product->item_cost;
+
+                        if (isset($detail->productItem->product->supplier)) {
+                            $tmpDetail['supplierId'] = $detail->productItem->product->supplier->id;
+                            $tmpDetail['supplierName'] = $detail->productItem->product->supplier->name;
+                        }
+                    }
+
+                    $warehouse = $detail->productItem->warehouses->first();
+                    if (isset($warehouse)) {
+                        $tmpDetail['stockQty'] = $warehouse->pivot->stock_qty;
+                    }
+                }
+
+                $result['items'][] = $tmpDetail;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * 更新進貨退出單
+     *
+     * @param integer $id
+     * @param array $data
+     * @return boolean
+     */
+    public function updateStockRequest(int $id, array $data): bool
+    {
+        $user = auth()->user();
+        $result = false;
+
+        DB::beginTransaction();
+        try {
+            $request = MiscStockRequest::findOrFail($id);
+            $requestData = [
+                'warehouse_id' => $data['warehouseId'],
+                'expected_qty' => 0,
+                'expected_amount' => 0,
+                'expected_tax_amount' => 0,
+                'total_sup_count' => 0,
+                'ship_to_name' => $data['shipToName'] ?? null,
+                'ship_to_mobile' => $data['shipToMobile'] ?? null,
+                'ship_to_address' => $data['shipToAddress'] ?? null,
+                'remark' => $data['remark'] ?? null,
+                'updated_by' => $user->id,
+            ];
+
+            // 儲存類型
+            if ($data['saveType'] == 'draft') {
+                $requestData['request_status'] = 'DRAFTED';
+            } else {
+                $requestData['request_status'] = 'REVIEWING';
+                $requestData['submitted_at'] = now();
+            }
+
+            $request->update($requestData);
+
+            // 移除申請單、供應商的中間表
+            $request->suppliers()->detach();
+            // 移除申請單明細
+            $request->miscStockRequestDetails()->delete();
+
+            $requestQty = 0;
+            $requestAmount = 0;
+            $totalSupCount = 0;
+            if (isset($data['items'])) {
+                // 依供應商分群
+                $supplierGroups = collect($data['items'])->groupBy('supplierId');
+                foreach ($supplierGroups as $supplierId => $items) {
+                    $requestSupplierData = [
+                        'misc_stock_request_id' => $id,
+                        'supplier_id' => $supplierId,
+                        'expected_qty' => 0,
+                        'expected_amount' => 0,
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                    ];
+
+                    // 儲存類型
+                    if ($data['saveType'] == 'draft') {
+                        $requestSupplierData['status_code'] = 'DRAFTED';
+                    } else {
+                        $requestSupplierData['status_code'] = 'REVIEWING';
+                    }
+
+                    // 建立申請單、供應商的中間表
+                    $createdRequestSupplier = MiscStockRequestSupplier::create($requestSupplierData);
+
+                    $requestSupplierQty = 0;
+                    $requestSupplierAmount = 0;
+                    foreach ($items as $item) {
+                        $expectedSubtotal = round($item['unitPrice'] * $item['expectedQty']);
+                        // 建立申請單明細
+                        $request->miscStockRequestDetails()->create([
+                            'misc_stock_request_sup_id' => $createdRequestSupplier->id,
+                            'product_item_id' => $item['productItemId'],
+                            'unit_price' => $item['unitPrice'],
+                            'expected_qty' => $item['expectedQty'],
+                            'expected_subtotal' => $expectedSubtotal,
+                            'onhand_qty' => $item['stockQty'],
+                            'created_by' => $user->id,
+                            'updated_by' => $user->id,
+                        ]);
+
+                        $requestSupplierQty += $item['expectedQty'];
+                        $requestSupplierAmount += $expectedSubtotal;
+                    }
+
+                    // 更新申請單、供應商的中間表數量、金額
+                    $createdRequestSupplier->update([
+                        'expected_qty' => $requestSupplierQty,
+                        'expected_amount' => $requestSupplierAmount,
+                    ]);
+
+                    $requestQty += $requestSupplierQty;
+                    $requestAmount += $requestSupplierAmount;
+                    $totalSupCount++;
+                }
+            }
+
+            $this->moneyAmountService
+                ->setOriginalPrice($requestAmount)
+                ->setTaxType((int) $request->tax)
+                ->calculateOriginalNontaxPrice()
+                ->calculateOriginalTaxPrice();
+
+            // 更新申請單數量、金額
+            $request->update([
+                'expected_qty' => $requestQty,
+                'expected_amount' => $requestAmount,
+                'expected_tax_amount' => $this->moneyAmountService->getOriginalTaxPrice(),
+                'total_sup_count' => $totalSupCount,
+            ]);
+
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+        }
+
+        return $result;
     }
 }

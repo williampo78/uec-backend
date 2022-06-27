@@ -229,7 +229,7 @@
                                             </td>
                                             <td>{{ productItem.stockQty }}</td>
                                             <td>
-                                                {{ productItem.unitPrice }}
+                                                {{ productItem.unitPriceForDisplay }}
                                             </td>
                                             <td>{{ productItem.uom }}</td>
                                         </tr>
@@ -336,6 +336,7 @@ export default {
                     supplierName: item.supplierName,
                     stockQty: item.stockQty,
                     unitPrice: item.unitPrice,
+                    unitPriceForDisplay: item.unitPrice != null ? item.unitPrice.toLocaleString('en-US') : "",
                     uom: item.uom,
                 });
             });

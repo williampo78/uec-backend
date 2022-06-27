@@ -130,7 +130,7 @@
                                         <div class="form-group">
                                             <div class="col-sm-3"></div>
                                             <div class="col-sm-9 text-right">
-                                                @if ($share_role_auth['auth_query'])
+                                                <span v-if="auth.auth_query">
                                                     <button type="button" class="btn btn-warning" @click="search">
                                                         <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                                     </button>
@@ -138,7 +138,7 @@
                                                     <button type="button" class="btn btn-danger" @click="resetForm">
                                                         <i class="fa-solid fa-eraser"></i> 清除
                                                     </button>
-                                                @endif
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -148,14 +148,12 @@
 
                         <div class="panel-body">
                             <div class="row">
-                                @if ($share_role_auth['auth_create'])
-                                    <div class="col-sm-2">
-                                        <a href="{{ route('misc_stock_requests.create') }}"
-                                            class="btn btn-block btn-warning btn-sm">
-                                            <i class="fa-solid fa-plus"></i> 新增
-                                        </a>
-                                    </div>
-                                @endif
+                                <div class="col-sm-2" v-if="auth.auth_create">
+                                    <a href="{{ route('misc_stock_requests.create') }}"
+                                        class="btn btn-block btn-warning btn-sm">
+                                        <i class="fa-solid fa-plus"></i> 新增
+                                    </a>
+                                </div>
                             </div>
                             <hr />
                             <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
@@ -178,39 +176,51 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(stockRequest, index) in miscStockRequests" :key="index">
-                                            {{-- <td>
-                                                <div v-if="auth">
+                                        <tr v-for="(request, index) in miscStockRequests" :key="index">
+                                            <td class="text-nowrap">
+                                                <span v-if="auth.auth_query">
                                                     <button type="button" class="btn btn-info btn-sm" title="檢視"
-                                                        @click="showRequest('{{ $buyoutStockInRequest['id'] }}')">
+                                                        @click="showRequest(request.id)">
                                                         <i class="fa-solid fa-magnifying-glass"></i>
                                                     </button>
-                                                </div>
+                                                </span>
 
-
-                                                @if ($share_role_auth['auth_update'] && $buyoutStockInRequest['status_code'] == 'DRAFTED')
+                                                <span v-if="auth.auth_update && request.requestStatus == 'DRAFTED'">
                                                     <a class="btn btn-warning btn-sm"
-                                                        href="{{ route('misc_stock_requests.edit', $buyoutStockInRequest['id']) }}">
+                                                        :href="`${BASE_URI}/${request.id}/edit`">
                                                         編輯
                                                     </a>
-                                                @endif
+                                                </span>
 
-                                                @if ($share_role_auth['auth_delete'] && $buyoutStockInRequest['status_code'] == 'DRAFTED')
+                                                <span v-if="auth.auth_update && request.requestStatus == 'COMPLETED' && !request.ediExportedAt">
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        @click="editExpectedDate(request.id)">
+                                                        預出日
+                                                    </button>
+                                                </span>
+
+                                                <span v-if="auth.auth_delete && request.requestStatus == 'DRAFTED'">
                                                     <button type="button" class="btn btn-danger btn-sm"
-                                                        @click="deleteRequest('{{ $buyoutStockInRequest['id'] }}', '{{ $buyoutStockInRequest['request_no'] }}', $event)">
+                                                        @click="deleteRequest(request.id, request.requestNo, $event)">
                                                         刪除
                                                     </button>
-                                                @endif
+                                                </span>
                                             </td>
-                                            <td>{{ $buyoutStockInRequest['request_no'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['request_date'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['expected_date'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['expected_qty'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['display_status_code'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['approved_at'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['edi_exported_at'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['actual_date'] }}</td>
-                                            <td>{{ $buyoutStockInRequest['supplier'] }}</td> --}}
+                                            <td>@{{ index + 1 }}</td>
+                                            <td>@{{ request.requestNo }}</td>
+                                            <td>@{{ request.requestDate }}</td>
+                                            <td>@{{ request.expectedDate }}</td>
+                                            <td>@{{ request.submittedAt }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary btn-sm" @click="">
+                                                    @{{ request.totalSupCount }}
+                                                </button>
+                                            </td>
+                                            <td>@{{ request.approvedSupCount }}</td>
+                                            <td>@{{ request.rejectedSupCount }}</td>
+                                            <td>@{{ request.approvedAt }}</td>
+                                            <td>@{{ request.ediExportedAt }}</td>
+                                            <td>@{{ request.actualDate }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -226,6 +236,8 @@
 
 @section('js')
     <script>
+        const BASE_URI = '/backend/misc-stock-requests';
+
         let vm = new Vue({
             el: "#app",
             data: {
@@ -274,8 +286,8 @@
                 auth: {},
             },
             created() {
+                this.BASE_URI = BASE_URI;
                 let payload = @json($payload);
-                // console.log(payload);
 
                 if (payload.statusCodes) {
                     Object.entries(payload.statusCodes).forEach(([key, statusCode]) => {
@@ -300,7 +312,22 @@
                 }
 
                 if (Array.isArray(payload.miscStockRequests) && payload.miscStockRequests.length) {
-
+                    payload.miscStockRequests.forEach(request => {
+                        this.miscStockRequests.push({
+                            id: request.id,
+                            requestNo: request.requestNo,
+                            requestDate: moment(request.requestDate).format("YYYY-MM-DD HH:mm"),
+                            expectedDate: request.expectedDate ? moment(request.expectedDate).format("YYYY-MM-DD") : "",
+                            submittedAt: request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "",
+                            totalSupCount: request.totalSupCount,
+                            approvedSupCount: request.approvedSupCount,
+                            rejectedSupCount: request.rejectedSupCount,
+                            approvedAt: request.approvedAt ? moment(request.approvedAt).format("YYYY-MM-DD HH:mm") : "",
+                            ediExportedAt: request.ediExportedAt ? moment(request.ediExportedAt).format("YYYY-MM-DD HH:mm") : "",
+                            actualDate: request.actualDate ? moment(request.actualDate).format("YYYY-MM-DD") : "",
+                            requestStatus: request.requestStatus,
+                        });
+                    });
                 }
 
                 this.initFlatPickrConfigs();
@@ -457,58 +484,58 @@
                         }
                     });
                 },
-                async showRequest(id) {
-                    let buyoutStockInRequest = await this.getBuyoutStockInRequest(id);
+                // async showRequest(id) {
+                //     let buyoutStockInRequest = await this.getBuyoutStockInRequest(id);
 
-                    this.modal.requestNo = buyoutStockInRequest.request_no;
-                    this.modal.requestDate = buyoutStockInRequest.request_date;
-                    this.modal.supplier = buyoutStockInRequest.supplier;
-                    this.modal.expectedDate = buyoutStockInRequest.expected_date;
-                    this.modal.expectedQty = buyoutStockInRequest.expected_qty;
-                    this.modal.remark = buyoutStockInRequest.remark;
-                    this.modal.statusCode = buyoutStockInRequest.status_code;
-                    this.modal.actualDate = buyoutStockInRequest.actual_date;
+                //     this.modal.requestNo = buyoutStockInRequest.request_no;
+                //     this.modal.requestDate = buyoutStockInRequest.request_date;
+                //     this.modal.supplier = buyoutStockInRequest.supplier;
+                //     this.modal.expectedDate = buyoutStockInRequest.expected_date;
+                //     this.modal.expectedQty = buyoutStockInRequest.expected_qty;
+                //     this.modal.remark = buyoutStockInRequest.remark;
+                //     this.modal.statusCode = buyoutStockInRequest.status_code;
+                //     this.modal.actualDate = buyoutStockInRequest.actual_date;
 
-                    this.modal.items = [];
-                    if (Array.isArray(buyoutStockInRequest.items) && buyoutStockInRequest.items.length) {
-                        buyoutStockInRequest.items.forEach(item => {
-                            this.modal.items.push({
-                                productItem: `${item.item_no}-${item.supplier_item_no}-${item.product_name}`,
-                                spec1Value: item.spec_1_value,
-                                spec2Value: item.spec_2_value,
-                                minPurchaseQty: item.min_purchase_qty,
-                                expectedQty: item.expected_qty,
-                                actualQty: item.actual_qty,
-                            });
-                        });
-                    }
+                //     this.modal.items = [];
+                //     if (Array.isArray(buyoutStockInRequest.items) && buyoutStockInRequest.items.length) {
+                //         buyoutStockInRequest.items.forEach(item => {
+                //             this.modal.items.push({
+                //                 productItem: `${item.item_no}-${item.supplier_item_no}-${item.product_name}`,
+                //                 spec1Value: item.spec_1_value,
+                //                 spec2Value: item.spec_2_value,
+                //                 minPurchaseQty: item.min_purchase_qty,
+                //                 expectedQty: item.expected_qty,
+                //                 actualQty: item.actual_qty,
+                //             });
+                //         });
+                //     }
 
-                    this.modal.reviewLogs = [];
-                    if (Array.isArray(buyoutStockInRequest.review_logs) && buyoutStockInRequest.review_logs.length) {
-                        buyoutStockInRequest.review_logs.forEach(reviewLog => {
-                            this.modal.reviewLogs.push({
-                                reviewer: reviewLog.reviewer,
-                                reviewAt: reviewLog.review_at,
-                                reviewResult: reviewLog.review_result,
-                                reviewRemark: reviewLog.review_remark,
-                            });
-                        });
-                    }
+                //     this.modal.reviewLogs = [];
+                //     if (Array.isArray(buyoutStockInRequest.review_logs) && buyoutStockInRequest.review_logs.length) {
+                //         buyoutStockInRequest.review_logs.forEach(reviewLog => {
+                //             this.modal.reviewLogs.push({
+                //                 reviewer: reviewLog.reviewer,
+                //                 reviewAt: reviewLog.review_at,
+                //                 reviewResult: reviewLog.review_result,
+                //                 reviewRemark: reviewLog.review_remark,
+                //             });
+                //         });
+                //     }
 
-                    $('#buyout-stock-in-request-modal').modal('show');
-                },
-                getBuyoutStockInRequest(id) {
-                    return axios({
-                            method: "get",
-                            url: `/backend/buyout-stock-in-requests/${id}`,
-                        })
-                        .then(function(response) {
-                            return response.data;
-                        })
-                        .catch(function(error) {
-                            console.log(error);
-                        });
-                },
+                //     $('#buyout-stock-in-request-modal').modal('show');
+                // },
+                // getBuyoutStockInRequest(id) {
+                //     return axios({
+                //             method: "get",
+                //             url: `/backend/buyout-stock-in-requests/${id}`,
+                //         })
+                //         .then(function(response) {
+                //             return response.data;
+                //         })
+                //         .catch(function(error) {
+                //             console.log(error);
+                //         });
+                // },
                 deleteRequest(id, requestNo, event) {
                     if (confirm(`確定要刪除申請單《${requestNo}》？`)) {
                         axios({

@@ -395,6 +395,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     supplierName: item.supplierName,
                     stockQty: item.stockQty,
                     unitPrice: item.unitPrice,
+                    unitPriceForDisplay: item.unitPrice != null ? item.unitPrice.toLocaleString('en-US') : "",
                     uom: item.uom
                   });
                 });
@@ -1681,7 +1682,7 @@ var render = function () {
                             _c("td", [
                               _vm._v(
                                 "\n                                            " +
-                                  _vm._s(productItem.unitPrice) +
+                                  _vm._s(productItem.unitPriceForDisplay) +
                                   "\n                                        "
                               ),
                             ]),

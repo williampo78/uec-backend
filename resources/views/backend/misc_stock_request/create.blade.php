@@ -23,8 +23,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">請輸入下列欄位資料</div>
                         <div class="panel-body">
-                            <form id="create-form" method="post" action="{{ route('misc_stock_requests.store') }}">
-                                @csrf
+                            <form id="create-form">
                                 <div class="row">
                                     <div class="col-sm-4">
                                         <div class="form-group">
@@ -135,7 +134,7 @@
                                                 <td>@{{ item.itemNo }}</td>
                                                 <td>@{{ item.spec1Value }}</td>
                                                 <td>@{{ item.spec2Value }}</td>
-                                                <td>@{{ item.unitPrice }}</td>
+                                                <td>@{{ item.unitPriceForDisplay }}</td>
                                                 <td>@{{ item.stockQty }}</td>
                                                 <td>
                                                     <div class="form-group">
@@ -166,8 +165,6 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <input type="hidden" name="save_type" :value="form.saveType">
-
                                             @if ($share_role_auth['auth_create'])
                                                 <button class="btn btn-success" type="button" :disabled="saveButton.isDisabled" @click="saveAsDraft">
                                                     <i class="fa-solid fa-floppy-disk"></i> 儲存草稿
@@ -375,6 +372,16 @@
                         return;
                     }
 
+                    if (this.form.items.some(item => item.unitPrice == null)) {
+                        alert("商品明細中，不可存在無單價的商品");
+                        return;
+                    }
+
+                    if (this.form.items.some(item => parseInt(item.stockQty) < 1)) {
+                        alert("商品明細中，不可存在可退量小於1的商品");
+                        return;
+                    }
+
                     $(`.item-expected-qty`).each(function() {
                         $(this).rules("add", {
                             required: true,
@@ -420,6 +427,7 @@
                             spec1Value: productItem.spec1Value,
                             spec2Value: productItem.spec2Value,
                             unitPrice: productItem.unitPrice,
+                            unitPriceForDisplay: productItem.unitPriceForDisplay,
                             stockQty: productItem.stockQty,
                             expectedQty: "",
                             supplierId: productItem.supplierId,

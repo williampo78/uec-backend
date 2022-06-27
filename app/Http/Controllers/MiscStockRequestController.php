@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Services\MiscStockRequestService;
 use App\Services\SupplierService;
 use App\Services\SysConfigService;
 use App\Services\WarehouseService;
-use App\Services\MiscStockRequestService;
+use Illuminate\Http\Request;
 
 class MiscStockRequestController extends Controller
 {
@@ -45,6 +45,18 @@ class MiscStockRequestController extends Controller
             'supplierId',
             'limit',
         ]);
+
+        if ($request->missing('requestDateStart')) {
+            $requestPayload['requestDateStart'] = today()->subMonths(2);
+        }
+
+        if ($request->missing('requestDateEnd')) {
+            $requestPayload['requestDateEnd'] = today();
+        }
+
+        if ($request->missing('limit')) {
+            $requestPayload['limit'] = 500;
+        }
 
         $responsePayload = [
             'statusCodes' => config('uec.options.misc_stock_requests.request_statuses.out'),
@@ -125,7 +137,15 @@ class MiscStockRequestController extends Controller
      */
     public function edit($id)
     {
+        $responsePayload = [
+            'warehouses' => $this->warehouseService->getWarehouseList(),
+            'taxes' => config('uec.options.taxes'),
+        ];
+        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->getStockRequestForEditPage($id);
+        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->formatStockRequestForEditPage($responsePayload['miscStockRequest']);
+        $response['payload'] = $responsePayload;
 
+        return view('backend.misc_stock_request.edit', $response);
     }
 
     /**
@@ -137,7 +157,23 @@ class MiscStockRequestController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $resquestPayload = $request->only([
+            'saveType',
+            'warehouseId',
+            'remark',
+            'shipToName',
+            'shipToMobile',
+            'shipToAddress',
+            'items',
+        ]);
 
+        if (!$this->miscStockRequestService->updateStockRequest($id, $resquestPayload)) {
+            return response()->json(['message' => '儲存失敗'], 500);
+        }
+
+        return response()->json([
+            'message' => '儲存成功',
+        ]);
     }
 
     /**
