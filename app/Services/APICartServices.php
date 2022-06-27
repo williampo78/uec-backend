@@ -136,7 +136,7 @@ class APICartServices
      * 取得購物車內容
      *
      */
-    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm=null)
+    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm = null)
     {
         $now = Carbon::now();
         //購物車內容
@@ -794,7 +794,7 @@ class APICartServices
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product,
                     "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
-                    "gtm"=>$gtm[$product_id]
+                    "gtm" => ($gtm ? $gtm[$product_id] : "")
                 );
 
             }
