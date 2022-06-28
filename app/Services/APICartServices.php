@@ -1088,7 +1088,7 @@ class APICartServices
 
             //運費規則
             $fee = [];
-            if ($total_amount < $shippingFee['HOME']->free_threshold) {
+            if (($cartTotal - round($cartDiscount) + round($thresholdAmount)) < $shippingFee['HOME']->free_threshold) {
                 $fee = $shippingFee['HOME']->shipping_fee;
             } else {
                 $fee = 0;
