@@ -1660,7 +1660,6 @@ class APIProductServices
                 $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
-                $gtm['discount'] = "0";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度
                 //品牌
                 $item_brand = $this->brandsService->getBrand($product->brand_id);
@@ -1673,8 +1672,6 @@ class APIProductServices
                 $gtm['item_category3'] = isset($item_category['level3']['name']) ? $item_category['level3']['name'] : "";
                 $gtm['item_category4'] = "";
                 $gtm['item_category5'] = "";
-                $gtm['price'] = intval($product->selling_price);
-                $gtm['quantity'] = 1;
 
                 if ($multi == 'item') {
                     foreach ($ProductSpec as $item) {
@@ -1700,6 +1697,9 @@ class APIProductServices
                     } else {
                         $gtm['item_variant'] = "";
                     }
+                    $gtm['price'] = intval($product->selling_price);
+                    $gtm['quantity'] = 1;
+                    $gtm['discount'] = "0";
 
                     $data[$product->id] = $gtm;
                 }
