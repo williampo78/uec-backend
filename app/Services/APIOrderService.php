@@ -519,19 +519,15 @@ class APIOrderService
                     //把最後一筆資料campaignDiscount的比例做修正
                     //$threshold_discount['discount'][$threshold['thresholdID']]
                     if (($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]) != 0) {
+                        $tmp_discount = ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
                         $detail = OrderCampaignDiscount::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')
                             ->where('level_code', 'CART_P')
-                            ->where('campaign_threshold_id',$threshold['thresholdID'])
+                            ->where('campaign_threshold_id', $threshold['thresholdID'])
                             ->orderBy('id', 'DESC')->first();
-
-                        if (($threshold['campaignDiscount'] > $threshold_discount['discount'][$threshold['thresholdID']])) {
-                            $discountData['discount'] = $detail->discount + ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
-                        } else {
-                            $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
-                        }
+                        $discountData['discount'] = $detail->discount + $tmp_discount;
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
                         //同時把同門檻訂單明細的比例做修正
-                        OrderDetail::where('id', $detail->order_detail_id)->update(['cart_p_discount'=>$discountData['discount']]);
+                        OrderDetail::where('id', $detail->order_detail_id)->update(['cart_p_discount' => $discountData['discount']]);
                     }
                 }
             }
