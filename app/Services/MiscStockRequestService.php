@@ -664,4 +664,182 @@ class MiscStockRequestService
 
         return $result;
     }
+
+    /**
+     * 取得檢視頁的進貨退出單
+     *
+     * @param integer $id
+     * @return Model
+     */
+    public function getStockRequestForShowPage(int $id): Model
+    {
+        $request = MiscStockRequest::with([
+            'warehouse',
+            'miscStockRequestDetails',
+            'miscStockRequestDetails.productItem',
+            'miscStockRequestDetails.productItem.product' => function ($query) {
+                $query->select()->addSelect(DB::raw('get_latest_product_cost(id, TRUE) AS item_cost'));
+            },
+            'miscStockRequestDetails.productItem.product.supplier',
+        ])->find($id);
+
+        $request->loadMissing(['miscStockRequestDetails.productItem.warehouses' => function ($query) use ($request) {
+            $query->where('warehouse.id', $request->warehouse_id);
+        }]);
+
+        return $request;
+    }
+
+    /**
+     * 整理檢視頁的進貨退出單
+     *
+     * @param Model $miscStockRequest
+     * @return array
+     */
+    public function formatStockRequestForShowPage(Model $miscStockRequest): array
+    {
+        if ($miscStockRequest->request_status == 'DRAFTED') {
+            $result = [
+                'id' => $miscStockRequest->id,
+                'requestNo' => $miscStockRequest->request_no,
+                'warehouseName' => null,
+                'expectedQty' => $miscStockRequest->expected_qty,
+                'requestDate' => $miscStockRequest->request_date,
+                'submittedAt' => $miscStockRequest->submitted_at,
+                'expectedDate' => $miscStockRequest->expected_date,
+                'tax' => config('uec.options.taxes')[$miscStockRequest->tax] ?? null,
+                'expectedTaxAmount' => null,
+                'expectedAmount' => null,
+                'remark' => $miscStockRequest->remark,
+                'shipToName' => $miscStockRequest->ship_to_name,
+                'shipToMobile' => $miscStockRequest->ship_to_mobile,
+                'shipToAddress' => $miscStockRequest->ship_to_address,
+                'actualDate' => $miscStockRequest->actual_date,
+                'actualTaxAmount' => round($miscStockRequest->actual_tax_amount),
+                'actualAmount' => round($miscStockRequest->actual_amount),
+                'items' => null,
+            ];
+
+            if (isset($miscStockRequest->warehouse)) {
+                $result['warehouseName'] = $miscStockRequest->warehouse->name;
+            }
+
+            $requestAmount = 0;
+            if ($miscStockRequest->miscStockRequestDetails->isNotEmpty()) {
+                foreach ($miscStockRequest->miscStockRequestDetails as $detail) {
+                    $tmpDetail = [
+                        'productNo' => null,
+                        'productName' => null,
+                        'itemNo' => null,
+                        'spec1Value' => null,
+                        'spec2Value' => null,
+                        'unitPrice' => null,
+                        'stockQty' => null,
+                        'expectedQty' => $detail->expected_qty,
+                        'expectedSubtotal' => 0,
+                        'supplierName' => null,
+                        'actualQty' => $detail->actual_qty,
+                        'actualSubtotal' => round($detail->actual_subtotal),
+                    ];
+
+                    if (isset($detail->productItem)) {
+                        $tmpDetail['itemNo'] = $detail->productItem->item_no;
+                        $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
+                        $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
+
+                        if (isset($detail->productItem->product)) {
+                            $tmpDetail['productNo'] = $detail->productItem->product->product_no;
+                            $tmpDetail['productName'] = $detail->productItem->product->product_name;
+                            $tmpDetail['unitPrice'] = $detail->productItem->product->item_cost * 100 / 100;
+                            $tmpDetail['expectedSubtotal'] = round($tmpDetail['unitPrice'] * $tmpDetail['expectedQty']);
+
+                            if (isset($detail->productItem->product->supplier)) {
+                                $tmpDetail['supplierName'] = $detail->productItem->product->supplier->name;
+                            }
+                        }
+
+                        $warehouse = $detail->productItem->warehouses->first();
+                        if (isset($warehouse)) {
+                            $tmpDetail['stockQty'] = $warehouse->pivot->stock_qty;
+                        }
+                    }
+
+                    $requestAmount += $tmpDetail['expectedSubtotal'];
+                    $result['items'][] = $tmpDetail;
+                }
+            }
+
+            $this->moneyAmountService
+                ->setOriginalPrice($requestAmount)
+                ->setTaxType((int) $miscStockRequest->tax)
+                ->calculateOriginalNontaxPrice()
+                ->calculateOriginalTaxPrice();
+
+            $result['expectedTaxAmount'] = round($this->moneyAmountService->getOriginalTaxPrice());
+            $result['expectedAmount'] = round($requestAmount);
+        } else {
+            $result = [
+                'id' => $miscStockRequest->id,
+                'requestNo' => $miscStockRequest->request_no,
+                'warehouseName' => null,
+                'expectedQty' => $miscStockRequest->expected_qty,
+                'requestDate' => $miscStockRequest->request_date,
+                'submittedAt' => $miscStockRequest->submitted_at,
+                'expectedDate' => $miscStockRequest->expected_date,
+                'tax' => config('uec.options.taxes')[$miscStockRequest->tax] ?? null,
+                'expectedTaxAmount' => round($miscStockRequest->expected_tax_amount),
+                'expectedAmount' => round($miscStockRequest->expected_amount),
+                'remark' => $miscStockRequest->remark,
+                'shipToName' => $miscStockRequest->ship_to_name,
+                'shipToMobile' => $miscStockRequest->ship_to_mobile,
+                'shipToAddress' => $miscStockRequest->ship_to_address,
+                'actualDate' => $miscStockRequest->actual_date,
+                'actualTaxAmount' => round($miscStockRequest->actual_tax_amount),
+                'actualAmount' => round($miscStockRequest->actual_amount),
+                'items' => null,
+            ];
+
+            if (isset($miscStockRequest->warehouse)) {
+                $result['warehouseName'] = $miscStockRequest->warehouse->name;
+            }
+
+            if ($miscStockRequest->miscStockRequestDetails->isNotEmpty()) {
+                foreach ($miscStockRequest->miscStockRequestDetails as $detail) {
+                    $tmpDetail = [
+                        'productNo' => null,
+                        'productName' => null,
+                        'itemNo' => null,
+                        'spec1Value' => null,
+                        'spec2Value' => null,
+                        'unitPrice' => $detail->unit_price * 100 / 100,
+                        'stockQty' => $detail->onhand_qty,
+                        'expectedQty' => $detail->expected_qty,
+                        'expectedSubtotal' => round($detail->expected_subtotal),
+                        'supplierName' => null,
+                        'actualQty' => $detail->actual_qty,
+                        'actualSubtotal' => round($detail->actual_subtotal),
+                    ];
+
+                    if (isset($detail->productItem)) {
+                        $tmpDetail['itemNo'] = $detail->productItem->item_no;
+                        $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
+                        $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
+
+                        if (isset($detail->productItem->product)) {
+                            $tmpDetail['productNo'] = $detail->productItem->product->product_no;
+                            $tmpDetail['productName'] = $detail->productItem->product->product_name;
+
+                            if (isset($detail->productItem->product->supplier)) {
+                                $tmpDetail['supplierName'] = $detail->productItem->product->supplier->name;
+                            }
+                        }
+                    }
+
+                    $result['items'][] = $tmpDetail;
+                }
+            }
+        }
+
+        return $result;
+    }
 }

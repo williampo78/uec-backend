@@ -61,13 +61,13 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label">申請稅額</label>
-                                            <input type="text" class="form-control" :value="form.expectedTaxAmount" disabled>
+                                            <input type="text" class="form-control" :value="expectedTaxAmountForDisplay" disabled>
                                         </div>
                                     </div>
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label">申請總金額</label>
-                                            <input type="text" class="form-control" :value="form.expectedAmount" disabled>
+                                            <input type="text" class="form-control" :value="expectedAmountForDisplay" disabled>
                                         </div>
                                     </div>
                                 </div>
@@ -333,6 +333,14 @@
                     },
                 });
             },
+            computed: {
+                expectedAmountForDisplay() {
+                    return this.form.expectedAmount != null ? this.form.expectedAmount.toLocaleString('en-US') : "";
+                },
+                expectedTaxAmountForDisplay() {
+                    return this.form.expectedTaxAmount != null ? this.form.expectedTaxAmount.toLocaleString('en-US') : "";
+                },
+            },
             watch: {
                 "form.warehouseId"(warehouseId) {
                     this.modal.productItem.warehouseId = warehouseId;
@@ -438,7 +446,7 @@
                         subtotal = _.round(parseFloat(item.unitPrice) * parseInt(item.expectedQty));
                     }
 
-                    return subtotal;
+                    return subtotal.toLocaleString('en-US');
                 },
                 // 儲存商品明細
                 saveProductItems(productItems) {

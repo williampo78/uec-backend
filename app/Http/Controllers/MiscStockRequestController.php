@@ -126,7 +126,11 @@ class MiscStockRequestController extends Controller
      */
     public function show($id)
     {
+        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->getStockRequestForShowPage($id);
+        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->formatStockRequestForShowPage($responsePayload['miscStockRequest']);
+        $response['payload'] = $responsePayload;
 
+        return response()->json($response);
     }
 
     /**
@@ -186,7 +190,7 @@ class MiscStockRequestController extends Controller
     {
         if (!$this->miscStockRequestService->deleteStockRequest($id)) {
             return response()->json([
-                'message' => '刪除失敗'
+                'message' => '刪除失敗',
             ], 500);
         }
 

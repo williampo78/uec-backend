@@ -269,16 +269,27 @@
                     limit: 500,
                 },
                 modal: {
-                    requestNo: "",
-                    requestDate: "",
-                    supplier: "",
-                    expectedDate: "",
-                    expectedQty: "",
-                    remark: "",
-                    statusCode: "",
-                    actualDate: "",
-                    items: [],
-                    reviewLogs: [],
+                    show: {
+                        id: "show-modal",
+                        title: "進貨退出單 檢視資料",
+                        requestNo: "",
+                        warehouseName: "",
+                        expectedQty: "",
+                        requestDate: "",
+                        submittedAt: "",
+                        expectedDate: "",
+                        tax: "",
+                        expectedTaxAmount: "",
+                        expectedAmount: "",
+                        remark: "",
+                        shipToName: "",
+                        shipToMobile: "",
+                        shipToAddress: "",
+                        actualDate: "",
+                        actualTaxAmount: "",
+                        actualAmount: "",
+                        items: [],
+                    },
                 },
                 statusCodes: [],
                 suppliers: [],
@@ -484,58 +495,60 @@
                         }
                     });
                 },
-                // async showRequest(id) {
-                //     let buyoutStockInRequest = await this.getBuyoutStockInRequest(id);
+                async showRequest(id) {
+                    let request = await this.getRequest(id);
 
-                //     this.modal.requestNo = buyoutStockInRequest.request_no;
-                //     this.modal.requestDate = buyoutStockInRequest.request_date;
-                //     this.modal.supplier = buyoutStockInRequest.supplier;
-                //     this.modal.expectedDate = buyoutStockInRequest.expected_date;
-                //     this.modal.expectedQty = buyoutStockInRequest.expected_qty;
-                //     this.modal.remark = buyoutStockInRequest.remark;
-                //     this.modal.statusCode = buyoutStockInRequest.status_code;
-                //     this.modal.actualDate = buyoutStockInRequest.actual_date;
+                    this.modal.show.requestNo = request.requestNo;
+                    this.modal.show.warehouseName = request.warehouseName;
+                    this.modal.show.expectedQty = request.expectedQty;
+                    this.modal.show.requestDate = moment(request.requestDate).format("YYYY-MM-DD HH:mm");
+                    this.modal.show.submittedAt = request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "";
+                    this.modal.show.expectedDate = request.expectedDate ? moment(request.expectedDate).format("YYYY-MM-DD") : "";
+                    this.modal.show.tax = request.tax;
+                    this.modal.show.expectedTaxAmount = request.expectedTaxAmount.toLocaleString('en-US');
+                    this.modal.show.expectedAmount = request.expectedAmount.toLocaleString('en-US');
+                    this.modal.show.remark = request.remark;
+                    this.modal.show.shipToName = request.shipToName;
+                    this.modal.show.shipToMobile = request.shipToMobile;
+                    this.modal.show.shipToAddress = request.shipToAddress;
+                    this.modal.show.actualDate = request.actualDate ? moment(request.actualDate).format("YYYY-MM-DD") : "";
+                    this.modal.show.actualTaxAmount = request.actualTaxAmount.toLocaleString('en-US');
+                    this.modal.show.actualAmount = request.actualAmount.toLocaleString('en-US');
 
-                //     this.modal.items = [];
-                //     if (Array.isArray(buyoutStockInRequest.items) && buyoutStockInRequest.items.length) {
-                //         buyoutStockInRequest.items.forEach(item => {
-                //             this.modal.items.push({
-                //                 productItem: `${item.item_no}-${item.supplier_item_no}-${item.product_name}`,
-                //                 spec1Value: item.spec_1_value,
-                //                 spec2Value: item.spec_2_value,
-                //                 minPurchaseQty: item.min_purchase_qty,
-                //                 expectedQty: item.expected_qty,
-                //                 actualQty: item.actual_qty,
-                //             });
-                //         });
-                //     }
+                    this.modal.show.items = [];
+                    if (Array.isArray(request.items) && request.items.length) {
+                        request.items.forEach(item => {
+                            this.modal.show.items.push({
+                                productNo: item.productNo,
+                                productName: item.productName,
+                                itemNo: item.itemNo,
+                                spec1Value: item.spec1Value,
+                                spec2Value: item.spec2Value,
+                                unitPrice: item.unitPrice.toLocaleString('en-US'),
+                                stockQty: item.stockQty,
+                                expectedQty: item.expectedQty,
+                                expectedSubtotal: item.expectedSubtotal.toLocaleString('en-US'),
+                                supplierName: item.supplierName,
+                                actualQty: item.actualQty,
+                                actualSubtotal: item.actualSubtotal.toLocaleString('en-US'),
+                            });
+                        });
+                    }
 
-                //     this.modal.reviewLogs = [];
-                //     if (Array.isArray(buyoutStockInRequest.review_logs) && buyoutStockInRequest.review_logs.length) {
-                //         buyoutStockInRequest.review_logs.forEach(reviewLog => {
-                //             this.modal.reviewLogs.push({
-                //                 reviewer: reviewLog.reviewer,
-                //                 reviewAt: reviewLog.review_at,
-                //                 reviewResult: reviewLog.review_result,
-                //                 reviewRemark: reviewLog.review_remark,
-                //             });
-                //         });
-                //     }
-
-                //     $('#buyout-stock-in-request-modal').modal('show');
-                // },
-                // getBuyoutStockInRequest(id) {
-                //     return axios({
-                //             method: "get",
-                //             url: `/backend/buyout-stock-in-requests/${id}`,
-                //         })
-                //         .then(function(response) {
-                //             return response.data;
-                //         })
-                //         .catch(function(error) {
-                //             console.log(error);
-                //         });
-                // },
+                    $(`#${this.modal.show.id}`).modal('show');
+                },
+                getRequest(id) {
+                    return axios({
+                            method: "get",
+                            url: `${BASE_URI}/${id}`,
+                        })
+                        .then(function(response) {
+                            return response.data.payload.miscStockRequest;
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                },
                 deleteRequest(id, requestNo, event) {
                     if (confirm(`確定要刪除《${requestNo}》？`)) {
                         axios({
