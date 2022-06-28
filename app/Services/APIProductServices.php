@@ -1665,8 +1665,9 @@ class APIProductServices
 
     /*
      * 取得商品資料(GTM)
+     * $multi = 'item' 顯示獨立item規格
      */
-    public function getProductItemForGTM($products)
+    public function getProductItemForGTM($products, $multi = null)
     {
         $config_levels = config('uec.web_category_hierarchy_levels');
         $now = Carbon::now();
@@ -1695,24 +1696,10 @@ class APIProductServices
                 //產品規格
                 $item_spec = [];
                 $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
-                $gtm['item_id'] = $ProductSpec[0]['item_no'];
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $gtm['discount'] = "0";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度
-                $spec_info = "";
-                foreach ($ProductSpec as $item) {
-                    if ($spec_info != "") {
-                        $spec_info .= "、";
-                    }
-                    $spec_info .= $item['spec_1_value'] . ($item['spec_2_value'] ? "_" . $item['spec_2_value'] : "");
-                }
-                if ($item_spec['spec_dimension'] > 0) {
-                    $gtm['item_variant'] = $spec_info;
-                } else {
-                    $gtm['item_variant'] = "";
-                }
-
                 //品牌
                 $item_brand = $this->brandsService->getBrand($product->brand_id);
                 $gtm['item_brand'] = $item_brand[0]->brand_name;
@@ -1726,7 +1713,34 @@ class APIProductServices
                 $gtm['item_category5'] = "";
                 $gtm['price'] = intval($product->selling_price);
                 $gtm['quantity'] = 1;
-                $data[$product->id] = $gtm;
+
+                if ($multi == 'item') {
+                    foreach ($ProductSpec as $item) {
+                        $gtm['item_id'] = $item['item_no'];
+                        if ($item_spec['spec_dimension'] > 0) {
+                            $gtm['item_variant'] = $item['spec_1_value'] . ($item['spec_2_value'] ? "_" . $item['spec_2_value'] : "");
+                        } else {
+                            $gtm['item_variant'] = "";
+                        }
+                        $data[$product->id][$item['id']] = $gtm;
+                    }
+                } else {
+                    $gtm['item_id'] = $ProductSpec[0]['item_no'];
+                    $spec_info = "";
+                    foreach ($ProductSpec as $item) {
+                        if ($spec_info != "") {
+                            $spec_info .= "、";
+                        }
+                        $spec_info .= $item['spec_1_value'] . ($item['spec_2_value'] ? "_" . $item['spec_2_value'] : "");
+                    }
+                    if ($item_spec['spec_dimension'] > 0) {
+                        $gtm['item_variant'] = $spec_info;
+                    } else {
+                        $gtm['item_variant'] = "";
+                    }
+
+                    $data[$product->id] = $gtm;
+                }
             }
 
             return $data;

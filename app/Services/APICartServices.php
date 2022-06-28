@@ -367,6 +367,7 @@ class APICartServices
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -459,6 +460,7 @@ class APICartServices
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -525,6 +527,7 @@ class APICartServices
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -591,6 +594,7 @@ class APICartServices
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
                                         "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -651,6 +655,7 @@ class APICartServices
                                     "campaignDiscountStatus" => false,
                                     "campaignDiscount" => 0,
                                     "campaignGiftAway" => $prod_gift,
+                                    "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                 );
                                 $cartTotal += round($item_info->selling_price * $detail_qty);
                                 $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -712,6 +717,7 @@ class APICartServices
                                 "campaignDiscountStatus" => false,
                                 "campaignDiscount" => 0,
                                 "campaignGiftAway" => $prod_gift,
+                                "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                             );
                             $cartTotal += round($item_info->selling_price * $detail_qty);
                             $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -770,6 +776,7 @@ class APICartServices
                             "campaignDiscountStatus" => false,
                             "campaignDiscount" => 0,
                             "campaignGiftAway" => [],
+                            "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                         );
                         $cartTotal += 0;
                         $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -791,8 +798,7 @@ class APICartServices
                     "sellingPrice" => $cartInfo[$product_id]['selling_price'],
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product,
-                    "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
-                    "gtm" => ($gtm ? $gtm[$product_id] : "")
+                    "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : [])
                 );
 
             }
