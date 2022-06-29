@@ -290,6 +290,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
         Route::get('/product-item-modal/list', [MiscStockRequestController::class, 'getProductItemModalList']);
         Route::get('/{id}/supplier-modal/list', [MiscStockRequestController::class, 'getSupplierModalList']);
         Route::get('/supplier-modal/list/{id}', [MiscStockRequestController::class, 'getSupplierModalDetail']);
+        Route::patch('/{id}/expected-date', [MiscStockRequestController::class, 'updateExpectedDate']);
     });
     Route::resource('/misc-stock-requests', MiscStockRequestController::class, [
         'names' => [

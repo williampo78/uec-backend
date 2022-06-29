@@ -274,4 +274,29 @@ class MiscStockRequestController extends Controller
 
         return response()->json($response);
     }
+
+    /**
+     * 更新預出日
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateExpectedDate(Request $request, $id)
+    {
+        $resquestPayload = $request->only([
+            'expectedDate',
+            'shipToName',
+            'shipToMobile',
+            'shipToAddress',
+        ]);
+
+        if (!$this->miscStockRequestService->updateExpectedDate($id, $resquestPayload)) {
+            return response()->json(['message' => '儲存失敗'], 500);
+        }
+
+        return response()->json([
+            'message' => '儲存成功',
+        ]);
+    }
 }

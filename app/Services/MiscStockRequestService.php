@@ -964,4 +964,35 @@ class MiscStockRequestService
 
         return $result;
     }
+
+    /**
+     * 更新預出日
+     *
+     * @param integer $id
+     * @param array $data
+     * @return boolean
+     */
+    public function updateExpectedDate(int $id, array $data): bool
+    {
+        $user = auth()->user();
+        $result = false;
+
+        try {
+            $request = MiscStockRequest::findOrFail($id);
+            $requestData = [
+                'expected_date' => $data['expectedDate'] ?? null,
+                'ship_to_name' => $data['shipToName'] ?? null,
+                'ship_to_mobile' => $data['shipToMobile'] ?? null,
+                'ship_to_address' => $data['shipToAddress'] ?? null,
+                'updated_by' => $user->id,
+            ];
+
+            $request->update($requestData);
+            $result = true;
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+
+        return $result;
+    }
 }

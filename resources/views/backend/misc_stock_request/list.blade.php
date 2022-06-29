@@ -232,6 +232,7 @@
         </div>
         @include('backend.misc_stock_request.show')
         @include('backend.misc_stock_request.supplier')
+        @include('backend.misc_stock_request.expected_date')
     </div>
 @endsection
 
@@ -305,11 +306,26 @@
                             reviewRemark: "",
                         },
                     },
+                    expectedDate: {
+                        id: "expected-date-modal",
+                        title: "進貨退出單-倉儲資訊更新",
+                        requestId: "",
+                        requestNo: "",
+                        expectedDate: {
+                            name: "expectedDate",
+                            date: "",
+                            config: {},
+                        },
+                        shipToName: "",
+                        shipToMobile: "",
+                        shipToAddress: "",
+                    },
                 },
                 requestStatuses: [],
                 suppliers: [],
                 miscStockRequests: [],
                 auth: {},
+                expectedDateValidator: {},
             },
             created() {
                 this.BASE_URI = BASE_URI;
@@ -441,6 +457,56 @@
                         $(element).closest(".form-group").removeClass("has-error");
                     },
                 });
+
+                // 驗證表單
+                this.expectedDateValidator = $("#expected-date-form").validate({
+                    // debug: true,
+                    submitHandler: function(form) {
+                        // form.submit();
+                        self.updateExpectedDate();
+                    },
+                    rules: {
+                        expectedDate: {
+                            required: true,
+                        },
+                        shipToName: {
+                            required: true,
+                            maxlength: 30,
+                        },
+                        shipToMobile: {
+                            maxlength: 30,
+                        },
+                        shipToAddress: {
+                            maxlength: 200,
+                        },
+                    },
+                    errorClass: "help-block",
+                    errorElement: "span",
+                    errorPlacement: function(error, element) {
+                        if (element.closest(".input-group").length) {
+                            element.closest(".input-group").parent().append(error);
+                            return;
+                        }
+
+                        if (element.closest(".radio-inline").length) {
+                            element.closest(".radio-inline").parent().append(error);
+                            return;
+                        }
+
+                        if (element.is('select')) {
+                            element.parent().append(error);
+                            return;
+                        }
+
+                        error.insertAfter(element);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").addClass("has-error");
+                    },
+                    success: function(label, element) {
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                });
             },
             methods: {
                 initFlatPickrConfigs() {
@@ -462,6 +528,11 @@
                     this.form.actualDateEnd.config = {
                         dateFormat: "Y-m-d",
                         minDate: this.form.actualDateStart.date,
+                    };
+
+                    this.modal.expectedDate.expectedDate.config = {
+                        dateFormat: "Y-m-d",
+                        minDate: moment().format("YYYY-MM-DD"),
                     };
                 },
                 onRequestDateStartChange(selectedDates, dateStr, instance) {
@@ -650,6 +721,49 @@
                         .catch(function(error) {
                             console.log(error);
                         });
+                },
+                async editExpectedDate(id) {
+                    let request = await this.getRequest(id);
+
+                    this.modal.expectedDate.requestId = id;
+                    this.modal.expectedDate.requestNo = request.requestNo;
+                    this.modal.expectedDate.expectedDate.date = request.expectedDate;
+                    this.modal.expectedDate.shipToName = request.shipToName;
+                    this.modal.expectedDate.shipToMobile = request.shipToMobile;
+                    this.modal.expectedDate.shipToAddress = request.shipToAddress;
+
+                    this.expectedDateValidator.resetForm();
+                    $("#expected-date-form").find(".has-error").removeClass("has-error");
+                    $(`#${this.modal.expectedDate.id}`).modal('show');
+                },
+                saveExpectedDate() {
+                    $("#expected-date-form").submit();
+                },
+                updateExpectedDate() {
+                    axios({
+                        method: "patch",
+                        url: `${BASE_URI}/${this.modal.expectedDate.requestId}/expected-date`,
+                        data: {
+                            expectedDate: this.modal.expectedDate.expectedDate.date,
+                            shipToName: this.modal.expectedDate.shipToName,
+                            shipToMobile: this.modal.expectedDate.shipToMobile,
+                            shipToAddress: this.modal.expectedDate.shipToAddress,
+                        },
+                    })
+                    .then((response) => {
+                        alert('儲存成功！');
+                    })
+                    .catch((error) => {
+                        console.log(error);
+
+                        if (error.response) {
+                            let data = error.response.data;
+                            alert(data.message);
+                        }
+                    })
+                    .finally(() => {
+                        $(`#${this.modal.expectedDate.id}`).modal('hide');
+                    });
                 },
             },
         });
