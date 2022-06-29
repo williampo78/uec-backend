@@ -67,6 +67,7 @@ class APIOrderService
         }
         //行銷活動
         $campaign_group = [];
+        $campaign_group_code = [];
         $group_i = 0;
         foreach ($cart['list'] as $products) {
             foreach ($campaigns as $product_id => $item) {
@@ -75,7 +76,8 @@ class APIOrderService
                         $campaign[$v->level_code][$v->category_code][$product_id] = $v;
                         if ($v->level_code != 'CART_P') { //單品活動才做
                             $group_i++;
-                            $campaign_group[$product_id][$v->id] = $group_i;
+                            $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
+                            $campaign_group_code[$product_id][$v->id] = $v->level_code;
                         }
                     }
                 }
@@ -92,7 +94,7 @@ class APIOrderService
                 $threshold_prod['price'][$product_id] = $threshold['productAmount'][$k]; //單品小計
                 $threshold_prod['thresholdDiscount'][$product_id] = $threshold['thresholdID']; //門檻ID
                 $total += $threshold['productAmount'][$k]; //單品金額加總
-                $campaign_group[$product_id][$threshold['campaignID']] = $group_i;
+                $campaign_group[$product_id][$threshold['campaignID']] = $group_i;  //群組ID (C003)
             }
             $threshold_discount['discount'][$threshold['thresholdID']] = $threshold['campaignDiscount']; //門檻折扣
             $threshold_discount['price'][$threshold['thresholdID']] = $total; //符合門檻總金額
@@ -100,11 +102,10 @@ class APIOrderService
         foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
             $group_i++;
             foreach ($threshold['products'] as $k => $product_id) {
-                $campaign_group[$product_id][$threshold['campaignID']] = $group_i;
+                $campaign_group[$product_id][$threshold['campaignID']] = $group_i;  //群組ID (C003)
                 $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //門檻ID
             }
         }
-
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -354,7 +355,7 @@ class APIOrderService
                     if ($item['campaignDiscountId'] && $item['campaignDiscountStatus']) {
                         $campaign_details[$seq] = [
                             "order_id" => $newOrder->id,
-                            "level_code" => $campaigns[$products['productID']][0]->level_code,
+                            "level_code" => $campaign_group_code[$products['productID']][$item['campaignDiscountId']],
                             "group_seq" => $campaign_group[$products['productID']][$item['campaignDiscountId']],
                             "order_detail_id" => $order_detail_id_M,
                             "promotion_campaign_id" => $item['campaignDiscountId'],
@@ -518,19 +519,15 @@ class APIOrderService
                     //把最後一筆資料campaignDiscount的比例做修正
                     //$threshold_discount['discount'][$threshold['thresholdID']]
                     if (($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]) != 0) {
+                        $tmp_discount = ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
                         $detail = OrderCampaignDiscount::where('order_id', '=', $newOrder->id)->where('record_identity', '=', 'M')
                             ->where('level_code', 'CART_P')
-                            ->where('campaign_threshold_id',$threshold['thresholdID'])
+                            ->where('campaign_threshold_id', $threshold['thresholdID'])
                             ->orderBy('id', 'DESC')->first();
-
-                        if (($threshold['campaignDiscount'] > $threshold_discount['discount'][$threshold['thresholdID']])) {
-                            $discountData['discount'] = $detail->discount - ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
-                        } else {
-                            $discountData['discount'] = $detail->discount + ($threshold['campaignDiscount'] - $threshold_discount['discount'][$threshold['thresholdID']]);
-                        }
+                        $discountData['discount'] = $detail->discount + $tmp_discount;
                         OrderCampaignDiscount::where('id', $detail->id)->update($discountData);
                         //同時把同門檻訂單明細的比例做修正
-                        OrderDetail::where('id', $detail->order_detail_id)->update(['cart_p_discount'=>$discountData['discount']]);
+                        OrderDetail::where('id', $detail->order_detail_id)->update(['cart_p_discount' => $discountData['discount']]);
                     }
                 }
             }
@@ -728,7 +725,6 @@ class APIOrderService
                     return $result;
                 }
             }
-
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

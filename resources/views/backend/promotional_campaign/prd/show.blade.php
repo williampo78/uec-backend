@@ -178,6 +178,8 @@
                                     <th class="text-nowrap">商品序號</th>
                                     <th class="text-nowrap">商品名稱</th>
                                     <th class="text-nowrap">贈品數量</th>
+                                    <th class="text-nowrap">庫存數</th>
+                                    <th class="text-nowrap">上架狀態</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -186,6 +188,8 @@
                                     <td>@{{ giveaway.productNo }}</td>
                                     <td>@{{ giveaway.productName }}</td>
                                     <td>@{{ giveaway.assignedQty }}</td>
+                                    <td>@{{ giveaway.stockQty }}</td>
+                                    <td>@{{ giveaway.launchStatus }}</td>
                                 </tr>
                             </tbody>
                         </table>

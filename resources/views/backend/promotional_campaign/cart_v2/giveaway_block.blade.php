@@ -18,6 +18,7 @@
                 <th class="text-nowrap">商品類型</th>
                 <th class="text-nowrap">供應商</th>
                 <th class="text-nowrap">庫存數</th>
+                <th class="text-nowrap">上架狀態</th>
                 <th class="text-nowrap" v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
             </tr>
         </thead>
@@ -38,6 +39,7 @@
                 <td>@{{ giveaway.productType }}</td>
                 <td>@{{ giveaway.supplier }}</td>
                 <td>@{{ giveaway.stockQty }}</td>
+                <td>@{{ giveaway.launchStatus }}</td>
                 <td v-if="!isNowGreaterThanOrEqualToStartAt">
                     <button type="button" class="btn btn-danger" @click="deleteGiveaway(threshold, index)">
                         <i class="fa-solid fa-trash-can"></i> 刪除
