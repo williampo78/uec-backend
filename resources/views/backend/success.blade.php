@@ -6,9 +6,7 @@
             <div class="col-sm-12">
                 <h1 class="page-header">系統訊息</h1>
             </div>
-            <!-- /.col-sm-12 -->
         </div>
-        <!-- /.row -->
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default">
@@ -16,25 +14,46 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="alert alert-success"><i class="fa-solid fa-check"></i>
-                                    @if($act==='add')
-                                        已經成功新增資料！
-                                    @elseif($act==='upd')
-                                        已經成功儲存修改！
-                                    @elseif($act==='del')
-                                        資料已刪除！
-                                    @elseif($act==='DRAFTED')
-                                        儲存草稿成功！
-                                    @elseif($act==='REVIEWING')
-                                        儲存成功，報價單送審中！
-                                    @elseif($act==='review')
-                                        儲存成功！
-                                    @elseif($act==='product_reviewing')
-                                        儲存成功，商品送審中！
-                                    @elseif($act==='review_success')
-                                        審核成功！
-                                    @endif
+                                    @switch($act)
+                                        @case('add')
+                                            已經成功新增資料！
+                                            @break
+
+                                        @case('upd')
+                                            已經成功儲存修改！
+                                            @break
+
+                                        @case('del')
+                                            資料已刪除！
+                                            @break
+
+                                        @case('DRAFTED')
+                                            儲存草稿成功！
+                                            @break
+
+                                        @case('REVIEWING')
+                                            儲存成功，報價單送審中！
+                                            @break
+
+                                        @case('review')
+                                            儲存成功！
+                                            @break
+
+                                        @case('product_reviewing')
+                                            儲存成功，商品送審中！
+                                            @break
+
+                                        @case('review_success')
+                                            審核成功！
+                                            @break
+
+                                        @default
+                                            @isset($message)
+                                                {{ $message }}
+                                            @endisset
+                                    @endswitch
                                 </div>
-                                <a class="btn btn-block btn-success" href="{{route($route_name)}}">
+                                <a class="btn btn-block btn-success" href="{{ route($route_name) }}">
                                     <i class="fa-solid fa-book"></i> 返回列表
                                 </a>
                             </div>

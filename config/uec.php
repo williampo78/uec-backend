@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     /**
@@ -6,7 +7,7 @@ return [
      *   指定為2時，中分類清單不顯示﹝展小類﹞的按鈕
      *   指定為3時，中分類清單顯示﹝展小類﹞的按鈕
      */
-    'web_category_hierarchy_levels' => env('UEC_CATEGORY_LEVEL','2'),
+    'web_category_hierarchy_levels' => env('UEC_CATEGORY_LEVEL', '2'),
 
     'config_key' => 'EC_WAREHOUSE_GOODS',
 
@@ -19,6 +20,7 @@ return [
     'mailFrom' => env('MAIL_FROM_ADDRESS'),
     'mailTo' => env('MAIL_TO_ADDRESS') ? array_filter(explode(',', env('MAIL_TO_ADDRESS'))) : [],
     'swithBackendUrl' => env('SWITCH_BACKEND_URL'),
+
     // 版位類型
     'ad_slot_type_option' => [
         'I' => '圖檔',
@@ -187,7 +189,7 @@ return [
         '3' => '零稅率',
     ],
 
-    //退貨申請單狀態
+    // 退貨申請單狀態
     'return_request_status_options' => [
         'CREATED' => '新建立',
         'VOIDED' => '已作廢',
@@ -196,7 +198,7 @@ return [
         'FAILED' => '退貨失敗',
     ],
 
-    //orders狀態
+    // orders狀態
     'order_refund_status_options' => [
         'PENDING' => '待退款',
         'COMPLETED' => '退款成功',
@@ -204,7 +206,7 @@ return [
         'VOIDED' => '已作廢',
     ],
 
-    //order_payments資料新增原因
+    // order_payments資料新增原因
     'order_payment_record_created_reason' => [
         'ORDER_CREATED' => '訂單成立',
         'ORDER_CANCELLED' => '訂單取消',
@@ -218,5 +220,62 @@ return [
         'PROCESSING' => '用印中',
         'APPROVED' => '已合作',
         'EXPIRED' => '已過期',
+    ],
+
+    // 各種選項
+    'options' => [
+        // 庫存申請單
+        'misc_stock_requests' => [
+            // 申請單狀態
+            'request_statuses' => [
+                // 入庫
+                'in' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'COMPLETED' => '審核完成',
+                    'CLOSED' => '已入庫',
+                ],
+                // 出庫
+                'out' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'COMPLETED' => '審核完成',
+                    'CLOSED' => '已出庫',
+                ],
+            ],
+            // 供應商申請狀態
+            'status_codes' => [
+                // 入庫
+                'in' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'APPROVED' => '已核准',
+                    'REJECTED' => '已駁回',
+                    'CLOSED' => '已入庫',
+                ],
+                // 出庫
+                'out' => [
+                    'DRAFTED' => '草稿',
+                    'REVIEWING' => '審核中',
+                    'APPROVED' => '已核准',
+                    'REJECTED' => '已駁回',
+                    'CLOSED' => '已出庫',
+                ],
+            ],
+        ],
+
+        // 稅別
+        'taxes' => [
+            '0' => '免稅',
+            // '1' => '應稅',
+            '2' => '應稅內含',
+            '3' => '零稅率',
+        ],
+
+        // 簽核結果
+        'review_results' => [
+            'APPROVE' => '核准',
+            'REJECT' => '駁回',
+        ],
     ],
 ];

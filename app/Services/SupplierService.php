@@ -33,6 +33,11 @@ class SupplierService
             }
         }
 
+        // 狀態
+        if (isset($queryData['active'])) {
+            $suppliers = $suppliers->where('active', $queryData['active']);
+        }
+
         return $suppliers->get();
     }
 

@@ -4,70 +4,110 @@ namespace App\Services;
 
 class MoneyAmountService
 {
-    // 原幣金額
-    private $original_price = 0;
-
-    // 原幣未稅金額
-    private $original_nontax_price = 0;
-
-    // 原幣稅額
-    private $original_tax_price = 0;
-
-    // 本幣金額
-    private $price = 0;
-
-    // 本幣未稅金額
-    private $nontax_price = 0;
-
-    // 本幣稅額
-    private $tax_price = 0;
-
-    // 匯率
-    private $exchange_rate = 1;
-
-    // 單價
-    private $unit_price = 0;
-
-    // 數量
-    private $quantity = 0;
-
-    // 稅別
-    private $tax_type = 'TAXABLE';
+    /**
+     * 原幣金額
+     *
+     * @var float
+     */
+    private $originalPrice = 0;
 
     /**
-     * Get the value of original_price
+     * 原幣未稅金額
+     *
+     * @var float
+     */
+    private $originalNontaxPrice = 0;
+
+    /**
+     * 原幣稅額
+     *
+     * @var float
+     */
+    private $originalTaxPrice = 0;
+
+    /**
+     * 本幣金額
+     *
+     * @var float
+     */
+    private $price = 0;
+
+    /**
+     * 本幣未稅金額
+     *
+     * @var float
+     */
+    private $nontaxPrice = 0;
+
+    /**
+     * 本幣稅額
+     *
+     * @var float
+     */
+    private $taxPrice = 0;
+
+    /**
+     * 匯率
+     *
+     * @var float
+     */
+    private $exchangeRate = 1;
+
+    /**
+     * 單價
+     *
+     * @var float
+     */
+    private $unitPrice = 0;
+
+    /**
+     * 數量
+     *
+     * @var integer
+     */
+    private $quantity = 0;
+
+    /**
+     * 稅別
+     *
+     * @var string|integer
+     */
+    private $taxType = 'TAXABLE';
+
+    /**
+     * Get the value of originalPrice
      */
     public function getOriginalPrice()
     {
-        return $this->original_price;
+        return $this->originalPrice;
     }
 
     /**
-     * Set the value of original_price
+     * Set the value of originalPrice
      *
      * @return  self
      */
-    public function setOriginalPrice($original_price)
+    public function setOriginalPrice($originalPrice)
     {
-        $this->original_price = $original_price;
+        $this->originalPrice = $originalPrice;
 
         return $this;
     }
 
     /**
-     * Get the value of original_nontax_price
+     * Get the value of originalNontaxPrice
      */
     public function getOriginalNontaxPrice()
     {
-        return $this->original_nontax_price;
+        return $this->originalNontaxPrice;
     }
 
     /**
-     * Get the value of original_tax_price
+     * Get the value of originalTaxPrice
      */
     public function getOriginalTaxPrice()
     {
-        return $this->original_tax_price;
+        return $this->originalTaxPrice;
     }
 
     /**
@@ -91,41 +131,41 @@ class MoneyAmountService
     }
 
     /**
-     * Get the value of nontax_price
+     * Get the value of nontaxPrice
      */
     public function getNontaxPrice()
     {
-        return $this->nontax_price;
+        return $this->nontaxPrice;
     }
 
     /**
-     * Get the value of tax_price
+     * Get the value of taxPrice
      */
     public function getTaxPrice()
     {
-        return $this->tax_price;
+        return $this->taxPrice;
     }
 
     /**
-     * Set the value of exchange_rate
+     * Set the value of exchangeRate
      *
      * @return  self
      */
-    public function setExchangeRate($exchange_rate)
+    public function setExchangeRate($exchangeRate)
     {
-        $this->exchange_rate = $exchange_rate;
+        $this->exchangeRate = $exchangeRate;
 
         return $this;
     }
 
     /**
-     * Set the value of unit_price
+     * Set the value of unitPrice
      *
      * @return  self
      */
-    public function setUnitPrice($unit_price)
+    public function setUnitPrice($unitPrice)
     {
-        $this->unit_price = $unit_price;
+        $this->unitPrice = $unitPrice;
 
         return $this;
     }
@@ -143,57 +183,63 @@ class MoneyAmountService
     }
 
     /**
-     * Set the value of tax_type
+     * Set the value of taxType
      *
      * @return  self
      */
-    public function setTaxType($tax_type)
+    public function setTaxType($taxType)
     {
-        $this->tax_type = $tax_type;
+        $this->taxType = $taxType;
 
         return $this;
     }
 
     /**
      * 計算原幣金額
+     *
+     * @return self
      */
     public function calculateOriginalPrice()
     {
-        $this->original_price = $this->unit_price * $this->quantity;
+        $this->originalPrice = $this->unitPrice * $this->quantity;
 
         return $this;
     }
 
     /**
      * 計算本幣金額
+     *
+     * @return self
      */
     public function calculatePrice()
     {
-        $this->price = $this->unit_price * $this->quantity * $this->exchange_rate;
+        $this->price = $this->unitPrice * $this->quantity * $this->exchangeRate;
 
         return $this;
     }
 
     /**
      * 計算原幣未稅金額
+     *
+     * @return self
      */
     public function calculateOriginalNontaxPrice()
     {
         // 免稅
-        if ($this->tax_type === 0 || $this->tax_type === 'NON_TAXABLE') {
-            $this->original_nontax_price = $this->original_price;
+        if ($this->taxType === 0 || $this->taxType === 'NON_TAXABLE') {
+            $this->originalNontaxPrice = $this->originalPrice;
         }
         // 應稅
-        // elseif ($this->tax_type === 1) {
+        // elseif ($this->taxType === 1) {
 
         // }
         // 應稅內含
-        elseif ($this->tax_type === 2 || $this->tax_type === 'TAXABLE') {
-            $this->original_nontax_price = round($this->original_price / ((100 + 5) / 100));
+        elseif ($this->taxType === 2 || $this->taxType === 'TAXABLE') {
+            $this->originalNontaxPrice = round($this->originalPrice / ((100 + 5) / 100));
         }
         // 零稅率
-        elseif ($this->tax_type === 3 || $this->tax_type === 'ZERO_RATED') {
-            $this->original_nontax_price = round($this->original_price / ((100 + 0) / 100));
+        elseif ($this->taxType === 3 || $this->taxType === 'ZERO_RATED') {
+            $this->originalNontaxPrice = round($this->originalPrice / ((100 + 0) / 100));
         }
 
         return $this;
@@ -201,24 +247,26 @@ class MoneyAmountService
 
     /**
      * 計算本幣未稅金額
+     *
+     * @return self
      */
     public function calculateNontaxPrice()
     {
         // 免稅
-        if ($this->tax_type === 0 || $this->tax_type === 'NON_TAXABLE') {
-            $this->nontax_price = $this->price;
+        if ($this->taxType === 0 || $this->taxType === 'NON_TAXABLE') {
+            $this->nontaxPrice = $this->price;
         }
         // 應稅
-        // elseif ($this->tax_type === 1) {
+        // elseif ($this->taxType === 1) {
 
         // }
         // 應稅內含
-        elseif ($this->tax_type === 2 || $this->tax_type === 'TAXABLE') {
-            $this->nontax_price = round($this->price / ((100 + 5) / 100));
+        elseif ($this->taxType === 2 || $this->taxType === 'TAXABLE') {
+            $this->nontaxPrice = round($this->price / ((100 + 5) / 100));
         }
         // 零稅率
-        elseif ($this->tax_type === 3 || $this->tax_type === 'ZERO_RATED') {
-            $this->nontax_price = round($this->price / ((100 + 0) / 100));
+        elseif ($this->taxType === 3 || $this->taxType === 'ZERO_RATED') {
+            $this->nontaxPrice = round($this->price / ((100 + 0) / 100));
         }
 
         return $this;
@@ -226,21 +274,40 @@ class MoneyAmountService
 
     /**
      * 計算原幣稅額
+     *
+     * @return self
      */
     public function calculateOriginalTaxPrice()
     {
-        $this->original_tax_price = $this->original_price - $this->original_nontax_price;
+        $this->originalTaxPrice = $this->originalPrice - $this->originalNontaxPrice;
 
         return $this;
     }
 
     /**
      * 計算本幣稅額
+     *
+     * @return self
      */
     public function calculateTaxPrice()
     {
-        $this->tax_price = $this->price - $this->nontax_price;
+        $this->taxPrice = $this->price - $this->nontaxPrice;
 
         return $this;
+    }
+
+    /**
+     * 計算所有金額
+     *
+     * @return void
+     */
+    public function calculateAll()
+    {
+        $this->calculateOriginalPrice()
+            ->calculateOriginalNontaxPrice()
+            ->calculateOriginalTaxPrice()
+            ->calculatePrice()
+            ->calculateNontaxPrice()
+            ->calculateTaxPrice();
     }
 }
