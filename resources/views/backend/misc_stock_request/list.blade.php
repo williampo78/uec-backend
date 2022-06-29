@@ -372,8 +372,8 @@
                     });
                 }
 
-                this.initFlatPickrConfigs();
                 this.setQueryParameters();
+                this.initFlatPickrConfigs();
             },
             mounted() {
                 let self = this;
@@ -474,9 +474,11 @@
                             maxlength: 30,
                         },
                         shipToMobile: {
+                            required: true,
                             maxlength: 30,
                         },
                         shipToAddress: {
+                            required: true,
                             maxlength: 200,
                         },
                     },

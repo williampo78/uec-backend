@@ -10,6 +10,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ExternalInventoryDailyReportController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MiscStockRequestController;
+use App\Http\Controllers\MiscStockRequestReviewController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderPaymentsReportController;
 use App\Http\Controllers\OrderRefundController;
@@ -301,6 +302,15 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'update' => 'misc_stock_requests.update',
             'show' => 'misc_stock_requests.show',
             'destroy' => 'misc_stock_requests.destroy',
+        ],
+    ]);
+
+    // 進貨退出單審核
+    Route::resource('/misc-stock-request-reviews', MiscStockRequestReviewController::class, [
+        'names' => [
+            'index' => 'misc_stock_request_reviews',
+            'edit' => 'misc_stock_request_reviews.edit',
+            'update' => 'misc_stock_request_reviews.update',
         ],
     ]);
 });

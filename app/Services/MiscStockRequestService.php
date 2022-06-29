@@ -995,4 +995,58 @@ class MiscStockRequestService
 
         return $result;
     }
+
+    /**
+     * 取得進貨退出單審核列表
+     *
+     * @param array $data
+     * @return Collection
+     */
+    public function getStockReviewTableList(array $data = []): Collection
+    {
+        $miscStockRequests = MiscStockRequest::oldest('request_no')->where('request_status', 'REVIEWING');
+
+        // 申請單號
+        if (isset($data['requestNo'])) {
+            $miscStockRequests = $miscStockRequests->where('request_no', $data['requestNo']);
+        }
+
+        // 送審時間-開始日期
+        if (isset($data['submittedAtStart'])) {
+            $miscStockRequests = $miscStockRequests->whereDate('submitted_at', '>=', $data['submittedAtStart']);
+        }
+
+        // 送審時間-結束日期
+        if (isset($data['submittedAtEnd'])) {
+            $miscStockRequests = $miscStockRequests->whereDate('submitted_at', '<=', $data['submittedAtEnd']);
+        }
+
+        return $miscStockRequests->get();
+    }
+
+    /**
+     * 整理進貨退出單審核列表
+     *
+     * @param Collection $miscStockRequests
+     * @return array
+     */
+    public function formatStockReviewTableList(Collection $miscStockRequests): array
+    {
+        $result = [];
+
+        foreach ($miscStockRequests as $request) {
+            $tmpStockRequest = [
+                'id' => $request->id,
+                'requestNo' => $request->request_no,
+                'submittedAt' => $request->submitted_at,
+                'totalSupCount' => $request->total_sup_count,
+                'expectedAmount' => round($request->expected_amount),
+                'expectedQty' => $request->expected_qty,
+            ];
+
+            $result[] = $tmpStockRequest;
+        }
+
+        return $result;
+    }
 }
