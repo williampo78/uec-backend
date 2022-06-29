@@ -54,7 +54,7 @@
                                                 <label class="control-label">狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select2 class="form-control" :options="statusCodes"
+                                                <select2 class="form-control" :options="requestStatuses"
                                                     v-model="form.statusCode" name="statusCode">
                                                     <option disabled value=""></option>
                                                 </select2>
@@ -212,7 +212,7 @@
                                             <td>@{{ request.expectedDate }}</td>
                                             <td>@{{ request.submittedAt }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-primary btn-sm" @click="">
+                                                <button type="button" class="btn btn-primary btn-sm" @click="viewRequestSuppliers(request.id, request.requestNo)">
                                                     @{{ request.totalSupCount }}
                                                 </button>
                                             </td>
@@ -231,6 +231,7 @@
             </div>
         </div>
         @include('backend.misc_stock_request.show')
+        @include('backend.misc_stock_request.supplier')
     </div>
 @endsection
 
@@ -290,8 +291,22 @@
                         actualAmount: "",
                         items: [],
                     },
+                    supplier: {
+                        id: "supplier-modal",
+                        title: "",
+                        list: [],
+                        detail: {
+                            isShow: false,
+                            supplierName: "",
+                            items: [],
+                            reviewAt: "",
+                            reviewerName: "",
+                            reviewResult: "",
+                            reviewRemark: "",
+                        },
+                    },
                 },
-                statusCodes: [],
+                requestStatuses: [],
                 suppliers: [],
                 miscStockRequests: [],
                 auth: {},
@@ -300,9 +315,9 @@
                 this.BASE_URI = BASE_URI;
                 let payload = @json($payload);
 
-                if (payload.statusCodes) {
-                    Object.entries(payload.statusCodes).forEach(([key, statusCode]) => {
-                        this.statusCodes.push({
+                if (payload.requestStatuses) {
+                    Object.entries(payload.requestStatuses).forEach(([key, statusCode]) => {
+                        this.requestStatuses.push({
                             text: statusCode,
                             id: key,
                         });
@@ -563,6 +578,78 @@
                             console.log(error);
                         });
                     }
+                },
+                async viewRequestSuppliers(id, requestNo) {
+                    this.modal.supplier.title = `退貨單號【${requestNo}】`;
+                    this.modal.supplier.detail.isShow = false;
+                    let requestSuppliers = await this.getRequestSuppliers(id);
+
+                    this.modal.supplier.list = [];
+                    if (Array.isArray(requestSuppliers) && requestSuppliers.length) {
+                        requestSuppliers.forEach(requestSupplier => {
+                            this.modal.supplier.list.push({
+                                id: requestSupplier.id,
+                                supplierName: requestSupplier.supplierName,
+                                statusCode: requestSupplier.statusCode,
+                                expectedQty: requestSupplier.expectedQty,
+                                expectedAmount: requestSupplier.expectedAmount.toLocaleString('en-US'),
+                            });
+                        });
+                    }
+
+                    $(`#${this.modal.supplier.id}`).modal('show');
+                },
+                getRequestSuppliers(id) {
+                    return axios({
+                            method: "get",
+                            url: `${BASE_URI}/${id}/supplier-modal/list`,
+                        })
+                        .then(function(response) {
+                            return response.data.payload.list;
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                },
+                async viewRequestSupplierDetail(requestSupplierId, supplierName) {
+                    let detail = await this.getRequestSupplierDetail(requestSupplierId);
+
+                    this.modal.supplier.detail.supplierName = supplierName;
+                    this.modal.supplier.detail.reviewAt = detail.reviewAt ? moment(detail.reviewAt).format("YYYY-MM-DD HH:mm") : "";
+                    this.modal.supplier.detail.reviewerName = detail.reviewerName;
+                    this.modal.supplier.detail.reviewResult = detail.reviewResult;
+                    this.modal.supplier.detail.reviewRemark = detail.reviewRemark;
+
+                    this.modal.supplier.detail.items = [];
+                    if (Array.isArray(detail.items) && detail.items.length) {
+                        detail.items.forEach(item => {
+                            this.modal.supplier.detail.items.push({
+                                productNo: item.productNo,
+                                productName: item.productName,
+                                itemNo: item.itemNo,
+                                spec1Value: item.spec1Value,
+                                spec2Value: item.spec2Value,
+                                unitPrice: item.unitPrice.toLocaleString('en-US'),
+                                stockQty: item.stockQty,
+                                expectedQty: item.expectedQty,
+                                expectedSubtotal: item.expectedSubtotal.toLocaleString('en-US'),
+                            });
+                        });
+                    }
+
+                    this.modal.supplier.detail.isShow = true;
+                },
+                getRequestSupplierDetail(requestSupplierId) {
+                    return axios({
+                            method: "get",
+                            url: `${BASE_URI}/supplier-modal/list/${requestSupplierId}`,
+                        })
+                        .then(function(response) {
+                            return response.data.payload.detail;
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
                 },
             },
         });

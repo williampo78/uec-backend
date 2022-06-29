@@ -285,8 +285,12 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
 
     // 進貨退出單
-    Route::get('/misc-stock-requests/product-item-modal/options', [MiscStockRequestController::class, 'getProductItemModalOptions']);
-    Route::get('/misc-stock-requests/product-item-modal/list', [MiscStockRequestController::class, 'getProductItemModalList']);
+    Route::group(['prefix' => 'misc-stock-requests'], function () {
+        Route::get('/product-item-modal/options', [MiscStockRequestController::class, 'getProductItemModalOptions']);
+        Route::get('/product-item-modal/list', [MiscStockRequestController::class, 'getProductItemModalList']);
+        Route::get('/{id}/supplier-modal/list', [MiscStockRequestController::class, 'getSupplierModalList']);
+        Route::get('/supplier-modal/list/{id}', [MiscStockRequestController::class, 'getSupplierModalDetail']);
+    });
     Route::resource('/misc-stock-requests', MiscStockRequestController::class, [
         'names' => [
             'index' => 'misc_stock_requests',

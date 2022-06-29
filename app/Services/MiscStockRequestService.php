@@ -698,77 +698,92 @@ class MiscStockRequestService
      */
     public function formatStockRequestForShowPage(Model $miscStockRequest): array
     {
-        if ($miscStockRequest->request_status == 'DRAFTED') {
-            $result = [
-                'id' => $miscStockRequest->id,
-                'requestNo' => $miscStockRequest->request_no,
-                'warehouseName' => null,
-                'expectedQty' => $miscStockRequest->expected_qty,
-                'requestDate' => $miscStockRequest->request_date,
-                'submittedAt' => $miscStockRequest->submitted_at,
-                'expectedDate' => $miscStockRequest->expected_date,
-                'tax' => config('uec.options.taxes')[$miscStockRequest->tax] ?? null,
-                'expectedTaxAmount' => null,
-                'expectedAmount' => null,
-                'remark' => $miscStockRequest->remark,
-                'shipToName' => $miscStockRequest->ship_to_name,
-                'shipToMobile' => $miscStockRequest->ship_to_mobile,
-                'shipToAddress' => $miscStockRequest->ship_to_address,
-                'actualDate' => $miscStockRequest->actual_date,
-                'actualTaxAmount' => round($miscStockRequest->actual_tax_amount),
-                'actualAmount' => round($miscStockRequest->actual_amount),
-                'items' => null,
-            ];
+        $result = [
+            'id' => $miscStockRequest->id,
+            'requestNo' => $miscStockRequest->request_no,
+            'warehouseName' => null,
+            'expectedQty' => $miscStockRequest->expected_qty,
+            'requestDate' => $miscStockRequest->request_date,
+            'submittedAt' => $miscStockRequest->submitted_at,
+            'expectedDate' => $miscStockRequest->expected_date,
+            'tax' => config('uec.options.taxes')[$miscStockRequest->tax] ?? null,
+            'expectedTaxAmount' => null,
+            'expectedAmount' => null,
+            'remark' => $miscStockRequest->remark,
+            'shipToName' => $miscStockRequest->ship_to_name,
+            'shipToMobile' => $miscStockRequest->ship_to_mobile,
+            'shipToAddress' => $miscStockRequest->ship_to_address,
+            'actualDate' => $miscStockRequest->actual_date,
+            'actualTaxAmount' => round($miscStockRequest->actual_tax_amount),
+            'actualAmount' => round($miscStockRequest->actual_amount),
+            'items' => null,
+        ];
 
-            if (isset($miscStockRequest->warehouse)) {
-                $result['warehouseName'] = $miscStockRequest->warehouse->name;
-            }
+        if (isset($miscStockRequest->warehouse)) {
+            $result['warehouseName'] = $miscStockRequest->warehouse->name;
+        }
 
-            $requestAmount = 0;
-            if ($miscStockRequest->miscStockRequestDetails->isNotEmpty()) {
-                foreach ($miscStockRequest->miscStockRequestDetails as $detail) {
-                    $tmpDetail = [
-                        'productNo' => null,
-                        'productName' => null,
-                        'itemNo' => null,
-                        'spec1Value' => null,
-                        'spec2Value' => null,
-                        'unitPrice' => null,
-                        'stockQty' => null,
-                        'expectedQty' => $detail->expected_qty,
-                        'expectedSubtotal' => 0,
-                        'supplierName' => null,
-                        'actualQty' => $detail->actual_qty,
-                        'actualSubtotal' => round($detail->actual_subtotal),
-                    ];
+        $requestAmount = 0;
+        if ($miscStockRequest->miscStockRequestDetails->isNotEmpty()) {
+            foreach ($miscStockRequest->miscStockRequestDetails as $detail) {
+                $tmpDetail = [
+                    'productNo' => null,
+                    'productName' => null,
+                    'itemNo' => null,
+                    'spec1Value' => null,
+                    'spec2Value' => null,
+                    'unitPrice' => null,
+                    'stockQty' => null,
+                    'expectedQty' => $detail->expected_qty,
+                    'expectedSubtotal' => 0,
+                    'supplierName' => null,
+                    'actualQty' => $detail->actual_qty,
+                    'actualSubtotal' => round($detail->actual_subtotal),
+                ];
 
-                    if (isset($detail->productItem)) {
-                        $tmpDetail['itemNo'] = $detail->productItem->item_no;
-                        $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
-                        $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
+                $unitPrice = null;
+                $expectedSubtotal = null;
+                $stockQty = null;
+                if (isset($detail->productItem)) {
+                    $tmpDetail['itemNo'] = $detail->productItem->item_no;
+                    $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
+                    $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
 
-                        if (isset($detail->productItem->product)) {
-                            $tmpDetail['productNo'] = $detail->productItem->product->product_no;
-                            $tmpDetail['productName'] = $detail->productItem->product->product_name;
-                            $tmpDetail['unitPrice'] = $detail->productItem->product->item_cost * 100 / 100;
-                            $tmpDetail['expectedSubtotal'] = round($tmpDetail['unitPrice'] * $tmpDetail['expectedQty']);
+                    if (isset($detail->productItem->product)) {
+                        $tmpDetail['productNo'] = $detail->productItem->product->product_no;
+                        $tmpDetail['productName'] = $detail->productItem->product->product_name;
+                        $unitPrice = $detail->productItem->product->item_cost * 100 / 100;
+                        $expectedSubtotal = round($unitPrice * $tmpDetail['expectedQty']);
+                        $requestAmount += $expectedSubtotal;
 
-                            if (isset($detail->productItem->product->supplier)) {
-                                $tmpDetail['supplierName'] = $detail->productItem->product->supplier->name;
-                            }
-                        }
-
-                        $warehouse = $detail->productItem->warehouses->first();
-                        if (isset($warehouse)) {
-                            $tmpDetail['stockQty'] = $warehouse->pivot->stock_qty;
+                        if (isset($detail->productItem->product->supplier)) {
+                            $tmpDetail['supplierName'] = $detail->productItem->product->supplier->name;
                         }
                     }
 
-                    $requestAmount += $tmpDetail['expectedSubtotal'];
-                    $result['items'][] = $tmpDetail;
+                    $warehouse = $detail->productItem->warehouses->first();
+                    if (isset($warehouse)) {
+                        $stockQty = $warehouse->pivot->stock_qty;
+                    }
                 }
-            }
 
+                // 草稿需重新計算金額、庫存
+                if ($miscStockRequest->request_status == 'DRAFTED') {
+                    $tmpDetail['unitPrice'] = $unitPrice;
+                    $tmpDetail['stockQty'] = $stockQty;
+                    $tmpDetail['expectedSubtotal'] = $expectedSubtotal;
+                } else {
+                    $tmpDetail['unitPrice'] = $detail->unit_price * 100 / 100;
+                    $tmpDetail['stockQty'] = $detail->onhand_qty;
+                    $tmpDetail['expectedSubtotal'] = round($detail->expected_subtotal);
+                }
+
+                $result['items'][] = $tmpDetail;
+            }
+        }
+
+        // 草稿需重新計算金額
+        if ($miscStockRequest->request_status == 'DRAFTED') {
             $this->moneyAmountService
                 ->setOriginalPrice($requestAmount)
                 ->setTaxType((int) $miscStockRequest->tax)
@@ -778,65 +793,172 @@ class MiscStockRequestService
             $result['expectedTaxAmount'] = round($this->moneyAmountService->getOriginalTaxPrice());
             $result['expectedAmount'] = round($requestAmount);
         } else {
-            $result = [
-                'id' => $miscStockRequest->id,
-                'requestNo' => $miscStockRequest->request_no,
-                'warehouseName' => null,
-                'expectedQty' => $miscStockRequest->expected_qty,
-                'requestDate' => $miscStockRequest->request_date,
-                'submittedAt' => $miscStockRequest->submitted_at,
-                'expectedDate' => $miscStockRequest->expected_date,
-                'tax' => config('uec.options.taxes')[$miscStockRequest->tax] ?? null,
-                'expectedTaxAmount' => round($miscStockRequest->expected_tax_amount),
-                'expectedAmount' => round($miscStockRequest->expected_amount),
-                'remark' => $miscStockRequest->remark,
-                'shipToName' => $miscStockRequest->ship_to_name,
-                'shipToMobile' => $miscStockRequest->ship_to_mobile,
-                'shipToAddress' => $miscStockRequest->ship_to_address,
-                'actualDate' => $miscStockRequest->actual_date,
-                'actualTaxAmount' => round($miscStockRequest->actual_tax_amount),
-                'actualAmount' => round($miscStockRequest->actual_amount),
-                'items' => null,
+            $result['expectedTaxAmount'] = round($miscStockRequest->expected_tax_amount);
+            $result['expectedAmount'] = round($miscStockRequest->expected_amount);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 取得供應商modal的列表
+     *
+     * @param integer $requestId
+     * @return Collection
+     */
+    public function getSupplierModalList(int $requestId): Collection
+    {
+        $requestSuppliers = MiscStockRequestSupplier::with([
+            'supplier',
+            'miscStockRequestDetails',
+            'miscStockRequestDetails.productItem',
+            'miscStockRequestDetails.productItem.product' => function ($query) {
+                $query->select()->addSelect(DB::raw('get_latest_product_cost(id, TRUE) AS item_cost'));
+            },
+        ])->where('misc_stock_request_id', $requestId);
+
+        return $requestSuppliers->get();
+    }
+
+    /**
+     * 整理供應商modal的列表
+     *
+     * @param Collection $requestSuppliers
+     * @return array
+     */
+    public function formatSupplierModalList(Collection $requestSuppliers): array
+    {
+        $result = [];
+        foreach ($requestSuppliers as $requestSupplier) {
+            $tmpRequestSupplier = [
+                'id' => $requestSupplier->id,
+                'supplierName' => null,
+                'statusCode' => config('uec.options.misc_stock_requests.status_codes.out')[$requestSupplier->status_code] ?? null,
+                'expectedQty' => $requestSupplier->expected_qty,
+                'expectedAmount' => null,
             ];
 
-            if (isset($miscStockRequest->warehouse)) {
-                $result['warehouseName'] = $miscStockRequest->warehouse->name;
+            if (isset($requestSupplier->supplier)) {
+                $tmpRequestSupplier['supplierName'] = $requestSupplier->supplier->name;
             }
 
-            if ($miscStockRequest->miscStockRequestDetails->isNotEmpty()) {
-                foreach ($miscStockRequest->miscStockRequestDetails as $detail) {
-                    $tmpDetail = [
-                        'productNo' => null,
-                        'productName' => null,
-                        'itemNo' => null,
-                        'spec1Value' => null,
-                        'spec2Value' => null,
-                        'unitPrice' => $detail->unit_price * 100 / 100,
-                        'stockQty' => $detail->onhand_qty,
-                        'expectedQty' => $detail->expected_qty,
-                        'expectedSubtotal' => round($detail->expected_subtotal),
-                        'supplierName' => null,
-                        'actualQty' => $detail->actual_qty,
-                        'actualSubtotal' => round($detail->actual_subtotal),
-                    ];
-
-                    if (isset($detail->productItem)) {
-                        $tmpDetail['itemNo'] = $detail->productItem->item_no;
-                        $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
-                        $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
-
-                        if (isset($detail->productItem->product)) {
-                            $tmpDetail['productNo'] = $detail->productItem->product->product_no;
-                            $tmpDetail['productName'] = $detail->productItem->product->product_name;
-
-                            if (isset($detail->productItem->product->supplier)) {
-                                $tmpDetail['supplierName'] = $detail->productItem->product->supplier->name;
+            // 草稿需重新計算金額
+            if ($requestSupplier->status_code == 'DRAFTED') {
+                $expectedAmount = 0;
+                if ($requestSupplier->miscStockRequestDetails->isNotEmpty()) {
+                    foreach ($requestSupplier->miscStockRequestDetails as $detail) {
+                        if (isset($detail->productItem)) {
+                            if (isset($detail->productItem->product)) {
+                                $unitPrice = $detail->productItem->product->item_cost * 100 / 100;
+                                $expectedAmount += round($unitPrice * $detail->expected_qty);
                             }
                         }
                     }
-
-                    $result['items'][] = $tmpDetail;
                 }
+
+                $tmpRequestSupplier['expectedAmount'] = round($expectedAmount);
+            } else {
+                $tmpRequestSupplier['expectedAmount'] = round($requestSupplier->expected_amount);
+            }
+
+            $result[] = $tmpRequestSupplier;
+        }
+
+        return $result;
+    }
+
+    /**
+     * 取得供應商modal的明細
+     *
+     * @param integer $requestSupplierId
+     * @return Model
+     */
+    public function getSupplierModalDetail(int $requestSupplierId): Model
+    {
+        $requestSupplier = MiscStockRequestSupplier::with([
+            'miscStockRequestDetails',
+            'miscStockRequestDetails.productItem',
+            'miscStockRequestDetails.productItem.product' => function ($query) {
+                $query->select()->addSelect(DB::raw('get_latest_product_cost(id, TRUE) AS item_cost'));
+            },
+            'reviewer',
+            'miscStockRequest',
+        ])->find($requestSupplierId);
+
+        $requestSupplier->loadMissing(['miscStockRequestDetails.productItem.warehouses' => function ($query) use ($requestSupplier) {
+            $query->where('warehouse.id', $requestSupplier->miscStockRequest->warehouse_id);
+        }]);
+
+        return $requestSupplier;
+    }
+
+    /**
+     * 整理供應商modal的明細
+     *
+     * @param Model $requestSupplier
+     * @return array
+     */
+    public function formatSupplierModalDetail(Model $requestSupplier): array
+    {
+        $result = [
+            'reviewAt' => $requestSupplier->review_at,
+            'reviewerName' => null,
+            'reviewResult' => config('uec.options.review_results')[$requestSupplier->review_result] ?? null,
+            'reviewRemark' => $requestSupplier->review_remark,
+            'items' => null,
+        ];
+
+        if (isset($requestSupplier->reviewer)) {
+            $result['reviewerName'] = $requestSupplier->reviewer->user_name;
+        }
+
+        if ($requestSupplier->miscStockRequestDetails->isNotEmpty()) {
+            foreach ($requestSupplier->miscStockRequestDetails as $detail) {
+                $tmpDetail = [
+                    'productNo' => null,
+                    'productName' => null,
+                    'itemNo' => null,
+                    'spec1Value' => null,
+                    'spec2Value' => null,
+                    'unitPrice' => null,
+                    'stockQty' => null,
+                    'expectedQty' => $detail->expected_qty,
+                    'expectedSubtotal' => null,
+                ];
+
+                $unitPrice = null;
+                $expectedSubtotal = null;
+                $stockQty = null;
+                if (isset($detail->productItem)) {
+                    $tmpDetail['itemNo'] = $detail->productItem->item_no;
+                    $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
+                    $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
+
+                    if (isset($detail->productItem->product)) {
+                        $tmpDetail['productNo'] = $detail->productItem->product->product_no;
+                        $tmpDetail['productName'] = $detail->productItem->product->product_name;
+                        $unitPrice = $detail->productItem->product->item_cost * 100 / 100;
+                        $expectedSubtotal = round($unitPrice * $tmpDetail['expectedQty']);
+                    }
+
+                    $warehouse = $detail->productItem->warehouses->first();
+                    if (isset($warehouse)) {
+                        $stockQty = $warehouse->pivot->stock_qty;
+                    }
+                }
+
+                // 草稿需重新計算金額、庫存
+                if ($requestSupplier->status_code == 'DRAFTED') {
+                    $tmpDetail['unitPrice'] = $unitPrice;
+                    $tmpDetail['stockQty'] = $stockQty;
+                    $tmpDetail['expectedSubtotal'] = $expectedSubtotal;
+                } else {
+                    $tmpDetail['unitPrice'] = $detail->unit_price * 100 / 100;
+                    $tmpDetail['stockQty'] = $detail->onhand_qty;
+                    $tmpDetail['expectedSubtotal'] = round($detail->expected_subtotal);
+                }
+
+                $result['items'][] = $tmpDetail;
             }
         }
 

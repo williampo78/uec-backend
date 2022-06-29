@@ -59,7 +59,7 @@ class MiscStockRequestController extends Controller
         }
 
         $responsePayload = [
-            'statusCodes' => config('uec.options.misc_stock_requests.request_statuses.out'),
+            'requestStatuses' => config('uec.options.misc_stock_requests.request_statuses.out'),
             'suppliers' => $this->supplierService->getSuppliers(),
             'auth' => $request->share_role_auth,
         ];
@@ -233,6 +233,42 @@ class MiscStockRequestController extends Controller
         $list = $this->miscStockRequestService->formatProductItemModalList($list);
         $responsePayload = [
             'list' => $list,
+        ];
+        $response['payload'] = $responsePayload;
+
+        return response()->json($response);
+    }
+
+    /**
+     * 取得供應商modal的列表
+     *
+     * @param int $requestId
+     * @return \Illuminate\Http\Response
+     */
+    public function getSupplierModalList($requestId)
+    {
+        $list = $this->miscStockRequestService->getSupplierModalList($requestId);
+        $list = $this->miscStockRequestService->formatSupplierModalList($list);
+        $responsePayload = [
+            'list' => $list,
+        ];
+        $response['payload'] = $responsePayload;
+
+        return response()->json($response);
+    }
+
+    /**
+     * 取得供應商modal的明細
+     *
+     * @param int $requestSupplierId
+     * @return \Illuminate\Http\Response
+     */
+    public function getSupplierModalDetail($requestSupplierId)
+    {
+        $detail = $this->miscStockRequestService->getSupplierModalDetail($requestSupplierId);
+        $detail = $this->miscStockRequestService->formatSupplierModalDetail($detail);
+        $responsePayload = [
+            'detail' => $detail,
         ];
         $response['payload'] = $responsePayload;
 
