@@ -55,11 +55,12 @@ class APIProductServices
     {
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
+        $s3 = config('filesystems.disks.s3.url');
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
             $strSQL = "select cate2.`sort` L1_SORT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief
+                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
                     from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
                     inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
@@ -82,7 +83,7 @@ class APIProductServices
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
         } elseif ($config_levels == '2') {
             $strSQL = "select cate1.`sort` L1_SORT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief
+                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate1.`category_short_name` as L1_short_name, cate1.`icon_name` as L1_icon_name
                     from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
                     inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
@@ -102,11 +103,12 @@ class APIProductServices
             $strSQL .= " group by cate.`id`
                     order by cate1.`sort`, cate.`sort`";
         }
-
         $categorys = DB::select($strSQL);
         foreach ($categorys as $category) {
             $L1_data[$category->L1_SORT]["id"] = $category->L1ID;
             $L1_data[$category->L1_SORT]["name"] = $category->L1_NAME;
+            $L1_data[$category->L1_SORT]["shortName"] = $category->L1_short_name;
+            $L1_data[$category->L1_SORT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
 
             if ($config_levels == '3') {
                 $L2_data[$category->L1_SORT][$category->sort]["id"] = $category->L2ID;
@@ -146,7 +148,7 @@ class APIProductServices
         //根據階層顯示層級資料(賣場)
         if ($config_levels == '3') {
             $strSQL = "select cate2.`sort` L1_SORT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*,0 as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief
+                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
                     from `web_category_hierarchy` cate
                     inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
@@ -165,7 +167,7 @@ class APIProductServices
                     order by cate2.`sort`, cate1.`sort`, cate.`sort`";
         } elseif ($config_levels == '2') {
             $strSQL = "select cate1.`sort` L1_SORT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, 0 as 'pCount',
-                    pcc.`campaign_name`, pcc.`url_code`, pcc.`campaign_brief`
+                    pcc.`campaign_name`, pcc.`url_code`, pcc.`campaign_brief`, cate1.`category_short_name` as L1_short_name, cate1.`icon_name` as L1_icon_name
                     from web_category_hierarchy cate
                     inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join `promotional_campaigns` pcc on pcc.`id`=cate.`promotion_campaign_id`
@@ -185,6 +187,8 @@ class APIProductServices
         foreach ($categorys as $category) {
             $L1_data[$category->L1_SORT]["id"] = $category->L1ID;
             $L1_data[$category->L1_SORT]["name"] = $category->L1_NAME;
+            $L1_data[$category->L1_SORT]["shortName"] = $category->category_short_name;
+            $L1_data[$category->L1_SORT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
 
             if ($config_levels == '3') {
                 $L2_data[$category->L1_SORT][$category->sort]["id"] = $category->L2ID;
@@ -228,6 +232,8 @@ class APIProductServices
                 $data2 = [];
                 $data[$key1]["id"] = $value1["id"];
                 $data[$key1]["name"] = $value1["name"];
+                $data[$key1]["shortName"] = $value1["shortName"];
+                $data[$key1]["icon"] = $value1["icon"];
                 if ($config_levels == 2) {
                     array_multisort(array_column($L2_data[$key1], 'sort'), SORT_ASC, $L2_data[$key1]);
                 }
@@ -564,13 +570,15 @@ class APIProductServices
     public function getSearchResultForCategory($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $attribute = null, $brand = null)
     {
 
+        $s3 = config('filesystems.disks.s3.url');
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
         $strSQL = "select cate1.id , cate1.category_name ,count(cate1.id) as count, p.id as prod_id";
         if ($config_levels == 3) {
             $strSQL .= ",cate2.id as L2, cate2.category_name as L2_Name,cate3.id as L1, cate3.category_name as L1_Name ";
+            $strSQL .= ", cate3.category_short_name as L1_category_short_name, cate3.icon_name as L1_icon_name ";
         } else {
-            $strSQL .= ",cate2.id as L1, cate2.category_name as L1_Name ";
+            $strSQL .= ",cate2.id as L1, cate2.category_name as L1_Name, cate2.category_short_name as L1_category_short_name, cate2.icon_name as L1_icon_name ";
         }
 
         $strSQL .= "from web_category_products
@@ -623,7 +631,7 @@ class APIProductServices
         } else {
             $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
         }
-        //dd($strSQL);
+
         $products = DB::select($strSQL);
 
         foreach ($products as $cateID => $product) {
@@ -670,6 +678,8 @@ class APIProductServices
                     $data[] = array(
                         'id' => $category->L1,
                         'name' => $category->L1_Name,
+                        'shortName' => $category->L1_category_short_name,
+                        'icon' => ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null),
                         'sub' => $sub[$category->L1]
                     );
                     $cate = $category->L1;
@@ -688,9 +698,11 @@ class APIProductServices
                 foreach ($products as $category) {
                     if ($cate == $category->L1) continue;
                     $data[] = array(
-                        'id' => $category->L2,
-                        'name' => $category->L2_Name,
-                        'sub' => $main[$category->L1]
+                        'id' => $category->L1,
+                        'name' => $category->L1_Name,
+                        'shortName' => $category->L1_category_short_name,
+                        'icon' => ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null),
+                        'sub' => $main
                     );
                     $cate = $category->L1;
                 }
