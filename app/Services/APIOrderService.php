@@ -255,7 +255,7 @@ class APIOrderService
                     $point_discount += round($discount_rate[$seq] * $order['points']);
                     $detail_p_discount += $cart_p_discount_prod[$products['productID']][$item['itemId']];
                     $order_detail_id_M = OrderDetail::insertGetId($details[$seq]);
-                    $order_detail_temp[$products['productID']] = $order_detail_id_M;
+                    $order_detail_temp[$products['productID']][$item['itemId']] = $order_detail_id_M;
                     $campaign_id = 0;
                     //有單品滿額贈時，正貨也寫入discount
                     if (isset($campaign['PRD']['GIFT'][$products['productID']])) {
@@ -496,7 +496,7 @@ class APIOrderService
                                         "order_id" => $newOrder->id,
                                         "level_code" => 'CART_P',
                                         "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
-                                        "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
+                                        "order_detail_id" => isset($order_detail_temp[$product_id][$item['itemId']]) ? $order_detail_temp[$product_id][$item['itemId']] : null,
                                         "promotion_campaign_id" => $threshold['campaignID'],
                                         "product_id" => $product_id,
                                         "product_item_id" => $item['itemId'],
@@ -545,7 +545,7 @@ class APIOrderService
                                         "order_id" => $newOrder->id,
                                         "level_code" => 'CART_P',
                                         "group_seq" => $campaign_group[$product_id][$threshold['campaignID']],
-                                        "order_detail_id" => isset($order_detail_temp[$product_id]) ? $order_detail_temp[$product_id] : null,
+                                        "order_detail_id" => isset($order_detail_temp[$product_id][$item['itemId']]) ? $order_detail_temp[$product_id][$item['itemId']] : null,
                                         "promotion_campaign_id" => $threshold['campaignID'],
                                         "product_id" => $product_id,
                                         "product_item_id" => $item['itemId'],
