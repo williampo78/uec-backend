@@ -55,7 +55,7 @@
                                             </div>
                                             <div class="col-sm-9">
                                                 <select2 class="form-control" :options="requestStatuses"
-                                                    v-model="form.statusCode" name="statusCode">
+                                                    v-model="form.requestStatus" name="requestStatus">
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -212,7 +212,7 @@
                                             <td>@{{ request.expectedDate }}</td>
                                             <td>@{{ request.submittedAt }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-primary btn-sm" @click="viewRequestSuppliers(request.id, request.requestNo)">
+                                                <button type="button" class="btn btn-primary btn-sm" @click="viewSuppliers(request.id, request.requestNo)">
                                                     @{{ request.totalSupCount }}
                                                 </button>
                                             </td>
@@ -255,7 +255,7 @@
                         config: {},
                     },
                     requestNo: "",
-                    statusCode: "",
+                    requestStatus: "",
                     actualDateStart: {
                         name: "actualDateStart",
                         date: "",
@@ -296,6 +296,7 @@
                         id: "supplier-modal",
                         title: "",
                         list: [],
+                        requestId: "",
                         detail: {
                             isShow: false,
                             supplierName: "",
@@ -332,9 +333,9 @@
                 let payload = @json($payload);
 
                 if (payload.requestStatuses) {
-                    Object.entries(payload.requestStatuses).forEach(([key, statusCode]) => {
+                    Object.entries(payload.requestStatuses).forEach(([key, requestStatus]) => {
                         this.requestStatuses.push({
-                            text: statusCode,
+                            text: requestStatus,
                             id: key,
                         });
                     });
@@ -652,30 +653,31 @@
                         });
                     }
                 },
-                async viewRequestSuppliers(id, requestNo) {
+                async viewSuppliers(id, requestNo) {
                     this.modal.supplier.title = `退貨單號【${requestNo}】`;
                     this.modal.supplier.detail.isShow = false;
-                    let requestSuppliers = await this.getRequestSuppliers(id);
+                    let suppliers = await this.getSuppliers(id);
 
+                    this.modal.supplier.requestId = id;
                     this.modal.supplier.list = [];
-                    if (Array.isArray(requestSuppliers) && requestSuppliers.length) {
-                        requestSuppliers.forEach(requestSupplier => {
+                    if (Array.isArray(suppliers) && suppliers.length) {
+                        suppliers.forEach(supplier => {
                             this.modal.supplier.list.push({
-                                id: requestSupplier.id,
-                                supplierName: requestSupplier.supplierName,
-                                statusCode: requestSupplier.statusCode,
-                                expectedQty: requestSupplier.expectedQty,
-                                expectedAmount: requestSupplier.expectedAmount.toLocaleString('en-US'),
+                                id: supplier.id,
+                                name: supplier.name,
+                                statusCode: supplier.statusCode,
+                                expectedQty: supplier.expectedQty,
+                                expectedAmount: supplier.expectedAmount.toLocaleString('en-US'),
                             });
                         });
                     }
 
                     $(`#${this.modal.supplier.id}`).modal('show');
                 },
-                getRequestSuppliers(id) {
+                getSuppliers(id) {
                     return axios({
                             method: "get",
-                            url: `${BASE_URI}/${id}/supplier-modal/list`,
+                            url: `${BASE_URI}/${id}/supplier-modal/suppliers`,
                         })
                         .then(function(response) {
                             return response.data.payload.list;
@@ -684,8 +686,8 @@
                             console.log(error);
                         });
                 },
-                async viewRequestSupplierDetail(requestSupplierId, supplierName) {
-                    let detail = await this.getRequestSupplierDetail(requestSupplierId);
+                async viewRequestSupplierDetail(supplierId, supplierName) {
+                    let detail = await this.getRequestSupplierDetail(supplierId);
 
                     this.modal.supplier.detail.supplierName = supplierName;
                     this.modal.supplier.detail.reviewAt = detail.reviewAt ? moment(detail.reviewAt).format("YYYY-MM-DD HH:mm") : "";
@@ -712,10 +714,10 @@
 
                     this.modal.supplier.detail.isShow = true;
                 },
-                getRequestSupplierDetail(requestSupplierId) {
+                getRequestSupplierDetail(supplierId) {
                     return axios({
                             method: "get",
-                            url: `${BASE_URI}/supplier-modal/list/${requestSupplierId}`,
+                            url: `${BASE_URI}/${this.modal.supplier.requestId}/supplier-modal/suppliers/${supplierId}`,
                         })
                         .then(function(response) {
                             return response.data.payload.detail;

@@ -30,67 +30,59 @@ class MiscStockRequestService
      */
     public function getStockRequestTableList(array $data = []): Collection
     {
-        $miscStockRequests = MiscStockRequest::latest('request_no');
-
+        $miscStockRequests = MiscStockRequest::latest('request_no')
         // 申請單時間-開始日期
-        if (isset($data['requestDateStart'])) {
-            $miscStockRequests = $miscStockRequests->whereDate('request_date', '>=', $data['requestDateStart']);
-        }
-
+            ->when(isset($data['requestDateStart']), function ($query) use ($data) {
+                $query->whereDate('request_date', '>=', $data['requestDateStart']);
+            })
         // 申請單時間-結束日期
-        if (isset($data['requestDateEnd'])) {
-            $miscStockRequests = $miscStockRequests->whereDate('request_date', '<=', $data['requestDateEnd']);
-        }
-
+            ->when(isset($data['requestDateEnd']), function ($query) use ($data) {
+                $query->whereDate('request_date', '<=', $data['requestDateEnd']);
+            })
         // 申請單號
-        if (isset($data['requestNo'])) {
-            $miscStockRequests = $miscStockRequests->where('request_no', $data['requestNo']);
-        }
-
+            ->when(isset($data['requestNo']), function ($query) use ($data) {
+                $query->where('request_no', $data['requestNo']);
+            })
         // 狀態
-        if (isset($data['statusCode'])) {
-            $miscStockRequests = $miscStockRequests->whereHas('suppliers', function (Builder $query) use ($data) {
-                $query->where('misc_stock_request_suppliers.status_code', $data['statusCode']);
-            });
-        }
-
+            ->when(isset($data['requestStatus']), function ($query) use ($data) {
+                $query->where('request_status', $data['requestStatus']);
+            })
         // 實際出入庫日期-開始日期
-        if (isset($data['actualDateStart'])) {
-            $miscStockRequests = $miscStockRequests->whereDate('actual_date', '>=', $data['actualDateStart']);
-        }
-
+            ->when(isset($data['actualDateStart']), function ($query) use ($data) {
+                $query->whereDate('actual_date', '>=', $data['actualDateStart']);
+            })
         // 實際出入庫日期-結束日期
-        if (isset($data['actualDateEnd'])) {
-            $miscStockRequests = $miscStockRequests->whereDate('actual_date', '<=', $data['actualDateEnd']);
-        }
-
+            ->when(isset($data['actualDateEnd']), function ($query) use ($data) {
+                $query->whereDate('actual_date', '<=', $data['actualDateEnd']);
+            })
         // 商品序號
-        if (isset($data['productNo'])) {
-            $productNos = explode(',', $data['productNo']);
-            $productNos = array_unique($productNos);
+            ->when(isset($data['productNo']), function ($query) use ($data) {
+                $productNos = explode(',', $data['productNo']);
+                $productNos = array_unique($productNos);
 
-            if (!empty($productNos)) {
-                $miscStockRequests = $miscStockRequests->whereHas('miscStockRequestDetails.productItem.product', function (Builder $query) use ($productNos) {
-                    foreach ($productNos as $productNo) {
-                        $query->orWhere('product_no', 'like', "%{$productNo}%");
-                    }
-                });
-            }
-        }
-
+                if (!empty($productNos)) {
+                    $query->whereHas('miscStockRequestDetails.productItem.product', function (Builder $query) use ($productNos) {
+                        $query->where(function ($query) use ($productNos) {
+                            foreach ($productNos as $productNo) {
+                                $query->orWhere('product_no', 'like', "%{$productNo}%");
+                            }
+                        });
+                    });
+                }
+            })
         // 供應商
-        if (isset($data['supplierId'])) {
-            $miscStockRequests = $miscStockRequests->whereHas('suppliers', function (Builder $query) use ($data) {
-                $query->where('supplier.id', $data['supplierId']);
-            });
-        }
-
+            ->when(isset($data['supplierId']), function ($query) use ($data) {
+                $query->whereHas('suppliers', function (Builder $query) use ($data) {
+                    $query->where('supplier.id', $data['supplierId']);
+                });
+            })
         // 限制筆數
-        if (isset($data['limit'])) {
-            $miscStockRequests = $miscStockRequests->limit($data['limit']);
-        }
+            ->when(isset($data['limit']), function ($query) use ($data) {
+                $query->limit($data['limit']);
+            })
+            ->get();
 
-        return $miscStockRequests->get();
+        return $miscStockRequests;
     }
 
     /**
@@ -142,59 +134,55 @@ class MiscStockRequestService
             'warehouses' => function ($query) use ($data) {
                 $query->where('warehouse.id', $data['warehouseId']);
             },
-        ])->where('agent_id', $user->agent_id);
-
+        ])
+            ->where('agent_id', $user->agent_id)
         // 庫存必需大於0
-        $productItems = $productItems->whereHas('warehouses', function (Builder $query) use ($data) {
-            $query->where('warehouse.id', $data['warehouseId'])->where('warehouse_stock.stock_qty', '>', 0);
-        });
-
+            ->whereHas('warehouses', function (Builder $query) use ($data) {
+                $query->where('warehouse.id', $data['warehouseId'])->where('warehouse_stock.stock_qty', '>', 0);
+            })
         // 庫存類型:買斷
-        $productItems = $productItems->whereHas('product', function (Builder $query) {
-            $query->where('stock_type', 'A');
-        });
-
+            ->whereHas('product', function (Builder $query) {
+                $query->where('stock_type', 'A');
+            })
         // 商品序號
-        if (isset($data['productNo'])) {
-            $productNos = explode(',', $data['productNo']);
-            $productNos = array_unique($productNos);
+            ->when(isset($data['productNo']), function ($query) use ($data) {
+                $productNos = explode(',', $data['productNo']);
+                $productNos = array_unique($productNos);
 
-            if (!empty($productNos)) {
-                $productItems = $productItems->whereHas('product', function (Builder $query) use ($productNos) {
-                    $query->where(function ($query) use ($productNos) {
-                        foreach ($productNos as $productNo) {
-                            $query->orWhere('product_no', 'like', "%{$productNo}%");
-                        }
+                if (!empty($productNos)) {
+                    $query->whereHas('product', function (Builder $query) use ($productNos) {
+                        $query->where(function ($query) use ($productNos) {
+                            foreach ($productNos as $productNo) {
+                                $query->orWhere('product_no', 'like', "%{$productNo}%");
+                            }
+                        });
                     });
-                });
-            }
-        }
-
+                }
+            })
         // 商品名稱
-        if (isset($data['productName'])) {
-            $productItems = $productItems->whereHas('product', function (Builder $query) use ($data) {
-                $query->where('product_name', 'like', "%{$data['productName']}%");
-            });
-        }
-
+            ->when(isset($data['productName']), function ($query) use ($data) {
+                $query->whereHas('product', function (Builder $query) use ($data) {
+                    $query->where('product_name', 'like', "%{$data['productName']}%");
+                });
+            })
         // 供應商
-        if (isset($data['supplierId'])) {
-            $productItems = $productItems->whereHas('product.supplier', function (Builder $query) use ($data) {
-                $query->where('supplier_id', $data['supplierId']);
-            });
-        }
-
+            ->when(isset($data['supplierId']), function ($query) use ($data) {
+                $query->whereHas('product.supplier', function (Builder $query) use ($data) {
+                    $query->where('supplier_id', $data['supplierId']);
+                });
+            })
         // 限制筆數
-        if (isset($data['limit'])) {
-            $productItems = $productItems->limit($data['limit']);
-        }
-
+            ->when(isset($data['limit']), function ($query) use ($data) {
+                $query->limit($data['limit']);
+            })
         // 排除已存在的品項
-        if (!empty($data['excludeProductItemIds'])) {
-            $productItems = $productItems->whereNotIn('id', $data['excludeProductItemIds']);
-        }
+            ->when(!empty($data['excludeProductItemIds']), function ($query) use ($data) {
+                $query->whereNotIn('id', $data['excludeProductItemIds']);
+            })
+            ->oldest('id')
+            ->get();
 
-        return $productItems->oldest('id')->get();
+        return $productItems;
     }
 
     /**
@@ -831,15 +819,15 @@ class MiscStockRequestService
         $result = [];
         foreach ($requestSuppliers as $requestSupplier) {
             $tmpRequestSupplier = [
-                'id' => $requestSupplier->id,
-                'supplierName' => null,
+                'id' => $requestSupplier->supplier_id,
+                'name' => null,
                 'statusCode' => config('uec.options.misc_stock_requests.status_codes.out')[$requestSupplier->status_code] ?? null,
                 'expectedQty' => $requestSupplier->expected_qty,
                 'expectedAmount' => null,
             ];
 
             if (isset($requestSupplier->supplier)) {
-                $tmpRequestSupplier['supplierName'] = $requestSupplier->supplier->name;
+                $tmpRequestSupplier['name'] = $requestSupplier->supplier->name;
             }
 
             // 草稿需重新計算金額
@@ -870,23 +858,26 @@ class MiscStockRequestService
     /**
      * 取得供應商modal的明細
      *
-     * @param integer $requestSupplierId
+     * @param integer $requestId
+     * @param integer $supplierId
      * @return Model
      */
-    public function getSupplierModalDetail(int $requestSupplierId): Model
+    public function getSupplierModalDetail(int $requestId, int $supplierId): Model
     {
+        $request = MiscStockRequest::find($requestId);
         $requestSupplier = MiscStockRequestSupplier::with([
             'miscStockRequestDetails',
             'miscStockRequestDetails.productItem',
             'miscStockRequestDetails.productItem.product' => function ($query) {
                 $query->select()->addSelect(DB::raw('get_latest_product_cost(id, TRUE) AS item_cost'));
             },
-            'reviewer',
-            'miscStockRequest',
-        ])->find($requestSupplierId);
+            'reviewedBy',
+        ])->where('misc_stock_request_id', $requestId)
+            ->where('supplier_id', $supplierId)
+            ->first();
 
-        $requestSupplier->loadMissing(['miscStockRequestDetails.productItem.warehouses' => function ($query) use ($requestSupplier) {
-            $query->where('warehouse.id', $requestSupplier->miscStockRequest->warehouse_id);
+        $requestSupplier->loadMissing(['miscStockRequestDetails.productItem.warehouses' => function ($query) use ($request) {
+            $query->where('warehouse.id', $request->warehouse_id);
         }]);
 
         return $requestSupplier;
@@ -908,8 +899,8 @@ class MiscStockRequestService
             'items' => null,
         ];
 
-        if (isset($requestSupplier->reviewer)) {
-            $result['reviewerName'] = $requestSupplier->reviewer->user_name;
+        if (isset($requestSupplier->reviewedBy)) {
+            $result['reviewerName'] = $requestSupplier->reviewedBy->user_name;
         }
 
         if ($requestSupplier->miscStockRequestDetails->isNotEmpty()) {
@@ -1004,24 +995,23 @@ class MiscStockRequestService
      */
     public function getStockReviewTableList(array $data = []): Collection
     {
-        $miscStockRequests = MiscStockRequest::oldest('request_no')->where('request_status', 'REVIEWING');
-
+        $miscStockRequests = MiscStockRequest::oldest('request_no')
+            ->where('request_status', 'REVIEWING')
         // 申請單號
-        if (isset($data['requestNo'])) {
-            $miscStockRequests = $miscStockRequests->where('request_no', $data['requestNo']);
-        }
-
+            ->when(isset($data['requestNo']), function ($query) use ($data) {
+                $query->where('request_no', $data['requestNo']);
+            })
         // 送審時間-開始日期
-        if (isset($data['submittedAtStart'])) {
-            $miscStockRequests = $miscStockRequests->whereDate('submitted_at', '>=', $data['submittedAtStart']);
-        }
-
+            ->when(isset($data['submittedAtStart']), function ($query) use ($data) {
+                $query->whereDate('submitted_at', '>=', $data['submittedAtStart']);
+            })
         // 送審時間-結束日期
-        if (isset($data['submittedAtEnd'])) {
-            $miscStockRequests = $miscStockRequests->whereDate('submitted_at', '<=', $data['submittedAtEnd']);
-        }
+            ->when(isset($data['submittedAtEnd']), function ($query) use ($data) {
+                $query->whereDate('submitted_at', '<=', $data['submittedAtEnd']);
+            })
+            ->get();
 
-        return $miscStockRequests->get();
+        return $miscStockRequests;
     }
 
     /**
@@ -1048,5 +1038,200 @@ class MiscStockRequestService
         }
 
         return $result;
+    }
+
+    /**
+     * 取得審核頁的進貨退出單
+     *
+     * @param integer $id
+     * @return Model
+     */
+    public function getStockRequestForReviewPage(int $id): Model
+    {
+        $request = MiscStockRequest::with([
+            'warehouse',
+            'suppliers' => function ($query) {
+                $query->wherePivotNull('reviewer');
+            },
+        ])->find($id);
+
+        return $request;
+    }
+
+    /**
+     * 整理審核頁的進貨退出單
+     *
+     * @param Model $miscStockRequest
+     * @return array
+     */
+    public function formatStockRequestForReviewPage(Model $miscStockRequest): array
+    {
+        $result = [
+            'id' => $miscStockRequest->id,
+            'requestNo' => $miscStockRequest->request_no,
+            'warehouseName' => null,
+            'expectedQty' => $miscStockRequest->expected_qty,
+            'requestDate' => $miscStockRequest->request_date,
+            'submittedAt' => $miscStockRequest->submitted_at,
+            'expectedDate' => $miscStockRequest->expected_date,
+            'tax' => config('uec.options.taxes')[$miscStockRequest->tax] ?? null,
+            'expectedTaxAmount' => round($miscStockRequest->expected_tax_amount),
+            'expectedAmount' => round($miscStockRequest->expected_amount),
+            'remark' => $miscStockRequest->remark,
+            'suppliers' => null,
+        ];
+
+        if (isset($miscStockRequest->warehouse)) {
+            $result['warehouseName'] = $miscStockRequest->warehouse->name;
+        }
+
+        if ($miscStockRequest->suppliers->isNotEmpty()) {
+            foreach ($miscStockRequest->suppliers as $supplier) {
+                $tmpSupplier = [
+                    'id' => $supplier->id,
+                    'name' => $supplier->name,
+                    'expectedQty' => $supplier->pivot->expected_qty,
+                    'expectedAmount' => round($supplier->pivot->expected_amount),
+                ];
+
+                $result['suppliers'][] = $tmpSupplier;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * 取得審核modal的明細
+     *
+     * @param integer $requestId
+     * @param integer $supplierId
+     * @return Model
+     */
+    public function getReviewModalDetail(int $requestId, int $supplierId): Model
+    {
+        $requestSupplier = MiscStockRequestSupplier::with([
+            'miscStockRequestDetails',
+            'miscStockRequestDetails.productItem',
+            'miscStockRequestDetails.productItem.product',
+        ])->where('misc_stock_request_id', $requestId)
+            ->where('supplier_id', $supplierId)
+            ->first();
+
+        return $requestSupplier;
+    }
+
+    /**
+     * 整理審核modal的明細
+     *
+     * @param Model $requestSupplier
+     * @return array
+     */
+    public function formatReviewModalDetail(Model $requestSupplier): array
+    {
+        $result = [
+            'list' => null,
+        ];
+
+        if ($requestSupplier->miscStockRequestDetails->isNotEmpty()) {
+            foreach ($requestSupplier->miscStockRequestDetails as $detail) {
+                $tmpDetail = [
+                    'productNo' => null,
+                    'productName' => null,
+                    'itemNo' => null,
+                    'spec1Value' => null,
+                    'spec2Value' => null,
+                    'unitPrice' => $detail->unit_price * 100 / 100,
+                    'stockQty' => $detail->onhand_qty,
+                    'expectedQty' => $detail->expected_qty,
+                    'expectedSubtotal' => round($detail->expected_subtotal),
+                ];
+
+                if (isset($detail->productItem)) {
+                    $tmpDetail['itemNo'] = $detail->productItem->item_no;
+                    $tmpDetail['spec1Value'] = $detail->productItem->spec_1_value;
+                    $tmpDetail['spec2Value'] = $detail->productItem->spec_2_value;
+
+                    if (isset($detail->productItem->product)) {
+                        $tmpDetail['productNo'] = $detail->productItem->product->product_no;
+                        $tmpDetail['productName'] = $detail->productItem->product->product_name;
+                    }
+                }
+
+                $result['list'][] = $tmpDetail;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * 審核申請單
+     *
+     * @param integer $id
+     * @param array $data
+     * @return array
+     */
+    public function reviewStockRequest(int $id, array $data): array
+    {
+        $user = auth()->user();
+        $isSuccess = false;
+        $remainingSupplierCount = null;
+
+        DB::beginTransaction();
+        try {
+            // 取得申請單
+            $request = MiscStockRequest::findOrFail($id);
+            // 審核的供應商數量
+            $reviewSupplierCount = count($data['supplierIds']);
+
+            $requestSupplierData = [
+                'reviewer' => $user->id,
+                'review_at' => now(),
+                'review_result' => $data['reviewResult'],
+                'review_remark' => $data['reviewRemark'],
+                'updated_by' => $user->id,
+            ];
+
+            $requestData = [
+                'updated_by' => $user->id,
+            ];
+
+            // 核准
+            if ($data['reviewResult'] == 'APPROVE') {
+                $requestSupplierData['status_code'] = 'APPROVED';
+                $requestData['approved_sup_count'] = $request->approved_sup_count + $reviewSupplierCount;
+            }
+            // 駁回
+            else {
+                $requestSupplierData['status_code'] = 'REJECTED';
+                $requestData['rejected_sup_count'] = $request->rejected_sup_count + $reviewSupplierCount;
+            }
+
+            // 更新申請單、供應商的中間表
+            $request->suppliers()->updateExistingPivot($data['supplierIds'], $requestSupplierData);
+
+            // 剩餘未審核的供應商數量
+            $remainingSupplierCount = $request->total_sup_count - ($request->approved_sup_count + $request->rejected_sup_count) - $reviewSupplierCount;
+            // 審核完成
+            if ($remainingSupplierCount <= 0) {
+                $requestData['request_status'] = 'COMPLETED';
+                $requestData['approved_at'] = now();
+            }
+
+            // 更新申請單
+            $request->update($requestData);
+
+            DB::commit();
+            $isSuccess = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+        }
+
+        return [
+            'isSuccess' => $isSuccess,
+            'remainingSupplierCount' => $remainingSupplierCount,
+        ];
     }
 }

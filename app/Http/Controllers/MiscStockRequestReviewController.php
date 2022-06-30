@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\MiscStockRequestService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MiscStockRequestReviewController extends Controller
@@ -84,7 +85,11 @@ class MiscStockRequestReviewController extends Controller
      */
     public function edit($id)
     {
-        //
+        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->getStockRequestForReviewPage($id);
+        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->formatStockRequestForReviewPage($responsePayload['miscStockRequest']);
+        $response['payload'] = $responsePayload;
+
+        return response()->json($response);
     }
 
     /**
@@ -92,11 +97,30 @@ class MiscStockRequestReviewController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+        $requestPayload = $request->only([
+            'supplierIds',
+            'reviewResult',
+            'reviewRemark',
+        ]);
+
+        $reviewResult = $this->miscStockRequestService->reviewStockRequest($id, $requestPayload);
+
+        if (!$reviewResult['isSuccess']) {
+            return response()->json([
+                'message' => '儲存失敗',
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => '儲存成功',
+            'payload' => [
+                'remainingSupplierCount' => $reviewResult['remainingSupplierCount'],
+            ],
+        ]);
     }
 
     /**
@@ -108,5 +132,24 @@ class MiscStockRequestReviewController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * 取得審核modal的明細
+     *
+     * @param integer $requestId
+     * @param integer $supplierId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getReviewModalDetail(int $requestId, int $supplierId): JsonResponse
+    {
+        $detail = $this->miscStockRequestService->getReviewModalDetail($requestId, $supplierId);
+        $detail = $this->miscStockRequestService->formatReviewModalDetail($detail);
+        $responsePayload = [
+            'detail' => $detail,
+        ];
+        $response['payload'] = $responsePayload;
+
+        return response()->json($response);
     }
 }

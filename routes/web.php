@@ -289,8 +289,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::group(['prefix' => 'misc-stock-requests'], function () {
         Route::get('/product-item-modal/options', [MiscStockRequestController::class, 'getProductItemModalOptions']);
         Route::get('/product-item-modal/list', [MiscStockRequestController::class, 'getProductItemModalList']);
-        Route::get('/{id}/supplier-modal/list', [MiscStockRequestController::class, 'getSupplierModalList']);
-        Route::get('/supplier-modal/list/{id}', [MiscStockRequestController::class, 'getSupplierModalDetail']);
+        Route::get('/{id}/supplier-modal/suppliers', [MiscStockRequestController::class, 'getSupplierModalList']);
+        Route::get('/{request_id}/supplier-modal/suppliers/{supplier_id}', [MiscStockRequestController::class, 'getSupplierModalDetail']);
         Route::patch('/{id}/expected-date', [MiscStockRequestController::class, 'updateExpectedDate']);
     });
     Route::resource('/misc-stock-requests', MiscStockRequestController::class, [
@@ -306,6 +306,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     ]);
 
     // 進貨退出單審核
+    Route::get('/misc-stock-request-reviews/{request_id}/review-modal/suppliers/{supplier_id}', [MiscStockRequestReviewController::class, 'getReviewModalDetail']);
     Route::resource('/misc-stock-request-reviews', MiscStockRequestReviewController::class, [
         'names' => [
             'index' => 'misc_stock_request_reviews',

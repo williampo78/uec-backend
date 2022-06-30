@@ -39,7 +39,7 @@ class MiscStockRequestSupplier extends Model
     /**
      * 建立與簽核者的關聯
      */
-    public function reviewer()
+    public function reviewedBy()
     {
         return $this->belongsTo(User::class, 'reviewer');
     }

@@ -6,6 +6,7 @@ use App\Services\MiscStockRequestService;
 use App\Services\SupplierService;
 use App\Services\SysConfigService;
 use App\Services\WarehouseService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MiscStockRequestController extends Controller
@@ -38,7 +39,7 @@ class MiscStockRequestController extends Controller
             'requestDateStart',
             'requestDateEnd',
             'requestNo',
-            'statusCode',
+            'requestStatus',
             'actualDateStart',
             'actualDateEnd',
             'productNo',
@@ -260,12 +261,13 @@ class MiscStockRequestController extends Controller
     /**
      * 取得供應商modal的明細
      *
-     * @param int $requestSupplierId
-     * @return \Illuminate\Http\Response
+     * @param integer $requestId
+     * @param integer $supplierId
+     * @return JsonResponse
      */
-    public function getSupplierModalDetail($requestSupplierId)
+    public function getSupplierModalDetail(int $requestId, int $supplierId): JsonResponse
     {
-        $detail = $this->miscStockRequestService->getSupplierModalDetail($requestSupplierId);
+        $detail = $this->miscStockRequestService->getSupplierModalDetail($requestId, $supplierId);
         $detail = $this->miscStockRequestService->formatSupplierModalDetail($detail);
         $responsePayload = [
             'detail' => $detail,

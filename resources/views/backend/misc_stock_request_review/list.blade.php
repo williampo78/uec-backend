@@ -100,7 +100,8 @@
                 </div>
             </div>
         </div>
-        {{-- @include('backend.misc_stock_request_review.review') --}}
+        @include('backend.misc_stock_request_review.review')
+        @include('backend.misc_stock_request_review.review_detail')
     </div>
 @endsection
 
@@ -138,15 +139,24 @@
                         expectedTaxAmount: "",
                         expectedAmount: "",
                         remark: "",
+                        suppliers: [],
                         form: {
-                            requestSuppliers: [],
+                            requestId: "",
+                            supplierIds: [],
                             reviewResult: "",
                             reviewRemark: "",
                         },
                     },
+                    reviewDetail: {
+                        id: "review-detail-modal",
+                        title: "",
+                        list: [],
+                    },
                 },
                 miscStockRequests: [],
                 auth: {},
+                reviewValidator: {},
+                reviewButtonEvent: {},
             },
             created() {
                 let payload = @json($payload);
@@ -172,7 +182,54 @@
                 this.initFlatPickrConfigs();
             },
             mounted() {
+                let self = this;
 
+                // 驗證表單
+                this.reviewValidator = $("#review-form").validate({
+                    // debug: true,
+                    submitHandler: function(form) {
+                        self.updateReviewResult();
+                    },
+                    rules: {
+                        reviewResult: {
+                            required: true,
+                        },
+                        reviewRemark: {
+                            required: {
+                                depends: function (element) {
+                                    return self.modal.review.form.reviewResult == "REJECT";
+                                }
+                            },
+                            maxlength: 150,
+                        },
+                    },
+                    errorClass: "help-block",
+                    errorElement: "span",
+                    errorPlacement: function(error, element) {
+                        if (element.closest(".input-group").length) {
+                            element.closest(".input-group").parent().append(error);
+                            return;
+                        }
+
+                        if (element.closest(".radio-inline").length) {
+                            element.closest(".radio-inline").parent().append(error);
+                            return;
+                        }
+
+                        if (element.is('select')) {
+                            element.parent().append(error);
+                            return;
+                        }
+
+                        error.insertAfter(element);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).closest(".form-group").addClass("has-error");
+                    },
+                    success: function(label, element) {
+                        $(element).closest(".form-group").removeClass("has-error");
+                    },
+                });
             },
             methods: {
                 initFlatPickrConfigs() {
@@ -211,41 +268,40 @@
                         }
                     });
                 },
-                async reviewRequest(id) {
+                async reviewRequest(id, event) {
                     let request = await this.getRequest(id);
 
-                    this.modal.show.requestNo = request.requestNo;
-                    this.modal.show.warehouseName = request.warehouseName;
-                    this.modal.show.expectedQty = request.expectedQty;
-                    this.modal.show.requestDate = moment(request.requestDate).format("YYYY-MM-DD HH:mm");
-                    this.modal.show.submittedAt = request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "";
-                    this.modal.show.expectedDate = request.expectedDate ? moment(request.expectedDate).format("YYYY-MM-DD") : "";
-                    this.modal.show.tax = request.tax;
-                    this.modal.show.expectedTaxAmount = request.expectedTaxAmount.toLocaleString('en-US');
-                    this.modal.show.expectedAmount = request.expectedAmount.toLocaleString('en-US');
-                    this.modal.show.remark = request.remark;
+                    this.modal.review.form.requestId = id;
+                    this.modal.review.requestNo = request.requestNo;
+                    this.modal.review.warehouseName = request.warehouseName;
+                    this.modal.review.expectedQty = request.expectedQty;
+                    this.modal.review.requestDate = moment(request.requestDate).format("YYYY-MM-DD HH:mm");
+                    this.modal.review.submittedAt = request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "";
+                    this.modal.review.expectedDate = request.expectedDate ? moment(request.expectedDate).format("YYYY-MM-DD") : "";
+                    this.modal.review.tax = request.tax;
+                    this.modal.review.expectedTaxAmount = request.expectedTaxAmount.toLocaleString('en-US');
+                    this.modal.review.expectedAmount = request.expectedAmount.toLocaleString('en-US');
+                    this.modal.review.remark = request.remark;
 
-                    this.modal.show.items = [];
-                    if (Array.isArray(request.items) && request.items.length) {
-                        request.items.forEach(item => {
-                            this.modal.show.items.push({
-                                productNo: item.productNo,
-                                productName: item.productName,
-                                itemNo: item.itemNo,
-                                spec1Value: item.spec1Value,
-                                spec2Value: item.spec2Value,
-                                unitPrice: item.unitPrice.toLocaleString('en-US'),
-                                stockQty: item.stockQty,
-                                expectedQty: item.expectedQty,
-                                expectedSubtotal: item.expectedSubtotal.toLocaleString('en-US'),
-                                supplierName: item.supplierName,
-                                actualQty: item.actualQty,
-                                actualSubtotal: item.actualSubtotal.toLocaleString('en-US'),
+                    this.modal.review.suppliers = [];
+                    if (Array.isArray(request.suppliers) && request.suppliers.length) {
+                        request.suppliers.forEach(supplier => {
+                            this.modal.review.suppliers.push({
+                                checked: false,
+                                id: supplier.id,
+                                name: supplier.name,
+                                expectedQty: supplier.expectedQty,
+                                expectedAmount: supplier.expectedAmount.toLocaleString('en-US'),
                             });
                         });
                     }
 
-                    $(`#${this.modal.show.id}`).modal('show');
+                    this.reviewValidator.resetForm();
+                    $("#review-form").find(".has-error").removeClass("has-error");
+                    this.modal.review.form.reviewResult = "";
+                    this.modal.review.form.reviewRemark = "";
+                    this.reviewButtonEvent = event;
+                    $(`#${this.modal.review.id}`).modal('show');
                 },
                 getRequest(id) {
                     return axios({
@@ -260,33 +316,95 @@
                         });
                 },
                 saveReviewResult() {
+                    this.modal.review.form.supplierIds = [];
+                    this.modal.review.suppliers.forEach(supplier => {
+                        if (supplier.checked) {
+                            this.modal.review.form.supplierIds.push(supplier.id);
+                        }
+                    });
+
+                    if (!this.modal.review.form.supplierIds.length) {
+                        alert("至少需勾選一個供應商");
+                        return;
+                    }
+
                     $('#review-form').submit();
                 },
                 updateReviewResult() {
-                    // axios({
-                    //     method: "patch",
-                    //     url: `${BASE_URI}/${this.modal.expectedDate.requestId}/expected-date`,
-                    //     data: {
-                    //         expectedDate: this.modal.expectedDate.expectedDate.date,
-                    //         shipToName: this.modal.expectedDate.shipToName,
-                    //         shipToMobile: this.modal.expectedDate.shipToMobile,
-                    //         shipToAddress: this.modal.expectedDate.shipToAddress,
-                    //     },
-                    // })
-                    // .then((response) => {
-                    //     alert('儲存成功！');
-                    // })
-                    // .catch((error) => {
-                    //     console.log(error);
+                    axios({
+                        method: "patch",
+                        url: `${BASE_URI}/${this.modal.review.form.requestId}`,
+                        data: {
+                            supplierIds: this.modal.review.form.supplierIds,
+                            reviewResult: this.modal.review.form.reviewResult,
+                            reviewRemark: this.modal.review.form.reviewRemark,
+                        },
+                    })
+                    .then((response) => {
+                        let payload = response.data.payload;
 
-                    //     if (error.response) {
-                    //         let data = error.response.data;
-                    //         alert(data.message);
-                    //     }
-                    // })
-                    // .finally(() => {
-                    //     $(`#${this.modal.expectedDate.id}`).modal('hide');
-                    // });
+                        alert('儲存成功！');
+                        if (payload.remainingSupplierCount <= 0) {
+                            let dataTable = $('#table_list').DataTable();
+                            dataTable.row(this.reviewButtonEvent.target.closest("tr")).remove().draw();
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+
+                        if (error.response) {
+                            let data = error.response.data;
+                            alert(data.message);
+                        }
+                    })
+                    .finally(() => {
+                        $(`#${this.modal.review.id}`).modal('hide');
+                    });
+                },
+                async viewSupplierDetail(supplierId, supplierName) {
+                    let detail = await this.getSupplierDetail(supplierId);
+
+                    this.modal.reviewDetail.title = `【${supplierName}】商品明細`;
+                    this.modal.reviewDetail.list = [];
+                    if (Array.isArray(detail.list) && detail.list.length) {
+                        detail.list.forEach(item => {
+                            this.modal.reviewDetail.list.push({
+                                productNo: item.productNo,
+                                productName: item.productName,
+                                itemNo: item.itemNo,
+                                spec1Value: item.spec1Value,
+                                spec2Value: item.spec2Value,
+                                unitPrice: item.unitPrice.toLocaleString('en-US'),
+                                stockQty: item.stockQty,
+                                expectedQty: item.expectedQty,
+                                expectedSubtotal: item.expectedSubtotal.toLocaleString('en-US'),
+                            });
+                        });
+                    }
+
+                    $(`#${this.modal.reviewDetail.id}`).modal('show');
+                },
+                getSupplierDetail(supplierId) {
+                    return axios({
+                            method: "get",
+                            url: `${BASE_URI}/${this.modal.review.form.requestId}/review-modal/suppliers/${supplierId}`,
+                        })
+                        .then(function(response) {
+                            return response.data.payload.detail;
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                },
+                checkAll() {
+                    this.modal.review.suppliers.forEach((supplier) => {
+                        supplier.checked = true;
+                    });
+                },
+                cancelAll() {
+                    this.modal.review.suppliers.forEach((supplier) => {
+                        supplier.checked = false;
+                    });
                 },
             },
         });
