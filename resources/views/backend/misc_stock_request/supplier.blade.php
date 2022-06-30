@@ -24,12 +24,12 @@
                             <tr v-for="(item, index) in modal.supplier.list" :key="index">
                                 <td>
                                     <button type="button" class="btn btn-info btn-sm"
-                                        @click="viewRequestSupplierDetail(item.id, item.supplierName)">
+                                        @click="viewRequestSupplierDetail(item.id, item.name)">
                                         明細
                                     </button>
                                 </td>
                                 <td>@{{ index + 1 }}</td>
-                                <td>@{{ item.supplierName }}</td>
+                                <td>@{{ item.name }}</td>
                                 <td>@{{ item.statusCode }}</td>
                                 <td>@{{ item.expectedQty }}</td>
                                 <td>@{{ item.expectedAmount }}</td>

@@ -35,6 +35,6 @@ class MiscStockRequest extends Model
     {
         return $this->belongsToMany(Supplier::class, 'misc_stock_request_suppliers', 'misc_stock_request_id', 'supplier_id')
             ->withTimestamps()
-            ->withPivot('status_code', 'expected_qty', 'expected_amount', 'actual_qty', 'actual_amount', 'reviewer', 'review_at', 'review_result', 'review_remark');
+            ->withPivot('id', 'status_code', 'expected_qty', 'expected_amount', 'actual_qty', 'actual_amount', 'reviewer', 'review_at', 'review_result', 'review_remark');
     }
 }

@@ -49,7 +49,7 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="col-sm-2">
-                                    <label class="control-label">【物流資訊】聯絡電話</label>
+                                    <label class="control-label">【物流資訊】聯絡電話 <span class="text-red">*</span></label>
                                 </div>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" name="shipToMobile" v-model="modal.expectedDate.shipToMobile">
@@ -61,7 +61,7 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="col-sm-2">
-                                    <label class="control-label">【物流資訊】地址</label>
+                                    <label class="control-label">【物流資訊】地址 <span class="text-red">*</span></label>
                                 </div>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" name="shipToAddress" v-model="modal.expectedDate.shipToAddress">
