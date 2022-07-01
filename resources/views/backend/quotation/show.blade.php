@@ -54,6 +54,7 @@
                             <th>POS品號</th>
                             <th>進貨成本</th>
                             <th>最小採購量</th>
+                            <th>請購單號</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,7 +63,7 @@
                                 <td>{{ $val->product_items_no }}</td>
                                 <td>
                                     @if (!$val->combination_name)
-                                        <span class="text-red">該商品異常</span>
+                                        <span class="redtext">該商品異常</span>
                                     @else
                                         {{ $val->combination_name }}
                                     @endif
@@ -70,6 +71,7 @@
                                 <td>{{ $val->pos_item_no }}</td>
                                 <td>{{ $val->original_unit_price }}</td>
                                 <td>{{ $val->min_purchase_qty }}</td>
+                                <td>測試</td>
                             </tr>
                         @endforeach
 

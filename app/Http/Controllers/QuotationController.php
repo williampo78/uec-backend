@@ -158,10 +158,9 @@ class QuotationController extends Controller
             case 'showQuotation':
                 $data = [];
                 $data['quotation'] = $this->quotationService->getQuotationById($in['id']);
-                $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($in['id'])->transform(function ($obj, $key) use ($brands) {
-
-                    $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
+                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($in['id'])->transform(function ($obj, $key)  {
+                    dd($obj->product_item);
+                    $brandsName = dd($obj->product_item->product->brand->brand_name);
 
                     $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
 
@@ -179,7 +178,7 @@ class QuotationController extends Controller
                     return $obj;
                 });
                 $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($in['id']);
-
+                dd($data);
                 $data['taxlist'] = config('uec.tax_option');
                 return view('backend.quotation.show', $data);
                 break;

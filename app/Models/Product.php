@@ -104,4 +104,11 @@ class Product extends Model
     {
         return $this->hasMany(ProductItem::class, 'product_id');
     }
+    /**
+     * 建立與品牌的關係
+     *
+     */
+    public function brand(){
+        return $this->belongsTo(Brand::class,'brand_id');
+    }
 }
