@@ -59,19 +59,19 @@
                     </thead>
                     <tbody>
                         @foreach ($quotationDetails as $val)
-                            <tr>
-                                <td>{{ $val->product_items_no }}</td>
-                                <td>
+                            <tr class="something">
+                                <td class="col-md-1">{{ $val->item_no }}</td>
+                                <td class="col-md-2">
                                     @if (!$val->combination_name)
                                         <span class="redtext">該商品異常</span>
                                     @else
                                         {{ $val->combination_name }}
                                     @endif
                                 </td>
-                                <td>{{ $val->pos_item_no }}</td>
-                                <td>{{ $val->original_unit_price }}</td>
-                                <td>{{ $val->min_purchase_qty }}</td>
-                                <td>測試</td>
+                                <td class="col-md-2">{{ $val->pos_item_no }}</td>
+                                <td class="col-md-1">{{ $val->original_unit_price }}</td>
+                                <td class="col-md-1">{{ $val->min_purchase_qty }}</td>
+                                <td class="col-md-5" style="word-break: break-all">{{$val->requisitions_purchase_number}}</td>
                             </tr>
                         @endforeach
 

@@ -499,6 +499,9 @@ class ProductService
         if (isset($in['stock_type']) && $in['stock_type'] !== '') {
             $productItems->where('products.stock_type', $in['stock_type']);
         }
+        if(!empty($in['exclude_selling_channel'])){
+            $productItems->whereNotIn('products.selling_channel',$in['exclude_selling_channel']);
+        }
         $result = $productItems->get();
         return $result;
     }
