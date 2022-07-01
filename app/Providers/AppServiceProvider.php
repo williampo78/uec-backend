@@ -5,7 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\Facades\URL;
 use App\Services\ImageUploadService;
 use Illuminate\Support\ServiceProvider;
-// use Illuminate\Contracts\Routing\UrlGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +17,11 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ImageUploadService::class);
         $this->app->alias(ImageUploadService::class, 'ImageUpload');
+
+        if ($this->app->environment('local')) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
     }
 
     /**
