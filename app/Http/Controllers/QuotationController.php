@@ -56,7 +56,12 @@ class QuotationController extends Controller
     {
         $result['supplier'] = $this->supplierService->getSuppliers();
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productService->getItemsAndProduct()->transform(function ($obj, $key) use ($brands) {
+        $in = [
+            'exclude_selling_channel'=>[
+                'STORE'
+            ],
+        ];
+        $result['products_item'] = $this->productService->getItemsAndProduct($in)->transform(function ($obj, $key) use ($brands) {
             $obj->brands_name = $brands[$obj->brand_id]['brand_name'] ?? ''; //不做join key find val
             return $obj;
         });
@@ -158,28 +163,33 @@ class QuotationController extends Controller
             case 'showQuotation':
                 $data = [];
                 $data['quotation'] = $this->quotationService->getQuotationById($in['id']);
-                $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-                $data['quotationDetails'] = $this->quotationService->getQuotationDetail($in['id'])->transform(function ($obj, $key) use ($brands) {
-
-                    $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
-
-                    $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
+                $data['quotationDetails'] = $this->quotationService->getQuotationDetail_v2($in['id'])->transform(function ($obj, $key)  {
+                    $obj->pos_item_no = $obj->productItem->pos_item_no ?? '';
+                    $obj->brands_name = $obj->productItem->product->brand->brand_name ?? '';
+                    $obj->item_no = $obj->productItem->item_no ?? '';
+                    $obj->product_name = $obj->productItem->product->product_name ;
+                    $obj->combination_name = "{$obj->item_no}-{$obj->brands_name}-{$obj->product_name}";
 
                     if ($obj->spec_1_value !== '') {
-                        $obj->combination_name .= '-' . $obj->spec_1_value;
+                        $obj->combination_name .= '-' . $obj->productItem->spec_1_value;
                     }
 
                     if ($obj->spec_2_value !== '') {
-                        $obj->combination_name .= '-' . $obj->spec_2_value;
+                        $obj->combination_name .= '-' . $obj->productItem->spec_2_value;
                     }
-                    if ($obj->product_name == '') {
-                        $obj->combination_name = false;
+
+                    $obj->min_purchase_qty = $obj->productItem->product->min_purchase_qty ?? '';
+                    $obj->requisitions_purchase_number = '';
+                    if(!is_null($obj->productItem->requisitionsPurchaseDetails)){
+                        foreach($obj->productItem->requisitionsPurchaseDetails as $key=>$val){
+                            $obj->requisitions_purchase_number .= $val->requisitionsPurchase->number.',' ;
+                        }
                     }
-                    $obj->brands_name = $brandsName; //不做join key find val
+                    // dd($obj->productItem->requisitionsPurchaseDetails);
+                    // forach($obj->productItem->requisitionsPurchaseDetails)
                     return $obj;
                 });
                 $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($in['id']);
-
                 $data['taxlist'] = config('uec.tax_option');
                 return view('backend.quotation.show', $data);
                 break;

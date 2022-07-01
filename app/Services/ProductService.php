@@ -489,7 +489,12 @@ class ProductService
     {
         $agent_id = Auth::user()->agent_id;
         $productItems = ProductItem::
-            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
+            select('product_items.*',
+            'products.product_name',
+            'products.brand_id',
+            'products.min_purchase_qty',
+            'products.uom',
+            'brands.brand_name as brand_name')
             ->where('product_items.agent_id', $agent_id)
             ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id');
@@ -498,6 +503,9 @@ class ProductService
         }
         if (isset($in['stock_type']) && $in['stock_type'] !== '') {
             $productItems->where('products.stock_type', $in['stock_type']);
+        }
+        if(!empty($in['exclude_selling_channel'])){
+            $productItems->whereNotIn('products.selling_channel',$in['exclude_selling_channel']);
         }
         $result = $productItems->get();
         return $result;

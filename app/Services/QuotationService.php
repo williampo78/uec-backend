@@ -183,6 +183,17 @@ class QuotationService
         return $result;
     }
 
+    public function getQuotationDetail_v2($quotation_id)
+    {
+        $result = QuotationDetail::with([
+            'productItem',
+            'productItem.product',
+            'productItem.requisitionsPurchaseDetails'
+            ])
+        ->where('quotation_id', $quotation_id)
+        ->get();
+        return $result;
+    }
     public function getQuotationDetail($quotation_id)
     {
         $result = QuotationDetail::select(
@@ -205,7 +216,6 @@ class QuotationService
             ->get();
         return $result;
     }
-
     public function getQuotationReview()
     {
         $user_id = Auth::user()->id;
@@ -292,7 +302,10 @@ class QuotationService
     {
         $result = Quotation::select(
             DB::raw('quotation_details.original_unit_nontax_price as original_unit_nontax_price'),
-            DB::raw('quotation_details.original_unit_tax_price as original_unit_tax_price'))
+            DB::raw('quotation_details.original_unit_tax_price as original_unit_tax_price'),
+            DB::raw('quotation.doc_number as doc_number'),
+            DB::raw('quotation.id as quotation_id')
+            )
             ->join('quotation_details', 'quotation.id', 'quotation_details.quotation_id')
             ->where('quotation.supplier_id', $in['supplier_id'])
             ->where('quotation.currency_code', $in['currency_code'])
