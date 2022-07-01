@@ -48,7 +48,9 @@
                                     <div class="form-group" id="div_trade_date">
                                         <label for="trade_date">請購日期 <span class="text-red">*</span></label>
                                         <div class="input-group" id="trade_date_flatpickr">
-                                            <input type="text" class="form-control" name="trade_date" id="trade_date" value="{{ $requisitionsPurchase->trade_date ?? date('Y-m-d') }}" autocomplete="off" data-input />
+                                            <input type="text" class="form-control" name="trade_date" id="trade_date"
+                                                value="{{ $requisitionsPurchase->trade_date ?? date('Y-m-d') }}"
+                                                autocomplete="off" data-input />
                                             <span class="input-group-btn" data-toggle>
                                                 <button class="btn btn-default" type="button">
                                                     <i class="fa-solid fa-calendar-days"></i>
@@ -121,9 +123,9 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="form-group" id="div_currency_code">
+                                    <div class="form-group">
                                         <label for="currency_code">稅別<span class="text-red">*</span></label>
-                                        <select class="form-control select2-vue-js" name="tax" id="tax"
+                                        <select class="form-control" name="tax" id="tax"
                                             v-model="requisitions_purchase.tax" @change="getItemLastPrice">
                                             @foreach ($taxList as $id => $tax)
                                                 <option value="{{ $id }}">{{ $tax }}</option>
@@ -150,54 +152,75 @@
                                 <div class="col-sm-12">
                                     <div class="form-group" id="div_remark">
                                         <label for="remark">備註</label>
-                                        <textarea class="form-control" rows="3" name="remark"
-                                            id="remark">{{ $requisitionsPurchase->remark ?? '' }}</textarea>
+                                        <textarea class="form-control" rows="3" name="remark" id="remark">{{ $requisitionsPurchase->remark ?? '' }}</textarea>
                                     </div>
                                 </div>
                             </div>
-                            <textarea style="display:none"
-                                name="requisitions_purchase_detail">@{{ details }}</textarea>
+                            <textarea style="display:none" name="requisitions_purchase_detail">@{{ details }}</textarea>
                             <textarea style="display:none"> @{{ detailsCount }}</textarea>
                             <hr>
                             <h4><i class="fa-solid fa-table-cells-large"></i> 品項 </h4>
                             <div id="ItemDiv">
                                 <div class="add_row">
                                     <div class="row">
-                                        <div class="col-sm-5 text-left">品項<span class="text-red">*</span></div>
+                                        <div class="col-sm-2 text-left">品項<span class="text-red">*</span></div>
+                                        <div class="col-sm-1 text-left">規格一</div>
+                                        <div class="col-sm-1 text-left">規格二</div>
                                         <div class="col-sm-1 text-left">贈品</div>
                                         <div class="col-sm-1 text-left">單價<span class="text-red">*</span></div>
                                         <div class="col-sm-1 text-left">數量<span class="text-red">*</span></div>
                                         <div class="col-sm-1 text-left">單位</div>
                                         <div class="col-sm-1 text-left">最小採購量</div>
                                         <div class="col-sm-1 text-left">原幣小計<span class="text-red">*</span></div>
+                                        <div class="col-sm-1 text-left">報價單號</div>
                                         <div class="col-sm-1 text-left">功能</div>
                                     </div>
                                 </div>
                                 <div class="add_row detailsdata" v-for="(detail, detailKey) in details">
                                     <div class="row">
-                                        <div class="col-sm-5">
-                                            <select2 :selectkey="detailKey" :item_options="itemOptions" :details="details"
-                                                :requisitions_purchase="requisitions_purchase"
+
+                                        <div class="col-sm-2">
+                                            <select2 :selectkey="detailKey" :item_options="itemOptions"
+                                                :details="details" :requisitions_purchase="requisitions_purchase"
                                                 v-model="details[detailKey].product_item_id"> </select2>
                                         </div>
+                                        {{-- 規格一 --}}
                                         <div class="col-sm-1">
-
-                                            <input type="checkbox" class="big-checkbox"
-                                                v-model="details[detailKey].is_gift" :true-value="1" :false-value="0">
+                                            <div class="form-group">
+                                                <input class="form-control spec_1_value"  readonly
+                                                    v-model="details[detailKey].spec_1_value"
+                                                    :name="'spec_1_value[' + detailKey + ']'">
+                                            </div>
                                         </div>
+                                        {{-- 規格二 --}}
+                                        <div class="col-sm-1">
+                                            <div class="form-group">
+                                                <input class="form-control spec_2_value" readonly
+                                                    v-model="details[detailKey].spec_2_value"
+                                                    :name="'spec_2_value[' + detailKey + ']'">
+                                            </div>
+                                        </div>
+                                        {{--  --}}
+                                        <div class="col-sm-1">
+                                            <input type="checkbox" class="big-checkbox"
+                                                v-model="details[detailKey].is_gift" :true-value="1"
+                                                :false-value="0">
+                                        </div>
+
                                         {{-- 單價 --}}
                                         <div class="col-sm-1">
                                             <div class="form-group">
                                                 <input class="form-control qty item_price" type="number" readonly
                                                     v-model="details[detailKey].item_price"
-                                                    :name="'item_price['+detailKey+']'">
+                                                    :name="'item_price[' + detailKey + ']'">
                                             </div>
                                         </div>
                                         {{-- 數量 --}}
                                         <div class="col-sm-1">
                                             <div class="form-group">
                                                 <input class="form-control item_qty" v-model="details[detailKey].item_qty"
-                                                    :name="'item_qty['+detailKey+']'" :min="0" type="number">
+                                                    :name="'item_qty[' + detailKey + ']'" :min="0"
+                                                    type="number">
                                             </div>
                                         </div>
                                         {{-- 單位 --}}
@@ -211,6 +234,13 @@
                                         {{-- 原幣小計 --}}
                                         <div class="col-sm-1"><input class="form-control" readonly
                                                 v-model="details[detailKey].original_subtotal_price">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div class="form-group">
+                                                <input class="form-control quotation_doc_number" readonly
+                                                    v-model="details[detailKey].quotation_doc_number"
+                                                    :name="'quotation_doc_number[' + detailKey + ']'">
+                                            </div>
                                         </div>
                                         {{-- 功能 --}}
                                         <div class="col-sm-1">
@@ -282,6 +312,7 @@
             created() {
                 var addArray = [];
                 var vm = this;
+                var requisitions_purchase = this.requisitions_purchase
                 $.each(this.detailsUpdate, function(key, obj) {
                     addArray.push({
                         id: obj.id,
@@ -297,16 +328,33 @@
                         is_gift: obj.is_gift, // 是否為贈品
                         subtotal_tax_price: obj.subtotal_tax_price, ////(本幣)稅額
                         original_subtotal_tax_price: obj.original_subtotal_tax_price, //原幣稅額
+                        spec_1_value: obj.spec_1_value, //規格一
+                        spec_2_value: obj.spec_2_value, //規格二
+                        quotation_doc_number: obj.quotation_doc_number, //規格二
+                        quotation_id: obj.quotation_id, //規格二
                         old_item_price: 0,
                     });
+                    var whereGet = '?supplier_id=' + $('#supplier_id').val() +
+                            '&currency_code=' + $('#currency_code').val() +
+                            '&tax=' + requisitions_purchase.tax +
+                            '&product_item_id=' + obj.product_item_id;
+                    var req = async () => {
+                        const response = await axios.get('/backend/getItemLastPrice/' + whereGet);
+                        if(response.data.doc_number !== obj.quotation_doc_number){
+                            alert(obj.product_name+'的報價已不是最新')
+                        }
+                    }
+                    req();
                 });
+                vm.details = addArray;
+
                 this.$nextTick(() => {
-                    vm.details = addArray;
                     this.switch_computed = 1;
                 });
-                if(vm.requisitions_purchase.tax == ''){
-                    vm.requisitions_purchase.tax =  '2'  ;
-                }else{
+
+                if (vm.requisitions_purchase.tax == '') {
+                    vm.requisitions_purchase.tax = '2';
+                } else {
                     vm.requisitions_purchase.tax = String(vm.requisitions_purchase.tax)
                 }
             },
@@ -373,11 +421,11 @@
                     $(".item_qty").each(function() {
                         $(this).rules("add", {
                             required: true,
-                            digits:true,
-                            min:1,
-                            messages:{
+                            digits: true,
+                            min: 1,
+                            messages: {
                                 digits: '請輸入正整數',
-                                min:'數量不能為0'
+                                min: '數量不能為0'
                             },
                         });
                     })
@@ -409,8 +457,17 @@
                         var req = async () => {
                             const response = await axios.get('/backend/getItemLastPrice/' +
                                 whereGet);
-                            details[key].item_price = response.data.item_price;
-                            details[key].item_price = response.data.item_price;
+                            if(response.data.item_price == null){
+                                details[key].item_price = '';
+                                details[key].old_item_price = 0;
+                                details[key].quotation_doc_number = '';
+                                details[key].quotation_id = '';
+                            }else{
+                                details[key].item_price = response.data.item_price;
+                                details[key].old_item_price = 0;
+                                details[key].quotation_doc_number = response.data.doc_number;
+                                details[key].quotation_id = response.data.quotation_id;
+                            }
 
                         }
                         req();
@@ -539,13 +596,15 @@
                                         whereGet);
                                     details[key].item_price = response.data.item_price;
                                     details[key].old_item_price = response.data.item_price;
+                                    details[key].quotation_doc_number = response.data.doc_number;
+                                    details[key].quotation_id = response.data.quotation_id;
                                 }
                                 req();
                             } else {
                                 obj.item_price = obj.old_item_price;
                             }
                         }
-                        if (obj.item_qty > 0 && obj.item_price) {
+                        if (obj.item_qty >= 0 && obj.item_price) {
                             obj.original_subtotal_price = obj.item_price * obj.item_qty; // (本幣)小計
                             obj.subtotal_price = obj.original_subtotal_price; //原幣小計
                             //各品項計算稅率
@@ -555,8 +614,10 @@
                                     obj.original_subtotal_tax_price = 0 //原幣稅額
                                     break;
                                 case '2': //應稅內含
-                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price / 1.05)).toFixed(2); //(本幣)稅額
-                                    obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj.original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
+                                    obj.subtotal_tax_price = (obj.subtotal_price - (obj.subtotal_price /
+                                        1.05)).toFixed(2); //(本幣)稅額
+                                    obj.original_subtotal_tax_price = (obj.original_subtotal_price - (obj
+                                        .original_subtotal_price / 1.05)).toFixed(2); //原幣稅額
                                     break;
                                 case '3': //零稅率
                                     obj.subtotal_tax_price = 0; //(本幣)稅額
@@ -569,8 +630,9 @@
                             obj.subtotal_price = 0;
                         }
                         sum_price += obj.subtotal_price;
-                        sum_total_tax_price = vm.NumberAdd(sum_total_tax_price,obj.subtotal_tax_price);
-                        sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price,obj.original_subtotal_tax_price);
+                        sum_total_tax_price = vm.NumberAdd(sum_total_tax_price, obj.subtotal_tax_price);
+                        sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price, obj
+                            .original_subtotal_tax_price);
                     });
                     //表頭計算稅
                     switch (requisitions_purchase.tax) {
@@ -639,7 +701,8 @@
                             details[getSelectKey].item_brand = obj.brand; //品牌
                             details[getSelectKey].item_uom = obj.uom; // 單位
                             details[getSelectKey].min_purchase_qty = obj.min_purchase_qty; //最小採購量
-                            // details[getSelectKey].item_qty = obj.min_purchase_qty; //最小採購量
+                            details[getSelectKey].spec_1_value = obj.spec_1_value; //規格1
+                            details[getSelectKey].spec_2_value = obj.spec_2_value; //規格2
                             var find_this_item_id = obj.id;
                             //帶出價格
                             var whereGet = '?supplier_id=' + $('#supplier_id').val() +
@@ -650,6 +713,9 @@
                                     whereGet);
                                 details[getSelectKey].item_price = response.data.item_price;
                                 details[getSelectKey].old_item_price = response.data.item_price;
+                                details[getSelectKey].quotation_doc_number = response.data.doc_number;
+                                details[getSelectKey].quotation_id = response.data.quotation_id;
+
                             }
                             req();
                         }

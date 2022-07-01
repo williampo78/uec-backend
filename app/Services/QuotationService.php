@@ -302,7 +302,10 @@ class QuotationService
     {
         $result = Quotation::select(
             DB::raw('quotation_details.original_unit_nontax_price as original_unit_nontax_price'),
-            DB::raw('quotation_details.original_unit_tax_price as original_unit_tax_price'))
+            DB::raw('quotation_details.original_unit_tax_price as original_unit_tax_price'),
+            DB::raw('quotation.doc_number as doc_number'),
+            DB::raw('quotation.id as quotation_id')
+            )
             ->join('quotation_details', 'quotation.id', 'quotation_details.quotation_id')
             ->where('quotation.supplier_id', $in['supplier_id'])
             ->where('quotation.currency_code', $in['currency_code'])

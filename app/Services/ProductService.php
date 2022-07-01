@@ -489,7 +489,12 @@ class ProductService
     {
         $agent_id = Auth::user()->agent_id;
         $productItems = ProductItem::
-            select('product_items.*', 'products.product_name', 'products.brand_id', 'products.min_purchase_qty', 'products.uom', 'brands.brand_name as brand_name')
+            select('product_items.*',
+            'products.product_name',
+            'products.brand_id',
+            'products.min_purchase_qty',
+            'products.uom',
+            'brands.brand_name as brand_name')
             ->where('product_items.agent_id', $agent_id)
             ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
             ->leftJoin('brands', 'brands.id', '=', 'products.brand_id');

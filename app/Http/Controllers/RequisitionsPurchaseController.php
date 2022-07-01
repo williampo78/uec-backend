@@ -49,12 +49,16 @@ class RequisitionsPurchaseController extends Controller
             'select_start_date',
             'select_end_date',
             'doc_number',
+            'order_supplier_number',
         ]);
         // 供應商
         $result['supplier'] = $this->supplierService->getSuppliers();
 
         if (!empty($payload)) {
-            $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($payload);
+            $result['requisitionsPurchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchase($payload)->transform(function ($obj, $key)  {
+                $obj->order_supplier_number = $obj->orderSupplier->number ?? '';
+                return $obj;
+            });
         }
 
         return view('backend.requisitions_purchase.list', $result);
@@ -261,7 +265,13 @@ class RequisitionsPurchaseController extends Controller
                 echo "OK@@" . json_encode($data);
                 break;
             case 'getItemOption':
-                $products_item = $this->productService->getItemsAndProduct(['supplier_id' => $rs['supplier_id']])->transform(function ($obj, $key) {
+                $in = [
+                    'exclude_selling_channel'=>[
+                        'STORE'
+                    ],
+                    'supplier_id'=>$rs['supplier_id'],
+                ];
+                $products_item = $this->productService->getItemsAndProduct($in)->transform(function ($obj, $key) {
                     $obj->text = $obj->item_no . '-' . $obj->brand_name . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;
                     return $obj;
                 });
@@ -294,8 +304,12 @@ class RequisitionsPurchaseController extends Controller
             ]);
         } else {
             $tem_price = $getItemLastPrice->original_unit_nontax_price + $getItemLastPrice->original_unit_tax_price;
+            $doc_number = $getItemLastPrice->doc_number;
+            $quotation_id = $getItemLastPrice->quotation_id;
             return response()->json([
                 'item_price' => $tem_price,
+                'doc_number' => $doc_number,
+                'quotation_id'=>$quotation_id,
             ]);
         };
 

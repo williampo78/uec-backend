@@ -25,7 +25,8 @@ class RequisitionsPurchaseService
     {
         $agent_id = Auth::user()->agent_id;
 
-        $rs = RequisitionsPurchase::select(
+        $rs = RequisitionsPurchase::with(['orderSupplier'])->
+            select(
             'requisitions_purchase.*',
             DB::RAW('users.user_name as user_name'),
             DB::RAW('supplier.name as supplier_name'),
@@ -35,6 +36,12 @@ class RequisitionsPurchaseService
             ->leftJoin('supplier', 'requisitions_purchase.supplier_id', '=', 'supplier.id')
             ->leftJoin('warehouse', 'requisitions_purchase.warehouse_id', '=', 'warehouse.id')
             ->where('requisitions_purchase.agent_id', $agent_id);
+
+        if (!empty($requset['order_supplier_number'])) {
+            $rs->whereHas('orderSupplier', function ($query) use ($requset) {
+                return $query->where('number', '=', $requset['order_supplier_number']);
+            });
+        }
 
         if (!empty($requset['select_start_date'])) {
             $select_start_date = Carbon::parse($requset['select_start_date'])->format('Y-m-d H:i:s');
@@ -176,10 +183,8 @@ class RequisitionsPurchaseService
                     unset($requisitions_purchase_detail[$key]['min_purchase_qty']);
                     unset($requisitions_purchase_detail[$key]['item_uom']);
                     unset($requisitions_purchase_detail[$key]['old_item_price']);
-                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
-                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
-                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
-                    $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
+                    unset($requisitions_purchase_detail[$key]['spec_1_value']);
+                    unset($requisitions_purchase_detail[$key]['spec_2_value']);
                     $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
                     $requisitions_purchase_detail[$key]['created_by'] = $user_id;
                     $requisitions_purchase_detail[$key]['created_at'] = $now;
@@ -252,7 +257,6 @@ class RequisitionsPurchaseService
             ];
 
             RequisitionsPurchase::where('id', $input['id'])->update($requisitions_purchase_in);
-
             foreach ($requisitions_purchase_detail_in as $key => $item) {
                 $indata = [];
                 unset($requisitions_purchase_detail_in[$key]['created_at']);
@@ -263,6 +267,8 @@ class RequisitionsPurchaseService
                 $indata['item_number'] = $item['item_number'];
                 $indata['subtotal_price'] = $item['subtotal_price'];
                 $indata['original_subtotal_tax_price'] = $item['original_subtotal_tax_price'];
+                $indata['quotation_id'] = $item['quotation_id'];
+                $indata['quotation_doc_number'] = $item['quotation_doc_number'];
                 $indata['subtotal_tax_price'] = $item['subtotal_tax_price'];
                 $indata['currency_code'] = $input['currency_code'];
                 $indata['updated_by'] = $user_id;
@@ -299,6 +305,7 @@ class RequisitionsPurchaseService
 
             $result['status'] = false;
         }
+        dd('STOP');
         return $result;
     }
 

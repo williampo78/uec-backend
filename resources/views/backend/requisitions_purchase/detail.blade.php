@@ -70,6 +70,7 @@
                                         <th>小計</th>
                                         <th>贈品</th>
                                         <th>最小採購量</th>
+                                        <th>報價單號</th>
                                     </tr>
                                 </thead>
                                 <tbody v-for="(item, itemKey) in requisitionsPurchaseDetail">
@@ -86,6 +87,7 @@
                                         </td>
                                         {{-- 最小出貨量 --}}
                                         <td>@{{ item.min_purchase_qty }}</td>
+                                        <td>@{{ item.quotation_doc_number }}</td>
                                     </tr>
                                 </tbody>
                             </table>
