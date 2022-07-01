@@ -187,5 +187,5 @@ return [
     |
     */
 
-    'custom_tags' => explode(',', env('TELESCOPE_CUSTOM_TAG', 'backend')),
+    'custom_tags' => explode(',', env('TELESCOPE_CUSTOM_TAGS', 'backend')),
 ];
