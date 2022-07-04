@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 @section('title', '商品主檔 - 新增基本資訊')
 @section('content')
     <style>

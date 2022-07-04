@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 
 @section('title', '使用者管理')
 
@@ -17,7 +17,7 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 新增資料</h1>
+                <h1 class="page-header"><i class="fa-solid fa-plus"></i> 新增資料</h1>
             </div>
         </div>
         <form id="create-form" method="post" action="{{ route('users.store') }}">

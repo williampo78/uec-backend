@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 @section('title', isset($requisitionsPurchase) ? '編輯請購單' : '新建請購單')
 @section('content')
 

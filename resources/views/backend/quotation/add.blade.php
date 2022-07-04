@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 @section('title', $act == 'upd' ? '編輯報價單' : '新增報價單')
 @section('content')
 
