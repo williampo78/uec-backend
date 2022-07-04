@@ -451,9 +451,16 @@
                                                    value="{{ $products->google_shop_photo_name }}">
                                         </div>
                                         <div class="col-sm-3">
+                                            @if($products->google_shop_photo_name == null || $products->google_shop_photo_name == "")
                                             <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
-                                                 src="{{ $products->google_shop_photo_name !== null ? config('filesystems.disks.s3.url') . $products->google_shop_photo_name : asset('asset/img/default_item.png') }} "
-                                                 style="max-width:40%;">
+                                            src="{{asset('asset/img/default_item.png')}}"
+                                            style="max-width:40%;">
+                                            @else
+                                            <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
+                                            src="{{config('filesystems.disks.s3.url') . $products->google_shop_photo_name}}"
+                                            style="max-width:40%;">
+                                            @endif
+
                                         </div>
                                         <button v-if="products.google_shop_photo_name" type="button"
                                                 class="btn btn-large btn-danger btn-sm"
