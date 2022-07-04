@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 
 @section('title', '供應商主檔管理')
 

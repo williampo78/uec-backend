@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 
 @section('title', '退貨申請單管理')
 

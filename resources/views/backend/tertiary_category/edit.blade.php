@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 @section('title', '編輯子分類管理')
 @section('content')
     @if ($errors->any())

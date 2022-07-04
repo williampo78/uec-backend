@@ -27,7 +27,7 @@
 
 <body>
     @auth
-        @include('backend.menu')
+        @include('backend.partials.menu')
 
         @if (session()->has('message'))
             <div class="alert alert-success">
