@@ -240,7 +240,9 @@
                         category_name: '',
                         old_category_name: '',
                         content_type:'P',
-                        act: ''
+                        act: '',
+                        gross_margin_threshold:0,//毛利門檻
+
                     },
                     disabled: {
                         disabled_level_2: 1,
