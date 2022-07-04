@@ -1478,31 +1478,28 @@ class APIProductServices
         foreach ($condition as $key) {
             $attribute_array[$key] = [];
         }
-        $tmp_brand = 0;
-        $tmp_attribute = '';
+
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
         if ($products) {
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $product) {
-                    if ($tmp_brand != $product->brand_id) {
-                        if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id] = 0;
-                        $attribute_array['BRAND'][$product->brand_id]++;
-                        $tmp_brand = $product->brand_id;
-                    }
-                    if ($tmp_attribute != $product->attribute_id) {
-                        if (isset($attribute_array[$product->attribute_type])) {
-                            if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id] = 0;
-                            $attribute_array[$product->attribute_type][$product->attribute_id]++;
-                            $tmp_attribute = $product->attribute_id;
-                        }
+                    //品牌(商品)
+                    if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
+                    $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
+                    //屬性(商品)
+                    if (isset($attribute_array[$product->attribute_type])) {
+                        if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 0;
+                        $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 1;
                     }
                 }
             }
         }
-
         foreach ($attribute_array as $data => $item) {
-            foreach ($item as $id => $count) {
-                $filter[$data][$id]['count'] = $count;
+            foreach ($item as $attribute_id => $attribute_item) {
+                if (isset($attribute_array[$data][$attribute_id])) {
+                    //將同屬性的不同商品加總
+                    $filter[$data][$attribute_id]['count'] = array_sum($attribute_array[$data][$attribute_id]);
+                }
             }
         }
         $filter_display = [];
