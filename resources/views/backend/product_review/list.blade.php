@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 
 @section('title', '商品主檔 -基本資訊管理')
 
@@ -108,7 +108,7 @@
 @section('js')
     <script>
         $(document).ready(function() {
-            
+
         });
     </script>
 @endsection

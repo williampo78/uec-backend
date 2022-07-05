@@ -1,4 +1,4 @@
-@extends('backend.master')
+@extends('backend.layouts.master')
 @section('title', '請購單簽核')
 @section('content')
     <!--列表-->

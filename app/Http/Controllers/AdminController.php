@@ -3,22 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use App\Services\PermissionService;
 
 class AdminController extends Controller
 {
-    protected $PermissionService;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function __construct(PermissionService $permission)
-    {
-        $this->permission = $permission;
-    }
     public function index()
     {
         return view('backend.home');
