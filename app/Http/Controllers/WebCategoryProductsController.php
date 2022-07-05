@@ -83,6 +83,7 @@ class WebCategoryProductsController extends Controller
         $in = [];
         $in['id'] = $id;
         $result['category_hierarchy_content'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents($in)[0];
+
         //原生sql不加入RomotionalCampaigns join - 另外撈取 活動名稱
         if ($result['category_hierarchy_content']->promotion_campaign_id !== null) {
             $getRomotionalCampaigns = $this->webCategoryHierarchyService->getRomotionalCampaigns(['id' => $result['category_hierarchy_content']->promotion_campaign_id])[0] ?? null;
@@ -91,6 +92,7 @@ class WebCategoryProductsController extends Controller
             $result['category_hierarchy_content']->campaign_brief = '';
         }
 
+        $result['check_icon_name'] = $this->webCategoryHierarchyService->check_icon_name($result['category_hierarchy_content']->level_one_id) ;
         // 網頁標題為空值時，預設為分類名稱的最小階層名稱
         if (empty($result['category_hierarchy_content']->meta_title)) {
             $split_names = explode('>', $result['category_hierarchy_content']->name);

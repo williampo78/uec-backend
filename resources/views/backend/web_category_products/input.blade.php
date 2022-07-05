@@ -161,6 +161,7 @@
                     category_hierarchy_content: @json($category_hierarchy_content),
                     result_products: [],
                     result_promotional_campaigns:[],
+
                 }
             },
             methods: {
@@ -337,8 +338,12 @@
                 $("#update-form").validate({
                     // debug: true,
                     submitHandler: function(form) {
-                        console.log('submit') ;
-                        form.submit();
+                        var check_icon_name = @json($check_icon_name) ;
+                        if(!check_icon_name && $("input[name='active']:checked").val() == '1'){
+                            alert('請先到W006 維護該大分類的圖檔才能將狀態開啟');
+                        }else{
+                            form.submit();
+                        }
                     },
                     rules: {
                         id: {
