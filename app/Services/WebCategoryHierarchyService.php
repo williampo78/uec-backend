@@ -72,6 +72,9 @@ class WebCategoryHierarchyService
         $user_id = Auth::user()->id;
         try {
             DB::beginTransaction();
+            if($in['parent_id'] == 'null'){
+                $in['parent_id'] = null ;
+            }
             $insert['category_name'] = $in['category_name'];
             $insert['content_type'] = $in['content_type'];
             if($in['category_level'] == '1'){
@@ -315,6 +318,15 @@ class WebCategoryHierarchyService
             $promotionalCampaigns->where('id', $in['id']);
         };
         return $promotionalCampaigns->get();
+    }
+    public  function del_icon_photo($id){
+        $CategoryHierarchy = CategoryHierarchy::where('id',$id)->first();
+        if($CategoryHierarchy->icon_name){
+            ImageUpload::DelPhoto($CategoryHierarchy->icon_name);
+            $CategoryHierarchy->icon_name = null ;
+            $CategoryHierarchy->save();
+        }
+        return true ;
     }
 
 }

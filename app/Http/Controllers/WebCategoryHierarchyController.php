@@ -113,6 +113,9 @@ class WebCategoryHierarchyController extends Controller
             case 'SortCategory':
                 $result = $this->webCategoryHierarchyService->sort_Category_Hierarchy($in) ;
                 break ;
+            case 'DelIconPhoto':
+                $result = $this->webCategoryHierarchyService->del_icon_photo($in['id']) ;
+                break;
             default:
                 # code...
                 break;

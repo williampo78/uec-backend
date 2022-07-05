@@ -67,7 +67,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row" v-show="addCategory.act == 'edit'">
+                    <div class="row" v-show="addCategory.act == 'edit' && addCategory.category_level == '1'">
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <div class="col-sm-2 "><label class="control-label">(漢堡)原短名稱<span
@@ -98,7 +98,7 @@
                                     <label class="control-label">(漢堡) 圖檔</label>
                                 </div>
                                 <div class="col-sm-7">
-                                    <input type="file" @change="uploadFile" multiple accept="image/*" :disabled="addCategory.icon_name !== null">
+                                    <input type="file" @change="uploadFile" id="icon_name_file_select" multiple accept="image/*" :disabled="addCategory.icon_name !== null">
                                     <input type="file"  :ref="'images_files'" id="icon_name_file" name="icon_name_file" style="display: none;">
                                     <p class="help-block">檔案大小不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                     <p class="help-block">圖檔比例須為1:1，至少須為96 * 96</p>
@@ -112,8 +112,11 @@
                                 <div class="col-sm-2">
                                     <label class="control-label">(漢堡) 圖檔預覽</label>
                                 </div>
-                                <div class="col-sm-3">
-                                    <img :src="showPhotoSrc" style="max-width: 40%;">
+                                <div class="col-sm-1">
+                                    <img :src="showPhotoSrc" style="max-width: 100%;">
+                                </div>
+                                <div class="col-sm-1" v-if="addCategory.icon_name !== null">
+                                    <button @click="delPhoto()" type="button" class="btn btn-danger pull-right btn-events-none" style="pointer-events: auto;"><i class="fa-solid fa-trash-can"></i></button>
                                 </div>
                             </div>
                         </div>

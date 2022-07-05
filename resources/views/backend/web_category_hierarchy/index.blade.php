@@ -224,7 +224,7 @@
                     imagesFile: null,
                     showPhotoSrc: null,
                     presetPhotoSrc: '/asset/img/default_item.png',
-                    fileUrl:@json(env('AWS_URL')),
+                    fileUrl: @json(env('AWS_URL')),
                     RoleAuthJson: RoleAuthJson, //腳色權限
                     UecConfig: UecConfig, //後臺設定
                     //list
@@ -249,7 +249,7 @@
                         act: '',
                         gross_margin_threshold: 0, //毛利門檻
                         category_short_name: '', //(漢堡)短名稱
-                        icon_name: '', //(漢堡呈現)分類icon圖檔名稱
+                        icon_name: null, //(漢堡呈現)分類icon圖檔名稱
                     },
                     disabled: {
                         disabled_level_2: 1,
@@ -328,21 +328,21 @@
                     this.addCategory.category_level = level;
                     this.addCategory.gross_margin_threshold = 0;
                     this.addCategory.old_category_short_name = '';
+                    this.addCategory.category_short_name = '';
                     this.addCategory.icon_name = null;
                     this.addCategory.act = act;
 
                     // 關閉驗證
                     // $('#receiver_name').closest(".form-group").removeClass("has-error").find('span').hide();
-                    this.showPhotoSrc = this.presetPhotoSrc ;
-
+                    this.showPhotoSrc = this.presetPhotoSrc;
                     if (act == 'edit') {
                         this.addCategory.old_category_name = obj.category_name;
                         this.addCategory.id = obj.id;
                         this.addCategory.icon_name = obj.icon_name;
                         this.addCategory.gross_margin_threshold = obj.gross_margin_threshold;
                         this.addCategory.old_category_short_name = obj.category_short_name;
-                        if(obj.icon_name){
-                            this.showPhotoSrc = this.fileUrl+obj.icon_name ;
+                        if (obj.icon_name) {
+                            this.showPhotoSrc = this.fileUrl + obj.icon_name;
                         }
                     }
                     switch (level) {
@@ -394,6 +394,7 @@
                             list.items.add(file);
                             vm.$refs.images_files.files = list.files;
                             vm.showPhotoSrc = showPhotoSrc;
+                            vm.addCategory.icon_name = callback.file.name;
                         } else {
                             e.target.value = '';
                         }
@@ -412,72 +413,38 @@
                         callback(result);
                     };
                 },
-                CategoryToList() { //新增編輯
-                    // var checkstatus = true;
-                    // var type = '';
+                delPhoto() {
+                    if (confirm('確定要刪除嗎?')) {
+                        var vm = this ;
+                        vm.showPhotoSrc = vm.presetPhotoSrc;
+                        vm.addCategory.icon_name = null;
 
+                        document.getElementById("icon_name_file_select").value = "";
+                        document.getElementById("icon_name_file").value = "";
+
+                        var PostAjax = async () => {
+
+                            const response = await axios.post('/backend/web_category_hierarchy/ajax', {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                type: 'DelIconPhoto',
+                                id:vm.addCategory.id,
+                            });
+                            if (response.status == 200) {
+                                alert('儲存排序成功');
+                            } else {
+                                alert('儲存排序失敗');
+                            }
+                        }
+                        if(vm.addCategory.id !== ''){
+                            PostAjax();
+                        }
+                    };
+
+
+                },
+                CategoryToList() { //新增編輯
                     // 提交給驗證器驗證
                     $('#webCategoryHierarchyModal').submit();
-                    console.log('CategoryToList toogle');
-                    // if (this.addCategory.act == 'add') {
-                    //     type = 'AddCategory';
-                    // } else {
-                    //     type = 'EditCategory';
-                    // }
-                    // const formData = new FormData();
-                    // formData.append('type', type);
-                    // formData.append('id', this.addCategory.id);
-                    // formData.append('category_level', this.addCategory.category_level);
-                    // formData.append('parent_id', this.addCategory.parent_id);
-                    // formData.append('category_name', this.addCategory.category_name);
-                    // formData.append('content_type', this.addCategory.category_level == this.UecConfig.web_category_hierarchy_levels ? this.addCategory.content_type : '');
-                    // formData.append('gross_margin_threshold', this.addCategory.gross_margin_threshold);
-                    // formData.append('category_short_name', this.addCategory.category_short_name);
-                    // let getimagefile = document.querySelector('#icon_name_file');
-                    // formData.append("image", getimagefile.files[0]);
-                    // var PostAjax = async () => {
-                    //     const response = await axios.post('/backend/web_category_hierarchy/ajax', formData,{
-                    //         headers: {
-                    //             'Content-Type': 'multipart/form-data'
-                    //         }
-                    //     });
-                        // switch (this.addCategory.category_level) {
-                        //     case '1':
-                        //         this.category_level_1 = response.data.result;
-                        //         if (this.addCategory.act == 'edit') {
-                        //             this.category_level_2 = {};
-                        //             this.category_level_2_title = '';
-                        //             this.category_level_3 = {};
-                        //             this.category_level_3_title = '';
-                        //         }
-                        //         break;
-                        //     case '2':
-                        //         this.category_level_2 = response.data.result;
-                        //         if (this.addCategory.act == 'edit') {
-                        //             this.category_level_3 = {};
-                        //             this.category_level_3_title = '';
-                        //         }
-                        //         break;
-                        //     case '3':
-                        //         this.category_level_3 = response.data.result;
-                        //         break;
-                        //     default:
-                        //         break;
-                        // }
-                        // if (type == 'EditCategory') {
-                        //     var act_msg = '編輯';
-                        // } else {
-                        //     var act_msg = '新增';
-                        // }
-                        // if (response.status == 200) {
-                        //     alert(act_msg + '成功')
-                        // } else {
-                        //     alert(act_msg + '失敗')
-                        // }
-                    // }
-                    // PostAjax();
-                    // $('.hidden-model').click();
-
                 },
                 drag(eve) {
                     eve.dataTransfer.setData("text/index", eve.target.dataset.index);
@@ -560,7 +527,7 @@
 
             },
             mounted: function() {
-                var vm = this ;
+                var vm = this;
                 // 驗證表單
                 $("#webCategoryHierarchyModal").validate({
                     // debug: true,
@@ -579,19 +546,57 @@
                         formData.append('category_level', vm.addCategory.category_level);
                         formData.append('parent_id', vm.addCategory.parent_id);
                         formData.append('category_name', vm.addCategory.category_name);
-                        formData.append('content_type', vm.addCategory.category_level == vm.UecConfig.web_category_hierarchy_levels ? vm.addCategory.content_type : '');
-                        formData.append('gross_margin_threshold', vm.addCategory.gross_margin_threshold);
+                        formData.append('content_type', vm.addCategory.category_level == vm
+                            .UecConfig.web_category_hierarchy_levels ? vm.addCategory
+                            .content_type : '');
+                        formData.append('gross_margin_threshold', vm.addCategory
+                            .gross_margin_threshold);
                         formData.append('category_short_name', vm.addCategory.category_short_name);
                         let getimagefile = document.querySelector('#icon_name_file');
                         formData.append("image", getimagefile.files[0]);
                         var PostAjax = async () => {
-                            const response = await axios.post('/backend/web_category_hierarchy/ajax', formData,{
-                                headers: {
-                                    'Content-Type': 'multipart/form-data'
-                                }
-                            });
+                            const response = await axios.post(
+                                '/backend/web_category_hierarchy/ajax', formData, {
+                                    headers: {
+                                        'Content-Type': 'multipart/form-data'
+                                    }
+                                });
+                            switch (vm.addCategory.category_level) {
+                                case '1':
+                                    vm.category_level_1 = response.data.result;
+                                    if (vm.addCategory.act == 'edit') {
+                                        vm.category_level_2 = {};
+                                        vm.category_level_2_title = '';
+                                        vm.category_level_3 = {};
+                                        vm.category_level_3_title = '';
+                                    }
+                                    break;
+                                case '2':
+                                    vm.category_level_2 = response.data.result;
+                                    if (vm.addCategory.act == 'edit') {
+                                        vm.category_level_3 = {};
+                                        vm.category_level_3_title = '';
+                                    }
+                                    break;
+                                case '3':
+                                    vm.category_level_3 = response.data.result;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (type == 'EditCategory') {
+                                var act_msg = '編輯';
+                            } else {
+                                var act_msg = '新增';
+                            }
+                            if (response.status == 200) {
+                                alert(act_msg + '成功')
+                            } else {
+                                alert(act_msg + '失敗')
+                            }
                         }
                         PostAjax();
+                        $('.hidden-model').click();
                     },
                     rules: {
                         receiver_name: {
