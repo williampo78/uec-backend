@@ -45,7 +45,15 @@ class ImageUploadService
                         $result['image'] = $path.'/' . $imageName;
                     }
                     break;
-
+                case 'category_icon':
+                        $img = Image::make($file);
+                        $img->resize('96', '96');
+                        $resource = $img->stream()->detach();
+                        $typeName = '.'.explode(".",$file->getClientOriginalName())[1] ?? '';
+                        $imageName = '96X96_' . uniqid(date('YmdHis')) . $typeName;
+                        Storage::disk('s3')->put('/'.$path.'/' . $imageName, $resource, 'public');
+                        $result['image'] = $path.'/' . $imageName;
+                    break;
                 default:
                     if (is_array($file)) {
                         foreach ($file as $key => $obj) {

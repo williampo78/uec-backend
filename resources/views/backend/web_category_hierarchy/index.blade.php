@@ -15,7 +15,8 @@
             transition: background-color 0.5s;
             /* background: #ce1f59 !important; */
         }
-        .elements-box >tr > td > *{
+
+        .elements-box>tr>td>* {
             pointer-events: none;
         }
     </style>
@@ -28,7 +29,6 @@
             </div>
         </div>
         <div class="row" id="web_category_hierarchy" v-cloak>
-            {{-- <button type="button" @click="test()">TEST BTN</button> --}}
             <div>
                 <div class="panel panel-default container-fluid">
                     <div class="container-fluid">
@@ -61,10 +61,10 @@
                                     <tbody>
                                         <tr v-for="(level_1_obj, level_1_key) in category_level_1 " @dragstart="drag"
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                            :data-index="level_1_key" :data-level="'1'" >
+                                            :data-index="level_1_key" :data-level="'1'">
                                             <td style="vertical-align:middle">
                                                 <i class="fa-solid fa-list"></i>
-                                                @{{ level_1_obj . category_name }}
+                                                @{{ level_1_obj.category_name }}
                                             </td>
                                             <td>
                                                 <div class="row">
@@ -120,25 +120,27 @@
                                         <tr v-for="(level_2_obj, level_2_key) in category_level_2" @dragstart="drag"
                                             @dragover='dragover' @dragleave='dragleave' @drop="drop"
                                             :data-index="level_2_key" :data-level="'2'">
-                                            <td style="vertical-align:middle" :data-index="level_2_key" :data-level="'2'" draggable="true">
+                                            <td style="vertical-align:middle" :data-index="level_2_key"
+                                                :data-level="'2'" draggable="true">
                                                 <i class="fa-solid fa-list"></i>
-                                                @{{ level_2_obj . category_name }}
+                                                @{{ level_2_obj.category_name }}
                                             </td>
                                             <td>
                                                 <div class="row">
-                                                    <div class="col-sm-5" v-show="UecConfig.web_category_hierarchy_levels == '3' ">
+                                                    <div class="col-sm-5"
+                                                        v-show="UecConfig.web_category_hierarchy_levels == '3' ">
                                                         <button type="button" class="btn btn-primary"
                                                             @click="GetCategory(level_2_obj,'2')">展小類</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-warning" data-toggle="modal"
-                                                            data-target="#addCategory"
-                                                            v-show="RoleAuthJson.auth_update"
+                                                            data-target="#addCategory" v-show="RoleAuthJson.auth_update"
                                                             @click="CategoryModelShow('2','edit',level_2_obj)">編輯
                                                         </button>
                                                     </div>
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-danger" v-show="RoleAuthJson.auth_delete"
+                                                        <button type="button" class="btn btn-danger"
+                                                            v-show="RoleAuthJson.auth_delete"
                                                             @click="DelCategory(level_2_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
@@ -185,19 +187,19 @@
                                             :data-index="level_3_key" :data-level="'3'">
                                             <td style="vertical-align:middle">
                                                 <i class="fa-solid fa-list"></i>
-                                                @{{ level_3_obj . category_name }}
+                                                @{{ level_3_obj.category_name }}
                                             </td>
                                             <td>
                                                 <div class="row">
                                                     <div class="col-sm-3">
-                                                        <button type="button" class="btn btn-warning" data-toggle="modal"
-                                                            data-target="#addCategory"
+                                                        <button type="button" class="btn btn-warning"
+                                                            data-toggle="modal" data-target="#addCategory"
                                                             v-show="RoleAuthJson.auth_update"
                                                             @click="CategoryModelShow('3','edit',level_3_obj)">編輯</button>
                                                     </div>
                                                     <div class="col-sm-3">
                                                         <button type="button" class="btn btn-danger"
-                                                        v-show="RoleAuthJson.auth_delete"
+                                                            v-show="RoleAuthJson.auth_delete"
                                                             @click="DelCategory(level_3_obj.id)">刪除</button>
                                                     </div>
                                                 </div>
@@ -219,8 +221,12 @@
         var requisitions = Vue.extend({
             data: function() {
                 return {
+                    imagesFile: null,
+                    showPhotoSrc: null,
+                    presetPhotoSrc: '/asset/img/default_item.png',
+                    fileUrl:@json(env('AWS_URL')),
                     RoleAuthJson: RoleAuthJson, //腳色權限
-                    UecConfig:UecConfig,//後臺設定
+                    UecConfig: UecConfig, //後臺設定
                     //list
                     category_level_1: @json($category_level_1),
                     category_level_2: [],
@@ -236,13 +242,14 @@
                         id: '',
                         show_title: '',
                         category_level: '',
-                        parent_id: '',
+                        parent_id: null,
                         category_name: '',
                         old_category_name: '',
-                        content_type:'P',
+                        content_type: 'P',
                         act: '',
-                        gross_margin_threshold:0,//毛利門檻
-
+                        gross_margin_threshold: 0, //毛利門檻
+                        category_short_name: '', //(漢堡)短名稱
+                        icon_name: '', //(漢堡呈現)分類icon圖檔名稱
                     },
                     disabled: {
                         disabled_level_2: 1,
@@ -255,9 +262,6 @@
                 }
             },
             methods: {
-                test() {
-                    console.log(this.addCategory);
-                },
                 GetCategory(obj, category_level) { //取得子分類
                     var dataFunction = this;
                     var req = async () => {
@@ -322,14 +326,24 @@
                     this.addCategory.category_name = '';
                     this.addCategory.id = '';
                     this.addCategory.category_level = level;
+                    this.addCategory.gross_margin_threshold = 0;
+                    this.addCategory.old_category_short_name = '';
+                    this.addCategory.icon_name = null;
                     this.addCategory.act = act;
 
                     // 關閉驗證
-                    $('#receiver_name').closest(".form-group").removeClass("has-error").find('span').hide();
+                    // $('#receiver_name').closest(".form-group").removeClass("has-error").find('span').hide();
+                    this.showPhotoSrc = this.presetPhotoSrc ;
 
                     if (act == 'edit') {
                         this.addCategory.old_category_name = obj.category_name;
                         this.addCategory.id = obj.id;
+                        this.addCategory.icon_name = obj.icon_name;
+                        this.addCategory.gross_margin_threshold = obj.gross_margin_threshold;
+                        this.addCategory.old_category_short_name = obj.category_short_name;
+                        if(obj.icon_name){
+                            this.showPhotoSrc = this.fileUrl+obj.icon_name ;
+                        }
                     }
                     switch (level) {
                         case '1':
@@ -350,72 +364,119 @@
                             break;
                     }
                 },
+                uploadFile(e) {
+                    var vm = this;
+                    let file = e.target.files[0];
+                    let type = e.target.files[0].type;
+                    let showPhotoSrc = URL.createObjectURL(file);
+                    this.getImage(showPhotoSrc, file, function(callback) {
+                        let status = true;
+                        if (callback.file.size > 1048576) {
+                            status = false;
+                            alert('照片名稱:' + callback.file.name + '已經超出大小');
+                        }
+                        if (callback.file.type !== 'image/jpeg' && callback.file.type !== 'image/png') {
+                            status = false;
+                            alert('照片名稱:' + file.name + '格式錯誤');
+                        }
+                        if (callback.width < 96 && callback.height < 96) {
+                            status = false;
+                            alert('照片名稱:' + callback.file.name + '照片尺寸必須為96*96以上');
+                        }
+                        if (callback.width !== callback.height) {
+                            status = false;
+                            alert('照片名稱:' + callback.file.name + '照片比例必須為1:1');
+                        }
+
+                        if (status) {
+                            //轉移file 到另一個隱藏的
+                            let list = new DataTransfer();
+                            list.items.add(file);
+                            vm.$refs.images_files.files = list.files;
+                            vm.showPhotoSrc = showPhotoSrc;
+                        } else {
+                            e.target.value = '';
+                        }
+                    });
+                },
+                getImage(fileurl, file, callback) {
+                    vm = this;
+                    img = new Image();
+                    img.src = fileurl;
+                    img.onload = function() {
+                        result = {
+                            width: this.width,
+                            height: this.height,
+                            file: file
+                        };
+                        callback(result);
+                    };
+                },
                 CategoryToList() { //新增編輯
-                    var checkstatus = true;
-                    var type = '';
+                    // var checkstatus = true;
+                    // var type = '';
 
                     // 提交給驗證器驗證
-                    $('#productModal').submit();
-
-                    if (this.addCategory.category_name == '') {
-                        checkstatus = false;
-                        // this.msg.receiver_name = '不能為空喔';
-                    }
-
-                    if (this.addCategory.act == 'add') {
-                        type = 'AddCategory';
-                    } else {
-                        type = 'EditCategory';
-                    }
-                    // console.log('TEST');
-                    var PostAjax = async () => {
-                        const response = await axios.post('/backend/web_category_hierarchy/ajax', {
-                            _token: $('meta[name="csrf-token"]').attr('content'),
-                            type: type,
-                            id: this.addCategory.id,
-                            category_level: this.addCategory.category_level,
-                            parent_id: this.addCategory.parent_id,
-                            category_name: this.addCategory.category_name,
-                            content_type:this.addCategory.category_level == this.UecConfig.web_category_hierarchy_levels ? this.addCategory.content_type : '' ,
-                        });
-                        switch (this.addCategory.category_level) {
-                            case '1':
-                                this.category_level_1 = response.data.result;
-                                if (this.addCategory.act == 'edit') {
-                                    this.category_level_2 = {};
-                                    this.category_level_2_title = '';
-                                    this.category_level_3 = {};
-                                    this.category_level_3_title = '';
-                                }
-                                break;
-                            case '2':
-                                this.category_level_2 = response.data.result;
-                                if (this.addCategory.act == 'edit') {
-                                    this.category_level_3 = {};
-                                    this.category_level_3_title = '';
-                                }
-                                break;
-                            case '3':
-                                this.category_level_3 = response.data.result;
-                                break;
-                            default:
-                                break;
-                        }
-                        if(type == 'EditCategory'){
-                            var act_msg = '編輯';
-                        }else{
-                            var act_msg = '新增';
-                        }
-                        if(response.status == 200){
-                            alert(act_msg+'成功')
-                        }else{
-                            alert(act_msg +'失敗')
-                        }
-                    }
-                    if (checkstatus) {
-                        PostAjax();
-                        $('.hidden-model').click();
-                    }
+                    $('#webCategoryHierarchyModal').submit();
+                    console.log('CategoryToList toogle');
+                    // if (this.addCategory.act == 'add') {
+                    //     type = 'AddCategory';
+                    // } else {
+                    //     type = 'EditCategory';
+                    // }
+                    // const formData = new FormData();
+                    // formData.append('type', type);
+                    // formData.append('id', this.addCategory.id);
+                    // formData.append('category_level', this.addCategory.category_level);
+                    // formData.append('parent_id', this.addCategory.parent_id);
+                    // formData.append('category_name', this.addCategory.category_name);
+                    // formData.append('content_type', this.addCategory.category_level == this.UecConfig.web_category_hierarchy_levels ? this.addCategory.content_type : '');
+                    // formData.append('gross_margin_threshold', this.addCategory.gross_margin_threshold);
+                    // formData.append('category_short_name', this.addCategory.category_short_name);
+                    // let getimagefile = document.querySelector('#icon_name_file');
+                    // formData.append("image", getimagefile.files[0]);
+                    // var PostAjax = async () => {
+                    //     const response = await axios.post('/backend/web_category_hierarchy/ajax', formData,{
+                    //         headers: {
+                    //             'Content-Type': 'multipart/form-data'
+                    //         }
+                    //     });
+                        // switch (this.addCategory.category_level) {
+                        //     case '1':
+                        //         this.category_level_1 = response.data.result;
+                        //         if (this.addCategory.act == 'edit') {
+                        //             this.category_level_2 = {};
+                        //             this.category_level_2_title = '';
+                        //             this.category_level_3 = {};
+                        //             this.category_level_3_title = '';
+                        //         }
+                        //         break;
+                        //     case '2':
+                        //         this.category_level_2 = response.data.result;
+                        //         if (this.addCategory.act == 'edit') {
+                        //             this.category_level_3 = {};
+                        //             this.category_level_3_title = '';
+                        //         }
+                        //         break;
+                        //     case '3':
+                        //         this.category_level_3 = response.data.result;
+                        //         break;
+                        //     default:
+                        //         break;
+                        // }
+                        // if (type == 'EditCategory') {
+                        //     var act_msg = '編輯';
+                        // } else {
+                        //     var act_msg = '新增';
+                        // }
+                        // if (response.status == 200) {
+                        //     alert(act_msg + '成功')
+                        // } else {
+                        //     alert(act_msg + '失敗')
+                        // }
+                    // }
+                    // PostAjax();
+                    // $('.hidden-model').click();
 
                 },
                 drag(eve) {
@@ -425,7 +486,7 @@
                 },
                 dragover(eve) {
                     eve.preventDefault();
-                    eve.target.parentNode.classList.add('ondragover') ;
+                    eve.target.parentNode.classList.add('ondragover');
 
                 },
                 dragleave(eve) {
@@ -433,9 +494,9 @@
                     eve.target.parentNode.classList.remove('ondragover');
                 },
                 drop(eve) {
-                    eve.target.parentNode.classList.remove('ondragover') ;
+                    eve.target.parentNode.classList.remove('ondragover');
                     $('tbody').removeClass('elements-box')
-                    eve.target.parentNode.parentNode.classList.remove('elements-box') ;
+                    eve.target.parentNode.parentNode.classList.remove('elements-box');
                     var index = eve.dataTransfer.getData("text/index");
                     var level = eve.dataTransfer.getData("text/level");
                     let targetIndex = eve.target.parentNode.dataset.index;
@@ -486,9 +547,9 @@
                                 type: 'SortCategory',
                                 JsonData: JSON.stringify(InData),
                             });
-                            if(response.status == 200){
+                            if (response.status == 200) {
                                 alert('儲存排序成功');
-                            }else{
+                            } else {
                                 alert('儲存排序失敗');
                             }
                         }
@@ -499,17 +560,50 @@
 
             },
             mounted: function() {
+                var vm = this ;
                 // 驗證表單
-                $("#productModal").validate({
+                $("#webCategoryHierarchyModal").validate({
                     // debug: true,
                     submitHandler: function(form) {
-                        // $('#btn-save').prop('disabled', true);
-                        // form.submit();
+                        var checkstatus = true;
+                        var type = '';
+
+                        if (vm.addCategory.act == 'add') {
+                            type = 'AddCategory';
+                        } else {
+                            type = 'EditCategory';
+                        }
+                        const formData = new FormData();
+                        formData.append('type', type);
+                        formData.append('id', vm.addCategory.id);
+                        formData.append('category_level', vm.addCategory.category_level);
+                        formData.append('parent_id', vm.addCategory.parent_id);
+                        formData.append('category_name', vm.addCategory.category_name);
+                        formData.append('content_type', vm.addCategory.category_level == vm.UecConfig.web_category_hierarchy_levels ? vm.addCategory.content_type : '');
+                        formData.append('gross_margin_threshold', vm.addCategory.gross_margin_threshold);
+                        formData.append('category_short_name', vm.addCategory.category_short_name);
+                        let getimagefile = document.querySelector('#icon_name_file');
+                        formData.append("image", getimagefile.files[0]);
+                        var PostAjax = async () => {
+                            const response = await axios.post('/backend/web_category_hierarchy/ajax', formData,{
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            });
+                        }
+                        PostAjax();
                     },
                     rules: {
                         receiver_name: {
                             required: true,
                         },
+                        gross_margin_threshold: {
+                            required: true,
+                        },
+                        category_short_name: {
+                            required: true,
+                        },
+
                     },
                     errorClass: "help-block",
                     errorElement: "span",

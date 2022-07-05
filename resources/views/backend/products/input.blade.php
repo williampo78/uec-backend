@@ -612,8 +612,7 @@
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                             <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
                                             <input type="file" @change="fileSelected" multiple accept=".jpg,.jpeg,.png">
-                                            <input style="display: none" type="file" :ref="'images_files'" name="filedata[]"
-                                                multiple>
+                                            <input style="display: none" type="file" :ref="'images_files'" name="filedata[]" multiple>
                                         </div>
                                     </div>
                                 </div>

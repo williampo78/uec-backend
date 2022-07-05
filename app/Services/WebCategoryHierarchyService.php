@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use ImageUpload ;
 class WebCategoryHierarchyService
 {
     public function __construct()
@@ -22,13 +22,17 @@ class WebCategoryHierarchyService
     {
         return CategoryHierarchy::where('parent_id', $parent_id)->orderBy('sort', 'ASC')->get();
     }
-    public function add_Category_Hierarchy($in)
+    public function add_Category_Hierarchy($in,$file)
     {
         $now = Carbon::now();
         $agent_id = Auth::user()->agent_id;
         $user_id = Auth::user()->id;
+        DB::beginTransaction();
+
         try {
-            DB::beginTransaction();
+            if($in['parent_id'] == 'null'){
+                $in['parent_id'] = null ;
+            }
             $insert['parent_id'] = $in['parent_id']; //父ID
             $insert['category_level'] = $in['category_level']; // 階級
             $insert['category_name'] = $in['category_name'];
@@ -39,16 +43,29 @@ class WebCategoryHierarchyService
             $insert['updated_by'] = $user_id;
             $insert['created_at'] = $now;
             $insert['updated_at'] = $now;
-            CategoryHierarchy::insert($insert);
+            if($in['category_level'] == '1'){
+                $insert['category_short_name'] = $in['category_short_name'];
+                $insert['gross_margin_threshold'] = $in['gross_margin_threshold'];
+            }
+            $CategoryHierarchy = CategoryHierarchy::create($insert);
+            if(!empty($file)){
+                $uploadPath = 'category_icon/'.$CategoryHierarchy->id;
+                $uploadFileResult = ImageUpload::uploadImage($file['image'], $uploadPath, 'category_icon');
+                CategoryHierarchy::where('id',$CategoryHierarchy->id)->update(['icon_name'=>$uploadFileResult['image']]);
+            }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             Log::info($e);
             return false;
         }
-        return CategoryHierarchy::where('parent_id', $in['parent_id'])->get();
+        $result = new CategoryHierarchy ;
+        if(!is_null($in['parent_id'])){
+           $result = $result->where('parent_id',$in['parent_id']);
+        }
+        return $result->get();
     }
-    public function edit_Category_Hierarchy($in)
+    public function edit_Category_Hierarchy($in,$file)
     {
         $now = Carbon::now();
         $agent_id = Auth::user()->agent_id;
@@ -57,6 +74,15 @@ class WebCategoryHierarchyService
             DB::beginTransaction();
             $insert['category_name'] = $in['category_name'];
             $insert['content_type'] = $in['content_type'];
+            if($in['category_level'] == '1'){
+                $insert['category_short_name'] = $in['category_short_name'];
+                $insert['gross_margin_threshold'] = $in['gross_margin_threshold'];
+            }
+            if(!empty($file)){
+                $uploadPath = 'category_icon/'.$in['id'];
+                $uploadFileResult = ImageUpload::uploadImage($file['image'], $uploadPath, 'category_icon');
+                CategoryHierarchy::where('id',$in['id'])->update(['icon_name'=>$uploadFileResult['image']]);
+            }
             $insert['updated_by'] = $user_id;
             $insert['updated_at'] = $now;
             CategoryHierarchy::where('id', $in['id'])->update($insert);

@@ -96,16 +96,16 @@ class WebCategoryHierarchyController extends Controller
     public function ajax(Request $request)
     {
         $in = $request->input() ;
-
+        $file = $request->file() ;
         switch ($in['type']) {
             case 'GetCategory': // 取得子分類
                 $result = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel($in['id']);
                 break;
             case 'AddCategory':
-                $result = $this->webCategoryHierarchyService->add_Category_Hierarchy($in) ;
+                $result = $this->webCategoryHierarchyService->add_Category_Hierarchy($in,$file) ;
                 break;
             case 'EditCategory':
-                $result = $this->webCategoryHierarchyService->edit_Category_Hierarchy($in) ;
+                $result = $this->webCategoryHierarchyService->edit_Category_Hierarchy($in,$file) ;
                 break;
             case 'DelCategory' :
                 $result = $this->webCategoryHierarchyService->del_Category_Hierarchy($in) ;
