@@ -200,8 +200,8 @@ class MemberController extends Controller
             $lgstCompanyCode = config('uec.lgst_company_code_options')[$order->lgst_company_code] ?? null;
 
             // 配送方式
-            if (isset($lgstMethod, $lgstCompanyCode)) {
-                $orderPayload['delivery_method'] = "{$lgstMethod}-{$lgstCompanyCode}";
+            if (isset($lgstMethod)) {
+                $orderPayload['delivery_method'] = "{$lgstMethod}";
             }
 
             // 出貨時間
@@ -339,8 +339,8 @@ class MemberController extends Controller
         $lgstCompanyCode = config('uec.lgst_company_code_options')[$order->lgst_company_code] ?? null;
 
         // 配送方式
-        if (isset($lgstMethod, $lgstCompanyCode)) {
-            $payload['results']['delivery_method'] = "{$lgstMethod}-{$lgstCompanyCode}";
+        if (isset($lgstMethod)) {
+            $payload['results']['delivery_method'] = "{$lgstMethod}";
         }
 
         // 發票開立時間
