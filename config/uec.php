@@ -219,4 +219,7 @@ return [
         'APPROVED' => '已合作',
         'EXPIRED' => '已過期',
     ],
+
+    //購物車滿額折扣，攤提回單品計算
+    'cart_p_discount_split'=> 1,
 ];
