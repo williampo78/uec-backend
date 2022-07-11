@@ -1112,6 +1112,7 @@ class APICartServices
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
+                "thresholdDiscountDisplay" => true,
                 "thresholdDiscount" => isset($thresholdDiscount_display) ? $thresholdDiscount_display : [],
                 "thresholdAmount" => round($thresholdAmount),
                 "thresholdGiftAway" => isset($thresholdGiftAway_display) ? $thresholdGiftAway_display : [],
@@ -1550,6 +1551,8 @@ class APICartServices
                                         "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => round($amount),
+                                        "itemDiscount" => (($cartAmount[$product_id] * $detail_qty) - round($amount)) * -1,
+                                        "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -1642,6 +1645,8 @@ class APICartServices
                                         "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => round($amount),
+                                        "itemDiscount" => (($cartAmount[$product_id] * $detail_qty) - round($amount)) * -1,
+                                        "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -1708,6 +1713,8 @@ class APICartServices
                                         "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => round($amount),
+                                        "itemDiscount" => (($cartAmount[$product_id] * $detail_qty) - round($amount)) * -1,
+                                        "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -1774,6 +1781,8 @@ class APICartServices
                                         "itemPrice" => round($unit_price),
                                         "itemQty" => $return_qty,
                                         "amount" => round($amount),
+                                        "itemDiscount" => (($cartAmount[$product_id] * $detail_qty) - round($amount)) * -1,
+                                        "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
@@ -1834,6 +1843,8 @@ class APICartServices
                                     "itemPrice" => round($item_info->selling_price),
                                     "itemQty" => $detail_qty,
                                     "amount" => round($item_info->selling_price * $detail_qty),
+                                    "itemDiscount" => (($cartAmount[$product_id] * $detail_qty) - round($item_info->selling_price * $detail_qty)) * -1,
+                                    "itemCartDiscount" => 0,
                                     "itemStock" => $stock,
                                     "outOfStock" => $outOfStock,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
@@ -1895,6 +1906,8 @@ class APICartServices
                                 "itemPrice" => round($item_info->selling_price),
                                 "itemQty" => $detail_qty,
                                 "amount" => round($item_info->selling_price * $detail_qty),
+                                "itemDiscount" => (($cartAmount[$product_id] * $detail_qty) - round($item_info->selling_price * $detail_qty)) * -1,
+                                "itemCartDiscount" => 0,
                                 "itemStock" => $stock,
                                 "outOfStock" => $outOfStock,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
@@ -1953,6 +1966,8 @@ class APICartServices
                             "itemPrice" => round($item_info->selling_price),
                             "itemQty" => $detail_qty,
                             "amount" => round($item_info->selling_price * $detail_qty),
+                            "itemDiscount" => (($cartAmount[$product_id] * $detail_qty) - round($item_info->selling_price * $detail_qty)) * -1,
+                            "itemCartDiscount" => 0,
                             "itemStock" => $stock,
                             "outOfStock" => $outOfStock,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
@@ -2291,6 +2306,7 @@ class APICartServices
                 "productRow" => $productRow,
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
+                "thresholdDiscountDisplay" => false,
                 "thresholdDiscount" => isset($thresholdDiscount_display) ? $thresholdDiscount_display : [],
                 "thresholdAmount" => round($thresholdAmount),
                 "thresholdGiftAway" => isset($thresholdGiftAway_display) ? $thresholdGiftAway_display : [],
@@ -2309,23 +2325,24 @@ class APICartServices
                     foreach ($threshold['products'] as $k => $product_id) {
                         $threshold_prod['value'][$product_id] = $threshold['campaignXvalue']; //折數、折價金額
                         $threshold_prod['price'][$product_id] = $threshold['productAmount'][$k]; //單品小計
-                        $threshold_prod['thresholdDiscount'][$product_id] = $threshold['thresholdID']; //門檻ID
+                        $threshold_prod['thresholdDiscount'][$product_id] = $threshold['thresholdID']; //商品對應的門檻ID
                         $threshold_prod['thresholdBrief'][$product_id] = $threshold['thresholdBrief']; //門檻文案
                         $total += $threshold['productAmount'][$k]; //單品金額加總
                     }
                     $threshold_discount['discount'][$threshold['thresholdID']] = $threshold['campaignDiscount']; //門檻折扣
                     $threshold_discount['price'][$threshold['thresholdID']] = $total; //符合門檻總金額
                 }
-                //dd($cart['thresholdDiscount']);
                 //計算門檻折扣
                 foreach ($cart['list'] as $products) { //主產品
                     foreach ($products['itemList'] as $item) { //細項多規
+                        //售價*數量-單品折抵(itemDiscount) = 單品折抵後的小計($tmp_subtotal)
+                        $tmp_subtotal = ($products['sellingPrice'] * $item['itemQty'] + $item['itemDiscount']);
                         //滿額門檻計算$threshold_prod['price']
                         if (isset($threshold_prod['value'][$products['productID']])) {
                             if ($threshold_prod['value'][$products['productID']] < 1) { //折數
-                                $cart_p_discount_prod[$products['productID']][$item['itemId']] = round($item['amount'] - round($item['amount'] * $threshold_prod['value'][$products['productID']])) * -1;
+                                $cart_p_discount_prod[$products['productID']][$item['itemId']] = round($tmp_subtotal - round($tmp_subtotal * $threshold_prod['value'][$products['productID']])) * -1;
                             } else {
-                                $cart_p_discount_prod[$products['productID']][$item['itemId']] = round($threshold_prod['value'][$products['productID']] * ($item['amount'] / $threshold_discount['price'][$threshold_prod['thresholdDiscount'][$products['productID']]])) * -1;
+                                $cart_p_discount_prod[$products['productID']][$item['itemId']] = round($threshold_prod['value'][$products['productID']] * ($tmp_subtotal / $threshold_discount['price'][$threshold_prod['thresholdDiscount'][$products['productID']]])) * -1;
                             }
                         } else {
                             $cart_p_discount_prod[$products['productID']][$item['itemId']] = 0;
@@ -2352,27 +2369,35 @@ class APICartServices
                         $last_threshold_productID = $threshold_discount['end'][$threshold['thresholdID']][0];   //product_id
                         $last_threshold_itemId = $threshold_discount['end'][$threshold['thresholdID']][1];      //prouct_item_id
                         $cart_p_discount_prod[$last_threshold_productID][$last_threshold_itemId] = $cart_p_discount_prod[$last_threshold_productID][$last_threshold_itemId] + $tmp_discount;
-
                     }
                 }
 
                 //重構商品折扣
                 foreach ($cart['list'] as $productKey => $products) { //主產品
                     foreach ($products['itemList'] as $key => $item) { //細項多規
-                        //活動折抵 = C002單品折抵 + C003滿額折抵 (-200)
+                        //活動折抵 = C002單品折抵 + C003滿額折抵 (負數)
                         $products['itemList'][$key]['campaignDiscount'] = $item['campaignDiscount'] + $cart_p_discount_prod[$products['productID']][$item['itemId']];
                         //小計 = 售價 x 數量 - 活動折抵 (如上,C002單品折抵 + C003滿額折抵) 因為活動折抵計算時為負數，所以用加的
                         $products['itemList'][$key]['amount'] = $products['sellingPrice'] * $item['itemQty'] + $products['itemList'][$key]['campaignDiscount'];
                         //活動價 = 小計 / 數量 (四捨五入至整數位)
                         $products['itemList'][$key]['itemPrice'] = round($products['itemList'][$key]['amount'] / $item['itemQty']);
+                        $products['itemList'][$key]['itemCartDiscount'] = $cart_p_discount_prod[$products['productID']][$item['itemId']];
                     }
                     if (count($products['campaignThresholdDiscount']) > 0) {    //如果有門檻活動
                         //重構門檻活動
+                        $check = 0;
                         foreach ($products['campaignThresholdDiscount']['campaignThreshold'] as $thresholdKey => $thresholdBrief) {
-                            if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
-                                $products['campaignThresholdDiscount']['campaignThreshold'] = $thresholdBrief;
-                                $products['campaignThresholdDiscount']['campaignThresholdStatus'] = true;
+                            if (isset($threshold_prod['thresholdBrief'][$products['productID']])) {
+                                if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
+                                    $check++;
+                                    $products['campaignThresholdDiscount']['campaignThreshold'] = $thresholdBrief;
+                                }
                             }
+                        }
+                        if ($check > 0) {
+                            $products['campaignThresholdDiscount']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
+                        } else {
+                            $products['campaignThresholdDiscount']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                         }
                     }
                     $cart['list'][$productKey] = $products;
@@ -2380,13 +2405,10 @@ class APICartServices
             } else {
                 //重構門檻活動
                 foreach ($cart['list'] as $productKey => $products) { //主產品
-                    $products['campaignThresholdDiscount']['campaignThresholdStatus'] = false;
+                    $products['campaignThresholdDiscount']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                     $cart['list'][$productKey] = $products;
                 }
             }
-
-            //移除滿額折顯示
-            unset($cart['thresholdDiscount']);
 
             return json_encode(array("status" => 200, "result" => $cart));
         }
