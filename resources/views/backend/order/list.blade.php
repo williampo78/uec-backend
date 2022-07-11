@@ -320,6 +320,9 @@
 @section('js')
     <script src="{{ mix('js/order.js') }}"></script>
     <script>
+        //攤提單品計算
+        let cart_p_discount_split = '{{ config('uec.cart_p_discount_split') }}';
+
         $(function() {
             let ordered_date_start_flatpickr = flatpickr("#ordered_date_start_flatpickr", {
                 dateFormat: "Y-m-d",
@@ -458,6 +461,17 @@
                                 let package_no = order_detail.package_no ?
                                     `<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">${order_detail.package_no}</a>` :
                                     '';
+                                let subtotal_and_cart_p_discount_html = '';
+
+                                if(cart_p_discount_split == 1){
+                                    subtotal_and_cart_p_discount_html = `
+                                    <td>${order_detail.cart_p_discount}</td>
+                                    <td>${order_detail.subtotal}</td>`;
+                                }else{
+                                    subtotal_and_cart_p_discount_html = `
+                                    <td>${order_detail.subtotal}</td>
+                                    <td>${order_detail.cart_p_discount}</td>`;
+                                }
 
                                 $("#tab-order-detail tbody").append(`
                                     <tr>
@@ -470,8 +484,7 @@
                                         <td>${order_detail.unit_price}</td>
                                         <td>${order_detail.qty}</td>
                                         <td>${order_detail.campaign_discount}</td>
-                                        <td>${order_detail.subtotal}</td>
-                                        <td>${order_detail.cart_p_discount}</td>
+                                        ${subtotal_and_cart_p_discount_html}
                                         <td>${order_detail.point_discount}</td>
                                         <td>${record_identity}</td>
                                         <td>${package_no}</td>
