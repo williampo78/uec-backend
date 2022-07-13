@@ -373,6 +373,8 @@ class OrderService
     $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']); // order_campaign_discounts
     $void_group_seq = [];
     $thresholdAmount = 0;
+    //滿額折
+    $thresholdDiscounts = collect();
 
     foreach ($discount as $obj) {
         switch ($obj->promotionalCampaign->level_code) {
@@ -412,6 +414,15 @@ class OrderService
                 }
                 //折扣
                 if ($obj->discount < 0 && $obj->order_detail_id !== null && $obj->promotionalCampaign->level_code == 'CART_P') {
+
+                    //滿額折-併入discount_content內使用
+                    $thresholdDiscounts->push([
+                        'product_id'             => $obj->product_id,
+                        'campaignName'           => $obj->promotionalCampaign->campaign_name,
+                        'campaignBrief'          => $obj->promotionalCampaign->campaign_brief,
+                        'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold->threshold_brief,
+                    ]);
+
                     if (!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])) {
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0;
                     }
@@ -498,23 +509,18 @@ class OrderService
         }
 
         //滿額折
-        $thresholdDiscounts = $discount->where('discount', '<', 0)
-            ->whereNotNull('order_detail_id')
-            ->where('level_code', 'CART_P')
-            ->where('product_id', $val['product_id']);
-
+        $thresholdDiscounts = $thresholdDiscounts->where('product_id', $val['product_id']);
         foreach ($thresholdDiscounts as $thresholdDiscount) {
 
             $order_details[$key]['discount_content'][] = [
-                'display'       => config('uec.cart_p_discount_split') == 1,
-                'type'          => '滿額折',
-                'campaignName'  => $thresholdDiscount->promotionalCampaign->campaign_name,
-                'campaignBrief' => $thresholdDiscount->promotionalCampaign->campaign_brief,
-                'thresholdCampaignBrief' => '',
-                'campaignProdList' => []
+                'display'                => config('uec.cart_p_discount_split') == 1,
+                'type'                   => '滿額折',
+                'campaignName'           => $thresholdDiscount['campaignName'],
+                'campaignBrief'          => $thresholdDiscount['campaignBrief'],
+                'thresholdCampaignBrief' => $thresholdDiscount['thresholdCampaignBrief'],
+                'campaignProdList'       => []
             ];
         }
-
     }
 
     if (isset($cart['discount'])) {
