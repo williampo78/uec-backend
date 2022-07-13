@@ -507,8 +507,11 @@ class OrderService
 
             $order_details[$key]['discount_content'][] = [
                 'display'       => config('uec.cart_p_discount_split') == 1,
+                'type'          => '滿額折',
                 'campaignName'  => $thresholdDiscount->promotionalCampaign->campaign_name,
                 'campaignBrief' => $thresholdDiscount->promotionalCampaign->campaign_brief,
+                'thresholdCampaignBrief' => '',
+                'campaignProdList' => []
             ];
         }
 
