@@ -418,6 +418,7 @@ class OrderService
                     //滿額折-併入discount_content內使用
                     $thresholdDiscounts->push([
                         'product_id'             => $obj->product_id,
+                        'product_item_id'        => $obj->product_item_id,
                         'campaignName'           => $obj->promotionalCampaign->campaign_name,
                         'campaignBrief'          => $obj->promotionalCampaign->campaign_brief,
                         'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold->threshold_brief,
@@ -509,8 +510,11 @@ class OrderService
         }
 
         //滿額折
-        $thresholdDiscounts = $thresholdDiscounts->where('product_id', $val['product_id']);
-        foreach ($thresholdDiscounts as $thresholdDiscount) {
+        $TargetThresholdDiscounts = $thresholdDiscounts
+            ->where('product_id', $val['product_id'])
+            ->where('product_item_id', $val['product_item_id']);
+
+        foreach ($TargetThresholdDiscounts as $thresholdDiscount) {
 
             $order_details[$key]['discount_content'][] = [
                 'display'                => config('uec.cart_p_discount_split') == 1,
