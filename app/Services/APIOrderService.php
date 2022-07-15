@@ -40,7 +40,7 @@ class APIOrderService
      */
     public function setOrders($cart, $order, $campaigns, $campaign_gift, $campaign_discount, $token = null)
     {
-        if (config('uec.cart_p_discount_split') == 1) return $this->setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount, $token = null);
+        if (config('uec.cart_p_discount_split') == 1) return $this->setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount, $token);
         $member_id = Auth::guard('api')->user()->member_id;
         $random = Str::random(6);
         //商城倉庫代碼
