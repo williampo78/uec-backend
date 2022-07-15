@@ -2374,6 +2374,7 @@ class APICartServices
 
                 //重構商品折扣
                 foreach ($cart['list'] as $productKey => $products) { //主產品
+                    $products['campaignThresholdDiscount']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                     foreach ($products['itemList'] as $key => $item) { //細項多規
                         //活動折抵 = C002單品折抵 + C003滿額折抵 (負數)
                         $products['itemList'][$key]['campaignDiscount'] = $item['campaignDiscount'] + $cart_p_discount_prod[$products['productID']][$item['itemId']];
@@ -2386,18 +2387,18 @@ class APICartServices
                     if (count($products['campaignThresholdDiscount']) > 0) {    //如果有門檻活動
                         //重構門檻活動
                         $check = 0;
-                        foreach ($products['campaignThresholdDiscount']['campaignThreshold'] as $thresholdKey => $thresholdBrief) {
-                            if (isset($threshold_prod['thresholdBrief'][$products['productID']])) {
-                                if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
-                                    $check++;
-                                    $products['campaignThresholdDiscount']['campaignThreshold'] = $thresholdBrief;
+                        if (isset($products['campaignThresholdDiscount']['campaignThreshold'])) {
+                            foreach ($products['campaignThresholdDiscount']['campaignThreshold'] as $thresholdKey => $thresholdBrief) {
+                                if (isset($threshold_prod['thresholdBrief'][$products['productID']])) {
+                                    if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
+                                        $check++;
+                                        $products['campaignThresholdDiscount']['campaignThreshold'] = $thresholdBrief;
+                                    }
                                 }
                             }
                         }
                         if ($check > 0) {
                             $products['campaignThresholdDiscount']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
-                        } else {
-                            $products['campaignThresholdDiscount']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                         }
                     }
                     $cart['list'][$productKey] = $products;
