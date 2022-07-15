@@ -38,9 +38,9 @@ class APIOrderService
      * @param 購物車清單, 前端的訂單資料
      * @return string
      */
-    public function setOrders($cart, $order, $campaigns, $campaign_gift, $campaign_discount, $token = null)
+    public function setOrders($cart, $order, $campaigns, $campaign_gift, $campaign_discount)
     {
-        if (config('uec.cart_p_discount_split') == 1) return $this->setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount, $token);
+        if (config('uec.cart_p_discount_split') == 1) return $this->setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount);
         $member_id = Auth::guard('api')->user()->member_id;
         $random = Str::random(6);
         //商城倉庫代碼
@@ -707,11 +707,9 @@ class APIOrderService
                     if ($payment) {
                         $result['status'] = 200;
                         $result['payment_url'] = $tapPayResult['payment_url'];
-                        $result['payment_token'] = $token;
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
-                        $result['payment_token'] = null;
                         Log::channel('tappay_api_log')->error('597:tappay error!' . json_encode($tapPayResult));
                         DB::rollBack();
                         return $result;
@@ -719,7 +717,6 @@ class APIOrderService
                 } else {
                     $result['status'] = 402;
                     $result['payment_url'] = null;
-                    $result['payment_token'] = null;
                     $result['tappay_msg'] = $tapPayResult['status'] . ":" . $tapPayResult['msg'];
                     Log::channel('tappay_api_log')->error($tapPayResult['status'] . ':tappay error!' . json_encode($tapPayResult));
                     DB::rollBack();
@@ -742,7 +739,7 @@ class APIOrderService
      * @param 購物車清單, 前端的訂單資料
      * @return string
      */
-    public function setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount, $token = null)
+    public function setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount)
     {
         $member_id = Auth::guard('api')->user()->member_id;
         $random = Str::random(6);
@@ -1415,11 +1412,9 @@ class APIOrderService
                     if ($payment) {
                         $result['status'] = 200;
                         $result['payment_url'] = $tapPayResult['payment_url'];
-                        $result['payment_token'] = $token;
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
-                        $result['payment_token'] = null;
                         Log::channel('tappay_api_log')->error('597:tappay error!' . json_encode($tapPayResult));
                         DB::rollBack();
                         return $result;
@@ -1427,7 +1422,6 @@ class APIOrderService
                 } else {
                     $result['status'] = 402;
                     $result['payment_url'] = null;
-                    $result['payment_token'] = null;
                     $result['tappay_msg'] = $tapPayResult['status'] . ":" . $tapPayResult['msg'];
                     Log::channel('tappay_api_log')->error($tapPayResult['status'] . ':tappay error!' . json_encode($tapPayResult));
                     DB::rollBack();
