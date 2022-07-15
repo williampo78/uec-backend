@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\OrderCampaignDiscount;
+use App\Models\OrderDetail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -372,6 +373,9 @@ class OrderService
     $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']); // order_campaign_discounts
     $void_group_seq = [];
     $thresholdAmount = 0;
+    //滿額折
+    $thresholdDiscounts = collect();
+
     foreach ($discount as $obj) {
         switch ($obj->promotionalCampaign->level_code) {
             case 'PRD':
@@ -380,6 +384,7 @@ class OrderService
                     if ($obj->record_identity == 'M' && $obj->discount !== 0.0) {
                         if ($val['id'] == $obj->order_detail_id) {
                             $order_details[$key]['discount_content'][$obj->group_seq] = [
+                                'display' => true,
                                 'campaignName' => $obj->promotionalCampaign->campaign_name,
                                 'campaignBrief' => $obj->promotionalCampaign->campaign_brief,
                                 'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '',
@@ -409,6 +414,16 @@ class OrderService
                 }
                 //折扣
                 if ($obj->discount < 0 && $obj->order_detail_id !== null && $obj->promotionalCampaign->level_code == 'CART_P') {
+
+                    //滿額折-併入discount_content內使用
+                    $thresholdDiscounts->push([
+                        'product_id'             => $obj->product_id,
+                        'product_item_id'        => $obj->product_item_id,
+                        'campaignName'           => $obj->promotionalCampaign->campaign_name,
+                        'campaignBrief'          => $obj->promotionalCampaign->campaign_brief,
+                        'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold->threshold_brief,
+                    ]);
+
                     if (!isset($cart['discount'][$obj->group_seq]['campaignDiscount'])) {
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] = 0;
                     }
@@ -424,6 +439,7 @@ class OrderService
         }
 
     }
+
     foreach($order_details as $key => $val){
         $findProductPRD_M = OrderCampaignDiscount::where('order_detail_id', '=', $val['id'])
                     ->where('order_id', $orders['results']['order_id'])
@@ -431,22 +447,44 @@ class OrderService
                     ->where('record_identity' ,'M')
                     ->where('discount' ,0.0)
                     ->first();
+
         if($findProductPRD_M !== null)
         {
             $findProductPRD_G = OrderCampaignDiscount::with([
                 'promotionalCampaign',
                 'promotionalCampaignThreshold',
-                'product',
             ])
+                ->with(['product' => function ($query) {
+                    $query->with(['productPhotos' => function ($query) {
+                        $query->select(['id', 'product_id', 'photo_name'])
+                            ->orderBy('sort', 'ASC');
+                    }]);
+                }])
+
             ->where('order_detail_id', '<>', $val['id'])
             ->where('group_seq',$findProductPRD_M->group_seq)
             ->where('order_id', $orders['results']['order_id'])
             ->where('level_code', 'PRD')
             ->where('record_identity' ,'G')
             ->get();
+
+            //取得需要的order_details資料
+            $orderDetailIds = $findProductPRD_G->pluck('order_detail_id')->toArray();
+            $OrderDetails   = collect();
+            if (empty($OrderDetails) === false) {
+                $OrderDetails = OrderDetail::select(['id', 'order_id', 'product_id', 'qty'])
+                    ->whereIn('id', $orderDetailIds)
+                    ->get();
+            }
+
             foreach($findProductPRD_G as $PRD){
+
+                $photo_name = optional($PRD->product->productPhotos->first())->photo_name;
+                $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
+
                 if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
                     $order_details[$key]['discount_content'][$PRD->group_seq] = [
+                        'display' => true,
                         'campaignName' => $PRD->promotionalCampaign->campaign_name,
                         'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
                         'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
@@ -454,6 +492,8 @@ class OrderService
                             [
                                 'productId' => $PRD->product->id,
                                 'productName' => $PRD->product->product_name,
+                                'productPhoto' => $photo_name,
+                                'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty
                             ],
                         ],
                     ];
@@ -461,12 +501,32 @@ class OrderService
                     $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][]= [
                         'productId' => $PRD->product->id,
                         'productName' => $PRD->product->product_name,
+                        'productPhoto' => $photo_name,
+                        'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty
                     ];
                 }
 
             }
         }
+
+        //滿額折
+        $TargetThresholdDiscounts = $thresholdDiscounts
+            ->where('product_id', $val['product_id'])
+            ->where('product_item_id', $val['product_item_id']);
+
+        foreach ($TargetThresholdDiscounts as $thresholdDiscount) {
+
+            $order_details[$key]['discount_content'][] = [
+                'display'                => config('uec.cart_p_discount_split') == 1,
+                'type'                   => '滿額折',
+                'campaignName'           => $thresholdDiscount['campaignName'],
+                'campaignBrief'          => $thresholdDiscount['campaignBrief'],
+                'thresholdCampaignBrief' => $thresholdDiscount['thresholdCampaignBrief'],
+                'campaignProdList'       => []
+            ];
+        }
     }
+
     if (isset($cart['discount'])) {
         array_multisort($cart['discount'], SORT_ASC);
     }
@@ -479,8 +539,10 @@ class OrderService
     foreach ($order_details as $key => $val) {
         array_multisort($order_details[$key]['discount_content'], SORT_ASC);
     }
-    $orders['results']['thresholdAmount'] = $thresholdAmount;
+    $orders['results']['thresholdAmount'] = config('uec.cart_p_discount_split') == 1 ? 0 : $thresholdAmount;
     $orders['results']['order_details'] = $order_details;
+    //是否顯示thresholdDiscount
+    $orders['results']['displayThresholdDiscount'] = config('uec.cart_p_discount_split') != 1;
     $orders['results']['thresholdDiscount'] = $cart['discount'] ?? []; //折扣
     $orders['results']['thresholdGiftAway'] = $cart['gift'] ?? []; //送禮,
     return $orders;
