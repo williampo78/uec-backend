@@ -268,27 +268,31 @@ class APICartServices
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             $dataCount = PromotionalCampaign::find($campaign['PRD']['GIFT'][$product_id]->id)->promotionalCampaignGiveaways; //單品有幾個贈品
-                            foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
-                                $giftCount++; //計算滿額贈禮數
-                                if (isset($stock_gift_check[$giftInfo->product_id])) {
-                                    $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
-                                    if ($giftCalc >= 0) {
-                                        $giftCheck++;//計算滿額贈禮有庫存的
+                            if (isset($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id])) {
+                                foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                    $giftCount++; //計算滿額贈禮數
+                                    if (isset($stock_gift_check[$giftInfo->product_id])) {
+                                        $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
+                                        if ($giftCalc >= 0) {
+                                            $giftCheck++;//計算滿額贈禮有庫存的
+                                        }
                                     }
                                 }
                             }
                             if ($giftCheck >= 0 && $giftCount == $giftCheck && $giftCount == count($dataCount)) {
-                                foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
-                                    if (isset($stock_gift_check[$giftInfo->product_id])) {
-                                        $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
-                                        if ($giftCalc >= 0) {
-                                            $giftAway[] = array(
-                                                "productPhoto" => $giftInfo['photo'],
-                                                "productId" => $giftInfo->product_id,
-                                                "productName" => $giftInfo->product_name,
-                                                "sellingPrice" => $giftInfo->selling_price,
-                                                "assignedQty" => $giftInfo->assignedQty,
-                                            );
+                                if (isset($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id])) {
+                                    foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                        if (isset($stock_gift_check[$giftInfo->product_id])) {
+                                            $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
+                                            if ($giftCalc >= 0) {
+                                                $giftAway[] = array(
+                                                    "productPhoto" => $giftInfo['photo'],
+                                                    "productId" => $giftInfo->product_id,
+                                                    "productName" => $giftInfo->product_name,
+                                                    "sellingPrice" => $giftInfo->selling_price,
+                                                    "assignedQty" => $giftInfo->assignedQty,
+                                                );
+                                            }
                                         }
                                     }
                                 }
@@ -1449,27 +1453,31 @@ class APICartServices
                     if (isset($campaign['PRD']['GIFT'][$product_id])) { //在活動內 滿額贈禮
                         if ($campaign['PRD']['GIFT'][$product_id]->campaign_type == 'PRD05') {
                             $dataCount = PromotionalCampaign::find($campaign['PRD']['GIFT'][$product_id]->id)->promotionalCampaignGiveaways; //單品有幾個贈品
-                            foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
-                                $giftCount++; //計算滿額贈禮數
-                                if (isset($stock_gift_check[$giftInfo->product_id])) {
-                                    $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
-                                    if ($giftCalc >= 0) {
-                                        $giftCheck++;//計算滿額贈禮有庫存的
+                            if (isset($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id])) {
+                                foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                    $giftCount++; //計算滿額贈禮數
+                                    if (isset($stock_gift_check[$giftInfo->product_id])) {
+                                        $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
+                                        if ($giftCalc >= 0) {
+                                            $giftCheck++;//計算滿額贈禮有庫存的
+                                        }
                                     }
                                 }
                             }
                             if ($giftCheck >= 0 && $giftCount == $giftCheck && $giftCount == count($dataCount)) {
-                                foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
-                                    if (isset($stock_gift_check[$giftInfo->product_id])) {
-                                        $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
-                                        if ($giftCalc >= 0) {
-                                            $giftAway[] = array(
-                                                "productPhoto" => $giftInfo['photo'],
-                                                "productId" => $giftInfo->product_id,
-                                                "productName" => $giftInfo->product_name,
-                                                "sellingPrice" => $giftInfo->selling_price,
-                                                "assignedQty" => $giftInfo->assignedQty,
-                                            );
+                                if (isset($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id])) {
+                                    foreach ($campaign_gift['PROD'][$campaign['PRD']['GIFT'][$product_id]->id] as $giftInfo) {
+                                        if (isset($stock_gift_check[$giftInfo->product_id])) {
+                                            $giftCalc = ($stock_gift_check[$giftInfo->product_id]->stock_qty - $giftInfo->assignedQty - ($product_id == $giftInfo->product_id ? $qty : 0));
+                                            if ($giftCalc >= 0) {
+                                                $giftAway[] = array(
+                                                    "productPhoto" => $giftInfo['photo'],
+                                                    "productId" => $giftInfo->product_id,
+                                                    "productName" => $giftInfo->product_name,
+                                                    "sellingPrice" => $giftInfo->selling_price,
+                                                    "assignedQty" => $giftInfo->assignedQty,
+                                                );
+                                            }
                                         }
                                     }
                                 }
