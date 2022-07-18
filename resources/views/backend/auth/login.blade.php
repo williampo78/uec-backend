@@ -36,6 +36,18 @@
                             <span class="focus-input100"></span>
                         </div>
 
+                        <div class="wrap-input100 validate-input" data-validate="必須填寫">
+                            <span class="label-input100"><i class="fa-solid fa-lock fa-fw fa-lg"></i></span>
+                            <input class="input100" type="text" name="captcha" placeholder="驗證碼" maxlength="4"
+                                   autocomplete="off">
+                            <span class="focus-input100"></span>
+                        </div>
+                        <p>&nbsp;</p>
+                        <div class="center-block" style="margin: 10px ">
+                            <img :src="captcha_image_url" @click="refreshCaptcha">
+                            <i class="fa-solid fa-refresh fa-fw fa-lg" @click="refreshCaptcha"></i>
+                        </div>
+
                         @if ($errors->any())
                             <p>&nbsp;</p>
                             <div class="alert alert-danger alert-dismissible" style="width: 100%; margin: 0px;">
@@ -71,6 +83,7 @@
                 saveButton: {
                     isDisabled: false,
                 },
+                captcha_image_url:'{{ captcha_src('flat') }}'
             },
             mounted() {
                 let self = this;
@@ -89,6 +102,9 @@
                         pwd: {
                             required: true,
                         },
+                        captcha: {
+                            required: true,
+                        },
                     },
                     errorClass: "help-block",
                     errorElement: "span",
@@ -105,6 +121,18 @@
                 submitForm() {
                     $("#login-form").submit();
                 },
+                refreshCaptcha() {
+                    let refreshCaptchaUrl = '{{ route('captcha.refresh') }}';
+                    axios.get(refreshCaptchaUrl, {
+                        responseType: 'json',
+                    })
+                        .then(function (response) {
+                            vm.captcha_image_url = response.data.url.img;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
             }
         });
     </script>
