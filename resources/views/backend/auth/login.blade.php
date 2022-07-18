@@ -64,7 +64,7 @@
 
                         <p>&nbsp;</p>
                         <div class="container-login100-form-btn">
-                            <button type="button" class="btn btn-lg btn-primary btn-block" :disabled="saveButton.isDisabled" @click="submitForm">
+                            <button type="submit" class="btn btn-lg btn-primary btn-block" :disabled="saveButton.isDisabled" @click="submitForm">
                                 <i class="fa-solid fa-arrow-right-to-bracket"></i> 登入
                             </button>
                         </div>
