@@ -536,9 +536,11 @@ class OrderService
             array_multisort($cart['gift'][$key]['campaignProdList'], SORT_ASC);
         }
     }
-//    foreach ($order_details as $key => $val) {
-//        array_multisort($order_details[$key]['discount_content'], SORT_ASC);
-//    }
+    //清除索引，回傳時統一為陣列格式
+    foreach ($order_details as $key => $val) {
+        $order_details[$key]['discount_content'] = array_values($val['discount_content']);
+    }
+
     $orders['results']['thresholdAmount'] = config('uec.cart_p_discount_split') == 1 ? 0 : $thresholdAmount;
     $orders['results']['order_details'] = $order_details;
     //是否顯示thresholdDiscount
