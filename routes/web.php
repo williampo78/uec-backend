@@ -5,6 +5,7 @@ use App\Http\Controllers\AdvertisementBlockController;
 use App\Http\Controllers\AdvertisementLaunchController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BuyoutProductsReportController;
+use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ExternalInventoryDailyReportController;
@@ -67,6 +68,9 @@ Route::group(['middleware' => ['guest']], function () {
 });
 
 Route::any('/ckfinder/connector', [CKFinderController::class, 'requestAction'])->name('ckfinder_connector');
+
+//驗證碼
+Route::get('/refresh-captcha', [CaptchaController::class, 'refreshCaptcha'])->name('captcha.refresh');
 
 // 已登入的user才能造訪
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {

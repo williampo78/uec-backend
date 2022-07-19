@@ -38,9 +38,11 @@ class AuthController extends Controller
         $request->validate([
             'account' => 'required',
             'pwd' => 'required',
+            'captcha' => 'captcha',
         ], [
             'account.required' => '使用者帳號不能為空',
             'pwd.required' => '密碼不能為空',
+            'captcha.captcha' => '驗證碼錯誤',
         ]);
 
         $user = User::where([
