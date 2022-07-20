@@ -189,7 +189,7 @@ class APIWebService
      * @param
      * @return string
      */
-    public function getMemberCollections()
+    public function getMemberCollections($gtm = null)
     {
         $s3 = config('filesystems.disks.s3.url');
         $collection = [];
@@ -212,7 +212,8 @@ class APIWebService
                 'product_discount' => intval($discount),
                 'product_photo' => (isset($photo['photo_name']) ? $s3 . $photo['photo_name'] : null),
                 "selling_channel" => $collect->selling_channel,
-                "start_selling" => $collect->start_selling_at
+                "start_selling" => $collect->start_selling_at,
+                "gtm" => ($gtm ? $gtm[$collect->id] : "")
             );
         }
 
