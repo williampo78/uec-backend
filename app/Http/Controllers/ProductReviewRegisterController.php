@@ -122,10 +122,16 @@ class ProductReviewRegisterController extends Controller
     {
         $in = $request->input();
         $status = true;
-
+        $msg ="" ;
         switch ($in['type']) {
             case 'offProduct':
-                $status = $this->productService->offProduct($in);
+                if($this->productService->checkProductInCampaignIsset($in['product_id'])){
+                    // $status = $this->productService->offProduct($in);
+                    $status = true ;
+                }else{
+                    $status = false ;
+                    $msg = '「商品存在上架中的行銷活動，不允許下架！」，不開放下架';
+                };
                 break;
             case 'checkProductReady':
                 if($in['product_type'] == 'N'){
@@ -139,6 +145,7 @@ class ProductReviewRegisterController extends Controller
         }
 
         return response()->json([
+            'msg' => $msg,
             'status' => $status,
             'in' => $request->input(),
         ]);
