@@ -1260,7 +1260,7 @@ class APIProductServices
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
                                 "start_selling" => $products[$product_id]->start_selling_at,
-                                "gtm" => ($gtm ? $gtm[$product_id] : "")
+                                "gtm" => (isset($gtm[$product_id]) ? $gtm[$product_id] : "")
                             );
                         }
                     }
