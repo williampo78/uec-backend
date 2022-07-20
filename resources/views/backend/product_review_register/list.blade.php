@@ -422,8 +422,12 @@
                             product_id: product.id,
                         })
                         .then(function(response) {
-                            alert('下架成功');
-                            history.go(0);
+                            if(response.data.status){
+                                alert('下架成功');
+                                history.go(0);
+                            }else{
+                                alert(response.data.msg);
+                            }
                         })
                         .catch(function(error) {
                             console.log(error);
