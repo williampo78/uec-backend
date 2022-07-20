@@ -9,9 +9,6 @@ use App\Models\Product;
 use App\Models\Products;
 use App\Models\ProductItem;
 use App\Models\ProductPhoto;
-use App\Models\ProductReviewLog;
-use App\Models\Products;
-use App\Models\ProductSpecInfo;
 use App\Models\PromotionalCampaignProduct;
 use App\Models\RelatedProduct;
 use App\Models\WarehouseStock;
@@ -1348,7 +1345,6 @@ class ProductService
         }
     }
     /**
-<<<<<<< HEAD
      * getProductRequisitionsLog function
      *
      * @param [int] $id
@@ -1410,7 +1406,8 @@ class ProductService
             ['start_at', 'desc'],
         ]);
         return $result ;
-=======
+    }	
+    /*
      * checkProductInCampaignIsset function
      * 檢查是否存在
      * @param [int] $product_id
@@ -1442,6 +1439,5 @@ class ProductService
         }else{
             return true ;
         }
->>>>>>> 8d56f3dca123d929fab61cee6406976c4f555500
     }
 }
