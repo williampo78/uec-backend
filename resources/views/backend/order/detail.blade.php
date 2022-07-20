@@ -192,7 +192,7 @@
                                 <div class="row">
                                     <div class="form-group">
                                         <div class="col-sm-9 text-right">
-                                            <label class="control-label">商品總價 (A)：</label>
+                                            <label class="control-label">{{ config('uec.cart_p_discount_split') == 1 ? '折後商品總價' : '商品總價' }} (A)：</label>
                                         </div>
                                         <div class="col-sm-3 text-right">
                                             <p class="form-control-static" id="modal-total-amount"></p>
@@ -287,8 +287,13 @@
                                         <th class="text-nowrap">商品活動價</th>
                                         <th class="text-nowrap">數量</th>
                                         <th class="text-nowrap">單品<br>活動折抵</th>
-                                        <th class="text-nowrap">小計</th>
-                                        <th class="text-nowrap">購物車<br>滿額折抵</th>
+                                        @if(config('uec.cart_p_discount_split') == 1)
+                                            <th class="text-nowrap">購物車<br>滿額折抵</th>
+                                            <th class="text-nowrap">小計</th>
+                                        @else
+                                            <th class="text-nowrap">小計</th>
+                                            <th class="text-nowrap">購物車<br>滿額折抵</th>
+                                        @endif
                                         <th class="text-nowrap">點數折抵</th>
                                         <th class="text-nowrap">備註</th>
                                         <th class="text-nowrap">託運單號</th>

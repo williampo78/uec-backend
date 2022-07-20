@@ -1046,7 +1046,7 @@ class APIProductServices
         $strSQL = "select lov.photo_name, pa.product_id
                 from product_attributes pa
                 join product_attribute_lov lov on pa.attribute_type = 'CERTIFICATE' and lov.id = pa.product_attribute_lov_id
-                where lov.active =1
+                where lov.active =1 and lov.attribute_type='CERTIFICATE'
                 order by lov.sort;";
         $certificate = DB::select($strSQL);
         return $certificate;

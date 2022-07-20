@@ -369,6 +369,7 @@ class MemberController extends Controller
                     'unit_price' => number_format($orderDetail->unit_price),
                     'subtotal' => number_format($orderDetail->subtotal),
                     'product_id' => $orderDetail->product_id,
+                    'product_item_id' => $orderDetail->product_item_id,
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'discount_content' => [],

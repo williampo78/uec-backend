@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\OrderExport;
+use App\Exports\CartPDiscountSplitOrderExport;
 use App\Services\MoneyAmountService;
 use App\Services\OrderService;
 use Carbon\Carbon;
@@ -506,6 +507,11 @@ class OrderController extends Controller
         $payload = $request->query();
 
         $orders = $this->orderService->getExcelList($payload);
+
+        //購物車滿額折扣，攤提回單品計算
+        if(config('uec.cart_p_discount_split') == 1){
+            return Excel::download(new CartPDiscountSplitOrderExport($orders), 'orders.xlsx');
+        }
 
         return Excel::download(new OrderExport($orders), 'orders.xlsx');
     }
