@@ -357,6 +357,9 @@ class OrderService
             'promotionalCampaign',
             'promotionalCampaignThreshold',
             'product',
+            'productItem' => function($query){
+                $query->select(['id', 'spec_1_value', 'spec_2_value']);
+            },
             'product.productPhotos' => function ($query) {
                 $query->orderBy('sort', 'asc');
             },
@@ -377,6 +380,7 @@ class OrderService
     $thresholdDiscounts = collect();
 
     foreach ($discount as $obj) {
+
         switch ($obj->promotionalCampaign->level_code) {
             case 'PRD':
                 //主商品 且有折扣金額
@@ -400,6 +404,7 @@ class OrderService
             default:
                 //送禮
                 if ($obj->promotionalCampaign->category_code == 'GIFT' && $obj->record_identity !== 'M') {
+
                     $cart['gift'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
                     $cart['gift'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                     $cart['gift'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
@@ -410,6 +415,8 @@ class OrderService
                         'productId' => $obj->product->id,
                         'productName' => $obj->product->product_name,
                         'assignedQty' => $giveaway_qty[$obj->order_detail_id] ?? 0 ,
+                        'spec_1_value' => optional($obj->productItem)->spec_1_value,
+                        'spec_2_value' => optional($obj->productItem)->spec_2_value
                     ]; //贈送的商品列表
                 }
                 //折扣
@@ -454,6 +461,9 @@ class OrderService
                 'promotionalCampaign',
                 'promotionalCampaignThreshold',
             ])
+                ->with(['productItem' => function($query){
+                    $query->select(['id', 'spec_1_value', 'spec_2_value']);
+                }])
                 ->with(['product' => function ($query) {
                     $query->with(['productPhotos' => function ($query) {
                         $query->select(['id', 'product_id', 'photo_name'])
@@ -493,7 +503,9 @@ class OrderService
                                 'productId' => $PRD->product->id,
                                 'productName' => $PRD->product->product_name,
                                 'productPhoto' => $photo_name,
-                                'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty
+                                'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty,
+                                'spec_1_value' => optional($PRD->productItem)->spec_1_value,
+                                'spec_2_value' => optional($PRD->productItem)->spec_2_value
                             ],
                         ],
                     ];
@@ -502,7 +514,9 @@ class OrderService
                         'productId' => $PRD->product->id,
                         'productName' => $PRD->product->product_name,
                         'productPhoto' => $photo_name,
-                        'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty
+                        'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty,
+                        'spec_1_value' => optional($PRD->productItem)->spec_1_value,
+                        'spec_2_value' => optional($PRD->productItem)->spec_2_value
                     ];
                 }
 
