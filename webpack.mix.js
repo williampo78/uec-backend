@@ -42,4 +42,9 @@ mix.copyDirectory(
 mix.alias({
     '@': path.join(__dirname, 'resources/js'),
     '@components': path.join(__dirname, 'resources/js/components'),
+    "@plugins": path.join(__dirname, "resources/js/plugins"),
 });
+
+if (mix.inProduction()) {
+    mix.version();
+}

@@ -230,7 +230,7 @@
             created() {
                 let payload = @json($payload);
 
-                if (Array.isArray(payload.warehouses) && payload.warehouses.length) {
+                if (!_.isEmpty(payload.warehouses)) {
                     payload.warehouses.forEach(warehouse => {
                         this.warehouses.push({
                             text: warehouse.name,
@@ -248,9 +248,9 @@
                     });
                 }
 
-                this.form.shipToName = payload.shipToName;
-                this.form.shipToMobile = payload.shipToMobile;
-                this.form.shipToAddress = payload.shipToAddress;
+                this.form.shipToName = payload.ship_to_name;
+                this.form.shipToMobile = payload.ship_to_mobile;
+                this.form.shipToAddress = payload.ship_to_address;
             },
             mounted() {
                 let self = this;
@@ -493,18 +493,28 @@
                     }
                 },
                 createRequest() {
+                    let items = this.form.items.map(function(item) {
+                        return {
+                            product_item_id: item.productItemId,
+                            unit_price: item.unitPrice,
+                            stock_qty: item.stockQty,
+                            expected_qty: item.expectedQty,
+                            supplier_id: item.supplierId,
+                        };
+                    });
+
                     axios({
                         method: "post",
                         url: BASE_URI,
                         data: {
-                            saveType: this.form.saveType,
-                            warehouseId: this.form.warehouseId,
+                            save_type: this.form.saveType,
+                            warehouse_id: this.form.warehouseId,
                             tax: this.form.tax,
                             remark: this.form.remark,
-                            shipToName: this.form.shipToName,
-                            shipToMobile: this.form.shipToMobile,
-                            shipToAddress: this.form.shipToAddress,
-                            items: this.form.items,
+                            ship_to_name: this.form.shipToName,
+                            ship_to_mobile: this.form.shipToMobile,
+                            ship_to_address: this.form.shipToAddress,
+                            items: items,
                         },
                     })
                     .then((response) => {

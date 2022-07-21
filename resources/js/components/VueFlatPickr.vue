@@ -5,8 +5,8 @@
             class="form-control"
             autocomplete="off"
             :name="name"
-            v-model="date"
-            :config="config"
+            v-model="valueLocal"
+            :config="configLocal"
             @on-change="onChange"
         >
         </flat-pickr>
@@ -25,24 +25,26 @@ import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
 
 export default {
     components: {
-        'flat-pickr': flatPickr,
+        "flat-pickr": flatPickr,
     },
     name: "vue-flat-pickr",
     props: {
-        setting: {
+        name: {
+            type: String,
+            default: "",
+        },
+        value: {
+            type: String,
+            default: "",
+        },
+        config: {
             type: Object,
-            default: () => ({
-                name: "",
-                date: "",
-                config: {},
-            }),
+            default: () => ({}),
         },
     },
     data() {
         return {
-            name: "date",
-            date: "",
-            config: {
+            configLocal: {
                 allowInput: true,
                 wrap: true,
                 clickOpens: false,
@@ -52,23 +54,20 @@ export default {
             },
         };
     },
-    created() {
-        if (this.setting) {
-            if (this.setting.name) {
-                this.name = this.setting.name;
-            }
-        }
+    computed: {
+        valueLocal: {
+            get() {
+                return this.value;
+            },
+            set(value) {
+                this.$emit("update:value", value);
+            },
+        },
     },
     watch: {
-        "setting.date": {
-            handler(date) {
-                this.date = date;
-            },
-            immediate: true,
-        },
-        "setting.config": {
+        config: {
             handler(config) {
-                this.config = Object.assign({}, this.config, config);
+                this.configLocal = Object.assign({}, this.configLocal, config);
             },
             deep: true,
             immediate: true,
@@ -76,7 +75,6 @@ export default {
     },
     methods: {
         onChange(selectedDates, dateStr, instance) {
-            this.setting.date = dateStr;
             this.$emit("on-change", selectedDates, dateStr, instance);
         },
     },

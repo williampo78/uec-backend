@@ -231,7 +231,7 @@
             created() {
                 let payload = @json($payload);
 
-                if (Array.isArray(payload.warehouses) && payload.warehouses.length) {
+                if (!_.isEmpty(payload.warehouses)) {
                     payload.warehouses.forEach(warehouse => {
                         this.warehouses.push({
                             text: warehouse.name,
@@ -249,31 +249,31 @@
                     });
                 }
 
-                if (payload.miscStockRequest) {
-                    this.form.requestId = payload.miscStockRequest.id;
-                    this.form.requestNo = payload.miscStockRequest.requestNo;
-                    this.form.warehouseId = String(payload.miscStockRequest.warehouseId);
-                    this.form.tax = String(payload.miscStockRequest.tax);
-                    this.form.remark = payload.miscStockRequest.remark;
-                    this.form.shipToName = payload.miscStockRequest.shipToName;
-                    this.form.shipToMobile = payload.miscStockRequest.shipToMobile;
-                    this.form.shipToAddress = payload.miscStockRequest.shipToAddress;
+                if (payload.misc_stock_request) {
+                    this.form.requestId = payload.misc_stock_request.id;
+                    this.form.requestNo = payload.misc_stock_request.request_no;
+                    this.form.warehouseId = String(payload.misc_stock_request.warehouse_id);
+                    this.form.tax = String(payload.misc_stock_request.tax);
+                    this.form.remark = payload.misc_stock_request.remark;
+                    this.form.shipToName = payload.misc_stock_request.ship_to_name;
+                    this.form.shipToMobile = payload.misc_stock_request.ship_to_mobile;
+                    this.form.shipToAddress = payload.misc_stock_request.ship_to_address;
 
-                    if (Array.isArray(payload.miscStockRequest.items) && payload.miscStockRequest.items.length) {
-                        payload.miscStockRequest.items.forEach(item => {
+                    if (!_.isEmpty(payload.misc_stock_request.items)) {
+                        payload.misc_stock_request.items.forEach(item => {
                             this.form.items.push({
-                                productItemId: item.productItemId,
-                                productNo: item.productNo,
-                                productName: item.productName,
-                                itemNo: item.itemNo,
-                                spec1Value: item.spec1Value,
-                                spec2Value: item.spec2Value,
-                                unitPrice: item.unitPrice,
-                                unitPriceForDisplay: item.unitPrice != null ? item.unitPrice.toLocaleString('en-US') : "",
-                                stockQty: item.stockQty,
-                                expectedQty: item.expectedQty,
-                                supplierId: item.supplierId,
-                                supplierName: item.supplierName,
+                                productItemId: item.product_item_id,
+                                productNo: item.product_no,
+                                productName: item.product_name,
+                                itemNo: item.item_no,
+                                spec1Value: item.spec_1_value,
+                                spec2Value: item.spec_2_value,
+                                unitPrice: item.unit_price,
+                                unitPriceForDisplay: item.unit_price != null ? item.unit_price.toLocaleString('en-US') : "",
+                                stockQty: item.stock_qty,
+                                expectedQty: item.expected_qty,
+                                supplierId: item.supplier_id,
+                                supplierName: item.supplier_name,
                             });
                         });
                     }
@@ -517,17 +517,27 @@
                     }
                 },
                 updateRequest() {
+                    let items = this.form.items.map(function(item) {
+                        return {
+                            product_item_id: item.productItemId,
+                            unit_price: item.unitPrice,
+                            stock_qty: item.stockQty,
+                            expected_qty: item.expectedQty,
+                            supplier_id: item.supplierId,
+                        };
+                    });
+
                     axios({
                         method: "put",
                         url: `${BASE_URI}/${this.form.requestId}`,
                         data: {
-                            saveType: this.form.saveType,
-                            warehouseId: this.form.warehouseId,
+                            save_type: this.form.saveType,
+                            warehouse_id: this.form.warehouseId,
                             remark: this.form.remark,
-                            shipToName: this.form.shipToName,
-                            shipToMobile: this.form.shipToMobile,
-                            shipToAddress: this.form.shipToAddress,
-                            items: this.form.items,
+                            ship_to_name: this.form.shipToName,
+                            ship_to_mobile: this.form.shipToMobile,
+                            ship_to_address: this.form.shipToAddress,
+                            items: items,
                         },
                     })
                     .then((response) => {

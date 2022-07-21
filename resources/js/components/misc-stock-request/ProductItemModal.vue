@@ -312,12 +312,12 @@ export default {
         },
         async search() {
             let requestPayload = {
-                productNo: this.form.productNo,
-                productName: this.form.productName,
-                supplierId: this.form.supplierId,
+                product_no: this.form.productNo,
+                product_name: this.form.productName,
+                supplier_id: this.form.supplierId,
                 limit: this.form.limit,
-                excludeProductItemIds: this.excludeProductItemIds,
-                warehouseId: this.warehouseId,
+                exclude_product_item_ids: this.excludeProductItemIds,
+                warehouse_id: this.warehouseId,
             };
 
             let responsePayload = await this.getList(requestPayload);
@@ -327,16 +327,16 @@ export default {
                 this.productItems.push({
                     id: item.id,
                     checked: false,
-                    productNo: item.productNo,
-                    productName: item.productName,
-                    itemNo: item.itemNo,
-                    spec1Value: item.spec1Value,
-                    spec2Value: item.spec2Value,
-                    supplierId: item.supplierId,
-                    supplierName: item.supplierName,
-                    stockQty: item.stockQty,
-                    unitPrice: item.unitPrice,
-                    unitPriceForDisplay: item.unitPrice != null ? item.unitPrice.toLocaleString('en-US') : "",
+                    productNo: item.product_no,
+                    productName: item.product_name,
+                    itemNo: item.item_no,
+                    spec1Value: item.spec_1_value,
+                    spec2Value: item.spec_2_value,
+                    supplierId: item.supplier_id,
+                    supplierName: item.supplier_name,
+                    stockQty: item.stock_qty,
+                    unitPrice: item.unit_price,
+                    unitPriceForDisplay: item.unit_price != null ? item.unit_price.toLocaleString('en-US') : "",
                     uom: item.uom,
                 });
             });

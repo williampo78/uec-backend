@@ -24,13 +24,23 @@
                                             <div class="col-sm-9">
                                                 <div class="row">
                                                     <div class="col-sm-5">
-                                                        <vue-flat-pickr :setting="form.requestDateStart" @on-change="onRequestDateStartChange"></vue-flat-pickr>
+                                                        <vue-flat-pickr
+                                                            name="request_date_start"
+                                                            :value.sync="form.requestDateStart"
+                                                            :config="flatPickrConfig.requestDateStart"
+                                                            @on-change="onRequestDateStartChange">
+                                                        </vue-flat-pickr>
                                                     </div>
                                                     <div class="col-sm-2 text-center">
                                                         <label class="control-label">～</label>
                                                     </div>
                                                     <div class="col-sm-5">
-                                                        <vue-flat-pickr :setting="form.requestDateEnd" @on-change="onRequestDateEndChange"></vue-flat-pickr>
+                                                        <vue-flat-pickr
+                                                            name="request_date_end"
+                                                            :value.sync="form.requestDateEnd"
+                                                            :config="flatPickrConfig.requestDateEnd"
+                                                            @on-change="onRequestDateEndChange">
+                                                        </vue-flat-pickr>
                                                     </div>
                                                 </div>
                                             </div>
@@ -43,7 +53,7 @@
                                                 <label class="control-label">退出單號</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="requestNo" v-model="form.requestNo">
+                                                <input type="text" class="form-control" name="request_no" v-model="form.requestNo">
                                             </div>
                                         </div>
                                     </div>
@@ -55,7 +65,7 @@
                                             </div>
                                             <div class="col-sm-9">
                                                 <select2 class="form-control" :options="requestStatuses"
-                                                    v-model="form.requestStatus" name="requestStatus">
+                                                    v-model="form.requestStatus" name="request_status">
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -72,13 +82,23 @@
                                             <div class="col-sm-9">
                                                 <div class="row">
                                                     <div class="col-sm-5">
-                                                        <vue-flat-pickr :setting="form.actualDateStart" @on-change="onActualDateStartChange"></vue-flat-pickr>
+                                                        <vue-flat-pickr
+                                                            name="actual_date_start"
+                                                            :value.sync="form.actualDateStart"
+                                                            :config="flatPickrConfig.actualDateStart"
+                                                            @on-change="onActualDateStartChange">
+                                                        </vue-flat-pickr>
                                                     </div>
                                                     <div class="col-sm-2 text-center">
                                                         <label class="control-label">～</label>
                                                     </div>
                                                     <div class="col-sm-5">
-                                                        <vue-flat-pickr :setting="form.actualDateEnd" @on-change="onActualDateEndChange"></vue-flat-pickr>
+                                                        <vue-flat-pickr
+                                                            name="actual_date_end"
+                                                            :value.sync="form.actualDateEnd"
+                                                            :config="flatPickrConfig.actualDateEnd"
+                                                            @on-change="onActualDateEndChange">
+                                                        </vue-flat-pickr>
                                                     </div>
                                                 </div>
                                             </div>
@@ -91,7 +111,7 @@
                                                 <label class="control-label">商品序號</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="productNo" v-model="form.productNo">
+                                                <input type="text" class="form-control" name="product_no" v-model="form.productNo">
                                             </div>
                                         </div>
                                     </div>
@@ -103,7 +123,7 @@
                                             </div>
                                             <div class="col-sm-9">
                                                 <select2 class="form-control" :options="suppliers"
-                                                    v-model="form.supplierId" name="supplierId">
+                                                    v-model="form.supplierId" name="supplier_id">
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -244,28 +264,12 @@
             el: "#app",
             data: {
                 form: {
-                    requestDateStart: {
-                        name: "requestDateStart",
-                        date: moment().subtract(2, 'months').format("YYYY-MM-DD"),
-                        config: {},
-                    },
-                    requestDateEnd: {
-                        name: "requestDateEnd",
-                        date: moment().format("YYYY-MM-DD"),
-                        config: {},
-                    },
+                    requestDateStart: moment().subtract(2, 'months').format("YYYY-MM-DD"),
+                    requestDateEnd: moment().format("YYYY-MM-DD"),
                     requestNo: "",
                     requestStatus: "",
-                    actualDateStart: {
-                        name: "actualDateStart",
-                        date: "",
-                        config: {},
-                    },
-                    actualDateEnd: {
-                        name: "actualDateEnd",
-                        date: "",
-                        config: {},
-                    },
+                    actualDateStart: "",
+                    actualDateEnd: "",
                     productNo: "",
                     supplierId: "",
                     limit: 500,
@@ -312,15 +316,18 @@
                         title: "進貨退出單-倉儲資訊更新",
                         requestId: "",
                         requestNo: "",
-                        expectedDate: {
-                            name: "expectedDate",
-                            date: "",
-                            config: {},
-                        },
+                        expectedDate: "",
                         shipToName: "",
                         shipToMobile: "",
                         shipToAddress: "",
                     },
+                },
+                flatPickrConfig: {
+                    requestDateStart: {},
+                    requestDateEnd: {},
+                    actualDateStart: {},
+                    actualDateEnd: {},
+                    expectedDate: {},
                 },
                 requestStatuses: [],
                 suppliers: [],
@@ -332,8 +339,8 @@
                 this.BASE_URI = BASE_URI;
                 let payload = @json($payload);
 
-                if (payload.requestStatuses) {
-                    Object.entries(payload.requestStatuses).forEach(([key, requestStatus]) => {
+                if (payload.request_statuses) {
+                    Object.entries(payload.request_statuses).forEach(([key, requestStatus]) => {
                         this.requestStatuses.push({
                             text: requestStatus,
                             id: key,
@@ -341,7 +348,7 @@
                     });
                 }
 
-                if (Array.isArray(payload.suppliers) && payload.suppliers.length) {
+                if (!_.isEmpty(payload.suppliers)) {
                     payload.suppliers.forEach(supplier => {
                         this.suppliers.push({
                             text: `【${supplier.display_number}】 ${supplier.name}`,
@@ -354,21 +361,21 @@
                     this.auth = Object.assign({}, this.auth, payload.auth);
                 }
 
-                if (Array.isArray(payload.miscStockRequests) && payload.miscStockRequests.length) {
-                    payload.miscStockRequests.forEach(request => {
+                if (!_.isEmpty(payload.misc_stock_requests)) {
+                    payload.misc_stock_requests.forEach(request => {
                         this.miscStockRequests.push({
                             id: request.id,
-                            requestNo: request.requestNo,
-                            requestDate: moment(request.requestDate).format("YYYY-MM-DD HH:mm"),
-                            expectedDate: request.expectedDate ? moment(request.expectedDate).format("YYYY-MM-DD") : "",
-                            submittedAt: request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "",
-                            totalSupCount: request.totalSupCount,
-                            approvedSupCount: request.approvedSupCount,
-                            rejectedSupCount: request.rejectedSupCount,
-                            approvedAt: request.approvedAt ? moment(request.approvedAt).format("YYYY-MM-DD HH:mm") : "",
-                            ediExportedAt: request.ediExportedAt ? moment(request.ediExportedAt).format("YYYY-MM-DD HH:mm") : "",
-                            actualDate: request.actualDate ? moment(request.actualDate).format("YYYY-MM-DD") : "",
-                            requestStatus: request.requestStatus,
+                            requestNo: request.request_no,
+                            requestDate: moment(request.request_date).format("YYYY-MM-DD HH:mm"),
+                            expectedDate: request.expected_date ? moment(request.expected_date).format("YYYY-MM-DD") : "",
+                            submittedAt: request.submitted_at ? moment(request.submitted_at).format("YYYY-MM-DD HH:mm") : "",
+                            totalSupCount: request.total_sup_count,
+                            approvedSupCount: request.approved_sup_count,
+                            rejectedSupCount: request.rejected_sup_count,
+                            approvedAt: request.approved_at ? moment(request.approved_at).format("YYYY-MM-DD HH:mm") : "",
+                            ediExportedAt: request.edi_exported_at ? moment(request.edi_exported_at).format("YYYY-MM-DD HH:mm") : "",
+                            actualDate: request.actual_date ? moment(request.actual_date).format("YYYY-MM-DD") : "",
+                            requestStatus: request.request_status,
                         });
                     });
                 }
@@ -390,12 +397,12 @@
                             compareDates: {
                                 param: function() {
                                     return {
-                                        date2: moment(self.form.requestDateStart.date).add(3, 'months'),
+                                        date2: moment(self.form.requestDateStart).add(3, 'months'),
                                         sign: "<=",
                                     };
                                 },
                                 depends: function(element) {
-                                    return self.form.requestDateStart.date;
+                                    return self.form.requestDateStart;
                                 },
                             },
                         },
@@ -403,12 +410,12 @@
                             compareDates: {
                                 param: function() {
                                     return {
-                                        date2: moment(self.form.actualDateStart.date).add(3, 'months'),
+                                        date2: moment(self.form.actualDateStart).add(3, 'months'),
                                         sign: "<=",
                                     };
                                 },
                                 depends: function(element) {
-                                    return self.form.actualDateStart.date;
+                                    return self.form.actualDateStart;
                                 },
                             },
                         },
@@ -513,42 +520,42 @@
             },
             methods: {
                 initFlatPickrConfigs() {
-                    this.form.requestDateStart.config = {
+                    this.flatPickrConfig.requestDateStart = {
                         dateFormat: "Y-m-d",
-                        maxDate: this.form.requestDateEnd.date,
+                        maxDate: this.form.requestDateEnd,
                     };
 
-                    this.form.requestDateEnd.config = {
+                    this.flatPickrConfig.requestDateEnd = {
                         dateFormat: "Y-m-d",
-                        minDate: this.form.requestDateStart.date,
+                        minDate: this.form.requestDateStart,
                     };
 
-                    this.form.actualDateStart.config = {
+                    this.flatPickrConfig.actualDateStart = {
                         dateFormat: "Y-m-d",
-                        maxDate: this.form.actualDateEnd.date,
+                        maxDate: this.form.actualDateEnd,
                     };
 
-                    this.form.actualDateEnd.config = {
+                    this.flatPickrConfig.actualDateEnd = {
                         dateFormat: "Y-m-d",
-                        minDate: this.form.actualDateStart.date,
+                        minDate: this.form.actualDateStart,
                     };
 
-                    this.modal.expectedDate.expectedDate.config = {
+                    this.flatPickrConfig.expectedDate = {
                         dateFormat: "Y-m-d",
                         minDate: moment().format("YYYY-MM-DD"),
                     };
                 },
                 onRequestDateStartChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.requestDateEnd.config, 'minDate', dateStr);
+                    this.$set(this.flatPickrConfig.requestDateEnd, 'minDate', dateStr);
                 },
                 onRequestDateEndChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.requestDateStart.config, 'maxDate', dateStr);
+                    this.$set(this.flatPickrConfig.requestDateStart, 'maxDate', dateStr);
                 },
                 onActualDateStartChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.actualDateEnd.config, 'minDate', dateStr);
+                    this.$set(this.flatPickrConfig.actualDateEnd, 'minDate', dateStr);
                 },
                 onActualDateEndChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.actualDateStart.config, 'maxDate', dateStr);
+                    this.$set(this.flatPickrConfig.actualDateStart, 'maxDate', dateStr);
                 },
                 search() {
                     $("#search-form").submit();
@@ -561,11 +568,7 @@
                             return;
                         }
 
-                        if (['requestDateStart', 'requestDateEnd', 'actualDateStart', 'actualDateEnd'].includes(key)) {
-                            self.form[key].date = "";
-                        } else {
-                            self.form[key] = "";
-                        }
+                        self.form[key] = "";
                     });
                 },
                 setQueryParameters() {
@@ -573,53 +576,51 @@
                     const params = Object.fromEntries(urlSearchParams.entries());
 
                     urlSearchParams.forEach((value, key) => {
-                        if (!this.form.hasOwnProperty(key)) {
+                        let formKey = _.camelCase(key);
+
+                        if (!this.form.hasOwnProperty(formKey)) {
                             return;
                         }
 
-                        if (['requestDateStart', 'requestDateEnd', 'actualDateStart', 'actualDateEnd'].includes(key)) {
-                            this.form[key].date = value;
-                        } else {
-                            this.form[key] = value;
-                        }
+                        this.form[formKey] = value;
                     });
                 },
                 async showRequest(id) {
                     let request = await this.getRequest(id);
 
-                    this.modal.show.requestNo = request.requestNo;
-                    this.modal.show.warehouseName = request.warehouseName;
-                    this.modal.show.expectedQty = request.expectedQty;
-                    this.modal.show.requestDate = moment(request.requestDate).format("YYYY-MM-DD HH:mm");
-                    this.modal.show.submittedAt = request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "";
-                    this.modal.show.expectedDate = request.expectedDate ? moment(request.expectedDate).format("YYYY-MM-DD") : "";
+                    this.modal.show.requestNo = request.request_no;
+                    this.modal.show.warehouseName = request.warehouse_name;
+                    this.modal.show.expectedQty = request.expected_qty;
+                    this.modal.show.requestDate = moment(request.request_date).format("YYYY-MM-DD HH:mm");
+                    this.modal.show.submittedAt = request.submitted_at ? moment(request.submitted_at).format("YYYY-MM-DD HH:mm") : "";
+                    this.modal.show.expectedDate = request.expected_date ? moment(request.expected_date).format("YYYY-MM-DD") : "";
                     this.modal.show.tax = request.tax;
-                    this.modal.show.expectedTaxAmount = request.expectedTaxAmount.toLocaleString('en-US');
-                    this.modal.show.expectedAmount = request.expectedAmount.toLocaleString('en-US');
+                    this.modal.show.expectedTaxAmount = request.expected_tax_amount.toLocaleString('en-US');
+                    this.modal.show.expectedAmount = request.expected_amount.toLocaleString('en-US');
                     this.modal.show.remark = request.remark;
-                    this.modal.show.shipToName = request.shipToName;
-                    this.modal.show.shipToMobile = request.shipToMobile;
-                    this.modal.show.shipToAddress = request.shipToAddress;
-                    this.modal.show.actualDate = request.actualDate ? moment(request.actualDate).format("YYYY-MM-DD") : "";
-                    this.modal.show.actualTaxAmount = request.actualTaxAmount.toLocaleString('en-US');
-                    this.modal.show.actualAmount = request.actualAmount.toLocaleString('en-US');
+                    this.modal.show.shipToName = request.ship_to_name;
+                    this.modal.show.shipToMobile = request.ship_to_mobile;
+                    this.modal.show.shipToAddress = request.ship_to_address;
+                    this.modal.show.actualDate = request.actual_date ? moment(request.actual_date).format("YYYY-MM-DD") : "";
+                    this.modal.show.actualTaxAmount = request.actual_tax_amount.toLocaleString('en-US');
+                    this.modal.show.actualAmount = request.actual_amount.toLocaleString('en-US');
 
                     this.modal.show.items = [];
-                    if (Array.isArray(request.items) && request.items.length) {
+                    if (!_.isEmpty(request.items)) {
                         request.items.forEach(item => {
                             this.modal.show.items.push({
-                                productNo: item.productNo,
-                                productName: item.productName,
-                                itemNo: item.itemNo,
-                                spec1Value: item.spec1Value,
-                                spec2Value: item.spec2Value,
-                                unitPrice: item.unitPrice.toLocaleString('en-US'),
-                                stockQty: item.stockQty,
-                                expectedQty: item.expectedQty,
-                                expectedSubtotal: item.expectedSubtotal.toLocaleString('en-US'),
-                                supplierName: item.supplierName,
-                                actualQty: item.actualQty,
-                                actualSubtotal: item.actualSubtotal.toLocaleString('en-US'),
+                                productNo: item.product_no,
+                                productName: item.product_name,
+                                itemNo: item.item_no,
+                                spec1Value: item.spec_1_value,
+                                spec2Value: item.spec_2_value,
+                                unitPrice: item.unit_price.toLocaleString('en-US'),
+                                stockQty: item.stock_qty,
+                                expectedQty: item.expected_qty,
+                                expectedSubtotal: item.expected_subtotal.toLocaleString('en-US'),
+                                supplierName: item.supplier_name,
+                                actualQty: item.actual_qty,
+                                actualSubtotal: item.actual_subtotal.toLocaleString('en-US'),
                             });
                         });
                     }
@@ -632,7 +633,7 @@
                             url: `${BASE_URI}/${id}`,
                         })
                         .then(function(response) {
-                            return response.data.payload.miscStockRequest;
+                            return response.data.payload.misc_stock_request;
                         })
                         .catch(function(error) {
                             console.log(error);
@@ -660,14 +661,14 @@
 
                     this.modal.supplier.requestId = id;
                     this.modal.supplier.list = [];
-                    if (Array.isArray(suppliers) && suppliers.length) {
+                    if (!_.isEmpty(suppliers)) {
                         suppliers.forEach(supplier => {
                             this.modal.supplier.list.push({
                                 id: supplier.id,
                                 name: supplier.name,
-                                statusCode: supplier.statusCode,
-                                expectedQty: supplier.expectedQty,
-                                expectedAmount: supplier.expectedAmount.toLocaleString('en-US'),
+                                statusCode: supplier.status_code,
+                                expectedQty: supplier.expected_qty,
+                                expectedAmount: supplier.expected_amount.toLocaleString('en-US'),
                             });
                         });
                     }
@@ -690,24 +691,24 @@
                     let detail = await this.getRequestSupplierDetail(supplierId);
 
                     this.modal.supplier.detail.supplierName = supplierName;
-                    this.modal.supplier.detail.reviewAt = detail.reviewAt ? moment(detail.reviewAt).format("YYYY-MM-DD HH:mm") : "";
-                    this.modal.supplier.detail.reviewerName = detail.reviewerName;
-                    this.modal.supplier.detail.reviewResult = detail.reviewResult;
-                    this.modal.supplier.detail.reviewRemark = detail.reviewRemark;
+                    this.modal.supplier.detail.reviewAt = detail.review_at ? moment(detail.review_at).format("YYYY-MM-DD HH:mm") : "";
+                    this.modal.supplier.detail.reviewerName = detail.reviewer_name;
+                    this.modal.supplier.detail.reviewResult = detail.review_result;
+                    this.modal.supplier.detail.reviewRemark = detail.review_remark;
 
                     this.modal.supplier.detail.items = [];
-                    if (Array.isArray(detail.items) && detail.items.length) {
+                    if (!_.isEmpty(detail.items)) {
                         detail.items.forEach(item => {
                             this.modal.supplier.detail.items.push({
-                                productNo: item.productNo,
-                                productName: item.productName,
-                                itemNo: item.itemNo,
-                                spec1Value: item.spec1Value,
-                                spec2Value: item.spec2Value,
-                                unitPrice: item.unitPrice.toLocaleString('en-US'),
-                                stockQty: item.stockQty,
-                                expectedQty: item.expectedQty,
-                                expectedSubtotal: item.expectedSubtotal.toLocaleString('en-US'),
+                                productNo: item.product_no,
+                                productName: item.product_name,
+                                itemNo: item.item_no,
+                                spec1Value: item.spec_1_value,
+                                spec2Value: item.spec_2_value,
+                                unitPrice: item.unit_price.toLocaleString('en-US'),
+                                stockQty: item.stock_qty,
+                                expectedQty: item.expected_qty,
+                                expectedSubtotal: item.expected_subtotal.toLocaleString('en-US'),
                             });
                         });
                     }
@@ -730,11 +731,11 @@
                     let request = await this.getRequest(id);
 
                     this.modal.expectedDate.requestId = id;
-                    this.modal.expectedDate.requestNo = request.requestNo;
-                    this.modal.expectedDate.expectedDate.date = request.expectedDate;
-                    this.modal.expectedDate.shipToName = request.shipToName;
-                    this.modal.expectedDate.shipToMobile = request.shipToMobile;
-                    this.modal.expectedDate.shipToAddress = request.shipToAddress;
+                    this.modal.expectedDate.requestNo = request.request_no;
+                    this.modal.expectedDate.expectedDate = request.expected_date;
+                    this.modal.expectedDate.shipToName = request.ship_to_name;
+                    this.modal.expectedDate.shipToMobile = request.ship_to_mobile;
+                    this.modal.expectedDate.shipToAddress = request.ship_to_address;
 
                     this.expectedDateValidator.resetForm();
                     $("#expected-date-form").find(".has-error").removeClass("has-error");
@@ -748,10 +749,10 @@
                         method: "patch",
                         url: `${BASE_URI}/${this.modal.expectedDate.requestId}/expected-date`,
                         data: {
-                            expectedDate: this.modal.expectedDate.expectedDate.date,
-                            shipToName: this.modal.expectedDate.shipToName,
-                            shipToMobile: this.modal.expectedDate.shipToMobile,
-                            shipToAddress: this.modal.expectedDate.shipToAddress,
+                            expected_date: this.modal.expectedDate.expectedDate,
+                            ship_to_name: this.modal.expectedDate.shipToName,
+                            ship_to_mobile: this.modal.expectedDate.shipToMobile,
+                            ship_to_address: this.modal.expectedDate.shipToAddress,
                         },
                     })
                     .then((response) => {

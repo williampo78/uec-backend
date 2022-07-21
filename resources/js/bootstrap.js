@@ -17,6 +17,8 @@ import Croppie from "Croppie";
 import moment from "moment";
 
 import Vue from "vue";
+import Affix from 'vue-affix';
+import VueScrollactive from "vue-scrollactive";
 
 window._ = lodash;
 
@@ -114,3 +116,5 @@ window.Croppie = Croppie;
  * vue
  */
 window.Vue = Vue;
+Vue.use(Affix);
+Vue.use(VueScrollactive);

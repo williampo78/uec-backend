@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\OrderExport;
 use App\Exports\CartPDiscountSplitOrderExport;
-use App\Services\MoneyAmountService;
+use App\Exports\OrderExport;
+use App\Services\MoneyAmount;
 use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -119,7 +119,7 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id, MoneyAmountService $moneyAmountService)
+    public function show($id)
     {
         $order = $this->orderService->getTableDetailById($id);
 
@@ -280,7 +280,7 @@ class OrderController extends Controller
 
         // 發票資訊
         if ($order->combineInvoices->isNotEmpty()) {
-            $order->combineInvoices->each(function ($combineInvoice) use ($moneyAmountService, &$payload) {
+            $order->combineInvoices->each(function ($combineInvoice) use (&$payload) {
                 $invoices = [
                     'transaction_date' => null,
                     'type' => null,
@@ -310,12 +310,8 @@ class OrderController extends Controller
 
                     // 有統編，總稅額需要從總金額計算出來
                     if (isset($combineInvoice->cust_gui_number)) {
-                        $moneyAmountService->setTaxType($combineInvoice->tax_type)
-                            ->setPrice($combineInvoice->total_amount)
-                            ->calculateNontaxPrice()
-                            ->calculateTaxPrice();
-
-                        $invoices['total_tax'] = $moneyAmountService->getTaxPrice();
+                        $moneyAmount = MoneyAmount::makeByPrice($combineInvoice->total_amount, $combineInvoice->tax_type)->calculate('local', true);
+                        $invoices['total_tax'] = $moneyAmount->getTaxPrice();
                     }
 
                     // 金額
@@ -355,12 +351,8 @@ class OrderController extends Controller
 
                     // 有統編，總稅額需要從總金額計算出來
                     if (isset($combineInvoice->invoice->cust_gui_number)) {
-                        $moneyAmountService->setTaxType($combineInvoice->invoice->tax_type)
-                            ->setPrice($combineInvoice->allowance_amount)
-                            ->calculateNontaxPrice()
-                            ->calculateTaxPrice();
-
-                        $invoices['total_tax'] = $moneyAmountService->getTaxPrice();
+                        $moneyAmount = MoneyAmount::makeByPrice($combineInvoice->allowance_amount, $combineInvoice->invoice->tax_type)->calculate('local', true);
+                        $invoices['total_tax'] = $moneyAmount->getTaxPrice();
                     }
 
                     // 金額
@@ -438,9 +430,9 @@ class OrderController extends Controller
                 ];
                 // 活動階層
                 $orderCampaignDiscounts['level_code'] = config('uec.campaign_level_code_options')[$orderCampaignDiscount->promotionalCampaign->level_code] ?? null;
-                if($orderCampaignDiscount->promotionalCampaignThreshold !== null){
+                if ($orderCampaignDiscount->promotionalCampaignThreshold !== null) {
                     $orderCampaignDiscounts['show_campaign_name'] = "{$orderCampaignDiscount->promotionalCampaign->campaign_brief} - {$orderCampaignDiscount->promotionalCampaignThreshold->threshold_brief}";
-                }else{
+                } else {
                     $orderCampaignDiscounts['show_campaign_name'] = "{$orderCampaignDiscount->promotionalCampaign->campaign_brief}";
                 }
                 if (isset($orderCampaignDiscount->product)) {
@@ -509,7 +501,7 @@ class OrderController extends Controller
         $orders = $this->orderService->getExcelList($payload);
 
         //購物車滿額折扣，攤提回單品計算
-        if(config('uec.cart_p_discount_split') == 1){
+        if (config('uec.cart_p_discount_split') == 1) {
             return Excel::download(new CartPDiscountSplitOrderExport($orders), 'orders.xlsx');
         }
 

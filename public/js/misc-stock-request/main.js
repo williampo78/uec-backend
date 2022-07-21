@@ -369,12 +369,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context2.prev = _context2.next) {
               case 0:
                 requestPayload = {
-                  productNo: _this2.form.productNo,
-                  productName: _this2.form.productName,
-                  supplierId: _this2.form.supplierId,
+                  product_no: _this2.form.productNo,
+                  product_name: _this2.form.productName,
+                  supplier_id: _this2.form.supplierId,
                   limit: _this2.form.limit,
-                  excludeProductItemIds: _this2.excludeProductItemIds,
-                  warehouseId: _this2.warehouseId
+                  exclude_product_item_ids: _this2.excludeProductItemIds,
+                  warehouse_id: _this2.warehouseId
                 };
                 _context2.next = 3;
                 return _this2.getList(requestPayload);
@@ -386,16 +386,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _this2.productItems.push({
                     id: item.id,
                     checked: false,
-                    productNo: item.productNo,
-                    productName: item.productName,
-                    itemNo: item.itemNo,
-                    spec1Value: item.spec1Value,
-                    spec2Value: item.spec2Value,
-                    supplierId: item.supplierId,
-                    supplierName: item.supplierName,
-                    stockQty: item.stockQty,
-                    unitPrice: item.unitPrice,
-                    unitPriceForDisplay: item.unitPrice != null ? item.unitPrice.toLocaleString('en-US') : "",
+                    productNo: item.product_no,
+                    productName: item.product_name,
+                    itemNo: item.item_no,
+                    spec1Value: item.spec_1_value,
+                    spec2Value: item.spec_2_value,
+                    supplierId: item.supplier_id,
+                    supplierName: item.supplier_name,
+                    stockQty: item.stock_qty,
+                    unitPrice: item.unit_price,
+                    unitPriceForDisplay: item.unit_price != null ? item.unit_price.toLocaleString('en-US') : "",
                     uom: item.uom
                   });
                 });

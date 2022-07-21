@@ -22,7 +22,7 @@
                                                 <label class="control-label">退出單號</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="requestNo" v-model="form.requestNo">
+                                                <input type="text" class="form-control" name="request_no" v-model="form.requestNo">
                                             </div>
                                         </div>
                                     </div>
@@ -35,13 +35,23 @@
                                             <div class="col-sm-9">
                                                 <div class="row">
                                                     <div class="col-sm-5">
-                                                        <vue-flat-pickr :setting="form.submittedAtStart" @on-change="onSubmittedAtStartChange"></vue-flat-pickr>
+                                                        <vue-flat-pickr
+                                                            name="submitted_at_start"
+                                                            :value.sync="form.submittedAtStart"
+                                                            :config="flatPickrConfig.submittedAtStart"
+                                                            @on-change="onSubmittedAtStartChange">
+                                                        </vue-flat-pickr>
                                                     </div>
                                                     <div class="col-sm-2 text-center">
                                                         <label class="control-label">～</label>
                                                     </div>
                                                     <div class="col-sm-5">
-                                                        <vue-flat-pickr :setting="form.submittedAtEnd" @on-change="onSubmittedAtEndChange"></vue-flat-pickr>
+                                                        <vue-flat-pickr
+                                                            name="submitted_at_end"
+                                                            :value.sync="form.submittedAtEnd"
+                                                            :config="flatPickrConfig.submittedAtEnd"
+                                                            @on-change="onSubmittedAtEndChange">
+                                                        </vue-flat-pickr>
                                                     </div>
                                                 </div>
                                             </div>
@@ -114,16 +124,8 @@
             data: {
                 form: {
                     requestNo: "",
-                    submittedAtStart: {
-                        name: "submittedAtStart",
-                        date: "",
-                        config: {},
-                    },
-                    submittedAtEnd: {
-                        name: "submittedAtEnd",
-                        date: "",
-                        config: {},
-                    },
+                    submittedAtStart: "",
+                    submittedAtEnd: "",
                 },
                 modal: {
                     review: {
@@ -153,6 +155,10 @@
                         list: [],
                     },
                 },
+                flatPickrConfig: {
+                    submittedAtStart: {},
+                    submittedAtEnd: {},
+                },
                 miscStockRequests: [],
                 auth: {},
                 reviewValidator: {},
@@ -165,15 +171,15 @@
                     this.auth = Object.assign({}, this.auth, payload.auth);
                 }
 
-                if (Array.isArray(payload.miscStockRequests) && payload.miscStockRequests.length) {
-                    payload.miscStockRequests.forEach(request => {
+                if (!_.isEmpty(payload.misc_stock_requests)) {
+                    payload.misc_stock_requests.forEach(request => {
                         this.miscStockRequests.push({
                             id: request.id,
-                            requestNo: request.requestNo,
-                            submittedAt: request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "",
-                            totalSupCount: request.totalSupCount,
-                            expectedAmount: request.expectedAmount.toLocaleString('en-US'),
-                            expectedQty: request.expectedQty,
+                            requestNo: request.request_no,
+                            submittedAt: request.submitted_at ? moment(request.submitted_at).format("YYYY-MM-DD HH:mm") : "",
+                            totalSupCount: request.total_sup_count,
+                            expectedAmount: request.expected_amount.toLocaleString('en-US'),
+                            expectedQty: request.expected_qty,
                         });
                     });
                 }
@@ -233,21 +239,21 @@
             },
             methods: {
                 initFlatPickrConfigs() {
-                    this.form.submittedAtStart.config = {
+                    this.flatPickrConfig.submittedAtStart = {
                         dateFormat: "Y-m-d",
-                        maxDate: this.form.submittedAtEnd.date,
+                        maxDate: this.form.submittedAtEnd,
                     };
 
-                    this.form.submittedAtEnd.config = {
+                    this.flatPickrConfig.submittedAtEnd = {
                         dateFormat: "Y-m-d",
-                        minDate: this.form.submittedAtStart.date,
+                        minDate: this.form.submittedAtStart,
                     };
                 },
                 onSubmittedAtStartChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.submittedAtEnd.config, 'minDate', dateStr);
+                    this.$set(this.flatPickrConfig.submittedAtEnd, 'minDate', dateStr);
                 },
                 onSubmittedAtEndChange(selectedDates, dateStr, instance) {
-                    this.$set(this.form.submittedAtStart.config, 'maxDate', dateStr);
+                    this.$set(this.flatPickrConfig.submittedAtStart, 'maxDate', dateStr);
                 },
                 search() {
                     $("#search-form").submit();
@@ -257,41 +263,39 @@
                     const params = Object.fromEntries(urlSearchParams.entries());
 
                     urlSearchParams.forEach((value, key) => {
-                        if (!this.form.hasOwnProperty(key)) {
+                        let formKey = _.camelCase(key);
+
+                        if (!this.form.hasOwnProperty(formKey)) {
                             return;
                         }
 
-                        if (['submittedAtStart', 'submittedAtEnd'].includes(key)) {
-                            this.form[key].date = value;
-                        } else {
-                            this.form[key] = value;
-                        }
+                        this.form[formKey] = value;
                     });
                 },
                 async reviewRequest(id, event) {
                     let request = await this.getRequest(id);
 
                     this.modal.review.form.requestId = id;
-                    this.modal.review.requestNo = request.requestNo;
-                    this.modal.review.warehouseName = request.warehouseName;
-                    this.modal.review.expectedQty = request.expectedQty;
-                    this.modal.review.requestDate = moment(request.requestDate).format("YYYY-MM-DD HH:mm");
-                    this.modal.review.submittedAt = request.submittedAt ? moment(request.submittedAt).format("YYYY-MM-DD HH:mm") : "";
-                    this.modal.review.expectedDate = request.expectedDate ? moment(request.expectedDate).format("YYYY-MM-DD") : "";
+                    this.modal.review.requestNo = request.request_no;
+                    this.modal.review.warehouseName = request.warehouse_name;
+                    this.modal.review.expectedQty = request.expected_qty;
+                    this.modal.review.requestDate = moment(request.request_date).format("YYYY-MM-DD HH:mm");
+                    this.modal.review.submittedAt = request.submitted_at ? moment(request.submitted_at).format("YYYY-MM-DD HH:mm") : "";
+                    this.modal.review.expectedDate = request.expected_date ? moment(request.expected_date).format("YYYY-MM-DD") : "";
                     this.modal.review.tax = request.tax;
-                    this.modal.review.expectedTaxAmount = request.expectedTaxAmount.toLocaleString('en-US');
-                    this.modal.review.expectedAmount = request.expectedAmount.toLocaleString('en-US');
+                    this.modal.review.expectedTaxAmount = request.expected_tax_amount.toLocaleString('en-US');
+                    this.modal.review.expectedAmount = request.expected_amount.toLocaleString('en-US');
                     this.modal.review.remark = request.remark;
 
                     this.modal.review.suppliers = [];
-                    if (Array.isArray(request.suppliers) && request.suppliers.length) {
+                    if (!_.isEmpty(request.suppliers)) {
                         request.suppliers.forEach(supplier => {
                             this.modal.review.suppliers.push({
                                 checked: false,
                                 id: supplier.id,
                                 name: supplier.name,
-                                expectedQty: supplier.expectedQty,
-                                expectedAmount: supplier.expectedAmount.toLocaleString('en-US'),
+                                expectedQty: supplier.expected_qty,
+                                expectedAmount: supplier.expected_amount.toLocaleString('en-US'),
                             });
                         });
                     }
@@ -309,7 +313,7 @@
                             url: `${BASE_URI}/${id}/edit`,
                         })
                         .then(function(response) {
-                            return response.data.payload.miscStockRequest;
+                            return response.data.payload.misc_stock_request;
                         })
                         .catch(function(error) {
                             console.log(error);
@@ -335,16 +339,16 @@
                         method: "patch",
                         url: `${BASE_URI}/${this.modal.review.form.requestId}`,
                         data: {
-                            supplierIds: this.modal.review.form.supplierIds,
-                            reviewResult: this.modal.review.form.reviewResult,
-                            reviewRemark: this.modal.review.form.reviewRemark,
+                            supplier_ids: this.modal.review.form.supplierIds,
+                            review_result: this.modal.review.form.reviewResult,
+                            review_remark: this.modal.review.form.reviewRemark,
                         },
                     })
                     .then((response) => {
                         let payload = response.data.payload;
 
                         alert('儲存成功！');
-                        if (payload.remainingSupplierCount <= 0) {
+                        if (payload.remaining_supplier_count <= 0) {
                             let dataTable = $('#table_list').DataTable();
                             dataTable.row(this.reviewButtonEvent.target.closest("tr")).remove().draw();
                         }
@@ -366,18 +370,18 @@
 
                     this.modal.reviewDetail.title = `【${supplierName}】商品明細`;
                     this.modal.reviewDetail.list = [];
-                    if (Array.isArray(detail.list) && detail.list.length) {
+                    if (!_.isEmpty(detail.list)) {
                         detail.list.forEach(item => {
                             this.modal.reviewDetail.list.push({
-                                productNo: item.productNo,
-                                productName: item.productName,
-                                itemNo: item.itemNo,
-                                spec1Value: item.spec1Value,
-                                spec2Value: item.spec2Value,
-                                unitPrice: item.unitPrice.toLocaleString('en-US'),
-                                stockQty: item.stockQty,
-                                expectedQty: item.expectedQty,
-                                expectedSubtotal: item.expectedSubtotal.toLocaleString('en-US'),
+                                productNo: item.product_no,
+                                productName: item.product_name,
+                                itemNo: item.item_no,
+                                spec1Value: item.spec_1_value,
+                                spec2Value: item.spec_2_value,
+                                unitPrice: item.unit_price.toLocaleString('en-US'),
+                                stockQty: item.stock_qty,
+                                expectedQty: item.expected_qty,
+                                expectedSubtotal: item.expected_subtotal.toLocaleString('en-US'),
                             });
                         });
                     }

@@ -16,6 +16,8 @@
 /* croppie */
 @import "~croppie/croppie.css";
 
+@import "./page.css";
+
 body {
     font-family: Segoe UI Light, 微軟正黑體;
     /* font-weight: bold; */
@@ -116,6 +118,12 @@ span .errorMsg {
     height: 25px;
 }
 
+.checkbox-normal {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
 .theme-color {
     color: #138cde;
 }
@@ -157,4 +165,11 @@ span .errorMsg {
 
 [v-cloak] {
     display: none;
+}
+
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 30px;
 }

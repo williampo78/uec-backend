@@ -24,9 +24,9 @@ class MiscStockRequestReviewController extends Controller
     public function index(Request $request)
     {
         $requestPayload = $request->only([
-            'requestNo',
-            'submittedAtStart',
-            'submittedAtEnd',
+            'request_no',
+            'submitted_at_start',
+            'submitted_at_end',
         ]);
 
         $responsePayload = [
@@ -36,13 +36,13 @@ class MiscStockRequestReviewController extends Controller
         // 有編輯權限
         if ($request->share_role_auth['auth_update']) {
             // 進貨退出單
-            $responsePayload['miscStockRequests'] = $this->miscStockRequestService->getStockReviewTableList($requestPayload);
-            $responsePayload['miscStockRequests'] = $this->miscStockRequestService->formatStockReviewTableList($responsePayload['miscStockRequests']);
+            $responsePayload['misc_stock_requests'] = $this->miscStockRequestService->getStockReviewTableList($requestPayload);
+            $responsePayload['misc_stock_requests'] = $this->miscStockRequestService->formatStockReviewTableList($responsePayload['misc_stock_requests']);
         }
 
-        $response['payload'] = $responsePayload;
-
-        return view('backend.misc_stock_request_review.list', $response);
+        return view('backend.misc_stock_request_review.list', [
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -85,11 +85,12 @@ class MiscStockRequestReviewController extends Controller
      */
     public function edit($id)
     {
-        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->getStockRequestForReviewPage($id);
-        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->formatStockRequestForReviewPage($responsePayload['miscStockRequest']);
-        $response['payload'] = $responsePayload;
+        $responsePayload['misc_stock_request'] = $this->miscStockRequestService->getStockRequestForReviewPage($id);
+        $responsePayload['misc_stock_request'] = $this->miscStockRequestService->formatStockRequestForReviewPage($responsePayload['misc_stock_request']);
 
-        return response()->json($response);
+        return response()->json([
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -102,14 +103,14 @@ class MiscStockRequestReviewController extends Controller
     public function update(Request $request, $id)
     {
         $requestPayload = $request->only([
-            'supplierIds',
-            'reviewResult',
-            'reviewRemark',
+            'supplier_ids',
+            'review_result',
+            'review_remark',
         ]);
 
         $reviewResult = $this->miscStockRequestService->reviewStockRequest($id, $requestPayload);
 
-        if (!$reviewResult['isSuccess']) {
+        if (!$reviewResult['is_success']) {
             return response()->json([
                 'message' => '儲存失敗',
             ], 500);
@@ -118,7 +119,7 @@ class MiscStockRequestReviewController extends Controller
         return response()->json([
             'message' => '儲存成功',
             'payload' => [
-                'remainingSupplierCount' => $reviewResult['remainingSupplierCount'],
+                'remaining_supplier_count' => $reviewResult['remaining_supplier_count'],
             ],
         ]);
     }
@@ -148,8 +149,9 @@ class MiscStockRequestReviewController extends Controller
         $responsePayload = [
             'detail' => $detail,
         ];
-        $response['payload'] = $responsePayload;
 
-        return response()->json($response);
+        return response()->json([
+            'payload' => $responsePayload,
+        ]);
     }
 }

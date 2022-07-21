@@ -28,7 +28,11 @@
                                     <label class="control-label">預計出庫日 <span class="text-red">*</span></label>
                                 </div>
                                 <div class="col-sm-10">
-                                    <vue-flat-pickr :setting="modal.expectedDate.expectedDate"></vue-flat-pickr>
+                                    <vue-flat-pickr
+                                        name="expectedDate"
+                                        :value.sync="modal.expectedDate.expectedDate"
+                                        :config="flatPickrConfig.expectedDate">
+                                    </vue-flat-pickr>
                                 </div>
                             </div>
                         </div>

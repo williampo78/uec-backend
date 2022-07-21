@@ -36,23 +36,23 @@ class MiscStockRequestController extends Controller
     public function index(Request $request)
     {
         $requestPayload = $request->only([
-            'requestDateStart',
-            'requestDateEnd',
-            'requestNo',
-            'requestStatus',
-            'actualDateStart',
-            'actualDateEnd',
-            'productNo',
-            'supplierId',
+            'request_date_start',
+            'request_date_end',
+            'request_no',
+            'request_status',
+            'actual_date_start',
+            'actual_date_end',
+            'product_no',
+            'supplier_id',
             'limit',
         ]);
 
-        if ($request->missing('requestDateStart')) {
-            $requestPayload['requestDateStart'] = today()->subMonths(2);
+        if ($request->missing('request_date_start')) {
+            $requestPayload['request_date_start'] = today()->subMonths(2);
         }
 
-        if ($request->missing('requestDateEnd')) {
-            $requestPayload['requestDateEnd'] = today();
+        if ($request->missing('request_date_end')) {
+            $requestPayload['request_date_end'] = today();
         }
 
         if ($request->missing('limit')) {
@@ -60,16 +60,17 @@ class MiscStockRequestController extends Controller
         }
 
         $responsePayload = [
-            'requestStatuses' => config('uec.options.misc_stock_requests.request_statuses.out'),
+            'request_statuses' => config('uec.options.misc_stock_requests.request_statuses.out'),
             'suppliers' => $this->supplierService->getSuppliers(),
             'auth' => $request->share_role_auth,
         ];
         // 進貨退出單
-        $responsePayload['miscStockRequests'] = $this->miscStockRequestService->getStockRequestTableList($requestPayload);
-        $responsePayload['miscStockRequests'] = $this->miscStockRequestService->formatStockRequestTableList($responsePayload['miscStockRequests']);
-        $response['payload'] = $responsePayload;
+        $responsePayload['misc_stock_requests'] = $this->miscStockRequestService->getStockRequestTableList($requestPayload);
+        $responsePayload['misc_stock_requests'] = $this->miscStockRequestService->formatStockRequestTableList($responsePayload['misc_stock_requests']);
 
-        return view('backend.misc_stock_request.list', $response);
+        return view('backend.misc_stock_request.list', [
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -82,13 +83,14 @@ class MiscStockRequestController extends Controller
         $responsePayload = [
             'warehouses' => $this->warehouseService->getWarehouseList(),
             'taxes' => config('uec.options.taxes'),
-            'shipToName' => $this->sysConfigService->getConfigValue('LGST_REC_NAME'),
-            'shipToMobile' => $this->sysConfigService->getConfigValue('LGST_REC_PHONE'),
-            'shipToAddress' => $this->sysConfigService->getConfigValue('LGST_REC_ADDR'),
+            'ship_to_name' => $this->sysConfigService->getConfigValue('LGST_REC_NAME'),
+            'ship_to_mobile' => $this->sysConfigService->getConfigValue('LGST_REC_PHONE'),
+            'ship_to_address' => $this->sysConfigService->getConfigValue('LGST_REC_ADDR'),
         ];
-        $response['payload'] = $responsePayload;
 
-        return view('backend.misc_stock_request.create', $response);
+        return view('backend.misc_stock_request.create', [
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -100,18 +102,20 @@ class MiscStockRequestController extends Controller
     public function store(Request $request)
     {
         $resquestPayload = $request->only([
-            'saveType',
-            'warehouseId',
+            'save_type',
+            'warehouse_id',
             'tax',
             'remark',
-            'shipToName',
-            'shipToMobile',
-            'shipToAddress',
+            'ship_to_name',
+            'ship_to_mobile',
+            'ship_to_address',
             'items',
         ]);
 
         if (!$this->miscStockRequestService->createStockRequest($resquestPayload)) {
-            return response()->json(['message' => '儲存失敗'], 500);
+            return response()->json([
+                'message' => '儲存失敗',
+            ], 500);
         }
 
         return response()->json([
@@ -127,11 +131,12 @@ class MiscStockRequestController extends Controller
      */
     public function show($id)
     {
-        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->getStockRequestForShowPage($id);
-        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->formatStockRequestForShowPage($responsePayload['miscStockRequest']);
-        $response['payload'] = $responsePayload;
+        $responsePayload['misc_stock_request'] = $this->miscStockRequestService->getStockRequestForShowPage($id);
+        $responsePayload['misc_stock_request'] = $this->miscStockRequestService->formatStockRequestForShowPage($responsePayload['misc_stock_request']);
 
-        return response()->json($response);
+        return response()->json([
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -146,11 +151,12 @@ class MiscStockRequestController extends Controller
             'warehouses' => $this->warehouseService->getWarehouseList(),
             'taxes' => config('uec.options.taxes'),
         ];
-        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->getStockRequestForEditPage($id);
-        $responsePayload['miscStockRequest'] = $this->miscStockRequestService->formatStockRequestForEditPage($responsePayload['miscStockRequest']);
-        $response['payload'] = $responsePayload;
+        $responsePayload['misc_stock_request'] = $this->miscStockRequestService->getStockRequestForEditPage($id);
+        $responsePayload['misc_stock_request'] = $this->miscStockRequestService->formatStockRequestForEditPage($responsePayload['misc_stock_request']);
 
-        return view('backend.misc_stock_request.edit', $response);
+        return view('backend.misc_stock_request.edit', [
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -163,17 +169,19 @@ class MiscStockRequestController extends Controller
     public function update(Request $request, $id)
     {
         $resquestPayload = $request->only([
-            'saveType',
-            'warehouseId',
+            'save_type',
+            'warehouse_id',
             'remark',
-            'shipToName',
-            'shipToMobile',
-            'shipToAddress',
+            'ship_to_name',
+            'ship_to_mobile',
+            'ship_to_address',
             'items',
         ]);
 
         if (!$this->miscStockRequestService->updateStockRequest($id, $resquestPayload)) {
-            return response()->json(['message' => '儲存失敗'], 500);
+            return response()->json([
+                'message' => '儲存失敗',
+            ], 500);
         }
 
         return response()->json([
@@ -208,9 +216,10 @@ class MiscStockRequestController extends Controller
         $responsePayload = [
             'suppliers' => $this->supplierService->getSuppliers(),
         ];
-        $response['payload'] = $responsePayload;
 
-        return response()->json($response);
+        return response()->json([
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -222,12 +231,12 @@ class MiscStockRequestController extends Controller
     public function getProductItemModalList(Request $request)
     {
         $requestPayload = $request->only([
-            'productNo',
-            'productName',
-            'supplierId',
+            'product_no',
+            'product_name',
+            'supplier_id',
             'limit',
-            'excludeProductItemIds',
-            'warehouseId',
+            'exclude_product_item_ids',
+            'warehouse_id',
         ]);
 
         $list = $this->miscStockRequestService->getProductItemModalList($requestPayload);
@@ -235,9 +244,10 @@ class MiscStockRequestController extends Controller
         $responsePayload = [
             'list' => $list,
         ];
-        $response['payload'] = $responsePayload;
 
-        return response()->json($response);
+        return response()->json([
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -253,9 +263,10 @@ class MiscStockRequestController extends Controller
         $responsePayload = [
             'list' => $list,
         ];
-        $response['payload'] = $responsePayload;
 
-        return response()->json($response);
+        return response()->json([
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -272,9 +283,10 @@ class MiscStockRequestController extends Controller
         $responsePayload = [
             'detail' => $detail,
         ];
-        $response['payload'] = $responsePayload;
 
-        return response()->json($response);
+        return response()->json([
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -287,14 +299,16 @@ class MiscStockRequestController extends Controller
     public function updateExpectedDate(Request $request, $id)
     {
         $resquestPayload = $request->only([
-            'expectedDate',
-            'shipToName',
-            'shipToMobile',
-            'shipToAddress',
+            'expected_date',
+            'ship_to_name',
+            'ship_to_mobile',
+            'ship_to_address',
         ]);
 
         if (!$this->miscStockRequestService->updateExpectedDate($id, $resquestPayload)) {
-            return response()->json(['message' => '儲存失敗'], 500);
+            return response()->json([
+                'message' => '儲存失敗',
+            ], 500);
         }
 
         return response()->json([

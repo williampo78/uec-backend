@@ -38,8 +38,9 @@
         "select2-bootstrap-theme": "^0.1.0-beta.10",
         "sweetalert2": "^11.4.0",
         "vue": "^2.6.14",
+        "vue-affix": "^0.5.2",
         "vue-flatpickr-component": "^8.1.7",
         "vue-multiselect": "^2.1.6",
-        "vue-select": "^3.18.3"
+        "vue-scrollactive": "^0.9.3"
     }
 }

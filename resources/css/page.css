@@ -1,0 +1,73 @@
+.vue-affix {
+    width: 16rem;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.page-sidebar {
+    width: 150px;
+    margin-left: 2rem;
+}
+
+.page-content {
+    flex-grow: 1;
+}
+
+.page-sidebar .menu {
+    padding: 16px 0;
+    border-radius: 5px;
+    box-shadow: 0 0 8px 4px lightgrey;
+    overflow: hidden;
+}
+
+.page-sidebar .menu-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-sidebar .menu-item {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    padding: 0 4px;
+    color: #aaaaaa;
+    text-decoration: none !important;
+}
+
+.page-sidebar .menu-item:hover {
+    background-color: #7fdbff26;
+}
+
+.page-sidebar .menu-item-icon {
+    position: relative;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.page-sidebar .icon-line {
+    display: block;
+    width: 2px;
+    height: 100%;
+    background-color: #aaaaaa;
+}
+
+.page-sidebar .menu-item-content {
+    flex-grow: 1;
+    padding: 0.8rem;
+    font-size: 1.5rem;
+}
+
+.page-sidebar .menu-item.is-active .icon-line {
+    background-color: blue;
+}
+
+.page-sidebar .menu-item.is-active .menu-item-content {
+    font-weight: bold;
+    color: blue;
+}

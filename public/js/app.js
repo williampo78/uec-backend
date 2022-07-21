@@ -3899,26 +3899,28 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    'flat-pickr': (vue_flatpickr_component__WEBPACK_IMPORTED_MODULE_0___default())
+    "flat-pickr": (vue_flatpickr_component__WEBPACK_IMPORTED_MODULE_0___default())
   },
   name: "vue-flat-pickr",
   props: {
-    setting: {
+    name: {
+      type: String,
+      "default": ""
+    },
+    value: {
+      type: String,
+      "default": ""
+    },
+    config: {
       type: Object,
       "default": function _default() {
-        return {
-          name: "",
-          date: "",
-          config: {}
-        };
+        return {};
       }
     }
   },
   data: function data() {
     return {
-      name: "date",
-      date: "",
-      config: {
+      configLocal: {
         allowInput: true,
         wrap: true,
         clickOpens: false,
@@ -3928,23 +3930,20 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
   },
-  created: function created() {
-    if (this.setting) {
-      if (this.setting.name) {
-        this.name = this.setting.name;
+  computed: {
+    valueLocal: {
+      get: function get() {
+        return this.value;
+      },
+      set: function set(value) {
+        this.$emit("update:value", value);
       }
     }
   },
   watch: {
-    "setting.date": {
-      handler: function handler(date) {
-        this.date = date;
-      },
-      immediate: true
-    },
-    "setting.config": {
+    config: {
       handler: function handler(config) {
-        this.config = Object.assign({}, this.config, config);
+        this.configLocal = Object.assign({}, this.configLocal, config);
       },
       deep: true,
       immediate: true
@@ -3952,7 +3951,6 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     onChange: function onChange(selectedDates, dateStr, instance) {
-      this.setting.date = dateStr;
       this.$emit("on-change", selectedDates, dateStr, instance);
     }
   }
@@ -4039,7 +4037,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var Croppie__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(Croppie__WEBPACK_IMPORTED_MODULE_15__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_16__);
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js");
+/* harmony import */ var vue_affix__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vue-affix */ "./node_modules/vue-affix/dist/vue-affix.min.js");
+/* harmony import */ var vue_affix__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(vue_affix__WEBPACK_IMPORTED_MODULE_17__);
+/* harmony import */ var vue_scrollactive__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! vue-scrollactive */ "./node_modules/vue-scrollactive/dist/vue-scrollactive.min.js");
+/* harmony import */ var vue_scrollactive__WEBPACK_IMPORTED_MODULE_18___default = /*#__PURE__*/__webpack_require__.n(vue_scrollactive__WEBPACK_IMPORTED_MODULE_18__);
+
+
 
 
 
@@ -4147,7 +4151,9 @@ window.Croppie = (Croppie__WEBPACK_IMPORTED_MODULE_15___default());
  * vue
  */
 
-window.Vue = vue__WEBPACK_IMPORTED_MODULE_17__["default"];
+window.Vue = vue__WEBPACK_IMPORTED_MODULE_19__["default"];
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use((vue_affix__WEBPACK_IMPORTED_MODULE_17___default()));
+vue__WEBPACK_IMPORTED_MODULE_19__["default"].use((vue_scrollactive__WEBPACK_IMPORTED_MODULE_18___default()));
 
 /***/ }),
 
@@ -25356,11 +25362,11 @@ if (typeof Object.assign !== "function") {
 /***/ ((module, exports, __webpack_require__) => {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * jQuery Validation Plugin v1.19.3
+ * jQuery Validation Plugin v1.19.5
  *
  * https://jqueryvalidation.org/
  *
- * Copyright (c) 2021 Jörn Zaefferer
+ * Copyright (c) 2022 Jörn Zaefferer
  * Released under the MIT license
  */
 (function( factory ) {
@@ -25475,7 +25481,7 @@ $.validator.addMethod( "accept", function( value, element, param ) {
 
 $.validator.addMethod( "alphanumeric", function( value, element ) {
 	return this.optional( element ) || /^\w+$/i.test( value );
-}, "Letters, numbers, and underscores only please" );
+}, "Letters, numbers, and underscores only please." );
 
 /*
  * Dutch bank account numbers (not 'giro' numbers) have 9 digits
@@ -25502,13 +25508,13 @@ $.validator.addMethod( "bankaccountNL", function( value, element ) {
 		sum = sum + factor * digit;
 	}
 	return sum % 11 === 0;
-}, "Please specify a valid bank account number" );
+}, "Please specify a valid bank account number." );
 
 $.validator.addMethod( "bankorgiroaccountNL", function( value, element ) {
 	return this.optional( element ) ||
 			( $.validator.methods.bankaccountNL.call( this, value, element ) ) ||
 			( $.validator.methods.giroaccountNL.call( this, value, element ) );
-}, "Please specify a valid bank or giro account number" );
+}, "Please specify a valid bank or giro account number." );
 
 /**
  * BIC is the business identifier code (ISO 9362). This BIC check is not a guarantee for authenticity.
@@ -25527,7 +25533,7 @@ $.validator.addMethod( "bankorgiroaccountNL", function( value, element ) {
  */
 $.validator.addMethod( "bic", function( value, element ) {
     return this.optional( element ) || /^([A-Z]{6}[A-Z2-9][A-NP-Z1-9])(X{3}|[A-WY-Z0-9][A-Z0-9]{2})?$/.test( value.toUpperCase() );
-}, "Please specify a valid BIC code" );
+}, "Please specify a valid BIC code." );
 
 /*
  * Código de identificación fiscal ( CIF ) is the tax identification code for Spanish legal entities
@@ -25692,7 +25698,7 @@ $.validator.addMethod( "cnhBR", function( value ) {
 
   return ( String( firstCN ).concat( secondCN ) === value.substr( -2 ) );
 
-}, "Please specify a valid CNH number" );
+}, "Please specify a valid CNH number." );
 
 /*
  * Brazillian value number (Cadastrado de Pessoas Juridica).
@@ -25767,7 +25773,7 @@ $.validator.addMethod( "cnpjBR", function( value, element ) {
 
 	return true;
 
-}, "Please specify a CNPJ value number" );
+}, "Please specify a CNPJ value number." );
 
 /*
  * Brazillian CPF number (Cadastrado de Pessoas Físicas) is the equivalent of a Brazilian tax registration number.
@@ -25833,7 +25839,7 @@ $.validator.addMethod( "cpfBR", function( value, element ) {
 	}
 	return false;
 
-}, "Please specify a valid CPF number" );
+}, "Please specify a valid CPF number." );
 
 // https://jqueryvalidation.org/creditcard-method/
 // based on https://en.wikipedia.org/wiki/Luhn_algorithm
@@ -25986,7 +25992,7 @@ $.validator.addMethod( "currency", function( value, element, param ) {
     regex = new RegExp( regex );
     return this.optional( element ) || regex.test( value );
 
-}, "Please specify a valid currency" );
+}, "Please specify a valid currency." );
 
 $.validator.addMethod( "dateFA", function( value, element ) {
 	return this.optional( element ) || /^[1-4]\d{3}\/((0?[1-6]\/((3[0-1])|([1-2][0-9])|(0?[1-9])))|((1[0-2]|(0?[7-9]))\/(30|([1-2][0-9])|(0?[1-9]))))$/.test( value );
@@ -26047,7 +26053,7 @@ $.validator.addMethod( "extension", function( value, element, param ) {
  */
 $.validator.addMethod( "giroaccountNL", function( value, element ) {
 	return this.optional( element ) || /^[0-9]{1,7}$/.test( value );
-}, "Please specify a valid giro account number" );
+}, "Please specify a valid giro account number." );
 
 $.validator.addMethod( "greaterThan", function( value, element, param ) {
     var target = $( param );
@@ -26208,11 +26214,11 @@ $.validator.addMethod( "iban", function( value, element ) {
 		cRest = cOperator % 97;
 	}
 	return cRest === 1;
-}, "Please specify a valid IBAN" );
+}, "Please specify a valid IBAN." );
 
 $.validator.addMethod( "integer", function( value, element ) {
 	return this.optional( element ) || /^-?\d+$/.test( value );
-}, "A positive or negative non-decimal number please" );
+}, "A positive or negative non-decimal number please." );
 
 $.validator.addMethod( "ipv4", function( value, element ) {
 	return this.optional( element ) || /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)$/i.test( value );
@@ -26248,11 +26254,11 @@ $.validator.addMethod( "lessThanEqual", function( value, element, param ) {
 
 $.validator.addMethod( "lettersonly", function( value, element ) {
 	return this.optional( element ) || /^[a-z]+$/i.test( value );
-}, "Letters only please" );
+}, "Letters only please." );
 
 $.validator.addMethod( "letterswithbasicpunc", function( value, element ) {
 	return this.optional( element ) || /^[a-z\-.,()'"\s]+$/i.test( value );
-}, "Letters or punctuation only please" );
+}, "Letters or punctuation only please." );
 
 // Limit the number of files in a FileList.
 $.validator.addMethod( "maxfiles", function( value, element, param ) {
@@ -26313,12 +26319,12 @@ $.validator.addMethod( "maxsizetotal", function( value, element, param ) {
 
 $.validator.addMethod( "mobileNL", function( value, element ) {
 	return this.optional( element ) || /^((\+|00(\s|\s?\-\s?)?)31(\s|\s?\-\s?)?(\(0\)[\-\s]?)?|0)6((\s|\s?\-\s?)?[0-9]){8}$/.test( value );
-}, "Please specify a valid mobile number" );
+}, "Please specify a valid mobile number." );
 
 $.validator.addMethod( "mobileRU", function( phone_number, element ) {
 	var ruPhone_number = phone_number.replace( /\(|\)|\s+|-/g, "" );
 	return this.optional( element ) || ruPhone_number.length > 9 && /^((\+7|7|8)+([0-9]){10})$/.test( ruPhone_number );
-}, "Please specify a valid mobile number" );
+}, "Please specify a valid mobile number." );
 
 /* For UK phone functions, do the following server side processing:
  * Compare original input with this RegEx pattern:
@@ -26332,7 +26338,7 @@ $.validator.addMethod( "mobileUK", function( phone_number, element ) {
 	phone_number = phone_number.replace( /\(|\)|\s+|-/g, "" );
 	return this.optional( element ) || phone_number.length > 9 &&
 		phone_number.match( /^(?:(?:(?:00\s?|\+)44\s?|0)7(?:[1345789]\d{2}|624)\s?\d{3}\s?\d{3})$/ );
-}, "Please specify a valid mobile number" );
+}, "Please specify a valid mobile number." );
 
 $.validator.addMethod( "netmask", function( value, element ) {
     return this.optional( element ) || /^(254|252|248|240|224|192|128)\.0\.0\.0|255\.(254|252|248|240|224|192|128|0)\.0\.0|255\.255\.(254|252|248|240|224|192|128|0)\.0|255\.255\.255\.(254|252|248|240|224|192|128|0)/i.test( value );
@@ -26488,7 +26494,7 @@ $.validator.addMethod( "nisBR", function( value ) {
 	} else {
 		return false;
 	}
-}, "Please specify a valid NIS/PIS number" );
+}, "Please specify a valid NIS/PIS number." );
 
 $.validator.addMethod( "notEqualTo", function( value, element, param ) {
 	return this.optional( element ) || !$.validator.methods.equalTo.call( this, value, element, param );
@@ -26496,7 +26502,7 @@ $.validator.addMethod( "notEqualTo", function( value, element, param ) {
 
 $.validator.addMethod( "nowhitespace", function( value, element ) {
 	return this.optional( element ) || /^\S+$/i.test( value );
-}, "No white space please" );
+}, "No white space please." );
 
 /**
 * Return true if the field value matches the given format RegExp
@@ -26550,7 +26556,7 @@ $.validator.addMethod( "phonePL", function( phone_number, element ) {
 	phone_number = phone_number.replace( /\s+/g, "" );
 	var regexp = /^(?:(?:(?:\+|00)?48)|(?:\(\+?48\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-68]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\d{7}$/;
 	return this.optional( element ) || regexp.test( phone_number );
-}, "Please specify a valid phone number" );
+}, "Please specify a valid phone number." );
 
 /* For UK phone functions, do the following server side processing:
  * Compare original input with this RegEx pattern:
@@ -26566,7 +26572,7 @@ $.validator.addMethod( "phonesUK", function( phone_number, element ) {
 	phone_number = phone_number.replace( /\(|\)|\s+|-/g, "" );
 	return this.optional( element ) || phone_number.length > 9 &&
 		phone_number.match( /^(?:(?:(?:00\s?|\+)44\s?|0)(?:1\d{8,9}|[23]\d{9}|7(?:[1345789]\d{8}|624\d{6})))$/ );
-}, "Please specify a valid uk phone number" );
+}, "Please specify a valid uk phone number." );
 
 /* For UK phone functions, do the following server side processing:
  * Compare original input with this RegEx pattern:
@@ -26580,7 +26586,7 @@ $.validator.addMethod( "phoneUK", function( phone_number, element ) {
 	phone_number = phone_number.replace( /\(|\)|\s+|-/g, "" );
 	return this.optional( element ) || phone_number.length > 9 &&
 		phone_number.match( /^(?:(?:(?:00\s?|\+)44\s?)|(?:\(?0))(?:\d{2}\)?\s?\d{4}\s?\d{4}|\d{3}\)?\s?\d{3}\s?\d{3,4}|\d{4}\)?\s?(?:\d{5}|\d{3}\s?\d{3})|\d{5}\)?\s?\d{4,5})$/ );
-}, "Please specify a valid phone number" );
+}, "Please specify a valid phone number." );
 
 /**
  * Matches US phone number format
@@ -26602,7 +26608,7 @@ $.validator.addMethod( "phoneUS", function( phone_number, element ) {
 	phone_number = phone_number.replace( /\s+/g, "" );
 	return this.optional( element ) || phone_number.length > 9 &&
 		phone_number.match( /^(\+?1-?)?(\([2-9]([02-9]\d|1[02-9])\)|[2-9]([02-9]\d|1[02-9]))-?[2-9]\d{2}-?\d{4}$/ );
-}, "Please specify a valid phone number" );
+}, "Please specify a valid phone number." );
 
 /*
 * Valida CEPs do brasileiros:
@@ -26631,21 +26637,21 @@ $.validator.addMethod( "postalcodeBR", function( cep_value, element ) {
  */
 $.validator.addMethod( "postalCodeCA", function( value, element ) {
 	return this.optional( element ) || /^[ABCEGHJKLMNPRSTVXY]\d[ABCEGHJKLMNPRSTVWXYZ] *\d[ABCEGHJKLMNPRSTVWXYZ]\d$/i.test( value );
-}, "Please specify a valid postal code" );
+}, "Please specify a valid postal code." );
 
 /* Matches Italian postcode (CAP) */
 $.validator.addMethod( "postalcodeIT", function( value, element ) {
 	return this.optional( element ) || /^\d{5}$/.test( value );
-}, "Please specify a valid postal code" );
+}, "Please specify a valid postal code." );
 
 $.validator.addMethod( "postalcodeNL", function( value, element ) {
 	return this.optional( element ) || /^[1-9][0-9]{3}\s?[a-zA-Z]{2}$/.test( value );
-}, "Please specify a valid postal code" );
+}, "Please specify a valid postal code." );
 
 // Matches UK postcode. Does not match to UK Channel Islands that have their own postcodes (non standard UK)
 $.validator.addMethod( "postcodeUK", function( value, element ) {
 	return this.optional( element ) || /^((([A-PR-UWYZ][0-9])|([A-PR-UWYZ][0-9][0-9])|([A-PR-UWYZ][A-HK-Y][0-9])|([A-PR-UWYZ][A-HK-Y][0-9][0-9])|([A-PR-UWYZ][0-9][A-HJKSTUW])|([A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRVWXY]))\s?([0-9][ABD-HJLNP-UW-Z]{2})|(GIR)\s?(0AA))$/i.test( value );
-}, "Please specify a valid UK postcode" );
+}, "Please specify a valid UK postcode." );
 
 /*
  * Lets you say "at least X inputs that match selector Y must be filled."
@@ -26782,24 +26788,24 @@ $.validator.addMethod( "stateUS", function( value, element, options ) {
 
 	regex = caseSensitive ? new RegExp( regex ) : new RegExp( regex, "i" );
 	return this.optional( element ) || regex.test( value );
-}, "Please specify a valid state" );
+}, "Please specify a valid state." );
 
 // TODO check if value starts with <, otherwise don't try stripping anything
 $.validator.addMethod( "strippedminlength", function( value, element, param ) {
 	return $( value ).text().length >= param;
-}, $.validator.format( "Please enter at least {0} characters" ) );
+}, $.validator.format( "Please enter at least {0} characters." ) );
 
 $.validator.addMethod( "time", function( value, element ) {
 	return this.optional( element ) || /^([01]\d|2[0-3]|[0-9])(:[0-5]\d){1,2}$/.test( value );
-}, "Please enter a valid time, between 00:00 and 23:59" );
+}, "Please enter a valid time, between 00:00 and 23:59." );
 
 $.validator.addMethod( "time12h", function( value, element ) {
 	return this.optional( element ) || /^((0?[1-9]|1[012])(:[0-5]\d){1,2}(\ ?[AP]M))$/i.test( value );
-}, "Please enter a valid time in 12-hour am/pm format" );
+}, "Please enter a valid time in 12-hour am/pm format." );
 
 // Same as url, but TLD is optional
 $.validator.addMethod( "url2", function( value, element ) {
-	return this.optional( element ) || /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)*(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test( value );
+	return this.optional( element ) || /^(?:(?:(?:https?|ftp):)?\/\/)(?:(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})+(?::(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?)|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff])|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62}\.)))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test( value );
 }, $.validator.messages.url );
 
 /**
@@ -26859,11 +26865,11 @@ $.validator.addMethod( "vinUS", function( v ) {
 
 $.validator.addMethod( "zipcodeUS", function( value, element ) {
 	return this.optional( element ) || /^\d{5}(-\d{4})?$/.test( value );
-}, "The specified US ZIP Code is invalid" );
+}, "The specified US ZIP Code is invalid." );
 
 $.validator.addMethod( "ziprange", function( value, element ) {
 	return this.optional( element ) || /^90[2-5]\d\{2\}-\d{4}$/.test( value );
-}, "Your ZIP-code must be in the range 902xx-xxxx to 905xx-xxxx" );
+}, "Your ZIP-code must be in the range 902xx-xxxx to 905xx-xxxx." );
 return $;
 }));
 
@@ -26876,11 +26882,11 @@ return $;
 /***/ ((module, exports, __webpack_require__) => {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * jQuery Validation Plugin v1.19.3
+ * jQuery Validation Plugin v1.19.5
  *
  * https://jqueryvalidation.org/
  *
- * Copyright (c) 2021 Jörn Zaefferer
+ * Copyright (c) 2022 Jörn Zaefferer
  * Released under the MIT license
  */
 (function( factory ) {
@@ -27926,6 +27932,10 @@ $.extend( $.validator, {
 		// meta-characters that should be escaped in order to be used with JQuery
 		// as a literal part of a name/id or any selector.
 		escapeCssMeta: function( string ) {
+			if ( string === undefined ) {
+				return "";
+			}
+
 			return string.replace( /([\\!"#$%&'()*+,./:;<=>?@\[\]^`{|}~])/g, "\\$1" );
 		},
 
@@ -28002,8 +28012,8 @@ $.extend( $.validator, {
 			}
 			delete this.pending[ element.name ];
 			$( element ).removeClass( this.settings.pendingClass );
-			if ( valid && this.pendingRequest === 0 && this.formSubmitted && this.form() ) {
-				$( this.currentForm ).submit();
+			if ( valid && this.pendingRequest === 0 && this.formSubmitted && this.form() && this.pendingRequest === 0 ) {
+				$( this.currentForm ).trigger( "submit" );
 
 				// Remove the hidden input that was used as a replacement for the
 				// missing submit button. The hidden input is added by `handle()`
@@ -28108,7 +28118,7 @@ $.extend( $.validator, {
 
 			// Exception: the jquery validate 'range' method
 			// does not test for the html5 'range' type
-			rules[ method ] = true;
+			rules[ type === "date" ? "dateISO" : method ] = true;
 		}
 	},
 
@@ -28306,7 +28316,7 @@ $.extend( $.validator, {
 			// https://gist.github.com/dperini/729294
 			// see also https://mathiasbynens.be/demo/url-regex
 			// modified to allow protocol-relative URLs
-			return this.optional( element ) || /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test( value );
+			return this.optional( element ) || /^(?:(?:(?:https?|ftp):)?\/\/)(?:(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})+(?::(?:[^\]\[?\/<~#`!@$^&*()+=}|:";',>{ ]|%[0-9A-Fa-f]{2})*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test( value );
 		},
 
 		// https://jqueryvalidation.org/date-method/
@@ -72612,7 +72622,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
 /* module decorator */ module = __webpack_require__.nmd(module);
 //! moment.js
-//! version : 2.29.3
+//! version : 2.29.4
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -75066,7 +75076,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
     function preprocessRFC2822(s) {
         // Remove comments and folding whitespace and replace multiple-spaces with a single space
         return s
-            .replace(/\([^)]*\)|[\n\t]/g, ' ')
+            .replace(/\([^()]*\)|[\n\t]/g, ' ')
             .replace(/(\s\s+)/g, ' ')
             .replace(/^\s\s*/, '')
             .replace(/\s\s*$/, '');
@@ -78247,7 +78257,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
     //! moment.js
 
-    hooks.version = '2.29.3';
+    hooks.version = '2.29.4';
 
     setHookCallback(createLocal);
 
@@ -88016,6 +88026,16 @@ if (typeof this !== 'undefined' && this.Sweetalert2){  this.swal = this.sweetAle
 
 /***/ }),
 
+/***/ "./node_modules/vue-affix/dist/vue-affix.min.js":
+/*!******************************************************!*\
+  !*** ./node_modules/vue-affix/dist/vue-affix.min.js ***!
+  \******************************************************/
+/***/ ((module) => {
+
+!function(t,e){ true?module.exports=e():0}(window,function(){return function(t){var e={};function i(o){if(e[o])return e[o].exports;var s=e[o]={i:o,l:!1,exports:{}};return t[o].call(s.exports,s,s.exports,i),s.l=!0,s.exports}return i.m=t,i.c=e,i.d=function(t,e,o){i.o(t,e)||Object.defineProperty(t,e,{enumerable:!0,get:o})},i.r=function(t){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"__esModule",{value:!0})},i.t=function(t,e){if(1&e&&(t=i(t)),8&e)return t;if(4&e&&"object"==typeof t&&t&&t.__esModule)return t;var o=Object.create(null);if(i.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:t}),2&e&&"string"!=typeof t)for(var s in t)i.d(o,s,function(e){return t[e]}.bind(null,s));return o},i.n=function(t){var e=t&&t.__esModule?function(){return t.default}:function(){return t};return i.d(e,"a",e),e},i.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},i.p="/dist/",i(i.s=3)}([function(t,e,i){var o=i(6);"string"==typeof o&&(o=[[t.i,o,""]]),o.locals&&(t.exports=o.locals);(0,i(2).default)("da410cd4",o,!1,{})},function(t,e){t.exports=function(t){var e=[];return e.toString=function(){return this.map(function(e){var i=function(t,e){var i=t[1]||"",o=t[3];if(!o)return i;if(e&&"function"==typeof btoa){var s=function(t){return"/*# sourceMappingURL=data:application/json;charset=utf-8;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(t))))+" */"}(o),n=o.sources.map(function(t){return"/*# sourceURL="+o.sourceRoot+t+" */"});return[i].concat(n).concat([s]).join("\n")}return[i].join("\n")}(e,t);return e[2]?"@media "+e[2]+"{"+i+"}":i}).join("")},e.i=function(t,i){"string"==typeof t&&(t=[[null,t,""]]);for(var o={},s=0;s<this.length;s++){var n=this[s][0];"number"==typeof n&&(o[n]=!0)}for(s=0;s<t.length;s++){var r=t[s];"number"==typeof r[0]&&o[r[0]]||(i&&!r[2]?r[2]=i:i&&(r[2]="("+r[2]+") and ("+i+")"),e.push(r))}},e}},function(t,e,i){"use strict";function o(t,e){for(var i=[],o={},s=0;s<e.length;s++){var n=e[s],r=n[0],f={id:t+":"+s,css:n[1],media:n[2],sourceMap:n[3]};o[r]?o[r].parts.push(f):i.push(o[r]={id:r,parts:[f]})}return i}i.r(e),i.d(e,"default",function(){return d});var s="undefined"!=typeof document;if("undefined"!=typeof DEBUG&&DEBUG&&!s)throw new Error("vue-style-loader cannot be used in a non-browser environment. Use { target: 'node' } in your Webpack config to indicate a server-rendering environment.");var n={},r=s&&(document.head||document.getElementsByTagName("head")[0]),f=null,l=0,a=!1,c=function(){},u=null,h="data-vue-ssr-id",p="undefined"!=typeof navigator&&/msie [6-9]\b/.test(navigator.userAgent.toLowerCase());function d(t,e,i,s){a=i,u=s||{};var r=o(t,e);return m(r),function(e){for(var i=[],s=0;s<r.length;s++){var f=r[s];(l=n[f.id]).refs--,i.push(l)}e?m(r=o(t,e)):r=[];for(s=0;s<i.length;s++){var l;if(0===(l=i[s]).refs){for(var a=0;a<l.parts.length;a++)l.parts[a]();delete n[l.id]}}}}function m(t){for(var e=0;e<t.length;e++){var i=t[e],o=n[i.id];if(o){o.refs++;for(var s=0;s<o.parts.length;s++)o.parts[s](i.parts[s]);for(;s<i.parts.length;s++)o.parts.push(v(i.parts[s]));o.parts.length>i.parts.length&&(o.parts.length=i.parts.length)}else{var r=[];for(s=0;s<i.parts.length;s++)r.push(v(i.parts[s]));n[i.id]={id:i.id,refs:1,parts:r}}}}function x(){var t=document.createElement("style");return t.type="text/css",r.appendChild(t),t}function v(t){var e,i,o=document.querySelector("style["+h+'~="'+t.id+'"]');if(o){if(a)return c;o.parentNode.removeChild(o)}if(p){var s=l++;o=f||(f=x()),e=g.bind(null,o,s,!1),i=g.bind(null,o,s,!0)}else o=x(),e=function(t,e){var i=e.css,o=e.media,s=e.sourceMap;o&&t.setAttribute("media",o);u.ssrId&&t.setAttribute(h,e.id);s&&(i+="\n/*# sourceURL="+s.sources[0]+" */",i+="\n/*# sourceMappingURL=data:application/json;base64,"+btoa(unescape(encodeURIComponent(JSON.stringify(s))))+" */");if(t.styleSheet)t.styleSheet.cssText=i;else{for(;t.firstChild;)t.removeChild(t.firstChild);t.appendChild(document.createTextNode(i))}}.bind(null,o),i=function(){o.parentNode.removeChild(o)};return e(t),function(o){if(o){if(o.css===t.css&&o.media===t.media&&o.sourceMap===t.sourceMap)return;e(t=o)}else i()}}var S=function(){var t=[];return function(e,i){return t[e]=i,t.filter(Boolean).join("\n")}}();function g(t,e,i,o){var s=i?"":o.css;if(t.styleSheet)t.styleSheet.cssText=S(e,s);else{var n=document.createTextNode(s),r=t.childNodes;r[e]&&t.removeChild(r[e]),r.length?t.insertBefore(n,r[e]):t.appendChild(n)}}},function(t,e,i){"use strict";i.r(e);var o=function(){var t=this.$createElement;return(this._self._c||t)("div",[this._t("default")],2)};function s(t){return(s="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}o._withStripped=!0;var n={props:{relativeElementSelector:{type:String,required:!0},offset:{type:Object,default:function(){return{top:40,bottom:40}},validator:function(t){if("object"!==s(t))return!1;var e=Object.keys(t);return e.includes("top")&&e.includes("bottom")}},enabled:{type:Boolean,default:!0},scrollAffix:{type:Boolean,default:!1},scrollContainerSelector:{type:String,default:null}},computed:{relativeElement:function(){return document.querySelector(this.relativeElementSelector)},scrollContainer:function(){return this.scrollContainerSelector?document.querySelector(this.scrollContainerSelector):window},affixTopPos:function(){return this.affixRect.top+this.topOfScreen-this.offset.top-this.topPadding},affixBottomPos:function(){return this.affixRect.bottom+this.topOfScreen+this.offset.bottom},bottomOfScreen:function(){return this.topOfScreen+this.scrollContainer.innerHeight},relativeElmTopPos:function(){return this.topOfScreen+this.relativeElement.getBoundingClientRect().top},relativeElmBottomPos:function(){return this.topOfScreen+this.relativeElement.getBoundingClientRect().bottom},screenIsPastAffix:function(){return this.bottomOfScreen>=this.affixBottomPos},screenIsBeforeAffix:function(){return this.topOfScreen<=this.affixTopPos},screenIsBeforeRelativeElm:function(){return this.topOfScreen<=this.relativeElmTopPos-this.offset.top},screenIsPastRelativeElm:function(){return this.bottomOfScreen>=this.relativeElmBottomPos+this.offset.bottom},screenIsInsideRelativeElm:function(){return!this.screenIsBeforeRelativeElm&&!this.screenIsPastRelativeElm}},data:function(){return{frameId:null,affixHeight:null,affixRect:null,affixInitialTop:null,relativeElmOffsetTop:null,topPadding:null,lastState:null,currentState:null,currentScrollAffix:null,topOfScreen:null,lastDistanceFromTop:null,scrollingUp:null,scrollingDown:null}},watch:{offset:function(t,e){t.top===e.top&&t.bottom===e.bottom||this.onScroll()}},methods:{updateData:function(){this.topOfScreen=this.scrollContainer.scrollTop||window.pageYOffset,this.affixRect=this.$el.getBoundingClientRect(),this.affixHeight=this.$el.offsetHeight,this.relativeElmOffsetTop=this.getOffsetTop(this.relativeElement)},handleScroll:function(){var t=this;this.frameId||(this.frameId=window.requestAnimationFrame(function(){t.onScroll(),t.frameId=null}))},onScroll:function(){if(this.enabled)if(this.updateData(),this.affixHeight+this.offset.top>=this.relativeElement.offsetHeight)this.scrollAffix&&"scrollaffix-top"!==this.currentScrollAffix?this.setScrollAffixTop():"affix-top"!==this.currentState&&this.setAffixTop();else{var t=this.affixHeight+this.offset.bottom+this.offset.top;this.scrollAffix&&t>this.scrollContainer.innerHeight?this.handleScrollAffix():this.handleAffix()}else this.removeClasses()},handleAffix:function(){this.topOfScreen<this.relativeElmOffsetTop-this.offset.top&&this.setAffixTop(),this.topOfScreen>=this.relativeElmOffsetTop-this.offset.top&&this.relativeElmBottomPos-this.offset.bottom>=this.topOfScreen+this.topPadding+this.affixHeight+this.offset.top&&this.setAffix(),this.relativeElmBottomPos-this.offset.bottom<this.topOfScreen+this.topPadding+this.affixHeight+this.offset.top&&this.setAffixBottom(),this.lastState=this.currentState},handleScrollAffix:function(){if(this.setScrollingDirection(),this.screenIsBeforeRelativeElm)this.setScrollAffixTop();else if(this.screenIsPastRelativeElm)this.setScrollAffixBottom();else if(this.screenIsInsideRelativeElm){var t="scrollaffix-top"===this.currentScrollAffix||"scrollaffix-bottom"===this.currentScrollAffix||"scrollaffix-up"===this.currentScrollAffix&&this.scrollingDown||"scrollaffix-down"===this.currentScrollAffix&&this.scrollingUp;this.screenIsBeforeAffix&&this.scrollingUp?this.setScrollAffixUp():this.screenIsPastAffix&&this.scrollingDown?this.setScrollAffixDown():t&&this.setScrollAffixScrolling()}this.lastScrollAffixState=this.currentScrollAffix,this.lastDistanceFromTop=this.topOfScreen},initScrollAffix:function(){this.bottomOfScreen<this.affixBottomPos?this.setScrollAffixTop():this.screenIsInsideRelativeElm?this.setScrollAffixDown():this.screenIsPastRelativeElm?this.setScrollAffixBottom():this.setScrollAffixScrolling()},setScrollAffixScrolling:function(){this.currentScrollAffix="scrollaffix-scrolling",this.$el.style.top="".concat(Math.floor(this.affixRect.top)+this.topOfScreen-this.affixInitialTop,"px"),this.$el.style.bottom="auto",this.removeClasses(),this.emitEvent()},setScrollAffixUp:function(){this.currentScrollAffix="scrollaffix-up",this.currentScrollAffix!==this.lastScrollAffixState&&(this.$el.style.top="".concat(this.topPadding+this.offset.top,"px"),this.$el.style.bottom="auto",this.removeClasses(),this.emitEvent(),this.$el.classList.add("affix"))},setScrollAffixDown:function(){this.currentScrollAffix="scrollaffix-down",this.currentScrollAffix!==this.lastScrollAffixState&&(this.$el.style.bottom="".concat(this.offset.bottom,"px"),this.$el.style.top="auto",this.removeClasses(),this.emitEvent(),this.$el.classList.add("affix"))},setScrollAffixTop:function(){this.currentScrollAffix="scrollaffix-top",this.$el.style.top=0,this.$el.style.bottom="auto",this.removeClasses(),this.emitEvent()},setScrollAffixBottom:function(){this.currentScrollAffix="scrollaffix-bottom",this.$el.style.top="".concat(this.relativeElmBottomPos-this.affixInitialTop-this.affixHeight,"px"),this.$el.style.bottom="auto",this.removeClasses(),this.emitEvent()},setScrollingDirection:function(){this.topOfScreen>this.lastDistanceFromTop?(this.scrollingDown=!0,this.scrollingUp=!1):(this.scrollingUp=!0,this.scrollingDown=!1)},setAffixTop:function(){this.currentState="affix-top",this.currentState!==this.lastState&&(this.emitEvent(),this.removeClasses(),this.$el.classList.remove("affix"),this.$el.classList.add("affix-top"),this.$el.style.top=null)},setAffix:function(){this.currentState="affix",this.$el.style.top="".concat(this.topPadding+this.offset.top,"px"),this.currentState!==this.lastState&&(this.emitEvent(),this.removeClasses(),this.$el.classList.add("affix"))},setAffixBottom:function(){this.currentState="affix-bottom",this.$el.style.top="".concat(this.relativeElement.offsetHeight-this.affixHeight-this.offset.bottom-this.topPadding,"px"),this.currentState!==this.lastState&&(this.emitEvent(),this.removeClasses(),this.$el.classList.add("affix-bottom"))},removeClasses:function(){this.$el.classList.remove("affix-top"),this.$el.classList.remove("affix"),this.$el.classList.remove("affix-bottom")},emitEvent:function(){this.scrollAffix&&this.lastScrollAffixState&&this.currentScrollAffix!==this.lastScrollAffixState&&this.$emit(this.currentScrollAffix.replace("-","")),this.lastState&&this.$emit(this.currentState.replace("-",""))},getOffsetTop:function(t){for(var e=0,i=t;i;)e+=i.offsetTop,i=i.offsetParent;return e}},mounted:function(){this.$el.classList.add("vue-affix"),this.affixInitialTop=this.getOffsetTop(this.$el),this.topPadding=this.affixInitialTop-this.getOffsetTop(this.relativeElement),this.updateData(),this.scrollAffix&&this.initScrollAffix(),this.onScroll(),this.scrollContainer.addEventListener("scroll",this.handleScroll)},beforeDestroy:function(){this.scrollContainer.removeEventListener("scroll",this.handleScroll)}};i(5);var r=function(t,e,i,o,s,n,r,f){var l,a="function"==typeof t?t.options:t;if(e&&(a.render=e,a.staticRenderFns=i,a._compiled=!0),o&&(a.functional=!0),n&&(a._scopeId="data-v-"+n),r?(l=function(t){(t=t||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext)||"undefined"==typeof __VUE_SSR_CONTEXT__||(t=__VUE_SSR_CONTEXT__),s&&s.call(this,t),t&&t._registeredComponents&&t._registeredComponents.add(r)},a._ssrRegister=l):s&&(l=f?function(){s.call(this,this.$root.$options.shadowRoot)}:s),l)if(a.functional){a._injectStyles=l;var c=a.render;a.render=function(t,e){return l.call(e),c(t,e)}}else{var u=a.beforeCreate;a.beforeCreate=u?[].concat(u,l):[l]}return{exports:t,options:a}}(n,o,[],!1,null,null,null);r.options.__file="affix.vue";var f=r.exports;i.d(e,"Affix",function(){return f});var l={install:function(t){l.install.installed||t.component("affix",f)}};"undefined"!=typeof window&&window.Vue&&l.install(window.Vue);e.default=l},,function(t,e,i){"use strict";var o=i(0);i.n(o).a},function(t,e,i){(t.exports=i(1)(!1)).push([t.i,"\n.vue-affix {\n  position: relative;\n}\n.affix {\n  position: fixed;\n}\n.affix-bottom {\n  position: relative;\n}\n",""])}])});
+
+/***/ }),
+
 /***/ "./node_modules/vue-flatpickr-component/dist/vue-flatpickr.min.js":
 /*!************************************************************************!*\
   !*** ./node_modules/vue-flatpickr-component/dist/vue-flatpickr.min.js ***!
@@ -88221,15 +88241,15 @@ var render = function () {
           "data-input": "",
           autocomplete: "off",
           name: _vm.name,
-          config: _vm.config,
+          config: _vm.configLocal,
         },
         on: { "on-change": _vm.onChange },
         model: {
-          value: _vm.date,
+          value: _vm.valueLocal,
           callback: function ($$v) {
-            _vm.date = $$v
+            _vm.valueLocal = $$v
           },
-          expression: "date",
+          expression: "valueLocal",
         },
       }),
       _vm._v(" "),
@@ -88370,6 +88390,421 @@ function normalizeComponent (
     options: options
   }
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-scrollactive/dist/vue-scrollactive.min.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/vue-scrollactive/dist/vue-scrollactive.min.js ***!
+  \********************************************************************/
+/***/ (function(module) {
+
+!(function (t, e) {
+   true
+    ? (module.exports = e())
+    : 0;
+})('undefined' != typeof self ? self : this, function () {
+  return (function (t) {
+    var e = {};
+    function r(n) {
+      if (e[n]) return e[n].exports;
+      var o = (e[n] = { i: n, l: !1, exports: {} });
+      return t[n].call(o.exports, o, o.exports, r), (o.l = !0), o.exports;
+    }
+    return (
+      (r.m = t),
+      (r.c = e),
+      (r.d = function (t, e, n) {
+        r.o(t, e) || Object.defineProperty(t, e, { enumerable: !0, get: n });
+      }),
+      (r.r = function (t) {
+        'undefined' != typeof Symbol &&
+          Symbol.toStringTag &&
+          Object.defineProperty(t, Symbol.toStringTag, { value: 'Module' }),
+          Object.defineProperty(t, '__esModule', { value: !0 });
+      }),
+      (r.t = function (t, e) {
+        if ((1 & e && (t = r(t)), 8 & e)) return t;
+        if (4 & e && 'object' == typeof t && t && t.__esModule) return t;
+        var n = Object.create(null);
+        if (
+          (r.r(n),
+          Object.defineProperty(n, 'default', { enumerable: !0, value: t }),
+          2 & e && 'string' != typeof t)
+        )
+          for (var o in t)
+            r.d(
+              n,
+              o,
+              function (e) {
+                return t[e];
+              }.bind(null, o)
+            );
+        return n;
+      }),
+      (r.n = function (t) {
+        var e =
+          t && t.__esModule
+            ? function () {
+                return t.default;
+              }
+            : function () {
+                return t;
+              };
+        return r.d(e, 'a', e), e;
+      }),
+      (r.o = function (t, e) {
+        return Object.prototype.hasOwnProperty.call(t, e);
+      }),
+      (r.p = '/dist/'),
+      r((r.s = 1))
+    );
+  })([
+    function (t, e) {
+      var r = 'function' == typeof Float32Array;
+      function n(t, e) {
+        return 1 - 3 * e + 3 * t;
+      }
+      function o(t, e) {
+        return 3 * e - 6 * t;
+      }
+      function i(t) {
+        return 3 * t;
+      }
+      function s(t, e, r) {
+        return ((n(e, r) * t + o(e, r)) * t + i(e)) * t;
+      }
+      function l(t, e, r) {
+        return 3 * n(e, r) * t * t + 2 * o(e, r) * t + i(e);
+      }
+      function a(t) {
+        return t;
+      }
+      t.exports = function (t, e, n, o) {
+        if (!(0 <= t && t <= 1 && 0 <= n && n <= 1))
+          throw new Error('bezier x values must be in [0, 1] range');
+        if (t === e && n === o) return a;
+        for (var i = r ? new Float32Array(11) : new Array(11), c = 0; c < 11; ++c)
+          i[c] = s(0.1 * c, t, n);
+        function u(e) {
+          for (var r = 0, o = 1; 10 !== o && i[o] <= e; ++o) r += 0.1;
+          --o;
+          var a = r + 0.1 * ((e - i[o]) / (i[o + 1] - i[o])),
+            c = l(a, t, n);
+          return c >= 0.001
+            ? (function (t, e, r, n) {
+                for (var o = 0; o < 4; ++o) {
+                  var i = l(e, r, n);
+                  if (0 === i) return e;
+                  e -= (s(e, r, n) - t) / i;
+                }
+                return e;
+              })(e, a, t, n)
+            : 0 === c
+            ? a
+            : (function (t, e, r, n, o) {
+                var i,
+                  l,
+                  a = 0;
+                do {
+                  (i = s((l = e + (r - e) / 2), n, o) - t) > 0 ? (r = l) : (e = l);
+                } while (Math.abs(i) > 1e-7 && ++a < 10);
+                return l;
+              })(e, r, r + 0.1, t, n);
+        }
+        return function (t) {
+          return 0 === t ? 0 : 1 === t ? 1 : s(u(t), e, o);
+        };
+      };
+    },
+    function (t, e, r) {
+      'use strict';
+      r.r(e);
+      var n = function () {
+        var t = this.$createElement;
+        return (this._self._c || t)(
+          this.tag,
+          { ref: 'scrollactive-nav-wrapper', tag: 'component', staticClass: 'scrollactive-nav' },
+          [this._t('default')],
+          2
+        );
+      };
+      n._withStripped = !0;
+      var o = r(0),
+        i = r.n(o);
+      function s(t) {
+        return (
+          (function (t) {
+            if (Array.isArray(t)) return l(t);
+          })(t) ||
+          (function (t) {
+            if ('undefined' != typeof Symbol && Symbol.iterator in Object(t)) return Array.from(t);
+          })(t) ||
+          (function (t, e) {
+            if (!t) return;
+            if ('string' == typeof t) return l(t, e);
+            var r = Object.prototype.toString.call(t).slice(8, -1);
+            'Object' === r && t.constructor && (r = t.constructor.name);
+            if ('Map' === r || 'Set' === r) return Array.from(t);
+            if ('Arguments' === r || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r))
+              return l(t, e);
+          })(t) ||
+          (function () {
+            throw new TypeError(
+              'Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.'
+            );
+          })()
+        );
+      }
+      function l(t, e) {
+        (null == e || e > t.length) && (e = t.length);
+        for (var r = 0, n = new Array(e); r < e; r++) n[r] = t[r];
+        return n;
+      }
+      var a = (function (t, e, r, n, o, i, s, l) {
+        var a,
+          c = 'function' == typeof t ? t.options : t;
+        if (
+          (e && ((c.render = e), (c.staticRenderFns = r), (c._compiled = !0)),
+          n && (c.functional = !0),
+          i && (c._scopeId = 'data-v-' + i),
+          s
+            ? ((a = function (t) {
+                (t =
+                  t ||
+                  (this.$vnode && this.$vnode.ssrContext) ||
+                  (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext)) ||
+                  'undefined' == typeof __VUE_SSR_CONTEXT__ ||
+                  (t = __VUE_SSR_CONTEXT__),
+                  o && o.call(this, t),
+                  t && t._registeredComponents && t._registeredComponents.add(s);
+              }),
+              (c._ssrRegister = a))
+            : o &&
+              (a = l
+                ? function () {
+                    o.call(this, (c.functional ? this.parent : this).$root.$options.shadowRoot);
+                  }
+                : o),
+          a)
+        )
+          if (c.functional) {
+            c._injectStyles = a;
+            var u = c.render;
+            c.render = function (t, e) {
+              return a.call(e), u(t, e);
+            };
+          } else {
+            var f = c.beforeCreate;
+            c.beforeCreate = f ? [].concat(f, a) : [a];
+          }
+        return { exports: t, options: c };
+      })(
+        {
+          props: {
+            activeClass: { type: String, default: 'is-active' },
+            offset: { type: Number, default: 20 },
+            scrollOffset: { type: Number, default: null },
+            scrollContainerSelector: { type: String, default: '' },
+            clickToScroll: { type: Boolean, default: !0 },
+            duration: { type: Number, default: 600 },
+            alwaysTrack: { type: Boolean, default: !1 },
+            bezierEasingValue: { type: String, default: '.5,0,.35,1' },
+            modifyUrl: { type: Boolean, default: !0 },
+            exact: { type: Boolean, default: !1 },
+            highlightFirstItem: { type: Boolean, default: !1 },
+            tag: { type: String, default: 'nav' },
+            scrollOnStart: { type: Boolean, default: !0 },
+          },
+          data: function () {
+            return {
+              observer: null,
+              items: [],
+              currentItem: null,
+              lastActiveItem: null,
+              scrollAnimationFrame: null,
+              bezierEasing: i.a,
+            };
+          },
+          computed: {
+            cubicBezierArray: function () {
+              return this.bezierEasingValue.split(',');
+            },
+            scrollContainer: function () {
+              var t = window;
+              return (
+                this.scrollContainerSelector &&
+                  (t = document.querySelector(this.scrollContainerSelector) || window),
+                t
+              );
+            },
+          },
+          mounted: function () {
+            var t = window.MutationObserver || window.WebKitMutationObserver;
+            this.observer ||
+              ((this.observer = new t(this.initScrollactiveItems)),
+              this.observer.observe(this.$refs['scrollactive-nav-wrapper'], {
+                childList: !0,
+                subtree: !0,
+              })),
+              this.initScrollactiveItems(),
+              this.removeActiveClass(),
+              (this.currentItem = this.getItemInsideWindow()),
+              this.currentItem && this.currentItem.classList.add(this.activeClass),
+              this.scrollOnStart && this.scrollToHashElement(),
+              this.scrollContainer.addEventListener('scroll', this.onScroll);
+          },
+          updated: function () {
+            this.initScrollactiveItems();
+          },
+          beforeDestroy: function () {
+            this.scrollContainer.removeEventListener('scroll', this.onScroll),
+              window.cancelAnimationFrame(this.scrollAnimationFrame);
+          },
+          methods: {
+            onScroll: function (t) {
+              (this.currentItem = this.getItemInsideWindow()),
+                this.currentItem !== this.lastActiveItem &&
+                  (this.removeActiveClass(),
+                  this.$emit('itemchanged', t, this.currentItem, this.lastActiveItem),
+                  (this.lastActiveItem = this.currentItem)),
+                this.currentItem && this.currentItem.classList.add(this.activeClass);
+            },
+            getItemInsideWindow: function () {
+              var t,
+                e = this;
+              return (
+                [].forEach.call(this.items, function (r) {
+                  var n = r === e.items[0],
+                    o = document.getElementById(decodeURI(r.hash.substr(1)));
+                  if (o) {
+                    var i = e.scrollContainer.scrollTop || window.pageYOffset,
+                      s = i >= e.getOffsetTop(o) - e.offset,
+                      l = i < e.getOffsetTop(o) - e.offset + o.offsetHeight;
+                    n && e.highlightFirstItem && l && (t = r),
+                      e.exact && s && l && (t = r),
+                      !e.exact && s && (t = r);
+                  }
+                }),
+                t
+              );
+            },
+            initScrollactiveItems: function () {
+              var t = this;
+              (this.items = this.$el.querySelectorAll('.scrollactive-item')),
+                this.clickToScroll
+                  ? [].forEach.call(this.items, function (e) {
+                      e.addEventListener('click', t.handleClick);
+                    })
+                  : [].forEach.call(this.items, function (e) {
+                      e.removeEventListener('click', t.handleClick);
+                    });
+            },
+            setScrollactiveItems: function () {
+              this.initScrollactiveItems();
+            },
+            handleClick: function (t) {
+              var e = this;
+              t.preventDefault();
+              var r = t.currentTarget.hash,
+                n = document.getElementById(decodeURI(r.substr(1)));
+              n
+                ? (this.alwaysTrack ||
+                    (this.scrollContainer.removeEventListener('scroll', this.onScroll),
+                    window.cancelAnimationFrame(this.scrollAnimationFrame),
+                    this.removeActiveClass(),
+                    t.currentTarget.classList.add(this.activeClass)),
+                  this.scrollTo(n).then(function () {
+                    if (!e.alwaysTrack) {
+                      e.scrollContainer.addEventListener('scroll', e.onScroll);
+                      (e.currentItem = [].find.call(e.items, function (t) {
+                        return decodeURI(t.hash.substr(1)) === n.id;
+                      })),
+                        e.currentItem !== e.lastActiveItem &&
+                          (e.$emit('itemchanged', null, e.currentItem, e.lastActiveItem),
+                          (e.lastActiveItem = e.currentItem));
+                    }
+                    e.modifyUrl && e.pushHashToUrl(r);
+                  }))
+                : console.warn(
+                    "[vue-scrollactive] Element '".concat(
+                      r,
+                      "' was not found. Make sure it is set in the DOM."
+                    )
+                  );
+            },
+            scrollTo: function (t) {
+              var e = this;
+              return new Promise(function (r) {
+                var n = e.getOffsetTop(t),
+                  o = e.scrollContainer.scrollTop || window.pageYOffset,
+                  i = n - o,
+                  l = e.bezierEasing.apply(e, s(e.cubicBezierArray)),
+                  a = null;
+                window.requestAnimationFrame(function t(n) {
+                  a || (a = n);
+                  var s = n - a,
+                    c = s / e.duration;
+                  s >= e.duration && (s = e.duration), c >= 1 && (c = 1);
+                  var u = e.scrollOffset || e.offset,
+                    f = o + l(c) * (i - u);
+                  e.scrollContainer.scrollTo(0, f),
+                    s < e.duration
+                      ? (e.scrollAnimationFrame = window.requestAnimationFrame(t))
+                      : r();
+                });
+              });
+            },
+            getOffsetTop: function (t) {
+              for (var e = 0, r = t; r; ) (e += r.offsetTop), (r = r.offsetParent);
+              return this.scrollContainer.offsetTop && (e -= this.scrollContainer.offsetTop), e;
+            },
+            removeActiveClass: function () {
+              var t = this;
+              [].forEach.call(this.items, function (e) {
+                e.classList.remove(t.activeClass);
+              });
+            },
+            scrollToHashElement: function () {
+              var t = this,
+                e = window.location.hash;
+              if (e) {
+                var r = document.querySelector(decodeURI(e));
+                r &&
+                  ((window.location.hash = ''),
+                  setTimeout(function () {
+                    var n = r.offsetTop - t.offset;
+                    t.scrollContainer.scrollTo(0, n), t.pushHashToUrl(e);
+                  }, 0));
+              }
+            },
+            pushHashToUrl: function (t) {
+              window.history.pushState
+                ? window.history.pushState(null, null, t)
+                : (window.location.hash = t);
+            },
+          },
+        },
+        n,
+        [],
+        !1,
+        null,
+        null,
+        null
+      );
+      a.options.__file = 'src/scrollactive.vue';
+      var c = a.exports,
+        u = {
+          install: function (t) {
+            u.install.installed || t.component('scrollactive', c);
+          },
+        };
+      'undefined' != typeof window && window.Vue && u.install(window.Vue);
+      e.default = u;
+    },
+  ]);
+});
 
 
 /***/ }),

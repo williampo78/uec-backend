@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-class MoneyAmountService
+class MoneyAmount
 {
     /**
      * 原幣金額
@@ -51,28 +51,65 @@ class MoneyAmountService
      *
      * @var float
      */
-    private $exchangeRate = 1;
+    private $exchangeRate;
 
     /**
      * 單價
      *
      * @var float
      */
-    private $unitPrice = 0;
+    private $unitPrice;
 
     /**
      * 數量
      *
      * @var integer
      */
-    private $quantity = 0;
+    private $quantity;
 
     /**
      * 稅別
      *
      * @var string|integer
      */
-    private $taxType = 'TAXABLE';
+    private $taxType;
+
+    public function __construct(float $unitPrice = 0, int $quantity = 0, $taxType = 'TAXABLE', float $exchangeRate = 1)
+    {
+        $this->unitPrice = $unitPrice;
+        $this->quantity = $quantity;
+        $this->taxType = $taxType;
+        $this->exchangeRate = $exchangeRate;
+    }
+
+    /**
+     * create instance
+     *
+     * @param float $unitPrice
+     * @param integer $quantity
+     * @param string|integer $taxType
+     * @param float $exchangeRate
+     * @return static
+     */
+    public static function make(float $unitPrice = 0, int $quantity = 0, $taxType = 'TAXABLE', float $exchangeRate = 1)
+    {
+        return new static($unitPrice, $quantity, $taxType, $exchangeRate);
+    }
+
+    /**
+     * create local instance
+     *
+     * @param float $price
+     * @param string|integer $taxType
+     * @return static
+     */
+    public static function makeByPrice(float $price, $taxType = 'TAXABLE')
+    {
+        $moneyAmount = new static(0, 0, $taxType);
+        $moneyAmount->price = $price;
+
+        return $moneyAmount;
+    }
 
     /**
      * Get the value of originalPrice
@@ -297,17 +334,46 @@ class MoneyAmountService
     }
 
     /**
-     * 計算所有金額
+     * 計算金額
      *
-     * @return void
+     * @param string $type all(全部), original(原幣), local(本幣)
+     * @param boolean $hasPrice
+     * @return self
      */
-    public function calculateAll()
+    public function calculate(string $type = 'all', bool $hasPrice = false): self
     {
-        $this->calculateOriginalPrice()
-            ->calculateOriginalNontaxPrice()
-            ->calculateOriginalTaxPrice()
-            ->calculatePrice()
-            ->calculateNontaxPrice()
-            ->calculateTaxPrice();
+        switch ($type) {
+            case 'original':
+                if (!$hasPrice) {
+                    $this->calculateOriginalPrice();
+                }
+
+                $this->calculateOriginalNontaxPrice()
+                    ->calculateOriginalTaxPrice();
+                break;
+
+            case 'local':
+                if (!$hasPrice) {
+                    $this->calculatePrice();
+                }
+
+                $this->calculateNontaxPrice()
+                    ->calculateTaxPrice();
+                break;
+
+            default:
+                if (!$hasPrice) {
+                    $this->calculateOriginalPrice()
+                        ->calculatePrice();
+                }
+
+                $this->calculateOriginalNontaxPrice()
+                    ->calculateOriginalTaxPrice()
+                    ->calculateNontaxPrice()
+                    ->calculateTaxPrice();
+                break;
+        }
+
+        return $this;
     }
 }
