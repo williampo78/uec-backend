@@ -366,10 +366,11 @@ class MemberController extends Controller
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'discount_content' => [],
                 ];
-                if ($orderDetail->product->productPhotos->isNotEmpty()) {
-                    $productPhoto = $orderDetail->product->productPhotos->first();
-                    $orderDetailPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
-                }
+
+                //商品圖 以規格圖為優先，否則取商品封面圖
+                $productPhoto = empty(optional($orderDetail->productItem)->photo_name) ? optional($orderDetail->product->productPhotos->first())->photo_name : optional($orderDetail->productItem)->photo_name;
+                $orderDetailPayload['photo_url'] = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
+
                 $payload['results']['order_details'][] = $orderDetailPayload;
                 $payload['results']['product_totals'] += 1;
             } else {
