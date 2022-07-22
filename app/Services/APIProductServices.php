@@ -1659,4 +1659,85 @@ class APIProductServices
 
         return $result;
     }
+
+    /*
+     * 回傳有效上架商品
+     */
+    public function getEffectProduct($keywords)
+    {
+        $s3 = config('filesystems.disks.s3.url');
+        $now = Carbon::now();
+        $data = [];
+        $keywords = explode(',', $keywords);
+        //產品主檔基本資訊
+        $product = self::getProducts();
+        $promotion = self::getPromotion('product_card');
+        foreach ($keywords as $id) {
+            if (!key_exists($id, $product)) continue;   //不存在的商品
+            if (strtotime($now) > strtotime($product[$id]->end_launched_at)) continue; //此商品已被下架
+            $product_categorys = self::getWebCategoryProducts('', '', '', '', $id, '', '');
+            if (sizeof($product_categorys) == 0) continue;  //此商品沒有前台分類
+
+            //促銷小標
+            if ($now >= $product[$id]->promotion_start_at && $now <= $product[$id]->promotion_end_at) {
+                $promotional = $product[$id]->promotion_desc;
+            } else {
+                $promotional = null;
+            }
+            if (isset($product[$id])) {
+                $collection = false;
+                $promotional = [];
+                if ($now >= $product[$id]->promotion_start_at && $now <= $product[$id]->promotion_end_at) {
+                    $promotion_desc = $product[$id]->promotion_desc;
+                } else {
+                    $promotion_desc = null;
+                }
+
+                $login = Auth::guard('api')->check();
+                $is_collection = [];
+                if ($login) {
+                    $member_id = Auth::guard('api')->user()->member_id;
+                    if ($member_id > 0) {
+                        $response = $this->apiWebService->getMemberCollections();
+                        $is_collection = json_decode($response, true);
+                    }
+                }
+
+                if (isset($promotion[$id])) {
+                    $promotion_txt = '';
+                    foreach ($promotion[$id] as $k => $Label) { //取活動標籤
+                        if ($Label->promotional_label == '') continue;
+                        if ($promotion_txt != $Label->promotional_label) {
+                            $promotional[] = $Label->promotional_label;
+                            $promotion_txt = $Label->promotional_label;
+                        }
+                    }
+                }
+
+                if (isset($is_collection)) {
+                    foreach ($is_collection as $k => $v) {
+                        if ($v['product_id'] == $id) {
+                            $collection = true;
+                        }
+                    }
+                }
+                $data[] = array(
+                    "product_id" => $id,
+                    "product_no" => $product[$id]->product_no,
+                    "product_name" => $product[$id]->product_name,
+                    "product_unit" => $product[$id]->uom,
+                    "product_photo" => ($product[$id]->displayPhoto ? $s3 . $product[$id]->displayPhoto : null),
+                    "selling_price" => intval($product[$id]->selling_price),
+                    "list_price" => intval($product[$id]->list_price),
+                    'promotion_desc' => $promotion_desc,
+                    "promotion_label" => $promotional,
+                    "collection" => $collection,
+                    "selling_channel" => $product[$id]->selling_channel,
+                    "start_selling" => $product[$id]->start_selling_at
+                );
+            }
+        }
+
+        return $data;
+    }
 }

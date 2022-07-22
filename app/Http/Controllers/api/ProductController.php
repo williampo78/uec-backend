@@ -389,4 +389,41 @@ class ProductController extends Controller
 
     }
 
+    /*
+     * 前台最近瀏覽商品
+     * 回傳有效上架商品
+     */
+    public function getEffectProduct(Request $request)
+    {
+
+        $error_code = $this->apiService->getErrorCode();
+
+        $messages = [
+            'product.required' => '產品編號不能為空'
+        ];
+
+
+        $v = Validator::make($request->all(), [
+            'product' => 'required'
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+
+        $keyword = ($request['product'] ? $request['product'] : '');
+        $result = $this->apiProductService->getEffectProduct($keyword);
+        if ($result == '404') {
+            $status = false;
+            $err = '404';
+            $list = [];
+        } else {
+            $status = true;
+            $err = '';
+            $list = $result;
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+
+    }
+
 }
