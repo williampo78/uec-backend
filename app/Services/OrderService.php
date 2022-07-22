@@ -358,7 +358,7 @@ class OrderService
             'promotionalCampaignThreshold',
             'product',
             'productItem' => function($query){
-                $query->select(['id', 'spec_1_value', 'spec_2_value']);
+                $query->select(['id', 'spec_1_value', 'spec_2_value', 'photo_name']);
             },
             'product.productPhotos' => function ($query) {
                 $query->orderBy('sort', 'asc');
@@ -405,13 +405,17 @@ class OrderService
                 //送禮
                 if ($obj->promotionalCampaign->category_code == 'GIFT' && $obj->record_identity !== 'M') {
 
+                    //商品圖 以規格圖為優先，否則取商品封面圖
+                    $productPhoto = empty(optional($obj->productItem)->photo_name) ? $obj->product->productPhotos[0]->photo_name : optional($obj->productItem)->photo_name;
+                    $productPhoto = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
+
                     $cart['gift'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
                     $cart['gift'][$obj->group_seq]['campaignName'] = $obj->promotionalCampaign->campaign_name;
                     $cart['gift'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                     $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaign->campaign_brief;
                     $cart['gift'][$obj->group_seq]['thresholdCampaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
                     $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
-                        'productPhoto' => config('filesystems.disks.s3.url') . $obj->product->productPhotos[0]->photo_name,
+                        'productPhoto' => $productPhoto,
                         'productId' => $obj->product->id,
                         'productName' => $obj->product->product_name,
                         'assignedQty' => $giveaway_qty[$obj->order_detail_id] ?? 0 ,
@@ -462,7 +466,7 @@ class OrderService
                 'promotionalCampaignThreshold',
             ])
                 ->with(['productItem' => function($query){
-                    $query->select(['id', 'spec_1_value', 'spec_2_value']);
+                    $query->select(['id', 'spec_1_value', 'spec_2_value', 'photo_name']);
                 }])
                 ->with(['product' => function ($query) {
                     $query->with(['productPhotos' => function ($query) {
@@ -489,8 +493,9 @@ class OrderService
 
             foreach($findProductPRD_G as $PRD){
 
-                $photo_name = optional($PRD->product->productPhotos->first())->photo_name;
-                $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
+                //商品圖 以規格圖為優先，否則取商品封面圖
+                $productPhoto = empty(optional($PRD->productItem)->photo_name) ? optional($PRD->product->productPhotos->first())->photo_name : optional($PRD->productItem)->photo_name;
+                $productPhoto = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
 
                 if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
                     $order_details[$key]['discount_content'][$PRD->group_seq] = [
@@ -502,7 +507,7 @@ class OrderService
                             [
                                 'productId' => $PRD->product->id,
                                 'productName' => $PRD->product->product_name,
-                                'productPhoto' => $photo_name,
+                                'productPhoto' => $productPhoto,
                                 'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty,
                                 'spec_1_value' => optional($PRD->productItem)->spec_1_value,
                                 'spec_2_value' => optional($PRD->productItem)->spec_2_value
@@ -513,7 +518,7 @@ class OrderService
                     $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][]= [
                         'productId' => $PRD->product->id,
                         'productName' => $PRD->product->product_name,
-                        'productPhoto' => $photo_name,
+                        'productPhoto' => $productPhoto,
                         'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty,
                         'spec_1_value' => optional($PRD->productItem)->spec_1_value,
                         'spec_2_value' => optional($PRD->productItem)->spec_2_value
