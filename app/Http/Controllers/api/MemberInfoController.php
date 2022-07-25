@@ -102,6 +102,7 @@ class MemberInfoController extends Controller
                 $data['districtId'] = $result['data']['districtId'];
                 $data['districtName'] = $result['data']['districtName'];
                 $data['address'] = $result['data']['address'];
+                $data['recommendSource'] = $result['data']['recommendSource'];
                 return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
             } else {
                 $err = $result['status'];
