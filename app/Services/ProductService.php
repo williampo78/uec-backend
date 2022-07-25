@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\CategoryHierarchy;
+use App\Models\WebCategoryHierarchy;
 use App\Models\CategoryProduct;
 use App\Models\Product;
 use App\Models\ProductAttribute;
@@ -892,7 +892,7 @@ class ProductService
      */
     public function checkProductReady($in)
     {
-        $count = CategoryHierarchy::select('web_category_products.*')
+        $count = WebCategoryHierarchy::select('web_category_products.*')
             ->Join('web_category_products', 'web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.id')
             ->where('web_category_products.product_id', $in['product_id'])
             ->count();

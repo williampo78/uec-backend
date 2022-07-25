@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     /**
@@ -6,7 +7,7 @@ return [
      *   指定為2時，中分類清單不顯示﹝展小類﹞的按鈕
      *   指定為3時，中分類清單顯示﹝展小類﹞的按鈕
      */
-    'web_category_hierarchy_levels' => env('UEC_CATEGORY_LEVEL','2'),
+    'web_category_hierarchy_levels' => env('UEC_CATEGORY_LEVEL', '2'),
 
     'config_key' => 'EC_WAREHOUSE_GOODS',
 
@@ -278,5 +279,5 @@ return [
     ],
 
     //購物車滿額折扣，攤提回單品計算
-    'cart_p_discount_split'=> 1,
+    'cart_p_discount_split' => 1,
 ];

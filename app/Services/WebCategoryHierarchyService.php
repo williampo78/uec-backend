@@ -2,27 +2,28 @@
 
 namespace App\Services;
 
-use App\Models\CategoryHierarchy;
 use App\Models\CategoryProduct;
+use App\Models\WebCategoryHierarchy;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use ImageUpload ;
+use ImageUpload;
+
 class WebCategoryHierarchyService
 {
-    public function __construct()
-    {
+    private const CATEGORY_UPLOAD_PATH_PREFIX = 'category_icon/';
 
-    }
     /*
      * parent_id = null 取出大分類
      */
     public function web_Category_Hierarchy_Bylevel($parent_id = null)
     {
-        return CategoryHierarchy::where('parent_id', $parent_id)->orderBy('sort', 'ASC')->get();
+        return WebCategoryHierarchy::where('parent_id', $parent_id)->orderBy('sort', 'ASC')->get();
     }
-    public function add_Category_Hierarchy($in,$file)
+
+    public function add_Category_Hierarchy($in, $file)
     {
         $now = Carbon::now();
         $agent_id = Auth::user()->agent_id;
@@ -30,8 +31,8 @@ class WebCategoryHierarchyService
         DB::beginTransaction();
 
         try {
-            if($in['parent_id'] == 'null'){
-                $in['parent_id'] = null ;
+            if ($in['parent_id'] == 'null') {
+                $in['parent_id'] = null;
             }
             $insert['parent_id'] = $in['parent_id']; //父ID
             $insert['category_level'] = $in['category_level']; // 階級
@@ -43,65 +44,71 @@ class WebCategoryHierarchyService
             $insert['updated_by'] = $user_id;
             $insert['created_at'] = $now;
             $insert['updated_at'] = $now;
-            if($in['category_level'] == '1'){
+            if ($in['category_level'] == '1') {
                 $insert['category_short_name'] = $in['category_short_name'];
                 $insert['gross_margin_threshold'] = $in['gross_margin_threshold'];
             }
-            $CategoryHierarchy = CategoryHierarchy::create($insert);
-            if(!empty($file)){
-                $uploadPath = 'category_icon/'.$CategoryHierarchy->id;
+            $CategoryHierarchy = WebCategoryHierarchy::create($insert);
+            if (!empty($file)) {
+                $uploadPath = 'category_icon/' . $CategoryHierarchy->id;
                 $uploadFileResult = ImageUpload::uploadImage($file['image'], $uploadPath, 'category_icon');
-                CategoryHierarchy::where('id',$CategoryHierarchy->id)->update(['icon_name'=>$uploadFileResult['image']]);
+                WebCategoryHierarchy::where('id', $CategoryHierarchy->id)->update(['icon_name' => $uploadFileResult['image']]);
             }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             Log::info($e);
+
             return false;
         }
-        $result = new CategoryHierarchy ;
-        if(!is_null($in['parent_id'])){
-           $result = $result->where('parent_id',$in['parent_id']);
+        $result = new WebCategoryHierarchy;
+        if (!is_null($in['parent_id'])) {
+            $result = $result->where('parent_id', $in['parent_id']);
         }
+
         return $result->get();
     }
-    public function edit_Category_Hierarchy($in,$file)
+
+    public function edit_Category_Hierarchy($in, $file)
     {
         $now = Carbon::now();
         $agent_id = Auth::user()->agent_id;
         $user_id = Auth::user()->id;
         try {
             DB::beginTransaction();
-            if($in['parent_id'] == 'null'){
-                $in['parent_id'] = null ;
+            if ($in['parent_id'] == 'null') {
+                $in['parent_id'] = null;
             }
             $insert['category_name'] = $in['category_name'];
             $insert['content_type'] = $in['content_type'];
-            if($in['category_level'] == '1'){
+            if ($in['category_level'] == '1') {
                 $insert['category_short_name'] = $in['category_short_name'];
                 $insert['gross_margin_threshold'] = $in['gross_margin_threshold'];
             }
-            if(!empty($file)){
-                $uploadPath = 'category_icon/'.$in['id'];
+            if (!empty($file)) {
+                $uploadPath = 'category_icon/' . $in['id'];
                 $uploadFileResult = ImageUpload::uploadImage($file['image'], $uploadPath, 'category_icon');
-                CategoryHierarchy::where('id',$in['id'])->update(['icon_name'=>$uploadFileResult['image']]);
+                WebCategoryHierarchy::where('id', $in['id'])->update(['icon_name' => $uploadFileResult['image']]);
             }
             $insert['updated_by'] = $user_id;
             $insert['updated_at'] = $now;
-            CategoryHierarchy::where('id', $in['id'])->update($insert);
+            WebCategoryHierarchy::where('id', $in['id'])->update($insert);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             Log::info($e);
+
             return false;
         }
-        return CategoryHierarchy::where('parent_id', $in['parent_id'])->orderBy('sort', 'ASC')->get();
+
+        return WebCategoryHierarchy::where('parent_id', $in['parent_id'])->orderBy('sort', 'ASC')->get();
     }
+
     public function del_Category_Hierarchy($in)
     {
         $resut = [];
         $CategoryProductsCount = CategoryProduct::where('web_category_hierarchy_id', $in['id'])->get()->count();
-        $CategoryHierarchyCount = CategoryHierarchy::where('parent_id', $in['id'])->get()->count();
+        $CategoryHierarchyCount = WebCategoryHierarchy::where('parent_id', $in['id'])->get()->count();
         $resut['Msg_Hierarchy'] = '';
         $resut['Msg_Products'] = '';
         $resut['Msg'] = '';
@@ -116,24 +123,28 @@ class WebCategoryHierarchyService
             $resut['status'] = false;
         }
         if ($resut['status']) {
-            CategoryHierarchy::where('id', $in['id'])->delete();
+            WebCategoryHierarchy::where('id', $in['id'])->delete();
             $resut['status'] = true;
             $resut['Msg'] = '刪除成功';
         }
+
         return $resut;
     }
+
     public function sort_Category_Hierarchy($in)
     {
         $sort = json_decode($in['JsonData'], true);
         foreach ($sort as $key => $val) {
-            CategoryHierarchy::where('id', $val['id'])->update(['sort' => $key]);
+            WebCategoryHierarchy::where('id', $val['id'])->update(['sort' => $key]);
         }
+
         return true;
     }
+
     public function getSort($in)
     {
 
-        $query = CategoryHierarchy::where('parent_id', $in['parent_id'])
+        $query = WebCategoryHierarchy::where('parent_id', $in['parent_id'])
             ->where('category_level', $in['category_level'])
             ->orderBy('sort', 'desc')
             ->first();
@@ -141,8 +152,10 @@ class WebCategoryHierarchyService
         if ($query !== null) {
             $sort = $query->sort += 1;
         }
+
         return $sort;
     }
+
     //取得開關分類判斷輸出內容
     public function getCategoryHierarchyContents($input = [])
     {
@@ -156,8 +169,8 @@ class WebCategoryHierarchyService
             $where .= " AND active = " . $input['active'];
         }
 
-        if(isset($input['exclude_content_type']) && $input['exclude_content_type']){
-            $where .= " AND content_type <> " . $input['exclude_content_type'] ;
+        if (isset($input['exclude_content_type']) && $input['exclude_content_type']) {
+            $where .= " AND content_type <> " . $input['exclude_content_type'];
         }
         if ($confi_levels == 2) {
             if (isset($input['keyword']) && $input['keyword'] !== '') {
@@ -183,27 +196,33 @@ class WebCategoryHierarchyService
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 " . $where . ") level_three ON level_three.parent_id = level_two.id
             " . $keyword . " ORDER BY level_one.category_name, level_two.category_name , level_three.category_name";
         }
+
         return DB::select($query);
     }
+
     public function categoryProductsHierarchyId($id)
     {
         $result = CategoryProduct::where('web_category_hierarchy_id', $id)
             ->join('products_v', 'products_v.id', '=', 'web_category_products.product_id')
             ->select('web_category_products.id as web_category_products_id', 'web_category_products.product_id as product_id', 'products_v.*')
             ->get();
+
         return $result;
     }
+
     public function categoryProductsId($id)
     {
         $confi_levels = config('uec.web_category_hierarchy_levels');
         $result = CategoryProduct::where('web_category_products.product_id', $id)
             ->leftJoin('web_category_hierarchy', 'web_category_hierarchy.id', '=', 'web_category_products.web_category_hierarchy_id')
-            ->select('web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.category_name', 'web_category_products.sort','web_category_hierarchy.active')
-            ->where('web_category_hierarchy.category_level',$confi_levels)
+            ->select('web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.category_name', 'web_category_products.sort', 'web_category_hierarchy.active')
+            ->where('web_category_hierarchy.category_level', $confi_levels)
             ->orderBy('web_category_products.sort', 'ASC')
             ->get();
+
         return $result;
     }
+
     public function get_products_v($in)
     {
         $agent_id = Auth::user()->agent_id;
@@ -241,8 +260,10 @@ class WebCategoryHierarchyService
         if (isset($in['selling_price_min']) && $in['selling_price_min'] !== '') {
             $query->where('products_v.selling_price', '<=', $in['selling_price_min']);
         }
+
         return $query->get();
     }
+
     public function edit_category_hierarchy_content($in, $id)
     {
         $result = false;
@@ -252,7 +273,7 @@ class WebCategoryHierarchyService
 
         DB::beginTransaction();
         try {
-            CategoryHierarchy::where('id', $id)->update([
+            WebCategoryHierarchy::where('id', $id)->update([
                 'active' => $in['active'],
                 'meta_title' => $in['meta_title'],
                 'meta_description' => $in['meta_description'],
@@ -280,6 +301,7 @@ class WebCategoryHierarchyService
             Log::info($e);
             $result = false;
         }
+
         return $result;
     }
 
@@ -292,10 +314,12 @@ class WebCategoryHierarchyService
     {
         return DB::table('web_category_products')->where('web_category_hierarchy_id', $in['category_id'])->where('product_id', $in['product_id'])->delete();
     }
+
     public function DelRelatedProducts($id)
     {
         return DB::table('related_products')->where('id', $id)->delete();
     }
+
     public function getRomotionalCampaigns($in)
     {
         $now = Carbon::now();
@@ -311,30 +335,104 @@ class WebCategoryHierarchyService
 
         if (!empty($in['promotional_campaigns_key_word'])) {
             $promotionalCampaigns->Where('campaign_name', 'like', '%' . $in['promotional_campaigns_key_word'] . '%')
-            ->orWhere('campaign_brief', 'like', '%' . $in['promotional_campaigns_key_word'] . '%');
+                ->orWhere('campaign_brief', 'like', '%' . $in['promotional_campaigns_key_word'] . '%');
         }
 
         if (!empty($in['id'])) {
             $promotionalCampaigns->where('id', $in['id']);
         };
+
         return $promotionalCampaigns->get();
     }
-    public  function del_icon_photo($id){
-        $CategoryHierarchy = CategoryHierarchy::where('id',$id)->first();
-        if($CategoryHierarchy->icon_name){
+
+    public function del_icon_photo($id)
+    {
+        $CategoryHierarchy = WebCategoryHierarchy::where('id', $id)->first();
+        if ($CategoryHierarchy->icon_name) {
             ImageUpload::DelPhoto($CategoryHierarchy->icon_name);
-            $CategoryHierarchy->icon_name = null ;
+            $CategoryHierarchy->icon_name = null;
             $CategoryHierarchy->save();
         }
-        return true ;
+
+        return true;
     }
-    public function check_icon_name($id){
-        $CategoryHierarchy = CategoryHierarchy::where('id',$id)->first();
-        if($CategoryHierarchy->icon_name){
-            return true ;
-        }else{
+
+    public function check_icon_name($id)
+    {
+        $CategoryHierarchy = WebCategoryHierarchy::where('id', $id)->first();
+        if ($CategoryHierarchy->icon_name) {
+            return true;
+        } else {
             return false;
         }
     }
 
+    /**
+     * 取得指定階層的同一層分類
+     *
+     * @param integer $level
+     * @return Collection
+     */
+    public function getSiblingCategoriesByLevel(int $level): Collection
+    {
+        return WebCategoryHierarchy::where('category_level', $level)
+            ->defaultOrder()
+            ->get();
+    }
+
+    /**
+     * 新增分類
+     *
+     * @param array $data
+     * @return array
+     */
+    public function createCategory(array $data): array
+    {
+        $user = auth()->user();
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try {
+            // 根節點
+            if ($data['category_level'] < 2) {
+                $createdCategory = WebCategoryHierarchy::create([
+                    'agent_id' => $user->agent_id,
+                    'category_name' => $data['category_name'],
+                    'category_level' => $data['category_level'],
+                    'gross_margin_threshold' => $data['gross_margin_threshold'],
+                    'category_short_name' => $data['category_short_name'],
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                ]);
+
+                if (!empty($data['icon_name'])) {
+                    $uploadPath = self::CATEGORY_UPLOAD_PATH_PREFIX . $createdCategory->id;
+                    $uploadFileResult = ImageUpload::uploadImage($data['icon_name'], $uploadPath, 'category_icon');
+                    $createdCategory->update([
+                        'icon_name' => $uploadFileResult['image'],
+                    ]);
+                }
+            } else {
+                $parentCategory = WebCategoryHierarchy::findOrFail($data['parent_id']);
+                $createdCategory = $parentCategory->children()->create([
+                    'agent_id' => $user->agent_id,
+                    'category_name' => $data['category_name'],
+                    'category_level' => $data['category_level'],
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                ]);
+            }
+
+            DB::commit();
+            $isSuccess = true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+        }
+
+        return [
+            'is_success' => $isSuccess,
+            'category' => $createdCategory ?? null,
+        ];
+    }
 }

@@ -23,9 +23,7 @@
 @endsection
 
 @section('content')
-    <!--新增-->
     <div id="page-wrapper">
-        <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
                 <h1 class="page-header"><i class="fa-solid fa-list"></i> 廣告上架管理</h1>
@@ -35,7 +33,6 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default">
-                    <!-- 功能按鈕 -->
                     <div class="panel-heading">
                         <form id="search-form" class="form-horizontal" method="GET" action="">
                             <div class="row">
@@ -51,7 +48,8 @@
                                                     @foreach ($ad_slots as $ad_slot)
                                                         <option value='{{ $ad_slot->id }}'
                                                             {{ $ad_slot->id == request()->input('slot_id') ? 'selected' : '' }}>
-                                                            【{{ $ad_slot->slot_code }}】{{ $ad_slot->slot_desc }}</option>
+                                                            【{{ $ad_slot->slot_code }}】{{ $ad_slot->slot_desc }}
+                                                        </option>
                                                     @endforeach
                                                 @endisset
                                             </select>

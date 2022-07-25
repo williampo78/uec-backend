@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Kalnoy\Nestedset\NodeTrait;
 
 class WebCategoryHierarchy extends Model
 {
-    use HasFactory;
+    use HasFactory, NodeTrait;
 
     protected $table = 'web_category_hierarchy';
     protected $guarded = [];
