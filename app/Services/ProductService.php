@@ -2,28 +2,29 @@
 
 namespace App\Services;
 
-use App\Models\CategoryHierarchy;
-use App\Models\CategoryProduct;
+use Batch;
+use ImageUpload;
+use Carbon\Carbon;
 use App\Models\Product;
-use App\Models\ProductAttribute;
-use App\Models\ProductAuditLog;
+use App\Models\Products;
 use App\Models\ProductItem;
 use App\Models\ProductPhoto;
-use App\Models\ProductReviewLog;
-use App\Models\Products;
-use App\Models\ProductSpecInfo;
 use App\Models\PromotionalCampaignProduct;
 use App\Models\RelatedProduct;
 use App\Models\WarehouseStock;
+use App\Models\CategoryProduct;
+use App\Models\ProductAuditLog;
+use App\Models\ProductSpecInfo;
+use App\Models\ProductAttribute;
+use App\Models\ProductReviewLog;
+use App\Models\CategoryHierarchy;
 use App\Services\UniversalService;
-use Batch;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\PromotionalCampaign;
 use Illuminate\Support\Facades\Log;
-use ImageUpload;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 class ProductService
 {
     private $universalService;
@@ -1405,5 +1406,38 @@ class ProductService
             ['start_at', 'desc'],
         ]);
         return $result ;
+    }	
+    /*
+     * checkProductInCampaignIsset function
+     * 檢查是否存在
+     * @param [int] $product_id
+     * @return bool
+     */
+    public function checkProductInCampaignIsset($product_id){
+        //C002
+        $campaigns = PromotionalCampaign::with(['campaignType'])
+        ->whereIn('level_code', ['PRD','CART_P']);
+
+        $campaigns = $campaigns->where(function ($query) {
+            $query->where('active', 1)
+                ->where('start_at', '<=', now())
+                ->where('end_at', '>=', now());
+        });
+        $campaigns = $campaigns->where(function ($query) use ($product_id) {
+            return $query->whereHas('promotionalCampaignProducts.product', function (Builder $query) use ($product_id) {
+                $query->where('id', $product_id);
+            })
+            ->orWhereHas('promotionalCampaignGiveaways.product', function (Builder $query) use ($product_id) {
+                $query->where('id', $product_id);
+            });
+        });
+
+        $campaigns = $campaigns->get()->count();
+
+        if($campaigns >= 1){
+            return false ;
+        }else{
+            return true ;
+        }
     }
 }

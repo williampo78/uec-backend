@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Services\APIProductServices;
 use App\Services\APIService;
 use App\Services\APIWebService;
 use Illuminate\Http\Request;
@@ -15,11 +16,13 @@ class MemberInfoController extends Controller
 
     public function __construct(
         APIService $apiService,
-        APIWebService $apiWebService
+        APIWebService $apiWebService,
+        APIProductServices $apiProductServices
     )
     {
         $this->apiService = $apiService;
         $this->apiWebService = $apiWebService;
+        $this->apiProductServices = $apiProductServices;
     }
 
     /**
@@ -102,6 +105,7 @@ class MemberInfoController extends Controller
                 $data['districtId'] = $result['data']['districtId'];
                 $data['districtName'] = $result['data']['districtName'];
                 $data['address'] = $result['data']['address'];
+                $data['recommendSource'] = $result['data']['recommendSource'];
                 return response()->json(['status' => true, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $data]);
             } else {
                 $err = $result['status'];
@@ -349,7 +353,9 @@ class MemberInfoController extends Controller
     {
         $err = null;
         $error_code = $this->apiService->getErrorCode();
-        $response = $this->apiWebService->getMemberCollections();
+        $products = $this->apiProductServices->getProducts();
+        $gtm = $this->apiProductServices->getProductItemForGTM($products);
+        $response = $this->apiWebService->getMemberCollections($gtm);
         $result = json_decode($response, true);
         if (count($result) > 0) {
             $status = true;
