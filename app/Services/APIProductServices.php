@@ -412,7 +412,8 @@ class APIProductServices
         $brand .= ($input['brand'] ? $input['brand'] : '');
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
         $product_info = $this->getProducts();
-        $gtm = $this->getProductItemForGTM($product_info);
+        //todo
+        //$gtm = $this->getProductItemForGTM($product_info);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             $promotion_threshold = self::getPromotionThreshold();
@@ -488,8 +489,7 @@ class APIProductServices
                             'collections' => $collection,
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
-                            'start_selling' => $product->start_selling_at,
-                            'gtm' => $gtm[$product->id]
+                            'start_selling' => $product->start_selling_at
                         );
 
                         $product_id = $product->id;
@@ -1179,7 +1179,8 @@ class APIProductServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->getProducts();
-        $gtm = $this->getProductItemForGTM($products);
+        //todo
+        //$gtm = $this->getProductItemForGTM($products);
         $id = $input['event'];
         $page = $input['page'];
         $size = $input['size'];
@@ -1259,8 +1260,7 @@ class APIProductServices
                                 "collection" => $collection,
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
-                                "start_selling" => $products[$product_id]->start_selling_at,
-                                "gtm" => (isset($gtm[$product_id]) ? $gtm[$product_id] : "")
+                                "start_selling" => $products[$product_id]->start_selling_at
                             );
                         }
                     }
