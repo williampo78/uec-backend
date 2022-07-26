@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\WebCategoryHierarchy\WebCategoryHierarchyResource;
 use App\Services\WebCategoryHierarchyService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WebCategoryHierarchyController extends Controller
@@ -21,9 +23,11 @@ class WebCategoryHierarchyController extends Controller
      */
     public function index(Request $request)
     {
+        $categories = $this->webCategoryHierarchyService->getSiblingCategories();
+
         $responsePayload = [
             'max_level' => config('uec.web_category_hierarchy_levels'),
-            'level_1_categories' => $this->webCategoryHierarchyService->getSiblingCategoriesByLevel(1),
+            'categories' => WebCategoryHierarchyResource::collection($categories),
             'auth' => $request->share_role_auth,
         ];
 
@@ -69,10 +73,7 @@ class WebCategoryHierarchyController extends Controller
 
         return response()->json([
             'message' => '新增成功',
-            'payload' => [
-                'id' => $createResult['category']->id,
-                'category_name' => $createResult['category']->category_name,
-            ],
+            'payload' => WebCategoryHierarchyResource::make($createResult['category']),
         ]);
     }
 
@@ -107,7 +108,26 @@ class WebCategoryHierarchyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $requestPayload = $request->only([
+            'category_name',
+            'gross_margin_threshold',
+            'category_short_name',
+            'icon_name',
+            'isIconDeleted',
+        ]);
+
+        $updateResult = $this->webCategoryHierarchyService->updateCategory($id, $requestPayload);
+
+        if (!$updateResult['is_success']) {
+            return response()->json([
+                'message' => '更新失敗',
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => '更新成功',
+            'payload' => WebCategoryHierarchyResource::make($updateResult['category']),
+        ]);
     }
 
     /**
@@ -120,32 +140,39 @@ class WebCategoryHierarchyController extends Controller
     {
         //
     }
-    public function GetCategory()
-    {
 
+    /**
+     * 取得多筆分類
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getCategories(Request $request): JsonResponse
+    {
+        $requestPayload = $request->only([
+            'parent_id',
+        ]);
+
+        $categories = $this->webCategoryHierarchyService->getSiblingCategories($requestPayload['parent_id']);
+
+        return response()->json([
+            'payload' => [
+                'title' => $this->webCategoryHierarchyService->getAncestorsAndSelfName($requestPayload['parent_id']),
+                'categories' => WebCategoryHierarchyResource::collection($categories),
+            ],
+        ]);
     }
+
     public function ajax(Request $request)
     {
         $in = $request->input();
         $file = $request->file();
         switch ($in['type']) {
-            case 'GetCategory': // 取得子分類
-                $result = $this->webCategoryHierarchyService->web_Category_Hierarchy_Bylevel($in['id']);
-                break;
-            case 'AddCategory':
-                $result = $this->webCategoryHierarchyService->add_Category_Hierarchy($in, $file);
-                break;
-            case 'EditCategory':
-                $result = $this->webCategoryHierarchyService->edit_Category_Hierarchy($in, $file);
-                break;
             case 'DelCategory':
                 $result = $this->webCategoryHierarchyService->del_Category_Hierarchy($in);
                 break;
             case 'SortCategory':
                 $result = $this->webCategoryHierarchyService->sort_Category_Hierarchy($in);
-                break;
-            case 'DelIconPhoto':
-                $result = $this->webCategoryHierarchyService->del_icon_photo($in['id']);
                 break;
         }
 

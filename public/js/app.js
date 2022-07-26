@@ -4175,7 +4175,7 @@ jQuery.validator.addMethod("compareDates", function (date1, element, params) {
     unit: ""
   };
   var result;
-  var errorMessage = '';
+  var errorMessage = "";
   params = Object.assign({}, defaultParams, params);
 
   switch (params.sign) {
@@ -4240,13 +4240,13 @@ jQuery.validator.addMethod("unique", function (value, element, params) {
   return matches.length == 0;
 }, "不可輸入重複的內容"); // 驗證檔案大小限制
 
-jQuery.validator.addMethod("filesize", function (value, element, param) {
+jQuery.validator.addMethod("filesize", function (value, element, params) {
   var filesize = 0;
 
   if (element.files[0]) {
     filesize = element.files[0].size;
 
-    switch (param[1]) {
+    switch (params[1]) {
       case "KB":
         filesize = filesize / 1024;
         break;
@@ -4261,7 +4261,7 @@ jQuery.validator.addMethod("filesize", function (value, element, param) {
     }
   }
 
-  return this.optional(element) || filesize <= param[0];
+  return this.optional(element) || filesize <= params[0];
 }, function (params, element) {
   if (params[1]) {
     return "\u6A94\u6848\u5927\u5C0F\u4E0D\u53EF\u8D85\u904E".concat(params[0]).concat(params[1]);
@@ -4296,13 +4296,22 @@ jQuery.validator.addMethod("minImageHeight", function (value, element, minHeight
   return "\u5716\u7247\u5BEC\u5EA6\u5FC5\u9700\u5927\u65BC\u7B49\u65BC".concat(minHeight, "px");
 });
 /**
- *  let obj  = {
-        startTime :$('#trade_date_start').val(),
-        endTime : $('#trade_date_end').val() ,
-        monthNum : 6 ,
-    }
+ * 驗證圖片比例
  */
 
+jQuery.validator.addMethod("imageRatio", function (value, element, params) {
+  if (element.files.length == 0) {
+    return true;
+  }
+
+  var width = $(element).attr("data-image-width");
+  var height = $(element).attr("data-image-height");
+  var ratio = width / height;
+  var ratioLimit = params[0] / params[1];
+  return ratio == ratioLimit;
+}, function (params, element) {
+  return "\u5716\u7247\u6BD4\u4F8B\u9808\u70BA".concat(params[0], ":").concat(params[1]);
+});
 jQuery.validator.addMethod("monthIntervalVerify", function (value, element, obj) {
   if (!obj.isExecution) {
     return true;

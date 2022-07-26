@@ -196,7 +196,12 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/qa', QAController::class, ['names' => ['index' => 'qa']]);
 
     // 分類階層管理
-    Route::resource('/web_category_hierarchy', WebCategoryHierarchyController::class, ['names' => ['index' => 'web_category_hierarchy']]);
+    Route::get('/web_category_hierarchy/categories', [WebCategoryHierarchyController::class, 'getCategories']);
+    Route::resource('/web_category_hierarchy', WebCategoryHierarchyController::class, [
+        'names' => [
+            'index' => 'web_category_hierarchy',
+        ],
+    ]);
     Route::post('/web_category_hierarchy/ajax', [WebCategoryHierarchyController::class, 'ajax']);
 
     // 分類階層內容管理

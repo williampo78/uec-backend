@@ -2,107 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\CategoryProduct;
-use App\Models\WebCategoryHierarchy;
+use ImageUpload;
 use Carbon\Carbon;
+use App\Models\CategoryProduct;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use ImageUpload;
+use App\Models\WebCategoryHierarchy;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class WebCategoryHierarchyService
 {
     private const CATEGORY_UPLOAD_PATH_PREFIX = 'category_icon/';
-
-    /*
-     * parent_id = null 取出大分類
-     */
-    public function web_Category_Hierarchy_Bylevel($parent_id = null)
-    {
-        return WebCategoryHierarchy::where('parent_id', $parent_id)->orderBy('sort', 'ASC')->get();
-    }
-
-    public function add_Category_Hierarchy($in, $file)
-    {
-        $now = Carbon::now();
-        $agent_id = Auth::user()->agent_id;
-        $user_id = Auth::user()->id;
-        DB::beginTransaction();
-
-        try {
-            if ($in['parent_id'] == 'null') {
-                $in['parent_id'] = null;
-            }
-            $insert['parent_id'] = $in['parent_id']; //父ID
-            $insert['category_level'] = $in['category_level']; // 階級
-            $insert['category_name'] = $in['category_name'];
-            $insert['content_type'] = $in['content_type'];
-            $insert['agent_id'] = $agent_id;
-            $insert['sort'] = $this->getSort($in);
-            $insert['created_by'] = $user_id;
-            $insert['updated_by'] = $user_id;
-            $insert['created_at'] = $now;
-            $insert['updated_at'] = $now;
-            if ($in['category_level'] == '1') {
-                $insert['category_short_name'] = $in['category_short_name'];
-                $insert['gross_margin_threshold'] = $in['gross_margin_threshold'];
-            }
-            $CategoryHierarchy = WebCategoryHierarchy::create($insert);
-            if (!empty($file)) {
-                $uploadPath = 'category_icon/' . $CategoryHierarchy->id;
-                $uploadFileResult = ImageUpload::uploadImage($file['image'], $uploadPath, 'category_icon');
-                WebCategoryHierarchy::where('id', $CategoryHierarchy->id)->update(['icon_name' => $uploadFileResult['image']]);
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::info($e);
-
-            return false;
-        }
-        $result = new WebCategoryHierarchy;
-        if (!is_null($in['parent_id'])) {
-            $result = $result->where('parent_id', $in['parent_id']);
-        }
-
-        return $result->get();
-    }
-
-    public function edit_Category_Hierarchy($in, $file)
-    {
-        $now = Carbon::now();
-        $agent_id = Auth::user()->agent_id;
-        $user_id = Auth::user()->id;
-        try {
-            DB::beginTransaction();
-            if ($in['parent_id'] == 'null') {
-                $in['parent_id'] = null;
-            }
-            $insert['category_name'] = $in['category_name'];
-            $insert['content_type'] = $in['content_type'];
-            if ($in['category_level'] == '1') {
-                $insert['category_short_name'] = $in['category_short_name'];
-                $insert['gross_margin_threshold'] = $in['gross_margin_threshold'];
-            }
-            if (!empty($file)) {
-                $uploadPath = 'category_icon/' . $in['id'];
-                $uploadFileResult = ImageUpload::uploadImage($file['image'], $uploadPath, 'category_icon');
-                WebCategoryHierarchy::where('id', $in['id'])->update(['icon_name' => $uploadFileResult['image']]);
-            }
-            $insert['updated_by'] = $user_id;
-            $insert['updated_at'] = $now;
-            WebCategoryHierarchy::where('id', $in['id'])->update($insert);
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::info($e);
-
-            return false;
-        }
-
-        return WebCategoryHierarchy::where('parent_id', $in['parent_id'])->orderBy('sort', 'ASC')->get();
-    }
 
     public function del_Category_Hierarchy($in)
     {
@@ -345,18 +257,6 @@ class WebCategoryHierarchyService
         return $promotionalCampaigns->get();
     }
 
-    public function del_icon_photo($id)
-    {
-        $CategoryHierarchy = WebCategoryHierarchy::where('id', $id)->first();
-        if ($CategoryHierarchy->icon_name) {
-            ImageUpload::DelPhoto($CategoryHierarchy->icon_name);
-            $CategoryHierarchy->icon_name = null;
-            $CategoryHierarchy->save();
-        }
-
-        return true;
-    }
-
     public function check_icon_name($id)
     {
         $CategoryHierarchy = WebCategoryHierarchy::where('id', $id)->first();
@@ -368,14 +268,14 @@ class WebCategoryHierarchyService
     }
 
     /**
-     * 取得指定階層的同一層分類
+     * 取得同一層分類
      *
-     * @param integer $level
+     * @param integer|null $parentId
      * @return Collection
      */
-    public function getSiblingCategoriesByLevel(int $level): Collection
+    public function getSiblingCategories(?int $parentId = null): Collection
     {
-        return WebCategoryHierarchy::where('category_level', $level)
+        return WebCategoryHierarchy::where('parent_id', $parentId)
             ->defaultOrder()
             ->get();
     }
@@ -434,5 +334,95 @@ class WebCategoryHierarchyService
             'is_success' => $isSuccess,
             'category' => $createdCategory ?? null,
         ];
+    }
+
+    /**
+     * 更新分類
+     *
+     * @param integer $id
+     * @param array $data
+     * @return array
+     */
+    public function updateCategory(int $id, array $data): array
+    {
+        $user = auth()->user();
+        $isSuccess = false;
+
+        DB::beginTransaction();
+        try {
+            $category = WebCategoryHierarchy::findOrFail($id);
+
+            $categoryData = [
+                'updated_by' => $user->id,
+            ];
+
+            if (!empty($data['category_name'])) {
+                $categoryData['category_name'] = $data['category_name'];
+            }
+
+            if ($category->category_level < 2) {
+                $categoryData['gross_margin_threshold'] = $data['gross_margin_threshold'];
+
+                if (!empty($data['category_short_name'])) {
+                    $categoryData['category_short_name'] = $data['category_short_name'];
+                }
+
+                $category->update($categoryData);
+
+                if (!empty($data['icon_name'])) {
+                    // 移除舊圖片
+                    if (
+                        !empty($category->icon_name)
+                        && Storage::disk('s3')->exists($category->icon_name)
+                    ) {
+                        Storage::disk('s3')->delete($category->icon_name);
+                    }
+
+                    $uploadPath = self::CATEGORY_UPLOAD_PATH_PREFIX . $category->id;
+                    $uploadFileResult = ImageUpload::uploadImage($data['icon_name'], $uploadPath, 'category_icon');
+                    $category->update([
+                        'icon_name' => $uploadFileResult['image'],
+                    ]);
+                } elseif ($data['isIconDeleted'] == 'true') {
+                    // 移除舊圖片
+                    if (
+                        !empty($category->icon_name)
+                        && Storage::disk('s3')->exists($category->icon_name)
+                    ) {
+                        Storage::disk('s3')->delete($category->icon_name);
+                    }
+
+                    $category->update([
+                        'icon_name' => null,
+                    ]);
+                }
+            } else {
+                $category->update($categoryData);
+            }
+
+            DB::commit();
+            $isSuccess = true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+        }
+
+        return [
+            'is_success' => $isSuccess,
+            'category' => $category ?? null,
+        ];
+    }
+
+    /**
+     * 取得祖先和自己的名稱
+     *
+     * @param integer $id
+     * @return string
+     */
+    public function getAncestorsAndSelfName(int $id): string
+    {
+        $categories = WebCategoryHierarchy::defaultOrder()->ancestorsAndSelf($id);
+
+        return $categories->count() ? implode(' > ', $categories->pluck('category_name')->toArray()) : '';
     }
 }

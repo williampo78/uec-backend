@@ -19,7 +19,7 @@ jQuery.validator.addMethod(
             unit: "",
         };
         let result;
-        let errorMessage = '';
+        let errorMessage = "";
 
         params = Object.assign({}, defaultParams, params);
 
@@ -30,7 +30,10 @@ jQuery.validator.addMethod(
                 break;
 
             case "<=":
-                result = moment(date1).isSameOrBefore(params.date2, params.unit);
+                result = moment(date1).isSameOrBefore(
+                    params.date2,
+                    params.unit
+                );
                 errorMessage = `必需小於等於`;
                 break;
 
@@ -50,7 +53,9 @@ jQuery.validator.addMethod(
                 break;
         }
 
-        $.validator.messages.compareDates = `${errorMessage} ${moment(params.date2).format("YYYY-MM-DD HH:mm:ss")}`;
+        $.validator.messages.compareDates = `${errorMessage} ${moment(
+            params.date2
+        ).format("YYYY-MM-DD HH:mm:ss")}`;
 
         return result;
     },
@@ -120,13 +125,13 @@ jQuery.validator.addMethod(
 // 驗證檔案大小限制
 jQuery.validator.addMethod(
     "filesize",
-    function (value, element, param) {
+    function (value, element, params) {
         let filesize = 0;
 
         if (element.files[0]) {
             filesize = element.files[0].size;
 
-            switch (param[1]) {
+            switch (params[1]) {
                 case "KB":
                     filesize = filesize / 1024;
                     break;
@@ -141,7 +146,7 @@ jQuery.validator.addMethod(
             }
         }
 
-        return this.optional(element) || filesize <= param[0];
+        return this.optional(element) || filesize <= params[0];
     },
     function (params, element) {
         if (params[1]) {
@@ -187,12 +192,27 @@ jQuery.validator.addMethod(
 );
 
 /**
- *  let obj  = {
-        startTime :$('#trade_date_start').val(),
-        endTime : $('#trade_date_end').val() ,
-        monthNum : 6 ,
-    }
+ * 驗證圖片比例
  */
+jQuery.validator.addMethod(
+    "imageRatio",
+    function (value, element, params) {
+        if (element.files.length == 0) {
+            return true;
+        }
+
+        let width = $(element).attr("data-image-width");
+        let height = $(element).attr("data-image-height");
+        let ratio = width / height;
+        let ratioLimit = params[0] / params[1];
+
+        return ratio == ratioLimit;
+    },
+    function (params, element) {
+        return `圖片比例須為${params[0]}:${params[1]}`;
+    }
+);
+
 jQuery.validator.addMethod(
     "monthIntervalVerify",
     function (value, element, obj) {
