@@ -95,7 +95,7 @@
                                                 </div>
                                                 <div class="col-sm-4">
                                                     <button type="button" class="btn btn-danger"
-                                                        @click="deleteCategory(category)"
+                                                        @click="deleteCategory(category, index)"
                                                         v-show="auth.delete">
                                                         刪除
                                                     </button>
@@ -171,7 +171,7 @@
                                                 <div class="col-sm-3">
                                                     <button type="button" class="btn btn-danger"
                                                         v-show="auth.delete"
-                                                        @click="deleteCategory(category)">
+                                                        @click="deleteCategory(category, index)">
                                                         刪除
                                                     </button>
                                                 </div>
@@ -238,7 +238,7 @@
                                                 <div class="col-sm-3">
                                                     <button type="button" class="btn btn-danger"
                                                         v-show="auth.delete"
-                                                        @click="deleteCategory(category)">
+                                                        @click="deleteCategory(category, index)">
                                                         刪除
                                                     </button>
                                                 </div>
@@ -565,29 +565,56 @@
                         $(`#${this.modal.categoryForm.id}`).modal('hide');
                     });
                 },
-                deleteCategory(category) {
-                    var DelAjax = async () => {
-                        const response = await axios.post('/backend/web_category_hierarchy/ajax', {
-                            type: 'DelCategory',
-                            id: category.id,
-                        });
-                        if (response.data.result.Msg_Hierarchy !== '') {
-                            alert(response.data.result.Msg_Hierarchy);
-                        }
-                        if (response.data.result.Msg_Products !== '') {
-                            alert(response.data.result.Msg_Products);
-                        }
-                        if (response.data.result.status) {
-                            alert(response.data.result.Msg);
-                            history.go(0);
-                        }
-                        console.log(response);
-                        // response.data.result.Msg_Hierarchy =
-                        // alert(response.data.result.Msg) ;
+                deleteCategory(category, index) {
+                    let alias = '';
+                    switch (category.categoryLevel) {
+                        case 1:
+                            alias = '大';
+                            break;
+
+                        case 2:
+                            alias = '中';
+                            break;
+
+                        case 3:
+                            alias = '小';
+                            break;
                     }
-                    var Sure = confirm('你確定要刪除該分類嗎?');
-                    if (Sure) {
-                        DelAjax();
+
+                    if (confirm(`確定要刪除${alias}分類 ${category.categoryName}`)) {
+                        axios({
+                            method: "delete",
+                            url: `${BASE_URI}/${category.id}`,
+                        })
+                        .then((response) => {
+                            this.level[category.categoryLevel].categories.splice(index, 1);
+                            this.showLevel = category.categoryLevel;
+                            alert('刪除成功');
+                        })
+                        .catch((error) => {
+                            if (error.response) {
+                                let data = error.response.data;
+                                let errorMessage = '刪除失敗: ';
+
+                                switch (data.code) {
+                                    // 子分類未刪除
+                                    case 'E100':
+                                        errorMessage += data.message;
+                                        alert(errorMessage);
+                                        break;
+
+                                    // 商品未刪除
+                                    case 'E101':
+                                        errorMessage += data.message;
+                                        alert(errorMessage);
+                                        break;
+
+                                    default:
+                                        alert('刪除失敗');
+                                        break;
+                                }
+                            }
+                        });
                     }
                 },
                 drag(eve) {
@@ -635,7 +662,6 @@
                                 break;
                         }
                     }
-
                 },
                 SaveSort(level) {
                     switch (level) {
@@ -654,7 +680,6 @@
                     if (InData.length > 0) {
                         let SeveSortAjax = async () => {
                             const response = await axios.post('/backend/web_category_hierarchy/ajax', {
-                                _token: $('meta[name="csrf-token"]').attr('content'),
                                 type: 'SortCategory',
                                 JsonData: JSON.stringify(InData),
                             });

@@ -138,7 +138,29 @@ class WebCategoryHierarchyController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if ($this->webCategoryHierarchyService->hasChildCategories($id)) {
+            return response()->json([
+                'message' => '請將該分類底下的子分類清空，才能執行該操作',
+                'code' => 'E100',
+            ], 400);
+        }
+
+        if ($this->webCategoryHierarchyService->hasProducts($id)) {
+            return response()->json([
+                'message' => '請將該分類有使用到的商品清空，才能執行該操作',
+                'code' => 'E101',
+            ], 400);
+        }
+
+        $deleteResult = $this->webCategoryHierarchyService->deleteCategory($id);
+
+        if (!$deleteResult['is_success']) {
+            return response()->json([
+                'message' => '刪除失敗',
+            ], 500);
+        }
+
+        return response()->noContent();
     }
 
     /**
@@ -168,9 +190,6 @@ class WebCategoryHierarchyController extends Controller
         $in = $request->input();
         $file = $request->file();
         switch ($in['type']) {
-            case 'DelCategory':
-                $result = $this->webCategoryHierarchyService->del_Category_Hierarchy($in);
-                break;
             case 'SortCategory':
                 $result = $this->webCategoryHierarchyService->sort_Category_Hierarchy($in);
                 break;

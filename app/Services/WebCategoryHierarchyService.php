@@ -16,33 +16,6 @@ class WebCategoryHierarchyService
 {
     private const CATEGORY_UPLOAD_PATH_PREFIX = 'category_icon/';
 
-    public function del_Category_Hierarchy($in)
-    {
-        $resut = [];
-        $CategoryProductsCount = CategoryProduct::where('web_category_hierarchy_id', $in['id'])->get()->count();
-        $CategoryHierarchyCount = WebCategoryHierarchy::where('parent_id', $in['id'])->get()->count();
-        $resut['Msg_Hierarchy'] = '';
-        $resut['Msg_Products'] = '';
-        $resut['Msg'] = '';
-
-        $resut['status'] = true;
-        if ($CategoryHierarchyCount !== 0) {
-            $resut['Msg_Hierarchy'] = '請將該分類底下的分類清空才能執行該操作';
-            $resut['status'] = false;
-        }
-        if ($CategoryProductsCount !== 0) {
-            $resut['Msg_Products'] = '請先將分類階層有使用到該分類的品項刪除,才能執行該操作';
-            $resut['status'] = false;
-        }
-        if ($resut['status']) {
-            WebCategoryHierarchy::where('id', $in['id'])->delete();
-            $resut['status'] = true;
-            $resut['Msg'] = '刪除成功';
-        }
-
-        return $resut;
-    }
-
     public function sort_Category_Hierarchy($in)
     {
         $sort = json_decode($in['JsonData'], true);
@@ -414,6 +387,28 @@ class WebCategoryHierarchyService
     }
 
     /**
+     * 刪除分類
+     *
+     * @param integer $id
+     * @return array
+     */
+    public function deleteCategory(int $id): array
+    {
+        $isSuccess = false;
+
+        try {
+            WebCategoryHierarchy::find($id)->delete();
+            $isSuccess = true;
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+
+        return [
+            'is_success' => $isSuccess,
+        ];
+    }
+
+    /**
      * 取得祖先和自己的名稱
      *
      * @param integer $id
@@ -424,5 +419,31 @@ class WebCategoryHierarchyService
         $categories = WebCategoryHierarchy::defaultOrder()->ancestorsAndSelf($id);
 
         return $categories->count() ? implode(' > ', $categories->pluck('category_name')->toArray()) : '';
+    }
+
+    /**
+     * 是否有子分類
+     *
+     * @param integer $id
+     * @return boolean
+     */
+    public function hasChildCategories(int $id): bool
+    {
+        $category = WebCategoryHierarchy::find($id);
+
+        return !$category->isLeaf();
+    }
+
+    /**
+     * 是否有商品
+     *
+     * @param integer $id
+     * @return boolean
+     */
+    public function hasProducts(int $id): bool
+    {
+        $category = WebCategoryHierarchy::withCount('products')->find($id);
+
+        return $category->products_count > 0;
     }
 }
