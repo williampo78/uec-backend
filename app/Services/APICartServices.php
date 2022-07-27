@@ -35,7 +35,7 @@ class APICartServices
         $s3 = config('filesystems.disks.s3.url');
         $result = ShoppingCartDetail::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
-            , "product_items.item_no")
+            , "product_items.item_no", "product_items.photo_name as item_photo")
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
             ->join('products', 'products.id', '=', 'product_items.product_id')
             ->where('shopping_cart_details.status_code', 0) //購物車
@@ -47,9 +47,12 @@ class APICartServices
         $result = $result->orderBy('shopping_cart_details.latest_added_at', 'desc')->get();
         $data = [];
         foreach ($result as $datas) {
-            $productPhotos = ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first();
+            //商品圖以規格圖為主為空，則取商品封面圖
+            $itemPhoto = empty($datas->item_photo) ? optional(ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first())->photo_name : $datas->item_photo;
+            $itemPhoto = empty($itemPhoto) ? null : $s3 . $itemPhoto;
+
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = (isset($productPhotos->photo_name) ? $s3 . $productPhotos->photo_name : null);
+            $data[$datas->product_id]['item_photo'] = $itemPhoto;
             $data['items'][$datas->product_id][$datas->item_id] = $datas;
         }
         return $data;
