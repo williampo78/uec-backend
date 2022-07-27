@@ -103,6 +103,7 @@ class APIProductServices
             $strSQL .= " group by cate.`id`
                     order by cate1.`sort`, cate.`sort`";
         }
+
         $categorys = DB::select($strSQL);
         foreach ($categorys as $category) {
             $L1_data[$category->L1_SORT]["id"] = $category->L1ID;
@@ -495,7 +496,7 @@ class APIProductServices
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
                             'start_selling' => $product->start_selling_at,
-                            'gtm' => $gtm[$product->id]
+                            'gtm' => isset($gtm[$product->id])?$gtm[$product->id]:""
                         );
 
                         $product_id = $product->id;
@@ -561,6 +562,7 @@ class APIProductServices
             $strSQL .= " and pc.id=" . (int)$event;
         }
         $strSQL .= " order by pcp.product_id, pc.promotional_label";
+
         $promotional = DB::select($strSQL);
         $data = [];
         $label = '';
@@ -642,7 +644,7 @@ class APIProductServices
         } else {
             $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
         }
-
+        //dd($strSQL);
         $products = DB::select($strSQL);
 
         foreach ($products as $cateID => $product) {
@@ -841,6 +843,7 @@ class APIProductServices
             //行銷促案資訊
             $promotion_type = [];
             $promotions = self::getPromotion('product_content');
+            $promotion_threshold = self::getPromotionThreshold();
             foreach ($promotions as $category => $promotion) {
                 foreach ($promotion as $item) {
                     if ($item->product_id == $id) {
@@ -1191,11 +1194,13 @@ class APIProductServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->getProducts();
+        $gtm = $this->getProductItemForGTM($products);
         $id = $input['event'];
         $page = $input['page'];
         $size = $input['size'];
 
         $promotion = $this->getPromotion('product_card');
+        $promotion_threshold = $this->getPromotionThreshold();
         foreach ($promotion as $product_id => $campaign) {
             $promotion_txt = '';
             foreach ($campaign as $label) {
@@ -1270,7 +1275,8 @@ class APIProductServices
                                 "collection" => $collection,
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
-                                "start_selling" => $products[$product_id]->start_selling_at
+                                "start_selling" => $products[$product_id]->start_selling_at,
+                                "gtm" => (isset($gtm[$product_id])?$gtm[$product_id]:"")
                             );
                         }
                     }
@@ -1785,6 +1791,7 @@ class APIProductServices
                 //產品規格
                 $item_spec = [];
                 $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
+                if (count($ProductSpec) ==0) continue;
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度

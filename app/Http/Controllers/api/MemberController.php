@@ -369,7 +369,7 @@ class MemberController extends Controller
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'discount_content' => [],
-                    'gtm' => $gtm[$orderDetail->product_id][$orderDetail->product_item_id]
+                    'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id])?$gtm[$orderDetail->product_id][$orderDetail->product_item_id]:""
                 ];
 
                 //商品圖 以規格圖為優先，否則取商品封面圖
