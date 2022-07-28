@@ -16,7 +16,11 @@
 /* croppie */
 @import "~croppie/croppie.css";
 
+/* vue-treeselect */
+@import "~@riophae/vue-treeselect/dist/vue-treeselect.css";
+
 @import "./page.css";
+@import "./draggable.css";
 
 body {
     font-family: Segoe UI Light, 微軟正黑體;

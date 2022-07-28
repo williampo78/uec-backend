@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 
-@section('title', '新增廣告上架')
+@section('title', '廣告上架 新增資料')
 
 @section('css')
     <link rel="stylesheet" href="{{ mix('css/advertisement.css') }}">
@@ -57,16 +57,17 @@
 
 @section('js')
     <script src="{{ mix('js/advertisement.js') }}"></script>
-
     <script>
         $(function() {
-            $("#promotional_campaigns_time_type").select2({allowClear: false,});
-            $("#see_more_cate_hierarchy_id").select2();
             let ad_slots = @json($ad_slots);
             // 商品分類下拉選項
             let product_category = @json($product_category);
             // 商品下拉選項
             let products = @json($products);
+            let category_tree = @json($category_tree);
+
+            $("#promotional_campaigns_time_type").select2({allowClear: false,});
+            $("#see_more_cate_hierarchy_id").select2();
 
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
@@ -74,10 +75,6 @@
 
             $('#btn-save').on('click', function() {
                 $("#create-form").submit();
-            });
-
-            $('#btn-cancel').on('click', function() {
-                location.href = "{{ route('advertisemsement_launch') }}";
             });
 
             // 驗證表單

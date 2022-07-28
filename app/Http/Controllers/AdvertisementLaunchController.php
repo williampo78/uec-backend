@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Advertisement\Launch\WebCategoryHierarchyResource;
 use App\Services\AdvertisementService;
 use App\Services\ProductService;
 use App\Services\WebCategoryHierarchyService;
@@ -42,8 +43,6 @@ class AdvertisementLaunchController extends Controller
         $ad_slots = $this->advertisement_service->getSlots();
         $ad_slot_contents = $this->advertisement_service->getSlotContents($query_datas);
         $this->advertisement_service->restructureAdSlotContents($ad_slot_contents);
-        // 優化用
-        // $ad_slot_contents = (new AdSlotContentCollection($ad_slot_contents))->resolve();
 
         return view('backend.advertisement.launch.list', compact('ad_slots', 'ad_slot_contents'));
     }
@@ -57,11 +56,13 @@ class AdvertisementLaunchController extends Controller
     {
         $ad_slots = $this->advertisement_service->getSlots();
         $product_category = $this->web_category_hierarchy_service->getCategoryHierarchyContents();
+        $category_tree = $this->web_category_hierarchy_service->getDescendantsUntilMaxLevel();
+        $category_tree = WebCategoryHierarchyResource::collection($category_tree);
         $products = $this->product_service->getProducts([
             'product_type' => 'N',
         ]);
 
-        return view('backend.advertisement.launch.add', compact('ad_slots', 'product_category', 'products'));
+        return view('backend.advertisement.launch.create', compact('ad_slots', 'product_category', 'products', 'category_tree'));
     }
 
     /**
@@ -224,7 +225,8 @@ class AdvertisementLaunchController extends Controller
         ]);
         //target_campaign_id
         //campaign_name
-        return view('backend.advertisement.launch.update', compact('ad_slot_content', 'product_category', 'products'));
+
+        return view('backend.advertisement.launch.edit', compact('ad_slot_content', 'product_category', 'products'));
     }
 
     /**
@@ -290,19 +292,22 @@ class AdvertisementLaunchController extends Controller
             'status' => false,
         ]);
     }
+
     /**
      * 取得活動賣場
      *
      * @param Request $request
      * @return json
      */
-    public function searchPromotionCampaign(Request $request){
+    public function searchPromotionCampaign(Request $request)
+    {
         $in = $request->input();
         $data = $this->advertisement_service->searchPromotionCampaign($in);
+
         return response()->json([
             'status' => true,
-            'data' => $data ,
-            'in'=>$in,
+            'data' => $data,
+            'in' => $in,
         ]);
     }
 }

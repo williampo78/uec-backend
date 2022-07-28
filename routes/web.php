@@ -197,12 +197,12 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
 
     // 分類階層管理
     Route::get('/web_category_hierarchy/categories', [WebCategoryHierarchyController::class, 'getCategories']);
+    Route::put('/web_category_hierarchy/sort', [WebCategoryHierarchyController::class, 'sortCategories']);
     Route::resource('/web_category_hierarchy', WebCategoryHierarchyController::class, [
         'names' => [
             'index' => 'web_category_hierarchy',
         ],
     ]);
-    Route::post('/web_category_hierarchy/ajax', [WebCategoryHierarchyController::class, 'ajax']);
 
     // 分類階層內容管理
     Route::resource('/web_category_products', WebCategoryProductsController::class, ['names' => ['index' => 'web_category_products']]);

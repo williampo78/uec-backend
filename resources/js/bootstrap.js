@@ -121,4 +121,7 @@ window.Vue = Vue;
 Vue.use(Affix);
 Vue.use(VueScrollactive);
 
+/**
+ * vue draggable
+ */
 Vue.component("draggable", VueDraggable);

@@ -18,6 +18,7 @@
     "dependencies": {
         "@ckeditor/ckeditor5-indent": "^31.0.0",
         "@fortawesome/fontawesome-free": "^6.0.0",
+        "@riophae/vue-treeselect": "^0.4.0",
         "@vuelidate/core": "^2.0.0-alpha.40",
         "@vuelidate/validators": "^2.0.0-alpha.28",
         "axios": "^0.26.0",

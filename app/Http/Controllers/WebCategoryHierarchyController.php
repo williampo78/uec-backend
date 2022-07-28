@@ -6,6 +6,7 @@ use App\Http\Resources\WebCategoryHierarchy\WebCategoryHierarchyResource;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class WebCategoryHierarchyController extends Controller
 {
@@ -50,9 +51,9 @@ class WebCategoryHierarchyController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $requestPayload = $request->only([
             'category_name',
@@ -104,16 +105,16 @@ class WebCategoryHierarchyController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         $requestPayload = $request->only([
             'category_name',
             'gross_margin_threshold',
             'category_short_name',
             'icon_name',
-            'isIconDeleted',
+            'is_icon_deleted',
         ]);
 
         $updateResult = $this->webCategoryHierarchyService->updateCategory($id, $requestPayload);
@@ -134,9 +135,9 @@ class WebCategoryHierarchyController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         if ($this->webCategoryHierarchyService->hasChildCategories($id)) {
             return response()->json([
@@ -160,7 +161,7 @@ class WebCategoryHierarchyController extends Controller
             ], 500);
         }
 
-        return response()->noContent();
+        return response()->json(null, 204);
     }
 
     /**
@@ -185,20 +186,27 @@ class WebCategoryHierarchyController extends Controller
         ]);
     }
 
-    public function ajax(Request $request)
+    /**
+     * 排序分類
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function sortCategories(Request $request): JsonResponse
     {
-        $in = $request->input();
-        $file = $request->file();
-        switch ($in['type']) {
-            case 'SortCategory':
-                $result = $this->webCategoryHierarchyService->sort_Category_Hierarchy($in);
-                break;
+        $requestPayload = $request->only([
+            'parent_id',
+            'category_ids',
+        ]);
+
+        $sortResult = $this->webCategoryHierarchyService->sortCategories($requestPayload);
+
+        if (!$sortResult['is_success']) {
+            return response()->json([
+                'message' => '儲存失敗',
+            ], 500);
         }
 
-        return response()->json([
-            'status' => true,
-            'in' => $request->input(),
-            'result' => $result,
-        ]);
+        return response()->json(null, 204);
     }
 }

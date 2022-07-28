@@ -2,44 +2,19 @@
 
 namespace App\Services;
 
-use ImageUpload;
-use Carbon\Carbon;
 use App\Models\CategoryProduct;
+use App\Models\WebCategoryHierarchy;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\WebCategoryHierarchy;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use ImageUpload;
 
 class WebCategoryHierarchyService
 {
     private const CATEGORY_UPLOAD_PATH_PREFIX = 'category_icon/';
-
-    public function sort_Category_Hierarchy($in)
-    {
-        $sort = json_decode($in['JsonData'], true);
-        foreach ($sort as $key => $val) {
-            WebCategoryHierarchy::where('id', $val['id'])->update(['sort' => $key]);
-        }
-
-        return true;
-    }
-
-    public function getSort($in)
-    {
-
-        $query = WebCategoryHierarchy::where('parent_id', $in['parent_id'])
-            ->where('category_level', $in['category_level'])
-            ->orderBy('sort', 'desc')
-            ->first();
-        $sort = 0;
-        if ($query !== null) {
-            $sort = $query->sort += 1;
-        }
-
-        return $sort;
-    }
 
     //取得開關分類判斷輸出內容
     public function getCategoryHierarchyContents($input = [])
@@ -356,7 +331,7 @@ class WebCategoryHierarchyService
                     $category->update([
                         'icon_name' => $uploadFileResult['image'],
                     ]);
-                } elseif ($data['isIconDeleted'] == 'true') {
+                } elseif ($data['is_icon_deleted'] == 'true') {
                     // 移除舊圖片
                     if (
                         !empty($category->icon_name)
@@ -409,6 +384,36 @@ class WebCategoryHierarchyService
     }
 
     /**
+     * 排序分類
+     *
+     * @param array $data
+     * @return array
+     */
+    public function sortCategories(array $data): array
+    {
+        $isSuccess = false;
+
+        try {
+            $parentCategory = WebCategoryHierarchy::findOrFail($data['parent_id']);
+
+            $treeData = collect($data['category_ids'])
+                ->map(function ($id) {
+                    return ['id' => $id];
+                })
+                ->toArray();
+
+            WebCategoryHierarchy::rebuildSubtree($parentCategory, $treeData);
+            $isSuccess = true;
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+        }
+
+        return [
+            'is_success' => $isSuccess,
+        ];
+    }
+
+    /**
      * 取得祖先和自己的名稱
      *
      * @param integer $id
@@ -445,5 +450,21 @@ class WebCategoryHierarchyService
         $category = WebCategoryHierarchy::withCount('products')->find($id);
 
         return $category->products_count > 0;
+    }
+
+    /**
+     * 取得後代的tree直到最大層級
+     *
+     * @return Collection
+     */
+    public function getDescendantsUntilMaxLevel(): Collection
+    {
+        $maxLevel = config('uec.web_category_hierarchy_levels');
+        $categoryTree = WebCategoryHierarchy::where('category_level', '<=', $maxLevel)
+            ->defaultOrder()
+            ->get()
+            ->toTree();
+
+        return $categoryTree;
     }
 }

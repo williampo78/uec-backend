@@ -8,18 +8,14 @@
             font-weight: bold;
         }
 
-        h4 .title_color {
-            color: darkturquoise;
+        .function-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
         }
 
-        .ondragover {
-            background: #b7e0fb !important;
-            transition: background-color 0.5s;
-            /* background: #ce1f59 !important; */
-        }
-
-        .elements-box>tr>td>* {
-            pointer-events: none;
+        .table > tbody > tr > td {
+            vertical-align: middle;
         }
     </style>
 @endsection
@@ -43,14 +39,23 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
-                                    <button type="button" class="btn btn-block btn-warning btn-sm" v-show="auth.create"
-                                        @click="showCreateModal(1)">
+                                    <button
+                                        type="button"
+                                        class="btn btn-block btn-warning btn-sm"
+                                        v-show="auth.create"
+                                        @click="showCreateModal(1)"
+                                    >
                                         新增大類
                                     </button>
                                 </div>
                                 <div class="col-sm-6">
-                                    <button type="button" class="btn btn-block btn-success btn-sm" v-show="auth.update"
-                                        @click="SaveSort('1')">
+                                    <button
+                                        type="button"
+                                        class="btn btn-block btn-success btn-sm"
+                                        v-show="auth.update"
+                                        :disabled="isSaveSortButtonDisabled(1)"
+                                        @click="updateSort(1)"
+                                    >
                                         儲存
                                     </button>
                                 </div>
@@ -59,47 +64,51 @@
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th class="col-sm-4">名稱</th>
-                                        <th class="col-sm-8">功能</th>
+                                        <th class="col-sm-5">名稱</th>
+                                        <th class="col-sm-7">功能</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody
+                                    is="draggable"
+                                    tag="tbody"
+                                    :list="level[1].categories"
+                                    ghost-class="draggable-ghost"
+                                    handle=".draggable-handle"
+                                    animation="200"
+                                >
                                     <tr
                                         v-for="(category, index) in level[1].categories"
                                         :key="index"
-                                        @dragstart="drag"
-                                        @dragover='dragover'
-                                        @dragleave='dragleave'
-                                        @drop="drop"
-                                        draggable="true"
-                                        :data-index="index"
-                                        :data-level="'1'"
                                     >
-                                        <td style="vertical-align:middle">
-                                            <i class="fa-solid fa-list"></i>
+                                        <td>
+                                            <i class="fa-solid fa-list fa-xl draggable-handle"></i>
                                             @{{ category.categoryName }}
                                         </td>
                                         <td>
-                                            <div class="row">
-                                                <div class="col-sm-4">
-                                                    <button type="button" class="btn btn-primary"
-                                                        @click="getCategories(category)">
-                                                        展中類
-                                                    </button>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <button type="button" class="btn btn-warning" v-show="auth.update"
-                                                        @click="showEditModal(category)">
-                                                        編輯
-                                                    </button>
-                                                </div>
-                                                <div class="col-sm-4">
-                                                    <button type="button" class="btn btn-danger"
-                                                        @click="deleteCategory(category, index)"
-                                                        v-show="auth.delete">
-                                                        刪除
-                                                    </button>
-                                                </div>
+                                            <div class="function-container">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-primary"
+                                                    @click="getCategories(category)"
+                                                >
+                                                    展中類
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-warning"
+                                                    v-show="auth.update"
+                                                    @click="showEditModal(category)"
+                                                >
+                                                    編輯
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-danger"
+                                                    @click="deleteCategory(category, index)"
+                                                    v-show="auth.delete"
+                                                >
+                                                    刪除
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -108,20 +117,29 @@
                         </div>
                         <div class="col-sm-4" v-show="showLevel > 1">
                             <div class="row">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <h4>【<span class="text-primary">@{{ level[2].title }}</span>】的中分類</h4>
-                                    </div>
+                                <div class="col-sm-12">
+                                    <h4>【<span class="text-primary">@{{ level[2].title }}</span>】的中分類</h4>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-6">
-                                    <button type="button" class="btn btn-block btn-warning btn-sm" v-show="auth.create"
-                                        @click="showCreateModal(2)">
+                                    <button
+                                        type="button"
+                                        class="btn btn-block btn-warning btn-sm"
+                                        v-show="auth.create"
+                                        @click="showCreateModal(2)"
+                                    >
                                         新增中類
                                     </button>
                                 </div>
                                 <div class="col-sm-6">
-                                    <button type="button" class="btn btn-block btn-success btn-sm" v-show="auth.update"
-                                        @click="SaveSort('2')">
+                                    <button
+                                        type="button"
+                                        class="btn btn-block btn-success btn-sm"
+                                        v-show="auth.update"
+                                        :disabled="isSaveSortButtonDisabled(2)"
+                                        @click="updateSort(2)"
+                                    >
                                         儲存
                                     </button>
                                 </div>
@@ -130,74 +148,83 @@
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th class="col-sm-4">名稱</th>
-                                        <th class="col-sm-8">功能</th>
+                                        <th class="col-sm-5">名稱</th>
+                                        <th class="col-sm-7">功能</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody
+                                    is="draggable"
+                                    tag="tbody"
+                                    :list="level[2].categories"
+                                    ghost-class="draggable-ghost"
+                                    handle=".draggable-handle"
+                                    animation="200"
+                                >
                                     <tr
                                         v-for="(category, index) in level[2].categories"
                                         :key="index"
-                                        @dragstart="drag"
-                                        @dragover='dragover'
-                                        @dragleave='dragleave'
-                                        @drop="drop"
-                                        :data-index="index"
-                                        :data-level="'2'"
                                     >
-                                        <td style="vertical-align:middle"
-                                            :data-index="index"
-                                            :data-level="'2'"
-                                            draggable="true"
-                                        >
-                                            <i class="fa-solid fa-list"></i>
+                                        <td>
+                                            <i class="fa-solid fa-list fa-xl draggable-handle"></i>
                                             @{{ category.categoryName }}
                                         </td>
                                         <td>
-                                            <div class="row">
-                                                <div class="col-sm-5"
-                                                    v-show="maxLevel > 2">
-                                                    <button type="button" class="btn btn-primary"
-                                                        @click="getCategories(category)">
-                                                        展小類
-                                                    </button>
-                                                </div>
-                                                <div class="col-sm-3">
-                                                    <button type="button" class="btn btn-warning" v-show="auth.update"
-                                                        @click="showEditModal(category)">
-                                                        編輯
-                                                    </button>
-                                                </div>
-                                                <div class="col-sm-3">
-                                                    <button type="button" class="btn btn-danger"
-                                                        v-show="auth.delete"
-                                                        @click="deleteCategory(category, index)">
-                                                        刪除
-                                                    </button>
-                                                </div>
+                                            <div class="function-container">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-primary"
+                                                    v-show="maxLevel > 2"
+                                                    @click="getCategories(category)"
+                                                >
+                                                    展小類
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-warning"
+                                                    v-show="auth.update"
+                                                    @click="showEditModal(category)"
+                                                >
+                                                    編輯
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-danger"
+                                                    v-show="auth.delete"
+                                                    @click="deleteCategory(category, index)"
+                                                >
+                                                    刪除
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
-
                                 </tbody>
                             </table>
                         </div>
                         <div class="col-sm-4" v-show="showLevel > 2">
                             <div class="row">
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <h4>【<span class="text-primary">@{{ level[3].title }}</span>】的小分類</h4>
-                                    </div>
+                                <div class="col-sm-12">
+                                    <h4>【<span class="text-primary">@{{ level[3].title }}</span>】的小分類</h4>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-6">
-                                    <button type="button" class="btn btn-block btn-warning btn-sm" v-show="auth.create"
-                                        @click="showCreateModal(3)">
+                                    <button
+                                        type="button"
+                                        class="btn btn-block btn-warning btn-sm"
+                                        v-show="auth.create"
+                                        @click="showCreateModal(3)"
+                                    >
                                         新增小類
                                     </button>
                                 </div>
                                 <div class="col-sm-6">
-                                    <button type="button" class="btn btn-block btn-success btn-sm" v-show="auth.update"
-                                        @click="SaveSort('2')">
+                                    <button
+                                        type="button"
+                                        class="btn btn-block btn-success btn-sm"
+                                        v-show="auth.update"
+                                        :disabled="isSaveSortButtonDisabled(3)"
+                                        @click="updateSort(3)"
+                                    >
                                         儲存
                                     </button>
                                 </div>
@@ -206,42 +233,44 @@
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th class="col-sm-4">名稱</th>
-                                        <th class="col-sm-8">功能</th>
+                                        <th class="col-sm-5">名稱</th>
+                                        <th class="col-sm-7">功能</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody
+                                    is="draggable"
+                                    tag="tbody"
+                                    :list="level[3].categories"
+                                    ghost-class="draggable-ghost"
+                                    handle=".draggable-handle"
+                                    animation="200"
+                                >
                                     <tr
                                         v-for="(category, index) in level[3].categories"
                                         :key="index"
-                                        @dragstart="drag"
-                                        @dragover='dragover'
-                                        @dragleave='dragleave'
-                                        @drop="drop"
-                                        draggable="true"
-                                        :data-index="index"
-                                        :data-level="'3'"
                                     >
-                                        <td style="vertical-align:middle">
-                                            <i class="fa-solid fa-list"></i>
+                                        <td>
+                                            <i class="fa-solid fa-list fa-xl draggable-handle"></i>
                                             @{{ category.categoryName }}
                                         </td>
                                         <td>
-                                            <div class="row">
-                                                <div class="col-sm-3">
-                                                    <button type="button" class="btn btn-warning"
-                                                        v-show="auth.update"
-                                                        @click="showEditModal(category)">
-                                                        編輯
-                                                    </button>
-                                                </div>
-                                                <div class="col-sm-3">
-                                                    <button type="button" class="btn btn-danger"
-                                                        v-show="auth.delete"
-                                                        @click="deleteCategory(category, index)">
-                                                        刪除
-                                                    </button>
-                                                </div>
+                                            <div class="function-container">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-warning"
+                                                    v-show="auth.update"
+                                                    @click="showEditModal(category)"
+                                                >
+                                                    編輯
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-danger"
+                                                    v-show="auth.delete"
+                                                    @click="deleteCategory(category, index)"
+                                                >
+                                                    刪除
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -526,7 +555,7 @@
                         formData.append("gross_margin_threshold", this.modal.categoryForm.grossMarginThreshold);
                         formData.append("category_short_name", this.modal.categoryForm.categoryShortName);
                         formData.append("icon_name", this.$refs.icon.files[0] ? this.$refs.icon.files[0] : '');
-                        formData.append("isIconDeleted", !this.modal.categoryForm.icon.showDeleteButton);
+                        formData.append("is_icon_deleted", !this.modal.categoryForm.icon.showDeleteButton);
                     }
 
                     axios({
@@ -617,81 +646,29 @@
                         });
                     }
                 },
-                drag(eve) {
-                    eve.dataTransfer.setData("text/index", eve.target.dataset.index);
-                    eve.dataTransfer.setData("text/level", eve.target.dataset.level);
-                    $('tbody').addClass('elements-box')
-                },
-                dragover(eve) {
-                    eve.preventDefault();
-                    eve.target.parentNode.classList.add('ondragover');
+                updateSort(level) {
+                    let categoryIds = this.level[level].categories.map(category => category.id);
 
-                },
-                dragleave(eve) {
-                    eve.preventDefault();
-                    eve.target.parentNode.classList.remove('ondragover');
-                },
-                drop(eve) {
-                    eve.target.parentNode.classList.remove('ondragover');
-                    $('tbody').removeClass('elements-box')
-                    eve.target.parentNode.parentNode.classList.remove('elements-box');
-                    var index = eve.dataTransfer.getData("text/index");
-                    var level = eve.dataTransfer.getData("text/level");
-                    let targetIndex = eve.target.parentNode.dataset.index;
-                    let targetlevel = eve.target.parentNode.dataset.level;
-                    if (targetlevel !== level) {
-                        alert('不能跨分類喔!');
-                    } else {
-                        switch (level) {
-                            case '1':
-                                var item = this.level[1].categories[index];
-                                this.level[1].categories.splice(index, 1)
-                                this.level[1].categories.splice(targetIndex, 0, item)
-                                break;
-                            case '2':
-                                var item = this.level[2].categories[index];
-                                this.level[2].categories.splice(index, 1)
-                                this.level[2].categories.splice(targetIndex, 0, item)
-                                break;
-                            case '3':
-                                var item = this.level[3].categories[index];
-                                this.level[3].categories.splice(index, 1)
-                                this.level[3].categories.splice(targetIndex, 0, item)
-                                break;
-                            default:
-                                break;
+                    axios({
+                        method: "put",
+                        url: `${BASE_URI}/sort`,
+                        data: {
+                            parent_id: this.level[level].parentId,
+                            category_ids: categoryIds,
+                        },
+                    })
+                    .then((response) => {
+                        alert('儲存成功');
+                    })
+                    .catch((error) => {
+                        if (error.response) {
+                            let data = error.response.data;
+                            alert('儲存失敗');
                         }
-                    }
+                    });
                 },
-                SaveSort(level) {
-                    switch (level) {
-                        case '1':
-                            var InData = this.level[1].categories;
-                            break;
-                        case '2':
-                            var InData = this.level[2].categories;
-                            break;
-                        case '3':
-                            var InData = this.level[3].categories;
-                            break;
-                        default:
-                            break;
-                    }
-                    if (InData.length > 0) {
-                        let SeveSortAjax = async () => {
-                            const response = await axios.post('/backend/web_category_hierarchy/ajax', {
-                                type: 'SortCategory',
-                                JsonData: JSON.stringify(InData),
-                            });
-                            if (response.status == 200) {
-                                alert('儲存排序成功');
-                            } else {
-                                alert('儲存排序失敗');
-                            }
-                        }
-
-                        SeveSortAjax();
-                    }
+                isSaveSortButtonDisabled(level) {
+                    return this.level[level].categories.length < 2;
                 },
             },
             mounted() {

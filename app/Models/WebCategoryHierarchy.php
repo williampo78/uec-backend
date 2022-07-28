@@ -14,6 +14,22 @@ class WebCategoryHierarchy extends Model
     protected $guarded = [];
 
     /**
+     * 對應lft column
+     */
+    public function getLftName()
+    {
+        return 'lft';
+    }
+
+    /**
+     * 對應rgt column
+     */
+    public function getRgtName()
+    {
+        return 'rgt';
+    }
+
+    /**
      * 建立與商品的關聯
      */
     public function products()
