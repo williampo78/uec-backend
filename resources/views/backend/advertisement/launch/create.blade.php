@@ -13,40 +13,55 @@
         </div>
     @endif
 
-    <div id="page-wrapper">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">請輸入下列欄位資料</div>
-                    <div class="panel-body">
-                        <form id="create-form" method="post" action="{{ route('advertisemsement_launch.store') }}"
-                            enctype="multipart/form-data">
-                            @csrf
+    <div id="app" v-cloak>
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h1 class="page-header">
+                        <i class="fa-solid fa-plus"></i> 廣告上架 新增資料
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">請輸入下列欄位資料</div>
+                        <div class="panel-body">
+                            <form id="create-form" method="post" action="{{ route('advertisemsement_launch.store') }}"
+                                enctype="multipart/form-data">
+                                @csrf
 
-                            <div class="row">
-                                <!-- 欄位 -->
-                                <div class="col-sm-12">
-                                    @include('backend.advertisement.launch.slot_block')
-                                    @include('backend.advertisement.launch.image_block')
-                                    @include('backend.advertisement.launch.text_block')
-                                    @include('backend.advertisement.launch.product_block')
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                @if ($share_role_auth['auth_create'])
-                                                    <button class="btn btn-success" type="button" id="btn-save">
-                                                        <i class="fa-solid fa-floppy-disk"></i> 儲存
-                                                    </button>
-                                                @endif
-                                                <button class="btn btn-danger" type="button" id="btn-cancel">
-                                                    <i class="fa-solid fa-ban"></i> 取消
-                                                </button>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @include('backend.advertisement.launch.slot_block')
+                                        @include('backend.advertisement.launch.image_block')
+                                        @include('backend.advertisement.launch.text_block')
+                                        @include('backend.advertisement.launch.product_block')
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                    @if ($share_role_auth['auth_create'])
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-success"
+                                                            @click="submit"
+                                                            :disabled="submitButtonDisabled"
+                                                        >
+                                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                                        </button>
+                                                    @endif
+
+                                                    <a href="{{ route('advertisemsement_launch') }}"
+                                                        class="btn btn-danger">
+                                                        <i class="fa-solid fa-ban"></i> 取消
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -58,30 +73,78 @@
 @section('js')
     <script src="{{ mix('js/advertisement.js') }}"></script>
     <script>
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                seeMore: {
+                    action: "X",
+                    categoryId: null,
+                    categoryValid: true,
+                    categoryRequired: false,
+                },
+                categoryTree: [],
+                maxLevel: 1,
+                submitButtonDisabled: false,
+            },
+            created() {
+                let payload = @json($payload);
+
+                if (!_.isEmpty(payload.category_tree)) {
+                    this.categoryTree = payload.category_tree;
+                }
+
+                if (payload.max_level) {
+                    this.maxLevel = payload.max_level;
+                }
+            },
+            watch: {
+                "seeMore.action"(value) {
+                    this.seeMore.categoryRequired = value == 'C' ? true : false;
+                },
+            },
+            methods: {
+                normalizer(node) {
+                    // remove empty children
+                    if (_.isEmpty(node.children)) {
+                        delete node.children;
+                    }
+
+                    // only use first and last level
+                    if (node.category_level != 1 && node.category_level != this.maxLevel) {
+                        node.isDisabled = true;
+                    }
+
+                    return {
+                        id: node.id,
+                        label: node.category_name,
+                        children: node.children,
+                    };
+                },
+                submit() {
+                    this.seeMore.categoryValid = this.seeMore.categoryRequired && !this.seeMore.categoryId ? false : true;
+                    $("#create-form").submit();
+                },
+            },
+        });
+
         $(function() {
-            let ad_slots = @json($ad_slots);
+            let ad_slots = @json($payload['ad_slots']);
             // 商品分類下拉選項
-            let product_category = @json($product_category);
+            let product_category = @json($payload['product_category']);
             // 商品下拉選項
-            let products = @json($products);
-            let category_tree = @json($category_tree);
+            let products = @json($payload['products']);
 
             $("#promotional_campaigns_time_type").select2({allowClear: false,});
-            $("#see_more_cate_hierarchy_id").select2();
 
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
 
-            $('#btn-save').on('click', function() {
-                $("#create-form").submit();
-            });
-
             // 驗證表單
             $("#create-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    $('#btn-save').prop('disabled', true);
+                    vm.submitButtonDisabled = true;
                     form.submit();
                 },
                 rules: {
@@ -98,22 +161,15 @@
                             return $('#start_at').val();
                         },
                     },
-                    see_more_url:{
+                    see_more_url: {
                         required: {
                             depends: function (element) {
                                 return $("input[name='see_more_action'][value='U']").is(":checked");
                             }
                         },
-                        url:{
+                        url: {
                             depends: function (element) {
                                 return $("input[name='see_more_action'][value='U']").is(":checked");
-                            }
-                        },
-                    },
-                    see_more_cate_hierarchy_id:{
-                        required: {
-                            depends: function (element) {
-                                return $("input[name='see_more_action'][value='C']").is(":checked");
                             }
                         },
                     },
@@ -166,27 +222,42 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
-                    if (element.is(':file')) {
-                        error.insertAfter(element);
-                        return;
-                    }
-
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent());
-                        return;
-                    }
-
-                    if (element.closest(".form-group").length) {
+                    if (element.hasClass('vue-treeselect__input')) {
                         element.closest(".form-group").append(error);
+                        return;
+                    }
+
+                    if (element.closest(".input-group").length) {
+                        element.closest(".input-group").parent().append(error);
+                        return;
+                    }
+
+                    if (element.closest(".radio-inline").length) {
+                        element.closest(".radio-inline").parent().append(error);
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
                         return;
                     }
 
                     error.insertAfter(element);
                 },
                 highlight: function(element, errorClass, validClass) {
+                    if ($(element).closest('.input-group').length) {
+                        $(element).closest(".input-group").parent().addClass("has-error");
+                        return;
+                    }
+
                     $(element).closest(".form-group").addClass("has-error");
                 },
                 success: function(label, element) {
+                    if ($(element).closest('.input-group').length) {
+                        $(element).closest(".input-group").parent().removeClass("has-error");
+                        return;
+                    }
+
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });

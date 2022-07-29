@@ -4156,6 +4156,590 @@ var VERSION = "0.4.0";
 
 /***/ }),
 
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/constant.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/constant.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "constant": () => (/* reexport default from dynamic */ lodash_constant__WEBPACK_IMPORTED_MODULE_0___default.a)
+/* harmony export */ });
+/* harmony import */ var lodash_constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/constant */ "./node_modules/lodash/constant.js");
+/* harmony import */ var lodash_constant__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_constant__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/createMap.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/createMap.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMap": () => (/* binding */ createMap)
+/* harmony export */ });
+const createMap = () => Object.create(null)
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/debounce.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/debounce.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "debounce": () => (/* reexport default from dynamic */ lodash_debounce__WEBPACK_IMPORTED_MODULE_0___default.a)
+/* harmony export */ });
+/* harmony import */ var lodash_debounce__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/debounce */ "./node_modules/lodash/debounce.js");
+/* harmony import */ var lodash_debounce__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_debounce__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/deepExtend.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/deepExtend.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "deepExtend": () => (/* binding */ deepExtend)
+/* harmony export */ });
+function isPlainObject(value) {
+  if (value == null || typeof value !== 'object') return false
+  return Object.getPrototypeOf(value) === Object.prototype
+}
+
+function copy(obj, key, value) {
+  if (isPlainObject(value)) {
+    obj[key] || (obj[key] = {})
+    deepExtend(obj[key], value)
+  } else {
+    obj[key] = value
+  }
+}
+
+function deepExtend(target, source) {
+  if (isPlainObject(source)) {
+    const keys = Object.keys(source)
+
+    for (let i = 0, len = keys.length; i < len; i++) {
+      copy(target, keys[i], source[keys[i]])
+    }
+  }
+
+  return target
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/find.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/find.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "find": () => (/* binding */ find)
+/* harmony export */ });
+function find(arr, predicate, ctx) {
+  for (let i = 0, len = arr.length; i < len; i++) {
+    if (predicate.call(ctx, arr[i], i, arr)) return arr[i]
+  }
+  return undefined
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/identity.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/identity.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "identity": () => (/* reexport default from dynamic */ lodash_identity__WEBPACK_IMPORTED_MODULE_0___default.a)
+/* harmony export */ });
+/* harmony import */ var lodash_identity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/identity */ "./node_modules/lodash/identity.js");
+/* harmony import */ var lodash_identity__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_identity__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/includes.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/includes.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "includes": () => (/* binding */ includes)
+/* harmony export */ });
+function includes(arrOrStr, elem) {
+  return arrOrStr.indexOf(elem) !== -1
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/index.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/index.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "warning": () => (/* reexport safe */ _warning__WEBPACK_IMPORTED_MODULE_0__.warning),
+/* harmony export */   "onLeftClick": () => (/* reexport safe */ _onLeftClick__WEBPACK_IMPORTED_MODULE_1__.onLeftClick),
+/* harmony export */   "scrollIntoView": () => (/* reexport safe */ _scrollIntoView__WEBPACK_IMPORTED_MODULE_2__.scrollIntoView),
+/* harmony export */   "debounce": () => (/* reexport safe */ _debounce__WEBPACK_IMPORTED_MODULE_3__.debounce),
+/* harmony export */   "watchSize": () => (/* reexport safe */ _watchSize__WEBPACK_IMPORTED_MODULE_4__.watchSize),
+/* harmony export */   "setupResizeAndScrollEventListeners": () => (/* reexport safe */ _setupResizeAndScrollEventListeners__WEBPACK_IMPORTED_MODULE_5__.setupResizeAndScrollEventListeners),
+/* harmony export */   "isNaN": () => (/* reexport safe */ _isNaN__WEBPACK_IMPORTED_MODULE_6__.isNaN),
+/* harmony export */   "isPromise": () => (/* reexport safe */ _isPromise__WEBPACK_IMPORTED_MODULE_7__.isPromise),
+/* harmony export */   "once": () => (/* reexport safe */ _once__WEBPACK_IMPORTED_MODULE_8__.once),
+/* harmony export */   "noop": () => (/* reexport safe */ _noop__WEBPACK_IMPORTED_MODULE_9__.noop),
+/* harmony export */   "identity": () => (/* reexport safe */ _identity__WEBPACK_IMPORTED_MODULE_10__.identity),
+/* harmony export */   "constant": () => (/* reexport safe */ _constant__WEBPACK_IMPORTED_MODULE_11__.constant),
+/* harmony export */   "createMap": () => (/* reexport safe */ _createMap__WEBPACK_IMPORTED_MODULE_12__.createMap),
+/* harmony export */   "deepExtend": () => (/* reexport safe */ _deepExtend__WEBPACK_IMPORTED_MODULE_13__.deepExtend),
+/* harmony export */   "last": () => (/* reexport safe */ _last__WEBPACK_IMPORTED_MODULE_14__.last),
+/* harmony export */   "includes": () => (/* reexport safe */ _includes__WEBPACK_IMPORTED_MODULE_15__.includes),
+/* harmony export */   "find": () => (/* reexport safe */ _find__WEBPACK_IMPORTED_MODULE_16__.find),
+/* harmony export */   "removeFromArray": () => (/* reexport safe */ _removeFromArray__WEBPACK_IMPORTED_MODULE_17__.removeFromArray),
+/* harmony export */   "quickDiff": () => (/* reexport safe */ _quickDiff__WEBPACK_IMPORTED_MODULE_18__.quickDiff)
+/* harmony export */ });
+/* harmony import */ var _warning__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./warning */ "./node_modules/@riophae/vue-treeselect/src/utils/warning.js");
+/* harmony import */ var _onLeftClick__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./onLeftClick */ "./node_modules/@riophae/vue-treeselect/src/utils/onLeftClick.js");
+/* harmony import */ var _scrollIntoView__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./scrollIntoView */ "./node_modules/@riophae/vue-treeselect/src/utils/scrollIntoView.js");
+/* harmony import */ var _debounce__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./debounce */ "./node_modules/@riophae/vue-treeselect/src/utils/debounce.js");
+/* harmony import */ var _watchSize__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./watchSize */ "./node_modules/@riophae/vue-treeselect/src/utils/watchSize.js");
+/* harmony import */ var _setupResizeAndScrollEventListeners__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./setupResizeAndScrollEventListeners */ "./node_modules/@riophae/vue-treeselect/src/utils/setupResizeAndScrollEventListeners.js");
+/* harmony import */ var _isNaN__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./isNaN */ "./node_modules/@riophae/vue-treeselect/src/utils/isNaN.js");
+/* harmony import */ var _isPromise__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./isPromise */ "./node_modules/@riophae/vue-treeselect/src/utils/isPromise.js");
+/* harmony import */ var _once__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./once */ "./node_modules/@riophae/vue-treeselect/src/utils/once.js");
+/* harmony import */ var _noop__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./noop */ "./node_modules/@riophae/vue-treeselect/src/utils/noop.js");
+/* harmony import */ var _identity__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./identity */ "./node_modules/@riophae/vue-treeselect/src/utils/identity.js");
+/* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./constant */ "./node_modules/@riophae/vue-treeselect/src/utils/constant.js");
+/* harmony import */ var _createMap__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./createMap */ "./node_modules/@riophae/vue-treeselect/src/utils/createMap.js");
+/* harmony import */ var _deepExtend__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./deepExtend */ "./node_modules/@riophae/vue-treeselect/src/utils/deepExtend.js");
+/* harmony import */ var _last__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./last */ "./node_modules/@riophae/vue-treeselect/src/utils/last.js");
+/* harmony import */ var _includes__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./includes */ "./node_modules/@riophae/vue-treeselect/src/utils/includes.js");
+/* harmony import */ var _find__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./find */ "./node_modules/@riophae/vue-treeselect/src/utils/find.js");
+/* harmony import */ var _removeFromArray__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./removeFromArray */ "./node_modules/@riophae/vue-treeselect/src/utils/removeFromArray.js");
+/* harmony import */ var _quickDiff__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./quickDiff */ "./node_modules/@riophae/vue-treeselect/src/utils/quickDiff.js");
+// ========================
+// Debugging Helpers
+// ========================
+
+
+
+// ========================
+// DOM Utilities
+// ========================
+
+
+
+
+
+
+
+// ========================
+// Language Helpers
+// ========================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ========================
+// Other Utilities
+// ========================
+
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/isNaN.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/isNaN.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isNaN": () => (/* binding */ isNaN)
+/* harmony export */ });
+function isNaN(x) {
+  return x !== x
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/isPromise.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/isPromise.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isPromise": () => (/* reexport default from dynamic */ is_promise__WEBPACK_IMPORTED_MODULE_0___default.a)
+/* harmony export */ });
+/* harmony import */ var is_promise__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! is-promise */ "./node_modules/is-promise/index.js");
+/* harmony import */ var is_promise__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(is_promise__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/last.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/last.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "last": () => (/* reexport default from dynamic */ lodash_last__WEBPACK_IMPORTED_MODULE_0___default.a)
+/* harmony export */ });
+/* harmony import */ var lodash_last__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/last */ "./node_modules/lodash/last.js");
+/* harmony import */ var lodash_last__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_last__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/noop.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/noop.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "noop": () => (/* reexport default from dynamic */ lodash_noop__WEBPACK_IMPORTED_MODULE_0___default.a)
+/* harmony export */ });
+/* harmony import */ var lodash_noop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/noop */ "./node_modules/lodash/noop.js");
+/* harmony import */ var lodash_noop__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_noop__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/onLeftClick.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/onLeftClick.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "onLeftClick": () => (/* binding */ onLeftClick)
+/* harmony export */ });
+function onLeftClick(mouseDownHandler) {
+  return function onMouseDown(evt, ...args) {
+    if (evt.type === 'mousedown' && evt.button === 0) {
+      mouseDownHandler.call(this, evt, ...args)
+    }
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/once.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/once.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "once": () => (/* reexport default from dynamic */ lodash_once__WEBPACK_IMPORTED_MODULE_0___default.a)
+/* harmony export */ });
+/* harmony import */ var lodash_once__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/once */ "./node_modules/lodash/once.js");
+/* harmony import */ var lodash_once__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_once__WEBPACK_IMPORTED_MODULE_0__);
+
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/quickDiff.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/quickDiff.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "quickDiff": () => (/* binding */ quickDiff)
+/* harmony export */ });
+function quickDiff(arrA, arrB) {
+  if (arrA.length !== arrB.length) return true
+
+  for (let i = 0; i < arrA.length; i++) {
+    if (arrA[i] !== arrB[i]) return true
+  }
+
+  return false
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/removeFromArray.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/removeFromArray.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "removeFromArray": () => (/* binding */ removeFromArray)
+/* harmony export */ });
+function removeFromArray(arr, elem) {
+  const idx = arr.indexOf(elem)
+  if (idx !== -1) arr.splice(idx, 1)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/scrollIntoView.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/scrollIntoView.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scrollIntoView": () => (/* binding */ scrollIntoView)
+/* harmony export */ });
+// from react-select
+function scrollIntoView($scrollingEl, $focusedEl) {
+  const scrollingReact = $scrollingEl.getBoundingClientRect()
+  const focusedRect = $focusedEl.getBoundingClientRect()
+  const overScroll = $focusedEl.offsetHeight / 3
+
+  if (focusedRect.bottom + overScroll > scrollingReact.bottom) {
+    $scrollingEl.scrollTop = Math.min(
+      $focusedEl.offsetTop + $focusedEl.clientHeight - $scrollingEl.offsetHeight + overScroll,
+      $scrollingEl.scrollHeight,
+    )
+  } else if (focusedRect.top - overScroll < scrollingReact.top) {
+    $scrollingEl.scrollTop = Math.max($focusedEl.offsetTop - overScroll, 0)
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/setupResizeAndScrollEventListeners.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/setupResizeAndScrollEventListeners.js ***!
+  \**********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "setupResizeAndScrollEventListeners": () => (/* binding */ setupResizeAndScrollEventListeners)
+/* harmony export */ });
+function findScrollParents($el) {
+  const $scrollParents = []
+  let $parent = $el.parentNode
+
+  while ($parent && $parent.nodeName !== 'BODY' && $parent.nodeType === document.ELEMENT_NODE) {
+    if (isScrollElment($parent)) $scrollParents.push($parent)
+    $parent = $parent.parentNode
+  }
+  $scrollParents.push(window)
+
+  return $scrollParents
+}
+
+function isScrollElment($el) {
+  // Firefox wants us to check `-x` and `-y` variations as well
+  const { overflow, overflowX, overflowY } = getComputedStyle($el)
+  return /(auto|scroll|overlay)/.test(overflow + overflowY + overflowX)
+}
+
+function setupResizeAndScrollEventListeners($el, listener) {
+  const $scrollParents = findScrollParents($el)
+
+  window.addEventListener('resize', listener, { passive: true })
+  $scrollParents.forEach(scrollParent => {
+    scrollParent.addEventListener('scroll', listener, { passive: true })
+  })
+
+  return function removeEventListeners() {
+    window.removeEventListener('resize', listener, { passive: true })
+    $scrollParents.forEach($scrollParent => {
+      $scrollParent.removeEventListener('scroll', listener, { passive: true })
+    })
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/warning.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/warning.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "warning": () => (/* binding */ warning)
+/* harmony export */ });
+/* harmony import */ var _noop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./noop */ "./node_modules/@riophae/vue-treeselect/src/utils/noop.js");
+
+
+const warning =  false
+  ? /* istanbul ignore next */ 0
+  : function warning(checker, complainer) {
+    if (!checker()) {
+      const message = [ '[Vue-Treeselect Warning]' ].concat(complainer())
+      // eslint-disable-next-line no-console
+      console.error(...message)
+    }
+  }
+
+
+/***/ }),
+
+/***/ "./node_modules/@riophae/vue-treeselect/src/utils/watchSize.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@riophae/vue-treeselect/src/utils/watchSize.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "watchSize": () => (/* binding */ watchSize)
+/* harmony export */ });
+/* harmony import */ var watch_size__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! watch-size */ "./node_modules/watch-size/index.es.mjs");
+/* harmony import */ var _removeFromArray__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./removeFromArray */ "./node_modules/@riophae/vue-treeselect/src/utils/removeFromArray.js");
+
+
+
+let intervalId
+const registered = []
+const INTERVAL_DURATION = 100
+
+function run() {
+  intervalId = setInterval(() => {
+    registered.forEach(test)
+  }, INTERVAL_DURATION)
+}
+
+function stop() {
+  clearInterval(intervalId)
+  intervalId = null
+}
+
+function test(item) {
+  const { $el, listener, lastWidth, lastHeight } = item
+  const width = $el.offsetWidth
+  const height = $el.offsetHeight
+
+  if (lastWidth !== width || lastHeight !== height) {
+    item.lastWidth = width
+    item.lastHeight = height
+
+    listener({ width, height })
+  }
+}
+
+function watchSizeForIE9($el, listener) {
+  const item = {
+    $el,
+    listener,
+    lastWidth: null,
+    lastHeight: null,
+  }
+  const unwatch = () => {
+    ;(0,_removeFromArray__WEBPACK_IMPORTED_MODULE_1__.removeFromArray)(registered, item)
+    if (!registered.length) stop()
+  }
+
+  registered.push(item)
+  // The original watch-size will call the listener on initialization.
+  // Keep the same behavior here.
+  test(item)
+  run()
+
+  return unwatch
+}
+
+function watchSize($el, listener) {
+  // See: https://stackoverflow.com/a/31293352
+  const isIE9 = document.documentMode === 9
+  // watch-size will call the listener on initialization.
+  // Disable this behavior with a lock to achieve a clearer code logic.
+  let locked = true
+  const wrappedListener = (...args) => locked || listener(...args)
+  const implementation = isIE9
+    ? watchSizeForIE9
+    : watch_size__WEBPACK_IMPORTED_MODULE_0__["default"]
+  const removeSizeWatcher = implementation($el, wrappedListener)
+  locked = false // unlock after initialization
+
+  return removeSizeWatcher
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/Croppie/croppie.js":
 /*!*****************************************!*\
   !*** ./node_modules/Croppie/croppie.js ***!
@@ -8186,31 +8770,78 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _riophae_vue_treeselect__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @riophae/vue-treeselect */ "./node_modules/@riophae/vue-treeselect/dist/vue-treeselect.cjs.js");
 /* harmony import */ var _riophae_vue_treeselect__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_riophae_vue_treeselect__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _riophae_vue_treeselect_src_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @riophae/vue-treeselect/src/utils */ "./node_modules/@riophae/vue-treeselect/src/utils/index.js");
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "treeselect",
   "extends": (_riophae_vue_treeselect__WEBPACK_IMPORTED_MODULE_0___default()),
   props: {
     clearValueText: {
+      type: String,
       "default": "清空"
     },
     loadingText: {
+      type: String,
       "default": "載入中..."
     },
     noChildrenText: {
+      type: String,
       "default": "沒有子項目"
     },
     noOptionsText: {
+      type: String,
       "default": "沒有可使用的項目"
     },
     noResultsText: {
+      type: String,
       "default": "沒有找到任何項目"
     },
     placeholder: {
-      "default": "請選擇..."
+      type: String,
+      "default": "請選擇"
     },
     showCount: {
+      type: Boolean,
       "default": true
+    }
+  },
+  methods: {
+    verifyProps: function verifyProps() {
+      var _this = this;
+
+      (0,_riophae_vue_treeselect_src_utils__WEBPACK_IMPORTED_MODULE_1__.warning)(function () {
+        return _this.async ? _this.searchable : true;
+      }, function () {
+        return 'For async search mode, the value of "searchable" prop must be true.';
+      });
+
+      if (this.options == null && !this.loadOptions) {
+        (0,_riophae_vue_treeselect_src_utils__WEBPACK_IMPORTED_MODULE_1__.warning)(function () {
+          return false;
+        }, function () {
+          return 'Are you meant to dynamically load options? You need to use "loadOptions" prop.';
+        });
+      }
+      /*
+      if (this.flat) {
+          warning(
+          () => this.multiple,
+          () => 'You are using flat mode. But you forgot to add "multiple=true"?',
+          )
+      }
+      */
+
+
+      if (!this.flat) {
+        var propNames = ["autoSelectAncestors", "autoSelectDescendants", "autoDeselectAncestors", "autoDeselectDescendants"];
+        propNames.forEach(function (propName) {
+          (0,_riophae_vue_treeselect_src_utils__WEBPACK_IMPORTED_MODULE_1__.warning)(function () {
+            return !_this[propName];
+          }, function () {
+            return "\"".concat(propName, "\" only applies to flat mode.");
+          });
+        });
+      }
     }
   }
 });
@@ -43812,6 +44443,106 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
+
+/***/ }),
+
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js */ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.vue-treeselect__menu {\n    line-height: 230%;\n}\n.vue-treeselect__label-container {\n    font-size: 14px;\n    color: #000000;\n}\n.vue-treeselect__count {\n    color: #ff0000;\n}\n.vue-treeselect__option-arrow-container:hover .vue-treeselect__option-arrow,\n.vue-treeselect--branch-nodes-disabled\n    .vue-treeselect__option:hover\n    .vue-treeselect__option-arrow {\n    color: #000000;\n}\n.vue-treeselect__option-arrow {\n    width: 11px;\n    height: 11px;\n}\n.vue-treeselect.treeselect-invalid:not(.vue-treeselect--open)\n    .vue-treeselect__control {\n    border-color: #a94442;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/laravel-mix/node_modules/css-loader/dist/runtime/api.js ***!
+  \******************************************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+// eslint-disable-next-line func-names
+module.exports = function (cssWithMappingToString) {
+  var list = []; // return the list of modules as css string
+
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = cssWithMappingToString(item);
+
+      if (item[2]) {
+        return "@media ".concat(item[2], " {").concat(content, "}");
+      }
+
+      return content;
+    }).join("");
+  }; // import a list of modules into the list
+  // eslint-disable-next-line func-names
+
+
+  list.i = function (modules, mediaQuery, dedupe) {
+    if (typeof modules === "string") {
+      // eslint-disable-next-line no-param-reassign
+      modules = [[null, modules, ""]];
+    }
+
+    var alreadyImportedModules = {};
+
+    if (dedupe) {
+      for (var i = 0; i < this.length; i++) {
+        // eslint-disable-next-line prefer-destructuring
+        var id = this[i][0];
+
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+
+    for (var _i = 0; _i < modules.length; _i++) {
+      var item = [].concat(modules[_i]);
+
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      if (mediaQuery) {
+        if (!item[2]) {
+          item[2] = mediaQuery;
+        } else {
+          item[2] = "".concat(mediaQuery, " and ").concat(item[2]);
+        }
+      }
+
+      list.push(item);
+    }
+  };
+
+  return list;
+};
 
 /***/ }),
 
@@ -93621,6 +94352,315 @@ Sortable.mount(Remove, Revert);
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css&":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css& ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueTreeselect_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./VueTreeselect.vue?vue&type=style&index=0&lang=css& */ "./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueTreeselect_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueTreeselect_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
+  \****************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+
+
+var isOldIE = function isOldIE() {
+  var memo;
+  return function memorize() {
+    if (typeof memo === 'undefined') {
+      // Test for IE <= 9 as proposed by Browserhacks
+      // @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+      // Tests for existence of standard globals is to allow style-loader
+      // to operate correctly into non-standard environments
+      // @see https://github.com/webpack-contrib/style-loader/issues/177
+      memo = Boolean(window && document && document.all && !window.atob);
+    }
+
+    return memo;
+  };
+}();
+
+var getTarget = function getTarget() {
+  var memo = {};
+  return function memorize(target) {
+    if (typeof memo[target] === 'undefined') {
+      var styleTarget = document.querySelector(target); // Special case to return head of iframe instead of iframe itself
+
+      if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+        try {
+          // This will throw an exception if access to iframe is blocked
+          // due to cross-origin restrictions
+          styleTarget = styleTarget.contentDocument.head;
+        } catch (e) {
+          // istanbul ignore next
+          styleTarget = null;
+        }
+      }
+
+      memo[target] = styleTarget;
+    }
+
+    return memo[target];
+  };
+}();
+
+var stylesInDom = [];
+
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+
+  for (var i = 0; i < stylesInDom.length; i++) {
+    if (stylesInDom[i].identifier === identifier) {
+      result = i;
+      break;
+    }
+  }
+
+  return result;
+}
+
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
+
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = options.base ? item[0] + options.base : item[0];
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var index = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3]
+    };
+
+    if (index !== -1) {
+      stylesInDom[index].references++;
+      stylesInDom[index].updater(obj);
+    } else {
+      stylesInDom.push({
+        identifier: identifier,
+        updater: addStyle(obj, options),
+        references: 1
+      });
+    }
+
+    identifiers.push(identifier);
+  }
+
+  return identifiers;
+}
+
+function insertStyleElement(options) {
+  var style = document.createElement('style');
+  var attributes = options.attributes || {};
+
+  if (typeof attributes.nonce === 'undefined') {
+    var nonce =  true ? __webpack_require__.nc : 0;
+
+    if (nonce) {
+      attributes.nonce = nonce;
+    }
+  }
+
+  Object.keys(attributes).forEach(function (key) {
+    style.setAttribute(key, attributes[key]);
+  });
+
+  if (typeof options.insert === 'function') {
+    options.insert(style);
+  } else {
+    var target = getTarget(options.insert || 'head');
+
+    if (!target) {
+      throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+    }
+
+    target.appendChild(style);
+  }
+
+  return style;
+}
+
+function removeStyleElement(style) {
+  // istanbul ignore if
+  if (style.parentNode === null) {
+    return false;
+  }
+
+  style.parentNode.removeChild(style);
+}
+/* istanbul ignore next  */
+
+
+var replaceText = function replaceText() {
+  var textStore = [];
+  return function replace(index, replacement) {
+    textStore[index] = replacement;
+    return textStore.filter(Boolean).join('\n');
+  };
+}();
+
+function applyToSingletonTag(style, index, remove, obj) {
+  var css = remove ? '' : obj.media ? "@media ".concat(obj.media, " {").concat(obj.css, "}") : obj.css; // For old IE
+
+  /* istanbul ignore if  */
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = replaceText(index, css);
+  } else {
+    var cssNode = document.createTextNode(css);
+    var childNodes = style.childNodes;
+
+    if (childNodes[index]) {
+      style.removeChild(childNodes[index]);
+    }
+
+    if (childNodes.length) {
+      style.insertBefore(cssNode, childNodes[index]);
+    } else {
+      style.appendChild(cssNode);
+    }
+  }
+}
+
+function applyToTag(style, options, obj) {
+  var css = obj.css;
+  var media = obj.media;
+  var sourceMap = obj.sourceMap;
+
+  if (media) {
+    style.setAttribute('media', media);
+  } else {
+    style.removeAttribute('media');
+  }
+
+  if (sourceMap && typeof btoa !== 'undefined') {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  } // For old IE
+
+  /* istanbul ignore if  */
+
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    while (style.firstChild) {
+      style.removeChild(style.firstChild);
+    }
+
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var singleton = null;
+var singletonCounter = 0;
+
+function addStyle(obj, options) {
+  var style;
+  var update;
+  var remove;
+
+  if (options.singleton) {
+    var styleIndex = singletonCounter++;
+    style = singleton || (singleton = insertStyleElement(options));
+    update = applyToSingletonTag.bind(null, style, styleIndex, false);
+    remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+  } else {
+    style = insertStyleElement(options);
+    update = applyToTag.bind(null, style, options);
+
+    remove = function remove() {
+      removeStyleElement(style);
+    };
+  }
+
+  update(obj);
+  return function updateStyle(newObj) {
+    if (newObj) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap) {
+        return;
+      }
+
+      update(obj = newObj);
+    } else {
+      remove();
+    }
+  };
+}
+
+module.exports = function (list, options) {
+  options = options || {}; // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+  // tags it will allow on a page
+
+  if (!options.singleton && typeof options.singleton !== 'boolean') {
+    options.singleton = isOldIE();
+  }
+
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
+  return function update(newList) {
+    newList = newList || [];
+
+    if (Object.prototype.toString.call(newList) !== '[object Array]') {
+      return;
+    }
+
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDom[index].references--;
+    }
+
+    var newLastIdentifiers = modulesToDom(newList, options);
+
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+
+      var _index = getIndexByIdentifier(_identifier);
+
+      if (stylesInDom[_index].references === 0) {
+        stylesInDom[_index].updater();
+
+        stylesInDom.splice(_index, 1);
+      }
+    }
+
+    lastIdentifiers = newLastIdentifiers;
+  };
+};
+
+/***/ }),
+
 /***/ "./node_modules/sweetalert2/dist/sweetalert2.all.js":
 /*!**********************************************************!*\
   !*** ./node_modules/sweetalert2/dist/sweetalert2.all.js ***!
@@ -97154,15 +98194,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _VueTreeselect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./VueTreeselect.vue?vue&type=script&lang=js& */ "./resources/js/components/VueTreeselect.vue?vue&type=script&lang=js&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _VueTreeselect_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./VueTreeselect.vue?vue&type=style&index=0&lang=css& */ "./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 var render, staticRenderFns
 ;
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _VueTreeselect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"],
   render,
   staticRenderFns,
@@ -97225,6 +98267,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_VueTreeselect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./VueTreeselect.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VueTreeselect.vue?vue&type=script&lang=js&");
  /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_VueTreeselect_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css& ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_laravel_mix_node_modules_css_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_10_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_VueTreeselect_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./VueTreeselect.vue?vue&type=style&index=0&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/laravel-mix/node_modules/css-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-10[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/VueTreeselect.vue?vue&type=style&index=0&lang=css&");
+
 
 /***/ }),
 

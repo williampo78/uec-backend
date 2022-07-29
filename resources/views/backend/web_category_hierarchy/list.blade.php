@@ -72,9 +72,7 @@
                                     is="draggable"
                                     tag="tbody"
                                     :list="level[1].categories"
-                                    ghost-class="draggable-ghost"
-                                    handle=".draggable-handle"
-                                    animation="200"
+                                    v-bind="dragOptions"
                                 >
                                     <tr
                                         v-for="(category, index) in level[1].categories"
@@ -156,9 +154,7 @@
                                     is="draggable"
                                     tag="tbody"
                                     :list="level[2].categories"
-                                    ghost-class="draggable-ghost"
-                                    handle=".draggable-handle"
-                                    animation="200"
+                                    v-bind="dragOptions"
                                 >
                                     <tr
                                         v-for="(category, index) in level[2].categories"
@@ -241,9 +237,7 @@
                                     is="draggable"
                                     tag="tbody"
                                     :list="level[3].categories"
-                                    ghost-class="draggable-ghost"
-                                    handle=".draggable-handle"
-                                    animation="200"
+                                    v-bind="dragOptions"
                                 >
                                     <tr
                                         v-for="(category, index) in level[3].categories"
@@ -366,6 +360,15 @@
                         });
                     });
                 }
+            },
+            computed: {
+                dragOptions() {
+                    return {
+                        animation: 200,
+                        handle: ".draggable-handle",
+                        ghostClass: "draggable-ghost",
+                    };
+                },
             },
             methods: {
                 getCategories(category) {

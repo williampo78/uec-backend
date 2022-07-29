@@ -27,4 +27,4 @@ Vue.component("vue-flat-pickr", VueFlatPickr);
 /**
  * vue treeselect
  */
- Vue.component("treeselect", VueTreeselect);
+Vue.component("treeselect", VueTreeselect);

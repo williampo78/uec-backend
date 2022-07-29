@@ -17,6 +17,7 @@ class WebCategoryHierarchyResource extends JsonResource
         return [
             'id' => $this->id,
             'category_name' => $this->category_name,
+            'category_level' => $this->category_level,
             'children' => WebCategoryHierarchyResource::collection($this->whenLoaded('children')),
         ];
     }

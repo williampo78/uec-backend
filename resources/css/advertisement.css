@@ -18,3 +18,10 @@
     min-width: 80px;
     width: 100px;
 }
+
+.label-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}

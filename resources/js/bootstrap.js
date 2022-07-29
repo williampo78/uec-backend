@@ -17,7 +17,7 @@ import Croppie from "Croppie";
 import moment from "moment";
 
 import Vue from "vue";
-import Affix from "vue-affix";
+import VueAffix from "vue-affix";
 import VueScrollactive from "vue-scrollactive";
 import VueDraggable from "vuedraggable";
 
@@ -118,7 +118,7 @@ window.Croppie = Croppie;
  */
 window.Vue = Vue;
 
-Vue.use(Affix);
+Vue.use(VueAffix);
 Vue.use(VueScrollactive);
 
 /**

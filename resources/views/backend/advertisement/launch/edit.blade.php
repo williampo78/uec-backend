@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 
-@section('title', '編輯廣告上架')
+@section('title', '廣告上架 編輯資料')
 
 @section('css')
     <link rel="stylesheet" href="{{ mix('css/advertisement.css') }}">
@@ -13,52 +13,66 @@
         </div>
     @endif
 
-    <div id="page-wrapper">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading">請輸入下列欄位資料</div>
-                    <div class="panel-body">
-                        <form id="update-form" method="post"
-                            action="{{ route('advertisemsement_launch.update', $ad_slot_content['content']['slot_content_id']) }}"
-                            enctype="multipart/form-data">
-                            @method('PUT')
-                            @csrf
+    <div id="app" v-cloak>
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h1 class="page-header">
+                        <i class="fa-solid fa-pencil"></i> 廣告上架 編輯資料
+                    </h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">請輸入下列欄位資料</div>
+                        <div class="panel-body">
+                            <form id="edit-form" method="post"
+                                action="{{ route('advertisemsement_launch.update', $payload['ad_slot_content']['content']['slot_content_id']) }}"
+                                enctype="multipart/form-data">
+                                @method('PUT')
+                                @csrf
 
-                            <div class="row">
-                                <!-- 欄位 -->
-                                <div class="col-sm-12">
-                                    @include(
-                                        'backend.advertisement.launch.slot_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.image_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.text_block'
-                                    )
-                                    @include(
-                                        'backend.advertisement.launch.product_block'
-                                    )
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        @include(
+                                            'backend.advertisement.launch.slot_block'
+                                        )
+                                        @include(
+                                            'backend.advertisement.launch.image_block'
+                                        )
+                                        @include(
+                                            'backend.advertisement.launch.text_block'
+                                        )
+                                        @include(
+                                            'backend.advertisement.launch.product_block'
+                                        )
 
-                                    <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                @if ($share_role_auth['auth_update'])
-                                                    <button class="btn btn-success" type="button" id="btn-save">
-                                                        <i class="fa-solid fa-floppy-disk"></i> 儲存
-                                                    </button>
-                                                @endif
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="form-group">
+                                                    @if ($share_role_auth['auth_update'])
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-success"
+                                                            @click="submit"
+                                                            :disabled="submitButtonDisabled"
+                                                        >
+                                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
+                                                        </button>
+                                                    @endif
 
-                                                <button class="btn btn-danger" type="button" id="btn-cancel">
-                                                    <i class="fa-solid fa-ban"></i> 取消
-                                                </button>
+                                                    <a href="{{ route('advertisemsement_launch') }}"
+                                                        class="btn btn-danger">
+                                                        <i class="fa-solid fa-ban"></i> 取消
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -69,37 +83,81 @@
 
 @section('js')
     <script src="{{ mix('js/advertisement.js') }}"></script>
-
     <script>
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                seeMore: {
+                    action: "X",
+                    categoryId: null,
+                    categoryValid: true,
+                    categoryRequired: false,
+                },
+                categoryTree: [],
+                maxLevel: 1,
+                submitButtonDisabled: false,
+            },
+            created() {
+                let payload = @json($payload);
+
+                if (!_.isEmpty(payload.category_tree)) {
+                    this.categoryTree = payload.category_tree;
+                }
+
+                if (payload.max_level) {
+                    this.maxLevel = payload.max_level;
+                }
+            },
+            watch: {
+                "seeMore.action"(value) {
+                    this.seeMore.categoryRequired = value == 'C' ? true : false;
+                },
+            },
+            methods: {
+                normalizer(node) {
+                    // remove empty children
+                    if (_.isEmpty(node.children)) {
+                        delete node.children;
+                    }
+
+                    // only use first and last level
+                    if (node.category_level != 1 && node.category_level != this.maxLevel) {
+                        node.isDisabled = true;
+                    }
+
+                    return {
+                        id: node.id,
+                        label: node.category_name,
+                        children: node.children,
+                    };
+                },
+                submit() {
+                    this.seeMore.categoryValid = this.seeMore.categoryRequired && !this.seeMore.categoryId ? false : true;
+                    $("#edit-form").submit();
+                },
+            },
+        });
+
         $(function() {
-            $("#see_more_cate_hierarchy_id").select2();
             // 商品分類下拉選項
-            let product_category = @json($product_category);
+            let product_category = @json($payload['product_category']);
             // 商品下拉選項
-            let products = @json($products);
-            let content = @json($ad_slot_content['content']);
-            let details = @json($ad_slot_content['details']);
+            let products = @json($payload['products']);
+            let content = @json($payload['ad_slot_content']['content']);
+            let details = @json($payload['ad_slot_content']['details']);
 
             if ($('#error-message').length) {
                 alert($('#error-message').text().trim());
             }
 
-            $('#btn-save').on('click', function() {
-                $("#update-form").submit();
-            });
-
-            $('#btn-cancel').on('click', function() {
-                location.href = "{{ route('advertisemsement_launch') }}";
-            });
-
             let product_category_select_options = getProductCategorySelectOptions(product_category);
             let product_select_options = getProductSelectOptions(products);
 
             // 驗證表單
-            $("#update-form").validate({
+            $("#edit-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
-                    $('#btn-save').prop('disabled', true);
+                    vm.submitButtonDisabled = true;
                     form.submit();
                 },
                 rules: {
@@ -112,13 +170,6 @@
                         url:{
                             depends: function (element) {
                                 return $("input[name='see_more_action'][value='U']").is(":checked");
-                            }
-                        },
-                    },
-                    see_more_cate_hierarchy_id:{
-                        required: {
-                            depends: function (element) {
-                                return $("input[name='see_more_action'][value='C']").is(":checked");
                             }
                         },
                     },
@@ -234,30 +285,46 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
-                    if (element.is(':file')) {
-                        error.insertAfter(element);
-                        return;
-                    }
-
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent());
-                        return;
-                    }
-
-                    if (element.closest(".form-group").length) {
+                    if (element.hasClass('vue-treeselect__input')) {
                         element.closest(".form-group").append(error);
+                        return;
+                    }
+
+                    if (element.closest(".input-group").length) {
+                        element.closest(".input-group").parent().append(error);
+                        return;
+                    }
+
+                    if (element.closest(".radio-inline").length) {
+                        element.closest(".radio-inline").parent().append(error);
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
                         return;
                     }
 
                     error.insertAfter(element);
                 },
                 highlight: function(element, errorClass, validClass) {
+                    if ($(element).closest('.input-group').length) {
+                        $(element).closest(".input-group").parent().addClass("has-error");
+                        return;
+                    }
+
                     $(element).closest(".form-group").addClass("has-error");
                 },
                 success: function(label, element) {
+                    if ($(element).closest('.input-group').length) {
+                        $(element).closest(".input-group").parent().removeClass("has-error");
+                        return;
+                    }
+
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
+
             let photo_width = content.photo_width;
             let photo_height = content.photo_height;
             if (photo_width > 0 || photo_height > 0) {
@@ -276,20 +343,16 @@
             if (new Date() >= new Date($('#start_at').val())) {
                 $('#start_at, #active_enabled, #active_disabled').prop('disabled', true);
             }
+
+            vm.seeMore.action = content.see_more_action;
             switch (content.see_more_action) {
                 case 'X':
-                    $("input[name='see_more_action'][value='X']").prop('checked', true);
                     break;
                 case 'U':
-                    $("input[name='see_more_action'][value='U']").prop('checked', true);
                     $('#see_more_url').val(content.see_more_url);
                     break;
                 case 'C':
-                    $("input[name='see_more_action'][value='C']").prop('checked', true);
-                    $('#see_more_cate_hierarchy_id').val(content.see_more_cate_hierarchy_id).trigger("change");
-                    break;
-                default:
-                    $('#see_more_url').val(content.see_more_url);
+                    vm.seeMore.categoryId = content.see_more_cate_hierarchy_id;
                     break;
             }
 

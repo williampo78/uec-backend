@@ -10,18 +10,18 @@ use Illuminate\Http\Request;
 
 class AdvertisementLaunchController extends Controller
 {
-    private $advertisement_service;
-    private $web_category_hierarchy_service;
-    private $product_service;
+    private $advertisementService;
+    private $webCategoryHierarchyService;
+    private $productService;
 
     public function __construct(
-        AdvertisementService $advertisement_service,
-        WebCategoryHierarchyService $web_category_hierarchy_service,
-        ProductService $product_service
+        AdvertisementService $advertisementService,
+        WebCategoryHierarchyService $webCategoryHierarchyService,
+        ProductService $productService
     ) {
-        $this->advertisement_service = $advertisement_service;
-        $this->web_category_hierarchy_service = $web_category_hierarchy_service;
-        $this->product_service = $product_service;
+        $this->advertisementService = $advertisementService;
+        $this->webCategoryHierarchyService = $webCategoryHierarchyService;
+        $this->productService = $productService;
     }
 
     /**
@@ -31,8 +31,7 @@ class AdvertisementLaunchController extends Controller
      */
     public function index(Request $request)
     {
-        $query_datas = [];
-        $query_datas = $request->only([
+        $queryData = $request->only([
             'slot_id',
             'launch_status',
             'start_at_start',
@@ -40,9 +39,9 @@ class AdvertisementLaunchController extends Controller
             'slot_title',
         ]);
 
-        $ad_slots = $this->advertisement_service->getSlots();
-        $ad_slot_contents = $this->advertisement_service->getSlotContents($query_datas);
-        $this->advertisement_service->restructureAdSlotContents($ad_slot_contents);
+        $ad_slots = $this->advertisementService->getSlots();
+        $ad_slot_contents = $this->advertisementService->getSlotContents($queryData);
+        $this->advertisementService->restructureAdSlotContents($ad_slot_contents);
 
         return view('backend.advertisement.launch.list', compact('ad_slots', 'ad_slot_contents'));
     }
@@ -54,15 +53,19 @@ class AdvertisementLaunchController extends Controller
      */
     public function create()
     {
-        $ad_slots = $this->advertisement_service->getSlots();
-        $product_category = $this->web_category_hierarchy_service->getCategoryHierarchyContents();
-        $category_tree = $this->web_category_hierarchy_service->getDescendantsUntilMaxLevel();
-        $category_tree = WebCategoryHierarchyResource::collection($category_tree);
-        $products = $this->product_service->getProducts([
-            'product_type' => 'N',
-        ]);
+        $categoryTree = $this->webCategoryHierarchyService->getDescendantsUntilMaxLevel();
 
-        return view('backend.advertisement.launch.create', compact('ad_slots', 'product_category', 'products', 'category_tree'));
+        return view('backend.advertisement.launch.create', [
+            'payload' => [
+                'ad_slots' => $this->advertisementService->getSlots(),
+                'product_category' => $this->webCategoryHierarchyService->getCategoryHierarchyContents(),
+                'products' => $this->productService->getProducts([
+                    'product_type' => 'N',
+                ]),
+                'category_tree' => WebCategoryHierarchyResource::collection($categoryTree),
+                'max_level' => config('uec.web_category_hierarchy_levels'),
+            ],
+        ]);
     }
 
     /**
@@ -73,8 +76,8 @@ class AdvertisementLaunchController extends Controller
      */
     public function store(Request $request)
     {
-        $input_data = $request->except('_token');
-        if (!$this->advertisement_service->addSlotContents($input_data)) {
+        $inputData = $request->except('_token');
+        if (!$this->advertisementService->addSlotContents($inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
@@ -93,17 +96,17 @@ class AdvertisementLaunchController extends Controller
     public function show($id)
     {
         // 取得商品分類
-        $product_category = $this->web_category_hierarchy_service->getCategoryHierarchyContents();
+        $product_category = $this->webCategoryHierarchyService->getCategoryHierarchyContents();
         $product_category_format = array_column($product_category, 'name', 'id');
 
         // 取得商品
-        $products = $this->product_service->getProducts();
+        $products = $this->productService->getProducts();
         $products_format = [];
         foreach ($products as $value) {
             $products_format[$value['id']] = "{$value['product_no']} {$value['product_name']}";
         }
 
-        $ad_slot_content = $this->advertisement_service->getSlotContentById($id);
+        $ad_slot_content = $this->advertisementService->getSlotContentById($id);
 
         $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $ad_slot_content['content']->slot_icon_name : null;
 
@@ -168,11 +171,12 @@ class AdvertisementLaunchController extends Controller
      */
     public function edit($id)
     {
-        $ad_slot_content = $this->advertisement_service->getSlotContentById($id);
+        $categoryTree = $this->webCategoryHierarchyService->getDescendantsUntilMaxLevel();
+        $adSlotContent = $this->advertisementService->getSlotContentById($id);
 
-        $ad_slot_content['content']->slot_icon_name_url = !empty($ad_slot_content['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $ad_slot_content['content']->slot_icon_name : null;
+        $adSlotContent['content']->slot_icon_name_url = !empty($adSlotContent['content']->slot_icon_name) ? config('filesystems.disks.s3.url') . $adSlotContent['content']->slot_icon_name : null;
         // 整理給前端的資料
-        $ad_slot_content['content'] = $ad_slot_content['content']->only([
+        $adSlotContent['content'] = $adSlotContent['content']->only([
             'slot_code',
             'slot_desc',
             'slot_type',
@@ -196,10 +200,10 @@ class AdvertisementLaunchController extends Controller
             'see_more_target_blank',
             'slot_title_color',
         ]);
-        foreach ($ad_slot_content['details'] as $key => $obj) {
+        foreach ($adSlotContent['details'] as $key => $obj) {
             $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
             // 整理給前端的資料
-            $ad_slot_content['details'][$key] = $obj->only([
+            $adSlotContent['details'][$key] = $obj->only([
                 'id',
                 'data_type',
                 'sort',
@@ -219,14 +223,17 @@ class AdvertisementLaunchController extends Controller
             ]);
         }
 
-        $product_category = $this->web_category_hierarchy_service->getCategoryHierarchyContents();
-        $products = $this->product_service->getProducts([
-            'product_type' => 'N',
+        return view('backend.advertisement.launch.edit', [
+            'payload' => [
+                'ad_slot_content' => $adSlotContent,
+                'product_category' => $this->webCategoryHierarchyService->getCategoryHierarchyContents(),
+                'products' => $this->productService->getProducts([
+                    'product_type' => 'N',
+                ]),
+                'category_tree' => WebCategoryHierarchyResource::collection($categoryTree),
+                'max_level' => config('uec.web_category_hierarchy_levels'),
+            ],
         ]);
-        //target_campaign_id
-        //campaign_name
-
-        return view('backend.advertisement.launch.edit', compact('ad_slot_content', 'product_category', 'products'));
     }
 
     /**
@@ -238,10 +245,10 @@ class AdvertisementLaunchController extends Controller
      */
     public function update(Request $request, $slot_content_id)
     {
-        $input_data = $request->except('_token', '_method');
-        $input_data['slot_content_id'] = $slot_content_id;
+        $inputData = $request->except('_token', '_method');
+        $inputData['slot_content_id'] = $slot_content_id;
 
-        if (!$this->advertisement_service->updateSlotContents($input_data)) {
+        if (!$this->advertisementService->updateSlotContents($inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
 
@@ -282,7 +289,7 @@ class AdvertisementLaunchController extends Controller
             ]);
         }
 
-        if ($this->advertisement_service->canSlotContentActive($slot_id, $start_at, $end_at, $slot_content_id)) {
+        if ($this->advertisementService->canSlotContentActive($slot_id, $start_at, $end_at, $slot_content_id)) {
             return response()->json([
                 'status' => true,
             ]);
@@ -302,7 +309,7 @@ class AdvertisementLaunchController extends Controller
     public function searchPromotionCampaign(Request $request)
     {
         $in = $request->input();
-        $data = $this->advertisement_service->searchPromotionCampaign($in);
+        $data = $this->advertisementService->searchPromotionCampaign($in);
 
         return response()->json([
             'status' => true,
