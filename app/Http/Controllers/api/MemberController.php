@@ -15,6 +15,7 @@ use App\Models\ReturnRequestDetail;
 use App\Models\Shipment;
 use App\Models\StockTransactionLog;
 use App\Models\WarehouseStock;
+use App\Services\APIProductServices;
 use App\Services\APIService;
 use App\Services\OrderService;
 use App\Services\ReturnRequestService;
@@ -25,6 +26,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 
 class MemberController extends Controller
 {
@@ -41,14 +43,17 @@ class MemberController extends Controller
         OrderService $orderService,
         WarehouseService $warehouseService,
         WarehouseStockService $warehouseStockService,
-        ReturnRequestService $returnRequestService
-    ) {
+        ReturnRequestService $returnRequestService,
+        APIProductServices $apiProductServices
+    )
+    {
         $this->apiService = $apiService;
         $this->sysConfigService = $sysConfigService;
         $this->orderService = $orderService;
         $this->warehouseService = $warehouseService;
         $this->warehouseStockService = $warehouseStockService;
         $this->returnRequestService = $returnRequestService;
+        $this->apiProductServices = $apiProductServices;
     }
 
     /**
@@ -227,13 +232,9 @@ class MemberController extends Controller
                 // 小計
                 $orderPayload['subtotal'] = number_format($orderDetail->subtotal);
 
-                // 商品圖片
-                if ($orderDetail->product->productPhotos->isNotEmpty()) {
-                    $productPhoto = $orderDetail->product->productPhotos->first();
-
-                    // 圖片網址
-                    $orderPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
-                }
+                //商品圖 以規格圖為優先，否則取商品封面圖
+                $productPhoto = empty(optional($orderDetail->productItem)->photo_name) ? optional($orderDetail->product->productPhotos->first())->photo_name : optional($orderDetail->productItem)->photo_name;
+                $orderPayload['photo_url'] = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
             }
 
             // 出貨單
@@ -269,7 +270,7 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $cancelLimitMins = (int) $this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
+        $cancelLimitMins = (int)$this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
         $payload = [
             'message' => '取得成功',
@@ -349,7 +350,10 @@ class MemberController extends Controller
         }
         $giveaway_qty = [];
 
-        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty) {
+        $products = $this->apiProductServices->getProducts();
+        $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
+
+        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
                     'id' => $orderDetail->id,
@@ -365,11 +369,13 @@ class MemberController extends Controller
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'discount_content' => [],
+                    'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id])?$gtm[$orderDetail->product_id][$orderDetail->product_item_id]:""
                 ];
-                if ($orderDetail->product->productPhotos->isNotEmpty()) {
-                    $productPhoto = $orderDetail->product->productPhotos->first();
-                    $orderDetailPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
-                }
+
+                //商品圖 以規格圖為優先，否則取商品封面圖
+                $productPhoto = empty(optional($orderDetail->productItem)->photo_name) ? optional($orderDetail->product->productPhotos->first())->photo_name : optional($orderDetail->productItem)->photo_name;
+                $orderDetailPayload['photo_url'] = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
+
                 $payload['results']['order_details'][] = $orderDetailPayload;
                 $payload['results']['product_totals'] += 1;
             } else {
@@ -428,7 +434,7 @@ class MemberController extends Controller
         }
 
         // 訂單成立後x分鐘內可取消
-        $cancelLimitMins = (int) $this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
+        $cancelLimitMins = (int)$this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
         // 是否可以取消訂單
         if (!$this->orderService->canCancelOrder($order->status_code, $order->ordered_date, $cancelLimitMins)) {
@@ -487,8 +493,7 @@ class MemberController extends Controller
                     'created_by' => -1,
                     'updated_by' => -1,
                 ]);
-            }
-            // 未付款
+            } // 未付款
             else {
                 // 更新訂單
                 Order::findOrFail($order->id)
@@ -569,8 +574,7 @@ class MemberController extends Controller
                             'created_by' => -1,
                             'updated_by' => -1,
                         ]);
-                    }
-                    // 更新庫存
+                    } // 更新庫存
                     else {
                         WarehouseStock::findOrFail($warehouseStock->id)
                             ->update([

@@ -75,6 +75,7 @@ class AuthController extends Controller
                     $token = Auth::guard('api')->login($member);
                     Member::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
                 }
+                $result['data']['userId'] = $result['data']['id'];
                 unset($result['data']['id']);
                 unset($result['data']['recommendSource']);
                 $result['data']['_token'] = $token;
@@ -241,7 +242,7 @@ class AuthController extends Controller
 
     public function registration(Request $request)
     {
-        $credentials = request(['mobile', 'name', 'email', 'pwd', 'birthday', 'sex', 'registeredSource']);
+        $credentials = request(['mobile', 'name', 'email', 'pwd', 'birthday', 'sex', 'registeredSource', 'recommendSource']);
         $messages = [
             'mobile.required' => '帳號不能為空',
             'name.required' => '姓名不能為空',
@@ -274,6 +275,8 @@ class AuthController extends Controller
         $data['birthday'] = $request['birthday'];
         $data['sex'] = $request['sex'];
         $data['registeredSource'] = $request['registeredSource'];
+        $data['recommendSource'] = $request['recommendSource'];
+
         $token = $request->server->getHeaders()['AUTHORIZATION'];
         $response = $this->apiService->memberRegistration($data, $token);
         $result = json_decode($response, true);

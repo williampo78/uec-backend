@@ -15,6 +15,7 @@ use App\Http\Controllers\api\ShoppingController;
 use App\Http\Controllers\api\PointInfoController;
 use App\Http\Controllers\api\MemberInfoController;
 use App\Http\Controllers\api\CaptchaController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -41,6 +42,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/campaign/{id}', [ProductController::class, 'getCampaignGift']);
     Route::get('/campaignGift/{id}', [ProductController::class, 'getCampaignThresholdGift']);
     Route::get('/campaignDiscount/{id}', [ProductController::class, 'getCampaignDiscount']);
+    Route::post('/product/recent', [ProductController::class, 'getEffectProduct']);
 
     Route::get('/ad_slots', [IndexController::class, 'getAdSlots']);
     Route::post('/advanceSearch', [ProductController::class, 'getProductSearchResult']);
