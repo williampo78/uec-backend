@@ -61,7 +61,7 @@ class AuthController extends Controller
         unset($credentials['password']);
         unset($credentials['channel']);
         try {
-            if ($result['status'] == '200') {
+            if ($result['status'] == 200) {
                 $status = true;
                 $tmp = Member::where('member_id', '=', $result['data']['id'])->first();
                 if (!is_null($tmp)) {
@@ -79,16 +79,16 @@ class AuthController extends Controller
                 unset($result['data']['id']);
                 unset($result['data']['recommendSource']);
                 $result['data']['_token'] = $token;
-                return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $result['data']]);
+                return response()->json(['status' => $status, 'error_code' => (int)$err, 'error_msg' => $error_code[$err], 'result' => $result['data']]);
             } else {
                 $status = false;
                 $err = $result['status'];
-                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
+                return response()->json(['status' => false, 'error_code' => (int)$err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
-            $err = '404';
-            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
+            $err = 404;
+            return response()->json(['status' => false, 'error_code' => (int)$err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
 
     }
