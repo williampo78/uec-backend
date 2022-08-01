@@ -41,7 +41,7 @@ class AuthController extends Controller
         $v = Validator::make($credentials, [
             'mobile' => 'required',
             'pwd' => 'required',
-            'captcha' => 'required|captcha_api:'.$credentials['key'].',flat',
+            'captcha' => 'required|captcha_api:' . $credentials['key'] . ',flat',
         ], $messages);
 
         if ($v->fails()) {
@@ -79,16 +79,16 @@ class AuthController extends Controller
                 unset($result['data']['id']);
                 unset($result['data']['recommendSource']);
                 $result['data']['_token'] = $token;
-                return response()->json(['status' => $status, 'error_code' => (int)$err, 'error_msg' => $error_code[$err], 'result' => $result['data']]);
+                return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $result['data']]);
             } else {
                 $status = false;
-                $err = $result['status'];
-                return response()->json(['status' => false, 'error_code' => (int)$err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
+                $err = (string)$result['status'];
+                return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
             }
         } catch (JWTException $e) {
             Log::info($e);
-            $err = 404;
-            return response()->json(['status' => false, 'error_code' => (int)$err, 'error_msg' => $error_code[$err], 'result' => []]);
+            $err = '404';
+            return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => []]);
         }
 
     }
