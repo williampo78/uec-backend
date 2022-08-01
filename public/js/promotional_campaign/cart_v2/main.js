@@ -615,7 +615,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (data.web_category_hierarchies) {
                 data.web_category_hierarchies.forEach(function (webCategoryHierarchy) {
                   _this.webCategoryHierarchies.push({
-                    text: webCategoryHierarchy.name,
+                    text: webCategoryHierarchy.category_name,
                     id: webCategoryHierarchy.id
                   });
                 });

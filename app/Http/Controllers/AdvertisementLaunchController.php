@@ -39,11 +39,14 @@ class AdvertisementLaunchController extends Controller
             'slot_title',
         ]);
 
-        $ad_slots = $this->advertisementService->getSlots();
-        $ad_slot_contents = $this->advertisementService->getSlotContents($queryData);
-        $this->advertisementService->restructureAdSlotContents($ad_slot_contents);
+        $adSlots = $this->advertisementService->getSlots();
+        $adSlotContents = $this->advertisementService->getSlotContents($queryData);
+        $this->advertisementService->restructureAdSlotContents($adSlotContents);
 
-        return view('backend.advertisement.launch.list', compact('ad_slots', 'ad_slot_contents'));
+        return view('backend.advertisement.launch.list', [
+            'ad_slots' => $adSlots,
+            'ad_slot_contents' => $adSlotContents,
+        ]);
     }
 
     /**
@@ -58,7 +61,7 @@ class AdvertisementLaunchController extends Controller
         return view('backend.advertisement.launch.create', [
             'payload' => [
                 'ad_slots' => $this->advertisementService->getSlots(),
-                'product_category' => $this->webCategoryHierarchyService->getCategoryHierarchyContents(),
+                'product_category' => $this->webCategoryHierarchyService->getMaxLevelCategories(),
                 'products' => $this->productService->getProducts([
                     'product_type' => 'N',
                 ]),
@@ -95,10 +98,6 @@ class AdvertisementLaunchController extends Controller
      */
     public function show($id)
     {
-        // 取得商品分類
-        $product_category = $this->webCategoryHierarchyService->getCategoryHierarchyContents();
-        $product_category_format = array_column($product_category, 'name', 'id');
-
         // 取得商品
         $products = $this->productService->getProducts();
         $products_format = [];
@@ -127,7 +126,7 @@ class AdvertisementLaunchController extends Controller
         foreach ($ad_slot_content['details'] as $key => $obj) {
             $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
             $obj->product = !empty($obj->product_id) ? $products_format[$obj->product_id] ?? null : null;
-            $obj->product_category = !empty($obj->web_category_hierarchy_id) ? $product_category_format[$obj->web_category_hierarchy_id] ?? null : null;
+            $obj->product_category = !empty($obj->web_category_hierarchy_id) ? $this->webCategoryHierarchyService->getAncestorsAndSelfName($obj->web_category_hierarchy_id) : null;
 
             switch ($obj->image_action) {
                 // URL
@@ -136,7 +135,7 @@ class AdvertisementLaunchController extends Controller
                     break;
                 // 商品分類
                 case 'C':
-                    $obj->link_content = $product_category_format[$obj->target_cate_hierarchy_id] ?? null;
+                    $obj->link_content = $this->webCategoryHierarchyService->getAncestorsAndSelfName($obj->target_cate_hierarchy_id) ?? null;
                     break;
                 default:
                     $obj->link_content = null;
@@ -226,7 +225,7 @@ class AdvertisementLaunchController extends Controller
         return view('backend.advertisement.launch.edit', [
             'payload' => [
                 'ad_slot_content' => $adSlotContent,
-                'product_category' => $this->webCategoryHierarchyService->getCategoryHierarchyContents(),
+                'product_category' => $this->webCategoryHierarchyService->getMaxLevelCategories(),
                 'products' => $this->productService->getProducts([
                     'product_type' => 'N',
                 ]),

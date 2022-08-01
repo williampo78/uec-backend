@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\CategoryProduct;
 use App\Models\WebCategoryHierarchy;
+use App\Models\WebCategoryProduct;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +15,12 @@ use ImageUpload;
 class WebCategoryHierarchyService
 {
     private const CATEGORY_UPLOAD_PATH_PREFIX = 'category_icon/';
+    private $maxLevel;
+
+    public function __construct()
+    {
+        $this->maxLevel = config('uec.web_category_hierarchy_levels');
+    }
 
     //取得開關分類判斷輸出內容
     public function getCategoryHierarchyContents($input = [])
@@ -47,14 +53,14 @@ class WebCategoryHierarchyService
             level_two.content_type , level_two.promotion_campaign_id,'' as meta_title ,level_two.meta_description ,level_two.content_type , level_two.meta_keywords
             FROM (SELECT * FROM web_category_hierarchy WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 " . $where . ") level_two ON level_two.parent_id = level_one.id
-            " . $keyword . " ORDER BY level_one.category_name, level_two.category_name";
+            " . $keyword . " ORDER BY level_one.lft, level_two.lft";
         } else {
             $query = "SELECT level_one.id as level_one_id, level_three.id as id, CONCAT( level_one.category_name, ' > ', level_two.category_name , ' > ' ,level_three.category_name) as name, level_three.active,
             level_three.content_type  ,level_three.meta_title ,level_three.meta_description,level_three.content_type ,level_three.meta_keywords,level_three.promotion_campaign_id
-            FROM ( SELECT id , category_name FROM web_category_hierarchy WHERE category_level = 1 ) level_one
+            FROM ( SELECT * FROM web_category_hierarchy WHERE category_level = 1 ) level_one
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 2 ) level_two ON level_two.parent_id = level_one.id
             JOIN ( SELECT * FROM web_category_hierarchy WHERE category_level = 3 " . $where . ") level_three ON level_three.parent_id = level_two.id
-            " . $keyword . " ORDER BY level_one.category_name, level_two.category_name , level_three.category_name";
+            " . $keyword . " ORDER BY level_one.lft, level_two.lft , level_three.lft";
         }
 
         return DB::select($query);
@@ -62,7 +68,7 @@ class WebCategoryHierarchyService
 
     public function categoryProductsHierarchyId($id)
     {
-        $result = CategoryProduct::where('web_category_hierarchy_id', $id)
+        $result = WebCategoryProduct::where('web_category_hierarchy_id', $id)
             ->join('products_v', 'products_v.id', '=', 'web_category_products.product_id')
             ->select('web_category_products.id as web_category_products_id', 'web_category_products.product_id as product_id', 'products_v.*')
             ->get();
@@ -73,7 +79,7 @@ class WebCategoryHierarchyService
     public function categoryProductsId($id)
     {
         $confi_levels = config('uec.web_category_hierarchy_levels');
-        $result = CategoryProduct::where('web_category_products.product_id', $id)
+        $result = WebCategoryProduct::where('web_category_products.product_id', $id)
             ->leftJoin('web_category_hierarchy', 'web_category_hierarchy.id', '=', 'web_category_products.web_category_hierarchy_id')
             ->select('web_category_products.web_category_hierarchy_id', 'web_category_hierarchy.category_name', 'web_category_products.sort', 'web_category_hierarchy.active')
             ->where('web_category_hierarchy.category_level', $confi_levels)
@@ -216,7 +222,7 @@ class WebCategoryHierarchyService
     }
 
     /**
-     * 取得同一層分類
+     * 取得指定parent id的同一層分類
      *
      * @param integer|null $parentId
      * @return Collection
@@ -394,7 +400,7 @@ class WebCategoryHierarchyService
         $isSuccess = false;
 
         try {
-            $parentCategory = WebCategoryHierarchy::findOrFail($data['parent_id']);
+            $parentCategory = WebCategoryHierarchy::find($data['parent_id']);
 
             $treeData = collect($data['category_ids'])
                 ->map(function ($id) {
@@ -459,12 +465,29 @@ class WebCategoryHierarchyService
      */
     public function getDescendantsUntilMaxLevel(): Collection
     {
-        $maxLevel = config('uec.web_category_hierarchy_levels');
-        $categoryTree = WebCategoryHierarchy::where('category_level', '<=', $maxLevel)
+        return WebCategoryHierarchy::where('category_level', '<=', $this->maxLevel)
             ->defaultOrder()
             ->get()
             ->toTree();
+    }
 
-        return $categoryTree;
+    /**
+     * 取得最大階層的分類
+     *
+     * @return Collection
+     */
+    public function getMaxLevelCategories(): Collection
+    {
+        return WebCategoryHierarchy::with(['ancestors'])
+            ->where('category_level', $this->maxLevel)
+            ->defaultOrder()
+            ->get()
+            ->map(function ($category) {
+                if ($category->ancestors->count()) {
+                    $category->category_name = implode(' > ', $category->ancestors->pluck('category_name')->toArray()) . " > {$category->category_name}";
+                }
+
+                return $category;
+            });
     }
 }

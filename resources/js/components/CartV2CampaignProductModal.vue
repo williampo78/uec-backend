@@ -559,7 +559,7 @@ export default {
         if (data.web_category_hierarchies) {
             data.web_category_hierarchies.forEach((webCategoryHierarchy) => {
                 this.webCategoryHierarchies.push({
-                    text: webCategoryHierarchy.name,
+                    text: webCategoryHierarchy.category_name,
                     id: webCategoryHierarchy.id,
                 });
             });

@@ -220,7 +220,7 @@ class PromotionalCampaignCartV2Controller extends Controller
         // 商品類型
         $result['product_type_options'] = config('uec.product_type_options');
         // 前台分類
-        $result['web_category_hierarchies'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents();
+        $result['web_category_hierarchies'] = $this->webCategoryHierarchyService->getMaxLevelCategories();
 
         return response()->json($result);
     }

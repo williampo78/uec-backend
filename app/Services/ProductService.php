@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\WebCategoryHierarchy;
-use App\Models\CategoryProduct;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductAuditLog;
@@ -15,6 +13,8 @@ use App\Models\ProductSpecInfo;
 use App\Models\PromotionalCampaignProduct;
 use App\Models\RelatedProduct;
 use App\Models\WarehouseStock;
+use App\Models\WebCategoryHierarchy;
+use App\Models\WebCategoryProduct;
 use App\Services\UniversalService;
 use Batch;
 use Carbon\Carbon;
@@ -298,6 +298,7 @@ class ProductService
             $result['error_code'] = $e->getMessage();
             $result['status'] = false;
         }
+
         return $result;
     }
 
@@ -452,6 +453,7 @@ class ProductService
             $result['status'] = false;
             $result['error_code'] = $e->getMessage();
         }
+
         return $result;
     }
 
@@ -474,6 +476,7 @@ class ProductService
             ->leftJoin('supplier', 'products.supplier_id', '=', 'supplier.id')
             ->where('products.agent_id', $agent_id)->where('products.id', $id);
         $result = $products->first();
+
         return $result;
     }
 
@@ -482,6 +485,7 @@ class ProductService
         $agent_id = Auth::user()->agent_id;
         $productItems = ProductItem::where('agent_id', $agent_id)->where('product_id', $products_id);
         $result = $productItems->get();
+
         return $result;
     }
 
@@ -504,10 +508,11 @@ class ProductService
         if (isset($in['stock_type']) && $in['stock_type'] !== '') {
             $productItems->where('products.stock_type', $in['stock_type']);
         }
-        if(!empty($in['exclude_selling_channel'])){
-            $productItems->whereNotIn('products.selling_channel',$in['exclude_selling_channel']);
+        if (!empty($in['exclude_selling_channel'])) {
+            $productItems->whereNotIn('products.selling_channel', $in['exclude_selling_channel']);
         }
         $result = $productItems->get();
+
         return $result;
     }
 
@@ -517,8 +522,10 @@ class ProductService
         $results = $productPhotos->get();
         $results = $results->map(function ($result) {
             $result->photo_size = ImageUpload::getSize($result->photo_name);
+
             return $result;
         });
+
         return $results;
     }
 
@@ -543,6 +550,7 @@ class ProductService
         $result = [];
         $result['spac_1'] = DB::select($sql_spac_1);
         $result['spac_2'] = DB::select($sql_spac_2);
+
         return $result;
 
     }
@@ -595,6 +603,7 @@ class ProductService
     public function getProduct_spec_info($product_id)
     {
         $result = ProductSpecInfo::where('product_id', $product_id)->first();
+
         return $result;
     }
 
@@ -605,10 +614,11 @@ class ProductService
             ->leftJoin('products', 'products.id', '=', 'related_products.related_product_id')
             ->orderBy('related_products.sort', 'ASC')
             ->get();
+
         return $result;
     }
 
-    public function updateProductSmall($in, $file = array(), $id)
+    public function updateProductSmall($in, $file = [], $id)
     {
         $result = [];
         $user_id = Auth::user()->id;
@@ -661,7 +671,7 @@ class ProductService
             }
             foreach ($CategoryHierarchyProducts as $key => $val) {
                 if (isset($val['status']) && $val['status'] == 'new') {
-                    CategoryProduct::create([
+                    WebCategoryProduct::create([
                         'web_category_hierarchy_id' => $val['web_category_hierarchy_id'],
                         'product_id' => $id,
                         'sort' => $key,
@@ -715,24 +725,24 @@ class ProductService
                 };
             }
             // array_merge
-            $change_product_attributes = [] ;
+            $change_product_attributes = [];
             //證書
-            if(isset($in['CERTIFICATE'])){
-                $change_product_attributes = array_merge($change_product_attributes,$in['CERTIFICATE']);
+            if (isset($in['CERTIFICATE'])) {
+                $change_product_attributes = array_merge($change_product_attributes, $in['CERTIFICATE']);
             }
             //成分
-            if(isset($in['INGREDIENT'])){
-               $change_product_attributes  = array_merge($change_product_attributes,$in['INGREDIENT']);
+            if (isset($in['INGREDIENT'])) {
+                $change_product_attributes = array_merge($change_product_attributes, $in['INGREDIENT']);
             }
             //族群
-            if(isset($in['GROUP'])){
-                $change_product_attributes = array_merge($change_product_attributes,$in['GROUP']);
+            if (isset($in['GROUP'])) {
+                $change_product_attributes = array_merge($change_product_attributes, $in['GROUP']);
             }
             //劑型
-            if(isset($in['DOSAGE_FORM'])){
-                $change_product_attributes = array_merge($change_product_attributes,$in['DOSAGE_FORM']);
+            if (isset($in['DOSAGE_FORM'])) {
+                $change_product_attributes = array_merge($change_product_attributes, $in['DOSAGE_FORM']);
             }
-            ProductAttribute::whereIn('attribute_type', ['CERTIFICATE','INGREDIENT','GROUP','DOSAGE_FORM'])->where('product_id', $id)->delete();
+            ProductAttribute::whereIn('attribute_type', ['CERTIFICATE', 'INGREDIENT', 'GROUP', 'DOSAGE_FORM'])->where('product_id', $id)->delete();
             $add_product_attributes = [];
             foreach ($change_product_attributes as $key => $val) {
                 $add_product_attributes[$key]['attribute_type'] = 'CERTIFICATE';
@@ -764,6 +774,7 @@ class ProductService
             ->leftJoin('users', 'users.id', '=', 'product_audit_log.updated_by')
             ->where('product_audit_log.product_id', $product_id)
             ->get();
+
         return $ProductAuditLog;
     }
 
@@ -774,6 +785,7 @@ class ProductService
             ->leftJoin('users as discontinued_user', 'discontinued_user.id', '=', 'product_review_log.discontinued_by')
             ->where('product_review_log.product_id', $id)
             ->get();
+
         return $getProductReviewLog;
     }
 
@@ -801,7 +813,7 @@ class ProductService
                 'selling_price' => $in['selling_price'],
                 'start_launched_at' => $in['start_launched_at'],
                 'end_launched_at' => $in['end_launched_at'],
-                'start_selling_at'=>$in['start_selling_at'],
+                'start_selling_at' => $in['start_selling_at'],
                 'created_by' => $user_id,
                 'updated_by' => $user_id,
             ]);
@@ -812,6 +824,7 @@ class ProductService
             Log::warning($e->getMessage());
             $result = false;
         }
+
         return $result;
     }
 
@@ -849,6 +862,7 @@ class ProductService
             Log::warning($e->getMessage());
             $result = false;
         }
+
         return $result;
     }
 
@@ -882,6 +896,7 @@ class ProductService
             Log::warning($e->getMessage());
             $result = false;
         }
+
         return $result;
     }
 
@@ -937,6 +952,7 @@ class ProductService
             'google_shop_photo_name' => '',
             'updated_by' => $user_id,
         ]);
+
         return true;
     }
 
@@ -1307,6 +1323,7 @@ class ProductService
                 $obj->status_cn = '否';
 
             }
+
             return $obj;
         });
     }
@@ -1381,6 +1398,7 @@ class ProductService
         $result = $result->sortBy([
             ['rp_trade_date', 'desc'],
         ]);
+
         return $result;
     }
     /**
@@ -1404,6 +1422,7 @@ class ProductService
         $result = $result->sortBy([
             ['start_at', 'desc'],
         ]);
-        return $result ;
+
+        return $result;
     }
 }

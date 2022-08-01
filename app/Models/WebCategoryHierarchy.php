@@ -14,7 +14,7 @@ class WebCategoryHierarchy extends Model
     protected $guarded = [];
 
     /**
-     * 對應lft column
+     * 對應 lft column
      */
     public function getLftName()
     {
@@ -22,7 +22,7 @@ class WebCategoryHierarchy extends Model
     }
 
     /**
-     * 對應rgt column
+     * 對應 rgt column
      */
     public function getRgtName()
     {

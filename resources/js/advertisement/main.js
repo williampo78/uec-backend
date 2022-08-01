@@ -528,7 +528,7 @@ window.getProductCategorySelectOptions = (datas = []) => {
 
     $.each(datas, function (key, value) {
         options += `
-            <option value='${value["id"]}'>${value["name"]}</option>
+            <option value='${value["id"]}'>${value["category_name"]}</option>
         `;
     });
 

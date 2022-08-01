@@ -86,7 +86,7 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <div class="col-sm-3">
-                    <label class="control-label label-container">
+                    <label class="label-container">
                         <span>版位標題色</span>
                         <span>(例：#00BB00)</span>
                     </label>
@@ -99,7 +99,7 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <div class="col-sm-3">
-                    <label class="control-label label-container">
+                    <label class="label-container">
                         <span>版位背景色</span>
                         <span>(例：#DAF7CD)</span>
                     </label>
@@ -147,62 +147,66 @@
     <hr style="border-top: 1px solid gray;" />
 
     <div class="row">
-        <div class="col-sm-2">
-            <label>〔看更多〕</label>
-        </div>
-        <div class="col-sm-10">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="see_more_action" value="X" v-model="seeMore.action" />
-                            無連結
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
+        <div class="col-sm-9">
+            <div class="form-group">
                 <div class="col-sm-2">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="see_more_action" value="U" v-model="seeMore.action" />
-                            URL
-                        </label>
-                    </div>
+                    <label class="control-label">〔看更多〕</label>
                 </div>
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="see_more_url" name="see_more_url" value="" />
+                <div class="col-sm-10 radio-group">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="see_more_action" value="X" v-model="seeMore.action" />
+                                    無連結
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="see_more_target_blank" name="see_more_target_blank" class="checkbox-normal" /> 另開視窗
-                        </label>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="see_more_action" value="U" v-model="seeMore.action" />
+                                    URL
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="see_more_url" name="see_more_url" value="" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="see_more_target_blank" name="see_more_target_blank" /> 另開視窗
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-2">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="see_more_action" value="C" v-model="seeMore.action" />
-                            商品分類頁
-                        </label>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <treeselect
-                            :class="{'treeselect-invalid': !seeMore.categoryValid}"
-                            :required="seeMore.categoryRequired"
-                            v-model="seeMore.categoryId"
-                            :options="categoryTree"
-                            :normalizer="normalizer"
-                            name="see_more_cate_hierarchy_id"
-                            :flat="true"
-                        />
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="see_more_action" value="C" v-model="seeMore.action" />
+                                    商品分類頁
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <treeselect
+                                    :class="{'treeselect-invalid': !seeMore.categoryValid}"
+                                    :required="seeMore.categoryRequired"
+                                    v-model="seeMore.categoryId"
+                                    :options="categoryTree"
+                                    :normalizer="normalizer"
+                                    name="see_more_cate_hierarchy_id"
+                                    :flat="true"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

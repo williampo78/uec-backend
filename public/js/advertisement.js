@@ -649,7 +649,7 @@ window.getProductCategorySelectOptions = function () {
   var datas = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
   var options = "";
   $.each(datas, function (key, value) {
-    options += "\n            <option value='".concat(value["id"], "'>").concat(value["name"], "</option>\n        ");
+    options += "\n            <option value='".concat(value["id"], "'>").concat(value["category_name"], "</option>\n        ");
   });
   return options;
 }; // 取得商品下拉選項
