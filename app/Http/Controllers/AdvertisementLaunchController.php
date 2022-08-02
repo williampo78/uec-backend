@@ -126,7 +126,7 @@ class AdvertisementLaunchController extends Controller
         foreach ($ad_slot_content['details'] as $key => $obj) {
             $obj->image_name_url = !empty($obj->image_name) ? config('filesystems.disks.s3.url') . $obj->image_name : null;
             $obj->product = !empty($obj->product_id) ? $products_format[$obj->product_id] ?? null : null;
-            $obj->product_category = !empty($obj->web_category_hierarchy_id) ? $this->webCategoryHierarchyService->getAncestorsAndSelfName($obj->web_category_hierarchy_id) : null;
+            $obj->product_category = isset($obj->web_category_hierarchy_id) ? $this->webCategoryHierarchyService->getAncestorsAndSelfName($obj->web_category_hierarchy_id) : null;
 
             switch ($obj->image_action) {
                 // URL
@@ -135,7 +135,7 @@ class AdvertisementLaunchController extends Controller
                     break;
                 // 商品分類
                 case 'C':
-                    $obj->link_content = $this->webCategoryHierarchyService->getAncestorsAndSelfName($obj->target_cate_hierarchy_id) ?? null;
+                    $obj->link_content = isset($obj->target_cate_hierarchy_id) ? $this->webCategoryHierarchyService->getAncestorsAndSelfName($obj->target_cate_hierarchy_id) : null;
                     break;
                 default:
                     $obj->link_content = null;

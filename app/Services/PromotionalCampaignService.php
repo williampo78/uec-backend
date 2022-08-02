@@ -1847,7 +1847,7 @@ class PromotionalCampaignService
                     // 前台分類
                     if ($campaignProduct->product->webCategoryHierarchies->isNotEmpty()) {
                         $webCategoryHierarchy = $campaignProduct->product->webCategoryHierarchies->first();
-                        $tmpCampaignProduct['web_category_hierarchy'] = $this->webCategoryHierarchyService->getAncestorsAndSelfName($webCategoryHierarchy->id);
+                        $tmpCampaignProduct['web_category_hierarchy'] = isset($webCategoryHierarchy) ? $this->webCategoryHierarchyService->getAncestorsAndSelfName($webCategoryHierarchy->id) : null;
                     }
                 }
 
@@ -2007,7 +2007,7 @@ class PromotionalCampaignService
             // 前台分類
             if ($product->webCategoryHierarchies->isNotEmpty()) {
                 $webCategoryHierarchy = $product->webCategoryHierarchies->first();
-                $tmpProduct['web_category_hierarchy'] = $this->webCategoryHierarchyService->getAncestorsAndSelfName($webCategoryHierarchy->id);
+                $tmpProduct['web_category_hierarchy'] = isset($webCategoryHierarchy) ? $this->webCategoryHierarchyService->getAncestorsAndSelfName($webCategoryHierarchy->id) : null;
             }
 
             // 合計各個商品品項的庫存數
