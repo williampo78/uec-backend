@@ -279,4 +279,48 @@ return [
 
     //購物車滿額折扣，攤提回單品計算
     'cart_p_discount_split'=> 1,
+
+    //異動類型
+    'transaction_type' => [
+        'PO_RCV'       => '採購進貨',
+        'PO_RTV'       => '採購退貨',
+        'ORDER_SHIP'   => '訂單出庫',
+        'ORDER_CANCEL' => '訂單取消',
+        'ORDER_VOID'   => '訂單作廢',
+        'ORDER_RTN'    => '訂單銷退',
+        'MISC_REC'     => '其他入庫',
+        'MISC_ISSUE'   => '其他出庫',
+    ],
+
+    //來源單據
+    'source_table_name' => [
+        'purchase_detail'            => [
+            'chinese_name'     => '進貨單',
+            'transaction_type' => null
+        ],
+        'misc_stock_request_details' => [
+            'chinese_name'     => '進貨退出單',
+            'transaction_type' => 'PO_RTV'
+        ],
+        'buyout_stock_req_details'   => [
+            'chinese_name'     => '寄售入庫申請單',
+            'transaction_type' => 'MISC_REC'
+        ],
+        'sup_req_cs_stock_details'   => [
+            'chinese_name'     => '寄售退倉申請單',
+            'transaction_type' => 'MISC_ISSUE'
+        ],
+        'sup_req_stock_details'      => [
+            'chinese_name'     => '轉單庫存異動申請單',
+            'transaction_type' => null
+        ],
+        'order_details'              => [
+            'chinese_name'     => '訂單',
+            'transaction_type' => null
+        ],
+        'return_request_details'     => [
+            'chinese_name'     => '退貨申請單',
+            'transaction_type' => null
+        ],
+    ]
 ];
