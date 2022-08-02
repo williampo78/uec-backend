@@ -267,19 +267,15 @@ class WebCategoryHierarchyService
                     ]);
                 }
             } else {
-                $configLevel = config('uec.web_category_hierarchy_levels');
-                $createAry =[
+                $parentCategory = WebCategoryHierarchy::findOrFail($data['parent_id']);
+                $createdCategory = $parentCategory->children()->create([
                     'agent_id' => $user->agent_id,
                     'category_name' => $data['category_name'],
                     'category_level' => $data['category_level'],
+                    'content_type' => $data['category_level'] == $this->maxLevel ? 'P' : null,
                     'created_by' => $user->id,
                     'updated_by' => $user->id,
-                ];
-                if($data['category_level'] == $configLevel){
-                    $createAry['content_type'] = 'P';
-                }
-                $parentCategory = WebCategoryHierarchy::findOrFail($data['parent_id']);
-                $createdCategory = $parentCategory->children()->create($createAry);
+                ]);
             }
 
             DB::commit();

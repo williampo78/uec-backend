@@ -59,7 +59,7 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-            $strSQL = "select cate2.`sort` L1_SORT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+            $strSQL = "select cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
                     '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
                     from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
@@ -80,9 +80,9 @@ class APIProductServices
                 $strSQL .= ")";
             }
             $strSQL .= " group by cate.`id`
-                    order by cate2.`sort`, cate1.`sort`, cate.`sort`";
+                    order by cate2.`lft`, cate1.`lft`, cate.`lft`";
         } elseif ($config_levels == '2') {
-            $strSQL = "select cate1.`sort` L1_SORT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+            $strSQL = "select cate1.`lft` L1_LFT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
                     '' as campaign_name, '' as url_code, '' as campaign_brief, cate1.`category_short_name` as L1_short_name, cate1.`icon_name` as L1_icon_name
                     from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
@@ -101,54 +101,54 @@ class APIProductServices
                 $strSQL .= ")";
             }
             $strSQL .= " group by cate.`id`
-                    order by cate1.`sort`, cate.`sort`";
+                    order by cate1.`lft`, cate.`lft`";
         }
 
         $categorys = DB::select($strSQL);
         foreach ($categorys as $category) {
-            $L1_data[$category->L1_SORT]["id"] = $category->L1ID;
-            $L1_data[$category->L1_SORT]["name"] = $category->L1_NAME;
-            $L1_data[$category->L1_SORT]["shortName"] = $category->L1_short_name;
-            $L1_data[$category->L1_SORT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
+            $L1_data[$category->L1_LFT]["id"] = $category->L1ID;
+            $L1_data[$category->L1_LFT]["name"] = $category->L1_NAME;
+            $L1_data[$category->L1_LFT]["shortName"] = $category->L1_short_name;
+            $L1_data[$category->L1_LFT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
 
             if ($config_levels == '3') {
-                $L2_data[$category->L1_SORT][$category->sort]["id"] = $category->L2ID;
-                $L2_data[$category->L1_SORT][$category->sort]["name"] = $category->L2_NAME;
+                $L2_data[$category->L1_LFT][$category->lft]["id"] = $category->L2ID;
+                $L2_data[$category->L1_LFT][$category->lft]["name"] = $category->L2_NAME;
 
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['id'] = $category->id;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['name'] = $category->category_name;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['type'] = $category->content_type;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['meta_title'] = $category->meta_title;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['meta_description'] = $category->meta_description;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['count'] = $category->pCount;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['campaign_name'] = $category->campaign_name;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['url_code'] = $category->url_code;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['sort'] = $category->sort;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['id'] = $category->id;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['name'] = $category->category_name;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['type'] = $category->content_type;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_title'] = $category->meta_title;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_description'] = $category->meta_description;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['lft'] = $category->lft;
 
             } else if ($config_levels == '2') {
 
-                $L2_data[$category->L1_SORT][$category->id]['id'] = $category->id;
-                $L2_data[$category->L1_SORT][$category->id]['name'] = $category->category_name;
-                $L2_data[$category->L1_SORT][$category->id]['type'] = $category->content_type;
-                $L2_data[$category->L1_SORT][$category->id]['meta_title'] = $category->meta_title;
-                $L2_data[$category->L1_SORT][$category->id]['meta_description'] = $category->meta_description;
-                $L2_data[$category->L1_SORT][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L2_data[$category->L1_SORT][$category->id]['count'] = $category->pCount;
-                $L2_data[$category->L1_SORT][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L2_data[$category->L1_SORT][$category->id]['campaign_name'] = $category->campaign_name;
-                $L2_data[$category->L1_SORT][$category->id]['url_code'] = $category->url_code;
-                $L2_data[$category->L1_SORT][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L2_data[$category->L1_SORT][$category->id]['sort'] = $category->sort;
+                $L2_data[$category->L1_LFT][$category->id]['id'] = $category->id;
+                $L2_data[$category->L1_LFT][$category->id]['name'] = $category->category_name;
+                $L2_data[$category->L1_LFT][$category->id]['type'] = $category->content_type;
+                $L2_data[$category->L1_LFT][$category->id]['meta_title'] = $category->meta_title;
+                $L2_data[$category->L1_LFT][$category->id]['meta_description'] = $category->meta_description;
+                $L2_data[$category->L1_LFT][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L2_data[$category->L1_LFT][$category->id]['count'] = $category->pCount;
+                $L2_data[$category->L1_LFT][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L2_data[$category->L1_LFT][$category->id]['campaign_name'] = $category->campaign_name;
+                $L2_data[$category->L1_LFT][$category->id]['url_code'] = $category->url_code;
+                $L2_data[$category->L1_LFT][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L2_data[$category->L1_LFT][$category->id]['lft'] = $category->lft;
             }
 
         }
 
         //根據階層顯示層級資料(賣場)
         if ($config_levels == '3') {
-            $strSQL = "select cate2.`sort` L1_SORT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*,0 as pCount,
+            $strSQL = "select cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*,0 as pCount,
                     '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
                     from `web_category_hierarchy` cate
                     inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
@@ -165,9 +165,9 @@ class APIProductServices
                 $strSQL .= ")";
             }
             $strSQL .= " group by cate.`id`
-                    order by cate2.`sort`, cate1.`sort`, cate.`sort`";
+                    order by cate2.`lft`, cate1.`lft`, cate.`lft`";
         } elseif ($config_levels == '2') {
-            $strSQL = "select cate1.`sort` L1_SORT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, 0 as 'pCount',
+            $strSQL = "select cate1.`lft` L1_LFT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, 0 as 'pCount',
                     pcc.`campaign_name`, pcc.`url_code`, pcc.`campaign_brief`, cate1.`category_short_name` as L1_short_name, cate1.`icon_name` as L1_icon_name
                     from web_category_hierarchy cate
                     inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
@@ -182,45 +182,45 @@ class APIProductServices
                 $strSQL .= ")";
             }
             $strSQL .= " group by cate.`id`
-                    order by cate1.`sort`, cate.`sort`";
+                    order by cate1.`lft`, cate.`lft`";
         }
         $categorys = DB::select($strSQL);
         foreach ($categorys as $category) {
-            $L1_data[$category->L1_SORT]["id"] = $category->L1ID;
-            $L1_data[$category->L1_SORT]["name"] = $category->L1_NAME;
-            $L1_data[$category->L1_SORT]["shortName"] = $category->category_short_name;
-            $L1_data[$category->L1_SORT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
+            $L1_data[$category->L1_LFT]["id"] = $category->L1ID;
+            $L1_data[$category->L1_LFT]["name"] = $category->L1_NAME;
+            $L1_data[$category->L1_LFT]["shortName"] = $category->category_short_name;
+            $L1_data[$category->L1_LFT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
 
             if ($config_levels == '3') {
-                $L2_data[$category->L1_SORT][$category->sort]["id"] = $category->L2ID;
-                $L2_data[$category->L1_SORT][$category->sort]["name"] = $category->L2_NAME;
+                $L2_data[$category->L1_LFT][$category->lft]["id"] = $category->L2ID;
+                $L2_data[$category->L1_LFT][$category->lft]["name"] = $category->L2_NAME;
 
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['id'] = $category->id;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['name'] = $category->category_name;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['type'] = $category->content_type;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['meta_title'] = $category->meta_title;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['meta_description'] = $category->meta_description;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['count'] = $category->pCount;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['campaign_name'] = $category->campaign_name;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['url_code'] = $category->url_code;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L3_data[$category->L1_SORT][$category->sort][$category->id]['sort'] = $category->sort;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['id'] = $category->id;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['name'] = $category->category_name;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['type'] = $category->content_type;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_title'] = $category->meta_title;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_description'] = $category->meta_description;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1_LFT][$category->lft][$category->id]['lft'] = $category->lft;
 
             } else if ($config_levels == '2') {
-                $L2_data[$category->L1_SORT][$category->id]['id'] = $category->id;
-                $L2_data[$category->L1_SORT][$category->id]['name'] = $category->category_name;
-                $L2_data[$category->L1_SORT][$category->id]['type'] = $category->content_type;
-                $L2_data[$category->L1_SORT][$category->id]['meta_title'] = $category->meta_title;
-                $L2_data[$category->L1_SORT][$category->id]['meta_description'] = $category->meta_description;
-                $L2_data[$category->L1_SORT][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L2_data[$category->L1_SORT][$category->id]['count'] = $category->pCount;
-                $L2_data[$category->L1_SORT][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L2_data[$category->L1_SORT][$category->id]['campaign_name'] = $category->campaign_name;
-                $L2_data[$category->L1_SORT][$category->id]['url_code'] = $category->url_code;
-                $L2_data[$category->L1_SORT][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L2_data[$category->L1_SORT][$category->id]['sort'] = $category->sort;
+                $L2_data[$category->L1_LFT][$category->id]['id'] = $category->id;
+                $L2_data[$category->L1_LFT][$category->id]['name'] = $category->category_name;
+                $L2_data[$category->L1_LFT][$category->id]['type'] = $category->content_type;
+                $L2_data[$category->L1_LFT][$category->id]['meta_title'] = $category->meta_title;
+                $L2_data[$category->L1_LFT][$category->id]['meta_description'] = $category->meta_description;
+                $L2_data[$category->L1_LFT][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L2_data[$category->L1_LFT][$category->id]['count'] = $category->pCount;
+                $L2_data[$category->L1_LFT][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L2_data[$category->L1_LFT][$category->id]['campaign_name'] = $category->campaign_name;
+                $L2_data[$category->L1_LFT][$category->id]['url_code'] = $category->url_code;
+                $L2_data[$category->L1_LFT][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L2_data[$category->L1_LFT][$category->id]['lft'] = $category->lft;
             }
 
         }
@@ -236,14 +236,14 @@ class APIProductServices
                 $data[$key1]["shortName"] = $value1["shortName"];
                 $data[$key1]["icon"] = $value1["icon"];
                 if ($config_levels == 2) {
-                    array_multisort(array_column($L2_data[$key1], 'sort'), SORT_ASC, $L2_data[$key1]);
+                    array_multisort(array_column($L2_data[$key1], 'lft'), SORT_ASC, $L2_data[$key1]);
                 }
                 foreach ($L2_data[$key1] as $key2 => $value2) {
                     $data2[$key2]["id"] = $value2["id"];
                     $data2[$key2]["name"] = $value2["name"];
                     if ($config_levels == 3) {
                         $data3 = [];
-                        array_multisort(array_column($L3_data[$key1][$key2], 'sort'), SORT_ASC, $L3_data[$key1][$key2]);
+                        array_multisort(array_column($L3_data[$key1][$key2], 'lft'), SORT_ASC, $L3_data[$key1][$key2]);
                         foreach ($L3_data[$key1][$key2] as $key3 => $value3) {
                             $data3[$key3]["id"] = $value3["id"];
                             $data3[$key3]["name"] = $value3["name"];
@@ -640,9 +640,9 @@ class APIProductServices
 
         $strSQL .= " group by cate1.id, p.id";
         if ($config_levels == 2) {
-            $strSQL .= " order by cate2.sort, cate1.sort";
+            $strSQL .= " order by cate2.lft, cate1.lft";
         } else {
-            $strSQL .= " order by cate3.sort, cate2.sort, cate1.sort";
+            $strSQL .= " order by cate3.lft, cate2.lft, cate1.lft";
         }
         //dd($strSQL);
         $products = DB::select($strSQL);
@@ -1145,7 +1145,7 @@ class APIProductServices
                 $strSQL .= " and cate.`id`=" . $category;
             }
             $strSQL .= " group by cate.`id`
-                    order by cate2.`sort`, cate1.`sort`, cate.`sort`";
+                    order by cate2.`lft`, cate1.`lft`, cate.`lft`";
         } elseif ($config_levels == '2') {
             $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
                     inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
@@ -1157,7 +1157,7 @@ class APIProductServices
                 $strSQL .= " and cate.`id`=" . $category;
             }
             $strSQL .= " group by cate.`id`
-                    order by cate1.`sort`, cate.`sort`";
+                    order by cate1.`lft`, cate.`lft`";
         }
         $categorys = DB::select($strSQL);
         $data = [];
