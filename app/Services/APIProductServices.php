@@ -112,21 +112,21 @@ class APIProductServices
             $L1_data[$category->L1_LFT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
 
             if ($config_levels == '3') {
-                $L2_data[$category->L1_LFT][$category->lft]["id"] = $category->L2ID;
-                $L2_data[$category->L1_LFT][$category->lft]["name"] = $category->L2_NAME;
+                $L2_data[$category->L1_LFT][$category->L2ID]["id"] = $category->L2ID;
+                $L2_data[$category->L1_LFT][$category->L2ID]["name"] = $category->L2_NAME;
 
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['id'] = $category->id;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['name'] = $category->category_name;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['type'] = $category->content_type;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_title'] = $category->meta_title;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_description'] = $category->meta_description;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['count'] = $category->pCount;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_name'] = $category->campaign_name;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['url_code'] = $category->url_code;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['lft'] = $category->lft;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['id'] = $category->id;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['name'] = $category->category_name;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['type'] = $category->content_type;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_title'] = $category->meta_title;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_description'] = $category->meta_description;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['lft'] = $category->lft;
 
             } else if ($config_levels == '2') {
 
@@ -192,21 +192,21 @@ class APIProductServices
             $L1_data[$category->L1_LFT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
 
             if ($config_levels == '3') {
-                $L2_data[$category->L1_LFT][$category->lft]["id"] = $category->L2ID;
-                $L2_data[$category->L1_LFT][$category->lft]["name"] = $category->L2_NAME;
+                $L2_data[$category->L1_LFT][$category->L2ID]["id"] = $category->L2ID;
+                $L2_data[$category->L1_LFT][$category->L2ID]["name"] = $category->L2_NAME;
 
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['id'] = $category->id;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['name'] = $category->category_name;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['type'] = $category->content_type;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_title'] = $category->meta_title;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_description'] = $category->meta_description;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['count'] = $category->pCount;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_name'] = $category->campaign_name;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['url_code'] = $category->url_code;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L3_data[$category->L1_LFT][$category->lft][$category->id]['lft'] = $category->lft;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['id'] = $category->id;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['name'] = $category->category_name;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['type'] = $category->content_type;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_title'] = $category->meta_title;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_description'] = $category->meta_description;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['lft'] = $category->lft;
 
             } else if ($config_levels == '2') {
                 $L2_data[$category->L1_LFT][$category->id]['id'] = $category->id;
