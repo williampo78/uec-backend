@@ -126,7 +126,7 @@ class ProductReviewRegisterController extends Controller
         switch ($in['type']) {
             case 'offProduct':
                 if($this->productService->checkProductInCampaignIsset($in['product_id'])){
-                     $status = $this->productService->offProduct($in);
+                    $status = $this->productService->offProduct($in);
                 }else{
                     $status = false ;
                     $msg = '商品存在上架中的行銷活動，不允許下架！';

@@ -41,7 +41,7 @@ class AuthController extends Controller
         $v = Validator::make($credentials, [
             'mobile' => 'required',
             'pwd' => 'required',
-            'captcha' => 'required|captcha_api:'.$credentials['key'].',flat',
+            'captcha' => 'required|captcha_api:' . $credentials['key'] . ',flat',
         ], $messages);
 
         if ($v->fails()) {
@@ -61,7 +61,7 @@ class AuthController extends Controller
         unset($credentials['password']);
         unset($credentials['channel']);
         try {
-            if ($result['status'] == '200') {
+            if ($result['status'] == 200) {
                 $status = true;
                 $tmp = Member::where('member_id', '=', $result['data']['id'])->first();
                 if (!is_null($tmp)) {
@@ -82,7 +82,7 @@ class AuthController extends Controller
                 return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $result['data']]);
             } else {
                 $status = false;
-                $err = $result['status'];
+                $err = (string)$result['status'];
                 return response()->json(['status' => false, 'error_code' => $err, 'error_msg' => $result['message'], 'result' => (isset($result['error']) ? $result['error'] : [])]);
             }
         } catch (JWTException $e) {

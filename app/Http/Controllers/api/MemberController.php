@@ -232,9 +232,19 @@ class MemberController extends Controller
                 // 小計
                 $orderPayload['subtotal'] = number_format($orderDetail->subtotal);
 
-                //商品圖 以規格圖為優先，否則取商品封面圖
-                $productPhoto = empty(optional($orderDetail->productItem)->photo_name) ? optional($orderDetail->product->productPhotos->first())->photo_name : optional($orderDetail->productItem)->photo_name;
-                $orderPayload['photo_url'] = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
+                // 商品圖片
+                if ($orderDetail->product->productPhotos->isNotEmpty()) {
+                    $productPhoto = $orderDetail->product->productPhotos->first();
+
+                    // 圖片網址
+                    $orderPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
+                }
+
+                //售價
+                $orderPayload['selling_price'] = number_format($orderDetail->selling_price);
+                //折抵合計
+                $orderPayload['total_discount'] = number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount);
+
             }
 
             // 出貨單
@@ -368,6 +378,8 @@ class MemberController extends Controller
                     'product_item_id' => $orderDetail->product_item_id,
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
+                    'selling_price' => number_format($orderDetail->selling_price),
+                    'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
                     'discount_content' => [],
                     'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id])?$gtm[$orderDetail->product_id][$orderDetail->product_item_id]:""
                 ];
