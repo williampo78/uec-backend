@@ -1460,38 +1460,4 @@ class ProductService
         return $result;
     }
 
-    /*
-     * checkProductInCampaignIsset function
-     * 檢查是否存在
-     * @param [int] $product_id
-     * @return bool
-     */
-    public function checkProductInCampaignIsset($product_id)
-    {
-        //C002
-        $campaigns = PromotionalCampaign::with(['campaignType'])
-            ->whereIn('level_code', ['PRD', 'CART_P']);
-
-        $campaigns = $campaigns->where(function ($query) {
-            $query->where('active', 1)
-                ->where('start_at', '<=', now())
-                ->where('end_at', '>=', now());
-        });
-        $campaigns = $campaigns->where(function ($query) use ($product_id) {
-            return $query->whereHas('promotionalCampaignProducts.product', function (Builder $query) use ($product_id) {
-                $query->where('id', $product_id);
-            })
-                ->orWhereHas('promotionalCampaignGiveaways.product', function (Builder $query) use ($product_id) {
-                    $query->where('id', $product_id);
-                });
-        });
-
-        $campaigns = $campaigns->get()->count();
-
-        if ($campaigns >= 1) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 }
