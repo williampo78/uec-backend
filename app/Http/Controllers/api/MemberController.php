@@ -361,8 +361,7 @@ class MemberController extends Controller
         $giveaway_qty = [];
 
         $products = $this->apiProductServices->getProducts();
-        //todo
-        //$gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
+        $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
 
         $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm) {
             if ($orderDetail->record_identity == 'M') {
@@ -381,7 +380,8 @@ class MemberController extends Controller
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'selling_price' => number_format($orderDetail->selling_price),
                     'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
-                    'discount_content' => []
+                    'discount_content' => [],
+                    'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id])?$gtm[$orderDetail->product_id][$orderDetail->product_item_id]:""
                 ];
                 if ($orderDetail->product->productPhotos->isNotEmpty()) {
                     $productPhoto = $orderDetail->product->productPhotos->first();

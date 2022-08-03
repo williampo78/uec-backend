@@ -212,7 +212,8 @@ class APIWebService
                 'product_discount' => intval($discount),
                 'product_photo' => (isset($photo['photo_name']) ? $s3 . $photo['photo_name'] : null),
                 "selling_channel" => $collect->selling_channel,
-                "start_selling" => $collect->start_selling_at
+                "start_selling" => $collect->start_selling_at,
+                "gtm" => (isset($gtm[$collect->id])?$gtm[$collect->id]:"")
             );
         }
 

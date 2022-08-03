@@ -412,8 +412,7 @@ class APIProductServices
         $brand .= ($input['brand'] ? $input['brand'] : '');
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
         $product_info = $this->getProducts();
-        //todo
-        //$gtm = $this->getProductItemForGTM($product_info);
+        $gtm = $this->getProductItemForGTM($product_info);
         if ($products) {
             $promotion = self::getPromotion('product_card');
             $promotion_threshold = self::getPromotionThreshold();
@@ -489,7 +488,8 @@ class APIProductServices
                             'collections' => $collection,
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
-                            'start_selling' => $product->start_selling_at
+                            'start_selling' => $product->start_selling_at,
+                            'gtm' => isset($gtm[$product->id])?$gtm[$product->id]:""
                         );
 
                         $product_id = $product->id;
@@ -1004,7 +1004,7 @@ class APIProductServices
         $now = Carbon::now();
         $data = [];
         $s3 = config('filesystems.disks.s3.url');
-        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.threshold_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
+        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
             ->where("promotional_campaigns.start_at", "<=", $now)
             ->where("promotional_campaigns.end_at", ">=", $now)
             ->where("promotional_campaigns.active", "=", "1")
@@ -1179,8 +1179,7 @@ class APIProductServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->getProducts();
-        //todo
-        //$gtm = $this->getProductItemForGTM($products);
+        $gtm = $this->getProductItemForGTM($products);
         $id = $input['event'];
         $page = $input['page'];
         $size = $input['size'];
@@ -1260,7 +1259,8 @@ class APIProductServices
                                 "collection" => $collection,
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
-                                "start_selling" => $products[$product_id]->start_selling_at
+                                "start_selling" => $products[$product_id]->start_selling_at,
+                                "gtm" => (isset($gtm[$product_id])?$gtm[$product_id]:"")
                             );
                         }
                     }
@@ -1695,6 +1695,7 @@ class APIProductServices
                 //產品規格
                 $item_spec = [];
                 $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
+                if (count($ProductSpec) ==0) continue;
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度
@@ -1741,7 +1742,6 @@ class APIProductServices
                     $data[$product->id] = $gtm;
                 }
             }
-
             return $data;
         } else {
             return 903;
