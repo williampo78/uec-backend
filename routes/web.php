@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ExternalInventoryDailyReportController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\StockTransactionLogController;
 use App\Http\Controllers\MiscStockRequestController;
 use App\Http\Controllers\MiscStockRequestReviewController;
 use App\Http\Controllers\OrderController;
@@ -323,4 +324,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
             'update' => 'misc_stock_request_reviews.update',
         ],
     ]);
+
+    //庫存異動歷程查詢
+    Route::group(['prefix' => 'stock-transaction-logs', 'as' => 'stock_transaction_logs'], function () {
+        Route::get('/', [StockTransactionLogController::class, 'index']);
+    });
+
 });
