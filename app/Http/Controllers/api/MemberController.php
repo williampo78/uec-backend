@@ -239,6 +239,12 @@ class MemberController extends Controller
                     // 圖片網址
                     $orderPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
                 }
+
+                //售價
+                $orderPayload['selling_price'] = number_format($orderDetail->selling_price);
+                //折抵合計
+                $orderPayload['total_discount'] = number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount);
+
             }
 
             // 出貨單
@@ -373,6 +379,8 @@ class MemberController extends Controller
                     'product_item_id' => $orderDetail->product_item_id,
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
+                    'selling_price' => number_format($orderDetail->selling_price),
+                    'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
                     'discount_content' => []
                 ];
                 if ($orderDetail->product->productPhotos->isNotEmpty()) {
