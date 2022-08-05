@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Models\InstallmentInterestRate;
 use App\Models\Product;
 use App\Models\PromotionalCampaignGiveaway;
 use App\Models\PromotionalCampaignProduct;
@@ -16,6 +17,7 @@ use App\Services\APIWebService;
 use App\Services\BrandsService;
 use App\Services\APICartServices;
 use App\Services\UniversalService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Models\PromotionalCampaign;
 use Illuminate\Support\Facades\Auth;
@@ -1004,10 +1006,104 @@ class APIProductServices
             }
             $data['rel_product'] = $rel_data;
 
+            //此商品可分期付款
+            if (strpos($product[$id]->payment_method, 'TAPPAY_INSTAL') !== false) {
+                //取得分期資料(不檢查消費門檻)
+                $installmentInterestRates = $this->getInstallmentAmountInterestRatesWithBank();
+                $installmentInterestRates = $this->handleInstallmentInterestRates($installmentInterestRates, $product[$id]->selling_price);
+            }
+
+            //分期資訊
+            $data['installment_interest_rates'] = $installmentInterestRates ?? [];
+
             return json_encode($data);
         } else {
             return 903;
         }
+    }
+
+    /**
+     * 取得信用卡分期資料
+     * $min_consumption有值則判斷門檻
+     * @param int|null $min_consumption
+     * @return Collection
+     * @Author: Eric
+     * @DateTime: 2022/8/5 上午 10:56
+     */
+    public function getInstallmentAmountInterestRatesWithBank(int $min_consumption = null):Collection
+    {
+        $today = Carbon::today()->toDateString();
+
+        return InstallmentInterestRate::with(['bank' => function ($query) {
+            $query->select(['id', 'bank_no', 'short_name'])
+                ->where('active', 1);
+        }])
+            ->where('active', 1)
+            ->whereDate('started_at', '<=', $today)
+            ->whereDate('ended_at', '>=', $today)
+            ->when(isset($min_consumption), function ($query) use ($min_consumption) {
+                $query->where('min_consumption', '<=', $min_consumption);
+            })
+            ->orderBy('interest_rate', 'asc')
+            ->orderBy('number_of_installments', 'asc')
+            ->get([
+                'id',
+                'issuing_bank_no',
+                'number_of_installments',
+                'interest_rate',
+                'min_consumption'
+            ]);
+    }
+
+    /**
+     * 整理分期的顯示資訊
+     * @param Collection $collection
+     * @param int $price
+     * @return array
+     * @Author: Eric
+     * @DateTime: 2022/8/4 下午 05:21
+     */
+    public function handleInstallmentInterestRates(Collection $collection, int $price): array
+    {
+        if($collection->isEmpty()){
+            return [];
+        }
+
+        //根據分期和利率group by
+        $details = $collection->groupBy(function ($item) {
+            return sprintf('%s_%s', $item['number_of_installments'], $item['interest_rate']);
+        });
+
+        $details = $details->map(function ($Entity) use ($price) {
+
+            return [
+                'interest_rate' => $Entity->first()->interest_rate,
+                'number_of_installments' => $Entity->first()->number_of_installments,
+                'amount' => $this->getInstallmentAmount($price, $Entity->first()->interest_rate, $Entity->first()->number_of_installments),
+                'banks' => $Entity->pluck('bank.short_name'),
+            ];
+        })->values();
+
+        return [
+            'interest_rate' => $collection->first()->interest_rate,
+            'number_of_installments' => $collection->first()->number_of_installments,
+            'amount' => $this->getInstallmentAmount($price, $collection->first()->interest_rate, $collection->first()->number_of_installments),
+            'details' => $details
+        ];
+    }
+
+    /**
+     * 分期付款金額
+     * @param int $price
+     * @param float $interestRate
+     * @param int $numberOfInstallments
+     * @return string
+     * @Author: Eric
+     * @DateTime: 2022/8/4 下午 05:20
+     */
+    public function getInstallmentAmount(int $price, float $interestRate, int $numberOfInstallments): string
+    {
+        return number_format($price * (1 + ($interestRate / 100)) / $numberOfInstallments);
     }
 
     /*
