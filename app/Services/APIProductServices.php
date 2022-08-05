@@ -489,7 +489,7 @@ class APIProductServices
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
                             'start_selling' => $product->start_selling_at,
-                            'gtm' => isset($gtm[$product->id])?$gtm[$product->id]:""
+                            'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : ""
                         );
 
                         $product_id = $product->id;
@@ -1260,7 +1260,7 @@ class APIProductServices
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
                                 "start_selling" => $products[$product_id]->start_selling_at,
-                                "gtm" => (isset($gtm[$product_id])?$gtm[$product_id]:"")
+                                "gtm" => (isset($gtm[$product_id]) ? $gtm[$product_id] : "")
                             );
                         }
                     }
@@ -1695,7 +1695,7 @@ class APIProductServices
                 //產品規格
                 $item_spec = [];
                 $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
-                if (count($ProductSpec) ==0) continue;
+                if (count($ProductSpec) == 0) continue;
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度
