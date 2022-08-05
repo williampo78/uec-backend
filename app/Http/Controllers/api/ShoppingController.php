@@ -103,8 +103,7 @@ class ShoppingController extends Controller
         $campaign_gift = $this->apiProductServices->getCampaignGift();
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
         $products = $this->apiProductServices->getProducts();
-        //todo
-        //$gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
+        $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
         $gtm = null;
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, $gtm);
         $response = json_decode($response, true);
