@@ -232,13 +232,10 @@ class MemberController extends Controller
                 // 小計
                 $orderPayload['subtotal'] = number_format($orderDetail->subtotal);
 
-                // 商品圖片
-                if ($orderDetail->product->productPhotos->isNotEmpty()) {
-                    $productPhoto = $orderDetail->product->productPhotos->first();
 
-                    // 圖片網址
-                    $orderPayload['photo_url'] = config('filesystems.disks.s3.url') . $productPhoto->photo_name;
-                }
+                //商品圖 以規格圖為優先，否則取商品封面圖
+                $productPhoto = empty(optional($orderDetail->productItem)->photo_name) ? optional($orderDetail->product->productPhotos->first())->photo_name : optional($orderDetail->productItem)->photo_name;
+                $orderPayload['photo_url'] = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
 
                 //售價
                 $orderPayload['selling_price'] = number_format($orderDetail->selling_price);
