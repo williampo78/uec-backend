@@ -1034,10 +1034,10 @@ class APIProductServices
     {
         $today = Carbon::today()->toDateString();
 
-        return InstallmentInterestRate::with(['bank' => function ($query) {
-            $query->select(['id', 'bank_no', 'short_name'])
-                ->where('active', 1);
-        }])
+        return InstallmentInterestRate::with('bank:id,bank_no,short_name')
+            ->whereHas('bank', function($query){
+                $query->where('active', 1);
+            })
             ->where('active', 1)
             ->whereDate('started_at', '<=', $today)
             ->whereDate('ended_at', '>=', $today)
