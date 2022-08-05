@@ -355,9 +355,8 @@ class MemberInfoController extends Controller
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $products = $this->apiProductServices->getProducts();
-        //todo
-        //$gtm = $this->apiProductServices->getProductItemForGTM($products);
-        $response = $this->apiWebService->getMemberCollections();
+        $gtm = $this->apiProductServices->getProductItemForGTM($products);
+        $response = $this->apiWebService->getMemberCollections($gtm);
         $result = json_decode($response, true);
         if (count($result) > 0) {
             $status = true;
