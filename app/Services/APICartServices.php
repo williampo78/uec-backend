@@ -47,12 +47,16 @@ class APICartServices
         $result = $result->orderBy('shopping_cart_details.latest_added_at', 'desc')->get();
         $data = [];
         foreach ($result as $datas) {
-            //商品圖以規格圖為主為空，則取商品封面圖
-            $itemPhoto = empty($datas->item_photo) ? optional(ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first())->photo_name : $datas->item_photo;
-            $itemPhoto = empty($itemPhoto) ? null : $s3 . $itemPhoto;
+
+            //商品封面圖
+            $productPhoto = optional(ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first())->photo_name;
+            //如規格圖為空，則取商品封面圖
+            $itemPhoto = empty($datas->item_photo) ? $productPhoto : $datas->item_photo;
 
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = $itemPhoto;
+            $data[$datas->product_id]['product_photo'] = empty($productPhoto) ?  null : $s3 . $productPhoto;
+            $data[$datas->product_id]['item_photo'] = empty($itemPhoto) ? null : $s3 . $itemPhoto;
+
             $data['items'][$datas->product_id][$datas->item_id] = $datas;
         }
         return $data;
@@ -379,7 +383,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
-                                        'itemPhoto' => $item_info->item_photo ?? null,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -472,7 +476,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
-                                        'itemPhoto' => $item_info->item_photo ?? null,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -539,7 +543,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
-                                        'itemPhoto' => $item_info->item_photo ?? null,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -606,7 +610,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
-                                        'itemPhoto' => $item_info->item_photo ?? null,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -667,7 +671,7 @@ class APICartServices
                                     "amount" => round($item_info->selling_price * $detail_qty),
                                     "itemStock" => $stock,
                                     "outOfStock" => $outOfStock,
-                                    'itemPhoto' => $item_info->item_photo ?? null,
+                                    'itemPhoto' => $item_info->product_photo ?? null,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                     "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                                     "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief : null),
@@ -729,7 +733,7 @@ class APICartServices
                                 "amount" => round($item_info->selling_price * $detail_qty),
                                 "itemStock" => $stock,
                                 "outOfStock" => $outOfStock,
-                                'itemPhoto' => $item_info->item_photo ?? null,
+                                'itemPhoto' => $item_info->product_photo ?? null,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                 "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
                                 "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountBrief : null),
@@ -788,7 +792,7 @@ class APICartServices
                             "amount" => round($item_info->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => $outOfStock,
-                            'itemPhoto' => $item_info->item_photo ?? null,
+                            'itemPhoto' => $item_info->product_photo ?? null,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                             "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                             "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief : null),
