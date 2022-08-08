@@ -94,7 +94,7 @@ class ShoppingController extends Controller
     /*
      * 購物車清單
      */
-    public function getShoppingCartData()
+    public function getShoppingCartData(Request $request)
     {
         $err = null;
         $error_code = $this->apiService->getErrorCode();
@@ -104,7 +104,8 @@ class ShoppingController extends Controller
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
-        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, $gtm);
+        $stock_type = ($request->stock_type == "supplier" ? "supplier" : "dradvice");
+        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, $gtm, $stock_type);
         $response = json_decode($response, true);
         if ($response['status'] == '200') {
             $status = true;

@@ -35,7 +35,7 @@ class APICartServices
         $s3 = config('filesystems.disks.s3.url');
         $result = ShoppingCartDetail::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
-            , "product_items.item_no", "product_items.photo_name as item_photo")
+            , "product_items.item_no", "product_items.photo_name as item_photo", "products.stock_type")
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
             ->join('products', 'products.id', '=', 'product_items.product_id')
             ->where('shopping_cart_details.status_code', 0) //購物車
@@ -148,9 +148,9 @@ class APICartServices
      * 取得購物車內容
      *
      */
-    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm = null)
+    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm = null, $stock_type = 'dradvice')
     {
-        if (config('uec.cart_p_discount_split') == 1) return $this->getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm);
+        if (config('uec.cart_p_discount_split') == 1) return $this->getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm, $stock_type);
 
         $now = Carbon::now();
         //購物車內容
@@ -949,12 +949,12 @@ class APICartServices
                                 foreach ($giftawayInfo as $giftInfo => $v) {
                                     $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                     //if (isset($threshold_prod[$v['product_id']])) {
-                                        $gift_array[$item->id]++;
-                                        if (isset($stock_gift_check[$v['product_id']])) {
-                                            if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
-                                                $gift_check[$item->id]++;
-                                            }
+                                    $gift_array[$item->id]++;
+                                    if (isset($stock_gift_check[$v['product_id']])) {
+                                        if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
+                                            $gift_check[$item->id]++;
                                         }
+                                    }
                                     //}
                                 }
                             }
@@ -1342,7 +1342,7 @@ class APICartServices
      * 取得購物車內容_V2 (滿額折分攤回單品)
      * 滿額折-改版版本
      */
-    public function getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm)
+    public function getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm, $stock_type)
     {
         $now = Carbon::now();
         //購物車內容
@@ -1370,6 +1370,10 @@ class APICartServices
             $CART04_n = [];
             $cartGift = [];
             $assigned = [];
+            $cartStockType = [];
+            $cartStockTypeCount['dradvice'] = 0;
+            $cartStockTypeCount['supplier'] = 0;
+
             foreach ($cartInfo as $items => $item) {
                 if ($items == 'item_photo') {
                     continue;
@@ -1381,6 +1385,17 @@ class APICartServices
 
                 $cartQty[$items][$item['item_id']] = $item->item_qty; //購物車數量
                 $cartAmount[$items] = round($item->selling_price); //商品售價
+
+                if (config('uec.cart_billing_split') == 1) {
+                    //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
+                    if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
+                        $cartStockTypeCount['supplier']++;
+                        $cartStockType[$items] = "supplier";
+                    } else {    //健康力出貨：買斷[A]、寄售[B] 商品
+                        $cartStockTypeCount['dradvice']++;
+                        $cartStockType[$items] = "dradvice";
+                    }
+                }
             }
             $prodQty = [];
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
@@ -1447,6 +1462,9 @@ class APICartServices
             $cartDiscount = 0;
             $prod_campaign = [];//活動下的單品
             foreach ($cartQty as $product_id => $item) {
+                if (config('uec.cart_billing_split') == 1) {
+                    if ($cartStockType[$product_id] != $stock_type) continue;
+                }
                 $product = [];
                 $prod_gift = [];
                 $prod_amount[$product_id] = 0;
@@ -2161,12 +2179,12 @@ class APICartServices
                                 foreach ($giftawayInfo as $giftInfo => $v) {
                                     $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                     //if (isset($threshold_prod[$v['product_id']])) {
-                                        $gift_array[$item->id]++;
-                                        if (isset($stock_gift_check[$v['product_id']])) {
-                                            if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
-                                                $gift_check[$item->id]++;
-                                            }
+                                    $gift_array[$item->id]++;
+                                    if (isset($stock_gift_check[$v['product_id']])) {
+                                        if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
+                                            $gift_check[$item->id]++;
                                         }
+                                    }
                                     //}
                                 }
                             }
@@ -2327,7 +2345,7 @@ class APICartServices
 
             $cart = array(
                 "feeInfo" => $feeInfo,
-                "productRow" => $productRow,
+                "productRow" => (config('uec.cart_billing_split') == 1 ? $cartStockTypeCount : $productRow),
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
                 "thresholdDiscountDisplay" => false,
