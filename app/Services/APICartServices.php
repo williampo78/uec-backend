@@ -1400,10 +1400,8 @@ class APICartServices
                 if (config('uec.cart_billing_split') == 1) {
                     //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
                     if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
-                        $cartStockTypeCount['supplier']++;
                         $cartStockType[$items] = "supplier";
                     } else {    //健康力出貨：買斷[A]、寄售[B] 商品
-                        $cartStockTypeCount['dradvice']++;
                         $cartStockType[$items] = "dradvice";
                     }
                 }
@@ -1413,6 +1411,15 @@ class APICartServices
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                     $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
+
+                    if (config('uec.cart_billing_split') == 1) {
+                        //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
+                        if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
+                            $cartStockTypeCount['supplier']++;
+                        } else {    //健康力出貨：買斷[A]、寄售[B] 商品
+                            $cartStockTypeCount['dradvice']++;
+                        }
+                    }
                 }
             }
             //行銷活動

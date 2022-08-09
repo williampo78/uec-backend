@@ -13,6 +13,7 @@ use App\Models\WarehouseStock;
 use App\Services\APIService;
 use App\Services\APITapPayService;
 use App\Services\StockService;
+use App\Services\SysConfigService;
 use Carbon\Carbon;
 use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,15 +23,19 @@ use Illuminate\Support\Str;
 
 class APIOrderService
 {
+    private $sysConfigService;
+
     public function __construct(
         APITapPayService $apiTapPayService,
         StockService $stockService,
-        APIService $apiService
+        APIService $apiService,
+        SysConfigService $sysConfigService
     )
     {
         $this->apiTapPayService = $apiTapPayService;
         $this->stockService = $stockService;
         $this->apiService = $apiService;
+        $this->sysConfigService = $sysConfigService;
     }
 
     /**
@@ -746,6 +751,12 @@ class APIOrderService
         //商城倉庫代碼
         $warehouseCode = $this->stockService->getWarehouseConfig();
 
+        // 轉單時間 X分鐘
+        $sup_trans_mins = (int)$this->sysConfigService->getConfigValue('SUP_ORDER_TRANS_MINS');
+
+        // 最晚應出貨時間 X個工作天
+        $ship_deadline = (int)$this->sysConfigService->getConfigValue('SUP_ORDER_SHIP_DEADLINE');
+
         $utms = ShoppingCartDetail::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
         foreach ($utms as $utm) {
@@ -862,6 +873,9 @@ class APIOrderService
             $webData['utm_campaign'] = isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null;
             $webData['utm_sales'] = isset($order['utm']['sales']) ? $order['utm']['sales'] : null;
             $webData['utm_time'] = isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null;
+            $webData['ship_from_whs'] = ($order['stock_type'] == 'supplier' ? 'SUP' : 'SELF');
+            $webData['sup_transferred_at'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addMinutes($sup_trans_mins) : null);
+            $webData['ship_deadline'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addDay($ship_deadline)->format('Y-m-d 23:59:59') : null);
             $newOrder = Order::create($webData);
             //$newOrder = new Order();
             //$newOrder->id = 843;
