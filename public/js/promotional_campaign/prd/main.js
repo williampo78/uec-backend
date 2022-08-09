@@ -474,6 +474,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     modal: {
@@ -498,12 +501,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         startLaunchedAtStart: "",
         startLaunchedAtEnd: "",
         productType: "",
-        limit: "100",
+        limit: 100,
         excludeProductIds: []
       },
       suppliers: [],
       productTypeOptions: [],
-      products: []
+      products: [],
+      limitOptions: [100, 300, 500]
     };
   },
   created: function created() {
@@ -2023,34 +2027,35 @@ var render = function () {
                     _c("div", { staticClass: "form-group" }, [
                       _vm._m(15),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-sm-4" }, [
-                        _c("input", {
-                          directives: [
+                      _c(
+                        "div",
+                        { staticClass: "col-sm-4" },
+                        [
+                          _c(
+                            "select2",
                             {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.form.limit,
-                              expression: "form.limit",
+                              staticClass: "form-control",
+                              attrs: {
+                                options: _vm.limitOptions,
+                                "allow-clear": false,
+                              },
+                              model: {
+                                value: _vm.form.limit,
+                                callback: function ($$v) {
+                                  _vm.$set(_vm.form, "limit", $$v)
+                                },
+                                expression: "form.limit",
+                              },
                             },
-                          ],
-                          staticClass: "form-control",
-                          attrs: {
-                            type: "number",
-                            max: "100",
-                            min: "0",
-                            readonly: "",
-                          },
-                          domProps: { value: _vm.form.limit },
-                          on: {
-                            input: function ($event) {
-                              if ($event.target.composing) {
-                                return
-                              }
-                              _vm.$set(_vm.form, "limit", $event.target.value)
-                            },
-                          },
-                        }),
-                      ]),
+                            [
+                              _c("option", {
+                                attrs: { disabled: "", value: "" },
+                              }),
+                            ]
+                          ),
+                        ],
+                        1
+                      ),
                       _vm._v(" "),
                       _c("div", { staticClass: "col-sm-6 text-right" }, [
                         _c(
