@@ -2058,6 +2058,7 @@ class APICartServices
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product,
                     "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
+                    "campaignThresholdGiveaway" => (isset($campaignThreshold['GIFT'][$product_id]) ? $campaignThreshold['GIFT'][$product_id] : []),
                 );
 
             }
@@ -2470,6 +2471,48 @@ class APICartServices
                     $cart['list'][$productKey] = $products;
                 }
             }
+
+
+            //有符合的滿額送贈時
+            if (count($cart['thresholdGiftAway']) > 0) {
+                //取得滿額門檻內容
+                //dd($cart['thresholdGiftAway']);
+                foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
+                    foreach ($threshold['products'] as $k => $product_id) {
+                        $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //商品對應的門檻ID
+                        $threshold_prod['thresholdBrief'][$product_id] = $threshold['thresholdBrief']; //門檻文案
+                    }
+                }
+                //重構商品滿額送贈
+                foreach ($cart['list'] as $productKey => $products) { //主產品
+                    $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
+                    if (count($products['campaignThresholdGiveaway']) > 0) {    //如果有門檻活動
+                        //重構門檻活動
+                        $check = 0;
+                        if (isset($products['campaignThresholdGiveaway']['campaignThreshold'])) {
+                            foreach ($products['campaignThresholdGiveaway']['campaignThreshold'] as $thresholdKey => $thresholdBrief) {
+                                if (isset($threshold_prod['thresholdBrief'][$products['productID']])) {
+                                    if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
+                                        $check++;
+                                        $products['campaignThresholdGiveaway']['campaignThreshold'] = $thresholdBrief;
+                                    }
+                                }
+                            }
+                        }
+                        if ($check > 0) {
+                            $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
+                        }
+                    }
+                    $cart['list'][$productKey] = $products;
+                }
+            } else {
+                //重構門檻活動
+                foreach ($cart['list'] as $productKey => $products) { //主產品
+                    $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
+                    $cart['list'][$productKey] = $products;
+                }
+            }
+
 
             return json_encode(array("status" => 200, "result" => $cart));
         }
