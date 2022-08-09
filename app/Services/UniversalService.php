@@ -155,6 +155,7 @@ class UniversalService
             'TAPPAY_CREDITCARD' => '信用卡',
             'TAPPAY_LINEPAY' => 'LINE Pay',
             'TAPPAY_JKOPAY' => '街口支付',
+            'TAPPAY_INSTAL' => '分期付款'
         ];
 
         return $data;

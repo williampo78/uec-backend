@@ -775,14 +775,18 @@ class APIProductServices
 
             //付款方式
             $payment_method = [];
-            //$payment_way = "TAPPAY_CREDITCARD,TAPPAY_LINEPAY,TAPPAY_JKOPAY";//本階段沒有欄位寫固定的付款方式
-            $payment_way = "TAPPAY_CREDITCARD,TAPPAY_LINEPAY";
-            //if ($product[$id]->payment_method != '') {
+            $payment_way = $product[$id]->payment_method;
+
             $methods = explode(',', $payment_way);
+
             foreach ($methods as $method) {
+                //畫面上不會顯示分期付款字樣
+                if($method === 'TAPPAY_INSTAL'){
+                    continue;
+                }
+
                 $payment_method[] = $payment_text[$method];
             }
-            //}
 
             //配送方式
             $delivery_method = [];
