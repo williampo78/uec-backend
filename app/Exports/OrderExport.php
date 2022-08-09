@@ -49,6 +49,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
     public function collection(): Collection
     {
         $body = collect();
+        $orderRecordIdentityOptions = config('uec.order_record_identity_options');
 
         $count = 1;
         foreach ($this->orders as $order) {
@@ -86,6 +87,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
                 'original_point_discount' => null,
                 'original_actual_subtotal' => null,
                 'original_cart_p_discount' => null,
+                'record_identity' => null,
                 'returned_qty' => null,
                 'returned_campaign_discount' => null,
                 'returned_subtotal' => null,
@@ -134,14 +136,14 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
             if ($order->orderDetails->isNotEmpty()) {
                 $mergeCellFirstRow = $count + 1;
 
-                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body) {
+                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body, $orderRecordIdentityOptions) {
                     $row['count'] = $count;
-                    $row['product_no'] = $orderDetail->product->product_no;
+                    $row['product_no'] = optional($orderDetail->product)->product_no;
                     $row['item_no'] = $orderDetail->item_no;
-                    $row['pos_item_no'] = $orderDetail->productItem->pos_item_no;
-                    $row['product_name'] = $orderDetail->product->product_name;
-                    $row['spec_1_value'] = $orderDetail->productItem->spec_1_value;
-                    $row['spec_2_value'] = $orderDetail->productItem->spec_2_value;
+                    $row['pos_item_no'] = optional($orderDetail->productItem)->pos_item_no;
+                    $row['product_name'] = optional($orderDetail->product)->product_name;
+                    $row['spec_1_value'] = optional($orderDetail->productItem)->spec_1_value;
+                    $row['spec_2_value'] = optional($orderDetail->productItem)->spec_2_value;
                     $row['selling_price'] = $orderDetail->selling_price;
                     $row['unit_price'] = $orderDetail->unit_price;
                     $row['original_qty'] = $orderDetail->qty - $orderDetail->returned_qty;
@@ -150,6 +152,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
                     $row['original_point_discount'] = $orderDetail->point_discount - $orderDetail->returned_point_discount;
                     $row['original_actual_subtotal'] = $row['original_subtotal'] + $row['original_point_discount'];
                     $row['original_cart_p_discount'] = $orderDetail->cart_p_discount - $orderDetail->returned_cart_p_discount;
+                    $row['record_identity'] = $orderRecordIdentityOptions[$orderDetail->record_identity] ?? null;
                     $row['returned_qty'] = $orderDetail->returned_qty;
                     $row['returned_campaign_discount'] = $orderDetail->returned_campaign_discount;
                     $row['returned_subtotal'] = $orderDetail->returned_subtotal;
@@ -223,6 +226,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
             '點數折抵',
             '實收金額',
             '購物車滿額折抵',
+            '身份',
             '已退數量',
             '已退單品折抵',
             '已退小計',
