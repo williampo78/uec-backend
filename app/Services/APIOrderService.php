@@ -733,7 +733,7 @@ class APIOrderService
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::channel('tappay_api_log')->error('結帳成立訂單錯誤 ! ' . $e);
+            Log::channel('tappay_api_log')->error('訂單與結帳發生錯誤 ! ' . $e);
             $result['status'] = 401;
             $result['payment_url'] = null;
         }
@@ -1480,12 +1480,6 @@ class APIOrderService
         $random = Str::random(6);
         DB::beginTransaction();
         try {
-            //使用Tappay付款才更新
-            if ($data['is_cash_on_delivery'] == 0) {
-                $order = Order::where('id', '=', $data['order_id'])->update(['pay_status' => 'COMPLETED', 'is_paid' => 1, 'paid_at' => $now]);
-                //更新付款狀態
-                $order_payment = OrderPayment::where('id', '=', $data['payment_id'])->update(['payment_status' => 'COMPLETED', 'latest_api_status' => 'S']);
-            }
             //建立出貨單頭
             $shipData = [];
             $shipData['agent_id'] = 1;

@@ -93,7 +93,6 @@ class APITapPayService
             $info = TapPayPayLog::where('id', '=', $pay_log_id)->first();
             //交易代碼status成功時才檢查回傳交易資料跟訂單是否符合
             //調整為成立訂單時就產生出貨單
-            /*
             if ($input['status'] == 0) {
                 $orderPayment = $this->getOrderPayment($info);
                 if ($orderPayment) { //符合資料後，查詢tappay的交易紀錄
@@ -104,18 +103,24 @@ class APITapPayService
                     if ($record['status'] == 2) { //tappay打回來的最後資料
                         //檢查該筆資料的交易紀錄的狀態
                         foreach ($record['trade_records'] as $trade) {
-                            if ($trade['record_status'] == 1 || $trade['record_status'] == 0) { //交易完成..更新金流狀態...準備出貨單
-                                $orderStatus = $this->setShipment($orderPayment);
+                            if ($trade['record_status'] == 1 || $trade['record_status'] == 0) { //交易完成..更新金流狀態
+                                $result = $this->updateOrder($orderPayment);
                             }
                         }
                     }
-                    $status = true;
-                    DB::commit();
+                    if ($result) {
+                        DB::commit();
+                        $status = true;
+                    } else {
+                        Log::channel('tappay_api_log')->error('3D驗證交易完成，更新金流狀態失敗 ! rec_trade_id :' . $info->rec_trade_id);
+                        DB::rollBack();
+                        $status = false;
+                    }
                 } else {
                     //等排程檢查出貨
                 }
             }
-            */
+
         }catch (\Exception $e){
             DB::rollBack();
             Log::info($e->getMessage());
@@ -277,6 +282,34 @@ class APITapPayService
             //$result['status'] = 401;
         }
         //return $result;
+    }
+
+    /**
+     * 更新訂單金流單與建立出貨單
+     * @param 訂單編號，交易編號，金額
+     * @return string
+     */
+    public function updateOrder($data)
+    {
+        $status = Order::getOrder($data->source_table_id);
+        if ($status['status_code'] != 'CREATED') exit;
+        $now = Carbon::now();
+        DB::beginTransaction();
+        try {
+            $order = Order::where('id', '=', $data->source_table_id)->update(['pay_status' => 'COMPLETED', 'is_paid' => 1, 'paid_at' => $now]);
+            //更新付款狀態
+            $order_payment = OrderPayment::where('id', '=', $data->id)->update(['payment_status' => 'COMPLETED', 'latest_api_status' => 'S']);
+
+            if ($order && $order_payment) {
+                DB::commit();
+                $result = true;
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = false;
+        }
+        return $result;
     }
 
 }
