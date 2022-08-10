@@ -92,6 +92,8 @@ class APITapPayService
             $pay_log_id = TapPayPayLog::insertGetId($input);
             $info = TapPayPayLog::where('id', '=', $pay_log_id)->first();
             //交易代碼status成功時才檢查回傳交易資料跟訂單是否符合
+            //調整為成立訂單時就產生出貨單
+            /*
             if ($input['status'] == 0) {
                 $orderPayment = $this->getOrderPayment($info);
                 if ($orderPayment) { //符合資料後，查詢tappay的交易紀錄
@@ -113,6 +115,7 @@ class APITapPayService
                     //等排程檢查出貨
                 }
             }
+            */
         }catch (\Exception $e){
             DB::rollBack();
             Log::info($e->getMessage());

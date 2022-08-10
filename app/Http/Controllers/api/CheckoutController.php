@@ -305,6 +305,12 @@ class CheckoutController extends Controller
                             $data['message'] = "庫存不足，無法成立訂單";
                             break;
 
+                        case 404:
+                            $status = false;
+                            $err = '906';
+                            $data['message'] = "出貨單成立失敗";
+                            break;
+
                         default:
                             $status = false;
                             $err = '401';

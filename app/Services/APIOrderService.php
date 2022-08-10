@@ -7,6 +7,8 @@ use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
 use App\Models\ProductItem;
+use App\Models\Shipment;
+use App\Models\ShipmentDetail;
 use App\Models\ShoppingCartDetail;
 use App\Models\StockTransactionLog;
 use App\Models\WarehouseStock;
@@ -1442,6 +1444,18 @@ class APIOrderService
                     return $result;
                 }
             }
+
+            //建立出貨單
+            $webData['order_id'] = $newOrder->id; //訂單ID
+            $webData['payment_id'] = $newOrderPayment->id; //付款ID
+            $ship_status = $this->setShipment($webData);
+            if (!$ship_status) {
+                $result['status'] = 404;
+                $result['payment_url'] = null;
+                DB::rollBack();
+                return $result;
+            }
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1450,6 +1464,79 @@ class APIOrderService
             $result['payment_url'] = null;
         }
 
+        return $result;
+    }
+
+    /**
+     * 建立出貨單
+     * @param 訂單資訊
+     * @return string
+     */
+    public function setShipment($data)
+    {
+        $status = Order::getOrder($data['order_id']);
+        if ($status['status_code'] != 'CREATED') exit;
+        $now = Carbon::now();
+        $random = Str::random(6);
+        DB::beginTransaction();
+        try {
+            //使用Tappay付款才更新
+            if ($data['is_cash_on_delivery'] == 0) {
+                $order = Order::where('id', '=', $data['order_id'])->update(['pay_status' => 'COMPLETED', 'is_paid' => 1, 'paid_at' => $now]);
+                //更新付款狀態
+                $order_payment = OrderPayment::where('id', '=', $data['payment_id'])->update(['payment_status' => 'COMPLETED', 'latest_api_status' => 'S']);
+            }
+            //建立出貨單頭
+            $shipData = [];
+            $shipData['agent_id'] = 1;
+            $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
+            $shipData['shipment_date'] = $now;
+            $shipData['status_code'] = 'CREATED';
+            $shipData['payment_method'] = $data['payment_method'];
+            $shipData['is_cash_on_delivery'] = $data['is_cash_on_delivery'];
+            $shipData['lgst_method'] = $data['lgst_method'];
+            $shipData['order_id'] = $data['order_id'];
+            $shipData['order_no'] = $data['order_no'];
+            $shipData['total_amount'] = $data['total_amount'];
+            $shipData['paid_amount'] = $data['paid_amount'];
+            $shipData['ship_to_name'] = $data['receiver_name'];
+            $shipData['ship_to_mobile'] = $data['receiver_mobile'];
+            $shipData['ship_to_zip_code'] = $data['receiver_zip_code'];
+            $shipData['ship_to_city'] = $data['receiver_city'];
+            $shipData['ship_to_district'] = $data['receiver_district'];
+            $shipData['ship_to_address'] = $data['receiver_address'];
+            $shipData['store_no'] = $data['store_no'];
+            $shipData['remark'] = '';
+            $shipData['created_by'] = -1;
+            $shipData['created_at'] = $now;
+            $shipData['updated_by'] = -1;
+            $shipData['updated_at'] = $now;
+            $ship_id = Shipment::insertGetId($shipData);
+            $shipDetail = [];
+
+            //出貨單單身
+            $order_details = OrderDetail::getOrderDetails($data['order_id']);
+            foreach ($order_details as $detail) {
+                $shipDetail['shipment_id'] = $ship_id;
+                $shipDetail['seq'] = $detail->seq;
+                $shipDetail['order_detail_id'] = $detail->id;
+                $shipDetail['product_item_id'] = $detail->product_item_id;
+                $shipDetail['item_no'] = $detail->item_no;
+                $shipDetail['qty'] = $detail->qty;
+                $shipDetail['created_by'] = -1;
+                $shipDetail['created_at'] = $now;
+                $shipDetail['updated_by'] = -1;
+                $shipDetail['updated_at'] = $now;
+                $shipDetail['order_detail_seq'] = $detail->seq; //新增加欄位，同$shipDetail['seq']
+                $shipDetail_id = ShipmentDetail::insertGetId($shipDetail);
+            }
+            DB::commit();
+            $result = true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('shipment')->error("出貨單建立失敗：".$e);
+            $result = false;
+        }
         return $result;
     }
 
