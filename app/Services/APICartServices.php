@@ -946,12 +946,12 @@ class APICartServices
                                 foreach ($giftawayInfo as $giftInfo => $v) {
                                     $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                     //if (isset($threshold_prod[$v['product_id']])) {
-                                        $gift_array[$item->id]++;
-                                        if (isset($stock_gift_check[$v['product_id']])) {
-                                            if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
-                                                $gift_check[$item->id]++;
-                                            }
+                                    $gift_array[$item->id]++;
+                                    if (isset($stock_gift_check[$v['product_id']])) {
+                                        if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
+                                            $gift_check[$item->id]++;
                                         }
+                                    }
                                     //}
                                 }
                             }
@@ -1220,12 +1220,12 @@ class APICartServices
         DB::beginTransaction();
         try {
 
-            if ($webDataUpd) {
+            if (count($webDataUpd) > 0) {
                 $cartInstance = new ShoppingCartDetail();
                 $upd = Batch::update($cartInstance, $webDataUpd, 'id');
             }
 
-            if ($webDataAdd) {
+            if (count($webDataAdd) > 0) {
                 $cartInstance = new ShoppingCartDetail();
                 $batchSize = 50;
                 $add = Batch::insert($cartInstance, $addColumn, $webDataAdd, $batchSize);
@@ -2151,12 +2151,12 @@ class APICartServices
                                 foreach ($giftawayInfo as $giftInfo => $v) {
                                     $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                     //if (isset($threshold_prod[$v['product_id']])) {
-                                        $gift_array[$item->id]++;
-                                        if (isset($stock_gift_check[$v['product_id']])) {
-                                            if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
-                                                $gift_check[$item->id]++;
-                                            }
+                                    $gift_array[$item->id]++;
+                                    if (isset($stock_gift_check[$v['product_id']])) {
+                                        if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
+                                            $gift_check[$item->id]++;
                                         }
+                                    }
                                     //}
                                 }
                             }
