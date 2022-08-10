@@ -702,7 +702,7 @@ class APIProductServices
                 $subCate = 0;
                 foreach ($products as $category) {
                     if ($subCate == $category->L2) continue;
-                    $main[$category->L2] = array(
+                    $main[$category->L1][] = array(
                         'id' => $category->L2,
                         'name' => $category->L2_Name,
                         'sub' => $sub[$category->L1][$category->L2]
@@ -716,7 +716,7 @@ class APIProductServices
                         'name' => $category->L1_Name,
                         'shortName' => $category->L1_category_short_name,
                         'icon' => ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null),
-                        'sub' => $main[$category->L2]
+                        'sub' => $main[$category->L1]
                     );
                     $cate = $category->L1;
                 }
