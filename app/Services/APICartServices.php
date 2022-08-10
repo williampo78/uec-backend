@@ -1201,7 +1201,7 @@ class APICartServices
                     $input['utm_medium'],
                     $input['utm_campaign'],
                     $input['utm_sales'],
-                    date("Y-m-d H:i:s", $input['utm_time']),
+                    Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s'),
                     $now,
                     $member_id,
                     $member_id,
