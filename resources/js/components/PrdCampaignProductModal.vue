@@ -284,14 +284,17 @@
                                             >
                                         </div>
                                         <div class="col-sm-4">
-                                            <input
-                                                type="number"
+                                            <select2
                                                 class="form-control"
-                                                max="100"
-                                                min="0"
-                                                readonly
+                                                :options="limitOptions"
                                                 v-model="form.limit"
-                                            />
+                                                :allow-clear="false"
+                                            >
+                                                <option
+                                                    disabled
+                                                    value=""
+                                                ></option>
+                                            </select2>
                                         </div>
                                         <div class="col-sm-6 text-right">
                                             <button
@@ -454,12 +457,13 @@ export default {
                 startLaunchedAtStart: "",
                 startLaunchedAtEnd: "",
                 productType: "",
-                limit: "100",
+                limit: 100,
                 excludeProductIds: [],
             },
             suppliers: [],
             productTypeOptions: [],
             products: [],
+            limitOptions: [100, 300, 500],
         };
     },
     async created() {
