@@ -1215,7 +1215,7 @@ class APICartServices
                     $input['utm_medium'],
                     $input['utm_campaign'],
                     $input['utm_sales'],
-                    date("Y-m-d H:i:s", $input['utm_time']),
+                    Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s'),
                     $now,
                     $member_id,
                     $member_id,
@@ -1234,12 +1234,12 @@ class APICartServices
         DB::beginTransaction();
         try {
 
-            if ($webDataUpd) {
+            if (count($webDataUpd) > 0) {
                 $cartInstance = new ShoppingCartDetail();
                 $upd = Batch::update($cartInstance, $webDataUpd, 'id');
             }
 
-            if ($webDataAdd) {
+            if (count($webDataAdd) > 0) {
                 $cartInstance = new ShoppingCartDetail();
                 $batchSize = 50;
                 $add = Batch::insert($cartInstance, $addColumn, $webDataAdd, $batchSize);
@@ -1469,10 +1469,12 @@ class APICartServices
             //活動滿額門檻資料 (活動時間內才做)
             //重組活動贈品
             $threshold_prod = [];
-            foreach ($campaign_gift['PROD'] as $campaign_id => $item) {
-                foreach ($item as $product_id => $data) {
-                    if ($now >= $data['start_launched_at'] && $now <= $data['end_launched_at']) {
-                        $threshold_prod[$product_id] = $data;
+            if (isset($campaign_gift['PROD'])) {
+                foreach ($campaign_gift['PROD'] as $campaign_id => $item) {
+                    foreach ($item as $product_id => $data) {
+                        if ($now >= $data['start_launched_at'] && $now <= $data['end_launched_at']) {
+                            $threshold_prod[$product_id] = $data;
+                        }
                     }
                 }
             }
