@@ -973,6 +973,7 @@ class APIOrderService
                         "returned_subtotal" => 0,
                         "returned_point_discount" => 0,
                         "returned_points" => 0,
+                        "main_product_id" => $products['productID']
                     ];
                     $point_discount += round($discount_rate[$seq] * $order['points']);
                     $detail_p_discount += $cart_p_discount_prod[$products['productID']][$item['itemId']];
@@ -1046,6 +1047,7 @@ class APIOrderService
                                             "returned_subtotal" => 0,
                                             "returned_point_discount" => 0,
                                             "returned_points" => 0,
+                                            "main_product_id" => $products['productID']
                                         ];
                                         $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                         //寫入折扣資訊
@@ -1129,6 +1131,7 @@ class APIOrderService
                         "returned_subtotal" => 0,
                         "returned_point_discount" => 0,
                         "returned_points" => 0,
+                        "main_product_id" => 0
                     ];
                     $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                     if ($campaign_id_gift != $gift['campaignId']) {
@@ -1314,6 +1317,7 @@ class APIOrderService
                                                 "returned_subtotal" => 0,
                                                 "returned_point_discount" => 0,
                                                 "returned_points" => 0,
+                                                "main_product_id" => $products['productID']
                                             ];
                                             $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                             //寫入折扣資訊
@@ -1450,7 +1454,7 @@ class APIOrderService
             $webData['payment_id'] = $newOrderPayment->id; //付款ID
             $ship_status = $this->setShipment($webData);
             if (!$ship_status) {
-                $result['status'] = 404;
+                $result['status'] = 405;
                 $result['payment_url'] = null;
                 DB::rollBack();
                 return $result;
@@ -1480,55 +1484,123 @@ class APIOrderService
         $random = Str::random(6);
         DB::beginTransaction();
         try {
-            //建立出貨單頭
-            $shipData = [];
-            $shipData['agent_id'] = 1;
-            $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
-            $shipData['shipment_date'] = $now;
-            $shipData['status_code'] = 'CREATED';
-            $shipData['payment_method'] = $data['payment_method'];
-            $shipData['is_cash_on_delivery'] = $data['is_cash_on_delivery'];
-            $shipData['lgst_method'] = $data['lgst_method'];
-            $shipData['order_id'] = $data['order_id'];
-            $shipData['order_no'] = $data['order_no'];
-            $shipData['total_amount'] = $data['total_amount'];
-            $shipData['paid_amount'] = $data['paid_amount'];
-            $shipData['ship_to_name'] = $data['receiver_name'];
-            $shipData['ship_to_mobile'] = $data['receiver_mobile'];
-            $shipData['ship_to_zip_code'] = $data['receiver_zip_code'];
-            $shipData['ship_to_city'] = $data['receiver_city'];
-            $shipData['ship_to_district'] = $data['receiver_district'];
-            $shipData['ship_to_address'] = $data['receiver_address'];
-            $shipData['store_no'] = $data['store_no'];
-            $shipData['remark'] = '';
-            $shipData['created_by'] = -1;
-            $shipData['created_at'] = $now;
-            $shipData['updated_by'] = -1;
-            $shipData['updated_at'] = $now;
-            $ship_id = Shipment::insertGetId($shipData);
-            $shipDetail = [];
+            if ($status['ship_from_whs'] == 'SELF') { //出貨倉，SELF-自有倉儲(秋雨倉)
+                //建立出貨單頭
+                $shipData = [];
+                $shipData['agent_id'] = 1;
+                $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
+                $shipData['shipment_date'] = $now;
+                $shipData['status_code'] = 'CREATED';
+                $shipData['payment_method'] = $data['payment_method'];
+                $shipData['is_cash_on_delivery'] = $data['is_cash_on_delivery'];
+                $shipData['lgst_method'] = $data['lgst_method'];
+                $shipData['order_id'] = $data['order_id'];
+                $shipData['order_no'] = $data['order_no'];
+                $shipData['total_amount'] = $data['total_amount'];
+                $shipData['paid_amount'] = $data['paid_amount'];
+                $shipData['ship_to_name'] = $data['receiver_name'];
+                $shipData['ship_to_mobile'] = $data['receiver_mobile'];
+                $shipData['ship_to_zip_code'] = $data['receiver_zip_code'];
+                $shipData['ship_to_city'] = $data['receiver_city'];
+                $shipData['ship_to_district'] = $data['receiver_district'];
+                $shipData['ship_to_address'] = $data['receiver_address'];
+                $shipData['store_no'] = $data['store_no'];
+                $shipData['remark'] = '';
+                $shipData['created_by'] = -1;
+                $shipData['created_at'] = $now;
+                $shipData['updated_by'] = -1;
+                $shipData['updated_at'] = $now;
+                $ship_id = Shipment::insertGetId($shipData);
+                $shipDetail = [];
 
-            //出貨單單身
-            $order_details = OrderDetail::getOrderDetails($data['order_id']);
-            foreach ($order_details as $detail) {
-                $shipDetail['shipment_id'] = $ship_id;
-                $shipDetail['seq'] = $detail->seq;
-                $shipDetail['order_detail_id'] = $detail->id;
-                $shipDetail['product_item_id'] = $detail->product_item_id;
-                $shipDetail['item_no'] = $detail->item_no;
-                $shipDetail['qty'] = $detail->qty;
-                $shipDetail['created_by'] = -1;
-                $shipDetail['created_at'] = $now;
-                $shipDetail['updated_by'] = -1;
-                $shipDetail['updated_at'] = $now;
-                $shipDetail['order_detail_seq'] = $detail->seq; //新增加欄位，同$shipDetail['seq']
-                $shipDetail_id = ShipmentDetail::insertGetId($shipDetail);
+                //出貨單單身
+                $order_details = OrderDetail::getOrderDetails($data['order_id']);
+                foreach ($order_details as $detail) {
+                    $shipDetail['shipment_id'] = $ship_id;
+                    $shipDetail['seq'] = $detail->seq;
+                    $shipDetail['order_detail_id'] = $detail->id;
+                    $shipDetail['product_item_id'] = $detail->product_item_id;
+                    $shipDetail['item_no'] = $detail->item_no;
+                    $shipDetail['qty'] = $detail->qty;
+                    $shipDetail['created_by'] = -1;
+                    $shipDetail['created_at'] = $now;
+                    $shipDetail['updated_by'] = -1;
+                    $shipDetail['updated_at'] = $now;
+                    $shipDetail['order_detail_seq'] = $detail->seq; //新增加欄位，同$shipDetail['seq']
+                    $shipDetail_id = ShipmentDetail::insertGetId($shipDetail);
+                }
+            } else {//出貨倉，SUP-供應商自出
+                //出貨單單身
+                $order_details = OrderDetail::getOrderDetails($data['order_id'])->toArray();
+                array_multisort(array_column($order_details, 'main_product_id'), SORT_ASC, $order_details);
+                $seq = 0;
+                $main_product_id = 0;
+                $shipment = [];
+                foreach ($order_details as $detail) {
+                    if ($main_product_id != $detail['main_product_id']) {
+                        $seq = 0;
+                        $shipment['total_amount'][$detail['main_product_id']] = 0;
+                        $shipment['paid_amount'][$detail['main_product_id']] = 0;
+                    }
+                    $seq++;
+                    $shipment['detail'][$detail['main_product_id']][$seq] = $detail;
+                    $main_product_id = $detail['main_product_id'];
+                    $shipment['total_amount'][$detail['main_product_id']] += $detail['subtotal'];
+                    $shipment['paid_amount'][$detail['main_product_id']] += ($detail['subtotal'] + $detail['point_discount']);
+                }
+                //一品一單
+                foreach ($shipment['detail'] as $main_product_id => $order_detail) {
+                    $random = Str::random(6);
+                    //建立出貨單頭
+                    $shipData = [];
+                    $shipData['agent_id'] = 1;
+                    $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
+                    $shipData['shipment_date'] = $now;
+                    $shipData['status_code'] = 'CREATED';
+                    $shipData['payment_method'] = $data['payment_method'];
+                    $shipData['is_cash_on_delivery'] = $data['is_cash_on_delivery'];
+                    $shipData['lgst_method'] = $data['lgst_method'];
+                    $shipData['order_id'] = $data['order_id'];
+                    $shipData['order_no'] = $data['order_no'];
+                    $shipData['total_amount'] = $shipment['total_amount'][$main_product_id];
+                    $shipData['paid_amount'] = $shipment['paid_amount'][$main_product_id];
+                    $shipData['ship_to_name'] = $data['receiver_name'];
+                    $shipData['ship_to_mobile'] = $data['receiver_mobile'];
+                    $shipData['ship_to_zip_code'] = $data['receiver_zip_code'];
+                    $shipData['ship_to_city'] = $data['receiver_city'];
+                    $shipData['ship_to_district'] = $data['receiver_district'];
+                    $shipData['ship_to_address'] = $data['receiver_address'];
+                    $shipData['store_no'] = $data['store_no'];
+                    $shipData['remark'] = '';
+                    $shipData['created_by'] = -1;
+                    $shipData['created_at'] = $now;
+                    $shipData['updated_by'] = -1;
+                    $shipData['updated_at'] = $now;
+                    $ship_id = Shipment::insertGetId($shipData);
+
+                    //出貨單單身
+                    foreach ($order_detail as $seq => $detail) {
+                        $shipDetail['shipment_id'] = $ship_id;
+                        $shipDetail['seq'] = $seq;
+                        $shipDetail['order_detail_id'] = $detail['id'];
+                        $shipDetail['product_item_id'] = $detail['product_item_id'];
+                        $shipDetail['item_no'] = $detail['item_no'];
+                        $shipDetail['qty'] = $detail['qty'];
+                        $shipDetail['created_by'] = -1;
+                        $shipDetail['created_at'] = $now;
+                        $shipDetail['updated_by'] = -1;
+                        $shipDetail['updated_at'] = $now;
+                        $shipDetail['order_detail_seq'] = $detail['seq']; //新增加欄位，同$shipDetail['seq']
+                        ShipmentDetail::insertGetId($shipDetail);
+                    }
+                }
+
             }
             DB::commit();
             $result = true;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::channel('shipment')->error("出貨單建立失敗：".$e);
+            Log::channel('shipment')->error("出貨單建立失敗：" . $e);
             $result = false;
         }
         return $result;
