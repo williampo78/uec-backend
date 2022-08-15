@@ -1433,10 +1433,12 @@ class APICartServices
             //活動滿額門檻資料 (活動時間內才做)
             //重組活動贈品
             $threshold_prod = [];
-            foreach ($campaign_gift['PROD'] as $campaign_id => $item) {
-                foreach ($item as $product_id => $data) {
-                    if ($now >= $data['start_launched_at'] && $now <= $data['end_launched_at']) {
-                        $threshold_prod[$product_id] = $data;
+            if (isset($campaign_gift['PROD'])) {
+                foreach ($campaign_gift['PROD'] as $campaign_id => $item) {
+                    foreach ($item as $product_id => $data) {
+                        if ($now >= $data['start_launched_at'] && $now <= $data['end_launched_at']) {
+                            $threshold_prod[$product_id] = $data;
+                        }
                     }
                 }
             }
