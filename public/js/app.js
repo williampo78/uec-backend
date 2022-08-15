@@ -8693,6 +8693,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -8715,6 +8721,10 @@ __webpack_require__.r(__webpack_exports__);
       "default": function _default() {
         return {};
       }
+    },
+    disabled: {
+      type: Boolean,
+      "default": false
     }
   },
   data: function data() {
@@ -8725,7 +8735,7 @@ __webpack_require__.r(__webpack_exports__);
         clickOpens: false,
         time_24hr: true,
         locale: flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_2__.MandarinTraditional,
-        disableMobile: "true"
+        disableMobile: true
       }
     };
   },
@@ -44463,7 +44473,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.vue-treeselect__menu {\n    line-height: 230%;\n}\n.vue-treeselect__label-container {\n    font-size: 14px;\n    color: #000000;\n}\n.vue-treeselect__count {\n    color: #ff0000;\n}\n.vue-treeselect__option-arrow-container:hover .vue-treeselect__option-arrow,\n.vue-treeselect--branch-nodes-disabled\n    .vue-treeselect__option:hover\n    .vue-treeselect__option-arrow {\n    color: #000000;\n}\n.vue-treeselect__option-arrow {\n    width: 11px;\n    height: 11px;\n}\n.vue-treeselect.treeselect-invalid:not(.vue-treeselect--open)\n    .vue-treeselect__control {\n    border-color: #a94442;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.vue-treeselect__menu {\r\n    line-height: 230%;\n}\n.vue-treeselect__label-container {\r\n    font-size: 14px;\r\n    color: #000000;\n}\n.vue-treeselect__count {\r\n    color: #ff0000;\n}\n.vue-treeselect__option-arrow-container:hover .vue-treeselect__option-arrow,\r\n.vue-treeselect--branch-nodes-disabled\r\n    .vue-treeselect__option:hover\r\n    .vue-treeselect__option-arrow {\r\n    color: #000000;\n}\n.vue-treeselect__option-arrow {\r\n    width: 11px;\r\n    height: 11px;\n}\n.vue-treeselect.treeselect-invalid:not(.vue-treeselect--open)\r\n    .vue-treeselect__control {\r\n    border-color: #a94442;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -98369,6 +98379,7 @@ var render = function () {
           autocomplete: "off",
           name: _vm.name,
           config: _vm.configLocal,
+          disabled: _vm.disabled,
         },
         on: { "on-change": _vm.onChange },
         model: {
@@ -98380,28 +98391,25 @@ var render = function () {
         },
       }),
       _vm._v(" "),
-      _vm._m(0),
+      _c("div", { staticClass: "input-group-btn" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-default",
+            attrs: {
+              type: "button",
+              disabled: _vm.disabled,
+              "data-toggle": "",
+            },
+          },
+          [_c("i", { staticClass: "fa-solid fa-calendar-days" })]
+        ),
+      ]),
     ],
     1
   )
 }
-var staticRenderFns = [
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "input-group-btn" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-default",
-          attrs: { type: "button", "data-toggle": "" },
-        },
-        [_c("i", { staticClass: "fa-solid fa-calendar-days" })]
-      ),
-    ])
-  },
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

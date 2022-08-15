@@ -8,10 +8,16 @@
             v-model="valueLocal"
             :config="configLocal"
             @on-change="onChange"
+            :disabled="disabled"
         >
         </flat-pickr>
         <div class="input-group-btn">
-            <button class="btn btn-default" type="button" data-toggle>
+            <button
+                class="btn btn-default"
+                type="button"
+                :disabled="disabled"
+                data-toggle
+            >
                 <i class="fa-solid fa-calendar-days"></i>
             </button>
         </div>
@@ -41,6 +47,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -50,7 +60,7 @@ export default {
                 clickOpens: false,
                 time_24hr: true,
                 locale: MandarinTraditional,
-                disableMobile: "true",
+                disableMobile: true,
             },
         };
     },
