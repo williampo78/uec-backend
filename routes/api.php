@@ -95,6 +95,7 @@ Route::group(['middleware' => 'jwt.verify'], function () {
     Route::group(['prefix' => 'checkout'], function () {
         Route::post('/tmpOrder', [CheckoutController::class, 'setTmpOrder']);
         Route::post('/checkOrder', [CheckoutController::class, 'setOrder']);
+        Route::post('/installment', [CheckoutController::class, 'getInstallment']);
     });
     Route::resource('/members/message', MessagesController::class, ['names' => ['index' => 'members.message']]);
     Route::get('/members/message-top/', [MessagesController::class, 'messageTop']);

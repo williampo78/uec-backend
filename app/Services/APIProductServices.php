@@ -1033,7 +1033,7 @@ class APIProductServices
      * @Author: Eric
      * @DateTime: 2022/8/5 上午 10:56
      */
-    public function getInstallmentAmountInterestRatesWithBank(int $min_consumption = null):Collection
+    public function getInstallmentAmountInterestRatesWithBank(int $min_consumption = null, string $bank_no = null):Collection
     {
         $today = Carbon::today()->toDateString();
 
@@ -1046,6 +1046,9 @@ class APIProductServices
             ->whereDate('ended_at', '>=', $today)
             ->when(isset($min_consumption), function ($query) use ($min_consumption) {
                 $query->where('min_consumption', '<=', $min_consumption);
+            })
+            ->when(isset($bank_no), function ($query) use ($bank_no) {
+                $query->where('issuing_bank_no', '=', $bank_no);
             })
             ->orderBy('interest_rate', 'asc')
             ->orderBy('number_of_installments', 'asc')

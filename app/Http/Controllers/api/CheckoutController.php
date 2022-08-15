@@ -370,4 +370,47 @@ class CheckoutController extends Controller
 
         return $data;
     }
+
+    /*
+     *
+     */
+    public function getInstallment(Request $request)
+    {
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $messages = [
+            'required' => '不能為空',
+            'numeric' => '必須為數值',
+        ];
+
+        $v = Validator::make($request->all(), [
+            'total_price' => 'required|numeric',
+        ], $messages);
+
+        if ($v->fails()) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+        }
+        if ($request->total_price > 0) {
+
+            $member_id = Auth::guard('api')->user()->member_id;
+            $campaign = $this->apiProductServices->getPromotion('product_card');
+            $campaign_gift = $this->apiProductServices->getCampaignGift();
+            $campaign_discount = $this->apiProductServices->getCampaignDiscount();
+            $stock_type = ($request->stock_type == "supplier" ? "supplier" : "dradvice");
+            $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, null, $stock_type);
+            $response = json_decode($response, true);
+            $order = $response['result'];
+            dd($order['totalPrice']);
+            $paid_amount = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee'] + $order['thresholdAmount']);
+            if ($paid_amount == $request->total_price) {
+                $installment = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($request->total_price, $request->bank_id);
+                $installment = $this->apiProductServices->handleInstallmentInterestRates($installment, $request->total_price);
+            }
+            $data['installment'] = isset($installment['details']) ? $installment['details'] : [];
+        } else {
+            $data['installment'] = [];
+        }
+        $data['paymentValue'] = (count($data['installment']) > 0 ? 'TAPPAY_INSTAL' : '');
+        return response()->json(['status' => 200, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
+    }
 }
