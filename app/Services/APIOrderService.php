@@ -1531,6 +1531,14 @@ class APIOrderService
                 }
             } else {//出貨倉，SUP-供應商自出
                 //出貨單單身
+
+                //取供應商id
+                $supplier_id = [];
+                $supplier_info = ProductItem::with('product')->get();
+                foreach ($supplier_info as $supplier) {
+                    $supplier_id[$supplier->product->id] = $supplier->product->supplier_id;
+                }
+
                 $order_details = OrderDetail::getOrderDetails($data['order_id'])->toArray();
                 array_multisort(array_column($order_details, 'main_product_id'), SORT_ASC, $order_details);
                 $seq = 0;
@@ -1547,6 +1555,7 @@ class APIOrderService
                     $main_product_id = $detail['main_product_id'];
                     $shipment['total_amount'][$detail['main_product_id']] += $detail['subtotal'];
                     $shipment['paid_amount'][$detail['main_product_id']] += ($detail['subtotal'] + $detail['point_discount']);
+                    $shipment['supplier'][$main_product_id] = $supplier_id[$main_product_id];
                 }
                 //一品一單
                 foreach ($shipment['detail'] as $main_product_id => $order_detail) {
@@ -1576,6 +1585,7 @@ class APIOrderService
                     $shipData['created_at'] = $now;
                     $shipData['updated_by'] = -1;
                     $shipData['updated_at'] = $now;
+                    $shipData['supplier_id'] = $shipment['supplier'][$main_product_id];
                     $ship_id = Shipment::insertGetId($shipData);
 
                     //出貨單單身

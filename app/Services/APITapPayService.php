@@ -104,7 +104,11 @@ class APITapPayService
                         //檢查該筆資料的交易紀錄的狀態
                         foreach ($record['trade_records'] as $trade) {
                             if ($trade['record_status'] == 1 || $trade['record_status'] == 0) { //交易完成..更新金流狀態
-                                $result = $this->updateOrder($orderPayment);
+                                if (config('uec.cart_p_discount_split') == 1) {
+                                    $result = $this->updateOrder($orderPayment);
+                                } else {
+                                    $result = $this->setShipment($orderPayment);
+                                }
                             }
                         }
                     }
