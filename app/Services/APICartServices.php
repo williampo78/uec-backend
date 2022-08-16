@@ -35,7 +35,7 @@ class APICartServices
         $s3 = config('filesystems.disks.s3.url');
         $result = ShoppingCartDetail::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
-            , "product_items.item_no", "product_items.photo_name as item_photo", "products.stock_type")
+            , "product_items.item_no", "product_items.photo_name as item_photo", "products.stock_type", "products.payment_method")
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
             ->join('products', 'products.id', '=', 'product_items.product_id')
             ->where('shopping_cart_details.status_code', 0) //購物車
@@ -54,7 +54,7 @@ class APICartServices
             $itemPhoto = empty($datas->item_photo) ? $productPhoto : $datas->item_photo;
 
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['product_photo'] = empty($productPhoto) ?  null : $s3 . $productPhoto;
+            $data[$datas->product_id]['product_photo'] = empty($productPhoto) ? null : $s3 . $productPhoto;
             $data[$datas->product_id]['item_photo'] = empty($itemPhoto) ? null : $s3 . $itemPhoto;
 
             $data['items'][$datas->product_id][$datas->item_id] = $datas;
@@ -1409,11 +1409,13 @@ class APICartServices
                 }
             }
             $prodQty = [];
+            $product_payment_method = [];
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                     $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
 
+                    $product_payment_method[] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                     if (config('uec.cart_billing_split') == 1) {
                         //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
                         if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
@@ -2524,6 +2526,12 @@ class APICartServices
                 }
             }
 
+            //取得主商品交集共同的付款方式
+            $payment_method = $product_payment_method[0];
+            foreach ($product_payment_method as $collection) {
+                $payment_method = $collection->intersect($payment_method);
+            }
+            $cart['paymentMethod'] = $payment_method->all();
 
             return json_encode(array("status" => 200, "result" => $cart));
         }
