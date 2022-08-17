@@ -9,6 +9,7 @@ use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ExternalInventoryDailyReportController;
+use App\Http\Controllers\InstallmentInterestRateController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\StockTransactionLogController;
 use App\Http\Controllers\MiscStockRequestController;
@@ -294,6 +295,15 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     // 進銷存彙總表
     Route::post('/summary_stock/ajax', [SummaryStockController::class, 'ajaxDetail']);
     Route::resource('/summary_stock', SummaryStockController::class, ['names' => ['index' => 'summary_stock']]);
+
+    //信用卡分期設定
+    Route::group(['prefix' => 'installment-interest-rates', 'as' => 'installment_interest_rates'], function () {
+        Route::get('/check-existed', [InstallmentInterestRateController::class, 'checkExisted'])->name('.check_existed');
+        Route::get('/', [InstallmentInterestRateController::class, 'index']);
+        Route::post('/', [InstallmentInterestRateController::class, 'store'])->name('.store');
+        Route::get('/{id}', [InstallmentInterestRateController::class, 'show'])->name('.show');
+        Route::put('/{id}', [InstallmentInterestRateController::class, 'update'])->name('.update');
+    });
 
     // 進貨退出單
     Route::group(['prefix' => 'misc-stock-requests'], function () {

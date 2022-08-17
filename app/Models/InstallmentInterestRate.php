@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InstallmentInterestRate extends Model
 {
+    protected $guarded = [];
+
     /**
      * @return BelongsTo
      * @Author: Eric
@@ -15,5 +17,15 @@ class InstallmentInterestRate extends Model
     public function bank():BelongsTo
     {
         return $this->belongsTo(Bank::class, 'issuing_bank_no', 'bank_no');
+    }
+
+    /**
+     * @return BelongsTo
+     * @Author: Eric
+     * @DateTime: 2022/8/9 上午 11:54
+     */
+    public function updatedBy():BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }
