@@ -313,14 +313,17 @@
                                             >
                                         </div>
                                         <div class="col-sm-4">
-                                            <input
-                                                type="number"
+                                            <select2
                                                 class="form-control"
-                                                max="100"
-                                                min="0"
-                                                readonly
+                                                :options="limitOptions"
                                                 v-model="form.limit"
-                                            />
+                                                :allow-clear="false"
+                                            >
+                                                <option
+                                                    disabled
+                                                    value=""
+                                                ></option>
+                                            </select2>
                                         </div>
                                     </div>
                                 </div>
@@ -501,7 +504,7 @@ export default {
                 startLaunchedAtEnd: "",
                 productType: "",
                 webCategoryHierarchyId: "",
-                limit: "100",
+                limit: 100,
                 stockType: "",
                 excludeProductIds: [],
             },
@@ -517,6 +520,7 @@ export default {
             productTypeOptions: [],
             webCategoryHierarchies: [],
             products: [],
+            limitOptions: [100, 300, 500],
         };
     },
     async created() {

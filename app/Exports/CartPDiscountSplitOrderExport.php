@@ -50,6 +50,7 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
     public function collection(): Collection
     {
         $body = collect();
+        $orderRecordIdentityOptions = config('uec.order_record_identity_options');
 
         $count = 1;
         foreach ($this->orders as $order) {
@@ -84,9 +85,10 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                 'original_qty'               => null,
                 'original_campaign_discount' => null,
                 'original_cart_p_discount'   => null,
-                'original_point_discount'    => null,
-                'original_actual_subtotal'   => null,
-                'original_subtotal'          => null,
+                'original_subtotal'          => null, //小計
+                'original_point_discount'    => null, //點數折抵
+                'original_actual_subtotal'   => null, //實收金額
+                'record_identity'            => null,
                 'returned_qty'               => null,
                 'returned_campaign_discount' => null,
                 'returned_subtotal'          => null,
@@ -135,14 +137,14 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             if ($order->orderDetails->isNotEmpty()) {
                 $mergeCellFirstRow = $count + 1;
 
-                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body) {
+                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body, $orderRecordIdentityOptions) {
                     $row['count']                      = $count;
-                    $row['product_no']                 = $orderDetail->product->product_no;
+                    $row['product_no']                 = optional($orderDetail->product)->product_no;
                     $row['item_no']                    = $orderDetail->item_no;
-                    $row['pos_item_no']                = $orderDetail->productItem->pos_item_no;
-                    $row['product_name']               = $orderDetail->product->product_name;
-                    $row['spec_1_value']               = $orderDetail->productItem->spec_1_value;
-                    $row['spec_2_value']               = $orderDetail->productItem->spec_2_value;
+                    $row['pos_item_no']                = optional($orderDetail->productItem)->pos_item_no;
+                    $row['product_name']               = optional($orderDetail->product)->product_name;
+                    $row['spec_1_value']               = optional($orderDetail->productItem)->spec_1_value;
+                    $row['spec_2_value']               = optional($orderDetail->productItem)->spec_2_value;
                     $row['selling_price']              = $orderDetail->selling_price;
                     $row['unit_price']                 = $orderDetail->unit_price;
                     $row['original_qty']               = $orderDetail->qty - $orderDetail->returned_qty;
@@ -156,7 +158,7 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                     $row['original_subtotal'] = $orderDetail->subtotal - $orderDetail->returned_subtotal;
                     //實收金額
                     $row['original_actual_subtotal'] = $row['original_subtotal'] + $row['original_point_discount'];
-
+                    $row['record_identity']            = $orderRecordIdentityOptions[$orderDetail->record_identity] ?? null;
                     $row['returned_qty']               = $orderDetail->returned_qty;
                     $row['returned_campaign_discount'] = $orderDetail->returned_campaign_discount;
                     $row['returned_subtotal']          = $orderDetail->returned_subtotal;
@@ -227,9 +229,10 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             '數量',
             '單品折抵',
             '購物車滿額折抵',
+            '小計',
             '點數折抵',
             '實收金額',
-            '小計',
+            '身份',
             '已退數量',
             '已退單品折抵',
             '已退小計',

@@ -66,29 +66,30 @@ class CheckoutController extends Controller
         $err = null;
         $error_code = $this->apiService->getErrorCode();
         $messages = [
-            'shipping_fee.required' => '運費不能為空',
-            'total_price.required' => '商品總價不能為空',
-            'total_price.numeric' => '商品總價必須為數值',
-            'discount.required' => '滿額折抵不能為空',
-            'discount.numeric' => '滿額折抵必須為數值',
+            'required' => '不能為空',
+            'numeric' => '必須為數值',
+            'in' => '購物車類型必須為: :values',
+            'string' => '購物車類型必須為: string',
         ];
 
         $v = Validator::make($request->all(), [
-            'shipping_fee' => 'required',
+            'shipping_fee' => 'required|numeric',
             'total_price' => 'required|numeric',
             'discount' => 'required|numeric',
+            'stock_type' => (config('uec.cart_billing_split') == 1 ? 'required|string|in:dradvice,supplier' : 'nullable'),
         ], $messages);
 
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
+
         $member_id = Auth::guard('api')->user()->member_id;
         $campaign = $this->apiProductServices->getPromotion('product_card');
         $campaign_gift = $this->apiProductServices->getCampaignGift();
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
-        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
+        $stock_type = ($request->stock_type == "supplier" ? "supplier" : "dradvice");
+        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, null, $stock_type);
         $response = json_decode($response, true);
-
         if ($request->points) { //結帳時使用的會員點數
             $points = $request->points;
         } else {
@@ -223,6 +224,7 @@ class CheckoutController extends Controller
             'utm.campaign' => 'string|nullable|max:100',
             'utm.sales' => 'string|nullable|max:100',
             'utm.time' => 'nullable',
+            'stock_type' => (config('uec.cart_billing_split') == 1 ? 'required|string|in:dradvice,supplier' : 'nullable')
         ], $messages);
 
         if ($v->fails()) {
@@ -233,7 +235,8 @@ class CheckoutController extends Controller
         $campaign = $this->apiProductServices->getPromotion('product_card');
         $campaign_gift = $this->apiProductServices->getCampaignGift();
         $campaign_discount = $this->apiProductServices->getCampaignDiscount();
-        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount);
+        $stock_type = ($request->stock_type == "supplier" ? "supplier" : "dradvice");
+        $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, null, $stock_type);
         $response = json_decode($response, true);
 
         /* test
@@ -300,6 +303,12 @@ class CheckoutController extends Controller
                             $status = false;
                             $err = '903';
                             $data['message'] = "庫存不足，無法成立訂單";
+                            break;
+
+                        case 405:
+                            $status = false;
+                            $err = '906';
+                            $data['message'] = "出貨單成立失敗";
                             break;
 
                         default:

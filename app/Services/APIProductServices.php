@@ -498,7 +498,7 @@ class APIProductServices
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
                             'start_selling' => $product->start_selling_at,
-                            'gtm' => isset($gtm[$product->id])?$gtm[$product->id]:""
+                            'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : ""
                         );
 
                         $product_id = $product->id;
@@ -646,7 +646,6 @@ class APIProductServices
         } else {
             $strSQL .= " order by cate3.lft, cate2.lft, cate1.lft";
         }
-        //dd($strSQL);
         $products = DB::select($strSQL);
 
         foreach ($products as $cateID => $product) {
@@ -703,7 +702,7 @@ class APIProductServices
                 $subCate = 0;
                 foreach ($products as $category) {
                     if ($subCate == $category->L2) continue;
-                    $main[] = array(
+                    $main[$category->L1][] = array(
                         'id' => $category->L2,
                         'name' => $category->L2_Name,
                         'sub' => $sub[$category->L1][$category->L2]
@@ -717,7 +716,7 @@ class APIProductServices
                         'name' => $category->L1_Name,
                         'shortName' => $category->L1_category_short_name,
                         'icon' => ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null),
-                        'sub' => $main
+                        'sub' => $main[$category->L1]
                     );
                     $cate = $category->L1;
                 }
@@ -775,14 +774,18 @@ class APIProductServices
 
             //付款方式
             $payment_method = [];
-            //$payment_way = "TAPPAY_CREDITCARD,TAPPAY_LINEPAY,TAPPAY_JKOPAY";//本階段沒有欄位寫固定的付款方式
-            $payment_way = "TAPPAY_CREDITCARD,TAPPAY_LINEPAY";
-            //if ($product[$id]->payment_method != '') {
+            $payment_way = $product[$id]->payment_method;
+
             $methods = explode(',', $payment_way);
+
             foreach ($methods as $method) {
+                //畫面上不會顯示分期付款字樣
+                if($method === 'TAPPAY_INSTAL'){
+                    continue;
+                }
+
                 $payment_method[] = $payment_text[$method];
             }
-            //}
 
             //配送方式
             $delivery_method = [];
@@ -1034,10 +1037,10 @@ class APIProductServices
     {
         $today = Carbon::today()->toDateString();
 
-        return InstallmentInterestRate::with(['bank' => function ($query) {
-            $query->select(['id', 'bank_no', 'short_name'])
-                ->where('active', 1);
-        }])
+        return InstallmentInterestRate::with('bank:id,bank_no,short_name')
+            ->whereHas('bank', function($query){
+                $query->where('active', 1);
+            })
             ->where('active', 1)
             ->whereDate('started_at', '<=', $today)
             ->whereDate('ended_at', '>=', $today)
@@ -1372,7 +1375,7 @@ class APIProductServices
                                 'cart' => $cart,
                                 "selling_channel" => $products[$product_id]->selling_channel,
                                 "start_selling" => $products[$product_id]->start_selling_at,
-                                "gtm" => (isset($gtm[$product_id])?$gtm[$product_id]:"")
+                                "gtm" => (isset($gtm[$product_id]) ? $gtm[$product_id] : "")
                             );
                         }
                     }
@@ -1887,7 +1890,7 @@ class APIProductServices
                 //產品規格
                 $item_spec = [];
                 $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
-                if (count($ProductSpec) ==0) continue;
+                if (count($ProductSpec) == 0) continue;
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度

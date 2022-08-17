@@ -35,7 +35,7 @@ class APICartServices
         $s3 = config('filesystems.disks.s3.url');
         $result = ShoppingCartDetail::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
-            , "product_items.item_no", "product_items.photo_name as item_photo")
+            , "product_items.item_no", "product_items.photo_name as item_photo", "products.stock_type")
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
             ->join('products', 'products.id', '=', 'product_items.product_id')
             ->where('shopping_cart_details.status_code', 0) //購物車
@@ -47,12 +47,16 @@ class APICartServices
         $result = $result->orderBy('shopping_cart_details.latest_added_at', 'desc')->get();
         $data = [];
         foreach ($result as $datas) {
-            //商品圖以規格圖為主為空，則取商品封面圖
-            $itemPhoto = empty($datas->item_photo) ? optional(ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first())->photo_name : $datas->item_photo;
-            $itemPhoto = empty($itemPhoto) ? null : $s3 . $itemPhoto;
+
+            //商品封面圖
+            $productPhoto = optional(ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first())->photo_name;
+            //如規格圖為空，則取商品封面圖
+            $itemPhoto = empty($datas->item_photo) ? $productPhoto : $datas->item_photo;
 
             $data[$datas->product_id] = $datas;
-            $data[$datas->product_id]['item_photo'] = $itemPhoto;
+            $data[$datas->product_id]['product_photo'] = empty($productPhoto) ?  null : $s3 . $productPhoto;
+            $data[$datas->product_id]['item_photo'] = empty($itemPhoto) ? null : $s3 . $itemPhoto;
+
             $data['items'][$datas->product_id][$datas->item_id] = $datas;
         }
         return $data;
@@ -148,9 +152,9 @@ class APICartServices
      * 取得購物車內容
      *
      */
-    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm = null)
+    public function getCartData($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm = null, $stock_type = 'dradvice')
     {
-        if (config('uec.cart_p_discount_split') == 1) return $this->getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm);
+        if (config('uec.cart_p_discount_split') == 1) return $this->getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm, $stock_type);
 
         $now = Carbon::now();
         //購物車內容
@@ -379,6 +383,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -471,6 +476,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -537,6 +543,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -603,6 +610,7 @@ class APICartServices
                                         "amount" => round($amount),
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->product_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
@@ -663,6 +671,7 @@ class APICartServices
                                     "amount" => round($item_info->selling_price * $detail_qty),
                                     "itemStock" => $stock,
                                     "outOfStock" => $outOfStock,
+                                    'itemPhoto' => $item_info->product_photo ?? null,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                     "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                                     "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief : null),
@@ -724,6 +733,7 @@ class APICartServices
                                 "amount" => round($item_info->selling_price * $detail_qty),
                                 "itemStock" => $stock,
                                 "outOfStock" => $outOfStock,
+                                'itemPhoto' => $item_info->product_photo ?? null,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                 "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
                                 "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountBrief : null),
@@ -782,6 +792,7 @@ class APICartServices
                             "amount" => round($item_info->selling_price * $detail_qty),
                             "itemStock" => $stock,
                             "outOfStock" => $outOfStock,
+                            'itemPhoto' => $item_info->product_photo ?? null,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                             "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                             "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief : null),
@@ -949,12 +960,12 @@ class APICartServices
                                 foreach ($giftawayInfo as $giftInfo => $v) {
                                     $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                     //if (isset($threshold_prod[$v['product_id']])) {
-                                        $gift_array[$item->id]++;
-                                        if (isset($stock_gift_check[$v['product_id']])) {
-                                            if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
-                                                $gift_check[$item->id]++;
-                                            }
+                                    $gift_array[$item->id]++;
+                                    if (isset($stock_gift_check[$v['product_id']])) {
+                                        if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
+                                            $gift_check[$item->id]++;
                                         }
+                                    }
                                     //}
                                 }
                             }
@@ -1204,7 +1215,7 @@ class APICartServices
                     $input['utm_medium'],
                     $input['utm_campaign'],
                     $input['utm_sales'],
-                    date("Y-m-d H:i:s", $input['utm_time']),
+                    Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s'),
                     $now,
                     $member_id,
                     $member_id,
@@ -1223,12 +1234,12 @@ class APICartServices
         DB::beginTransaction();
         try {
 
-            if ($webDataUpd) {
+            if (count($webDataUpd) > 0) {
                 $cartInstance = new ShoppingCartDetail();
                 $upd = Batch::update($cartInstance, $webDataUpd, 'id');
             }
 
-            if ($webDataAdd) {
+            if (count($webDataAdd) > 0) {
                 $cartInstance = new ShoppingCartDetail();
                 $batchSize = 50;
                 $add = Batch::insert($cartInstance, $addColumn, $webDataAdd, $batchSize);
@@ -1342,7 +1353,7 @@ class APICartServices
      * 取得購物車內容_V2 (滿額折分攤回單品)
      * 滿額折-改版版本
      */
-    public function getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm)
+    public function getCartDataV2($member_id, $campaigns, $campaign_gift, $campaign_discount, $gtm, $stock_type)
     {
         $now = Carbon::now();
         //購物車內容
@@ -1370,6 +1381,10 @@ class APICartServices
             $CART04_n = [];
             $cartGift = [];
             $assigned = [];
+            $cartStockType = [];
+            $cartStockTypeCount['dradvice'] = 0;
+            $cartStockTypeCount['supplier'] = 0;
+
             foreach ($cartInfo as $items => $item) {
                 if ($items == 'item_photo') {
                     continue;
@@ -1381,12 +1396,30 @@ class APICartServices
 
                 $cartQty[$items][$item['item_id']] = $item->item_qty; //購物車數量
                 $cartAmount[$items] = round($item->selling_price); //商品售價
+
+                if (config('uec.cart_billing_split') == 1) {
+                    //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
+                    if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
+                        $cartStockType[$items] = "supplier";
+                    } else {    //健康力出貨：買斷[A]、寄售[B] 商品
+                        $cartStockType[$items] = "dradvice";
+                    }
+                }
             }
             $prodQty = [];
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                     $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
+
+                    if (config('uec.cart_billing_split') == 1) {
+                        //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
+                        if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
+                            $cartStockTypeCount['supplier']++;
+                        } else {    //健康力出貨：買斷[A]、寄售[B] 商品
+                            $cartStockTypeCount['dradvice']++;
+                        }
+                    }
                 }
             }
             //行銷活動
@@ -1436,10 +1469,12 @@ class APICartServices
             //活動滿額門檻資料 (活動時間內才做)
             //重組活動贈品
             $threshold_prod = [];
-            foreach ($campaign_gift['PROD'] as $campaign_id => $item) {
-                foreach ($item as $product_id => $data) {
-                    if ($now >= $data['start_launched_at'] && $now <= $data['end_launched_at']) {
-                        $threshold_prod[$product_id] = $data;
+            if (isset($campaign_gift['PROD'])) {
+                foreach ($campaign_gift['PROD'] as $campaign_id => $item) {
+                    foreach ($item as $product_id => $data) {
+                        if ($now >= $data['start_launched_at'] && $now <= $data['end_launched_at']) {
+                            $threshold_prod[$product_id] = $data;
+                        }
                     }
                 }
             }
@@ -1447,6 +1482,9 @@ class APICartServices
             $cartDiscount = 0;
             $prod_campaign = [];//活動下的單品
             foreach ($cartQty as $product_id => $item) {
+                if (config('uec.cart_billing_split') == 1) {
+                    if ($cartStockType[$product_id] != $stock_type) continue;
+                }
                 $product = [];
                 $prod_gift = [];
                 $prod_amount[$product_id] = 0;
@@ -1572,12 +1610,14 @@ class APICartServices
                                         "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->item_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
-                                        "campaignGiftAway" => $prod_gift
+                                        "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -1666,12 +1706,14 @@ class APICartServices
                                         "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->item_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
                                         "campaignDiscountStatus" => $return_type,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
-                                        "campaignGiftAway" => $prod_gift
+                                        "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -1734,12 +1776,14 @@ class APICartServices
                                         "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->item_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
-                                        "campaignGiftAway" => $prod_gift
+                                        "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -1802,12 +1846,14 @@ class APICartServices
                                         "itemCartDiscount" => 0,
                                         "itemStock" => $stock,
                                         "outOfStock" => $outOfStock,
+                                        'itemPhoto' => $item_info->item_photo ?? null,
                                         "campaignDiscountId" => $campaign['PRD']['DISCOUNT'][$product_id]->id,
                                         "campaignDiscountName" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name,
                                         "campaignDiscountBrief" => $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief,
                                         "campaignDiscountStatus" => true,
                                         "campaignDiscount" => ((round($item_info->selling_price) * $return_qty) - round($amount)) * -1,
-                                        "campaignGiftAway" => $prod_gift
+                                        "campaignGiftAway" => $prod_gift,
+                                        "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                     );
                                     $cartTotal += round($amount);
                                     $prod_amount[$product_id] += round($amount);
@@ -1864,12 +1910,14 @@ class APICartServices
                                     "itemCartDiscount" => 0,
                                     "itemStock" => $stock,
                                     "outOfStock" => $outOfStock,
+                                    'itemPhoto' => $item_info->item_photo ?? null,
                                     "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                     "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                                     "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief : null),
                                     "campaignDiscountStatus" => false,
                                     "campaignDiscount" => 0,
-                                    "campaignGiftAway" => $prod_gift
+                                    "campaignGiftAway" => $prod_gift,
+                                    "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                                 );
                                 $cartTotal += round($item_info->selling_price * $detail_qty);
                                 $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -1927,12 +1975,14 @@ class APICartServices
                                 "itemCartDiscount" => 0,
                                 "itemStock" => $stock,
                                 "outOfStock" => $outOfStock,
+                                'itemPhoto' => $item_info->item_photo ?? null,
                                 "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                                 "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountName : null),
                                 "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaignDiscountBrief : null),
                                 "campaignDiscountStatus" => false,
                                 "campaignDiscount" => 0,
-                                "campaignGiftAway" => $prod_gift
+                                "campaignGiftAway" => $prod_gift,
+                                "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                             );
                             $cartTotal += round($item_info->selling_price * $detail_qty);
                             $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -1987,12 +2037,14 @@ class APICartServices
                             "itemCartDiscount" => 0,
                             "itemStock" => $stock,
                             "outOfStock" => $outOfStock,
+                            'itemPhoto' => $item_info->item_photo ?? null,
                             "campaignDiscountId" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->id) ? $campaign['PRD']['DISCOUNT'][$product_id]->id : null),
                             "campaignDiscountName" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_name) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_name : null),
                             "campaignDiscountBrief" => (isset($campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief) ? $campaign['PRD']['DISCOUNT'][$product_id]->campaign_brief : null),
                             "campaignDiscountStatus" => false,
                             "campaignDiscount" => 0,
-                            "campaignGiftAway" => []
+                            "campaignGiftAway" => [],
+                            "gtm" => (isset($gtm[$product_id][$item_info->item_id]) ? $gtm[$product_id][$item_info->item_id] : "")
                         );
                         $cartTotal += 0;
                         $prod_amount[$product_id] += round($item_info->selling_price * $detail_qty);
@@ -2015,6 +2067,7 @@ class APICartServices
                     "productPhoto" => $cartInfo[$product_id]['item_photo'],
                     "itemList" => $product,
                     "campaignThresholdDiscount" => (isset($campaignThreshold['DISCOUNT'][$product_id]) ? $campaignThreshold['DISCOUNT'][$product_id] : []),
+                    "campaignThresholdGiveaway" => (isset($campaignThreshold['GIFT'][$product_id]) ? $campaignThreshold['GIFT'][$product_id] : []),
                 );
 
             }
@@ -2154,12 +2207,12 @@ class APICartServices
                                 foreach ($giftawayInfo as $giftInfo => $v) {
                                     $prd = isset($prod_qty[$v['product_id']]) ? $prod_qty[$v['product_id']] : 0; //購物車中單品的數量
                                     //if (isset($threshold_prod[$v['product_id']])) {
-                                        $gift_array[$item->id]++;
-                                        if (isset($stock_gift_check[$v['product_id']])) {
-                                            if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
-                                                $gift_check[$item->id]++;
-                                            }
+                                    $gift_array[$item->id]++;
+                                    if (isset($stock_gift_check[$v['product_id']])) {
+                                        if (($stock_gift_check[$v['product_id']]->stock_qty - $v->assigned_qty - $prd) >= 0) {
+                                            $gift_check[$item->id]++;
                                         }
+                                    }
                                     //}
                                 }
                             }
@@ -2320,7 +2373,7 @@ class APICartServices
 
             $cart = array(
                 "feeInfo" => $feeInfo,
-                "productRow" => $productRow,
+                "productRow" => (config('uec.cart_billing_split') == 1 ? $cartStockTypeCount : $productRow),
                 "list" => $productDetail,
                 "totalPrice" => $cartTotal,
                 "thresholdDiscountDisplay" => false,
@@ -2427,6 +2480,48 @@ class APICartServices
                     $cart['list'][$productKey] = $products;
                 }
             }
+
+
+            //有符合的滿額送贈時
+            if (count($cart['thresholdGiftAway']) > 0) {
+                //取得滿額門檻內容
+                //dd($cart['thresholdGiftAway']);
+                foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
+                    foreach ($threshold['products'] as $k => $product_id) {
+                        $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //商品對應的門檻ID
+                        $threshold_prod['thresholdBrief'][$product_id] = $threshold['thresholdBrief']; //門檻文案
+                    }
+                }
+                //重構商品滿額送贈
+                foreach ($cart['list'] as $productKey => $products) { //主產品
+                    $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
+                    if (count($products['campaignThresholdGiveaway']) > 0) {    //如果有門檻活動
+                        //重構門檻活動
+                        $check = 0;
+                        if (isset($products['campaignThresholdGiveaway']['campaignThreshold'])) {
+                            foreach ($products['campaignThresholdGiveaway']['campaignThreshold'] as $thresholdKey => $thresholdBrief) {
+                                if (isset($threshold_prod['thresholdBrief'][$products['productID']])) {
+                                    if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
+                                        $check++;
+                                        $products['campaignThresholdGiveaway']['campaignThreshold'] = $thresholdBrief;
+                                    }
+                                }
+                            }
+                        }
+                        if ($check > 0) {
+                            $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
+                        }
+                    }
+                    $cart['list'][$productKey] = $products;
+                }
+            } else {
+                //重構門檻活動
+                foreach ($cart['list'] as $productKey => $products) { //主產品
+                    $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
+                    $cart['list'][$productKey] = $products;
+                }
+            }
+
 
             return json_encode(array("status" => 200, "result" => $cart));
         }

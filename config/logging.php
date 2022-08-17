@@ -117,6 +117,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 365,
         ],
+        'shipment' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/api/shipment/shipment.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 365,
+        ],
     ],
 
 ];

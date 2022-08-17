@@ -8693,6 +8693,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 
@@ -8715,6 +8721,10 @@ __webpack_require__.r(__webpack_exports__);
       "default": function _default() {
         return {};
       }
+    },
+    disabled: {
+      type: Boolean,
+      "default": false
     }
   },
   data: function data() {
@@ -8725,7 +8735,7 @@ __webpack_require__.r(__webpack_exports__);
         clickOpens: false,
         time_24hr: true,
         locale: flatpickr_dist_l10n_zh_tw_js__WEBPACK_IMPORTED_MODULE_2__.MandarinTraditional,
-        disableMobile: "true"
+        disableMobile: true
       }
     };
   },
@@ -98386,6 +98396,7 @@ var render = function () {
           autocomplete: "off",
           name: _vm.name,
           config: _vm.configLocal,
+          disabled: _vm.disabled,
         },
         on: { "on-change": _vm.onChange },
         model: {
@@ -98397,28 +98408,25 @@ var render = function () {
         },
       }),
       _vm._v(" "),
-      _vm._m(0),
+      _c("div", { staticClass: "input-group-btn" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-default",
+            attrs: {
+              type: "button",
+              disabled: _vm.disabled,
+              "data-toggle": "",
+            },
+          },
+          [_c("i", { staticClass: "fa-solid fa-calendar-days" })]
+        ),
+      ]),
     ],
     1
   )
 }
-var staticRenderFns = [
-  function () {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "input-group-btn" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-default",
-          attrs: { type: "button", "data-toggle": "" },
-        },
-        [_c("i", { staticClass: "fa-solid fa-calendar-days" })]
-      ),
-    ])
-  },
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
