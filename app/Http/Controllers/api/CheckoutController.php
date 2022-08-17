@@ -184,7 +184,7 @@ class CheckoutController extends Controller
         ];
 
         $v = Validator::make($request->all(), [
-            'payment_method' => 'required|string|in:TAPPAY_CREDITCARD,TAPPAY_LINEPAY,TAPPAY_JKOPAY',
+            'payment_method' => 'required|string|in:TAPPAY_CREDITCARD,TAPPAY_LINEPAY,TAPPAY_JKOPAY,TAPPAY_INSTAL',
             'tappay_prime' => 'required|string',
             'lgst_method' => 'required|string|in:HOME,FAMILY',
             'store_no' => 'string|nullable|max:30',
@@ -224,7 +224,10 @@ class CheckoutController extends Controller
             'utm.campaign' => 'string|nullable|max:100',
             'utm.sales' => 'string|nullable|max:100',
             'utm.time' => 'nullable',
-            'stock_type' => (config('uec.cart_billing_split') == 1 ? 'required|string|in:dradvice,supplier' : 'nullable')
+            'stock_type' => (config('uec.cart_billing_split') == 1 ? 'required|string|in:dradvice,supplier' : 'nullable'),
+            'instalment_info.bank_id' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|string' : 'nullable'),
+            'instalment_info.number_of_instalments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
+            'instalment_info.fee_of_instalments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
         ], $messages);
 
         if ($v->fails()) {
@@ -238,6 +241,22 @@ class CheckoutController extends Controller
         $stock_type = ($request->stock_type == "supplier" ? "supplier" : "dradvice");
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, null, $stock_type);
         $response = json_decode($response, true);
+        //檢查付款方式
+        $payment_method = in_array($request->payment_method, $response['result']['paymentMethod']);
+        if (!$payment_method) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => "本購物車無此付款方式"]);
+        }
+
+        //驗算分期手續費
+        if ($request->payment_method === 'TAPPAY_INSTAL') {
+            $paid_amount = ($request->total_price + $request->cart_campaign_discount + $request->point_discount + $request->shipping_fee + $response['result']['thresholdAmount']);
+            $instalment_rate = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
+            $fee_of_instalments = $this->apiProductServices->getInstallmentFee($instalment_rate, $request->instalment_info, $request->total_price);
+            $response['result']['instalments'] = $fee_of_instalments;
+            if ($request->instalment_info['fee_of_instalments'] != $fee_of_instalments['interest_fee']) {
+                return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => "分期手續費計算錯誤"]);
+            }
+        }
 
         /* test
         $data = $this->apiOrderService->setOrders($response['result'], $request, $campaign, $campaign_gift);
@@ -391,13 +410,12 @@ class CheckoutController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
         if ($request->total_price > 0) {
-            $installment = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($request->total_price, $request->bank_id);
+            $installment = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($request->total_price);
             $installment = $this->apiProductServices->handleInstallmentInterestRates($installment, $request->total_price);
             $data['installment'] = isset($installment['details']) ? $installment['details'] : [];
         } else {
             $data['installment'] = [];
         }
-        $data['paymentValue'] = (count($data['installment']) > 0 ? 'TAPPAY_INSTAL' : '');
         return response()->json(['status' => 200, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
     }
 }

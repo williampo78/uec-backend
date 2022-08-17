@@ -38,7 +38,7 @@ class APITapPayService
         $data['prime'] = $input['prime'];
         $data['partner_key'] = config('tappay.partner_key');
         $data['merchant_id'] = config('tappay.merchant_id')[$input['payment_method']];
-        $data['amount'] = $input['paid_amount'];
+        $data['amount'] = $input['paid_amount'] + $input['fee_of_instal'];
         $data['currency'] = 'TWD';
         $data['details'] = config('tappay.details');
         $buyer['phone_number'] = $input['buyer_mobile'];
@@ -49,6 +49,11 @@ class APITapPayService
         $data['remember'] = false;
         if ($input['payment_method'] == 'TAPPAY_CREDITCARD') {
             $data['three_domain_secure'] = true;
+        }
+        if ($input['payment_method'] == "TAPPAY_INSTAL") {
+            $data['instalment'] = $input['number_of_instal'];
+            $data['three_domain_secure'] = true;
+            $data['remember'] = true;
         }
         $url['frontend_redirect_url'] = config('tappay.frontend_redirect_url');
         $url['backend_notify_url'] = config('tappay.backend_notify_url');
@@ -125,7 +130,7 @@ class APITapPayService
                 }
             }
 
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e->getMessage());
             $status = false;

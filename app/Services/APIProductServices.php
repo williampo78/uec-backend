@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\WebShippingInfoService;
 use App\Services\ShippingFeeRulesService;
 use App\Services\WebCategoryHierarchyService;
+use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\String_;
 
 class APIProductServices
 {
@@ -780,7 +782,7 @@ class APIProductServices
 
             foreach ($methods as $method) {
                 //畫面上不會顯示分期付款字樣
-                if($method === 'TAPPAY_INSTAL'){
+                if ($method === 'TAPPAY_INSTAL') {
                     continue;
                 }
 
@@ -1033,12 +1035,12 @@ class APIProductServices
      * @Author: Eric
      * @DateTime: 2022/8/5 上午 10:56
      */
-    public function getInstallmentAmountInterestRatesWithBank(int $min_consumption = null, string $bank_no = null):Collection
+    public function getInstallmentAmountInterestRatesWithBank(int $min_consumption = null): Collection
     {
         $today = Carbon::today()->toDateString();
 
         return InstallmentInterestRate::with('bank:id,bank_no,short_name')
-            ->whereHas('bank', function($query){
+            ->whereHas('bank', function ($query) {
                 $query->where('active', 1);
             })
             ->where('active', 1)
@@ -1046,9 +1048,6 @@ class APIProductServices
             ->whereDate('ended_at', '>=', $today)
             ->when(isset($min_consumption), function ($query) use ($min_consumption) {
                 $query->where('min_consumption', '<=', $min_consumption);
-            })
-            ->when(isset($bank_no), function ($query) use ($bank_no) {
-                $query->where('issuing_bank_no', '=', $bank_no);
             })
             ->orderBy('interest_rate', 'asc')
             ->orderBy('number_of_installments', 'asc')
@@ -1071,7 +1070,7 @@ class APIProductServices
      */
     public function handleInstallmentInterestRates(Collection $collection, int $price): array
     {
-        if($collection->isEmpty()){
+        if ($collection->isEmpty()) {
             return [];
         }
 
@@ -1081,12 +1080,12 @@ class APIProductServices
         });
 
         $details = $details->map(function ($Entity) use ($price) {
-
             return [
                 'interest_rate' => $Entity->first()->interest_rate,
                 'number_of_installments' => $Entity->first()->number_of_installments,
                 'amount' => $this->getInstallmentAmount($price, $Entity->first()->interest_rate, $Entity->first()->number_of_installments),
                 'banks' => $Entity->pluck('bank.short_name'),
+                'bank_id' => $Entity->pluck('bank.bank_no'),
             ];
         })->values();
 
@@ -1945,5 +1944,30 @@ class APIProductServices
         } else {
             return 903;
         }
+    }
+
+
+    /**
+     * 計算銀行分期手續費
+     * @param Collection $collection
+     * @param array $instalment_info
+     * @param int $paid_amount
+     * @return Integer
+     */
+    public function getInstallmentFee(Collection $collection, array $instalment_info, int $paid_amount): array
+    {
+        if ($collection->isEmpty()) {
+            return [];
+        }
+        $interest_rate = $collection->where('issuing_bank_no', $instalment_info['bank_id'])
+            ->where('number_of_installments', $instalment_info['number_of_instalments'])
+            ->first();
+        $result = [
+            "interest_rate" => $interest_rate->interest_rate,
+            "interest_fee" => (int)round($paid_amount * $interest_rate->interest_rate / 100),
+            "min_consumption" => $interest_rate->min_consumption,
+        ];
+        return $result;
+
     }
 }

@@ -779,6 +779,14 @@ class APIOrderService
                 }
             }
         }
+
+        //取產品中for供應商使用相關資訊
+        $product_with = [];
+        $supplier_info = ProductItem::with('product:id,supplier_id,purchase_price')->get();
+        foreach ($supplier_info as $supplier) {
+            $product_with['supplier_id'][$supplier->product->id] = $supplier->product->supplier_id;
+            $product_with['purchase_price'][$supplier->product->id] = ($supplier->product->purchase_price ?? null);
+        }
         //行銷活動
         $campaign_group = [];
         $campaign_group_code = [];
@@ -825,6 +833,7 @@ class APIOrderService
             //訂單單頭
             $cart_campaign_discount = ($order['cart_campaign_discount'] < 0 ? ($order['cart_campaign_discount'] - ($cart['thresholdAmount'])) : 0);
             $cart_p_discount = $cart['thresholdAmount'];
+            $interest_fee = isset($cart['instalments']['interest_fee']) ? $cart['instalments']['interest_fee'] : 0;
             $webData = [];
             $webData['agent_id'] = 1;
             $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
@@ -878,6 +887,10 @@ class APIOrderService
             $webData['ship_from_whs'] = ($order['stock_type'] == 'supplier' ? 'SUP' : 'SELF');
             $webData['sup_transferred_at'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addMinutes($sup_trans_mins) : null);
             $webData['ship_deadline'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addDay($ship_deadline)->format('Y-m-d 23:59:59') : null);
+            $webData['number_of_instal'] = isset($order['instalment_info']['number_of_instalments']) ? $order['instalment_info']['number_of_instalments'] : 0;
+            $webData['interest_rate_of_instal'] = isset($cart['instalments']['interest_rate']) ? $cart['instalments']['interest_rate'] : 0;
+            $webData['min_consumption_of_instal'] = isset($cart['instalments']['min_consumption']) ? $cart['instalments']['min_consumption'] : 0;
+            $webData['fee_of_instal'] = $interest_fee;
             $newOrder = Order::create($webData);
             //$newOrder = new Order();
             //$newOrder->id = 843;
@@ -889,12 +902,15 @@ class APIOrderService
             $paymantData['payment_type'] = 'PAY';
             $paymantData['payment_method'] = $order['payment_method'];
             $paymantData['payment_status'] = 'PENDING';
-            $paymantData['amount'] = $webData['paid_amount'];
+            $paymantData['amount'] = ($webData['paid_amount'] + $webData['fee_of_instal']);
             $paymantData['point_discount'] = $webData['point_discount'];
             $paymantData['points'] = $webData['points'];
             $paymantData['record_created_reason'] = 'ORDER_CREATED';
             $paymantData['created_by'] = $member_id;
             $paymantData['updated_by'] = $member_id;
+            $paymantData['number_of_instal'] = $webData['number_of_instal'];
+            $paymantData['interest_rate_of_instal'] = $webData['interest_rate_of_instal'];
+            $paymantData['min_consumption_of_instal'] = $webData['min_consumption_of_instal'];
             $newOrderPayment = OrderPayment::create($paymantData);
             //訂單單身
             $seq = 0;
@@ -973,7 +989,8 @@ class APIOrderService
                         "returned_subtotal" => 0,
                         "returned_point_discount" => 0,
                         "returned_points" => 0,
-                        "main_product_id" => $products['productID']
+                        "main_product_id" => $products['productID'],
+                        "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
                     ];
                     $point_discount += round($discount_rate[$seq] * $order['points']);
                     $detail_p_discount += $cart_p_discount_prod[$products['productID']][$item['itemId']];
@@ -1047,7 +1064,8 @@ class APIOrderService
                                             "returned_subtotal" => 0,
                                             "returned_point_discount" => 0,
                                             "returned_points" => 0,
-                                            "main_product_id" => $products['productID']
+                                            "main_product_id" => $products['productID'],
+                                            "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
                                         ];
                                         $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                         //寫入折扣資訊
@@ -1131,7 +1149,8 @@ class APIOrderService
                         "returned_subtotal" => 0,
                         "returned_point_discount" => 0,
                         "returned_points" => 0,
-                        "main_product_id" => 0
+                        "main_product_id" => 0,
+                        "purchase_price" => 0,
                     ];
                     $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                     if ($campaign_id_gift != $gift['campaignId']) {
@@ -1317,7 +1336,8 @@ class APIOrderService
                                                 "returned_subtotal" => 0,
                                                 "returned_point_discount" => 0,
                                                 "returned_points" => 0,
-                                                "main_product_id" => $products['productID']
+                                                "main_product_id" => $products['productID'],
+                                                "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
                                             ];
                                             $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                             //寫入折扣資訊
@@ -1431,7 +1451,8 @@ class APIOrderService
                     $payment = OrderPayment::where('id', $newOrderPayment->id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => now()]);
                     if ($payment) {
                         $result['status'] = 200;
-                        $result['payment_url'] = $tapPayResult['payment_url'];
+                        //$result['payment_url'] = $tapPayResult['payment_url'];
+                        $result['payment_url'] = $tapPayResult;
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
@@ -1452,7 +1473,7 @@ class APIOrderService
             //建立出貨單
             $webData['order_id'] = $newOrder->id; //訂單ID
             $webData['payment_id'] = $newOrderPayment->id; //付款ID
-            $ship_status = $this->setShipment($webData);
+            $ship_status = $this->setShipment($webData, $product_with['supplier_id']);
             if (!$ship_status) {
                 $result['status'] = 405;
                 $result['payment_url'] = null;
@@ -1476,7 +1497,7 @@ class APIOrderService
      * @param 訂單資訊
      * @return string
      */
-    public function setShipment($data)
+    public function setShipment($data, $supplier_id)
     {
         $status = Order::getOrder($data['order_id']);
         if ($status['status_code'] != 'CREATED') exit;
@@ -1527,17 +1548,12 @@ class APIOrderService
                     $shipDetail['updated_by'] = -1;
                     $shipDetail['updated_at'] = $now;
                     $shipDetail['order_detail_seq'] = $detail->seq; //新增加欄位，同$shipDetail['seq']
+                    $shipDetail['selling_price'] = $detail['selling_price'];
+                    $shipDetail['purchase_price'] = $detail['purchase_price'];
                     $shipDetail_id = ShipmentDetail::insertGetId($shipDetail);
                 }
             } else {//出貨倉，SUP-供應商自出
                 //出貨單單身
-
-                //取供應商id
-                $supplier_id = [];
-                $supplier_info = ProductItem::with('product')->get();
-                foreach ($supplier_info as $supplier) {
-                    $supplier_id[$supplier->product->id] = $supplier->product->supplier_id;
-                }
 
                 $order_details = OrderDetail::getOrderDetails($data['order_id'])->toArray();
                 array_multisort(array_column($order_details, 'main_product_id'), SORT_ASC, $order_details);
@@ -1601,6 +1617,8 @@ class APIOrderService
                         $shipDetail['updated_by'] = -1;
                         $shipDetail['updated_at'] = $now;
                         $shipDetail['order_detail_seq'] = $detail['seq']; //新增加欄位，同$shipDetail['seq']
+                        $shipDetail['selling_price'] = $detail['selling_price'];
+                        $shipDetail['purchase_price'] = $detail['purchase_price'];
                         ShipmentDetail::insertGetId($shipDetail);
                     }
                 }
