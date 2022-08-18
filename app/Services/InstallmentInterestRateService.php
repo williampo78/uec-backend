@@ -38,10 +38,8 @@ class InstallmentInterestRateService
     {
         //分期資料
         $installmentInterestRates = InstallmentInterestRate::with(['bank:id,bank_no,short_name', 'updatedBy:id,user_name'])
-            ->when(isset($payload['bank_id']), function ($query) use ($payload) {
-                $query->whereHas('bank', function ($query) use ($payload) {
-                    $query->where('id', $payload['bank_id']);
-                });
+            ->when(isset($payload['bank_no']), function ($query) use ($payload) {
+                $query->where('issuing_bank_no', $payload['bank_no']);
             })
             ->when(isset($payload['number_of_installments']), function ($query) use ($payload) {
                 $query->where('number_of_installments', $payload['number_of_installments']);
@@ -87,32 +85,53 @@ class InstallmentInterestRateService
      */
     public function handleList(Collection $list): Collection
     {
+        return $list->map(function ($installmentInterestRate) {
+            return $this->handleSingle($installmentInterestRate);
+        });
+    }
+
+    /**
+     * @param Model $installmentInterestRate
+     * @return array
+     * @Author: Eric
+     * @DateTime: 2022/8/18 上午 11:56
+     */
+    public function handleSingle(model $installmentInterestRate):array
+    {
+        return [
+            'id'                     => $installmentInterestRate->id,
+            'bank_code_and_name'     => sprintf('%s %s', $installmentInterestRate->issuing_bank_no, $installmentInterestRate->bank->short_name),
+            'period'                 => sprintf('%s ~ %s', Carbon::parse($installmentInterestRate->started_at)->toDateString(), Carbon::parse($installmentInterestRate->ended_at)->toDateString()),
+            'number_of_installments' => $installmentInterestRate->number_of_installments,
+            'interest_rate'          => $installmentInterestRate->interest_rate,
+            'min_consumption'        => number_format($installmentInterestRate->min_consumption),
+            'active_chinese'         => $this->getActiveChinese($installmentInterestRate),
+            'remark'                 => $installmentInterestRate->remark,
+            'updated_at'             => $installmentInterestRate->updated_at->toDateTimeString(),
+            'updated_by'             => optional($installmentInterestRate->updatedBy)->user_name,
+        ];
+    }
+
+    /**
+     * @param Model $installmentInterestRate
+     * @return string
+     * @Author: Eric
+     * @DateTime: 2022/8/17 下午 04:02
+     */
+    public function getActiveChinese(model $installmentInterestRate):string
+    {
         $nowTimestamp = now()->timestamp;
 
-        return $list->map(function ($installmentInterestRate) use ($nowTimestamp) {
+        $activeChinese = '已上架';
 
-            $activeChinese = '已上架';
+        if ($installmentInterestRate->active == 0) {
+            $activeChinese = '關閉';
+        } else if (strtotime($installmentInterestRate->started_at) > $nowTimestamp) {
+            $activeChinese = '待上架';
+        } else if (strtotime($installmentInterestRate->ended_at) < $nowTimestamp) {
+            $activeChinese = '下架';
+        }
 
-            if ($installmentInterestRate->active == 0) {
-                $activeChinese = '關閉';
-            } else if (strtotime($installmentInterestRate->started_at) > $nowTimestamp) {
-                $activeChinese = '待上架';
-            } else if (strtotime($installmentInterestRate->ended_at) < $nowTimestamp) {
-                $activeChinese = '下架';
-            }
-
-            return [
-                'id'                     => $installmentInterestRate->id,
-                'bank_code_and_name'     => sprintf('%s %s', $installmentInterestRate->issuing_bank_no, $installmentInterestRate->bank->short_name),
-                'period'                 => sprintf('%s ~ %s', Carbon::parse($installmentInterestRate->started_at)->toDateString(), Carbon::parse($installmentInterestRate->ended_at)->toDateString()),
-                'number_of_installments' => $installmentInterestRate->number_of_installments,
-                'interest_rate'          => $installmentInterestRate->interest_rate,
-                'min_consumption'        => number_format($installmentInterestRate->min_consumption),
-                'active_chinese'         => $activeChinese,
-                'remark'                 => $installmentInterestRate->remark,
-                'updated_at'             => $installmentInterestRate->updated_at->toDateTimeString(),
-                'updated_by'             => optional($installmentInterestRate->updatedBy)->user_name,
-            ];
-        });
+        return $activeChinese;
     }
 }

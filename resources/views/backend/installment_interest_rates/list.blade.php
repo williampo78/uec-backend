@@ -88,7 +88,7 @@
                         <!-- Table list -->
                         <div class="panel-body">
                             <div class="row">
-                                <div class="col-sm-2" v-if="auth.auth_query">
+                                <div class="col-sm-2" v-if="auth.auth_create">
                                     <button class="btn btn-block btn-warning btn-sm" @click="onCreate">
                                         <i class="fa-solid fa-plus"></i> 新增
                                     </button>
@@ -118,7 +118,7 @@
                                         :key="installmentInterestRate.id">
                                         @verbatim
                                             <td>
-                                                <span v-if="auth.auth_update">
+                                                <span v-if="auth.auth_query">
                                                     <button type="button" class="btn btn-warning btn-sm"
                                                             @click="onEdit(installmentInterestRate.id)">
                                                         編輯
@@ -156,7 +156,7 @@
                         </h4>
                     </div>
                     <div class="modal-body">
-                        <form id="submit-date-form" class="form-horizontal" method="get">
+                        <form id="submit-date-form" class="form-horizontal" autocomplete="off">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
@@ -200,8 +200,9 @@
                                                 <div class="col-sm-5">
                                                     <vue-flat-pickr name="started_at"
                                                                     :value.sync="modal.startedAt.date"
-                                                                    :config="modal.startedAt.configs"
-                                                                    @on-change="onStartedAtChange">
+                                                                    :config="modal.startedAt.config"
+                                                                    @on-change="onStartedAtChange"
+                                                                    :disabled="modal.startedAt.disabled">
                                                     </vue-flat-pickr>
                                                 </div>
                                                 <div class="col-sm-2 text-center">
@@ -210,8 +211,9 @@
                                                 <div class="col-sm-5">
                                                     <vue-flat-pickr name="ended_at"
                                                                     :value.sync="modal.endedAt.date"
-                                                                    :config="modal.endedAt.configs"
-                                                                    @on-change="onEndedAtChange">
+                                                                    :config="modal.endedAt.config"
+                                                                    @on-change="onEndedAtChange"
+                                                                    :disabled="modal.endedAt.disabled">
                                                     </vue-flat-pickr>
                                                 </div>
                                             </div>
@@ -281,7 +283,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" @click="submitForm">
+                        <button type="button" class="btn btn-success" @click="submitForm" v-if="modal.can_operate">
                             儲存
                         </button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">
@@ -299,6 +301,7 @@
         new Vue({
             el: '#app',
             data: {
+                dataTable: null,
                 id: null,
                 action: null,
                 method: null,
@@ -320,6 +323,7 @@
                 installmentInterestRates:@json($installmentInterestRates),
                 auth: @json($share_role_auth),
                 modal: {
+                    can_operate: false,
                     title: null,
                     bankNo: null,
                     bankNoDisabled: null,
@@ -328,18 +332,20 @@
                     startedAt: {
                         name: 'started_at',
                         date: '{{ request('started_at') }}',
-                        configs: {
-                            minDate: null,
-                            maxDate: null,
+                        config: {
+                            minDate: '',
+                            maxDate: '',
                         },
+                        disabled: false
                     },
                     endedAt: {
                         name: 'ended_at',
                         date: '{{ request('ended_at') }}',
-                        configs: {
-                            minDate: null,
-                            maxDate: null,
+                        config: {
+                            minDate: '',
+                            maxDate: '',
                         },
+                        disabled: false
                     },
                     interestRate: null,
                     interestRateDisabled: null,
@@ -462,29 +468,14 @@
                         }
 
                         //成功
-                        $('#form-modal').modal('hide');
-
-                        if (this.action == 'edit') {
-                            this.$swal({
-                                icon: 'success',
-                                title: '更新成功',
-                            });
-                            return false;
-                        }
-
-                        Swal.fire({
-                            title: '分期利率新增成功!',
-                            showCancelButton: true,
-                            confirmButtonText: '回主畫面',
-                            cancelButtonText: '繼續新增'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                                return false;
-                            }
-
-                            $('#form-modal').modal('show');
+                        this.$swal({
+                            icon: 'success',
+                            title: response.data.message,
                         });
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1500);
+
                     }).catch((error) => {
 
                         if (error.response) {
@@ -542,20 +533,14 @@
                         });
                     });
                 },
+                removeErrors() {
+                    $('.has-error').removeClass('has-error')
+                    this.Validator.resetForm();
+                },
                 //點擊新增按鈕
                 onCreate() {
 
-                    //銀行
-                    this.modal.bankNoDisabled = false;
-                    //期數
-                    this.modal.numberOfInstallmentsDisabled = false;
-                    //利率
-                    this.modal.interestRateDisabled = false;
-                    //門檻
-                    this.modal.minConsumptionDisabled = false;
-                    //限制最小日期
-                    this.modal.startedAt.configs.minDate = 'today';
-                    this.modal.endedAt.configs.minDate = 'today';
+                    this.modal.can_operate = this.auth.auth_create == 1;
                     //重置參數
                     this.resetParameters();
 
@@ -584,7 +569,7 @@
                         interest_rate: {
                             required: true,
                             min: 0,
-                            max: 99,
+                            max: 99.99,
                             step: 0.01
                         },
                         min_consumption: {
@@ -600,13 +585,15 @@
                     };
 
                     this.setValidator(rules);
-                    this.Validator.resetForm();
+                    this.removeErrors();
 
                     $('#form-modal').modal('show');
                 },
                 //點擊編輯按鈕
                 async onEdit(id) {
 
+                    this.modal.can_operate = this.auth.auth_update == 1;
+                    //取資料
                     let installmentInterestRate = await this.getInstallmentInterestRate(id);
                     //銀行
                     this.modal.bankNoDisabled = true;
@@ -618,8 +605,10 @@
                     this.modal.minConsumptionDisabled = true;
 
                     //不限制最小日期
-                    this.modal.startedAt.configs.minDate = null;
-                    this.modal.endedAt.configs.minDate = null;
+                    this.modal.startedAt.config.minDate = null;
+                    this.modal.startedAt.config.maxDate = null;
+                    this.modal.endedAt.config.minDate = null;
+                    this.modal.endedAt.config.maxDate = null;
 
                     var now = new Date();
                     var startedAt = new Date(installmentInterestRate.started_at);
@@ -629,7 +618,7 @@
                         interest_rate: {
                             required: true,
                             min: 0,
-                            max: 99,
+                            max: 99.99,
                             step: 0.01
                         },
                         min_consumption: {
@@ -646,17 +635,23 @@
 
                     //關閉 不允許修改起訖日
                     if (installmentInterestRate.active == 0) {
-
+                        console.log('關閉');
+                        this.modal.startedAt.disabled = true;
+                        this.modal.endedAt.disabled = true;
                         //下架 不允許修改起訖日
                     } else if (now > endedAt) {
                         console.log('下架');
+                        this.modal.startedAt.disabled = true;
+                        this.modal.endedAt.disabled = true;
                         //待上架
                     } else if (now < startedAt) {
-
+                        console.log('待上架');
+                        this.modal.startedAt.disabled = false;
+                        this.modal.endedAt.disabled = false;
                         this.modal.interestRateDisabled = false;
                         this.modal.minConsumptionDisabled = false;
-                        this.modal.startedAt.configs.minDate = 'today';
-                        this.modal.endedAt.configs.minDate = 'today';
+                        this.modal.startedAt.config.minDate = 'today';
+                        this.modal.endedAt.config.minDate = 'today';
 
                         rules.started_at = {
                             required: true,
@@ -671,7 +666,10 @@
                         };
                         //已上架
                     } else if (now >= startedAt && now <= endedAt) {
-                        this.modal.endedAt.configs.minDate = 'today';
+                        console.log('已上架');
+                        this.modal.startedAt.disabled = true;
+                        this.modal.endedAt.disabled = false;
+                        this.modal.endedAt.config.minDate = 'today';
 
                         rules.ended_at = {
                             required: true,
@@ -681,7 +679,7 @@
                     }
 
                     this.setValidator(rules);
-                    this.Validator.resetForm();
+                    this.removeErrors();
 
                     this.modal.id = installmentInterestRate.id;
                     this.modal.bankNo = installmentInterestRate.issuing_bank_no;
@@ -704,18 +702,35 @@
                 resetParameters() {
                     this.modal.bankNo = null;
                     this.modal.numberOfInstallments = null;
-                    this.modal.startedAt.date = null;
-                    this.modal.endedAt.date = null;
+                    this.modal.startedAt.date = '';
+                    this.modal.endedAt.date = '';
                     this.modal.interestRate = null;
                     this.modal.minConsumption = null;
-                    this.modal.active = null;
+                    this.modal.active = 1;
                     this.modal.remark = null;
+
+                    //銀行
+                    this.modal.bankNoDisabled = false;
+                    //期數
+                    this.modal.numberOfInstallmentsDisabled = false;
+                    //利率
+                    this.modal.interestRateDisabled = false;
+                    //門檻
+                    this.modal.minConsumptionDisabled = false;
+                    //適用期間 開始
+                    this.modal.startedAt.disabled = false;
+                    //適用期間 結束
+                    this.modal.endedAt.disabled = false;
+                    this.modal.startedAt.config.minDate = 'today';
+                    this.modal.startedAt.config.maxDate = '';
+                    this.modal.endedAt.config.minDate = 'today';
+                    this.modal.endedAt.config.maxDate = '';
                 },
                 onStartedAtChange(selectedDates, dateStr) {
-                    this.modal.endedAt.configs.minDate = dateStr;
+                    this.modal.endedAt.config.minDate = dateStr;
                 },
                 onEndedAtChange(selectedDates, dateStr) {
-                    this.modal.startedAt.configs.maxDate = dateStr;
+                    this.modal.startedAt.config.maxDate = dateStr;
                 },
             }
         })

@@ -33,7 +33,7 @@ class InstallmentInterestRateController extends Controller
 
             $payload = $request->only(
                 [
-                    'bank_id',
+                    'bank_no',
                     'number_of_installments',
                     'status',
                 ]
@@ -159,7 +159,7 @@ class InstallmentInterestRateController extends Controller
 
         $user_id = Auth()->id();
 
-        InstallmentInterestRate::create([
+        $installmentInterestRate = InstallmentInterestRate::create([
             'issuing_bank_no'        => $payload['issuing_bank_no'],
             'number_of_installments' => $payload['number_of_installments'],
             'started_at'             => date('Y-m-d 00:00:00', strtotime($payload['started_at'])),
@@ -175,6 +175,7 @@ class InstallmentInterestRateController extends Controller
         return response()->json([
             'status'  => true,
             'message' => '新增成功',
+            //'data'    => $this->installmentInterestRateService->handleSingle($installmentInterestRate)
         ]);
     }
 
@@ -194,6 +195,7 @@ class InstallmentInterestRateController extends Controller
             ]);
         }
 
+        //必要的參數
         $payload = $request->only(
             [
                 'id',
@@ -202,6 +204,7 @@ class InstallmentInterestRateController extends Controller
             ]
         );
 
+        //驗證規則
         $rules = [
             'id'     => 'required',
             'active' => 'required|integer',
@@ -210,15 +213,17 @@ class InstallmentInterestRateController extends Controller
 
         $installmentInterestRate = InstallmentInterestRate::findOrFail($payload['id']);
 
-        //更新為啟用
-        if ($payload['active'] == 1) {
+        //用來確認資料，是否存在的query資料
+        $checkExistedParams = [
+            'issuing_bank_no'        => $installmentInterestRate->issuing_bank_no,
+            'number_of_installments' => $installmentInterestRate->number_of_installments,
+            'started_at'             => $installmentInterestRate->started_at,
+            'ended_at'               => $installmentInterestRate->ended_at,
+            'exclude_id'             => $installmentInterestRate->id,
+        ];
 
-            //確認是否存在的資料
-            $checkExistedParams = [
-                'issuing_bank_no'        => $installmentInterestRate->issuing_bank_no,
-                'number_of_installments' => $installmentInterestRate->number_of_installments,
-                'exclude_id'             => $installmentInterestRate->id,
-            ];
+        //狀態為啟用
+        if ($installmentInterestRate->active == 1) {
 
             $nowTimestamp = now()->timestamp;
             //根據狀態,判斷能更新那些欄位
@@ -229,7 +234,7 @@ class InstallmentInterestRateController extends Controller
                 $payload['ended_at']        = date('Y-m-d 23:59:59', strtotime($request->ended_at));
                 $payload['interest_rate']   = $request->interest_rate;
                 $payload['min_consumption'] = $request->min_consumption;
-                //增加規則
+                //增加驗證規則
                 $rules['started_at']      = 'required|date|after_or_equal:today';
                 $rules['ended_at']        = 'required|date|after_or_equal:started_at';
                 $rules['interest_rate']   = 'required|numeric|between:0,99.99';
@@ -243,21 +248,10 @@ class InstallmentInterestRateController extends Controller
                 //更新資料的參數
                 $payload['ended_at'] = date('Y-m-d 23:59:59', strtotime($request->ended_at));
 
-                //增加規則
+                //增加驗證規則
                 $rules['ended_at'] = 'required|date|after_or_equal:today';
                 //增加確認資料是否存在的資料
-                $checkExistedParams['started_at'] = $installmentInterestRate->started_at;
                 $checkExistedParams['ended_at']   = $payload['ended_at'];
-            }
-
-            //更新前確認是否有相同的設定資料存在
-            $enableInstallmentInterestRate = $this->installmentInterestRateService->getEnableInstallmentInterestRate($checkExistedParams);
-
-            if (!empty($enableInstallmentInterestRate)) {
-                return response()->json([
-                    'status'  => false,
-                    'message' => '請確認發卡銀行、期數，<br>同時間只能有一組啟用設定',
-                ]);
             }
         }
 
@@ -278,6 +272,18 @@ class InstallmentInterestRateController extends Controller
                 'status'  => false,
                 'message' => $validator->errors()->first(),
             ]);
+        }
+
+        //更新為啟用前，確認是否有相同的設定資料存在
+        if ($payload['active'] == 1) {
+            $enableInstallmentInterestRate = $this->installmentInterestRateService->getEnableInstallmentInterestRate($checkExistedParams);
+
+            if (!empty($enableInstallmentInterestRate)) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => '請確認發卡銀行、期數，<br>同時間只能有一組啟用設定',
+                ]);
+            }
         }
 
         $installmentInterestRate->update($payload);
