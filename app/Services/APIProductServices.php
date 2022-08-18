@@ -348,7 +348,7 @@ class APIProductServices
         }
 
         if ($category) {//依分類搜尋
-            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+            $strSQL .= " and web_category_products.web_category_hierarchy_id = ". $category;
         }
 
         if ($id) {//依產品編號找相關分類
@@ -394,8 +394,8 @@ class APIProductServices
     {
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
-        $keyword = $input['keyword'];
-        $category = $input['category'];
+        $keyword = addslashes($input['keyword']);
+        $category = (int) $input['category'];
         $size = $input['size'];
         $page = $input['page'];
         $selling_price_min = $input['price_min'];
@@ -617,7 +617,7 @@ class APIProductServices
         }
 
         if ($category) {//依分類搜尋
-            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+            $strSQL .= " and web_category_products.web_category_hierarchy_id = " . $category;
         }
 
         if ($attribute) {//進階篩選條件
@@ -1449,8 +1449,8 @@ class APIProductServices
     public function getProductFilter($request)
     {
 
-        $keyword = $request['keyword'];
-        $category = $request['category'];
+        $keyword = addslashes($request['keyword']);
+        $category = (int) $request['category'];
         $selling_price_min = $request['price_min'];
         $selling_price_max = $request['price_max'];
         $order_by = 'attribute';
@@ -1607,51 +1607,53 @@ class APIProductServices
                 $data[$product->promotional_campaign_id][$product->id] = $product;
             }
         }
-        foreach ($gifts as $campaign_id => $item) {
-            $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $campaign_id)->orderBy('n_value')->get();
-            if (count($campaignThresholds) > 0) {
-                foreach ($campaignThresholds as $threshold) {
-                    $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
-                    foreach ($thresholdGift as $k => $v) {
-                        $giftArray[$campaign_id][$threshold->id][] = array(
+        if (isset($gifts)) {
+            foreach ($gifts as $campaign_id => $item) {
+                $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $campaign_id)->orderBy('n_value')->get();
+                if (count($campaignThresholds) > 0) {
+                    foreach ($campaignThresholds as $threshold) {
+                        $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
+                        foreach ($thresholdGift as $k => $v) {
+                            $giftArray[$campaign_id][$threshold->id][] = array(
+                                "productName" => $data[$campaign_id][$v->product_id]->product_name,
+                                "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
+                                "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
+                            );
+                        }
+
+                        $campaignGive[$campaign_id][] = array(
+                            "thresholdId" => $threshold->id,
+                            "thresholdBrief" => $threshold->threshold_brief,
+                            "qualified" => $threshold->is_qualified_to_sent == 1 ? true : false,
+                            "giveList" => $giftArray[$campaign_id][$threshold->id]
+                        );
+                    }
+                } else {
+                    $campaignGift = PromotionalCampaignGiveaway::where("promotional_campaign_id", $campaign_id)->where('threshold_id', 0)->get();
+                    foreach ($campaignGift as $k => $v) {
+                        $giftArray[$campaign_id][] = array(
                             "productName" => $data[$campaign_id][$v->product_id]->product_name,
                             "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
                             "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
                         );
                     }
-
                     $campaignGive[$campaign_id][] = array(
-                        "thresholdId" => $threshold->id,
-                        "thresholdBrief" => $threshold->threshold_brief,
-                        "qualified" => $threshold->is_qualified_to_sent == 1 ? true : false,
-                        "giveList" => $giftArray[$campaign_id][$threshold->id]
+                        "giveList" => $giftArray[$campaign_id]
                     );
                 }
-            } else {
-                $campaignGift = PromotionalCampaignGiveaway::where("promotional_campaign_id", $campaign_id)->where('threshold_id', 0)->get();
-                foreach ($campaignGift as $k => $v) {
-                    $giftArray[$campaign_id][] = array(
-                        "productName" => $data[$campaign_id][$v->product_id]->product_name,
-                        "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
-                        "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
-                    );
-                }
-                $campaignGive[$campaign_id][] = array(
-                    "giveList" => $giftArray[$campaign_id]
+                $giveArray[] = array(
+                    "campaignID" => $campaign_id,
+                    "campaignUrlCode" => $item->url_code,
+                    "campaignBrief" => $item->campaign_brief,
+                    "campaignName" => $item->campaign_name,
+                    "expireDate" => $item->end_at,
+                    "gotoEvent" => ($item->level_code == 'CART_P' ? true : false),
+                    "qualified" => $item->is_qualified_to_sent == 1 ? true : false,
+                    "campaignGive" => (isset($campaignGive[$campaign_id]) ? $campaignGive[$campaign_id] : [])
                 );
             }
-            $giveArray[] = array(
-                "campaignID" => $campaign_id,
-                "campaignUrlCode" => $item->url_code,
-                "campaignBrief" => $item->campaign_brief,
-                "campaignName" => $item->campaign_name,
-                "expireDate" => $item->end_at,
-                "gotoEvent" => ($item->level_code == 'CART_P' ? true : false),
-                "qualified" => $item->is_qualified_to_sent == 1 ? true : false,
-                "campaignGive" => (isset($campaignGive[$campaign_id]) ? $campaignGive[$campaign_id] : [])
-            );
         }
-        if (count($giveArray) > 0) {
+        if (isset($giveArray)) {
             $result['status'] = 200;
             $result['result'] = $giveArray;
         } else {
