@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\PromotionalCampaignGiveaway;
 use App\Models\PromotionalCampaignProduct;
 use App\Models\PromotionalCampaignThreshold;
+use App\Models\WebCategoryHierarchy;
 use Carbon\Carbon;
 use App\Models\ProductItem;
 use App\Models\ProductPhoto;
@@ -309,7 +310,6 @@ class APIProductServices
      */
     public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null)
     {
-
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
         $strSQL = "select web_category_products.web_category_hierarchy_id";
@@ -359,7 +359,16 @@ class APIProductServices
         }
 
         if ($category) {//依分類搜尋
-            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+            if ($config_levels == 3) {
+                $hasChild = $this->apiWebCategory->hasChildCategories($category);
+                if ($hasChild) {
+                    $strSQL .= " and cate3.id in (" . $category . ")";
+                } else {
+                    $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+                }
+            } else {
+                $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+            }
         }
 
         if ($id) {//依產品編號找相關分類
@@ -631,7 +640,16 @@ class APIProductServices
         }
 
         if ($category) {//依分類搜尋
-            $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+            if ($config_levels == 3) {
+                $hasChild = $this->apiWebCategory->hasChildCategories($category);
+                if ($hasChild) {
+                    $strSQL .= " and cate3.id in (" . $category . ")";
+                } else {
+                    $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+                }
+            } else {
+                $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+            }
         }
 
         if ($attribute) {//進階篩選條件
@@ -714,6 +732,7 @@ class APIProductServices
                 foreach ($products as $category) {
                     if ($cate == $category->L1) continue;
                     $data[] = array(
+                        'level' => ($hasChild ? 1 : 3),
                         'id' => $category->L1,
                         'name' => $category->L1_Name,
                         'shortName' => $category->L1_category_short_name,
