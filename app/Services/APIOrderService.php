@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
+use App\Models\OrderPaymentSecrets;
 use App\Models\ProductItem;
 use App\Models\Shipment;
 use App\Models\ShipmentDetail;
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Contracts\Encryption\DecryptException;
 
 class APIOrderService
 {
@@ -1450,9 +1453,30 @@ class APIOrderService
                 if ($tapPayResult['status'] == 0) {
                     $payment = OrderPayment::where('id', $newOrderPayment->id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => now()]);
                     if ($payment) {
-                        $result['status'] = 200;
-                        //$result['payment_url'] = $tapPayResult['payment_url'];
-                        $result['payment_url'] = $tapPayResult;
+                        if ($webData['payment_method'] == 'TAPPAY_INSTAL') {
+                            $tapPayData['order_no'] = $newOrder->id;
+                            $tapPayData['card_key'] = Crypt::encrypt($tapPayResult['card_secret']['card_key']);
+                            $tapPayData['card_token'] = Crypt::encrypt($tapPayResult['card_secret']['card_token']);
+                            $tapPayData['created_by'] = $member_id;
+                            $tapPayData['updated_by'] = $member_id;
+                            $tapPayData['created_at'] = now();
+                            $tapPayData['updated_at'] = now();
+                            $secret = OrderPaymentSecrets::insertGetId($tapPayData);
+
+                            if ($secret > 0) {
+                                $result['status'] = 200;
+                                $result['payment_url'] = $tapPayResult['payment_url'];
+                            } else {
+                                $result['status'] = 402;
+                                $result['payment_url'] = null;
+                                Log::channel('tappay_api_log')->error('加密資料失敗' . json_encode($tapPayResult));
+                                DB::rollBack();
+                                return $result;
+                            }
+                        } else {
+                            $result['status'] = 200;
+                            $result['payment_url'] = $tapPayResult['payment_url'];
+                        }
                     } else {
                         $result['status'] = 402;
                         $result['payment_url'] = null;
