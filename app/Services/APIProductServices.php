@@ -362,12 +362,12 @@ class APIProductServices
             if ($config_levels == 3) {
                 $hasChild = $this->apiWebCategory->hasChildCategories($category);
                 if ($hasChild) {
-                    $strSQL .= " and cate3.id in (" . $category . ")";
+                    $strSQL .= " and cate3.id =" . $category;
                 } else {
-                    $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+                    $strSQL .= " and web_category_products.web_category_hierarchy_id =" . $category;
                 }
             } else {
-                $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+                $strSQL .= " and web_category_products.web_category_hierarchy_id =" . $category;
             }
         }
 
@@ -597,6 +597,7 @@ class APIProductServices
     {
 
         $s3 = config('filesystems.disks.s3.url');
+        $hasChild = false;
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
         $strSQL = "select cate1.id , cate1.category_name ,count(cate1.id) as count, p.id as prod_id";
@@ -639,16 +640,18 @@ class APIProductServices
             $strSQL .= " and p.selling_price between " . $selling_price_min . " and " . $selling_price_max;
         }
 
+        $show_level = false;
         if ($category) {//依分類搜尋
             if ($config_levels == 3) {
+                $show_level = true;
                 $hasChild = $this->apiWebCategory->hasChildCategories($category);
                 if ($hasChild) {
-                    $strSQL .= " and cate3.id in (" . $category . ")";
+                    $strSQL .= " and cate3.id = " . $category;
                 } else {
-                    $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+                    $strSQL .= " and web_category_products.web_category_hierarchy_id = " . $category;
                 }
             } else {
-                $strSQL .= " and web_category_products.web_category_hierarchy_id in (" . $category . ")";
+                $strSQL .= " and web_category_products.web_category_hierarchy_id " . $category;
             }
         }
 
@@ -732,7 +735,7 @@ class APIProductServices
                 foreach ($products as $category) {
                     if ($cate == $category->L1) continue;
                     $data[] = array(
-                        'level' => ($hasChild ? 1 : 3),
+                        'level' => ($show_level ? ($hasChild ? 1 : 3) : null),
                         'id' => $category->L1,
                         'name' => $category->L1_Name,
                         'shortName' => $category->L1_category_short_name,
