@@ -20,7 +20,7 @@ import Vue from "vue";
 import VueAffix from "vue-affix";
 import VueScrollactive from "vue-scrollactive";
 import VueDraggable from "vuedraggable";
-
+import VueSweetalert2 from "vue-sweetalert2";
 window._ = lodash;
 
 /**
@@ -120,6 +120,20 @@ window.Vue = Vue;
 
 Vue.use(VueAffix);
 Vue.use(VueScrollactive);
+Vue.use(VueSweetalert2);
+// 設定sweetalert2 toast
+const Toast = Vue.swal.mixin({
+    toast: true,
+    position: "bottom-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Vue.swal.stopTimer);
+        toast.addEventListener("mouseleave", Vue.swal.resumeTimer);
+    },
+});
+window.Toast = Toast;
 
 /**
  * vue draggable
