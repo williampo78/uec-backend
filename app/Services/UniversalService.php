@@ -192,4 +192,17 @@ class UniversalService
         }
         return $data;
     }
+
+    /*
+     * 截斷引號
+     * Author: Rowena
+     * Return: string
+     */
+    public function handleAddslashes($params = null)
+    {
+        $len = strlen($params);
+        if ($len == 0) return "";
+        if (strncmp($params, "'", 1) === 0 && substr($params, $len - 1) == "'") return $params; // already quoted
+        return addslashes($params);
+    }
 }
