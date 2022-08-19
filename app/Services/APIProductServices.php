@@ -394,7 +394,7 @@ class APIProductServices
     {
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
-        $keyword = addslashes($input['keyword']);
+        $keyword = $this->universalService->handleAddslashes($input['keyword']);//($input['keyword'] ? $this->universalService->handleAddslashes($input['keyword']) : '');
         $category = (int) $input['category'];
         $size = $input['size'];
         $page = $input['page'];
@@ -1449,7 +1449,7 @@ class APIProductServices
     public function getProductFilter($request)
     {
 
-        $keyword = addslashes($request['keyword']);
+        $keyword = ($request['keyword'] ? $this->universalService->handleAddslashes($request['keyword']) : '');
         $category = (int) $request['category'];
         $selling_price_min = $request['price_min'];
         $selling_price_max = $request['price_max'];
