@@ -115,17 +115,21 @@ class CheckoutController extends Controller
                     $shipping_fee = 0;
                 }
                 if ($shipping_fee == $request->shipping_fee) {
-                    if (in_array('TAPPAY_INSTAL', $response['result']['paymentMethod'])) {
-                        //是否有符合信用卡分期門檻
-                        $paid_amount = ($response['result']['totalPrice'] - ($response['result']['discount'] + abs($response['result']['thresholdAmount'])) - $point_discount + $shipping_fee);
-                        $installment = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
-                        $installment = $this->apiProductServices->handleInstallmentInterestRates($installment, $paid_amount);
-                        $installment = isset($installment['details']) ? 1 : 0; //不符合回傳0
-                        $data['paymentMethod'] = $response['result']['paymentMethod'];
-                        foreach ($data['paymentMethod'] as $key => $method) {
-                            if ($data['paymentMethod'][$key] == 'TAPPAY_INSTAL' && $installment == 0) {//並將分期付款條件移除
-                                unset($data['paymentMethod'][$key]);
+                    if (isset($response['result']['paymentMethod'])) {
+                        if (in_array('TAPPAY_INSTAL', $response['result']['paymentMethod'])) {
+                            //是否有符合信用卡分期門檻
+                            $paid_amount = ($response['result']['totalPrice'] - ($response['result']['discount'] + abs($response['result']['thresholdAmount'])) - $point_discount + $shipping_fee);
+                            $installment = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
+                            $installment = $this->apiProductServices->handleInstallmentInterestRates($installment, $paid_amount);
+                            $installment = isset($installment['details']) ? 1 : 0; //不符合回傳0
+                            $data['paymentMethod'] = $response['result']['paymentMethod'];
+                            foreach ($data['paymentMethod'] as $key => $method) {
+                                if ($data['paymentMethod'][$key] == 'TAPPAY_INSTAL' && $installment == 0) {//並將分期付款條件移除
+                                    unset($data['paymentMethod'][$key]);
+                                }
                             }
+                        } else {
+                            $data['paymentMethod'] = $response['result']['paymentMethod'];
                         }
                     } else {
                         $data['paymentMethod'] = ['TAPPAY_CREDITCARD', 'TAPPAY_LINEPAY', 'TAPPAY_JKOPAY'];
