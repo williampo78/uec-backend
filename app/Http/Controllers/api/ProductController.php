@@ -8,17 +8,19 @@ use Illuminate\Http\Request;
 use App\Services\APIService;
 use Validator;
 use App\Services\ProductAttributeLovService;
+use App\Services\UniversalService;
 
 class ProductController extends Controller
 {
     //
     private $apiProductService;
 
-    public function __construct(APIProductServices $apiProductService, APIService $apiService, ProductAttributeLovService $apiProductAttributeLovService)
+    public function __construct(APIProductServices $apiProductService, APIService $apiService, ProductAttributeLovService $apiProductAttributeLovService, UniversalService $universalService)
     {
         $this->apiProductService = $apiProductService;
         $this->apiService = $apiService;
         $this->apiProductAttributeLovService = $apiProductAttributeLovService;
+        $this->universalService = $universalService;
     }
 
     /*
@@ -28,7 +30,7 @@ class ProductController extends Controller
     {
         $err = false;
         $error_code = $this->apiService->getErrorCode();
-        $keyword = ($request['keyword'] ? $request['keyword'] : '');
+        $keyword = ($request['keyword'] ? $this->universalService->handleAddslashes($request['keyword']) : '');
         $result = $this->apiProductService->getCategory($keyword);
         if ($result == '404') {
             $status = false;
@@ -53,6 +55,7 @@ class ProductController extends Controller
         $messages = [
             'price_min.numeric' => '最低價必須是數字',
             'price_max.numeric' => '最高價必須是數字',
+            'category' => '分類必須是數字'
         ];
 
         $in = '';
@@ -68,6 +71,7 @@ class ProductController extends Controller
         $v = Validator::make($request->all(), [
             'price_min' => 'numeric',
             'price_max' => 'numeric' . $in,
+            'category' => 'numeric|nullable',
         ], $messages);
 
         if ($v->fails()) {
@@ -97,6 +101,7 @@ class ProductController extends Controller
         $messages = [
             'price_min.numeric' => '最低價必須是數字',
             'price_max.numeric' => '最高價必須是數字',
+            'category' => '分類必須是數字'
         ];
 
         $in = '';
@@ -112,14 +117,15 @@ class ProductController extends Controller
         $v = Validator::make($request->all(), [
             'price_min' => 'numeric',
             'price_max' => 'numeric' . $in,
+            'category' => 'numeric|nullable',
         ], $messages);
 
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
-        $keyword = $request['keyword'];
-        $category = $request['category'];
+        $keyword = ($request['keyword'] ? $this->universalService->handleAddslashes($request['keyword']) : '');
+        $category = (int) $request['category'];
         $selling_price_min = $request['price_min'];
         $selling_price_max = $request['price_max'];
         $attribute = '';
@@ -150,7 +156,7 @@ class ProductController extends Controller
     {
         $err = false;
         $error_code = $this->apiService->getErrorCode();
-        $params = $request['detail'];
+        $params = ($request['detail'] ? $this->universalService->handleAddslashes($request['detail']) : '');
         $result = $this->apiProductService->getProduct($id, $params);
 
         if ($result == '903') {
@@ -302,6 +308,7 @@ class ProductController extends Controller
         $messages = [
             'price_min.numeric' => '最低價必須是數字',
             'price_max.numeric' => '最高價必須是數字',
+            'category' => '分類必須是數字'
         ];
 
         $in = '';
@@ -317,6 +324,7 @@ class ProductController extends Controller
         $v = Validator::make($request->all(), [
             'price_min' => 'numeric',
             'price_max' => 'numeric' . $in,
+            'category' => 'numeric|nullable',
         ], $messages);
 
         if ($v->fails()) {

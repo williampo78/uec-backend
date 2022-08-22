@@ -28,7 +28,7 @@ class APIIndexServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $products = $this->apiProductService->getProducts();
-
+        $gtm = $this->apiProductService->getProductItemForGTM($products);
         $categoryProducts = $this->apiProductService->getWebCategoryProducts('', '', '', '', '', '', '');
 
         $strSQL = "select ad1.`slot_code`, ad1.`slot_desc`, ad1.`slot_type`, ad1.`is_mobile_applicable`, ad1.`is_desktop_applicable`
@@ -166,7 +166,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $product->selling_channel,
-                                "start_selling" => $product->start_selling_at
+                                "start_selling" => $product->start_selling_at,
+                                "gtm" => (isset($gtm[$product->id]) ? $gtm[$product->id] : "")
                             );
                         }
 
@@ -217,7 +218,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
-                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at
+                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
+                                "gtm" => (isset($gtm[$ad_slot->product_id]) ? $gtm[$ad_slot->product_id] : "")
                             );
                         }
                         if (isset($product_info[$ad_slot->slot_code])) {
@@ -269,7 +271,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
-                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at
+                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
+                                "gtm" => (isset($gtm[$ad_slot->product_id]) ? $gtm[$ad_slot->product_id] : "")
                             );
                         }
                         $H080A_seemore['see_more_action'] = $ad_slot->see_more_action;
@@ -293,7 +296,8 @@ class APIIndexServices
                                 'promotion_label' => (isset($promotional[$ad_slot->product_id]) ? $promotional[$ad_slot->product_id] : null),
                                 "collection" => $collection,
                                 "selling_channel" => $products[$ad_slot->product_id]->selling_channel,
-                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at
+                                "start_selling" => $products[$ad_slot->product_id]->start_selling_at,
+                                "gtm" => (isset($gtm[$ad_slot->product_id]) ? $gtm[$ad_slot->product_id] : "")
                             );
                         }
                         $H080B_seemore['see_more_action'] = $ad_slot->see_more_action;
