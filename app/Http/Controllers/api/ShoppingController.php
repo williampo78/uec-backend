@@ -189,8 +189,17 @@ class ShoppingController extends Controller
 
         $response = $this->apiCartService->setGoodsQty($request);
         if ($response == 'success') {
+            $cartCount = 0;
             $status = true;
-            $data = ($request['status'] == 0 ? '加入' : '移除') . '購物車成功';
+            $data['message'] = ($request['status'] == 0 ? '加入' : '移除') . '購物車成功';
+            $login = Auth::guard('api')->check();
+            if ($login) {
+                $member_id = Auth::guard('api')->user()->member_id;
+                if ($member_id > 0) {
+                    $cartCount = $this->apiCartService->getCartCount($member_id);
+                }
+            }
+            $data['cartCount'] = $cartCount;
         } elseif ($response == '203') {
             $status = false;
             $err = $response;
