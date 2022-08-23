@@ -34,7 +34,6 @@
             right: 0;
             margin: auto;
         }
-
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -210,7 +209,7 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="radio-inline">
-                                        <input type="radio" name="selling_channel" value="STORE"> 門市限定
+                                            <input type="radio" name="selling_channel" value="STORE"> 門市限定
                                         </label>
                                     </div>
                                 </div>
@@ -271,8 +270,8 @@
                                         <label class="control-label">最小採購量</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="min_purchase_qty" type="number" min="0"
-                                            value="0">
+                                        <input class="form-control" name="min_purchase_qty" type="number"
+                                            min="0" value="0">
                                     </div>
                                 </div>
                             </div>
@@ -308,8 +307,8 @@
                                         <label class="control-label">允收期(天)</label>
                                     </div>
                                     <div class="col-sm-3">
-                                        <input type="number" class="form-control" name="expiry_receiving_days" min="0"
-                                            value="0">
+                                        <input type="number" class="form-control" name="expiry_receiving_days"
+                                            min="0" value="0">
                                     </div>
                                 </div>
                             </div>
@@ -345,12 +344,14 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
-                                            <input type="radio" name="is_discontinued" id="inlineRadio1" value="1"> 是
+                                            <input type="radio" name="is_discontinued" id="inlineRadio1"
+                                                value="1"> 是
                                         </label>
                                     </div>
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
-                                            <input type="radio" name="is_discontinued" id="inlineRadio3" value="0" checked>
+                                            <input type="radio" name="is_discontinued" id="inlineRadio3"
+                                                value="0" checked>
                                             否
                                         </label>
                                     </div>
@@ -367,19 +368,22 @@
                                         <label class="control-label">長</label>
                                     </div>
                                     <div class="col-sm-2">
-                                        <input class="form-control" name="length" type="number" min="0" value="">
+                                        <input class="form-control" name="length" type="number" min="0"
+                                            value="">
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">寬</label>
                                     </div>
                                     <div class="col-sm-2 ">
-                                        <input class="form-control" name="width" type="number" min="0" value="">
+                                        <input class="form-control" name="width" type="number" min="0"
+                                            value="">
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">高</label>
                                     </div>
                                     <div class="col-sm-2">
-                                        <input class="form-control" name="height" type="number" min="0" value="">
+                                        <input class="form-control" name="height" type="number" min="0"
+                                            value="">
                                     </div>
                                 </div>
                             </div>
@@ -389,7 +393,8 @@
                                         <label class="control-label">重量(公克)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name="weight" type="number" min="0" value="">
+                                        <input class="form-control" name="weight" type="number" min="0"
+                                            value="">
                                     </div>
                                 </div>
                             </div>
@@ -401,7 +406,8 @@
                                         <label class="control-label">市價(含稅)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="list_price" type="number" min="0" value="">
+                                        <input class="form-control" name="list_price" type="number" min="0"
+                                            value="">
                                     </div>
                                 </div>
                             </div>
@@ -412,8 +418,30 @@
                                         <label class="control-label">售價(含稅)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="selling_price" type="number" min="0" value="">
+                                        <input class="form-control" name="selling_price" type="number" min="0"
+                                            value="">
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2">
+                                        <label class="control-label">付款方式</label>
+                                    </div>
+                                    @foreach ($payment_method_options as $key => $val)
+                                        <label class="radio-inline">
+                                            @if ($payment_method_options_lock[$key])
+                                                <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked onclick="return false">
+                                                {{ $val }}
+                                            @else
+                                                <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                    value="{{ $key }}">
+                                                {{ $val }}
+                                            @endif
+                                        </label>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>
@@ -447,7 +475,8 @@
                                         <label class="control-label">採購人員</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value=""
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -457,7 +486,8 @@
                                         <label class="control-label">轉單審核人員</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value=""
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -469,7 +499,8 @@
                                         <label class="control-label">建檔人員</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value=""
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -479,7 +510,8 @@
                                         <label class="control-label">建檔時間</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value=""
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -491,7 +523,8 @@
                                         <label class="control-label">修改人員</label>
                                     </div>
                                     <div class="col-sm-7">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value=""
+                                            readonly>
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="control-label">
@@ -506,7 +539,8 @@
                                         <label class="control-label">修改時間</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value=""
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -611,17 +645,19 @@
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                             <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
-                                            <input type="file" @change="fileSelected" multiple accept=".jpg,.jpeg,.png">
-                                            <input style="display: none" type="file" :ref="'images_files'" name="filedata[]" multiple>
+                                            <input type="file" @change="fileSelected" multiple
+                                                accept=".jpg,.jpeg,.png">
+                                            <input style="display: none" type="file" :ref="'images_files'"
+                                                name="filedata[]" multiple>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
-                                    <div class="thumbnail" @dragstart="drag" @dragover='dragover'
-                                        @dragleave='dragleave' @drop="drop" :data-index="key" :data-type="'image'"
-                                        draggable="true" style="pointer-events: auto;">
+                                    <div class="thumbnail" @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
+                                        @drop="drop" :data-index="key" :data-type="'image'" draggable="true"
+                                        style="pointer-events: auto;">
                                         <div class="img-box" style="pointer-events: none;">
                                             <img :ref="'image'">
                                         </div>
