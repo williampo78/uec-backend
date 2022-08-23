@@ -1574,6 +1574,7 @@ class APIOrderService
                     $shipDetail['order_detail_seq'] = $detail->seq; //新增加欄位，同$shipDetail['seq']
                     $shipDetail['selling_price'] = $detail['selling_price'];
                     $shipDetail['purchase_price'] = $detail['purchase_price'];
+                    $shipDetail['record_identity'] = $detail['record_identity'];
                     $shipDetail_id = ShipmentDetail::insertGetId($shipDetail);
                 }
             } else {//出貨倉，SUP-供應商自出
@@ -1643,6 +1644,7 @@ class APIOrderService
                         $shipDetail['order_detail_seq'] = $detail['seq']; //新增加欄位，同$shipDetail['seq']
                         $shipDetail['selling_price'] = $detail['selling_price'];
                         $shipDetail['purchase_price'] = $detail['purchase_price'];
+                        $shipDetail['record_identity'] = $detail['record_identity'];
                         ShipmentDetail::insertGetId($shipDetail);
                     }
                 }
