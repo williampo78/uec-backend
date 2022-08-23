@@ -358,7 +358,7 @@ class OrderService
             'promotionalCampaignThreshold',
             'product',
             'productItem' => function($query){
-                $query->select(['id', 'spec_1_value', 'spec_2_value']);
+                $query->select(['id', 'spec_1_value', 'spec_2_value', 'photo_name']);
             },
             'product.productPhotos' => function ($query) {
                 $query->orderBy('sort', 'asc');
@@ -401,6 +401,16 @@ class OrderService
                 break;
 
             default:
+
+                //規格圖
+                $photo_name = optional($obj->productItem)->photo_name;
+                //規格圖為空，取商品封面圖
+                if (empty($photo_name)) {
+                    $photo_name = optional($obj->product->productPhotos->first())->photo_name;
+                }
+
+                $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
+
                 //送禮
                 if ($obj->promotionalCampaign->category_code == 'GIFT' && $obj->record_identity !== 'M') {
                     $cart['gift'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
@@ -409,7 +419,7 @@ class OrderService
                     $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaign->campaign_brief;
                     $cart['gift'][$obj->group_seq]['thresholdCampaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
                     $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
-                        'productPhoto' => config('filesystems.disks.s3.url') . $obj->product->productPhotos[0]->photo_name,
+                        'productPhoto' => $photo_name,
                         'productId' => $obj->product->id,
                         'productName' => $obj->product->product_name,
                         'assignedQty' => $giveaway_qty[$obj->order_detail_id] ?? 0 ,
@@ -460,7 +470,7 @@ class OrderService
                 'promotionalCampaignThreshold',
             ])
                 ->with(['productItem' => function($query){
-                    $query->select(['id', 'spec_1_value', 'spec_2_value']);
+                    $query->select(['id', 'spec_1_value', 'spec_2_value', 'photo_name']);
                 }])
                 ->with(['product' => function ($query) {
                     $query->with(['productPhotos' => function ($query) {
@@ -487,7 +497,13 @@ class OrderService
 
             foreach($findProductPRD_G as $PRD){
 
-                $photo_name = optional($PRD->product->productPhotos->first())->photo_name;
+                //規格圖
+                $photo_name = optional($PRD->productItem)->photo_name;
+                //規格圖為空，取商品封面圖
+                if (empty($photo_name)) {
+                    $photo_name = optional($PRD->product->productPhotos->first())->photo_name;
+                }
+
                 $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
 
                 if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
