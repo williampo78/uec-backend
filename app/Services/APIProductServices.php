@@ -64,71 +64,73 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-            $strSQL = "select cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
-                    from `web_category_products` cate_prod
-                    inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
-                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
-                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
-                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
-                    where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N'";
-            if ($keyword) {
-                $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
-                $strSQL .= " or prod.product_no like '%" . $keyword . "%'";
-                $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
-                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
-                $strSQL .= " or cate2.category_name like '%" . $keyword . "%'";
-                $strSQL .= " or prod.keywords like '%" . $keyword . "%'";
-                $strSQL .= " or prod.supplier_name like '%" . $keyword . "%'";
-                $strSQL .= " or prod.brand_name like '%" . $keyword . "%'";
-                $strSQL .= ")";
-            }
-            $strSQL .= " group by cate.`id`
-                    order by cate2.`lft`, cate1.`lft`, cate.`lft`";
-        } elseif ($config_levels == '2') {
-            $strSQL = "select cate1.`lft` L1_LFT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate1.`category_short_name` as L1_short_name, cate1.`icon_name` as L1_icon_name
-                    from `web_category_products` cate_prod
-                    inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
-                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
-                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
-                    where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
-            if ($keyword) {
-                $strSQL .= " and (prod.product_name like '%" . $keyword . "%'";
-                $strSQL .= " or prod.product_no like '%" . $keyword . "%'";
-                $strSQL .= " or cate.category_name like '%" . $keyword . "%'";
-                $strSQL .= " or cate1.category_name like '%" . $keyword . "%'";
-                $strSQL .= " or prod.keywords like '%" . $keyword . "%'";
-                $strSQL .= " or prod.supplier_name like '%" . $keyword . "%'";
-                $strSQL .= " or prod.brand_name like '%" . $keyword . "%'";
-                $strSQL .= ")";
-            }
-            $strSQL .= " group by cate.`id`
-                    order by cate1.`lft`, cate.`lft`";
-        }
-//        $categorys = DB::select($strSQL);
-echo $strSQL;
-        $categorys = DB::table("2eb_category_products as cate_prod")
-            ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
-            ->join("`web_category_hierarchy` cate", function($join){
-                $join->on("cate.`id`", "=", "cate_prod.`web_category_hierarchy_id`")
-                    ->where("cate.`category_level`", "=", 3);
-            })
-            ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
-            ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
-            ->select(DB::raw("cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+
+            $categorys = DB::table("2eb_category_products as cate_prod")
+                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
+                ->join("web_category_hierarchy as cate", function ($join) {
+                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
+                        ->where("cate.category_level", "=", 3);
+                })
+                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
+                ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
+                ->select(DB::raw("cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
                     '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name"))
-            ->where('prod.approval_status', 'APPROVED')
-            ->where('prod.start_launched_at', '<=', now())
-            ->where('prod.end_launched_at', '>=', now())
-            ->where('prod.product_type', 'N')
-            ->where('cate.active', 1)
-            ->orderBy("cate2.lft","asc")
-            ->orderBy("cate1.lft","asc")
-            ->groupBy("cate")
-            ->get();
+                ->where('prod.approval_status', 'APPROVED')
+                ->where('prod.start_launched_at', '<=', now())
+                ->where('prod.end_launched_at', '>=', now())
+                ->where('prod.product_type', 'N')
+                ->where('cate.active', 1);
+            if ($keyword) {
+                $categorys = $categorys->where(function ($query) use ($keyword) {
+                    $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
+                        ->orWhere('prod.supplier_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
+                });
+            }
+            $categorys = $categorys->groupBy("cate.id")
+                ->orderBy("cate2.lft", "asc")
+                ->orderBy("cate1.lft", "asc")
+                ->orderBy("cate.lft", "asc")
+                ->get();
+        } elseif ($config_levels == '2') {
+            $categorys = DB::table("web_category_products as cate_prod")
+                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
+                ->join("web_category_hierarchy as cate", function ($join) {
+                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
+                        ->where("cate.category_level", "=", 2);
+                })
+                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
+                ->select(DB::raw("cate1.`lft` L1_LFT, cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate1.`category_short_name` as L1_short_name, cate1.`icon_name` as L1_icon_name"))
+                ->where('prod.approval_status', 'APPROVED')
+                ->where('prod.start_launched_at', '<=', now())
+                ->where('prod.end_launched_at', '>=', now())
+                ->where('prod.product_type', 'N')
+                ->where('cate.active', 1);
+            if ($keyword) {
+                $categorys = $categorys->where(function ($query) use ($keyword) {
+                    $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
+                        ->orWhere('prod.supplier_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%');
+                });
+            }
+            $categorys = $categorys->groupBy("cate.id")
+                ->orderBy("cate1.lft", "asc")
+                ->orderBy("cate.lft", "asc")
+                ->get();
+        }
+        //dd($strSQL);
+        //$categorys = DB::select($strSQL);
+
 
         foreach ($categorys as $category) {
             $L1_data[$category->L1_LFT]["id"] = $category->L1ID;
