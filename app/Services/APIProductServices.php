@@ -108,9 +108,9 @@ class APIProductServices
             $strSQL .= " group by cate.`id`
                     order by cate1.`lft`, cate.`lft`";
         }
-        $categorys = DB::select($strSQL);
-
-        $categorys = DB::table("web_category_products as cate_prod")
+//        $categorys = DB::select($strSQL);
+echo $strSQL;
+        $categorys = DB::table("2eb_category_products as cate_prod")
             ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
             ->join("`web_category_hierarchy` cate", function($join){
                 $join->on("cate.`id`", "=", "cate_prod.`web_category_hierarchy_id`")
@@ -118,16 +118,15 @@ class APIProductServices
             })
             ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
             ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
-
-            ->innerJoin("`web_category_hierarchy` cate2", function($join){
-                $join->on("cate2.`id`", "=", "cate1.`parent_id`");
-            })
-            ->select("cate2.`lft` l1_lft", "cate2.`id` l1id", "cate2.`category_name` l1_name", "cate1.`id` l2id", "cate1.`category_name` l2_name", "cate.*", "count (cate_prod.`product_id`) as pcount", "'' as campaign_name", "'' as url_code", "'' as campaign_brief", "cate2.`category_short_name` as l1_short_name", "cate2.`icon_name` as l1_icon_name")
-            ->where("cate.`active`", "=", 1)
-            ->where("current_timestamp()", "between", prod.`start_launched_at`)
-            ->where(DB::raw("prod.`end_launched_at`"))
-            ->where("prod.product_type", "=", n)
-            ->orderBy("cate2.`lft`,","cate1.`lft`,")
+            ->select(DB::raw("cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name"))
+            ->where('prod.approval_status', 'APPROVED')
+            ->where('prod.start_launched_at', '<=', now())
+            ->where('prod.end_launched_at', '>=', now())
+            ->where('prod.product_type', 'N')
+            ->where('cate.active', 1)
+            ->orderBy("cate2.lft","asc")
+            ->orderBy("cate1.lft","asc")
             ->groupBy("cate")
             ->get();
 
