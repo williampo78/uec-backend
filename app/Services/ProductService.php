@@ -854,13 +854,19 @@ class ProductService
         $now = Carbon::now();
         DB::beginTransaction();
         try {
-            ProductReviewLog::where('product_id', $id)->orderBy('id', 'DESC')->first()->update([
+            $update = [
                 'review_result' => $review_result,
                 'review_remark' => $in['review_remark'],
                 'reviewer' => $user_id,
                 'review_at' => $now,
                 'updated_by' => $user_id,
-            ]);
+            ];
+            if (isset($in['payment_method'])) {
+                $payment_method_string = implode(",", $in['payment_method']);
+                $update['payment_method'] = $payment_method_string;
+            }
+            // $update
+            ProductReviewLog::where('product_id', $id)->orderBy('id', 'DESC')->first()->update($update);
             // 客戶要求：審核完成後，不要更新產品修改人員 => 不要修改products.updated_by、products.updated_at
             $Products_update = Product::where('id', $id)->first();
             Product::where('id', $id)->update([
