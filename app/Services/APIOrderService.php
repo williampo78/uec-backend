@@ -836,7 +836,7 @@ class APIOrderService
             //訂單單頭
             $cart_campaign_discount = ($order['cart_campaign_discount'] < 0 ? ($order['cart_campaign_discount'] - ($cart['thresholdAmount'])) : 0);
             $cart_p_discount = $cart['thresholdAmount'];
-            $interest_fee = isset($cart['instalments']['interest_fee']) ? $cart['instalments']['interest_fee'] : 0;
+            $interest_fee = isset($cart['installments']['interest_fee']) ? $cart['installments']['interest_fee'] : 0;
             $webData = [];
             $webData['agent_id'] = 1;
             $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
@@ -890,9 +890,9 @@ class APIOrderService
             $webData['ship_from_whs'] = ($order['stock_type'] == 'supplier' ? 'SUP' : 'SELF');
             $webData['sup_transferred_at'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addMinutes($sup_trans_mins) : null);
             $webData['ship_deadline'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addDay($ship_deadline)->format('Y-m-d 23:59:59') : null);
-            $webData['number_of_instal'] = isset($order['instalment_info']['number_of_instalments']) ? $order['instalment_info']['number_of_instalments'] : 0;
-            $webData['interest_rate_of_instal'] = isset($cart['instalments']['interest_rate']) ? $cart['instalments']['interest_rate'] : 0;
-            $webData['min_consumption_of_instal'] = isset($cart['instalments']['min_consumption']) ? $cart['instalments']['min_consumption'] : 0;
+            $webData['number_of_instal'] = isset($order['installment_info']['number_of_installments']) ? $order['installment_info']['number_of_installments'] : 0;
+            $webData['interest_rate_of_instal'] = isset($cart['installments']['interest_rate']) ? $cart['installments']['interest_rate'] : 0;
+            $webData['min_consumption_of_instal'] = isset($cart['installments']['min_consumption']) ? $cart['installments']['min_consumption'] : 0;
             $webData['fee_of_instal'] = $interest_fee;
             $newOrder = Order::create($webData);
             //$newOrder = new Order();

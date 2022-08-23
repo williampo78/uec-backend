@@ -2034,17 +2034,17 @@ echo $strSQL;
     /**
      * 計算銀行分期手續費
      * @param Collection $collection
-     * @param array $instalment_info
+     * @param array $installment_info
      * @param int $paid_amount
      * @return Integer
      */
-    public function getInstallmentFee(Collection $collection, array $instalment_info, int $paid_amount): array
+    public function getInstallmentFee(Collection $collection, array $installment_info, int $paid_amount): array
     {
         if ($collection->isEmpty()) {
             return [];
         }
-        $interest_rate = $collection->where('issuing_bank_no', $instalment_info['bank_id'])
-            ->where('number_of_installments', $instalment_info['number_of_instalments'])
+        $interest_rate = $collection->where('issuing_bank_no', $installment_info['bank_id'])
+            ->where('number_of_installments', $installment_info['number_of_installments'])
             ->first();
         $result = [
             "interest_rate" => $interest_rate->interest_rate,

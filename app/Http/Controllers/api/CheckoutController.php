@@ -244,9 +244,9 @@ class CheckoutController extends Controller
             'utm.sales' => 'string|nullable|max:100',
             'utm.time' => 'nullable',
             'stock_type' => (config('uec.cart_billing_split') == 1 ? 'required|string|in:dradvice,supplier' : 'nullable'),
-            'instalment_info.bank_id' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|string' : 'nullable'),
-            'instalment_info.number_of_instalments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
-            'instalment_info.fee_of_instalments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
+            'installment_info.bank_id' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|string' : 'nullable'),
+            'installment_info.number_of_installments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
+            'installment_info.fee_of_installments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
         ], $messages);
 
         if ($v->fails()) {
@@ -269,10 +269,10 @@ class CheckoutController extends Controller
         //驗算分期手續費
         if ($request->payment_method === 'TAPPAY_INSTAL') {
             $paid_amount = ($request->total_price + $request->cart_campaign_discount + $request->point_discount + $request->shipping_fee + $response['result']['thresholdAmount']);
-            $instalment_rate = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
-            $fee_of_instalments = $this->apiProductServices->getInstallmentFee($instalment_rate, $request->instalment_info, $request->total_price);
-            $response['result']['instalments'] = $fee_of_instalments;
-            if ($request->instalment_info['fee_of_instalments'] != $fee_of_instalments['interest_fee']) {
+            $installment_rate = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
+            $fee_of_installments = $this->apiProductServices->getInstallmentFee($installment_rate, $request->installment_info, $request->total_price);
+            $response['result']['installments'] = $fee_of_installments;
+            if ($request->installment_info['fee_of_installments'] != $fee_of_installments['interest_fee']) {
                 return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => "分期手續費計算錯誤"]);
             }
         }
