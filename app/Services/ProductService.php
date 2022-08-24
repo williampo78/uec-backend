@@ -236,6 +236,11 @@ class ProductService
                 'updated_at' => $now,
                 'agent_id' => $agent_id,
             ];
+            //付款方式
+            if (isset($in['payment_method'])) {
+                $payment_method_string = implode(",", $in['payment_method']);
+                $insert['payment_method'] = $payment_method_string;
+            }
             $products_id = Product::create($insert)->id;
             $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'], 'id' => $products_id]);
             Product::where('id', $products_id)->update(['product_no' => $product_no]);
@@ -300,6 +305,7 @@ class ProductService
             $result['error_code'] = $e->getMessage();
             $result['status'] = false;
         }
+
         return $result;
     }
 
@@ -351,6 +357,11 @@ class ProductService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ];
+             //付款方式
+             if (isset($in['payment_method'])) {
+                $payment_method_string = implode(",", $in['payment_method']);
+                $insert['payment_method'] = $payment_method_string;
+            }
             if (isset($in['spec_dimension']) && $in['spec_dimension'] !== '') {
                 $update['spec_dimension'] = $in['spec_dimension'];
             }
@@ -843,13 +854,19 @@ class ProductService
         $now = Carbon::now();
         DB::beginTransaction();
         try {
-            ProductReviewLog::where('product_id', $id)->orderBy('id', 'DESC')->first()->update([
+            $update = [
                 'review_result' => $review_result,
                 'review_remark' => $in['review_remark'],
                 'reviewer' => $user_id,
                 'review_at' => $now,
                 'updated_by' => $user_id,
-            ]);
+            ];
+            if (isset($in['payment_method'])) {
+                $payment_method_string = implode(",", $in['payment_method']);
+                $update['payment_method'] = $payment_method_string;
+            }
+            // $update
+            ProductReviewLog::where('product_id', $id)->orderBy('id', 'DESC')->first()->update($update);
             // 客戶要求：審核完成後，不要更新產品修改人員 => 不要修改products.updated_by、products.updated_at
             $Products_update = Product::where('id', $id)->first();
             Product::where('id', $id)->update([
@@ -1346,6 +1363,7 @@ class ProductService
         }
 
     }
+
     /**
      * checkItemQty function
      *
@@ -1361,16 +1379,18 @@ class ProductService
             return false;
         }
     }
+
     /**
      * checkProductInCampaignIsset function
      * 檢查是否存在
      * @param [int] $product_id
      * @return bool
      */
-    public function checkProductInCampaignIsset($product_id){
+    public function checkProductInCampaignIsset($product_id)
+    {
         //C002
         $campaigns = PromotionalCampaign::with(['campaignType'])
-        ->whereIn('level_code', ['PRD','CART_P']);
+            ->whereIn('level_code', ['PRD', 'CART_P']);
 
         $campaigns = $campaigns->where(function ($query) {
             $query->where('active', 1)
@@ -1381,19 +1401,20 @@ class ProductService
             return $query->whereHas('promotionalCampaignProducts.product', function (Builder $query) use ($product_id) {
                 $query->where('id', $product_id);
             })
-            ->orWhereHas('promotionalCampaignGiveaways.product', function (Builder $query) use ($product_id) {
-                $query->where('id', $product_id);
-            });
+                ->orWhereHas('promotionalCampaignGiveaways.product', function (Builder $query) use ($product_id) {
+                    $query->where('id', $product_id);
+                });
         });
 
         $campaigns = $campaigns->get()->count();
 
-        if($campaigns >= 1){
-            return false ;
-        }else{
-            return true ;
+        if ($campaigns >= 1) {
+            return false;
+        } else {
+            return true;
         }
     }
+
     /**
      * getProductRequisitionsLog function
      *
@@ -1435,6 +1456,7 @@ class ProductService
 
         return $result;
     }
+
     /**
      * getProductPromotionalLog function
      *

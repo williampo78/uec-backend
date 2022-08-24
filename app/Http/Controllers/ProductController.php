@@ -37,6 +37,7 @@ class ProductController extends Controller
         $this->categoriesSerivce = $categoriesSerivce;
         $this->orderSupplierService = $orderSupplierService;
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -76,6 +77,9 @@ class ProductController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['brands'] = $this->brandsService->getBrands();
         $result['pos'] = $this->categoriesSerivce->getPosCategories();
+        $result['payment_method_options'] = config('uec.payment_method_options');
+        $result['payment_method_options_lock'] = config('uec.payment_method_options_lock');
+
         return view('backend.products.input', $result);
     }
 
@@ -99,6 +103,7 @@ class ProductController extends Controller
             if (isset($execution['error_code'])) {
                 $result['error_code'] = $execution['error_code'];
             };
+
             return view('backend.error', $result);
         };
     }
@@ -113,6 +118,9 @@ class ProductController extends Controller
     {
         $result = [];
         $result['products'] = $this->productService->showProducts($id);
+        $result['payment_method_options'] = config('uec.payment_method_options');// 付款選項
+        $result['payment_method_options_lock'] = config('uec.payment_method_options_lock'); // 付款選項 - 綁定勾選
+        $result['payment_method'] = $result['products']->payment_method ? explode(',',$result['products']->payment_method) : []; //付款方式
         $result['product_audit_log'] = $this->productService->getProductAuditLog($id);
         $result['products_item'] = $this->productService->getProductItems($id);
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
@@ -123,6 +131,7 @@ class ProductController extends Controller
         $result['finallyOrderSupplier'] = $this->orderSupplierService->getFinallyOrderSupplier($id);
         $result['requisitions_log'] = $this->productService->getProductRequisitionsLog($id);
         $result['promotional_log'] = $this->productService->getProductPromotionalLog($id);
+
         return view('backend.products.show', $result);
     }
 
@@ -165,6 +174,9 @@ class ProductController extends Controller
                 break;
         }
         $result['products'] = $products;
+        $result['payment_method_options'] = config('uec.payment_method_options');// 付款選項
+        $result['payment_method_options_lock'] = config('uec.payment_method_options_lock'); // 付款選項 - 綁定勾選
+        $result['payment_method'] = $products->payment_method ? explode(',',$products->payment_method) : []; //付款方式
         $result['product_audit_log'] = $this->productService->getProductAuditLog($id);
         $result['requisitions_log'] = $this->productService->getProductRequisitionsLog($id);
         $result['promotional_log'] = $this->productService->getProductPromotionalLog($id);
@@ -201,6 +213,7 @@ class ProductController extends Controller
             if (isset($execution['error_code'])) {
                 $result['error_code'] = $execution['error_code'];
             };
+
             return view('backend.error', $result);
         };
     }
@@ -215,6 +228,7 @@ class ProductController extends Controller
     {
         //
     }
+
     public function ajax(Request $request)
     {
         $in = $request->input();
@@ -238,6 +252,7 @@ class ProductController extends Controller
             'result' => $result,
         ]);
     }
+
     public function export($in)
     {
         $data = $this->productService->getItemsJoinProducts($in);
@@ -296,6 +311,7 @@ class ProductController extends Controller
             "status_cn" => "狀態",
         ];
         $export = new ReportExport($title, $data->toArray());
+
         return Excel::download($export, '商品主檔' . date('Y-m-d') . '.xlsx');
     }
 }

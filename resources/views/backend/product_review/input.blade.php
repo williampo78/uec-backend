@@ -89,8 +89,8 @@
                                         <label class="control-label ">商品序號</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="product_no"
-                                            value="{{ $products->product_no }}" readonly>
+                                        <input class="form-control" name="product_no" value="{{ $products->product_no }}"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -139,8 +139,8 @@
                                         <label class="control-label">市價(含稅)</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="list_price"
-                                            value="{{ $products->list_price }}" readonly>
+                                        <input class="form-control" name="list_price" value="{{ $products->list_price }}"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -182,6 +182,30 @@
                                 </div>
                             </div>
                         </div>
+                        {{-- 付款方式 --}}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2">
+                                        <label class="control-label">付款方式</label>
+                                    </div>
+                                    @foreach ($payment_method_options as $key => $val)
+                                        <label class="radio-inline">
+                                            @if ($payment_method_options_lock[$key])
+                                                <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                    value="{{ $key }}" checked onclick="return false">
+                                                {{ $val }}
+                                            @else
+                                                <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                    value="{{ $key }}"
+                                                    {{ in_array($key, $payment_method) ? 'checked' : '' }} onclick="return false">
+                                                {{ $val }}
+                                            @endif
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
@@ -190,7 +214,9 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group" id="start_launched_at_flatpickr">
-                                            <input type="text" class="form-control" name="start_launched_at" id="start_launched_at" value="{{ $products->start_launched_at }}" readonly autocomplete="off" data-input />
+                                            <input type="text" class="form-control" name="start_launched_at"
+                                                id="start_launched_at" value="{{ $products->start_launched_at }}"
+                                                readonly autocomplete="off" data-input />
                                             <span class="input-group-btn" data-toggle>
                                                 <button class="btn btn-default" type="button">
                                                     <i class="fa-solid fa-calendar-days"></i>
@@ -207,7 +233,9 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group" id="end_launched_at_flatpickr">
-                                            <input type="text" class="form-control" name="end_launched_at" id="end_launched_at" value="{{ $products->end_launched_at }}" readonly autocomplete="off" data-input />
+                                            <input type="text" class="form-control" name="end_launched_at"
+                                                id="end_launched_at" value="{{ $products->end_launched_at }}" readonly
+                                                autocomplete="off" data-input />
                                             <span class="input-group-btn" data-toggle>
                                                 <button class="btn btn-default" type="button">
                                                     <i class="fa-solid fa-calendar-days"></i>
@@ -226,7 +254,9 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <div class="input-group" id="start_selling_at_flatpickr">
-                                            <input type="text" class="form-control" name="start_selling_at" id="start_selling_at" value="{{ $products->start_selling_at }}" readonly autocomplete="off" data-input />
+                                            <input type="text" class="form-control" name="start_selling_at"
+                                                id="start_selling_at" value="{{ $products->start_selling_at }}" readonly
+                                                autocomplete="off" data-input />
                                             <span class="input-group-btn" data-toggle>
                                                 <button class="btn btn-default" type="button">
                                                     <i class="fa-solid fa-calendar-days"></i>
@@ -291,7 +321,7 @@
                                         @foreach ($product_review_log as $val)
                                             <tr>
                                                 <td>{{ $val->start_launched_at }} ~ {{ $val->end_launched_at }}</td>
-                                                <td>{{$val->start_selling_at}}</td>
+                                                <td>{{ $val->start_selling_at }}</td>
                                                 <td>{{ $val->selling_price }}</td>
                                                 <td>{{ $val->review_at }}</td>
                                                 <td>
@@ -361,8 +391,9 @@
                 errorClass: "help-block",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
-                    if(element.parent('.input-group').data('gross-margin')){
-                        if($("[name='review_result']:checked").val() == '1' && $('.gross_margin').val() < 0){
+                    if (element.parent('.input-group').data('gross-margin')) {
+                        if ($("[name='review_result']:checked").val() == '1' && $('.gross_margin')
+                        .val() < 0) {
                             alert('商品毛利為負，不允許上架！');
                         }
                     }

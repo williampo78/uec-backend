@@ -404,6 +404,27 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2">
+                                        <label class="control-label">付款方式</label>
+                                    </div>
+                                    @foreach ($payment_method_options as $key => $val)
+                                        <label class="radio-inline">
+                                            @if ($payment_method_options_lock[$key])
+                                                <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked onclick="return false" disabled>
+                                                {{ $val }}
+                                            @else
+                                                <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                    value="{{ $key }}" {{in_array($key,$payment_method) ? 'checked' : '' }} disabled>
+                                                {{ $val }}
+                                            @endif
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
                         <div class="row form-group">
                             <div class="col-sm-6">
                                 <div class="col-sm-2 no-pa">
