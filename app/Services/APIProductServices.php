@@ -65,7 +65,7 @@ class APIProductServices
         //根據階層顯示層級資料
         if ($config_levels == '3') {
 
-            $categorys = DB::table("2eb_category_products as cate_prod")
+            $categorys = DB::table("web_category_products as cate_prod")
                 ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
                 ->join("web_category_hierarchy as cate", function ($join) {
                     $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
@@ -128,9 +128,6 @@ class APIProductServices
                 ->orderBy("cate.lft", "asc")
                 ->get();
         }
-        //dd($strSQL);
-        //$categorys = DB::select($strSQL);
-
 
         foreach ($categorys as $category) {
             $L1_data[$category->L1_LFT]["id"] = $category->L1ID;
@@ -315,13 +312,24 @@ class APIProductServices
                     FROM products AS p
                     where p.approval_status = 'APPROVED' ";
         if ($product_id) {
-            $strSQL .= " and p.id=" . $product_id;
+            $strSQL .= " and p.id=" . (int)$product_id;
         } else {
             $strSQL .= " and current_timestamp() between p.start_launched_at and p.end_launched_at ";
         }
-        $products = DB::select($strSQL);
+        //$products = DB::select($strSQL);
+        $products = Product::select("*")
+            ->where('approval_status', 'APPROVED');
+        if ($product_id) {
+            $products = $products->where('id', $product_id);
+        } else {
+            $products = $products->where('start_launched_at', '<=', now());
+            $products = $products->where('end_launched_at', '>=', now());
+        }
+        $products->get();
+        dd($products);
         $data = [];
         foreach ($products as $product) {
+            dd($product);
             $data[$product->id] = $product;
         }
         return $data;
@@ -454,7 +462,7 @@ class APIProductServices
     {
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
-        $keyword = $this->universalService->handleAddslashes($input['keyword']);//($input['keyword'] ? $this->universalService->handleAddslashes($input['keyword']) : '');
+        $keyword = ($input['keyword'] ? $this->universalService->handleAddslashes($input['keyword']) : '');
         $category = (int)$input['category'];
         $size = $input['size'];
         $page = $input['page'];

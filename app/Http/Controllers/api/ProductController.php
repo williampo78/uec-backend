@@ -419,7 +419,7 @@ class ProductController extends Controller
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
 
-        $keyword = ($request['product'] ? $request['product'] : '');
+        $keyword = ($request['product'] ? $this->universalService->handleAddslashes($request['product']) : '');
         $result = $this->apiProductService->getEffectProduct($keyword);
         if ($result == '404') {
             $status = false;
