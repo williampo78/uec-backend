@@ -249,6 +249,7 @@ class CheckoutController extends Controller
             'installment_info.bank_id' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|string' : 'nullable'),
             'installment_info.number_of_installments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
             'installment_info.fee_of_installments' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|numeric' : 'nullable'),
+            'buyer_remark' => 'string|nullable|max:300',
         ], $messages);
 
         if ($v->fails()) {
@@ -278,7 +279,6 @@ class CheckoutController extends Controller
                 return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => "分期手續費計算錯誤"]);
             }
         }
-
         /* test
         $data = $this->apiOrderService->setOrders($response['result'], $request, $campaign, $campaign_gift);
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
@@ -365,7 +365,6 @@ class CheckoutController extends Controller
             } else {
                 $status = false;
                 $err = '401';
-
                 if ($response['result']['totalPrice'] != $request->total_price) {
                     $data['total_price'] = "商品總價有誤";
                 }

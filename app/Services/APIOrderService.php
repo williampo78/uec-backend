@@ -894,6 +894,7 @@ class APIOrderService
             $webData['interest_rate_of_instal'] = isset($cart['installments']['interest_rate']) ? $cart['installments']['interest_rate'] : 0;
             $webData['min_consumption_of_instal'] = isset($cart['installments']['min_consumption']) ? $cart['installments']['min_consumption'] : 0;
             $webData['fee_of_instal'] = $interest_fee;
+            $webData['buyer_remark'] = $order['buyer_remark'];
             $newOrder = Order::create($webData);
             //$newOrder = new Order();
             //$newOrder->id = 843;
