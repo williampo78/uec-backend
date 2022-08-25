@@ -22,6 +22,7 @@ class StockTransactionLogService
                 $query->select(['id', 'product_id', 'spec_1_value', 'spec_2_value', 'item_no'])
                     ->with(['product:id,stock_type,product_no,product_name']);
             }])
+            ->has('productItem')
             //異動日期開始
             ->when(empty($payload['dateStart']) === false, function ($query) use ($payload) {
                 $query->whereDate('transaction_date', '>=', $payload['dateStart']);
