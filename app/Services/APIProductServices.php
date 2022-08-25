@@ -305,19 +305,10 @@ class APIProductServices
      */
     public function getProducts($product_id = null)
     {
-        $strSQL = "SELECT p.*,
-                    (SELECT photo_name
+        $products = Product::select("*",
+            DB::raw("(SELECT photo_name
                      FROM product_photos
-                     WHERE p.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto
-                    FROM products AS p
-                    where p.approval_status = 'APPROVED' ";
-        if ($product_id) {
-            $strSQL .= " and p.id=" . (int)$product_id;
-        } else {
-            $strSQL .= " and current_timestamp() between p.start_launched_at and p.end_launched_at ";
-        }
-        //$products = DB::select($strSQL);
-        $products = Product::select("*")
+                     WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto"))
             ->where('approval_status', 'APPROVED');
         if ($product_id) {
             $products = $products->where('id', $product_id);
@@ -325,11 +316,9 @@ class APIProductServices
             $products = $products->where('start_launched_at', '<=', now());
             $products = $products->where('end_launched_at', '>=', now());
         }
-        $products->get();
-        dd($products);
+        $products = $products->get();
         $data = [];
         foreach ($products as $product) {
-            dd($product);
             $data[$product->id] = $product;
         }
         return $data;
@@ -1328,32 +1317,51 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-            $strSQL = "select cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
-                    inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id`  and cate.`category_level`=3
-                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
-                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
-                    inner join  `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
-                    where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
+            $categorys = DB::table("web_category_products as cate_prod")
+                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
+                ->join("web_category_hierarchy as cate", function ($join) {
+                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
+                        ->where("cate.category_level", "=", 3);
+                })
+                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
+                ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
+                ->select(DB::raw("cate2.id L1ID , cate2.category_name L1_NAME, cate1.id L2ID , cate1.category_name L2_NAME, cate.*, count(cate_prod.product_id) as pCount"))
+                ->where('prod.approval_status', 'APPROVED')
+                ->where('prod.start_launched_at', '<=', now())
+                ->where('prod.end_launched_at', '>=', now())
+                ->where('prod.product_type', 'N')
+                ->where('cate.active', 1);
             if ($category) {
-                $strSQL .= " and cate.`id`=" . $category;
+                $categorys = $categorys->where('cate.id', $category);
             }
-            $strSQL .= " group by cate.`id`
-                    order by cate2.`lft`, cate1.`lft`, cate.`lft`";
+            $categorys = $categorys->groupBy("cate.id")
+                ->orderBy("cate2.lft", "asc")
+                ->orderBy("cate1.lft", "asc")
+                ->orderBy("cate.lft", "asc")
+                ->get();
         } elseif ($config_levels == '2') {
-            $strSQL = "select cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount from `web_category_products` cate_prod
-                    inner join `web_category_hierarchy` cate on  cate.`id` =cate_prod.`web_category_hierarchy_id` and cate.`category_level`=2
-                    inner join `frontend_products_v` prod on prod.`id` =cate_prod.`product_id`
-                    inner join  `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
-                    where cate.`active`=1
-                    and current_timestamp() between prod.`start_launched_at` and prod.`end_launched_at` and prod.product_type = 'N' ";
+            $categorys = DB::table("web_category_products as cate_prod")
+                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
+                ->join("web_category_hierarchy as cate", function ($join) {
+                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
+                        ->where("cate.category_level", "=", 2);
+                })
+                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
+                ->select(DB::raw("cate1.`id` L1ID , cate1.`category_name` L1_NAME, cate.*, count(cate_prod.`product_id`) as pCount"))
+                ->where('prod.approval_status', 'APPROVED')
+                ->where('prod.start_launched_at', '<=', now())
+                ->where('prod.end_launched_at', '>=', now())
+                ->where('prod.product_type', 'N')
+                ->where('cate.active', 1);
             if ($category) {
-                $strSQL .= " and cate.`id`=" . $category;
+                $categorys = $categorys->where('cate.id', $category);
             }
-            $strSQL .= " group by cate.`id`
-                    order by cate1.`lft`, cate.`lft`";
+            $categorys = $categorys->groupBy("cate.id")
+                ->orderBy("cate1.lft", "asc")
+                ->orderBy("cate.lft", "asc")
+                ->get();
         }
-        $categorys = DB::select($strSQL);
+
         $data = [];
         foreach ($categorys as $category) {
             $data['level1']["id"] = $category->L1ID;

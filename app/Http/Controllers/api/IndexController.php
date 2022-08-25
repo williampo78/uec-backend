@@ -111,7 +111,8 @@ class IndexController extends Controller
 
     public function getAdSlots(Request $request)
     {
-        $result = $this->apiIndexService->getIndex($request['ad']);
+        $ad_code = $this->universalService->handleAddslashes($request['ad']);
+        $result = $this->apiIndexService->getIndex($ad_code);
         return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $result]);
     }
 
