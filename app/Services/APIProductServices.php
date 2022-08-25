@@ -409,7 +409,8 @@ class APIProductServices
         }
 
         if ($brand) { //品牌
-            $products = $products->whereIn('p.brand_id', explode($brand));
+            $brand = explode(',', $brand);
+            $products = $products->whereIn('p.brand_id', $brand);
         }
         if ($attribute) {//進階篩選條件
             $attribute = explode(',', $attribute);
@@ -710,7 +711,8 @@ class APIProductServices
         }
 
         if ($brand) { //品牌
-            $products = $products->whereIn('p.brand_id', explode($brand));
+            $brand = explode(',', $brand);
+            $products = $products->whereIn('p.brand_id', $brand);
         }
 
         if ($attribute) {//進階篩選條件
