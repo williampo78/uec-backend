@@ -96,6 +96,11 @@ class ProductReviewController extends Controller
         }
         $result['products']  = $products;
         $result['product_review_log'] = $this->productService->getProductReviewLog($id);
+        //付款方式
+        $result['payment_method_options'] = config('uec.payment_method_options');
+        $result['payment_method_options_lock'] = config('uec.payment_method_options_lock');
+        $result['payment_method'] = $products->payment_method ? explode(',',$products->payment_method) : []; //付款方式
+
         return view('backend.product_review.input', $result);
     }
 
