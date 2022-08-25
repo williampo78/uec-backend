@@ -271,7 +271,7 @@ class CheckoutController extends Controller
 
         //驗算分期手續費
         if ($request->payment_method === 'TAPPAY_INSTAL') {
-            $paid_amount = ($request->total_price + $request->cart_campaign_discount + $request->point_discount + $request->shipping_fee + $response['result']['thresholdAmount'] +$request->installment_info['fee_of_installments']);
+            $paid_amount = ($request->total_price + $request->cart_campaign_discount + $request->point_discount + $request->shipping_fee + $response['result']['thresholdAmount']);
             $installment_rate = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
             $fee_of_installments = $this->apiProductServices->getInstallmentFee($installment_rate, $request->installment_info, $request->total_price);
             $response['result']['installments'] = $fee_of_installments;
