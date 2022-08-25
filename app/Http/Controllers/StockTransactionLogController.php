@@ -96,8 +96,12 @@ class StockTransactionLogController extends Controller
 
         //權限判斷
         if ($request->share_role_auth['auth_query']) {
-            $stockTransactionLogs = $this->stockTransactionLogService->getIndexData($payload);
-            $stockTransactionLogs = $this->stockTransactionLogService->handleIndexData($stockTransactionLogs);
+
+            // 有搜尋條件才會進行處理
+            if (!empty($payload)) {
+                $stockTransactionLogs = $this->stockTransactionLogService->getIndexData($payload);
+                $stockTransactionLogs = $this->stockTransactionLogService->handleIndexData($stockTransactionLogs);
+            }
         }
 
         $parameters['stockTransactionLogs'] = $stockTransactionLogs;
