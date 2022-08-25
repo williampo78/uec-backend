@@ -123,10 +123,12 @@ class CheckoutController extends Controller
                             $installment = $this->apiProductServices->handleInstallmentInterestRates($installment, $paid_amount);
                             $installment = isset($installment['details']) ? 1 : 0; //不符合回傳0
                             $data['paymentMethod'] = $response['result']['paymentMethod'];
+                            $del_key = "Del";
                             foreach ($data['paymentMethod'] as $key => $method) {
-                                if ($data['paymentMethod'][$key] == 'TAPPAY_INSTAL' && $installment == 0) {//並將分期付款條件移除
-                                    unset($data['paymentMethod'][$key]);
-                                }
+                                if ($data['paymentMethod'][$key] == 'TAPPAY_INSTAL' && $installment == 0) $del_key = $key;
+                            }
+                            if ($del_key != 'Del') { //將分期付款條件移除
+                                array_splice($data['paymentMethod'], $del_key, 1);
                             }
                         } else {
                             $data['paymentMethod'] = $response['result']['paymentMethod'];
