@@ -41,6 +41,25 @@
             text-align: right;
         }
 
+        .detail{
+            display: none;
+        }
+        .detail-show{
+            display: table-row;
+        }
+        .refund-item{
+            cursor: pointer;
+        }
+        .refund-item .fa-chevron-down{
+            display: none
+        }
+        .refund-item-active .fa-chevron-down{
+            display: inline
+        }
+        .refund-item-active span{
+            display: none
+        }
+
     </style>
 @endsection
 
@@ -455,20 +474,75 @@
                             <td class="text-nowrap">
                                 <button type="button" class="btn btn-warning">協商回報</button>
                             </td>
-                            <td class="text-nowrap">${value.item_no}</td>
+                            <td class="text-nowrap refund-item">
+                                <span>></span>
+                            <i class="fa-sharp fa-solid fa-chevron-down"></i>
+                                ${value.item_no}
+                            </td>
                             <td class="text-nowrap">${value.product_name}</td>
                             <td class="text-nowrap">${value.spec_1}</td>
                             <td class="text-nowrap">${value.spec_2}</td>
                             <td class="text-nowrap">${value.request_qty}</td>
                             <td class="text-nowrap">${value.passed_qty}</td>
                             <td class="text-nowrap">${value.failed_qty}</td>
-                        </tr>`;
+                        </tr>
+                        <tr class="detail detail-${index}" style="background:#eee">
+                            <td style="border:none" colspan="2"></td>
+                            <td style="border:none" colspan="5">
+                                <table class="table table-bordered">
+                                   <thead>
+                                        <tr class="active">
+                                          <th>Item編號</th>
+                                          <th>商品名稱</th>
+                                          <th>規格一</th>
+                                          <th>規格二</th>
+                                          <th>申請數量</th>
+                                          <th>廠商料號</th>
+                                        </tr>
+                                    </thead>
+                                   <tbody>
+                                        <tr>
+                                          <td>T0008880001</td>
+                                          <td>防曬乳</td>
+                                          <td>無香</td>
+                                          <td></td>
+                                          <td>1</td>
+                                          <td>VDR077</td>
+                                        </tr>
+                                        <tr>
+                                          <td>T0008880001</td>
+                                          <td>防曬乳</td>
+                                          <td>無香</td>
+                                          <td></td>
+                                          <td>1</td>
+                                          <td>VDR077</td>
+                                        </tr>
+                                        <tr>
+                                          <td>T0008880001</td>
+                                          <td>防曬乳</td>
+                                          <td>無香</td>
+                                          <td></td>
+                                          <td>1</td>
+                                          <td>VDR077</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="border:none" colspan="5"></td>
+                        </tr>
+                        `;
                 index++;
             })
 
             $('#return_details_content').append(list);
             //退款明細 end
         }
+        $(document).on('click', '.refund-item', function() {
+          const index = [...$('.refund-item')].indexOf(this)
+          $(`.detail-${index}`).toggleClass('detail-show')
+         $(this).toggleClass('refund-item-active')
+        })
+
 
         //處理退貨明細資料
         function handleReturnInformation(return_information) {
