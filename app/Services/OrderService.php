@@ -603,10 +603,10 @@ class OrderService
         $T01 = null; //出貨單 產生時間
         $T02 = null; //出貨單 取消時間/作廢時間
         $T03 = null; //退款成功時間
-        $T04 = $order->paid_at; //請款成功時間
+        $T04 = (isEmpty($order->paid_at)) ? null : Carbon::parse($order->paid_at)->format('Y-m-d H:i'); //請款成功時間
         $T05 = null; //出貨單 出貨時間 (出貨確認)
-        $T06 = $order->delivered_at; //出貨單 配達時間
-        $T07 = $order->overdue_confirmed_at; //出貨單 配送異常時間
+        $T06 = (isEmpty($order->delivered_at)) ? null : Carbon::parse($order->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
+        $T07 = (isEmpty($order->overdue_confirmed_at)) ? null : Carbon::parse($order->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
 
         // 退貨申請單
         if ($order->returnRequests->isNotEmpty()) {
@@ -616,15 +616,16 @@ class OrderService
 
         //出貨單
         foreach ($order->shipments as $detail) {
+            $T01 = Carbon::parse($detail->shipment_date)->format('Y-m-d H:i');
+            $T02 = !isEmpty($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
+            $T05 = (isEmpty($detail->shipped_at)) ? $T05 : Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
             $shipments = Shipment::with('shipmentDetails')->where('id', $detail->id)->get();
             foreach ($shipments as $shipment) {
                 foreach ($shipment->shipmentDetails as $shipment_detail) {
-                    $T01 = Carbon::parse($detail->shipment_date)->format('Y-m-d H:i');
-                    $T02 = !isEmpty($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
-                    $T05 = Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
                     $status[$shipment_detail->order_detail_id][$shipment_detail->product_item_id] = [
                         "order_status" => $order->status_code,
                         "payment_status" => $order->is_paid,
+                        "shipment_status" => $detail->status_code,
                         "T01" => $T01,
                         "T02" => $T02,
                         "T03" => $T03,
@@ -636,6 +637,63 @@ class OrderService
                 }
             }
         }
-        return $status;
+        foreach ($status as $order_detail_id => $shipment_detail) {
+            $show_array = [];
+            foreach ($shipment_detail as $item_id => $detail) {
+                $show_array[] = [
+                    "status_desc" => "訂單成立",
+                    "status_time" => $detail['T01'],
+                    "status_display" => true
+                ];
+                if ($detail['order_status'] == 'CANCELLED' || $detail['order_status'] == 'VOIDED') {
+                    $show_array[] = [
+                        "status_desc" => "已取消",
+                        "status_time" => $detail['T02'],
+                        "status_display" => false
+                    ];
+                    if ($detail['payment_status'] == 1) {
+                        $show_array[] = [
+                            "status_desc" => "已退款",
+                            "status_time" => $detail['T03'],
+                            "status_display" => false
+                        ];
+                    }
+                } else {
+                    $show_array[] = [
+                        "status_desc" => "待出貨",
+                        "status_time" => $detail['T04'],
+                        "status_display" => true
+                    ];
+                    $show_array[] = [
+                        "status_desc" => "出貨中",
+                        "status_time" => $detail['T05'],
+                        "status_display" => true
+                    ];
+                    if ($detail['payment_status'] == 1) {
+                        if (isset($detail['T07'])) {
+                            $show_array[] = [
+                                "status_desc" => "配送失敗",
+                                "status_time" => $detail['T07'],
+                                "status_display" => true
+                            ];
+                        } else {
+                            $show_array[] = [
+                                "status_desc" => "已到貨",
+                                "status_time" => $detail['T06'],
+                                "status_display" => true
+                            ];
+                        }
+                    } else {
+                        $show_array[] = [
+                            "status_desc" => "已到貨",
+                            "status_time" => $detail['T06'],
+                            "status_display" => true
+                        ];
+                    }
+                }
+                $shipment_status[$order_detail_id][$item_id] = $show_array;
+            }
+        }
+        return $shipment_status;
     }
 }
