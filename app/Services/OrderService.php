@@ -603,22 +603,33 @@ class OrderService
         $T01 = null; //出貨單 產生時間
         $T02 = null; //出貨單 取消時間/作廢時間
         $T03 = null; //退款成功時間
-        $T04 = (isEmpty($order->paid_at)) ? null : Carbon::parse($order->paid_at)->format('Y-m-d H:i'); //請款成功時間
+        $T04 = (is_null($order->paid_at)) ? null : Carbon::parse($order->paid_at)->format('Y-m-d H:i'); //請款成功時間
         $T05 = null; //出貨單 出貨時間 (出貨確認)
-        $T06 = (isEmpty($order->delivered_at)) ? null : Carbon::parse($order->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
-        $T07 = (isEmpty($order->overdue_confirmed_at)) ? null : Carbon::parse($order->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
+        $T06 = (is_null($order->delivered_at)) ? null : Carbon::parse($order->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
+        $T07 = (is_null($order->overdue_confirmed_at)) ? null : Carbon::parse($order->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
+
+        // 金流單
+        if ($order->status_code == 'CANCELLED' || $order->status_code == 'VOIDED') {
+            $payment = OrderPayment::select("latest_api_date")
+                ->where('source_table_name', 'return_requests')
+                ->where('payment_type', 'REFUND')
+                ->where('payment_status', 'COMPLETED')
+                ->where('order_no', $order->order_no)
+                ->first();
+            $T03 = isset($payment->latest_api_date) ? Carbon::parse($payment->latest_api_date)->format('Y-m-d H:i') : $T03;
+
+        }
 
         // 退貨申請單
         if ($order->returnRequests->isNotEmpty()) {
             $returnRequest = $order->returnRequests->first();
-            $T03 = Carbon::parse($returnRequest->refund_at)->format('Y-m-d H:i');
         }
 
         //出貨單
         foreach ($order->shipments as $detail) {
             $T01 = Carbon::parse($detail->shipment_date)->format('Y-m-d H:i');
-            $T02 = !isEmpty($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
-            $T05 = (isEmpty($detail->shipped_at)) ? $T05 : Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
+            $T02 = !is_null($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
+            $T05 = (is_null($detail->shipped_at)) ? $T05 : Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
             $shipments = Shipment::with('shipmentDetails')->where('id', $detail->id)->get();
             foreach ($shipments as $shipment) {
                 foreach ($shipment->shipmentDetails as $shipment_detail) {
