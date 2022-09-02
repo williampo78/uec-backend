@@ -38,6 +38,8 @@ class OrderRefundController extends Controller
                 'status_code',
                 'order_no',
                 'member_name',
+                'ship_from_whs',
+                'to_do_item'
             ]);
 
             // 有搜尋條件才會進行處理
@@ -49,6 +51,30 @@ class OrderRefundController extends Controller
 
         $params = [];
         $params['orderRefunds'] = $orderRefunds;
+
+        //訂單類型
+        $params['shipFromWhs'] = [
+            [
+                'id'   => 'SELF',
+                'text' => '商城出貨'
+            ],
+            [
+                'id'   => 'SUP',
+                'text' => '供應商出貨'
+            ]
+        ];
+
+        //待辦事項
+        $params['toDoItems'] = [
+            [
+                'id'   => 'check_exception',
+                'text' => '檢驗異常，待協商'
+            ],
+            [
+                'id'   => 'refund_failed',
+                'text' => '退款失敗'
+            ]
+        ];
 
         return view('backend.order_refund.list', $params);
     }

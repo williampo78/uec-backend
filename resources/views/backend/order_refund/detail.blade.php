@@ -72,33 +72,10 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="col-sm-4">
-                                                <label class="control-label">退貨說明</label>
-                                            </div>
-                                            <div class="col-sm-8">
-                                                <p class="form-control-static modal-req-remark"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-4">
                                                 <label class="control-label">物流方式</label>
                                             </div>
                                             <div class="col-sm-8">
                                                 <p class="form-control-static" id="modal-lgst-method"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-4">
-                                                <label class="control-label">物流廠商</label>
-                                            </div>
-                                            <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-return-request"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -112,7 +89,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="col-sm-4">
-                                                <label class="control-label">會員帳號</label>
+                                                <label class="control-label">會員編號</label>
                                             </div>
                                             <div class="col-sm-8">
                                                 <p class="form-control-static" id="modal-member-account"></p>

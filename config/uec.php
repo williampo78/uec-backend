@@ -198,10 +198,9 @@ return [
     //退貨申請單狀態
     'return_request_status_options' => [
         'CREATED' => '新建立',
-        'VOIDED' => '已作廢',
         'PROCESSING' => '處理中',
         'COMPLETED' => '退貨完成',
-        'FAILED' => '退貨失敗',
+        'VOIDED' => '已作廢',
     ],
 
     //orders狀態

@@ -192,12 +192,40 @@
                             <br />
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">訂單類型</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2-shipment-status-code"
+                                                    name="ship_from_whs">
+                                                <option></option>
+                                                    @foreach ($shipFromWhs as $type)
+                                                        <option value='{{ $type['id'] }}'
+                                                            {{ $type['id'] == request('ship_from_whs') ? 'selected' : '' }}>
+                                                            {{ $type['text'] }}</option>
+                                                    @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">待辦項目</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2-shipment-status-code"
+                                                    name="to_do_item">
+                                                <option></option>
+                                                @foreach ($toDoItems as $item)
+                                                    <option value='{{ $item['id'] }}'
+                                                        {{ $item['id'] == request('to_do_item') ? 'selected' : '' }}>
+                                                        {{ $item['text'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
@@ -205,7 +233,7 @@
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_export'])
                                                 <button data-url="{{ route('order_refund.export_excel') }}"
-                                                    class="btn btn-primary" id="btn-export-excel" type="button">
+                                                        class="btn btn-primary" id="btn-export-excel" type="button">
                                                     <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
                                                 </button>
                                             @endif
@@ -219,6 +247,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <br />
                         </form>
                     </div>
 
@@ -234,8 +263,9 @@
                                         <th class="text-nowrap">退貨申請時間</th>
                                         <th class="text-nowrap">退貨申請單號</th>
                                         <th class="text-nowrap">訂單編號</th>
-                                        <th class="text-nowrap">狀態</th>
+                                        <th class="text-nowrap">退貨申請單狀態</th>
                                         <th class="text-nowrap">物流方式</th>
+                                        <th class="text-nowrap">訂單類型</th>
                                         <th class="text-nowrap">退款方式</th>
                                         <th class="text-nowrap">退貨完成時間</th>
                                         <th class="text-nowrap">取件聯絡人</th>
@@ -260,6 +290,7 @@
                                             <td>{{ $orderRefund->order_no }}</td>
                                             <td>{{ $orderRefund->status_code }}</td>
                                             <td>{{ $orderRefund->lgst_method }}</td>
+                                            <td>{{ $orderRefund->ship_from_whs }}</td>
                                             <td>{{ $orderRefund->refund_method }}</td>
                                             <td>{{ $orderRefund->completed_at }}</td>
                                             <td>{{ $orderRefund->req_name }}</td>
@@ -435,12 +466,8 @@
             $('#modal-status-code').empty().text(return_request.status_code);
             //退貨完成時間
             $('#modal-completed-at').empty().text(return_request.completed_at);
-            //退貨說明
-            $('#modal-req-remark').empty().text(return_request.req_remark);
             //物流方式
             $('#modal-lgst-method').empty().text(return_request.lgst_method);
-            //物流廠商
-            $('#modal-return-request').empty().text(return_request.lgst_company)
             //會員編號
             $('#modal-member-account').empty().text(return_request.member_account);
             //訂購人
@@ -537,10 +564,11 @@
             $('#return_details_content').append(list);
             //退款明細 end
         }
-        $(document).on('click', '.refund-item', function() {
-          const index = [...$('.refund-item')].indexOf(this)
-          $(`.detail-${index}`).toggleClass('detail-show')
-         $(this).toggleClass('refund-item-active')
+
+        $(document).on('click', '.refund-item', function () {
+            const index = [...$('.refund-item')].indexOf(this);
+            $(`.detail-${index}`).toggleClass('detail-show');
+            $(this).toggleClass('refund-item-active');
         })
 
 

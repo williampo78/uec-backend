@@ -54,6 +54,17 @@ class OrderRefundService
         if (empty($request['member_name']) === false) {
             $builder = $builder->where('o.buyer_name', $request['member_name']);
         }
+
+        //訂單類型
+        if (empty($request['ship_from_whs']) === false) {
+            $builder = $builder->where('rr.ship_from_whs', $request['ship_from_whs']);
+        }
+
+        //訂單類型
+        if (empty($request['to_do_item']) === false) {
+            #TODO
+        }
+
         return $builder;
     }
 
@@ -66,7 +77,7 @@ class OrderRefundService
      */
     public function getOrderRefunds($request = [])
     {
-        $select = "rr.id, rr.request_date, rr.request_no, rr.order_no, rr.status_code, rr.lgst_method, rr.refund_method, rr.completed_at, rr.req_name, rr.req_mobile, rr.req_city, rr.req_district, rr.req_address";
+        $select = "rr.id, rr.request_date, rr.request_no, rr.order_no, rr.status_code, rr.lgst_method, rr.ship_from_whs, rr.refund_method, rr.completed_at, rr.req_name, rr.req_mobile, rr.req_city, rr.req_district, rr.req_address";
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
@@ -99,6 +110,7 @@ class OrderRefundService
             $orderRefund->status_code = config('uec.return_request_status_options')[$orderRefund->status_code] ?? null;
             $orderRefund->refund_method = config('uec.payment_method_options')[$orderRefund->refund_method] ?? null;
             $orderRefund->lgst_method = config('uec.lgst_method_options')[$orderRefund->lgst_method] ?? null;
+            $orderRefund->ship_from_whs = $orderRefund->ship_from_whs == 'SELF' ? '商城出貨' : '供應商出貨';
 
             return $orderRefund;
         });
