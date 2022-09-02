@@ -452,6 +452,9 @@
             $.each(return_details, function(index, value) {
                 list += `<tr>
                             <td class="text-nowrap">${index + 1 }</td>
+                            <td class="text-nowrap">
+                                <button type="button" class="btn btn-warning">協商回報</button>
+                            </td>
                             <td class="text-nowrap">${value.item_no}</td>
                             <td class="text-nowrap">${value.product_name}</td>
                             <td class="text-nowrap">${value.spec_1}</td>

@@ -55,6 +55,7 @@
                                             </div>
                                             <div class="col-sm-8">
                                                 <p class="form-control-static" id="modal-status-code"></p>
+                                                <button type="button" class="btn btn-warning">人工退款</button>
                                             </div>
                                         </div>
                                     </div>
@@ -235,6 +236,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">功能</th>
                                         <th class="text-nowrap">Item編號</th>
                                         <th class="text-nowrap">商品名稱</th>
                                         <th class="text-nowrap">規格一</th>
