@@ -565,6 +565,7 @@
             //退款明細 end
         }
 
+        //退貨檢驗單號收合
         $(document).on('click', '.refund-item', function () {
             const index = [...$('.refund-item')].indexOf(this);
             $(`.detail-${index}`).toggleClass('detail-show');
