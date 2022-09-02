@@ -360,7 +360,10 @@ class MemberController extends Controller
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
 
-        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm) {
+        // 貨態進度
+        $shippedStatus = $this->orderService->getShippedStatus($order);
+
+        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
                     'id' => $orderDetail->id,
@@ -378,7 +381,8 @@ class MemberController extends Controller
                     'selling_price' => number_format($orderDetail->selling_price),
                     'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
                     'discount_content' => [],
-                    'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id])?$gtm[$orderDetail->product_id][$orderDetail->product_item_id]:""
+                    'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id]) ? $gtm[$orderDetail->product_id][$orderDetail->product_item_id] : "",
+                    'shipped_status'=> isset($shippedStatus[$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus[$orderDetail->id][$orderDetail->product_item_id] : "",
                 ];
 
                 //商品圖 以規格圖為優先，否則取商品封面圖
