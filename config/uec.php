@@ -331,6 +331,18 @@ return [
         ],
     ],
 
+    //檢驗單狀態
+    'return_examination_status_codes' => [
+        'CREATED'        => '接獲申請',
+        'VOIDED'         => '已作廢',
+        'DISPATCHED'     => '派車回收',
+        'COMPLETED'      => '檢驗完成',
+        'FAILED'         => '檢驗異常',
+        'NEGO_COMPLETED' => '完成協商',
+        'CLOSED'         => '已結案',
+        'M_CLOSED'       => '異常結案',
+    ],
+
     //購物車拆車結帳
     'cart_billing_split' => 1,
 ];

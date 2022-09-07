@@ -212,15 +212,23 @@
                             <table class='table table-striped table-bordered table-hover' style='width:100%'>
                                 <thead>
                                     <tr>
+
                                         <th class="text-nowrap">項次</th>
                                         <th class="text-nowrap">功能</th>
-                                        <th class="text-nowrap">Item編號</th>
-                                        <th class="text-nowrap">商品名稱</th>
-                                        <th class="text-nowrap">規格一</th>
-                                        <th class="text-nowrap">規格二</th>
-                                        <th class="text-nowrap">申請數量</th>
-                                        <th class="text-nowrap">檢驗合格數量</th>
-                                        <th class="text-nowrap">檢驗不合格數</th>
+                                        <th class="text-nowrap">退貨檢驗單號</th>
+                                        <th class="text-nowrap">檢驗單狀態</th>
+                                        <th class="text-nowrap">供應商</th>
+                                        <th class="text-nowrap">派車確認時間</th>
+                                        <th class="text-nowrap">派車物流</th>
+                                        <th class="text-nowrap">
+                                            <span id="number_or_logistics_name_column_name">物流單號</span>
+                                        </th>
+                                        <th class="text-nowrap">檢驗回報時間</th>
+                                        <th class="text-nowrap">檢驗結果</th>
+                                        <th class="text-nowrap">檢驗結果說明</th>
+                                        <th class="text-nowrap">協商結果</th>
+                                        <th class="text-nowrap">協商退款金額</th>
+                                        <th class="text-nowrap">協商內容備註</th>
                                     </tr>
                                 </thead>
                                 <tbody id="return_details_content">

@@ -412,6 +412,8 @@
                         let return_request = response.data.data.return_request;
                         let return_details = response.data.data.return_details;
                         let return_information = response.data.data.return_information;
+                        //文字是取件單號或是物流單號
+                        $('#number_or_logistics_name_column_name').html(response.data.data.number_or_logistics_name_column_name);
 
                         //檢視資料內的內容
                         handleReturnRequest(return_request);
@@ -496,6 +498,20 @@
 
             //退款明細 start
             $.each(return_details, function(index, value) {
+
+                let details = '';
+                //詳細內容
+                $.each(value.details, function(index, detail) {
+                    details += `<tr>
+                        <td>${detail.item_no}</td>
+                        <td>${detail.product_name}</td>
+                        <td>${detail.spec_1_value}</td>
+                        <td>${detail.spec_2_value}</td>
+                        <td>${detail.request_qty}</td>
+                        <td>${detail.supplier_product_no}</td>
+                    </tr>`;
+                });
+
                 list += `<tr>
                             <td class="text-nowrap">${index + 1 }</td>
                             <td class="text-nowrap">
@@ -503,15 +519,20 @@
                             </td>
                             <td class="text-nowrap refund-item">
                                 <span>></span>
-                            <i class="fa-sharp fa-solid fa-chevron-down"></i>
-                                ${value.item_no}
+                                <i class="fa-sharp fa-solid fa-chevron-down"></i>
+                                ${value.examination_no}
                             </td>
-                            <td class="text-nowrap">${value.product_name}</td>
-                            <td class="text-nowrap">${value.spec_1}</td>
-                            <td class="text-nowrap">${value.spec_2}</td>
-                            <td class="text-nowrap">${value.request_qty}</td>
-                            <td class="text-nowrap">${value.passed_qty}</td>
-                            <td class="text-nowrap">${value.failed_qty}</td>
+                            <td class="text-nowrap">${value.status_code}</td>
+                            <td class="text-nowrap">${value.supplier_name}</td>
+                            <td class="text-nowrap">${value.lgst_dispatched_at}</td>
+                            <td class="text-nowrap">${value.number_or_logistics_name}</td>
+                            <td class="text-nowrap">${value.lgst_doc_no}</td>
+                            <td class="text-nowrap">${value.examination_reported_at}</td>
+                            <td class="text-nowrap">${value.is_examination_passed}</td>
+                            <td class="text-nowrap">${value.examination_remark}</td>
+                            <td class="text-nowrap">${value.nego_result}</td>
+                            <td class="text-nowrap">${value.nego_refund_amount}</td>
+                            <td class="text-nowrap">${value.nego_remark}</td>
                         </tr>
                         <tr class="detail detail-${index}" style="background:#eee">
                             <td style="border:none" colspan="2"></td>
@@ -528,38 +549,14 @@
                                         </tr>
                                     </thead>
                                    <tbody>
-                                        <tr>
-                                          <td>T0008880001</td>
-                                          <td>防曬乳</td>
-                                          <td>無香</td>
-                                          <td></td>
-                                          <td>1</td>
-                                          <td>VDR077</td>
-                                        </tr>
-                                        <tr>
-                                          <td>T0008880001</td>
-                                          <td>防曬乳</td>
-                                          <td>無香</td>
-                                          <td></td>
-                                          <td>1</td>
-                                          <td>VDR077</td>
-                                        </tr>
-                                        <tr>
-                                          <td>T0008880001</td>
-                                          <td>防曬乳</td>
-                                          <td>無香</td>
-                                          <td></td>
-                                          <td>1</td>
-                                          <td>VDR077</td>
-                                        </tr>
+                                        ${details}
                                     </tbody>
                                 </table>
                             </td>
                             <td style="border:none" colspan="5"></td>
-                        </tr>
-                        `;
+                        </tr>`;
                 index++;
-            })
+            });
 
             $('#return_details_content').append(list);
             //退款明細 end

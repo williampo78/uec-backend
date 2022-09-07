@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Exports\OrderRefundExport;
+use App\Models\LookupValuesV;
 use App\Services\OrderRefundService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -94,16 +96,26 @@ class OrderRefundController extends Controller
                 'message' => '發生錯誤，缺少參數',
             ]);
         }
-
-        $id = $request->id;
+        $id             = $request->id;
+        //檢驗單資料
+        $returnExaminations = $this->orderRefundService->getReturnExaminationWithDetails($id);
+        //設定的資料
+        $lookupValuesVs = LookupValuesV::where('type_code', 'SUP_LGST_COMPANY')
+            ->where('agent_id', Auth::user()->agent_id)
+            ->get(['description', 'code']);
+        //整理檢驗單資料
+        $returnExaminations = $this->orderRefundService->handleReturnExaminations($returnExaminations, $lookupValuesVs);
+        //退貨申請單資料
+        $ReturnRequest = $this->orderRefundService->getReturnRequest($id);
 
         return response()->json([
             'status' => true,
             'data' => [
+                'number_or_logistics_name_column_name' => $ReturnRequest->ship_from_whs == 'SELF' ? '取件單號' : '物流單號',
                 //退貨資料
-                'return_request' => $this->orderRefundService->getReturnRequest($id),
+                'return_request' => $ReturnRequest,
                 //退貨明細
-                'return_details' => $this->orderRefundService->getReturnDetails($id),
+                'return_details' => $returnExaminations,
                 //退款資訊
                 'return_information' => $this->orderRefundService->getReturnInformation($id),
             ],

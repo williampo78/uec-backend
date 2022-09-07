@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\ReturnExamination;
+use App\Models\ReturnRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -107,12 +109,110 @@ class OrderRefundService
                 $orderRefund->completed_at = Carbon::parse($orderRefund->completed_at)->format('Y-m-d H:i');
             }
 
-            $orderRefund->status_code = config('uec.return_request_status_options')[$orderRefund->status_code] ?? null;
+            $orderRefund->status_code   = config('uec.return_request_status_options')[$orderRefund->status_code] ?? null;
             $orderRefund->refund_method = config('uec.payment_method_options')[$orderRefund->refund_method] ?? null;
-            $orderRefund->lgst_method = config('uec.lgst_method_options')[$orderRefund->lgst_method] ?? null;
+            $orderRefund->lgst_method   = config('uec.lgst_method_options')[$orderRefund->lgst_method] ?? null;
             $orderRefund->ship_from_whs = $orderRefund->ship_from_whs == 'SELF' ? '商城出貨' : '供應商出貨';
 
             return $orderRefund;
+        });
+    }
+
+    /**
+     * 檢驗單內容
+     * @param int $id
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     * @Author: Eric
+     * @DateTime: 2022/9/6 上午 11:36
+     */
+    public function getReturnExaminationWithDetails(int $id)
+    {
+        return ReturnExamination::with([
+            'supplier:id,name',
+            'returnRequest:id,lgst_company_code,ship_from_whs',
+            'returnExaminationDetails:id,return_examination_id,product_item_id,request_qty',
+            'returnExaminationDetails.productItem:id,product_id,spec_1_value,spec_2_value,item_no',
+            'returnExaminationDetails.productItem.product:id,product_name,supplier_product_no'
+        ])
+            ->where('return_request_id', $id)
+            ->orderBy('examination_no')
+            ->get([
+                'id',
+                'examination_no',
+                'supplier_id',
+                'return_request_id',
+                'status_code',
+                'sup_lgst_company',
+                'lgst_dispatched_at',
+                'lgst_doc_no',
+                'examination_reported_at',
+                'is_examination_passed',
+                'examination_remark',
+                'nego_result',
+                'nego_refund_amount',
+                'nego_remark'
+            ]);
+    }
+
+    /**
+     * @param Collection $returnExaminations
+     * @param Collection $lookupValuesVs
+     * @return Collection
+     * @Author: Eric
+     * @DateTime: 2022/9/7 上午 11:35
+     */
+    public function handleReturnExaminations(Collection $returnExaminations, Collection $lookupValuesVs): Collection
+    {
+        return $returnExaminations->map(function ($returnExamination) use ($lookupValuesVs) {
+
+            $numberOrLogisticsName = optional($returnExamination->returnRequest)->lgst_company_code;
+            $numberOrLogisticsName = config('uec.lgst_company_code_options')[$numberOrLogisticsName] ?? '';
+
+            if ($returnExamination->returnRequest->ship_from_whs == 'SUP') {
+                $code = $returnExamination->sup_lgst_company;
+                $numberOrLogisticsName = optional($lookupValuesVs->where('code', $code)->first())->description;
+            }
+
+            //細項
+            $details = $returnExamination->returnExaminationDetails->map(function ($Detail) {
+
+                return [
+                    'item_no'             => $Detail->productItem->item_no ?? '',
+                    'product_name'        => $Detail->productItem->product->product_name ?? '',
+                    'spec_1_value'        => $Detail->productItem->spec_1_value ?? '',
+                    'spec_2_value'        => $Detail->productItem->spec_2_value ?? '',
+                    'request_qty'         => $Detail->request_qty ?? '',
+                    'supplier_product_no' => $Detail->productItem->product->supplier_product_no ?? '',
+                ];
+            });
+
+            return [
+                //檢驗單號
+                'examination_no'           => $returnExamination->examination_no ?? '',
+                //檢驗單狀態
+                'status_code'              => config('uec.return_examination_status_codes')[$returnExamination->status_code] ?? null ?? '',
+                //供應商
+                'supplier_name'            => optional($returnExamination)->supplier->name ?? '',
+                //派車確認時間
+                'lgst_dispatched_at'       => $returnExamination->lgst_dispatched_at ?? '',
+                //物流單號或是派車物流
+                'number_or_logistics_name' => $numberOrLogisticsName ?? '',
+                //取件單號
+                'lgst_doc_no'              => $returnExamination->lgst_doc_no ?? '',
+                //檢驗回報時間
+                'examination_reported_at'  => $returnExamination->examination_reported_at ?? '',
+                //檢驗結果
+                'is_examination_passed'    => $returnExamination->is_examination_passed == 1 ? '合格' : '不合格' ?? '',
+                //檢驗結果說明
+                'examination_remark'       => $returnExamination->examination_remark ?? '',
+                //協商結果
+                'nego_result'              => $returnExamination->nego_result == 1 ? '允許退貨' : '不允許退貨' ?? '',
+                //協商退款金額
+                'nego_refund_amount'       => number_format($returnExamination->nego_refund_amount) ?? '',
+                //協商內容備註
+                'nego_remark'              => $returnExamination->nego_remark ?? '',
+                'details'                  => $details ?? []
+            ];
         });
     }
 
@@ -184,6 +284,7 @@ class OrderRefundService
             rr.req_district,
             rr.req_address,
             rr.lgst_company_code,
+            rr.ship_from_whs,
             o.member_account, o.buyer_name,
             lvv.description as req_reason_description';
 
