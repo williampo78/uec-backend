@@ -27,4 +27,12 @@ class ReturnRequest extends Model
     {
         return $this->hasMany(ReturnRequestDetail::class, 'return_request_id');
     }
+
+    /*
+     * 建立與退貨檢驗單的關聯
+     */
+    public function returnExamination()
+    {
+        return $this->hasMany(ReturnExamination::class, 'request_no','request_no');
+    }
 }

@@ -20,6 +20,7 @@ use App\Services\APIService;
 use App\Services\OrderService;
 use App\Services\ReturnRequestService;
 use App\Services\SysConfigService;
+use App\Services\UniversalService;
 use App\Services\WarehouseService;
 use App\Services\WarehouseStockService;
 use Carbon\Carbon;
@@ -44,7 +45,8 @@ class MemberController extends Controller
         WarehouseService $warehouseService,
         WarehouseStockService $warehouseStockService,
         ReturnRequestService $returnRequestService,
-        APIProductServices $apiProductServices
+        APIProductServices $apiProductServices,
+        UniversalService $universalService
     )
     {
         $this->apiService = $apiService;
@@ -54,6 +56,7 @@ class MemberController extends Controller
         $this->warehouseStockService = $warehouseStockService;
         $this->returnRequestService = $returnRequestService;
         $this->apiProductServices = $apiProductServices;
+        $this->universalService = $universalService;
     }
 
     /**
@@ -174,10 +177,12 @@ class MemberController extends Controller
 
         // 訂單
         $orders->each(function ($order) use (&$payload) {
+            //訂單狀態
+            $order_status_desc = $this->universalService->getOrderStatus($order->status_code, $order->pay_status);
             $orderPayload = [
                 'order_no' => $order->order_no,
                 'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s'),
-                'order_status' => $order->order_status_desc,
+                'order_status' => $order_status_desc,
                 'photo_url' => null,
                 'product_name' => null,
                 'spec_1_value' => null,
@@ -269,6 +274,7 @@ class MemberController extends Controller
     {
         // 取得訂單
         $order = $this->orderService->getMemberOrderDetailByOrderNo($request->order_no);
+
         // 沒有任何訂單
         if (!isset($order)) {
             return response()->json([
@@ -279,6 +285,9 @@ class MemberController extends Controller
         // 訂單成立後x分鐘內可取消
         $cancelLimitMins = (int)$this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
+        //訂單狀態
+        $order_status_desc = $this->universalService->getOrderStatus($order->status_code, $order->pay_status);
+
         $payload = [
             'message' => '取得成功',
             'results' => [
@@ -288,7 +297,7 @@ class MemberController extends Controller
                 'prepared_shipment_at' => null,
                 'shipped_at' => null,
                 'delivered_at' => null,
-                'order_status' => $order->order_status_desc,
+                'order_status' => $order_status_desc,
                 'cancelled_at' => null,
                 'order_no' => $order->order_no,
                 'payment_method' => config('uec.payment_method_options')[$order->payment_method] ?? null,
@@ -310,11 +319,13 @@ class MemberController extends Controller
                 'cart_campaign_discount' => $order->cart_campaign_discount * -1,
                 'points' => $order->points * -1,
                 'paid_amount' => number_format($order->paid_amount),
+                'fee_of_instal' => (int)number_format($order->fee_of_instal),
                 'invoice_type' => config('uec.invoice_usage_options')[$order->invoice_usage] ?? null,
                 'invoice_no' => $order->invoice_no,
                 'invoice_date' => null,
                 'invoice_gui_number' => $order->buyer_gui_number,
                 'invoice_title' => $order->buyer_title,
+                'buyer_remark' => $order->buyer_remark,
                 'can_cancel_order' => $this->orderService->canCancelOrder($order->status_code, $order->ordered_date, $cancelLimitMins),
                 'can_return_order' => $this->orderService->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id),
             ],
@@ -359,10 +370,8 @@ class MemberController extends Controller
 
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
-
         // 貨態進度
         $shippedStatus = $this->orderService->getShippedStatus($order);
-
         $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
@@ -382,9 +391,9 @@ class MemberController extends Controller
                     'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
                     'discount_content' => [],
                     'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id]) ? $gtm[$orderDetail->product_id][$orderDetail->product_item_id] : "",
-                    'shipped_status'=> isset($shippedStatus[$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus[$orderDetail->id][$orderDetail->product_item_id] : "",
+                    'shipped_info' => isset($shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id] : "",
+                    'shipped_status' => isset($shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id] : "",
                 ];
-
                 //商品圖 以規格圖為優先，否則取商品封面圖
                 $productPhoto = empty(optional($orderDetail->productItem)->photo_name) ? optional($orderDetail->product->productPhotos->first())->photo_name : optional($orderDetail->productItem)->photo_name;
                 $orderDetailPayload['photo_url'] = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
@@ -423,6 +432,18 @@ class MemberController extends Controller
             if (isset($returnRequest->request_date)) {
                 $payload['results']['return_date'] = Carbon::parse($returnRequest->request_date)->format('Y-m-d H:i:s');
             }
+        }
+
+        //金流相關數字
+        if ($order->revision_no > 0 && $order->refund_status != 'COMPLETED') { //還沒完成退款，須抓前一版本的order資訊呈現
+            //最新版訂單
+            $preOrder = $this->orderService->getMemberPreRevisionByOrderNo($request->order_no, $order->revision_no);
+            $payload['results']['total_amount'] = $preOrder->total_amount;
+            $payload['results']['shipping_fee'] = number_format($preOrder->shipping_fee);
+            $payload['results']['point_discount'] = number_format($preOrder->point_discount * -1);
+            $payload['results']['cart_campaign_discount'] = $preOrder->cart_campaign_discount == 0 ? 0 : ($preOrder->cart_campaign_discount * -1);
+            $payload['results']['points'] = $preOrder->points * -1;
+            $payload['results']['paid_amount'] = number_format($preOrder->paid_amount);
         }
 
         return response()->json($payload, 200);

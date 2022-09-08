@@ -73,7 +73,7 @@ class Order extends Model
      */
     public function returnRequests()
     {
-        return $this->hasMany(ReturnRequest::class, 'order_id');
+        return $this->hasMany(ReturnRequest::class, 'order_no', 'order_no');
     }
 
     /**

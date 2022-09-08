@@ -6,11 +6,13 @@ use App\Models\Order;
 use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
+use App\Models\ReturnRequest;
 use App\Models\Shipment;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\Types\Integer;
 use function PHPUnit\Framework\isEmpty;
 
 class OrderService
@@ -242,12 +244,11 @@ class OrderService
                 $query->orderBy('product_id', 'asc')
                     ->orderBy('sort', 'asc');
             },
-        ])->where('revision_no', 0)
+        ])->where('is_latest', 1)
             ->where('member_id', $member->member_id)
             ->whereDate('ordered_date', '>=', $payload['ordered_date_start'])
             ->whereDate('ordered_date', '<=', $payload['ordered_date_end'])
             ->select()
-            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
             ->orderBy('ordered_date', 'desc')
             ->get();
 
@@ -263,7 +264,6 @@ class OrderService
     public function getMemberOrderDetailByOrderNo(string $orderNo): ?Model
     {
         $member = auth('api')->user();
-
         $order = Order::with([
             'shipments',
             'orderDetails' => function ($query) {
@@ -279,11 +279,10 @@ class OrderService
             'returnRequests' => function ($query) {
                 $query->orderBy('id', 'desc');
             },
-        ])->where('revision_no', 0)
+        ])->where('is_latest', 1)
             ->where('member_id', $member->member_id)
             ->where('order_no', $orderNo)
             ->select()
-            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
             ->first();
 
         return $order;
@@ -600,111 +599,289 @@ class OrderService
      */
     public function getShippedStatus($order): array
     {
-        $T01 = null; //出貨單 產生時間
-        $T02 = null; //出貨單 取消時間/作廢時間
-        $T03 = null; //退款成功時間
-        $T04 = (is_null($order->paid_at)) ? null : Carbon::parse($order->paid_at)->format('Y-m-d H:i'); //請款成功時間
-        $T05 = null; //出貨單 出貨時間 (出貨確認)
-        $T06 = (is_null($order->delivered_at)) ? null : Carbon::parse($order->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
-        $T07 = (is_null($order->overdue_confirmed_at)) ? null : Carbon::parse($order->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
-
-        // 金流單
-        if ($order->status_code == 'CANCELLED' || $order->status_code == 'VOIDED') {
-            $payment = OrderPayment::select("latest_api_date")
-                ->where('source_table_name', 'return_requests')
-                ->where('payment_type', 'REFUND')
-                ->where('payment_status', 'COMPLETED')
-                ->where('order_no', $order->order_no)
-                ->first();
-            $T03 = isset($payment->latest_api_date) ? Carbon::parse($payment->latest_api_date)->format('Y-m-d H:i') : $T03;
-
-        }
-
-        // 退貨申請單
-        if ($order->returnRequests->isNotEmpty()) {
-            $returnRequest = $order->returnRequests->first();
-        }
-
-        //出貨單
-        foreach ($order->shipments as $detail) {
-            $T01 = Carbon::parse($detail->shipment_date)->format('Y-m-d H:i');
-            $T02 = !is_null($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
-            $T05 = (is_null($detail->shipped_at)) ? $T05 : Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
-            $shipments = Shipment::with('shipmentDetails')->where('id', $detail->id)->get();
-            foreach ($shipments as $shipment) {
-                foreach ($shipment->shipmentDetails as $shipment_detail) {
-                    $status[$shipment_detail->order_detail_id][$shipment_detail->product_item_id] = [
-                        "order_status" => $order->status_code,
-                        "payment_status" => $order->is_paid,
-                        "shipment_status" => $detail->status_code,
-                        "T01" => $T01,
-                        "T02" => $T02,
-                        "T03" => $T03,
-                        "T04" => $T04,
-                        "T05" => $T05,
-                        "T06" => $T06,
-                        "T07" => $T07
-                    ];
+        $status = [];
+        $return_status = [];
+        // 有退貨申請單
+        if (count($order->returnRequests) > 0) {
+            $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
+            foreach ($order->returnRequests as $returnRequest) {
+                if (isset($return_examination_info)) {
+                    foreach ($return_examination_info as $return_detail) {
+                        $T21 = (is_null($returnRequest->created_at)) ? null : Carbon::parse($returnRequest->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
+                        if ($order->ship_from_whs == 'SELF') {
+                            $T22 = (is_null($returnRequest->lgst_dispatched_at)) ? null : Carbon::parse($returnRequest->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
+                        } else {
+                            $T22 = (is_null($returnRequest->lgst_dispatched_at)) ? null : Carbon::parse($returnRequest->lgst_dispatched_at)->format('Y-m-d H:i');//退貨檢驗單 派車時間
+                        }
+                        $T23 = (is_null($returnRequest->returnable_confirmed_at)) ? null : Carbon::parse($returnRequest->returnable_confirmed_at)->format('Y-m-d H:i');//退貨檢驗單檢驗回報時間
+                        $T24 = (is_null($returnRequest->refund_at)) ? null : Carbon::parse($returnRequest->refund_at)->format('Y-m-d H:i');//退款成功時間 / 退款失敗時間
+                        $T25 = (is_null($returnRequest->examination_reported_at)) ? null : Carbon::parse($returnRequest->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
+                        $req_mobile = isset($returnRequest->req_mobile) ? substr($returnRequest->req_mobile, 0, 7) . '***' : "";
+                        if ($return_detail->request_no == $returnRequest->request_no) {
+                            $status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
+                                "status_code" => $return_detail->examinations_status,
+                                "is_returnable" => $return_detail->is_returnable,
+                                "request_no" => $returnRequest->request_no,
+                                "req_name" => $this->privacyCode($returnRequest->req_name),
+                                "req_mobile" => $req_mobile,
+                                "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
+                                "T21" => $T21,
+                                "T22" => $T22,
+                                "T23" => $T23,
+                                "T24" => $T24,
+                                "T25" => $T25
+                            ];
+                        } else {
+                            $status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
+                                "status_code" => $return_detail->examinations_status,
+                                "is_returnable" => $return_detail->is_returnable,
+                                "request_no" => $returnRequest->request_no,
+                                "req_name" => $this->privacyCode($returnRequest->req_name),
+                                "req_mobile" => $req_mobile,
+                                "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
+                                "T21" => $T21,
+                                "T22" => $T22,
+                                "T23" => $T23,
+                                "T24" => $T24,
+                                "T25" => $T25
+                            ];
+                        }
+                    }
                 }
             }
-        }
-        foreach ($status as $order_detail_id => $shipment_detail) {
-            $show_array = [];
-            foreach ($shipment_detail as $item_id => $detail) {
-                $show_array[] = [
-                    "status_desc" => "訂單成立",
-                    "status_time" => $detail['T01'],
-                    "status_display" => true
-                ];
-                if ($detail['order_status'] == 'CANCELLED' || $detail['order_status'] == 'VOIDED') {
-                    $show_array[] = [
-                        "status_desc" => "已取消",
-                        "status_time" => $detail['T02'],
-                        "status_display" => false
-                    ];
-                    if ($detail['payment_status'] == 1) {
+            //重新組合for前端
+            if (isset($status)) {
+                foreach ($status as $order_detail_id => $examination_detail) {
+                    $info_array =[];
+                    $show_array = [];
+                    foreach ($examination_detail as $item_id => $detail) {
+                        $info_array[] = [
+                            'number_desc' => '退貨單號',
+                            'number' => $detail['request_no'],
+                            'req_name' =>$detail['req_name'],
+                            'req_mobile'=>$detail['req_mobile'],
+                            'req_address'=>$detail['req_address']
+                        ];
                         $show_array[] = [
-                            "status_desc" => "已退款",
-                            "status_time" => $detail['T03'],
+                            "status_desc" => "退貨成立",
+                            "status_time" => $detail['T21'],
                             "status_display" => false
                         ];
-                    }
-                } else {
-                    $show_array[] = [
-                        "status_desc" => "待出貨",
-                        "status_time" => $detail['T04'],
-                        "status_display" => true
-                    ];
-                    $show_array[] = [
-                        "status_desc" => "出貨中",
-                        "status_time" => $detail['T05'],
-                        "status_display" => true
-                    ];
-                    if ($detail['payment_status'] == 1) {
-                        if (isset($detail['T07'])) {
+                        $show_array[] = [
+                            "status_desc" => "派車回收",
+                            "status_time" => $detail['T22'],
+                            "status_display" => false
+                        ];
+                        if ($detail['status_code'] == 'VOIDED' || ($detail['status_code'] == 'M_CLOSED' && $detail['is_returnable'] === 0)) {
                             $show_array[] = [
-                                "status_desc" => "配送失敗",
-                                "status_time" => $detail['T07'],
-                                "status_display" => true
+                                "status_desc" => "退貨失敗",
+                                "status_time" => $detail['T23'],
+                                "status_display" => false
+                            ];
+                        } else if ($detail['status_code'] == 'FAILED') {
+                            $show_array[] = [
+                                "status_desc" => "退貨處理中",
+                                "status_time" => $detail['T25'],
+                                "status_display" => false
+                            ];
+                        } else if ($detail['status_code'] == 'FAILED' && $detail['is_returnable'] === 1) {
+                            $show_array[] = [
+                                "status_desc" => "退貨完成",
+                                "status_time" => $detail['T23'],
+                                "status_display" => false
+                            ];
+                            $show_array[] = [
+                                "status_desc" => "退款失敗",
+                                "status_time" => $detail['T24'],
+                                "status_display" => false
                             ];
                         } else {
                             $show_array[] = [
-                                "status_desc" => "已到貨",
-                                "status_time" => $detail['T06'],
-                                "status_display" => true
+                                "status_desc" => "退貨完成",
+                                "status_time" => $detail['T23'],
+                                "status_display" => false
+                            ];
+                            $show_array[] = [
+                                "status_desc" => "已退款",
+                                "status_time" => $detail['T24'],
+                                "status_display" => false
                             ];
                         }
-                    } else {
-                        $show_array[] = [
-                            "status_desc" => "已到貨",
-                            "status_time" => $detail['T06'],
-                            "status_display" => true
-                        ];
+                        $return_status['shipped_info'][$order_detail_id][$item_id] = $info_array;
+                        $return_status['shipped_status'][$order_detail_id][$item_id] = $show_array;
                     }
                 }
-                $shipment_status[$order_detail_id][$item_id] = $show_array;
             }
+            return $return_status;
+        } else {
+            $T01 = null; //出貨單 產生時間
+            $T02 = null; //出貨單 取消時間/作廢時間
+            $T03 = null; //退款成功時間
+            $T04 = (is_null($order->paid_at)) ? null : Carbon::parse($order->paid_at)->format('Y-m-d H:i'); //請款成功時間
+            $T05 = null; //出貨單 出貨時間 (出貨確認)
+            $T06 = (is_null($order->delivered_at)) ? null : Carbon::parse($order->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
+            $T07 = (is_null($order->overdue_confirmed_at)) ? null : Carbon::parse($order->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
+            // 金流單
+            if ($order->status_code == 'CANCELLED' || $order->status_code == 'VOIDED') {
+                $payment = OrderPayment::select("latest_api_date")
+                    ->where('source_table_name', 'return_requests')
+                    ->where('payment_type', 'REFUND')
+                    ->where('payment_status', 'COMPLETED')
+                    ->where('order_no', $order->order_no)
+                    ->first();
+                $T03 = isset($payment->latest_api_date) ? Carbon::parse($payment->latest_api_date)->format('Y-m-d H:i') : $T03;
+            }
+            if ($order->shipments->isNotEmpty()) {
+                //出貨單
+                foreach ($order->shipments as $detail) {
+                    $T01 = Carbon::parse($detail->shipment_date)->format('Y-m-d H:i');
+                    $T02 = !is_null($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
+                    $T05 = (is_null($detail->shipped_at)) ? $T05 : Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
+                    $shipments = Shipment::with('shipmentDetails')->where('id', $detail->id)->get();
+                    foreach ($shipments as $shipment) {
+                        foreach ($shipment->shipmentDetails as $shipment_detail) {
+                            $status[$shipment_detail->order_detail_id][$shipment_detail->product_item_id] = [
+                                "order_status" => $order->status_code,
+                                "payment_status" => $order->pay_status,
+                                "shipment_status" => $detail->status_code,
+                                "package_no" => $shipment->package_no,
+                                "T01" => $T01,
+                                "T02" => $T02,
+                                "T03" => $T03,
+                                "T04" => $T04,
+                                "T05" => $T05,
+                                "T06" => $T06,
+                                "T07" => $T07
+                            ];
+                        }
+                    }
+                }
+                //重新組合
+                foreach ($status as $order_detail_id => $shipment_detail) {
+                    $info_array =[];
+                    $show_array = [];
+                    foreach ($shipment_detail as $item_id => $detail) {
+                        $info_array[] = [
+                            'number_desc' => '配送單號',
+                            'number' => $detail['package_no']
+                        ];
+                        $show_array[] = [
+                            "status_desc" => "訂單成立",
+                            "status_time" => $detail['T01'],
+                            "status_display" => true
+                        ];
+                        if ($detail['order_status'] == 'CANCELLED' || $detail['order_status'] == 'VOIDED') {
+                            $show_array[] = [
+                                "status_desc" => "已取消",
+                                "status_time" => $detail['T02'],
+                                "status_display" => false
+                            ];
+                            if ($detail['payment_status'] == 'COMPLETED') {
+                                $show_array[] = [
+                                    "status_desc" => "已退款",
+                                    "status_time" => $detail['T03'],
+                                    "status_display" => false
+                                ];
+                            }
+                        } else {
+                            $show_array[] = [
+                                "status_desc" => "待出貨",
+                                "status_time" => $detail['T04'],
+                                "status_display" => true
+                            ];
+                            $show_array[] = [
+                                "status_desc" => "出貨中",
+                                "status_time" => $detail['T05'],
+                                "status_display" => true
+                            ];
+                            if ($detail['payment_status'] == 'COMPLETED') {
+                                if (isset($detail['T07'])) {
+                                    $show_array[] = [
+                                        "status_desc" => "配送失敗",
+                                        "status_time" => $detail['T07'],
+                                        "status_display" => true
+                                    ];
+                                } else {
+                                    $show_array[] = [
+                                        "status_desc" => "已到貨",
+                                        "status_time" => $detail['T06'],
+                                        "status_display" => true
+                                    ];
+                                }
+                            } else {
+                                $show_array[] = [
+                                    "status_desc" => "已到貨",
+                                    "status_time" => $detail['T06'],
+                                    "status_display" => true
+                                ];
+                            }
+                        }
+                        $shipment_status['shipped_info'][$order_detail_id][$item_id] = $info_array;
+                        $shipment_status['shipped_status'][$order_detail_id][$item_id] = $show_array;
+                    }
+                }
+            } else {
+                $shipment_status['shipped_info'] = null;
+                $shipment_status['shipped_status'] = null;
+            }
+            return $shipment_status;
         }
-        return $shipment_status;
     }
+
+    /**
+     * 檢查會員訂單前一版訂單
+     *
+     * @param string $orderNo
+     * @return Model|null
+     */
+    public function getMemberPreRevisionByOrderNo(string $orderNo,  $vision): ?Model
+    {
+        $vision_no = ($vision-1);
+        $member = auth('api')->user();
+        $order = Order::where('member_id', $member->member_id)
+            ->where('order_no', $orderNo)
+            ->where('revision_no', $vision_no)
+            ->select('revision_no', 'refund_status', 'total_amount', 'shipping_fee', 'point_discount', 'cart_campaign_discount', 'points', 'paid_amount', 'fee_of_instal')
+            ->first();
+        return $order;
+    }
+
+    /*
+     * 姓名個資隱碼
+     * Author: Rowena
+     * Return: string
+     */
+    public function privacyCode($params = null)
+    {
+        $len = strlen($params);
+        if ($len == 0) return "";
+        $str = "";
+        if ($len < 3) {
+            $str = '*' . mb_substr($params, -1);
+        } elseif ($len == 3) {
+            $str = '*' . mb_substr($params, 1, 1) . '*';
+        } else {
+            $str = '*' . mb_substr($params, 1, ($len - 1)) . '*';
+        }
+        return $str;
+    }
+
+    /*
+     * 依訂單編號找出退貨貨態
+     * param string $orderNo
+     * Author: Rowena
+     * Return: string
+     */
+    public function getReturnExaminationsByOrderNo(string $orderNo)
+    {
+        $data = ReturnRequest::select('return_requests.request_no', 'return_requests.status_code as return_status'
+            , 'order_details.id as order_detail_id', 'order_details.product_item_id'
+            , 'return_examinations.*', 'return_examinations.status_code as examinations_status')
+            ->join('order_details','order_details.order_id','return_requests.new_order_id')
+            ->Leftjoin('return_request_details', 'return_request_details.return_request_id', 'return_requests.id')
+            ->Leftjoin('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
+            ->where('return_requests.order_no', $orderNo)->where('return_request_details.record_identity','M')->get();
+        return $data;
+    }
+
 }
