@@ -617,35 +617,19 @@ class OrderService
                         $T24 = (is_null($returnRequest->refund_at)) ? null : Carbon::parse($returnRequest->refund_at)->format('Y-m-d H:i');//退款成功時間 / 退款失敗時間
                         $T25 = (is_null($returnRequest->examination_reported_at)) ? null : Carbon::parse($returnRequest->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
                         $req_mobile = isset($returnRequest->req_mobile) ? substr($returnRequest->req_mobile, 0, 7) . '***' : "";
-                        if ($return_detail->request_no == $returnRequest->request_no) {
-                            $status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
-                                "status_code" => $return_detail->examinations_status,
-                                "is_returnable" => $return_detail->is_returnable,
-                                "request_no" => $returnRequest->request_no,
-                                "req_name" => $this->privacyCode($returnRequest->req_name),
-                                "req_mobile" => $req_mobile,
-                                "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
-                                "T21" => $T21,
-                                "T22" => $T22,
-                                "T23" => $T23,
-                                "T24" => $T24,
-                                "T25" => $T25
-                            ];
-                        } else {
-                            $status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
-                                "status_code" => $return_detail->examinations_status,
-                                "is_returnable" => $return_detail->is_returnable,
-                                "request_no" => $returnRequest->request_no,
-                                "req_name" => $this->privacyCode($returnRequest->req_name),
-                                "req_mobile" => $req_mobile,
-                                "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
-                                "T21" => $T21,
-                                "T22" => $T22,
-                                "T23" => $T23,
-                                "T24" => $T24,
-                                "T25" => $T25
-                            ];
-                        }
+                        $status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
+                            "status_code" => $return_detail->examinations_status,
+                            "is_returnable" => $return_detail->is_returnable,
+                            "request_no" => $returnRequest->request_no,
+                            "req_name" => $this->privacyCode($returnRequest->req_name),
+                            "req_mobile" => $req_mobile,
+                            "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
+                            "T21" => $T21,
+                            "T22" => $T22,
+                            "T23" => $T23,
+                            "T24" => $T24,
+                            "T25" => $T25
+                        ];
                     }
                 }
             }
