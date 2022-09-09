@@ -620,7 +620,7 @@ class OrderService
                         $status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
                             "status_code" => $return_detail->examinations_status,
                             "is_returnable" => $return_detail->is_returnable,
-                            "request_no" => $returnRequest->request_no,
+                            "examination_no" => $returnRequest->examination_no,
                             "req_name" => $this->privacyCode($returnRequest->req_name),
                             "req_mobile" => $req_mobile,
                             "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
@@ -641,7 +641,7 @@ class OrderService
                     foreach ($examination_detail as $item_id => $detail) {
                         $info_array[] = [
                             'number_desc' => '退貨單號',
-                            'number' => $detail['request_no'],
+                            'number' => $detail['examination_no'],
                             'req_name' =>$detail['req_name'],
                             'req_mobile'=>$detail['req_mobile'],
                             'req_address'=>$detail['req_address']

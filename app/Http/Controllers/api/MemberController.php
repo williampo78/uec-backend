@@ -370,7 +370,6 @@ class MemberController extends Controller
 
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
-        //dd($gtm);
         // 貨態進度
         $shippedStatus = $this->orderService->getShippedStatus($order);
         $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus) {
