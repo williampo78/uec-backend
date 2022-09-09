@@ -30,7 +30,12 @@ class APIIndexServices
         $products = $this->apiProductService->getProducts();
         $gtm = $this->apiProductService->getProductItemForGTM($products);
         $categoryProducts = $this->apiProductService->getWebCategoryProducts('', '', '', '', '', '', '');
-
+        $rel_category = [];
+        foreach ($categoryProducts as $key => $category) {
+            foreach ($category as $kk => $vv) {
+                $rel_category[$vv->id] = $vv;
+            }
+        }
         $strSQL = "select ad1.`slot_code`, ad1.`slot_desc`, ad1.`slot_type`, ad1.`is_mobile_applicable`, ad1.`is_desktop_applicable`
                 , ad2.`slot_color_code`, ad2.`slot_icon_name`, ad2.`slot_title`, ad2.`product_assigned_type`
                 , ad2.`slot_title_color`, ad2.`see_more_action`, ad2.`see_more_url`, ad2.`see_more_cate_hierarchy_id`, ad2.`see_more_target_blank`
@@ -98,7 +103,6 @@ class APIIndexServices
             }
         }
         foreach ($ads as $ad_slot) {
-            $product_check = $this->apiProductService->getWebCategoryProducts('', '', '', '', $ad_slot->product_id, '', '');
             if ($ad_slot->slot_type == 'T') {
                 $data[$ad_slot->slot_code][] = array(
                     'name' => $ad_slot->texts,
@@ -205,7 +209,7 @@ class APIIndexServices
                                 }
                             }
                         }
-                        if (count($product_check) > 0) {
+                        if (isset($rel_category[$ad_slot->product_id]->web_category_hierarchy_id) > 0) {
                             $product_info[$ad_slot->slot_code][] = array(
                                 'product_id' => $ad_slot->product_id,
                                 'product_no' => $products[$ad_slot->product_id]->product_no,
@@ -256,7 +260,7 @@ class APIIndexServices
                         }
                     }
                     if ($ad_slot->slot_code == 'H080A') {
-                        if (count($product_check) > 0) {
+                        if (isset($rel_category[$ad_slot->product_id]->web_category_hierarchy_id)) {
                             $prd_H080A[] = array(
                                 'product_id' => $products[$ad_slot->product_id]->id,
                                 'product_no' => $products[$ad_slot->product_id]->product_no,
@@ -281,7 +285,7 @@ class APIIndexServices
                         $H080A_seemore['see_more_target_blank'] = $ad_slot->see_more_target_blank;
                     }
                     if ($ad_slot->slot_code == 'H080B') {
-                        if (count($product_check) > 0) {
+                        if (isset($rel_category[$ad_slot->product_id]->web_category_hierarchy_id)) {
                             $prd_H080B[] = array(
                                 'product_id' => $products[$ad_slot->product_id]->id,
                                 'product_no' => $products[$ad_slot->product_id]->product_no,
@@ -309,7 +313,7 @@ class APIIndexServices
 
                 if ($ad_slot->data_type == 'IMG') {
                     if ($ad_slot->slot_code == 'H080A') {
-                        if (count($product_check) > 0) {
+                        if (isset($rel_category[$ad_slot->product_id]->web_category_hierarchy_id)) {
                             $img_H080A[] = array(
                                 'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
                                 'img_alt' => $ad_slot->image_alt,
@@ -327,7 +331,7 @@ class APIIndexServices
                         }
                     }
                     if ($ad_slot->slot_code == 'H080B') {
-                        if (count($product_check) > 0) {
+                        if (isset($rel_category[$ad_slot->product_id]->web_category_hierarchy_id)) {
                             $img_H080B[] = array(
                                 'img_path' => ($ad_slot->image_name ? $s3 . $ad_slot->image_name : null),
                                 'img_alt' => $ad_slot->image_alt,

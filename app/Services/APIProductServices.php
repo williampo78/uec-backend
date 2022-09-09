@@ -348,7 +348,7 @@ class APIProductServices
         }
 
         if ($category) {//依分類搜尋
-            $strSQL .= " and web_category_products.web_category_hierarchy_id = ". $category;
+            $strSQL .= " and web_category_products.web_category_hierarchy_id = " . $category;
         }
 
         if ($id) {//依產品編號找相關分類
@@ -395,7 +395,7 @@ class APIProductServices
         $now = Carbon::now();
         $s3 = config('filesystems.disks.s3.url');
         $keyword = $this->universalService->handleAddslashes($input['keyword']);//($input['keyword'] ? $this->universalService->handleAddslashes($input['keyword']) : '');
-        $category = (int) $input['category'];
+        $category = (int)$input['category'];
         $size = $input['size'];
         $page = $input['page'];
         $selling_price_min = $input['price_min'];
@@ -1450,7 +1450,7 @@ class APIProductServices
     {
 
         $keyword = ($request['keyword'] ? $this->universalService->handleAddslashes($request['keyword']) : '');
-        $category = (int) $request['category'];
+        $category = (int)$request['category'];
         $selling_price_min = $request['price_min'];
         $selling_price_max = $request['price_max'];
         $order_by = 'attribute';
@@ -1676,45 +1676,40 @@ class APIProductServices
         //產品主檔基本資訊
         $gtm = [];
         $data = [];
+        $product_categorys = self::getWebCategoryProducts('', '', '', '', '', '', '');
+        foreach ($product_categorys as $key => $category) {
+            foreach ($category as $kk => $vv) {
+                $rel_category[$vv->id] = array(
+                    "brand_name" => $vv->brand_name,
+                    "category_id" => $vv->web_category_hierarchy_id,
+                    "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
+                );
+
+            }
+        }
+        $product_spec = $this->getProductItems();
         if (sizeof($products) > 0) {
             foreach ($products as $product) {
-                if (strtotime($now) > strtotime($product->end_launched_at)) continue;
-                $product_categorys = self::getWebCategoryProducts('', '', '', '', $product->id, '', '');
-                $rel_category = [];
-                if (sizeof($product_categorys) > 0) {
-                    foreach ($product_categorys as $key => $category) {
-                        foreach ($category as $kk => $vv) {
-                            $rel_category[] = array(
-                                "category_id" => $vv->web_category_hierarchy_id,
-                                "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
-                            );
-
-                        }
-                    }
-                }
-                if (!$rel_category) continue;
-
-                //產品規格
                 $item_spec = [];
-                $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
-                if (count($ProductSpec) == 0) continue;
+                if (strtotime($now) > strtotime($product->end_launched_at)) continue;
+                if (!isset($rel_category[$product->id])) continue;
+                if (!isset($product_spec[$product->id])) continue;
+                //產品規格
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度
                 //品牌
-                $item_brand = $this->brandsService->getBrand($product->brand_id);
-                $gtm['item_brand'] = $item_brand[0]->brand_name;
-
+                $gtm['item_brand'] = $rel_category[$product->id]['brand_name'];
                 //分類
-                $item_category = $this->getBreadcrumbCategory($rel_category[0]['category_id']);
-                $gtm['item_category'] = $item_category['level1']['name'];
-                $gtm['item_category2'] = $item_category['level2']['name'];
-                $gtm['item_category3'] = isset($item_category['level3']['name']) ? $item_category['level3']['name'] : "";
+                $item_category = explode(', ', $rel_category[$product->id]['category_name']);
+                $gtm['item_category'] = $item_category[0];
+                $gtm['item_category2'] = $item_category[1];
+                $gtm['item_category3'] = isset($item_category[2]) ? $item_category[2] : "";
                 $gtm['item_category4'] = "";
                 $gtm['item_category5'] = "";
 
                 if ($multi == 'item') {
-                    foreach ($ProductSpec as $item) {
+                    foreach ($product_spec[$product->id] as $item) {
                         $gtm['item_id'] = $item['item_no'];
                         if ($item_spec['spec_dimension'] > 0) {
                             $gtm['item_variant'] = $item['spec_1_value'] . ($item['spec_2_value'] ? "_" . $item['spec_2_value'] : "");
@@ -1724,9 +1719,9 @@ class APIProductServices
                         $data[$product->id][$item['id']] = $gtm;
                     }
                 } else {
-                    $gtm['item_id'] = $ProductSpec[0]['item_no'];
+                    $gtm['item_id'] = $product_spec[$product->id][0]['item_no'];
                     $spec_info = "";
-                    foreach ($ProductSpec as $item) {
+                    foreach ($product_spec[$product->id] as $item) {
                         if ($spec_info != "") {
                             $spec_info .= "、";
                         }
@@ -1748,5 +1743,17 @@ class APIProductServices
         } else {
             return 903;
         }
+    }
+
+    /*
+     * 取得商品item
+     */
+    public function getProductItems(): array
+    {
+        $productItem = ProductItem::where('status', 1)->orderBy('sort', 'asc')->get();
+        foreach ($productItem as $item) {
+            $productSpec[$item->product_id][] = $item;
+        }
+        return $productSpec;
     }
 }
