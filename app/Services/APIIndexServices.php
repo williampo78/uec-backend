@@ -42,7 +42,7 @@ class APIIndexServices
                 where current_timestamp() between ad2.`start_at` and ad2.`end_at` and ad1.active = 1 and ad2.active = 1 ";
         if ($params) {
             $strSQL .= " and ad1.`applicable_page` !='HOME'";
-            $strSQL .= " and ad1.`slot_code` = '".$params."'";
+            $strSQL .= " and ad1.`slot_code` = '" . $params . "'";
         } else {
             $strSQL .= " and ad1.`applicable_page` ='HOME'";
         }
@@ -61,7 +61,7 @@ class APIIndexServices
         foreach ($promotion as $k => $v) {
             $promotion_txt = '';
             foreach ($v as $label) {
-                if ($label->promotional_label=='') continue;
+                if ($label->promotional_label == '') continue;
                 if ($label->campaign_type == 'CART_P03' || $label->campaign_type == 'CART_P04') { //檢查多門檻的商品是否為正常上架
                     if (isset($promotion_threshold[$k])) {
                         if ($promotion_threshold[$k]) {
@@ -127,10 +127,10 @@ class APIIndexServices
                     'target_campaign' => $ad_slot->target_campaign_id,
                     'campaign_url_code' => $ad_slot->url_code,
                     'target_cate_hierarchy' => $ad_slot->target_cate_hierarchy_id,
-                    'see_more_action'=> $ad_slot->see_more_action,
-                    'see_more_url'=> $ad_slot->see_more_url,
-                    'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
-                    'see_more_target_blank'=> $ad_slot->see_more_target_blank,
+                    'see_more_action' => $ad_slot->see_more_action,
+                    'see_more_url' => $ad_slot->see_more_url,
+                    'see_more_cate_hierarchy_id' => $ad_slot->see_more_cate_hierarchy_id,
+                    'see_more_target_blank' => $ad_slot->see_more_target_blank,
                     'mobile_applicable' => $ad_slot->is_mobile_applicable,
                     'desktop_applicable' => $ad_slot->is_desktop_applicable
                 );
@@ -181,10 +181,10 @@ class APIIndexServices
                             'slot_title_color' => $ad_slot->slot_title_color,
                             'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
                             'slot_title' => $ad_slot->slot_title,
-                            'see_more_action'=> $ad_slot->see_more_action,
-                            'see_more_url'=> $ad_slot->see_more_url,
-                            'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
-                            'see_more_target_blank'=> $ad_slot->see_more_target_blank,
+                            'see_more_action' => $ad_slot->see_more_action,
+                            'see_more_url' => $ad_slot->see_more_url,
+                            'see_more_cate_hierarchy_id' => $ad_slot->see_more_cate_hierarchy_id,
+                            'see_more_target_blank' => $ad_slot->see_more_target_blank,
                             'mobile_applicable' => $ad_slot->is_mobile_applicable,
                             'desktop_applicable' => $ad_slot->is_desktop_applicable,
                             'products' => $product_info_return[$ad_slot->slot_code]
@@ -228,10 +228,10 @@ class APIIndexServices
                                 'slot_title_color' => $ad_slot->slot_title_color,
                                 'slot_icon_name' => ($ad_slot->slot_icon_name ? $s3 . $ad_slot->slot_icon_name : null),
                                 'slot_title' => $ad_slot->slot_title,
-                                'see_more_action'=> $ad_slot->see_more_action,
-                                'see_more_url'=> $ad_slot->see_more_url,
-                                'see_more_cate_hierarchy_id'=> $ad_slot->see_more_cate_hierarchy_id,
-                                'see_more_target_blank'=> $ad_slot->see_more_target_blank,
+                                'see_more_action' => $ad_slot->see_more_action,
+                                'see_more_url' => $ad_slot->see_more_url,
+                                'see_more_cate_hierarchy_id' => $ad_slot->see_more_cate_hierarchy_id,
+                                'see_more_target_blank' => $ad_slot->see_more_target_blank,
                                 'mobile_applicable' => $ad_slot->is_mobile_applicable,
                                 'desktop_applicable' => $ad_slot->is_desktop_applicable,
                                 'products' => $product_info[$ad_slot->slot_code]
@@ -352,10 +352,10 @@ class APIIndexServices
             unset($data['H080A']);
         } else {
             $data['H080A'] = array(
-                'see_more_action'=> $H080A_seemore['see_more_action'],
-                'see_more_url'=> $H080A_seemore['see_more_url'],
-                'see_more_cate_hierarchy_id'=> $H080A_seemore['see_more_cate_hierarchy_id'],
-                'see_more_target_blank'=> $H080A_seemore['see_more_target_blank'],
+                'see_more_action' => $H080A_seemore['see_more_action'] ?? null,
+                'see_more_url' => $H080A_seemore['see_more_url'] ?? null,
+                'see_more_cate_hierarchy_id' => $H080A_seemore['see_more_cate_hierarchy_id'] ?? null,
+                'see_more_target_blank' => $H080A_seemore['see_more_target_blank'] ?? null,
                 'images' => $img_H080A,
                 'products' => $prd_H080A
             );
@@ -364,10 +364,10 @@ class APIIndexServices
             unset($data['H080B']);
         } else {
             $data['H080B'] = array(
-                'see_more_action'=> $H080B_seemore['see_more_action'],
-                'see_more_url'=> $H080B_seemore['see_more_url'],
-                'see_more_cate_hierarchy_id'=> $H080B_seemore['see_more_cate_hierarchy_id'],
-                'see_more_target_blank'=> $H080B_seemore['see_more_target_blank'],
+                'see_more_action' => $H080B_seemore['see_more_action'] ?? null,
+                'see_more_url' => $H080B_seemore['see_more_url'] ?? null,
+                'see_more_cate_hierarchy_id' => $H080B_seemore['see_more_cate_hierarchy_id'] ?? null,
+                'see_more_target_blank' => $H080B_seemore['see_more_target_blank'] ?? null,
                 'images' => $img_H080B,
                 'products' => $prd_H080B
             );
