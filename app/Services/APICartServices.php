@@ -1418,16 +1418,18 @@ class APICartServices
             $campaignThresholdItem = [];
             $campaignThresholdGift = [];
             if (isset($campaign['CART_P'])) {
+                $campaignThresholds = $this->getCampaignThresholds();
                 foreach ($campaign['CART_P'] as $type => $items) {
                     foreach ($items as $product_id => $data) {
                         $campaignThreshold_brief = [];
                         $campaignThreshold_item = [];
-                        $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $data->id)->orderBy('n_value')->get();
+                        //$campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $data->id)->orderBy('n_value')->get();
                         foreach ($campaignThresholds as $threshold) {
                             $campaignThreshold_brief[] = $threshold->threshold_brief;
                             $campaignThreshold_item[] = $threshold;
-                            $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
-                            $campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
+                            //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
+                            //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
+                            $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
 
                         }
                         //畫面顯示用
@@ -1443,6 +1445,7 @@ class APICartServices
                         $campaignThresholdMain[$data->id] = $data; //活動主檔
                     }
                 }
+                //dd($campaignThresholdGift);
             }
             //活動滿額門檻資料 (活動時間內才做)
             //重組活動贈品
@@ -2457,6 +2460,16 @@ class APICartServices
 
             return json_encode(array("status" => 200, "result" => $cart));
         }
+    }
+
+    /*
+     * 取活動門檻
+     */
+    public function getCampaignThresholds()
+    {
+        $campaign_thresholds = PromotionalCampaignThreshold::with('promotionalCampaignGiveaways')
+            ->orderBy('promotional_campaign_id', 'asc')->orderBy('n_value')->get();
+        return $campaign_thresholds;
     }
 
 }
