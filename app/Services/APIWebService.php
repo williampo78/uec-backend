@@ -194,13 +194,14 @@ class APIWebService
         $s3 = config('filesystems.disks.s3.url');
         $collection = [];
         $member_id = Auth::guard('api')->user()->member_id;
-        $collects = DB::table('member_collections')->select('products.id', 'products.product_no', 'products.product_name', 'products.selling_price', 'products.list_price', 'products.selling_channel', 'products.start_selling_at')
+        $collects = DB::table('member_collections')->select('products.id', 'products.product_no', 'products.product_name', 'products.selling_price', 'products.list_price', 'products.selling_channel', 'products.start_selling_at'
+            , DB::raw("(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS photo_name"))
             ->Join('products', 'member_collections.product_id', '=', 'products.id')
             ->where('member_collections.member_id', '=', $member_id)
             ->where('member_collections.status', '=', 0)->get();
         foreach ($collects as $collect) {
-            $photo = ProductPhoto::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first();
-
+            //$photo = ProductPhoto::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first();
+            $photo = $collect->photo_name;
             $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));
             //echo $discount;
             $collection[] = array(
