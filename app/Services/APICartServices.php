@@ -1490,6 +1490,11 @@ class APICartServices
             $productRow = 0;
             $cartDiscount = 0;
             $prod_campaign = [];//活動下的單品
+            $stock_info = [];
+            $stock_item_info = $this->stockService->getStockByWarehouse($warehouseCode); //找出產品的庫存數
+            foreach ($stock_item_info as $item_info) {
+                $stock_info_array[$item_info->product_item_id] = $item_info;
+            }
             foreach ($cartQty as $product_id => $item) {
                 if (config('uec.cart_billing_split') == 1) {
                     if ($cartStockType[$product_id] != $stock_type) continue;
@@ -1594,10 +1599,10 @@ class APICartServices
                                             );
                                         }
                                     }
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
+                                    $stock_info = $stock_info_array[$item_info->item_id] ?? null;
                                     $stock = 0;
                                     if ($stock_info) {
-                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                        $stock = ($stock_info['stockQty'] <= $stock_info['limitedQty'] ? $stock_info['stockQty'] : $stock_info['limitedQty']);
                                     }
                                     //處理給前端的可下訂庫存
                                     if ($stock == 0) { //可訂購數 =0
@@ -1689,11 +1694,10 @@ class APICartServices
                                             );
                                         }
                                     }
-
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
+                                    $stock_info = $stock_info_array[$item_info->item_id] ?? null;
                                     $stock = 0;
                                     if ($stock_info) {
-                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                        $stock = ($stock_info['stockQty'] <= $stock_info['limitedQty'] ? $stock_info['stockQty'] : $stock_info['limitedQty']);
                                     }
                                     //處理給前端的可下訂庫存
                                     if ($stock == 0) { //可訂購數 =0
@@ -1759,11 +1763,10 @@ class APICartServices
                                     $amount = $tmp_qty * $price;
                                     $return_qty = $tmp_qty;
                                     $unit_price = round($amount / $return_qty);
-
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
+                                    $stock_info = $stock_info_array[$item_info->item_id] ?? null;
                                     $stock = 0;
                                     if ($stock_info) {
-                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                        $stock = ($stock_info['stockQty'] <= $stock_info['limitedQty'] ? $stock_info['stockQty'] : $stock_info['limitedQty']);
                                     }
                                     //處理給前端的可下訂庫存
                                     if ($stock == 0) { //可訂購數 =0
@@ -1830,10 +1833,10 @@ class APICartServices
                                     $amount = $tmp_qty * $price;
                                     $return_qty = $tmp_qty;
                                     $unit_price = round($amount / $return_qty);
-                                    $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
+                                    $stock_info = $stock_info_array[$item_info->item_id] ?? null;
                                     $stock = 0;
                                     if ($stock_info) {
-                                        $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                        $stock = ($stock_info['stockQty'] <= $stock_info['limitedQty'] ? $stock_info['stockQty'] : $stock_info['limitedQty']);
                                     }
                                     //處理給前端的可下訂庫存
                                     if ($stock == 0) { //可訂購數 =0
@@ -1894,10 +1897,10 @@ class APICartServices
                             //foreach ($item as $item_id => $detail_qty) { //取得item規格數量
                             foreach ($cartDetail[$product_id] as $item_id => $item_info) {
                                 $detail_qty = $item_info->item_qty;
-                                $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
+                                $stock_info = $stock_info_array[$item_info->item_id] ?? null;
                                 $stock = 0;
                                 if ($stock_info) {
-                                    $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                    $stock = ($stock_info['stockQty'] <= $stock_info['limitedQty'] ? $stock_info['stockQty'] : $stock_info['limitedQty']);
                                 }
                                 //處理給前端的可下訂庫存
                                 if ($stock == 0) { //可訂購數 =0
@@ -1958,11 +1961,10 @@ class APICartServices
                         }
                         foreach ($cartDetail[$product_id] as $item_id => $item_info) {
                             $detail_qty = $item_info->item_qty;
-
-                            $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
+                            $stock_info = $stock_info_array[$item_info->item_id] ?? null;
                             $stock = 0;
                             if ($stock_info) {
-                                $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                                $stock = ($stock_info['stockQty'] <= $stock_info['limitedQty'] ? $stock_info['stockQty'] : $stock_info['limitedQty']);
                             }
                             //處理給前端的可下訂庫存
                             if ($stock == 0) { //可訂購數 =0
@@ -2021,10 +2023,10 @@ class APICartServices
                     foreach ($cartDetail[$product_id] as $item_id => $item_info) {
                         $detail_qty = $item_info->item_qty;
                         $product_type = 'expired';
-                        $stock_info = $this->stockService->getStockByItem($warehouseCode, $item_info->item_id);
+                        $stock_info = $stock_info_array[$item_info->item_id] ?? null;
                         $stock = 0;
                         if ($stock_info) {
-                            $stock = ($stock_info->stockQty <= $stock_info->limitedQty ? $stock_info->stockQty : $stock_info->limitedQty);
+                            $stock = ($stock_info['stockQty'] <= $stock_info['limitedQty'] ? $stock_info['stockQty'] : $stock_info['limitedQty']);
                         }
                         //處理給前端的可下訂庫存
                         if ($stock == 0) { //可訂購數 =0

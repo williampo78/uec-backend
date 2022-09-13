@@ -107,4 +107,20 @@ class StockService
         }
         return $data;
     }
+
+    /*
+     * 找出產品的庫存數
+     * @params : $number = 倉別
+     */
+    public function getStockByWarehouse($number = null)
+    {
+        $stock = WarehouseStock::select("warehouse_stock.stock_qty as stockQty", "products.order_limited_qty as limitedQty", "warehouse_stock.warehouse_id", "warehouse_stock.id", "warehouse_stock.product_item_id")
+            ->join("warehouse", "warehouse.id", "=", "warehouse_stock.warehouse_id")
+            ->join("product_items", "product_items.id", "=", "warehouse_stock.product_item_id")
+            ->join("products", "products.id", "=", "product_items.product_id")
+            ->where("warehouse.delete", "=", "0")
+            ->where("warehouse.number", "=", $number)
+            ->get();
+        return $stock;
+    }
 }
