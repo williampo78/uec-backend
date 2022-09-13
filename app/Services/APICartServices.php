@@ -36,6 +36,9 @@ class APICartServices
         $result = ShoppingCartDetail::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
             , "product_items.item_no", "product_items.photo_name as item_photo", "products.stock_type", "products.payment_method")
+            , "product_items.item_no", "product_items.photo_name as item_photo"
+            , DB::raw("(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS photo_name")
+        )
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
             ->join('products', 'products.id', '=', 'product_items.product_id')
             ->where('shopping_cart_details.status_code', 0) //購物車
@@ -49,7 +52,8 @@ class APICartServices
         foreach ($result as $datas) {
 
             //商品封面圖
-            $productPhoto = optional(ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first())->photo_name;
+            //$productPhoto = optional(ProductPhoto::where('product_id', $datas->product_id)->orderBy('sort', 'asc')->first())->photo_name;
+            $productPhoto = $datas->photo_name;
             //如規格圖為空，則取商品封面圖
             $itemPhoto = empty($datas->item_photo) ? $productPhoto : $datas->item_photo;
 
@@ -1444,16 +1448,18 @@ class APICartServices
             $campaignThresholdItem = [];
             $campaignThresholdGift = [];
             if (isset($campaign['CART_P'])) {
+                $campaignThresholds = $this->getCampaignThresholds();
                 foreach ($campaign['CART_P'] as $type => $items) {
                     foreach ($items as $product_id => $data) {
                         $campaignThreshold_brief = [];
                         $campaignThreshold_item = [];
-                        $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $data->id)->orderBy('n_value')->get();
+                        //$campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $data->id)->orderBy('n_value')->get();
                         foreach ($campaignThresholds as $threshold) {
                             $campaignThreshold_brief[] = $threshold->threshold_brief;
                             $campaignThreshold_item[] = $threshold;
-                            $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
-                            $campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
+                            //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
+                            //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
+                            $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
 
                         }
                         //畫面顯示用
@@ -2535,6 +2541,16 @@ class APICartServices
 
             return json_encode(array("status" => 200, "result" => $cart));
         }
+    }
+
+    /*
+     * 取活動門檻
+     */
+    public function getCampaignThresholds()
+    {
+        $campaign_thresholds = PromotionalCampaignThreshold::with('promotionalCampaignGiveaways')
+            ->orderBy('promotional_campaign_id', 'asc')->orderBy('n_value')->get();
+        return $campaign_thresholds;
     }
 
 }

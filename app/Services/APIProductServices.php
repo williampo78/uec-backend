@@ -1204,7 +1204,8 @@ class APIProductServices
         $now = Carbon::now();
         $data = [];
         $s3 = config('filesystems.disks.s3.url');
-        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
+        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price"
+            , DB::raw("(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS photo_name"))
             ->where("promotional_campaigns.start_at", "<=", $now)
             ->where("promotional_campaigns.end_at", ">=", $now)
             ->where("promotional_campaigns.active", "=", "1")
@@ -1212,9 +1213,9 @@ class APIProductServices
             ->join('products', 'products.id', '=', 'promotional_campaign_giveaways.product_id')
             ->where('products.approval_status', '=', 'APPROVED')->get();
         foreach ($promotional as $promotion) {
-            $productPhotos = ProductPhoto::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
+            //$productPhotos = ProductPhoto::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
             $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id] = $promotion; //取單品的贈品
-            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($productPhotos->photo_name) ? $s3 . $productPhotos->photo_name : null);
+            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($promotion->photo_name) ? $s3 . $promotion->photo_name : null);
             if ($promotion->level_code == 'CART') {
                 $data['CART'][] = $promotion; //取全站贈品
             }
@@ -1975,45 +1976,40 @@ class APIProductServices
         //產品主檔基本資訊
         $gtm = [];
         $data = [];
+        $product_categorys = self::getWebCategoryProducts('', '', '', '', '', '', '');
+        foreach ($product_categorys as $key => $category) {
+            foreach ($category as $kk => $vv) {
+                $rel_category[$vv->id] = array(
+                    "brand_name" => $vv->brand_name,
+                    "category_id" => $vv->web_category_hierarchy_id,
+                    "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
+                );
+
+            }
+        }
+        $product_spec = $this->getProductItems();
         if (sizeof($products) > 0) {
             foreach ($products as $product) {
-                if (strtotime($now) > strtotime($product->end_launched_at)) continue;
-                $product_categorys = self::getWebCategoryProducts('', '', '', '', $product->id, '', '');
-                $rel_category = [];
-                if (sizeof($product_categorys) > 0) {
-                    foreach ($product_categorys as $key => $category) {
-                        foreach ($category as $kk => $vv) {
-                            $rel_category[] = array(
-                                "category_id" => $vv->web_category_hierarchy_id,
-                                "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
-                            );
-
-                        }
-                    }
-                }
-                if (!$rel_category) continue;
-
-                //產品規格
                 $item_spec = [];
-                $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
-                if (count($ProductSpec) == 0) continue;
+                if (strtotime($now) > strtotime($product->end_launched_at)) continue;
+                if (!isset($rel_category[$product->id])) continue;
+                if (!isset($product_spec[$product->id])) continue;
+                //產品規格
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度
                 //品牌
-                $item_brand = $this->brandsService->getBrand($product->brand_id);
-                $gtm['item_brand'] = $item_brand[0]->brand_name;
-
+                $gtm['item_brand'] = $rel_category[$product->id]['brand_name'];
                 //分類
-                $item_category = $this->getBreadcrumbCategory($rel_category[0]['category_id']);
-                $gtm['item_category'] = $item_category['level1']['name'];
-                $gtm['item_category2'] = $item_category['level2']['name'];
-                $gtm['item_category3'] = isset($item_category['level3']['name']) ? $item_category['level3']['name'] : "";
+                $item_category = explode(', ', $rel_category[$product->id]['category_name']);
+                $gtm['item_category'] = $item_category[0];
+                $gtm['item_category2'] = $item_category[1];
+                $gtm['item_category3'] = isset($item_category[2]) ? $item_category[2] : "";
                 $gtm['item_category4'] = "";
                 $gtm['item_category5'] = "";
 
                 if ($multi == 'item') {
-                    foreach ($ProductSpec as $item) {
+                    foreach ($product_spec[$product->id] as $item) {
                         $gtm['item_id'] = $item['item_no'];
                         if ($item_spec['spec_dimension'] > 0) {
                             $gtm['item_variant'] = $item['spec_1_value'] . ($item['spec_2_value'] ? "_" . $item['spec_2_value'] : "");
@@ -2023,9 +2019,9 @@ class APIProductServices
                         $data[$product->id][$item['id']] = $gtm;
                     }
                 } else {
-                    $gtm['item_id'] = $ProductSpec[0]['item_no'];
+                    $gtm['item_id'] = $product_spec[$product->id][0]['item_no'];
                     $spec_info = "";
-                    foreach ($ProductSpec as $item) {
+                    foreach ($product_spec[$product->id] as $item) {
                         if ($spec_info != "") {
                             $spec_info .= "、";
                         }
@@ -2073,5 +2069,17 @@ class APIProductServices
         ];
         return $result;
 
+    }
+
+    /*
+     * 取得商品item
+     */
+    public function getProductItems(): array
+    {
+        $productItem = ProductItem::where('status', 1)->orderBy('sort', 'asc')->get();
+        foreach ($productItem as $item) {
+            $productSpec[$item->product_id][] = $item;
+        }
+        return $productSpec;
     }
 }
