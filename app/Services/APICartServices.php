@@ -35,8 +35,7 @@ class APICartServices
         $s3 = config('filesystems.disks.s3.url');
         $result = ShoppingCartDetail::select("products.id as product_id", "products.product_no", "products.product_name", "products.list_price", "products.selling_price", "products.start_launched_at", "products.end_launched_at"
             , "product_items.id as item_id", "shopping_cart_details.qty as item_qty", "product_items.spec_1_value as item_spec1", "product_items.spec_2_value as item_spec2"
-            , "product_items.item_no", "product_items.photo_name as item_photo", "products.stock_type", "products.payment_method")
-            , "product_items.item_no", "product_items.photo_name as item_photo"
+            , "product_items.item_no", "product_items.photo_name as item_photo", "products.stock_type", "products.payment_method"
             , DB::raw("(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS photo_name")
         )
             ->join('product_items', 'product_items.id', '=', 'shopping_cart_details.product_item_id')
