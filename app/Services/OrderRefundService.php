@@ -161,15 +161,15 @@ class OrderRefundService
      * @Author: Eric
      * @DateTime: 2022/9/7 上午 11:35
      */
-    public function handleReturnExaminations(Collection $returnExaminations, Collection $lookupValuesVs): Collection
+    public function handleReturnExaminations(Collection $returnExaminations, Collection $lookupValuesVs, array $permission): Collection
     {
-        return $returnExaminations->map(function ($returnExamination) use ($lookupValuesVs) {
+        return $returnExaminations->map(function ($returnExamination) use ($lookupValuesVs, $permission) {
 
             $numberOrLogisticsName = optional($returnExamination->returnRequest)->lgst_company_code;
             $numberOrLogisticsName = config('uec.lgst_company_code_options')[$numberOrLogisticsName] ?? '';
 
             if ($returnExamination->returnRequest->ship_from_whs == 'SUP') {
-                $code = $returnExamination->sup_lgst_company;
+                $code                  = $returnExamination->sup_lgst_company;
                 $numberOrLogisticsName = optional($lookupValuesVs->where('code', $code)->first())->description;
             }
 
@@ -186,7 +186,13 @@ class OrderRefundService
                 ];
             });
 
+
             return [
+                'button'                   => [
+                    'title'       => '協商回報',
+                    'can_operate' => $returnExamination->status_code == 'FAILED' && $permission['auth_update'] == 1,
+                ],
+                'return_examination_id'    => $returnExamination->id,
                 //檢驗單號
                 'examination_no'           => $returnExamination->examination_no ?? '',
                 //檢驗單狀態
@@ -396,28 +402,83 @@ class OrderRefundService
             $item->refund_status = config('uec.order_refund_status_options')[$item->refund_status] ?? null;
 
             return [
-                (string) $index + 1, //項次
-                (string) $item->request_date, //退貨申請時間
-                (string) $item->request_no, //退貨申請單號
-                (string) $item->order_no, //訂單編號
-                (string) $item->member_account, //會員帳號
-                (string) $item->status_code, //狀態
-                (string) $item->lgst_method, //物流方式
-                (string) $item->completed_at, //退貨完成時間
-                (string) $item->refund_method, //退款方式
-                (string) $item->refund_status, //退款狀態
-                (string) $item->buyer_name, //訂購人
-                (string) $item->req_name, //取件聯絡人
-                (string) $item->req_mobile, //取件聯絡手機
+                (string)$index + 1, //項次
+                (string)$item->request_date, //退貨申請時間
+                (string)$item->request_no, //退貨申請單號
+                (string)$item->order_no, //訂單編號
+                (string)$item->member_account, //會員帳號
+                (string)$item->status_code, //狀態
+                (string)$item->lgst_method, //物流方式
+                (string)$item->completed_at, //退貨完成時間
+                (string)$item->refund_method, //退款方式
+                (string)$item->refund_status, //退款狀態
+                (string)$item->buyer_name, //訂購人
+                (string)$item->req_name, //取件聯絡人
+                (string)$item->req_mobile, //取件聯絡手機
                 sprintf('%s%s%s', $item->req_city, $item->req_district, $item->req_address), //取件地址
-                (string) $item->item_no, //Item編號
-                (string) $item->product_name, //商品名稱
-                (string) $item->spec_1_value, //規格一
-                (string) $item->spec_2_value, //規格二
-                (string) $item->request_qty, //申請數量
-                (string) $item->passed_qty, //檢驗合格數量
-                (string) $item->failed_qty, //檢驗不合格數
+                (string)$item->item_no, //Item編號
+                (string)$item->product_name, //商品名稱
+                (string)$item->spec_1_value, //規格一
+                (string)$item->spec_2_value, //規格二
+                (string)$item->request_qty, //申請數量
+                (string)$item->passed_qty, //檢驗合格數量
+                (string)$item->failed_qty, //檢驗不合格數
             ];
         });
+    }
+
+    /**
+     * 更新協商資料
+     * @param array $payload
+     * @return array
+     * @Author: Eric
+     * @DateTime: 2022/9/13 下午 05:36
+     */
+    public function updateNegotiatedReturn(array $payload): array
+    {
+        //取得檢驗單
+        $returnExamination = ReturnExamination::with([
+            'returnExaminationDetails:id,return_examination_id,return_request_detail_id',
+            'returnExaminationDetails.ReturnRequestDetail:id,return_request_id,point_discount,points'
+        ])
+            ->where('status_code', 'FAILED')
+            ->find($payload['return_examination_id'], ['id']);
+
+        if (empty($returnExamination)) {
+            return [
+                'status'  => false,
+                'message' => null
+            ];
+        }
+
+        //申請單身的點數合計
+        $pointDiscounts = $returnExamination->returnExaminationDetails->sum('returnRequestDetail.point_discount');
+        $points         = $returnExamination->returnExaminationDetails->sum('returnRequestDetail.points');
+
+        $now = now();
+
+        $update = [
+            'nego_result'             => $payload['nego_result'],
+            'nego_refund_amount'      => $payload['nego_refund_amount'],
+            'nego_remark'             => $payload['nego_remark'],
+            'nego_reported_at'        => $now,
+            'nego_reported_by'        => Auth()->user()->id,
+            'returnable_confirmed_at' => $now
+        ];
+
+        //允許退貨
+        if ($payload['nego_result'] == 1) {
+            $update['status_code']               = 'NEGO_COMPLETED';
+            $update['returnable_amount']         = $payload['nego_refund_amount'] * (-1);
+            $update['returnable_points']         = $points;
+            $update['returnable_point_discount'] = $pointDiscounts;
+            $update['is_returnable']             = 1;
+        } else {
+            $update['status_code']               = 'M_CLOSED';
+            $update['returnable_amount']         = 0;
+            $update['returnable_points']         = 0;
+            $update['returnable_point_discount'] = 0;
+            $update['is_returnable']             = 0;
+        }
     }
 }

@@ -306,7 +306,11 @@
                 </div>
             </div>
         </div>
+        {{-- 詳細 modal--}}
         @include('backend.order_refund.detail')
+        {{-- 協商回報 modal--}}
+        @include('backend.order_refund.negotiated_return')
+        <!-- /.modal -->
     </div>
 @endsection
 
@@ -315,6 +319,7 @@
     <script>
         $(function() {
             let get_detail_url = '{{ route('order_refund.detail') }}';
+            let nego_refund_amount_object = $('#nego_refund_amount');
             const required_message = '須指定﹝退貨申請時間﹞起訖、或﹝退貨申請單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！';
 
             let order_refund_date_start_flatpickr = flatpickr("#order_refund_date_start_flatpickr", {
@@ -333,7 +338,7 @@
                 },
             });
 
-            // 驗證表單
+            // 搜尋-驗證表單
             $("#search-form").validate({
                 // debug: true,
                 submitHandler: function(form) {
@@ -394,6 +399,77 @@
                 },
             });
 
+            //退貨協商回報-驗證表單
+            $("#negotiated-return-form").validate({
+                submitHandler: function(form) {
+                    updateNegotiatedReturn();
+                },
+                rules: {
+                    //協商結果
+                    nego_result: {
+                        required:true
+                    },
+                    //退款金額
+                    nego_refund_amount: {
+                        required:true,
+                        min:0,
+                        max:999999,
+                        digits:true
+                    },
+                    //協商內容備註
+                    nego_remark: {
+                        required:true,
+                        maxlength:250
+                    },
+                },
+                messages: {
+                    //退款金額
+                    nego_refund_amount: {
+                        min:'請輸入大於{0}的數字',
+                        max:'請輸入小於{0}的數字',
+                        digits:'金額格式錯誤'
+                    },
+                    //協商內容備註
+                    nego_remark: {
+                        maxlength:'字數請勿超過{0}',
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.is('select')) {
+                        element.parent().append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function(label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
+
+            //切換協商結果radio
+            $(document).on('change', 'input[name="nego_result"]', function(){
+                nego_refund_amount_object.prop('disabled', false);
+                //不允許退貨
+                if($(this).val() == 0){
+                    nego_refund_amount_object.prop('disabled', true);
+                    nego_refund_amount_object.val(0);
+                }
+            });
+
             //點擊放大鏡
             $(document).on('click', '.order_refund_detail', function() {
                 axios.get(get_detail_url, {
@@ -418,7 +494,7 @@
                         //檢視資料內的內容
                         handleReturnRequest(return_request);
                         //退款明細
-                        handleReturnDetails(return_details);
+                        handleReturnDetails(return_details, return_request.request_no);
                         //處理退貨明細資料
                         handleReturnInformation(return_information);
 
@@ -453,7 +529,33 @@
                         console.log(error);
                     });
             });
+
+            //協商回報按鈕
+            $(document).on('click', '.negotiated-return', function() {
+
+                $('input[name="return_examination_id"]').val($(this).data('return_examination_id'));
+                $('#negotiated-return-request-no').html($(this).data('return_request_no'));
+                $('#negotiated-return-examination-no').html($(this).data('return_examination_no'));
+            });
         });
+
+        //更新協商狀態
+        function updateNegotiatedReturn() {
+
+            axios.post('{{ route('order_refund.update_negotiated_return') }}', {
+                _method: 'PUT',
+                return_examination_id: $('#return_examination_id').val(),
+                nego_result: $('input[name="nego_result"]:checked').val(),
+                nego_refund_amount: $('#nego_refund_amount').val(),
+                nego_remark: $('#nego_remark').val(),
+            }).then(function (response) {
+                console.log(1);
+                //saveAs(response.data, "order_refunds.xlsx");
+            }).catch(function (error) {
+                console.log(2);
+                console.log(error);
+            });
+        }
 
         //檢視資料內的內容
         function handleReturnRequest(return_request) {
@@ -492,7 +594,7 @@
         }
 
         //退款明細
-        function handleReturnDetails(return_details) {
+        function handleReturnDetails(return_details, request_no) {
             let list = '';
             $('#return_details_content').empty();
 
@@ -512,10 +614,15 @@
                     </tr>`;
                 });
 
+                let button = '';
+                if(value.button.can_operate){
+                    button = `<button type="button" class="btn btn-warning negotiated-return" data-return_examination_id="${value.return_examination_id}" data-return_request_no="${request_no}" data-return_examination_no="${ value.examination_no}" data-toggle="modal" data-target="#negotiated_return" data-dismiss="modal">${ value.button.title }</button>`;
+                }
+
                 list += `<tr>
                             <td class="text-nowrap">${index + 1 }</td>
                             <td class="text-nowrap">
-                                <button type="button" class="btn btn-warning">協商回報</button>
+                                ${button}
                             </td>
                             <td class="text-nowrap refund-item">
                                 <span>></span>
@@ -568,7 +675,6 @@
             $(`.detail-${index}`).toggleClass('detail-show');
             $(this).toggleClass('refund-item-active');
         })
-
 
         //處理退貨明細資料
         function handleReturnInformation(return_information) {

@@ -16,7 +16,8 @@ class OrderRefundController extends Controller
 
     public function __construct(
         OrderRefundService $OrderRefundService
-    ) {
+    )
+    {
         $this->orderRefundService = $OrderRefundService;
     }
 
@@ -51,7 +52,7 @@ class OrderRefundController extends Controller
             }
         }
 
-        $params = [];
+        $params                 = [];
         $params['orderRefunds'] = $orderRefunds;
 
         //訂單類型
@@ -92,32 +93,33 @@ class OrderRefundController extends Controller
     {
         if (empty($request->id)) {
             return response()->json([
-                'status' => false,
+                'status'  => false,
                 'message' => '發生錯誤，缺少參數',
             ]);
         }
-        $id             = $request->id;
+        $id = $request->id;
         //檢驗單資料
         $returnExaminations = $this->orderRefundService->getReturnExaminationWithDetails($id);
         //設定的資料
         $lookupValuesVs = LookupValuesV::where('type_code', 'SUP_LGST_COMPANY')
             ->where('agent_id', Auth::user()->agent_id)
             ->get(['description', 'code']);
+
         //整理檢驗單資料
-        $returnExaminations = $this->orderRefundService->handleReturnExaminations($returnExaminations, $lookupValuesVs);
+        $returnExaminations = $this->orderRefundService->handleReturnExaminations($returnExaminations, $lookupValuesVs, $request->share_role_auth);
         //退貨申請單資料
         $ReturnRequest = $this->orderRefundService->getReturnRequest($id);
 
         return response()->json([
-            'status' => true,
-            'data' => [
+            'status'  => true,
+            'data'    => [
                 'number_or_logistics_name_column_name' => $ReturnRequest->ship_from_whs == 'SELF' ? '取件單號' : '物流單號',
                 //退貨資料
-                'return_request' => $ReturnRequest,
+                'return_request'                       => $ReturnRequest,
                 //退貨明細
-                'return_details' => $returnExaminations,
+                'return_details'                       => $returnExaminations,
                 //退款資訊
-                'return_information' => $this->orderRefundService->getReturnInformation($id),
+                'return_information'                   => $this->orderRefundService->getReturnInformation($id),
             ],
             'message' => '',
         ]);
@@ -151,5 +153,51 @@ class OrderRefundController extends Controller
         $orderRefunds = $this->orderRefundService->handleExcelData($orderRefunds);
 
         return Excel::download(new OrderRefundExport($orderRefunds), 'orderRefunds.xlsx');
+    }
+
+    public function updateNegotiatedReturn(request $request)
+    {
+
+        $result = [
+            'status'  => false,
+            'message' => 'Forbidden'
+        ];
+
+        // 無權限
+        if (!$request->share_role_auth['auth_update']) {
+            return response()->json($result, 403);
+        }
+
+        $payload = $request->only([
+            'return_examination_id',
+            'nego_result',
+            'nego_refund_amount',
+            'nego_remark',
+        ]);
+
+        //驗證參數
+        $validateResult = \Validator::make($payload, [
+            'return_examination_id' => 'required',
+            'nego_result'           => 'required|boolean',
+            'nego_refund_amount'    => 'required|integer|between:0,999999',
+            'nego_remark'           => 'required',
+        ], [
+            'required' => ':attribute為必填',
+            'between'  => ':attribute必須介於:min ~ :max之間',
+            'integer'  => ':attribute必須為正整數',
+        ], [
+            'return_examination_id' => '檢驗單id',
+            'nego_result'           => '協商結果',
+            'nego_refund_amount'    => '退款金額',
+            'nego_remark'           => '協商內容備註',
+        ]);
+
+        if ($validateResult->fails()) {
+            $result['message'] = $validateResult->messages()->first();
+            return response()->json($result, 400);
+        }
+
+        //更新資料
+        $this->orderRefundService->updateNegotiatedReturn($payload);
     }
 }
