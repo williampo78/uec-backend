@@ -2433,7 +2433,7 @@ class APICartServices
                         //小計 = 售價 x 數量 - 活動折抵 (如上,C002單品折抵 + C003滿額折抵) 因為活動折抵計算時為負數，所以用加的
                         $products['itemList'][$key]['amount'] = $products['sellingPrice'] * $item['itemQty'] + $products['itemList'][$key]['campaignDiscount'];
                         //活動價 = 小計 / 數量 (四捨五入至整數位)
-                        $products['itemList'][$key]['itemPrice'] = round($products['itemList'][$key]['amount'] / $item['itemQty']);
+                        $products['itemList'][$key]['itemPrice'] = ($item['itemQty'] == 0 ? 0 : round($products['itemList'][$key]['amount'] / $item['itemQty']));
                         $products['itemList'][$key]['itemCartDiscount'] = $cart_p_discount_prod[$products['productID']][$item['itemId']];
                     }
                     if (count($products['campaignThresholdDiscount']) > 0) {    //如果有門檻活動
