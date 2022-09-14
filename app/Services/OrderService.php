@@ -383,6 +383,9 @@ class OrderService
         //滿額折
         $thresholdDiscounts = collect();
 
+        //滿額贈
+        $campaignBrief = collect();
+
         foreach ($discount as $obj) {
 
             switch ($obj->promotionalCampaign->level_code) {
@@ -462,11 +465,21 @@ class OrderService
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] += $obj->discount;
                         $thresholdAmount += $obj->discount;
                     }
+                    //滿額贈
+                    if ($obj->promotionalCampaign->category_code == 'GIFT' && $obj->record_identity == 'M' && $obj->level_code == 'CART_P') {
+                        //滿額贈-併入discount_content內使用
+                        $campaignBrief->push([
+                            'product_id' => $obj->product_id,
+                            'product_item_id' => $obj->product_item_id,
+                            'campaignName' => $obj->promotionalCampaign->campaign_name,
+                            'campaignBrief' => $obj->promotionalCampaign->campaign_brief,
+                            'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold->threshold_brief,
+                        ]);
+                    }
                     break;
             }
 
         }
-
         foreach ($order_details as $key => $val) {
             $findProductPRD_M = OrderCampaignDiscount::where('order_detail_id', '=', $val['id'])
                 ->where('order_id', $orders['results']['order_id'])
@@ -566,6 +579,21 @@ class OrderService
                     'campaignProdList' => []
                 ];
             }
+            //滿額贈
+            $TargetcampaignBrief = $campaignBrief
+                ->where('product_id', $val['product_id'])
+                ->where('product_item_id', $val['product_item_id']);
+            foreach ($TargetcampaignBrief as $thresholdDiscount) {
+                $order_details[$key]['discount_content'][] = [
+                    'display' => config('uec.cart_p_discount_split') == 1,
+                    'type' => '滿額贈',
+                    'campaignName' => $thresholdDiscount['campaignName'],
+                    'campaignBrief' => $thresholdDiscount['campaignBrief'],
+                    'thresholdCampaignBrief' => $thresholdDiscount['thresholdCampaignBrief'],
+                    'campaignProdList' => []
+                ];
+            }
+
         }
 
         if (isset($cart['discount'])) {
@@ -637,15 +665,15 @@ class OrderService
             //重新組合for前端
             if (isset($status)) {
                 foreach ($status as $order_detail_id => $examination_detail) {
-                    $info_array =[];
+                    $info_array = [];
                     $show_array = [];
                     foreach ($examination_detail as $item_id => $detail) {
                         $info_array[] = [
                             'number_desc' => '退貨單號',
                             'number' => $detail['examination_no'],
-                            'req_name' =>$detail['req_name'],
-                            'req_mobile'=>$detail['req_mobile'],
-                            'req_address'=>$detail['req_address']
+                            'req_name' => $detail['req_name'],
+                            'req_mobile' => $detail['req_mobile'],
+                            'req_address' => $detail['req_address']
                         ];
                         $show_array[] = [
                             "status_desc" => "退貨成立",
@@ -743,7 +771,7 @@ class OrderService
                 }
                 //重新組合
                 foreach ($status as $order_detail_id => $shipment_detail) {
-                    $info_array =[];
+                    $info_array = [];
                     $show_array = [];
                     foreach ($shipment_detail as $item_id => $detail) {
                         $info_array[] = [
@@ -819,9 +847,9 @@ class OrderService
      * @param string $orderNo
      * @return Model|null
      */
-    public function getMemberPreRevisionByOrderNo(string $orderNo,  $vision): ?Model
+    public function getMemberPreRevisionByOrderNo(string $orderNo, $vision): ?Model
     {
-        $vision_no = ($vision-1);
+        $vision_no = ($vision - 1);
         $member = auth('api')->user();
         $order = Order::where('member_id', $member->member_id)
             ->where('order_no', $orderNo)
@@ -862,10 +890,10 @@ class OrderService
         $data = ReturnRequest::select('return_requests.request_no', 'return_requests.status_code as return_status'
             , 'order_details.id as order_detail_id', 'order_details.product_item_id'
             , 'return_examinations.*', 'return_examinations.status_code as examinations_status')
-            ->join('order_details','order_details.order_id','return_requests.new_order_id')
+            ->join('order_details', 'order_details.order_id', 'return_requests.new_order_id')
             ->Leftjoin('return_request_details', 'return_request_details.return_request_id', 'return_requests.id')
             ->Leftjoin('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
-            ->where('return_requests.order_no', $orderNo)->where('return_request_details.record_identity','M')->get();
+            ->where('return_requests.order_no', $orderNo)->where('return_request_details.record_identity', 'M')->get();
         return $data;
     }
 
