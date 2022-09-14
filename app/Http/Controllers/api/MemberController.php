@@ -405,7 +405,7 @@ class MemberController extends Controller
                 $giveaway_qty[$orderDetail->id] = $orderDetail->qty;
             }
         });
-        $payload = $this->orderService->addDiscountsToOrder($payload, $giveaway_qty);
+        $payload = $this->orderService->addDiscountsToOrder($payload, $giveaway_qty, $shippedStatus);
 
         // 出貨單
         if ($order->shipments->isNotEmpty()) {

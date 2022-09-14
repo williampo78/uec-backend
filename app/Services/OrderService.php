@@ -374,7 +374,7 @@ class OrderService
      * @param [type] $orders
      * @return void
      */
-    public function addDiscountsToOrder($orders, $giveaway_qty = [])
+    public function addDiscountsToOrder($orders, $giveaway_qty = [], $shippedStatus)
     {
         $order_details = $orders['results']['order_details'];
         $discount = $this->orderCampaignDiscountsByOrderId($orders['results']['order_id']); // order_campaign_discounts
@@ -418,7 +418,6 @@ class OrderService
 
                     //送禮
                     if ($obj->promotionalCampaign->category_code == 'GIFT' && $obj->record_identity !== 'M') {
-
                         //商品圖 以規格圖為優先，否則取商品封面圖
                         $productPhoto = empty(optional($obj->productItem)->photo_name) ? $obj->product->productPhotos[0]->photo_name : optional($obj->productItem)->photo_name;
                         $productPhoto = empty($productPhoto) ? null : config('filesystems.disks.s3.url') . $productPhoto;
@@ -435,7 +434,9 @@ class OrderService
                             'productName' => $obj->product->product_name,
                             'assignedQty' => $giveaway_qty[$obj->order_detail_id] ?? 0,
                             'spec_1_value' => optional($obj->productItem)->spec_1_value,
-                            'spec_2_value' => optional($obj->productItem)->spec_2_value
+                            'spec_2_value' => optional($obj->productItem)->spec_2_value,
+                            'shipped_info' => isset($shippedStatus['shipped_info'][$obj->order_detail_id][$obj->product_item_id]) ? $shippedStatus['shipped_info'][$obj->order_detail_id][$obj->product_item_id] : "",
+                            'shipped_status' => isset($shippedStatus['shipped_status'][$obj->order_detail_id][$obj->product_item_id]) ? $shippedStatus['shipped_status'][$obj->order_detail_id][$obj->product_item_id] : "",
                         ]; //贈送的商品列表
                     }
                     //折扣
