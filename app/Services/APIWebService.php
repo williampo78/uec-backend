@@ -201,7 +201,6 @@ class APIWebService
             ->where('member_collections.status', '=', 0)->get();
         foreach ($collects as $collect) {
             //$photo = ProductPhoto::select('photo_name')->where('product_id', '=', $collect->id)->orderBy('sort', 'ASC')->first();
-            $photo = $collect->photo_name;
             $discount = ($collect->list_price == 0 ? 0 : ceil(($collect->selling_price / $collect->list_price) * 100));
             //echo $discount;
             $collection[] = array(
@@ -211,7 +210,7 @@ class APIWebService
                 'selling_price' => intval($collect->selling_price),
                 'list_price' => intval($collect->list_price),
                 'product_discount' => intval($discount),
-                'product_photo' => (isset($photo['photo_name']) ? $s3 . $photo['photo_name'] : null),
+                'product_photo' => (isset($collect->photo_name) ? $s3 . $collect->photo_name : null),
                 "selling_channel" => $collect->selling_channel,
                 "start_selling" => $collect->start_selling_at,
                 "gtm" => (isset($gtm[$collect->id]) ? $gtm[$collect->id] : "")
