@@ -924,36 +924,27 @@ class OrderService
      * @param string|null $delivered_at 商品配達時間
      * @param string|null $cooling_off_due_date 鑑賞期截止時間
      * @param integer|null $return_request_id 退貨申請單id
-     * @return boolean
+     * @return array
      */
-    public function canReturnOrderV2(string $status_code, ?string $delivered_at, ?string $cooling_off_due_date, ?int $return_request_id): bool
+    public function canReturnOrderV2(string $status_code, ?string $delivered_at, ?string $cooling_off_due_date, ?int $return_request_id): array
     {
         $now = Carbon::now();
         $cooling_off_due_date = Carbon::parse($cooling_off_due_date);
         $data = [];
-        if ($status_code == 'PROCESSING' && !isset($cooling_off_due_date)) {
+        if ($status_code == 'PROCESSING' && !isset($cooling_off_due_date)) { //出貨準備中，無出貨單配達
             $data['status'] = true;
-            $data['type'] = '1';
+            $data['type'] = 1;
+        } elseif ($status_code == 'PROCESSING' && isset($cooling_off_due_date)) { //至少一張出貨單配達、尚有出貨單未配達
+            $data['status'] = true;
+            $data['type'] = 2;
+        } elseif ($status_code == 'CLOSED' && !$now->greaterThan($cooling_off_due_date)) { //出貨單全數配達，且未超過鑑賞期
+            $data['status'] = true;
+            $data['type'] = 3;
+        } else {
+            $data['status'] = false;
+            $data['type'] = 0;
         }
-
-        if ($status_code != 'CLOSED') {
-            return false;
-        }
-
-        if (isset($return_request_id)) {
-            return false;
-        }
-
-        if (!isset($delivered_at) || !isset($cooling_off_due_date)) {
-            return false;
-        }
-
-        // 現在時間>鑑賞期截止時間
-        if ($now->greaterThan($cooling_off_due_date)) {
-            return false;
-        }
-
-        return true;
+        return $data;
     }
 
 }

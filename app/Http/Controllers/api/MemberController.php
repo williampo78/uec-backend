@@ -654,7 +654,8 @@ class MemberController extends Controller
         }
 
         // 是否可以申請退貨
-        if (!$this->orderService->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id)) {
+        $canReturn = $this->orderService->canReturnOrderV2($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id);
+        if (!$canReturn['status']) {
             return response()->json([
                 'message' => '商品尚未配達/已超過鑑賞期/退貨處理中，不可申請退貨',
             ], 423);
