@@ -495,6 +495,7 @@ class OrderService
                             'campaignBrief' => $obj->promotionalCampaign->campaign_brief,
                             'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold->threshold_brief,
                         ]);
+                        $cart['gift'][$obj->group_seq]['itemList'][] = $obj->product_item_id; //贈送的商品;
                     }
                     break;
             }
