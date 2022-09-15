@@ -458,9 +458,9 @@ class OrderService
                             'assignedQty' => $giveaway_qty[$obj->order_detail_id] ?? 0,
                             'spec_1_value' => optional($obj->productItem)->spec_1_value,
                             'spec_2_value' => optional($obj->productItem)->spec_2_value,
-                            'shipped_info' => isset($shippedStatus['shipped_info'][$obj->order_detail_id][$obj->product_item_id]) ? $shippedStatus['shipped_info'][$obj->order_detail_id][$obj->product_item_id] : "",
-                            'shipped_status' => isset($shippedStatus['shipped_status'][$obj->order_detail_id][$obj->product_item_id]) ? $shippedStatus['shipped_status'][$obj->order_detail_id][$obj->product_item_id] : "",
                         ]; //贈送的商品列表
+                        $cart['gift'][$obj->group_seq]['shipped_info'] = isset($shippedStatus['shipped_info'][$obj->order_detail_id][$obj->product_item_id]) ? $shippedStatus['shipped_info'][$obj->order_detail_id][$obj->product_item_id] : "";
+                        $cart['gift'][$obj->group_seq]['shipped_status'] = isset($shippedStatus['shipped_status'][$obj->order_detail_id][$obj->product_item_id]) ? $shippedStatus['shipped_status'][$obj->order_detail_id][$obj->product_item_id] : "";
                     }
                     //折扣
                     if ($obj->discount < 0 && $obj->order_detail_id !== null && $obj->promotionalCampaign->level_code == 'CART_P') {
