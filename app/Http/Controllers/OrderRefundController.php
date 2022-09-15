@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\OrderRefundExport;
 use App\Models\LookupValuesV;
 use App\Services\OrderRefundService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -108,7 +109,7 @@ class OrderRefundController extends Controller
         //整理檢驗單資料
         $returnExaminations = $this->orderRefundService->handleReturnExaminations($returnExaminations, $lookupValuesVs, $request->share_role_auth);
         //退貨申請單資料
-        $ReturnRequest = $this->orderRefundService->getReturnRequest($id);
+        $ReturnRequest = $this->orderRefundService->getReturnRequest($id, $request->share_role_auth);
 
         return response()->json([
             'status'  => true,
@@ -155,7 +156,14 @@ class OrderRefundController extends Controller
         return Excel::download(new OrderRefundExport($orderRefunds), 'orderRefunds.xlsx');
     }
 
-    public function updateNegotiatedReturn(request $request)
+    /**
+     * 更新協商狀態
+     * @param Request $request
+     * @return JsonResponse
+     * @Author: Eric
+     * @DateTime: 2022/9/15 下午 02:32
+     */
+    public function updateNegotiatedReturn(request $request): JsonResponse
     {
 
         $result = [
@@ -198,6 +206,65 @@ class OrderRefundController extends Controller
         }
 
         //更新資料
-        $this->orderRefundService->updateNegotiatedReturn($payload);
+        $updateResult = $this->orderRefundService->updateNegotiatedReturn($payload);
+
+        if ($updateResult['status'] === false) {
+            return response()->json($updateResult, 500);
+        }
+
+        return response()->json($updateResult);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @Author: Eric
+     * @DateTime: 2022/9/15 下午 02:33
+     */
+    public function updateManualRefund(request $request): JsonResponse
+    {
+        $result = [
+            'status'  => false,
+            'message' => 'Forbidden'
+        ];
+
+        // 無權限
+        if (!$request->share_role_auth['auth_update']) {
+            return response()->json($result, 403);
+        }
+
+        $payload = $request->only([
+            'return_request_id',
+            'refund_at',
+            'manually_refund_remark',
+        ]);
+
+        //驗證參數
+        $validateResult = \Validator::make($payload, [
+            'return_request_id'      => 'required',
+            'refund_at'              => 'required|date',
+            'manually_refund_remark' => 'required',
+        ], [
+            'required' => ':attribute為必填',
+            'date'     => ':attribute格式錯誤',
+        ], [
+            'return_request_id'      => '申請單id',
+            'refund_at'              => '實際退款日期',
+            'manually_refund_remark' => '退款備註',
+        ]);
+
+        if ($validateResult->fails()) {
+            $result['message'] = $validateResult->messages()->first();
+            return response()->json($result, 400);
+        }
+
+        //更新資料
+        $updateResult = $this->orderRefundService->updateManualRefund($payload);
+
+        if ($updateResult['status'] === false) {
+            return response()->json($updateResult, 500);
+        }
+
+        return response()->json($updateResult);
     }
 }

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderRefundService
 {
@@ -190,6 +191,7 @@ class OrderRefundService
             return [
                 'button'                   => [
                     'title'       => '協商回報',
+                    //是否能協商回報
                     'can_operate' => $returnExamination->status_code == 'FAILED' && $permission['auth_update'] == 1,
                 ],
                 'return_examination_id'    => $returnExamination->id,
@@ -272,7 +274,7 @@ class OrderRefundService
         return $order_payments;
     }
 
-    public function getReturnRequest(int $id)
+    public function getReturnRequest(int $id, array $permission)
     {
         $agent_id = Auth::user()->agent_id;
 
@@ -291,6 +293,7 @@ class OrderRefundService
             rr.req_address,
             rr.lgst_company_code,
             rr.ship_from_whs,
+            rr.refund_status,
             o.member_account, o.buyer_name,
             lvv.description as req_reason_description';
 
@@ -322,6 +325,17 @@ class OrderRefundService
         $returnRequest->lgst_method = config('uec.lgst_method_options')[$returnRequest->lgst_method] ?? null;
         //物流廠商
         $returnRequest->lgst_company = config('uec.lgst_company_code_options')[$returnRequest->lgst_company_code] ?? null;
+        //是否能人工退款
+        $returnRequest->can_manual_refund = false;
+        //退款異常
+        if ($returnRequest->refund_status == 'FAILED') {
+
+            $returnRequest->status_code = sprintf('%s(退款異常)', $returnRequest->status_code);
+            //有編輯權限
+            if ($permission['auth_update'] == 1) {
+                $returnRequest->can_manual_refund = true;
+            }
+        }
 
         return $returnRequest;
     }
@@ -436,49 +450,133 @@ class OrderRefundService
      */
     public function updateNegotiatedReturn(array $payload): array
     {
-        //取得檢驗單
+        //取得檢驗單相關資料
         $returnExamination = ReturnExamination::with([
-            'returnExaminationDetails:id,return_examination_id,return_request_detail_id',
-            'returnExaminationDetails.ReturnRequestDetail:id,return_request_id,point_discount,points'
+            'returnExaminationDetails:id,return_examination_id,return_request_detail_id,request_qty',
+            'returnExaminationDetails.ReturnRequestDetail:id,return_request_id,request_qty,point_discount,points'
         ])
             ->where('status_code', 'FAILED')
-            ->find($payload['return_examination_id'], ['id']);
+            ->find($payload['return_examination_id'], ['id', 'return_request_id']);
 
         if (empty($returnExamination)) {
             return [
                 'status'  => false,
-                'message' => null
+                'message' => '發生錯誤'
             ];
         }
 
         //申請單身的點數合計
         $pointDiscounts = $returnExamination->returnExaminationDetails->sum('returnRequestDetail.point_discount');
         $points         = $returnExamination->returnExaminationDetails->sum('returnRequestDetail.points');
+        $now            = now();
+        $userId         = Auth()->user()->id;
 
-        $now = now();
-
-        $update = [
+        $updateData = [
             'nego_result'             => $payload['nego_result'],
-            'nego_refund_amount'      => $payload['nego_refund_amount'],
+            'nego_refund_amount'      => $payload['nego_refund_amount'] * (-1),
             'nego_remark'             => $payload['nego_remark'],
             'nego_reported_at'        => $now,
-            'nego_reported_by'        => Auth()->user()->id,
+            'nego_reported_by'        => $userId,
             'returnable_confirmed_at' => $now
         ];
 
-        //允許退貨
-        if ($payload['nego_result'] == 1) {
-            $update['status_code']               = 'NEGO_COMPLETED';
-            $update['returnable_amount']         = $payload['nego_refund_amount'] * (-1);
-            $update['returnable_points']         = $points;
-            $update['returnable_point_discount'] = $pointDiscounts;
-            $update['is_returnable']             = 1;
-        } else {
-            $update['status_code']               = 'M_CLOSED';
-            $update['returnable_amount']         = 0;
-            $update['returnable_points']         = 0;
-            $update['returnable_point_discount'] = 0;
-            $update['is_returnable']             = 0;
+        try {
+
+            //允許退貨
+            if ($payload['nego_result'] == 1) {
+                $updateData['status_code']               = 'NEGO_COMPLETED';
+                $updateData['returnable_amount']         = $payload['nego_refund_amount'] * (-1);
+                $updateData['returnable_points']         = $points * (-1);
+                $updateData['returnable_point_discount'] = $pointDiscounts * (-1);
+                $updateData['is_returnable']             = 1;
+
+                $updateColumn = 'passed_qty';
+
+            } else {
+                $updateData['status_code']               = 'M_CLOSED';
+                $updateData['returnable_amount']         = 0;
+                $updateData['returnable_points']         = 0;
+                $updateData['returnable_point_discount'] = 0;
+                $updateData['is_returnable']             = 0;
+
+                $updateColumn = 'failed_qty';
+            }
+
+            DB::beginTransaction();
+            //更新檢驗單頭
+            $returnExamination->update($updateData);
+
+            $returnExamination->returnExaminationDetails->each(function ($returnExaminationDetail) use ($userId, $updateColumn) {
+                //更新檢驗單身
+                $returnExaminationDetail->update([
+                    $updateColumn => $returnExaminationDetail->request_qty,
+                    'updated_by'  => $userId
+                ]);
+
+                //更新申請單身
+                $returnExaminationDetail->returnRequestDetail->update([
+                    $updateColumn => $returnExaminationDetail->returnRequestDetail->request_qty,
+                    'updated_by'  => $userId
+                ]);
+            });
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            return [
+                'status'  => false,
+                'message' => '發生錯誤'
+            ];
         }
+
+        //檢查退貨申請單所有檢驗單的is_returnable 是否皆有值(0或1)
+        $unconfirmedReturnExamination = ReturnExamination::where('return_request_id', $returnExamination->return_request_id)
+            ->whereNull('is_returnable')
+            ->first();
+
+        //呼叫退貨api
+        if (empty($unconfirmedReturnExamination)) {
+            #TODO 退貨api
+        }
+
+        return [
+            'status'  => true,
+            'message' => '資料更新成功',
+        ];
+    }
+
+    /**
+     * 人工退款
+     * @param array $payload
+     * @return array
+     * @Author: Eric
+     * @DateTime: 2022/9/15 下午 03:23
+     */
+    public function updateManualRefund(array $payload): array
+    {
+        $returnRequest = ReturnRequest::where('status_code', 'FAILED')
+            ->find($payload['return_request_id'], ['id']);
+
+        if (empty($returnRequest)) {
+            return [
+                'status'  => false,
+                'message' => '此申請單不存在',
+            ];
+        }
+
+        $returnRequest->update([
+            'refund_status'          => 'COMPLETED',
+            'refund_at'              => $payload['refund_at'],
+            'is_manually_refund'     => 1,
+            'manually_refunded_by'   => auth()->user()->id,
+            'manually_refund_remark' => $payload['manually_refund_remark'],
+        ]);
+
+        return [
+            'status'  => true,
+            'message' => '資料更新成功',
+        ];
     }
 }

@@ -55,7 +55,7 @@
                                             </div>
                                             <div class="col-sm-8">
                                                 <p class="form-control-static" id="modal-status-code"></p>
-                                                <button type="button" class="btn btn-warning">人工退款</button>
+                                                <button id="manual-refund-button" type="button" class="btn btn-danger" data-toggle="modal" data-target="#manual-refund-modal" data-dismiss="modal">人工退款</button>
                                             </div>
                                         </div>
                                     </div>
