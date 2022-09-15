@@ -327,10 +327,9 @@ class MemberController extends Controller
                 'invoice_title' => $order->buyer_title,
                 'buyer_remark' => $order->buyer_remark,
                 'can_cancel_order' => $this->orderService->canCancelOrder($order->status_code, $order->ordered_date, $cancelLimitMins, $order->ship_from_whs),
-                'can_return_order' => $this->orderService->canReturnOrder($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id),
+                'can_return_order' => $this->orderService->canReturnOrderV2($order->status_code, $order->delivered_at, $order->cooling_off_due_date, $order->return_request_id),
             ],
         ];
-
         // 付款完成時間
         if (isset($order->paid_at)) {
             $payload['results']['paid_at'] = Carbon::parse($order->paid_at)->format('Y-m-d H:i:s');

@@ -917,4 +917,43 @@ class OrderService
         return $data;
     }
 
+    /**
+     * 是否可以申請退貨
+     *
+     * @param string $status_code 訂單狀態
+     * @param string|null $delivered_at 商品配達時間
+     * @param string|null $cooling_off_due_date 鑑賞期截止時間
+     * @param integer|null $return_request_id 退貨申請單id
+     * @return boolean
+     */
+    public function canReturnOrderV2(string $status_code, ?string $delivered_at, ?string $cooling_off_due_date, ?int $return_request_id): bool
+    {
+        $now = Carbon::now();
+        $cooling_off_due_date = Carbon::parse($cooling_off_due_date);
+        $data = [];
+        if ($status_code == 'PROCESSING' && !isset($cooling_off_due_date)) {
+            $data['status'] = true;
+            $data['type'] = '1';
+        }
+
+        if ($status_code != 'CLOSED') {
+            return false;
+        }
+
+        if (isset($return_request_id)) {
+            return false;
+        }
+
+        if (!isset($delivered_at) || !isset($cooling_off_due_date)) {
+            return false;
+        }
+
+        // 現在時間>鑑賞期截止時間
+        if ($now->greaterThan($cooling_off_due_date)) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
