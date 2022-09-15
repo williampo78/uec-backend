@@ -296,18 +296,38 @@ class OrderService
      * @param integer $cancel_limit_mins 訂單取消限制時間
      * @return boolean
      */
-    public function canCancelOrder(string $status_code, string $order_date, int $cancel_limit_mins): bool
+    public function canCancelOrder(string $status_code, string $order_date, int $cancel_limit_mins, string $ship_from_whs): bool
     {
         $now = Carbon::now();
         $cancel_limit_date = Carbon::parse($order_date)->addMinutes($cancel_limit_mins);
+        $is_split = config('uec.cart_p_discount_split');
+        switch ($is_split) {
+            case 1:
+                if ($ship_from_whs == 'SUP') {
+                    if ($status_code != 'CREATED') {
+                        return false;
+                    }
+                } else {
+                    if ($status_code != 'CREATED') {
+                        return false;
+                    }
+                    // 現在時間>訂單取消限制時間
+                    if ($now->greaterThan($cancel_limit_date)) {
+                        return false;
+                    }
+                }
+                break;
+            default:
+                if ($status_code != 'CREATED') {
+                    return false;
+                }
 
-        if ($status_code != 'CREATED') {
-            return false;
-        }
+                // 現在時間>訂單取消限制時間
+                if ($now->greaterThan($cancel_limit_date)) {
+                    return false;
+                }
+                break;
 
-        // 現在時間>訂單取消限制時間
-        if ($now->greaterThan($cancel_limit_date)) {
-            return false;
         }
 
         return true;
