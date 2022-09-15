@@ -370,7 +370,7 @@ class MemberController extends Controller
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
         // 貨態進度
-        $shippedStatus = $this->orderService->getShippedStatus($order);
+        $shippedStatus = $this->orderService->getShippedStatus($order,$payload['results']['can_return_order']);
         $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
@@ -390,6 +390,7 @@ class MemberController extends Controller
                     'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
                     'discount_content' => [],
                     'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id]) ? $gtm[$orderDetail->product_id][$orderDetail->product_item_id] : "",
+                    'can_return'=>isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id] : "",
                     'shipped_info' => isset($shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id] : "",
                     'shipped_status' => isset($shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id] : "",
                 ];

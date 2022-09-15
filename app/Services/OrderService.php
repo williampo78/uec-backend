@@ -646,7 +646,7 @@ class OrderService
      * @param array $payload
      * @return array
      */
-    public function getShippedStatus($order): array
+    public function getShippedStatus($order, $can_return_order): array
     {
         $status = [];
         $return_status = [];
@@ -654,6 +654,14 @@ class OrderService
         if (count($order->returnRequests) > 0) {
             $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
             foreach ($order->returnRequests as $returnRequest) {
+                $can_return = false;
+                if ($can_return_order['type'] == 3) {
+                    if ($returnRequest->status_code == 'COMPLETED' && $returnRequest->status_code == 'VOIDED') { //無「未結案」的退貨申請
+                        $can_return = false;
+                    } else {
+                        $can_return = true;
+                    }
+                }
                 if (isset($return_examination_info)) {
                     foreach ($return_examination_info as $return_detail) {
                         $T21 = (is_null($returnRequest->created_at)) ? null : Carbon::parse($returnRequest->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
@@ -667,6 +675,7 @@ class OrderService
                         $T25 = (is_null($returnRequest->examination_reported_at)) ? null : Carbon::parse($returnRequest->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
                         $req_mobile = isset($returnRequest->req_mobile) ? substr($returnRequest->req_mobile, 0, 7) . '***' : "";
                         $status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
+                            "can_return" => $can_return,
                             "status_code" => $return_detail->examinations_status,
                             "is_returnable" => $return_detail->is_returnable,
                             "examination_no" => $returnRequest->examination_no,
@@ -687,7 +696,9 @@ class OrderService
                 foreach ($status as $order_detail_id => $examination_detail) {
                     $info_array = [];
                     $show_array = [];
+                    $can_return = false;
                     foreach ($examination_detail as $item_id => $detail) {
+                        $can_return = $detail['can_return'];
                         $info_array[] = [
                             'number_desc' => '退貨單號',
                             'number' => $detail['examination_no'],
@@ -742,6 +753,7 @@ class OrderService
                         }
                         $return_status['shipped_info'][$order_detail_id][$item_id] = $info_array;
                         $return_status['shipped_status'][$order_detail_id][$item_id] = $show_array;
+                        $return_status['can_return'][$order_detail_id][$item_id] = $can_return;
                     }
                 }
             }
@@ -851,11 +863,13 @@ class OrderService
                         }
                         $shipment_status['shipped_info'][$order_detail_id][$item_id] = $info_array;
                         $shipment_status['shipped_status'][$order_detail_id][$item_id] = $show_array;
+                        $shipment_status['can_return'][$order_detail_id][$item_id] = true;
                     }
                 }
             } else {
                 $shipment_status['shipped_info'] = null;
                 $shipment_status['shipped_status'] = null;
+                $shipment_status['can_return'] = false;
             }
             return $shipment_status;
         }
