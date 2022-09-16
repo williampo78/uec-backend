@@ -148,6 +148,8 @@ class OrderRefundController extends Controller
             'status_code',
             'order_no',
             'member_name',
+            'ship_from_whs',
+            'to_do_item'
         ]);
 
         $orderRefunds = $this->orderRefundService->getExcelData($payload);
@@ -216,6 +218,7 @@ class OrderRefundController extends Controller
     }
 
     /**
+     * 人工退款
      * @param Request $request
      * @return JsonResponse
      * @Author: Eric

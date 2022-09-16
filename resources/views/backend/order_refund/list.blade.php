@@ -210,7 +210,7 @@
                                             <label class="control-label">訂單類型</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control select2-shipment-status-code"
+                                            <select id="ship_from_whs" class="form-control select2-shipment-status-code"
                                                     name="ship_from_whs">
                                                 <option></option>
                                                 @foreach ($shipFromWhs as $type)
@@ -228,7 +228,7 @@
                                             <label class="control-label">待辦項目</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control select2-shipment-status-code"
+                                            <select id="to_do_item" class="form-control select2-shipment-status-code"
                                                     name="to_do_item">
                                                 <option></option>
                                                 @foreach ($toDoItems as $item)
@@ -342,7 +342,7 @@
 
         $(function () {
             get_detail_url = '{{ route('order_refund.detail') }}';
-            nego_refund_amount_object = $('#nego_refund_amount');
+            nego_refund_amount_object = $('#negotiated-return-form').find('input[name="nego_refund_amount"]');
             manual_refund_form_object = $('#manual-refund-form');
             negotiated_return_form_object = $('#negotiated-return-form');
             manual_refund_button_object = $('#manual-refund-button');
@@ -542,6 +542,7 @@
 
             //切換協商結果radio
             $(document).on('change', 'input[name="nego_result"]', function () {
+                console.log(212121);
                 nego_refund_amount_object.prop('disabled', false);
                 //不允許退貨
                 if ($(this).val() == 0) {
@@ -599,6 +600,8 @@
                         status_code: $('#status_code').val(),
                         order_no: $('#order_no').val(),
                         member_name: $('#member_name').val(),
+                        ship_from_whs: $('#ship_from_whs').val(),
+                        to_do_item: $('#to_do_item').val(),
                     },
                     responseType: 'blob',
                 })
@@ -699,11 +702,10 @@
             //訂單編號
             $('#modal-order-no').empty().text(return_request.order_no);
 
-            //can_manual_refund
-            console.log(return_request.can_manual_refund);
             //人工退款按鈕
             manual_refund_button_object.hide();
-            $('#modal-status-code').css('color', '#333');
+
+            $('#modal-prompt-text').text(return_request.prompt_text);
 
             //允許人工退款
             if (return_request.can_manual_refund) {
@@ -712,7 +714,6 @@
                 manual_refund_button_object.data('return_request_id', return_request.id);
                 //人工退款按鈕 申請單編號
                 manual_refund_button_object.data('request_no', return_request.request_no);
-                $('#modal-status-code').css('color', 'red');
             }
 
             //退貨單狀態

@@ -63,9 +63,25 @@ class OrderRefundService
             $builder = $builder->where('rr.ship_from_whs', $request['ship_from_whs']);
         }
 
-        //訂單類型
+        //待辦項目
         if (empty($request['to_do_item']) === false) {
-            #TODO
+
+            switch($request['to_do_item']){
+                //檢驗異常
+                case 'check_exception':
+
+                    $builder->whereExists(function ($query) {
+                        $query->select(['id'])
+                            ->from('return_examinations as re')
+                            ->whereColumn('re.return_request_id', 'rr.id')
+                            ->where('status_code', 'FAILED');
+                    });
+                    break;
+                //退款異常
+                case 'refund_failed':
+                    $builder = $builder->where('rr.refund_status', 'FAILED');
+                    break;
+            }
         }
 
         return $builder;
@@ -80,11 +96,24 @@ class OrderRefundService
      */
     public function getOrderRefunds($request = [])
     {
-        $select = "rr.id, rr.request_date, rr.request_no, rr.order_no, rr.status_code, rr.lgst_method, rr.ship_from_whs, rr.refund_method, rr.completed_at, rr.req_name, rr.req_mobile, rr.req_city, rr.req_district, rr.req_address";
+        $select = "rr.id,
+            rr.request_date,
+            rr.request_no,
+            rr.order_no,
+            rr.status_code,
+            rr.lgst_method,
+            rr.ship_from_whs,
+            rr.refund_method,
+            rr.completed_at,
+            rr.req_name,
+            rr.req_mobile,
+            rr.req_city,
+            rr.req_district,
+            rr.req_address";
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.order_id'); //join條件調整
+            ->join('orders as o', 'o.id', '=', 'rr.order_id');
 
         //處理where
         $builder = $this->handleBuilder($builder, $request);
@@ -295,12 +324,19 @@ class OrderRefundService
             rr.ship_from_whs,
             rr.refund_status,
             o.member_account, o.buyer_name,
-            lvv.description as req_reason_description';
+            lvv.description as req_reason_description,
+            re.id as re_id';
 
         $returnRequest = DB::table('return_requests as rr')
             ->selectRaw($select)
             ->join('orders as o', 'o.id', '=', 'rr.order_id')
             ->leftJoin('lookup_values_v as lvv', 'lvv.code', '=', 'rr.req_reason_code')
+            ->leftJoin('return_examinations as re', function ($query) {
+                $query->on('re.return_request_id', '=', 'rr.id')
+                    ->on('re.id', '=',
+                        //檢驗異常
+                        DB::raw('(select id from return_examinations where status_code = "FAILED" limit 1)'));
+            })
             ->where('rr.id', $id)
             ->where('rr.agent_id', $agent_id)
             ->where('lvv.agent_id', $agent_id)
@@ -327,10 +363,16 @@ class OrderRefundService
         $returnRequest->lgst_company = config('uec.lgst_company_code_options')[$returnRequest->lgst_company_code] ?? null;
         //是否能人工退款
         $returnRequest->can_manual_refund = false;
+        $returnRequest->prompt_text = null;
+        //有任一檢驗單狀態為檢驗異常
+        if(!empty($returnRequest->re_id)){
+            $returnRequest->prompt_text = '(待協商)';
+        }
+
         //退款異常
         if ($returnRequest->refund_status == 'FAILED') {
 
-            $returnRequest->status_code = sprintf('%s(退款異常)', $returnRequest->status_code);
+            $returnRequest->prompt_text = '(退款異常)';
             //有編輯權限
             if ($permission['auth_update'] == 1) {
                 $returnRequest->can_manual_refund = true;
@@ -350,40 +392,47 @@ class OrderRefundService
     public function getExcelData(array $request = [])
     {
         $select = "rr.request_date,
-            rr.request_no,
-            rr.order_no,
-            o.member_account,
-            rr.status_code,
-            rr.lgst_method,
-            rr.completed_at,
-            rr.refund_method,
-            o_new.refund_status,
-            o.buyer_name,
-            rr.req_name,
-            rr.req_mobile,
-            rr.req_city,
-            rr.req_district,
-            rr.req_address,
-            pi.item_no,
-            p.product_name,
-            pi.spec_1_value,
-            pi.spec_2_value,
-            rrd.request_qty,
-            rrd.passed_qty,
-            rrd.failed_qty";
+           rr.request_no,
+           rr.order_no,
+           o.member_account,
+           rr.status_code,
+           rr.lgst_method,
+           rr.completed_at,
+           rr.refund_method,
+           rr.refund_status,
+           o.buyer_name,
+           rr.req_name,
+           rr.req_mobile,
+           CONCAT(rr.req_city, rr.req_district, rr.req_address) as full_address,
+           re.examination_no,
+           re.status_code,
+           (select supplier.name from supplier where supplier.id = re.supplier_id) as supplier_name,
+           re.sup_lgst_company,
+           re.lgst_doc_no,
+           re.is_pkg_returned,
+           re.is_examination_passed,
+           pi.item_no,
+           p.product_name,
+           pi.spec_1_value,
+           pi.spec_2_value,
+           red.request_qty,
+           rrd.record_identity";
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.order_id') //join條件調整
-            ->join('return_request_details as rrd', 'rrd.return_request_id', '=', 'rr.id')
-            ->join('product_items as pi', 'pi.id', '=', 'rrd.product_item_id')
-            ->join('products as p', 'p.id', '=', 'pi.product_id')
-            ->leftJoin('orders as o_new', 'o_new.id', '=', 'rr.new_order_id'); //add
+            ->join('orders as o', 'o.id', '=', 'rr.order_id')
+            ->join('return_examinations as re', 're.return_request_id', '=', 'rr.id')
+            ->join('return_examination_details as red', 'red.return_examination_id', '=', 're.id')
+            ->join('return_request_details as rrd', 'rrd.id', '=', 'red.return_request_detail_id')
+            ->join('product_items as pi', 'pi.id', '=', 'red.product_item_id')
+            ->join('products as p', 'p.id', '=', 'pi.product_id');
 
         //處理where
         $builder = $this->handleBuilder($builder, $request);
         $builder->orderBy('rr.request_date', 'asc')
-            ->orderBy('rr.request_no', 'asc');
+            ->orderBy('rr.request_no', 'asc')
+            ->orderBy('re.examination_no', 'asc')
+            ->orderBy('pi.item_no', 'asc');
 
         return $builder->get();
     }
@@ -415,13 +464,26 @@ class OrderRefundService
             //退款狀態
             $item->refund_status = config('uec.order_refund_status_options')[$item->refund_status] ?? null;
 
+            //取件結果
+            if(isset($item->is_pkg_returned)){
+                $item->is_pkg_returned = $item->is_pkg_returned == 1 ? '取件成功' : '取件失敗';
+            }
+
+            //檢驗結果
+            if(isset($item->is_examination_passed)){
+                $item->is_examination_passed = $item->is_examination_passed == 1 ? '合格' : '不合格';
+            }
+
+            //訂單身份
+            $item->record_identity = config('uec.order_record_identity_options')[$item->record_identity] ?? null;
+
             return [
                 (string)$index + 1, //項次
                 (string)$item->request_date, //退貨申請時間
                 (string)$item->request_no, //退貨申請單號
                 (string)$item->order_no, //訂單編號
                 (string)$item->member_account, //會員帳號
-                (string)$item->status_code, //狀態
+                (string)$item->status_code, //退貨申請單狀態
                 (string)$item->lgst_method, //物流方式
                 (string)$item->completed_at, //退貨完成時間
                 (string)$item->refund_method, //退款方式
@@ -429,14 +491,20 @@ class OrderRefundService
                 (string)$item->buyer_name, //訂購人
                 (string)$item->req_name, //取件聯絡人
                 (string)$item->req_mobile, //取件聯絡手機
-                sprintf('%s%s%s', $item->req_city, $item->req_district, $item->req_address), //取件地址
+                (string)$item->full_address, //取件地址
+                (string)$item->examination_no,//退貨檢驗單號
+                (string)$item->status_code,//退貨檢驗單狀態
+                (string)$item->supplier_name,//供應商
+                (string)$item->sup_lgst_company,//物流公司
+                (string)$item->lgst_doc_no,//取件單號
+                (string)$item->is_pkg_returned,//取件結果
+                (string)$item->is_examination_passed,//檢驗結果
                 (string)$item->item_no, //Item編號
                 (string)$item->product_name, //商品名稱
                 (string)$item->spec_1_value, //規格一
                 (string)$item->spec_2_value, //規格二
                 (string)$item->request_qty, //申請數量
-                (string)$item->passed_qty, //檢驗合格數量
-                (string)$item->failed_qty, //檢驗不合格數
+                $item->record_identity //訂單身份
             ];
         });
     }
@@ -556,7 +624,7 @@ class OrderRefundService
      */
     public function updateManualRefund(array $payload): array
     {
-        $returnRequest = ReturnRequest::where('status_code', 'FAILED')
+        $returnRequest = ReturnRequest::where('refund_status', 'FAILED')
             ->find($payload['return_request_id'], ['id']);
 
         if (empty($returnRequest)) {
