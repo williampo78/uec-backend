@@ -451,6 +451,7 @@ class OrderService
                         $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaign->campaign_brief;
                         $cart['gift'][$obj->group_seq]['thresholdCampaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
                         $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
+                            'id' => $obj->order_detail_id,
                             'productPhoto' => $productPhoto,
                             'productPhoto' => $photo_name,
                             'productId' => $obj->product->id,
@@ -561,6 +562,7 @@ class OrderService
                             'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
                             'campaignProdList' => [
                                 [
+                                    'id' => $PRD->order_detail_id,
                                     'productId' => $PRD->product->id,
                                     'productName' => $PRD->product->product_name,
                                     'productPhoto' => $photo_name,
@@ -572,6 +574,7 @@ class OrderService
                         ];
                     } else {
                         $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
+                            'id' => $PRD->order_detail_id,
                             'productId' => $PRD->product->id,
                             'productName' => $PRD->product->product_name,
                             'productPhoto' => $photo_name,

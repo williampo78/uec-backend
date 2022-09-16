@@ -370,7 +370,7 @@ class MemberController extends Controller
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
         // 貨態進度
-        $shippedStatus = $this->orderService->getShippedStatus($order,$payload['results']['can_return_order']);
+        $shippedStatus = $this->orderService->getShippedStatus($order, $payload['results']['can_return_order']);
         $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
@@ -390,7 +390,7 @@ class MemberController extends Controller
                     'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
                     'discount_content' => [],
                     'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id]) ? $gtm[$orderDetail->product_id][$orderDetail->product_item_id] : "",
-                    'can_return'=>isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id] : "",
+                    'can_return' => isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id] : "",
                     'shipped_info' => isset($shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id] : "",
                     'shipped_status' => isset($shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id] : "",
                 ];
@@ -662,6 +662,8 @@ class MemberController extends Controller
             ], 423);
         }
 
+        //前台退貨申請
+
         DB::beginTransaction();
 
         try {
@@ -688,6 +690,7 @@ class MemberController extends Controller
                 'req_telephone_ext' => $request->telephone_ext,
                 'req_reason_code' => $request->code,
                 'req_remark' => $request->remark,
+                'ship_from_whs' => $order->ship_from_whs,
                 'created_by' => -1,
                 'updated_by' => -1,
             ]);
@@ -705,6 +708,15 @@ class MemberController extends Controller
                         'request_qty' => $orderDetail->qty,
                         'passed_qty' => 0,
                         'failed_qty' => 0,
+                        'selling_price'=> $orderDetail->selling_price,
+                        'unit_price'=> $orderDetail->unit_price,
+                        'campaign_discount'=> $orderDetail->campaign_discount,
+                        'cart_p_discount'=> $orderDetail->cart_p_discount,
+                        'subtotal'=> $orderDetail->subtotal,
+                        'point_discount'=> $orderDetail->point_discount,
+                        'points'=> $orderDetail->points,
+                        'record_identity'=> $orderDetail->record_identity,
+                        'purchase_price'=> $orderDetail->purchase_price,
                         'created_by' => -1,
                         'updated_by' => -1,
                     ]);
