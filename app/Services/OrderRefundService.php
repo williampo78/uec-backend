@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\ReturnExamination;
+use App\Models\ReturnRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderRefundService
 {
@@ -54,6 +57,33 @@ class OrderRefundService
         if (empty($request['member_name']) === false) {
             $builder = $builder->where('o.buyer_name', $request['member_name']);
         }
+
+        //訂單類型
+        if (empty($request['ship_from_whs']) === false) {
+            $builder = $builder->where('rr.ship_from_whs', $request['ship_from_whs']);
+        }
+
+        //待辦項目
+        if (empty($request['to_do_item']) === false) {
+
+            switch($request['to_do_item']){
+                //檢驗異常
+                case 'check_exception':
+
+                    $builder->whereExists(function ($query) {
+                        $query->select(['id'])
+                            ->from('return_examinations as re')
+                            ->whereColumn('re.return_request_id', 'rr.id')
+                            ->where('status_code', 'FAILED');
+                    });
+                    break;
+                //退款異常
+                case 'refund_failed':
+                    $builder = $builder->where('rr.refund_status', 'FAILED');
+                    break;
+            }
+        }
+
         return $builder;
     }
 
@@ -66,11 +96,24 @@ class OrderRefundService
      */
     public function getOrderRefunds($request = [])
     {
-        $select = "rr.id, rr.request_date, rr.request_no, rr.order_no, rr.status_code, rr.lgst_method, rr.refund_method, rr.completed_at, rr.req_name, rr.req_mobile, rr.req_city, rr.req_district, rr.req_address";
+        $select = "rr.id,
+            rr.request_date,
+            rr.request_no,
+            rr.order_no,
+            rr.status_code,
+            rr.lgst_method,
+            rr.ship_from_whs,
+            rr.refund_method,
+            rr.completed_at,
+            rr.req_name,
+            rr.req_mobile,
+            rr.req_city,
+            rr.req_district,
+            rr.req_address";
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.order_id'); //join條件調整
+            ->join('orders as o', 'o.id', '=', 'rr.order_id');
 
         //處理where
         $builder = $this->handleBuilder($builder, $request);
@@ -96,11 +139,117 @@ class OrderRefundService
                 $orderRefund->completed_at = Carbon::parse($orderRefund->completed_at)->format('Y-m-d H:i');
             }
 
-            $orderRefund->status_code = config('uec.return_request_status_options')[$orderRefund->status_code] ?? null;
+            $orderRefund->status_code   = config('uec.return_request_status_options')[$orderRefund->status_code] ?? null;
             $orderRefund->refund_method = config('uec.payment_method_options')[$orderRefund->refund_method] ?? null;
-            $orderRefund->lgst_method = config('uec.lgst_method_options')[$orderRefund->lgst_method] ?? null;
+            $orderRefund->lgst_method   = config('uec.lgst_method_options')[$orderRefund->lgst_method] ?? null;
+            $orderRefund->ship_from_whs = $orderRefund->ship_from_whs == 'SELF' ? '商城出貨' : '供應商出貨';
 
             return $orderRefund;
+        });
+    }
+
+    /**
+     * 檢驗單內容
+     * @param int $id
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     * @Author: Eric
+     * @DateTime: 2022/9/6 上午 11:36
+     */
+    public function getReturnExaminationWithDetails(int $id)
+    {
+        return ReturnExamination::with([
+            'supplier:id,name',
+            'returnRequest:id,lgst_company_code,ship_from_whs',
+            'returnExaminationDetails:id,return_examination_id,product_item_id,request_qty',
+            'returnExaminationDetails.productItem:id,product_id,spec_1_value,spec_2_value,item_no',
+            'returnExaminationDetails.productItem.product:id,product_name,supplier_product_no'
+        ])
+            ->where('return_request_id', $id)
+            ->orderBy('examination_no')
+            ->get([
+                'id',
+                'examination_no',
+                'supplier_id',
+                'return_request_id',
+                'status_code',
+                'sup_lgst_company',
+                'lgst_dispatched_at',
+                'lgst_doc_no',
+                'examination_reported_at',
+                'is_examination_passed',
+                'examination_remark',
+                'nego_result',
+                'nego_refund_amount',
+                'nego_remark'
+            ]);
+    }
+
+    /**
+     * @param Collection $returnExaminations
+     * @param Collection $lookupValuesVs
+     * @return Collection
+     * @Author: Eric
+     * @DateTime: 2022/9/7 上午 11:35
+     */
+    public function handleReturnExaminations(Collection $returnExaminations, Collection $lookupValuesVs, array $permission): Collection
+    {
+        return $returnExaminations->map(function ($returnExamination) use ($lookupValuesVs, $permission) {
+
+            $numberOrLogisticsName = optional($returnExamination->returnRequest)->lgst_company_code;
+            $numberOrLogisticsName = config('uec.lgst_company_code_options')[$numberOrLogisticsName] ?? '';
+
+            if ($returnExamination->returnRequest->ship_from_whs == 'SUP') {
+                $code                  = $returnExamination->sup_lgst_company;
+                $numberOrLogisticsName = optional($lookupValuesVs->where('code', $code)->first())->description;
+            }
+
+            //細項
+            $details = $returnExamination->returnExaminationDetails->map(function ($Detail) {
+
+                return [
+                    'item_no'             => $Detail->productItem->item_no ?? '',
+                    'product_name'        => $Detail->productItem->product->product_name ?? '',
+                    'spec_1_value'        => $Detail->productItem->spec_1_value ?? '',
+                    'spec_2_value'        => $Detail->productItem->spec_2_value ?? '',
+                    'request_qty'         => $Detail->request_qty ?? '',
+                    'supplier_product_no' => $Detail->productItem->product->supplier_product_no ?? '',
+                ];
+            });
+
+
+            return [
+                'button'                   => [
+                    'title'       => '協商回報',
+                    //是否能協商回報
+                    'can_operate' => $returnExamination->status_code == 'FAILED' && $permission['auth_update'] == 1,
+                ],
+                'return_examination_id'    => $returnExamination->id,
+                //檢驗單號
+                'examination_no'           => $returnExamination->examination_no ?? '',
+                //檢驗單狀態
+                'status_code'              => config('uec.return_examination_status_codes')[$returnExamination->status_code] ?? null ?? '',
+                //供應商
+                'supplier_name'            => optional($returnExamination)->supplier->name ?? '',
+                //派車確認時間
+                'lgst_dispatched_at'       => $returnExamination->lgst_dispatched_at ?? '',
+                //物流單號或是派車物流
+                'number_or_logistics_name' => $numberOrLogisticsName ?? '',
+                //取件單號
+                'lgst_doc_no'              => $returnExamination->lgst_doc_no ?? '',
+                //檢驗回報時間
+                'examination_reported_at'  => $returnExamination->examination_reported_at ?? '',
+                //檢驗結果
+                'is_examination_passed'    => $returnExamination->is_examination_passed == 1 ? '合格' : '不合格' ?? '',
+                //檢驗結果說明
+                'examination_remark'       => $returnExamination->examination_remark ?? '',
+                //協商結果
+                'nego_result'              => $returnExamination->nego_result == 1 ? '允許退貨' : '不允許退貨' ?? '',
+                //協商退款金額
+                'nego_refund_amount'       => number_format($returnExamination->nego_refund_amount) ?? '',
+                //協商內容備註
+                'nego_remark'              => $returnExamination->nego_remark ?? '',
+                'details'                  => $details ?? []
+            ];
         });
     }
 
@@ -154,7 +303,7 @@ class OrderRefundService
         return $order_payments;
     }
 
-    public function getReturnRequest(int $id)
+    public function getReturnRequest(int $id, array $permission)
     {
         $agent_id = Auth::user()->agent_id;
 
@@ -172,13 +321,22 @@ class OrderRefundService
             rr.req_district,
             rr.req_address,
             rr.lgst_company_code,
+            rr.ship_from_whs,
+            rr.refund_status,
             o.member_account, o.buyer_name,
-            lvv.description as req_reason_description';
+            lvv.description as req_reason_description,
+            re.id as re_id';
 
         $returnRequest = DB::table('return_requests as rr')
             ->selectRaw($select)
             ->join('orders as o', 'o.id', '=', 'rr.order_id')
             ->leftJoin('lookup_values_v as lvv', 'lvv.code', '=', 'rr.req_reason_code')
+            ->leftJoin('return_examinations as re', function ($query) {
+                $query->on('re.return_request_id', '=', 'rr.id')
+                    ->on('re.id', '=',
+                        //檢驗異常
+                        DB::raw('(select id from return_examinations where status_code = "FAILED" limit 1)'));
+            })
             ->where('rr.id', $id)
             ->where('rr.agent_id', $agent_id)
             ->where('lvv.agent_id', $agent_id)
@@ -203,6 +361,23 @@ class OrderRefundService
         $returnRequest->lgst_method = config('uec.lgst_method_options')[$returnRequest->lgst_method] ?? null;
         //物流廠商
         $returnRequest->lgst_company = config('uec.lgst_company_code_options')[$returnRequest->lgst_company_code] ?? null;
+        //是否能人工退款
+        $returnRequest->can_manual_refund = false;
+        $returnRequest->prompt_text = null;
+        //有任一檢驗單狀態為檢驗異常
+        if(!empty($returnRequest->re_id)){
+            $returnRequest->prompt_text = '(待協商)';
+        }
+
+        //退款異常
+        if ($returnRequest->refund_status == 'FAILED') {
+
+            $returnRequest->prompt_text = '(退款異常)';
+            //有編輯權限
+            if ($permission['auth_update'] == 1) {
+                $returnRequest->can_manual_refund = true;
+            }
+        }
 
         return $returnRequest;
     }
@@ -217,40 +392,47 @@ class OrderRefundService
     public function getExcelData(array $request = [])
     {
         $select = "rr.request_date,
-            rr.request_no,
-            rr.order_no,
-            o.member_account,
-            rr.status_code,
-            rr.lgst_method,
-            rr.completed_at,
-            rr.refund_method,
-            o_new.refund_status,
-            o.buyer_name,
-            rr.req_name,
-            rr.req_mobile,
-            rr.req_city,
-            rr.req_district,
-            rr.req_address,
-            pi.item_no,
-            p.product_name,
-            pi.spec_1_value,
-            pi.spec_2_value,
-            rrd.request_qty,
-            rrd.passed_qty,
-            rrd.failed_qty";
+           rr.request_no,
+           rr.order_no,
+           o.member_account,
+           rr.status_code,
+           rr.lgst_method,
+           rr.completed_at,
+           rr.refund_method,
+           rr.refund_status,
+           o.buyer_name,
+           rr.req_name,
+           rr.req_mobile,
+           CONCAT(rr.req_city, rr.req_district, rr.req_address) as full_address,
+           re.examination_no,
+           re.status_code,
+           (select supplier.name from supplier where supplier.id = re.supplier_id) as supplier_name,
+           re.sup_lgst_company,
+           re.lgst_doc_no,
+           re.is_pkg_returned,
+           re.is_examination_passed,
+           pi.item_no,
+           p.product_name,
+           pi.spec_1_value,
+           pi.spec_2_value,
+           red.request_qty,
+           rrd.record_identity";
 
         $builder = DB::table('return_requests as rr')
             ->selectRaw($select)
-            ->join('orders as o', 'o.id', '=', 'rr.order_id') //join條件調整
-            ->join('return_request_details as rrd', 'rrd.return_request_id', '=', 'rr.id')
-            ->join('product_items as pi', 'pi.id', '=', 'rrd.product_item_id')
-            ->join('products as p', 'p.id', '=', 'pi.product_id')
-            ->leftJoin('orders as o_new', 'o_new.id', '=', 'rr.new_order_id'); //add
+            ->join('orders as o', 'o.id', '=', 'rr.order_id')
+            ->join('return_examinations as re', 're.return_request_id', '=', 'rr.id')
+            ->join('return_examination_details as red', 'red.return_examination_id', '=', 're.id')
+            ->join('return_request_details as rrd', 'rrd.id', '=', 'red.return_request_detail_id')
+            ->join('product_items as pi', 'pi.id', '=', 'red.product_item_id')
+            ->join('products as p', 'p.id', '=', 'pi.product_id');
 
         //處理where
         $builder = $this->handleBuilder($builder, $request);
         $builder->orderBy('rr.request_date', 'asc')
-            ->orderBy('rr.request_no', 'asc');
+            ->orderBy('rr.request_no', 'asc')
+            ->orderBy('re.examination_no', 'asc')
+            ->orderBy('pi.item_no', 'asc');
 
         return $builder->get();
     }
@@ -282,29 +464,187 @@ class OrderRefundService
             //退款狀態
             $item->refund_status = config('uec.order_refund_status_options')[$item->refund_status] ?? null;
 
+            //取件結果
+            if(isset($item->is_pkg_returned)){
+                $item->is_pkg_returned = $item->is_pkg_returned == 1 ? '取件成功' : '取件失敗';
+            }
+
+            //檢驗結果
+            if(isset($item->is_examination_passed)){
+                $item->is_examination_passed = $item->is_examination_passed == 1 ? '合格' : '不合格';
+            }
+
+            //訂單身份
+            $item->record_identity = config('uec.order_record_identity_options')[$item->record_identity] ?? null;
+
             return [
-                (string) $index + 1, //項次
-                (string) $item->request_date, //退貨申請時間
-                (string) $item->request_no, //退貨申請單號
-                (string) $item->order_no, //訂單編號
-                (string) $item->member_account, //會員帳號
-                (string) $item->status_code, //狀態
-                (string) $item->lgst_method, //物流方式
-                (string) $item->completed_at, //退貨完成時間
-                (string) $item->refund_method, //退款方式
-                (string) $item->refund_status, //退款狀態
-                (string) $item->buyer_name, //訂購人
-                (string) $item->req_name, //取件聯絡人
-                (string) $item->req_mobile, //取件聯絡手機
-                sprintf('%s%s%s', $item->req_city, $item->req_district, $item->req_address), //取件地址
-                (string) $item->item_no, //Item編號
-                (string) $item->product_name, //商品名稱
-                (string) $item->spec_1_value, //規格一
-                (string) $item->spec_2_value, //規格二
-                (string) $item->request_qty, //申請數量
-                (string) $item->passed_qty, //檢驗合格數量
-                (string) $item->failed_qty, //檢驗不合格數
+                (string)$index + 1, //項次
+                (string)$item->request_date, //退貨申請時間
+                (string)$item->request_no, //退貨申請單號
+                (string)$item->order_no, //訂單編號
+                (string)$item->member_account, //會員帳號
+                (string)$item->status_code, //退貨申請單狀態
+                (string)$item->lgst_method, //物流方式
+                (string)$item->completed_at, //退貨完成時間
+                (string)$item->refund_method, //退款方式
+                (string)$item->refund_status, //退款狀態
+                (string)$item->buyer_name, //訂購人
+                (string)$item->req_name, //取件聯絡人
+                (string)$item->req_mobile, //取件聯絡手機
+                (string)$item->full_address, //取件地址
+                (string)$item->examination_no,//退貨檢驗單號
+                (string)$item->status_code,//退貨檢驗單狀態
+                (string)$item->supplier_name,//供應商
+                (string)$item->sup_lgst_company,//物流公司
+                (string)$item->lgst_doc_no,//取件單號
+                (string)$item->is_pkg_returned,//取件結果
+                (string)$item->is_examination_passed,//檢驗結果
+                (string)$item->item_no, //Item編號
+                (string)$item->product_name, //商品名稱
+                (string)$item->spec_1_value, //規格一
+                (string)$item->spec_2_value, //規格二
+                (string)$item->request_qty, //申請數量
+                $item->record_identity //訂單身份
             ];
         });
+    }
+
+    /**
+     * 更新協商資料
+     * @param array $payload
+     * @return array
+     * @Author: Eric
+     * @DateTime: 2022/9/13 下午 05:36
+     */
+    public function updateNegotiatedReturn(array $payload): array
+    {
+        //取得檢驗單相關資料
+        $returnExamination = ReturnExamination::with([
+            'returnExaminationDetails:id,return_examination_id,return_request_detail_id,request_qty',
+            'returnExaminationDetails.ReturnRequestDetail:id,return_request_id,request_qty,point_discount,points'
+        ])
+            ->where('status_code', 'FAILED')
+            ->find($payload['return_examination_id'], ['id', 'return_request_id']);
+
+        if (empty($returnExamination)) {
+            return [
+                'status'  => false,
+                'message' => '發生錯誤'
+            ];
+        }
+
+        //申請單身的點數合計
+        $pointDiscounts = $returnExamination->returnExaminationDetails->sum('returnRequestDetail.point_discount');
+        $points         = $returnExamination->returnExaminationDetails->sum('returnRequestDetail.points');
+        $now            = now();
+        $userId         = Auth()->user()->id;
+
+        $updateData = [
+            'nego_result'             => $payload['nego_result'],
+            'nego_refund_amount'      => $payload['nego_refund_amount'] * (-1),
+            'nego_remark'             => $payload['nego_remark'],
+            'nego_reported_at'        => $now,
+            'nego_reported_by'        => $userId,
+            'returnable_confirmed_at' => $now
+        ];
+
+        try {
+
+            //允許退貨
+            if ($payload['nego_result'] == 1) {
+                $updateData['status_code']               = 'NEGO_COMPLETED';
+                $updateData['returnable_amount']         = $payload['nego_refund_amount'] * (-1);
+                $updateData['returnable_points']         = $points * (-1);
+                $updateData['returnable_point_discount'] = $pointDiscounts * (-1);
+                $updateData['is_returnable']             = 1;
+
+                $updateColumn = 'passed_qty';
+
+            } else {
+                $updateData['status_code']               = 'M_CLOSED';
+                $updateData['returnable_amount']         = 0;
+                $updateData['returnable_points']         = 0;
+                $updateData['returnable_point_discount'] = 0;
+                $updateData['is_returnable']             = 0;
+
+                $updateColumn = 'failed_qty';
+            }
+
+            DB::beginTransaction();
+            //更新檢驗單頭
+            $returnExamination->update($updateData);
+
+            $returnExamination->returnExaminationDetails->each(function ($returnExaminationDetail) use ($userId, $updateColumn) {
+                //更新檢驗單身
+                $returnExaminationDetail->update([
+                    $updateColumn => $returnExaminationDetail->request_qty,
+                    'updated_by'  => $userId
+                ]);
+
+                //更新申請單身
+                $returnExaminationDetail->returnRequestDetail->update([
+                    $updateColumn => $returnExaminationDetail->returnRequestDetail->request_qty,
+                    'updated_by'  => $userId
+                ]);
+            });
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            return [
+                'status'  => false,
+                'message' => '發生錯誤'
+            ];
+        }
+
+        //檢查退貨申請單所有檢驗單的is_returnable 是否皆有值(0或1)
+        $unconfirmedReturnExamination = ReturnExamination::where('return_request_id', $returnExamination->return_request_id)
+            ->whereNull('is_returnable')
+            ->first();
+
+        //呼叫退貨api
+        if (empty($unconfirmedReturnExamination)) {
+            #TODO 退貨api
+        }
+
+        return [
+            'status'  => true,
+            'message' => '資料更新成功',
+        ];
+    }
+
+    /**
+     * 人工退款
+     * @param array $payload
+     * @return array
+     * @Author: Eric
+     * @DateTime: 2022/9/15 下午 03:23
+     */
+    public function updateManualRefund(array $payload): array
+    {
+        $returnRequest = ReturnRequest::where('refund_status', 'FAILED')
+            ->find($payload['return_request_id'], ['id']);
+
+        if (empty($returnRequest)) {
+            return [
+                'status'  => false,
+                'message' => '此申請單不存在',
+            ];
+        }
+
+        $returnRequest->update([
+            'refund_status'          => 'COMPLETED',
+            'refund_at'              => $payload['refund_at'],
+            'is_manually_refund'     => 1,
+            'manually_refunded_by'   => auth()->user()->id,
+            'manually_refund_remark' => $payload['manually_refund_remark'],
+        ]);
+
+        return [
+            'status'  => true,
+            'message' => '資料更新成功',
+        ];
     }
 }

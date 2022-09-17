@@ -30,7 +30,7 @@ class OrderRefundExport implements FromCollection, WithHeadings, WithColumnWidth
             '退貨申請單號',
             '訂單編號',
             '會員帳號',
-            '狀態',
+            '退貨申請單狀態',
             '物流方式',
             '退貨完成時間',
             '退款方式',
@@ -39,13 +39,19 @@ class OrderRefundExport implements FromCollection, WithHeadings, WithColumnWidth
             '取件聯絡人',
             '取件聯絡手機',
             '取件地址',
+            '退貨檢驗單號',
+            '退貨檢驗單狀態',
+            '供應商',
+            '物流公司',
+            '取件單號',
+            '取件結果',
+            '檢驗結果',
             'Item編號',
             '商品名稱',
             '規格一',
             '規格二',
             '申請數量',
-            '檢驗合格數量',
-            '檢驗不合格數',
+            '訂單身份'
         ];
     }
 
@@ -80,8 +86,8 @@ class OrderRefundExport implements FromCollection, WithHeadings, WithColumnWidth
     {
         // 對齊方式
         $alignment_datas = [
-            'left' => ['N', 'P', 'Q', 'R'],
-            'center' => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'O', 'S', 'T', 'U'],
+            'left' => ['W', 'X', 'Y'],
+            'center' => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'Z', 'AA'],
             'right' => [],
         ];
 
@@ -108,7 +114,7 @@ class OrderRefundExport implements FromCollection, WithHeadings, WithColumnWidth
         }
 
         return [
-            'A1:U1' => [
+            'A1:AA1' => [
                 'alignment' => [
                     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                 ],
@@ -116,7 +122,7 @@ class OrderRefundExport implements FromCollection, WithHeadings, WithColumnWidth
                     'bold' => true,
                 ],
             ],
-            "A1:U{$this->total_rows}" => [
+            "A1:AA{$this->total_rows}" => [
                 'alignment' => [
                     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 ],

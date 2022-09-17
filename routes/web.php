@@ -172,6 +172,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
         Route::get('/ajax/excel', [OrderRefundController::class, 'exportExcel'])->name('order_refund.export_excel');
         // 詳細資料
         Route::get('/ajax/detail', [OrderRefundController::class, 'getDetail'])->name('order_refund.detail');
+        //更新協商退貨回報
+        Route::put('/ajax/update-negotiated-return', [OrderRefundController::class, 'updateNegotiatedReturn'])->name('order_refund.update_negotiated_return');
+        //人工退款
+        Route::put('/ajax/update-manual-refund', [OrderRefundController::class, 'updateManualRefund'])->name('order_refund.update_manual_refund');
     });
 
     // 金流對帳單

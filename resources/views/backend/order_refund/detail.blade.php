@@ -54,7 +54,11 @@
                                                 <label class="control-label">退貨單狀態</label>
                                             </div>
                                             <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-status-code"></p>
+                                                <p class="form-control-static">
+                                                    <span id="modal-status-code"></span>
+                                                    <span id="modal-prompt-text" style="color:red"></span>
+                                                </p>
+                                                <button id="manual-refund-button" type="button" class="btn btn-danger" data-toggle="modal" data-target="#manual-refund-modal" data-dismiss="modal">人工退款</button>
                                             </div>
                                         </div>
                                     </div>
@@ -71,33 +75,10 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="col-sm-4">
-                                                <label class="control-label">退貨說明</label>
-                                            </div>
-                                            <div class="col-sm-8">
-                                                <p class="form-control-static modal-req-remark"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-4">
                                                 <label class="control-label">物流方式</label>
                                             </div>
                                             <div class="col-sm-8">
                                                 <p class="form-control-static" id="modal-lgst-method"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-4">
-                                                <label class="control-label">物流廠商</label>
-                                            </div>
-                                            <div class="col-sm-8">
-                                                <p class="form-control-static" id="modal-return-request"></p>
                                             </div>
                                         </div>
                                     </div>
@@ -111,7 +92,7 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="col-sm-4">
-                                                <label class="control-label">會員帳號</label>
+                                                <label class="control-label">會員編號</label>
                                             </div>
                                             <div class="col-sm-8">
                                                 <p class="form-control-static" id="modal-member-account"></p>
@@ -234,14 +215,23 @@
                             <table class='table table-striped table-bordered table-hover' style='width:100%'>
                                 <thead>
                                     <tr>
+
                                         <th class="text-nowrap">項次</th>
-                                        <th class="text-nowrap">Item編號</th>
-                                        <th class="text-nowrap">商品名稱</th>
-                                        <th class="text-nowrap">規格一</th>
-                                        <th class="text-nowrap">規格二</th>
-                                        <th class="text-nowrap">申請數量</th>
-                                        <th class="text-nowrap">檢驗合格數量</th>
-                                        <th class="text-nowrap">檢驗不合格數</th>
+                                        <th class="text-nowrap">功能</th>
+                                        <th class="text-nowrap">退貨檢驗單號</th>
+                                        <th class="text-nowrap">檢驗單狀態</th>
+                                        <th class="text-nowrap">供應商</th>
+                                        <th class="text-nowrap">派車確認時間</th>
+                                        <th class="text-nowrap">派車物流</th>
+                                        <th class="text-nowrap">
+                                            <span id="number_or_logistics_name_column_name">物流單號</span>
+                                        </th>
+                                        <th class="text-nowrap">檢驗回報時間</th>
+                                        <th class="text-nowrap">檢驗結果</th>
+                                        <th class="text-nowrap">檢驗結果說明</th>
+                                        <th class="text-nowrap">協商結果</th>
+                                        <th class="text-nowrap">協商退款金額</th>
+                                        <th class="text-nowrap">協商內容備註</th>
                                     </tr>
                                 </thead>
                                 <tbody id="return_details_content">
