@@ -370,7 +370,7 @@ class MemberController extends Controller
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
         // 貨態進度
-        $shippedStatus = $this->orderService->getShippedStatus($order,$payload['results']['can_return_order']);
+        $shippedStatus = $this->orderService->getShippedStatus($order, $payload['results']['can_return_order']);
         $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
@@ -390,7 +390,7 @@ class MemberController extends Controller
                     'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
                     'discount_content' => [],
                     'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id]) ? $gtm[$orderDetail->product_id][$orderDetail->product_item_id] : "",
-                    'can_return'=>isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id] : "",
+                    'can_return' => isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id] : "",
                     'shipped_info' => isset($shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_info'][$orderDetail->id][$orderDetail->product_item_id] : "",
                     'shipped_status' => isset($shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['shipped_status'][$orderDetail->id][$orderDetail->product_item_id] : "",
                 ];
@@ -662,78 +662,99 @@ class MemberController extends Controller
             ], 423);
         }
 
-        DB::beginTransaction();
+        //前台退貨申請
+        if(config('uec.cart_p_discount_split') == 1) {//折車多單
+            $requestNo = $this->returnRequestService->generateRequestNo(); //退貨申請單號
+            $return_status = $this->orderService->setReturnByOrderNo($order, $request, $requestNo);
+            return response()->json([
+                'message' => $return_status['message'],
+                'results'=> $return_status['results']
+            ], $return_status['status']);
+        } else {
+            DB::beginTransaction();
 
-        try {
-            $requestNo = $this->returnRequestService->generateRequestNo();
+            try {
 
-            // 新增退貨申請單
-            $returnRequest = ReturnRequest::create([
-                'agent_id' => 1,
-                'request_no' => $requestNo,
-                'request_date' => now(),
-                'member_id' => auth('api')->user()->member_id,
-                'order_id' => $order->id,
-                'order_no' => $order->order_no,
-                'status_code' => 'CREATED',
-                'refund_method' => $order->payment_method,
-                'lgst_method' => $order->lgst_method,
-                'req_name' => $request->name,
-                'req_mobile' => $request->mobile,
-                'req_city' => $request->city,
-                'req_district' => $request->district,
-                'req_address' => $request->address,
-                'req_zip_code' => $request->zip_code,
-                'req_telephone' => $request->telephone,
-                'req_telephone_ext' => $request->telephone_ext,
-                'req_reason_code' => $request->code,
-                'req_remark' => $request->remark,
-                'created_by' => -1,
-                'updated_by' => -1,
-            ]);
+                $requestNo = $this->returnRequestService->generateRequestNo();
 
-            // 訂單明細
-            if ($order->orderDetails->isNotEmpty()) {
-                $order->orderDetails->each(function ($orderDetail) use ($returnRequest) {
-                    // 新增退貨申請單明細
-                    ReturnRequestDetail::create([
-                        'return_request_id' => $returnRequest->id,
-                        'seq' => $orderDetail->seq,
-                        'order_detail_id' => $orderDetail->id,
-                        'product_item_id' => $orderDetail->product_item_id,
-                        'item_no' => $orderDetail->item_no,
-                        'request_qty' => $orderDetail->qty,
-                        'passed_qty' => 0,
-                        'failed_qty' => 0,
-                        'created_by' => -1,
-                        'updated_by' => -1,
-                    ]);
-                });
-            }
-
-            // 更新訂單
-            Order::findOrFail($order->id)
-                ->update([
-                    'return_request_id' => $returnRequest->id,
+                // 新增退貨申請單
+                $returnRequest = ReturnRequest::create([
+                    'agent_id' => 1,
+                    'request_no' => $requestNo,
+                    'request_date' => now(),
+                    'member_id' => auth('api')->user()->member_id,
+                    'order_id' => $order->id,
+                    'order_no' => $order->order_no,
+                    'status_code' => 'CREATED',
+                    'refund_method' => $order->payment_method,
+                    'lgst_method' => $order->lgst_method,
+                    'req_name' => $request->name,
+                    'req_mobile' => $request->mobile,
+                    'req_city' => $request->city,
+                    'req_district' => $request->district,
+                    'req_address' => $request->address,
+                    'req_zip_code' => $request->zip_code,
+                    'req_telephone' => $request->telephone,
+                    'req_telephone_ext' => $request->telephone_ext,
+                    'req_reason_code' => $request->code,
+                    'req_remark' => $request->remark,
+                    'ship_from_whs' => $order->ship_from_whs,
+                    'created_by' => -1,
                     'updated_by' => -1,
                 ]);
 
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error($e->getMessage());
+                // 訂單明細
+                if ($order->orderDetails->isNotEmpty()) {
+                    $order->orderDetails->each(function ($orderDetail) use ($returnRequest) {
+                        // 新增退貨申請單明細
+                        ReturnRequestDetail::create([
+                            'return_request_id' => $returnRequest->id,
+                            'seq' => $orderDetail->seq,
+                            'order_detail_id' => $orderDetail->id,
+                            'product_item_id' => $orderDetail->product_item_id,
+                            'item_no' => $orderDetail->item_no,
+                            'request_qty' => $orderDetail->qty,
+                            'passed_qty' => 0,
+                            'failed_qty' => 0,
+                            'selling_price' => $orderDetail->selling_price,
+                            'unit_price' => $orderDetail->unit_price,
+                            'campaign_discount' => $orderDetail->campaign_discount,
+                            'cart_p_discount' => $orderDetail->cart_p_discount,
+                            'subtotal' => $orderDetail->subtotal,
+                            'point_discount' => $orderDetail->point_discount,
+                            'points' => $orderDetail->points,
+                            'record_identity' => $orderDetail->record_identity,
+                            'purchase_price' => $orderDetail->purchase_price,
+                            'created_by' => -1,
+                            'updated_by' => -1,
+                        ]);
+                    });
+                }
+
+                // 更新訂單
+                Order::findOrFail($order->id)
+                    ->update([
+                        'return_request_id' => $returnRequest->id,
+                        'updated_by' => -1,
+                    ]);
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error($e->getMessage());
+
+                return response()->json([
+                    'message' => '其他錯誤',
+                ], 500);
+            }
 
             return response()->json([
-                'message' => '其他錯誤',
-            ], 500);
+                'message' => '訂單退貨成功',
+                'results' => [
+                    'return_no' => $requestNo,
+                    'return_date' => now()->format('Y-m-d H:i:s'),
+                ],
+            ], 200);
         }
-
-        return response()->json([
-            'message' => '訂單退貨成功',
-            'results' => [
-                'return_no' => $requestNo,
-                'return_date' => now()->format('Y-m-d H:i:s'),
-            ],
-        ], 200);
     }
 }

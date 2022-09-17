@@ -6,12 +6,18 @@ use App\Models\Order;
 use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
+use App\Models\ProductItem;
+use App\Models\ReturnExamination;
+use App\Models\ReturnExaminationDetail;
 use App\Models\ReturnRequest;
+use App\Models\ReturnRequestDetail;
 use App\Models\Shipment;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use phpDocumentor\Reflection\Types\Integer;
 use function PHPUnit\Framework\isEmpty;
 
@@ -451,6 +457,7 @@ class OrderService
                         $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaign->campaign_brief;
                         $cart['gift'][$obj->group_seq]['thresholdCampaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
                         $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
+                            'id' => $obj->order_detail_id,
                             'productPhoto' => $productPhoto,
                             'productPhoto' => $photo_name,
                             'productId' => $obj->product->id,
@@ -561,6 +568,7 @@ class OrderService
                             'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
                             'campaignProdList' => [
                                 [
+                                    'id' => $PRD->order_detail_id,
                                     'productId' => $PRD->product->id,
                                     'productName' => $PRD->product->product_name,
                                     'productPhoto' => $photo_name,
@@ -572,6 +580,7 @@ class OrderService
                         ];
                     } else {
                         $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
+                            'id' => $PRD->order_detail_id,
                             'productId' => $PRD->product->id,
                             'productName' => $PRD->product->product_name,
                             'productPhoto' => $photo_name,
@@ -765,8 +774,6 @@ class OrderService
             $T03 = null; //退款成功時間
             $T04 = (is_null($order->paid_at)) ? null : Carbon::parse($order->paid_at)->format('Y-m-d H:i'); //請款成功時間
             $T05 = null; //出貨單 出貨時間 (出貨確認)
-            $T06 = (is_null($order->delivered_at)) ? null : Carbon::parse($order->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
-            $T07 = (is_null($order->overdue_confirmed_at)) ? null : Carbon::parse($order->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
             // 金流單
             if ($order->status_code == 'CANCELLED' || $order->status_code == 'VOIDED') {
                 $payment = OrderPayment::select("latest_api_date")
@@ -783,6 +790,8 @@ class OrderService
                     $T01 = Carbon::parse($detail->shipment_date)->format('Y-m-d H:i');
                     $T02 = !is_null($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
                     $T05 = (is_null($detail->shipped_at)) ? $T05 : Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
+                    $T06 = (is_null($detail->delivered_at)) ? null : Carbon::parse($detail->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
+                    $T07 = (is_null($detail->overdue_confirmed_at)) ? null : Carbon::parse($detail->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
                     $shipments = Shipment::with('shipmentDetails')->where('id', $detail->id)->get();
                     foreach ($shipments as $shipment) {
                         foreach ($shipment->shipmentDetails as $shipment_detail) {
@@ -816,13 +825,13 @@ class OrderService
                             "status_time" => $detail['T01'],
                             "status_display" => true
                         ];
-                        if ($detail['order_status'] == 'CANCELLED' || $detail['order_status'] == 'VOIDED') {
+                        if ($detail['shipment_status'] == 'CANCELLED' || $detail['shipment_status'] == 'VOIDED') {
                             $show_array[] = [
                                 "status_desc" => "已取消",
                                 "status_time" => $detail['T02'],
                                 "status_display" => false
                             ];
-                            if ($detail['payment_status'] == 'COMPLETED') {
+                            if ($detail['shipment_status'] == 'COMPLETED') {
                                 $show_array[] = [
                                     "status_desc" => "已退款",
                                     "status_time" => $detail['T03'],
@@ -962,4 +971,170 @@ class OrderService
         return $data;
     }
 
+    /*
+     * 前台退貨申請
+     * param $order, $request
+     * Author: Rowena
+     * Return: string
+     */
+    public function setReturnByOrderNo($order, $request, $requestNo)
+    {
+        $now = Carbon::now();
+        //取供應商ID
+        $product_with = [];
+        $supplier_info = ProductItem::with('product:id,supplier_id')->get();
+        foreach ($supplier_info as $supplier) {
+            $product_with['supplier_id'][$supplier->id] = $supplier->product->supplier_id;
+        }
+        $product_with['ship_from_whs'] = $order->ship_from_whs;
+        DB::beginTransaction();
+        try {
+            // 新增退貨申請單
+            $returnRequest = ReturnRequest::create([
+                'agent_id' => 1,
+                'request_no' => $requestNo,
+                'request_date' => now(),
+                'member_id' => auth('api')->user()->member_id,
+                'order_id' => $order->id,
+                'order_no' => $order->order_no,
+                'status_code' => 'CREATED',
+                'refund_method' => $order->payment_method,
+                'lgst_method' => $order->lgst_method,
+                'req_name' => $request->name,
+                'req_mobile' => $request->mobile,
+                'req_city' => $request->city,
+                'req_district' => $request->district,
+                'req_address' => $request->address,
+                'req_zip_code' => $request->zip_code,
+                'req_telephone' => $request->telephone,
+                'req_telephone_ext' => $request->telephone_ext,
+                'req_reason_code' => $request->code,
+                'req_remark' => $request->remark,
+                'ship_from_whs' => $order->ship_from_whs,
+                'created_by' => -1,
+                'updated_by' => -1,
+            ]);
+            // 訂單明細
+            if ($order->orderDetails->isNotEmpty()) {
+                $returnable['amount'] = [];
+                $returnable['points'] = [];
+                $returnable['point_discount'] = [];
+                $returnable['item_id'] = [];
+                $returnable['detail_id'] = [];
+                $order->orderDetails->each(function ($orderDetail) use ($returnRequest, &$request, &$returnable, &$product_with) {
+                    if (in_array($orderDetail->id, $request->return_id)) {
+                        $supplier = ($product_with['ship_from_whs'] == 'SUP') ? $product_with['supplier_id'][$orderDetail->product_item_id] : 0;
+                        if (!key_exists($supplier, $returnable['amount'])) $returnable['amount'][$supplier] = 0;
+                        if (!key_exists($supplier, $returnable['points'])) $returnable['points'][$supplier] = 0;
+                        if (!key_exists($supplier, $returnable['point_discount'])) $returnable['point_discount'][$supplier] = 0;
+                        if (!key_exists($supplier, $returnable['item_id'])) $returnable['item_id'][$supplier] = 0;
+                        // 新增退貨申請單明細
+                        $return_request_detail = ReturnRequestDetail::create([
+                            'return_request_id' => $returnRequest->id,
+                            'seq' => $orderDetail->seq,
+                            'order_detail_id' => $orderDetail->id,
+                            'product_item_id' => $orderDetail->product_item_id,
+                            'item_no' => $orderDetail->item_no,
+                            'request_qty' => $orderDetail->qty,
+                            'passed_qty' => 0,
+                            'failed_qty' => 0,
+                            'selling_price' => $orderDetail->selling_price,
+                            'unit_price' => $orderDetail->unit_price,
+                            'campaign_discount' => $orderDetail->campaign_discount,
+                            'cart_p_discount' => $orderDetail->cart_p_discount,
+                            'subtotal' => $orderDetail->subtotal,
+                            'point_discount' => $orderDetail->point_discount,
+                            'points' => $orderDetail->points,
+                            'record_identity' => $orderDetail->record_identity,
+                            'purchase_price' => $orderDetail->purchase_price,
+                            'created_by' => -1,
+                            'updated_by' => -1,
+                        ]);
+                        $returnable['amount'][$supplier] += $orderDetail->subtotal;
+                        $returnable['points'][$supplier] += $orderDetail->points;
+                        $returnable['point_discount'][$supplier] += $orderDetail->point_discount;
+                        $returnable['item_id'][$orderDetail->product_item_id] = $supplier;
+                        $returnable['detail_id'][$orderDetail->product_item_id] = $return_request_detail->id;
+                    }
+                });
+            }
+            if (count($returnable['amount']) == 0) {
+                $result['status'] = 401;
+                $result['message'] = '資料錯誤';
+                $result['results'] = [];
+                return $result;
+            }
+            $msg['examination'] = [];
+            $msg['examination_count'] = [];
+            $exam_payload = [];
+            foreach ($returnable['amount'] as $supplier_id => $returnableVal) {
+                // 新增退貨檢驗單
+                $random_string = Str::upper(Str::random(6));
+                $examination_no = 'RX' . $now->format('ymd') . $random_string;
+                $returnExamination = ReturnExamination::create([
+                    'return_request_id' => $returnRequest->id,
+                    'examination_no' => $examination_no,
+                    'request_no' => $requestNo,
+                    'supplier_id' => $supplier_id,
+                    'status_code' => 'CREATED',
+                    'lgst_dispatched_deadline' => Carbon::parse($returnRequest->create_at)->addDay(2)->format('Y-m-d 23:59:59'),
+                    'examination_deadline' => Carbon::parse($returnRequest->create_at)->addDay(7)->format('Y-m-d 23:59:59'),
+                    'returnable_amount' => $returnable['amount'][$supplier_id],
+                    'returnable_points' => $returnable['points'][$supplier_id],
+                    'returnable_point_discount' => $returnable['point_discount'][$supplier_id],
+                    'created_by' => -1,
+                    'updated_by' => -1,
+                ]);
+                $msg['examination_count'][] = [
+                    'examination_no' => $examination_no,
+                ];
+                // 退貨檢驗單明細
+                if ($order->orderDetails->isNotEmpty()) {
+                    $order->orderDetails->each(function ($orderDetail) use ($returnExamination, &$request, &$returnable, &$supplier_id, &$msg) {
+                        if (in_array($orderDetail->id, $request->return_id)) {
+                            if ($returnable['item_id'][$orderDetail->product_item_id] == $supplier_id) {
+                                // 新增退貨檢驗單明細
+                                $returnExaminationDetail = ReturnExaminationDetail::create([
+                                    'return_examination_id' => $returnExamination->id,
+                                    'return_request_detail_id' => $returnable['detail_id'][$orderDetail->product_item_id],
+                                    'product_item_id' => $orderDetail->product_item_id,
+                                    'item_no' => $orderDetail->item_no,
+                                    'request_qty' => $orderDetail->qty,
+                                    'passed_qty' => 0,
+                                    'failed_qty' => 0,
+                                    'created_by' => -1,
+                                    'updated_by' => -1,
+                                ]);
+                                $msg['examination'][$returnExamination->examination_no][] = [
+                                    'id' => $orderDetail->id,
+                                    'product_name' => $orderDetail->product->product_name,
+                                    'return_qty' => $orderDetail->qty,
+                                    'record_identity' => $orderDetail->record_identity
+                                ];
+                            }
+                        }
+                    });
+                }
+            }
+            // 更新訂單
+            Order::findOrFail($order->id)
+                ->update([
+                    'return_request_id' => $returnRequest->id,
+                    'updated_by' => -1,
+                ]);
+            $result['status'] = 200;
+            $result['message'] = '訂單退貨成功';
+            $result['results']['return_count'] = count($msg['examination_count']);
+            $result['results']['return_data'] = $msg['examination'];
+            $result['results']['return_date'] = now()->format('Y-m-d H:i:s');
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            $result['status'] = 500;
+            $result['message'] = '其他錯誤';
+            $result['results'] = [];
+        }
+        return $result;
+    }
 }
