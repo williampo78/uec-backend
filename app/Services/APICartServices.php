@@ -1417,38 +1417,45 @@ class APICartServices
                 }
             }
             //活動滿額門檻資料 (活動時間內才做)
+            $campaignThresholdsAll = [];
             $campaignThreshold = [];
             $campaignThresholdItem = [];
             $campaignThresholdGift = [];
+            $campaignThresholdWithDataId = [];
             if (isset($campaign['CART_P'])) {
-                $campaignThresholds = $this->getCampaignThresholds();
+                $campaignThresholdsAll = $this->getCampaignThresholds();
+                foreach ($campaignThresholdsAll as $threshold) {
+                    $campaignThresholds[$threshold->promotional_campaign_id] = $threshold;
+                }
                 foreach ($campaign['CART_P'] as $type => $items) {
                     foreach ($items as $product_id => $data) {
                         $campaignThreshold_brief = [];
                         $campaignThreshold_item = [];
                         //$campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $data->id)->orderBy('n_value')->get();
-                        foreach ($campaignThresholds as $threshold) {
-                            $campaignThreshold_brief[] = $threshold->threshold_brief;
-                            $campaignThreshold_item[] = $threshold;
+                        if (key_exists($data->id, $campaignThresholds)) {
+                            $campaignThresholdWithDataId = $campaignThresholds[$data->id];
+                            //foreach ($campaignThresholdWithDataId as $threshold) {
+                            $campaignThreshold_brief[] = $campaignThresholdWithDataId->threshold_brief;
+                            $campaignThreshold_item[] = $campaignThresholdWithDataId;
                             //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
                             //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
-                            $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
+                            $campaignThresholdGift[$data->id][$campaignThresholdWithDataId->id][] = $campaignThresholdWithDataId->promotionalCampaignGiveaways;
 
+                            //}
+                            //畫面顯示用
+                            $campaignThreshold[$type][$product_id] = array(
+                                "campaignId" => $data->id,
+                                "campaignName" => $data->campaign_name,
+                                "campaignBrief" => $data->campaign_brief,
+                                "campaignUrlCode" => $data->url_code,
+                                "campaignThreshold" => $campaignThreshold_brief
+                            );
+                            //滿額計算用
+                            $campaignThresholdItem[$data->id] = $campaignThreshold_item;//活動門檻資料
+                            $campaignThresholdMain[$data->id] = $data; //活動主檔
                         }
-                        //畫面顯示用
-                        $campaignThreshold[$type][$product_id] = array(
-                            "campaignId" => $data->id,
-                            "campaignName" => $data->campaign_name,
-                            "campaignBrief" => $data->campaign_brief,
-                            "campaignUrlCode" => $data->url_code,
-                            "campaignThreshold" => $campaignThreshold_brief
-                        );
-                        //滿額計算用
-                        $campaignThresholdItem[$data->id] = $campaignThreshold_item;//活動門檻資料
-                        $campaignThresholdMain[$data->id] = $data; //活動主檔
                     }
                 }
-                //dd($campaignThresholdGift);
             }
             //活動滿額門檻資料 (活動時間內才做)
             //重組活動贈品
