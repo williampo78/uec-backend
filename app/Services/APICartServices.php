@@ -1451,7 +1451,7 @@ class APICartServices
             if (isset($campaign['CART_P'])) {
                 $campaignThresholdsAll = $this->getCampaignThresholds();
                 foreach ($campaignThresholdsAll as $threshold) {
-                    $campaignThresholds[$threshold->promotional_campaign_id] = $threshold;
+                    $campaignThresholds[$threshold->promotional_campaign_id][] = $threshold;
                 }
                 foreach ($campaign['CART_P'] as $type => $items) {
                     foreach ($items as $product_id => $data) {
@@ -1460,14 +1460,14 @@ class APICartServices
                         //$campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $data->id)->orderBy('n_value')->get();
                         if (key_exists($data->id, $campaignThresholds)) {
                             $campaignThresholdWithDataId = $campaignThresholds[$data->id];
-                            //foreach ($campaignThresholdWithDataId as $threshold) {
-                            $campaignThreshold_brief[] = $campaignThresholdWithDataId->threshold_brief;
-                            $campaignThreshold_item[] = $campaignThresholdWithDataId;
+                            foreach ($campaignThresholdWithDataId as $threshold) {
+                            $campaignThreshold_brief[] = $threshold->threshold_brief;
+                            $campaignThreshold_item[] = $threshold;
                             //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
                             //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
-                            $campaignThresholdGift[$data->id][$campaignThresholdWithDataId->id][] = $campaignThresholdWithDataId->promotionalCampaignGiveaways;
+                            $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
 
-                            //}
+                            }
                             //畫面顯示用
                             $campaignThreshold[$type][$product_id] = array(
                                 "campaignId" => $data->id,
