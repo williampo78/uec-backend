@@ -213,7 +213,7 @@ class UniversalService
      * Author: Rowena
      * Return: string
      */
-    public function getOrderStatus(string $orderStatus, string $payStatus, string $refundStatus)
+    public function getOrderStatus(string $orderStatus, string $payStatus, $refundStatus)
     {
         $result = null;
         if ($orderStatus == 'CREATED') {
