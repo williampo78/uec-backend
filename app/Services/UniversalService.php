@@ -213,7 +213,7 @@ class UniversalService
      * Author: Rowena
      * Return: string
      */
-    public function getOrderStatus(string $orderStatus, string $payStatus)
+    public function getOrderStatus(string $orderStatus, string $payStatus, string $refundStatus)
     {
         $result = null;
         if ($orderStatus == 'CREATED') {
@@ -231,15 +231,12 @@ class UniversalService
         } else if ($orderStatus == 'VOIDED') {
             $result = '訂單作廢';
         } else if ($orderStatus == 'CANCELLED') {
-            switch ($payStatus) {
-                case 'PENDING':
-                    $result = '已取消';
-                    break;
-                case 'FAILED':
-                    $result = '已取消';
-                    break;
+            switch ($refundStatus) {
                 case 'COMPLETED':
                     $result = '已退款';
+                    break;
+                default:
+                    $result = '已取消';
                     break;
             }
         }

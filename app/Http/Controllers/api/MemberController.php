@@ -178,7 +178,7 @@ class MemberController extends Controller
         // 訂單
         $orders->each(function ($order) use (&$payload) {
             //訂單狀態
-            $order_status_desc = $this->universalService->getOrderStatus($order->status_code, $order->pay_status);
+            $order_status_desc = $this->universalService->getOrderStatus($order->status_code, $order->pay_status, $order->refund_status);
             $orderPayload = [
                 'order_no' => $order->order_no,
                 'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i:s'),
@@ -286,7 +286,7 @@ class MemberController extends Controller
         $cancelLimitMins = (int)$this->sysConfigService->getConfigValue('CANCEL_LIMIT_MINS');
 
         //訂單狀態
-        $order_status_desc = $this->universalService->getOrderStatus($order->status_code, $order->pay_status);
+        $order_status_desc = $this->universalService->getOrderStatus($order->status_code, $order->pay_status, $order->refund_status);
 
         $payload = [
             'message' => '取得成功',
