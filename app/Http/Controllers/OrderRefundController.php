@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\OrderRefundExport;
 use App\Models\LookupValuesV;
 use App\Services\OrderRefundService;
+use App\Services\ReturnGoodsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,12 +15,15 @@ use Maatwebsite\Excel\Facades\Excel;
 class OrderRefundController extends Controller
 {
     private $orderRefundService;
+    private $returnGoodsService;
 
     public function __construct(
-        OrderRefundService $OrderRefundService
+        OrderRefundService $OrderRefundService,
+        ReturnGoodsService $returnGoodsService
     )
     {
         $this->orderRefundService = $OrderRefundService;
+        $this->returnGoodsService = $returnGoodsService;
     }
 
     /**
@@ -30,6 +34,14 @@ class OrderRefundController extends Controller
      */
     public function index(Request $request): view
     {
+
+        //test
+        $result = $this->returnGoodsService
+            ->setReturnRequestId(4)
+            ->handle();
+        dd($result);
+        //test
+
         $orderRefunds = collect();
 
         // 有權限
