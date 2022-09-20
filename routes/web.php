@@ -340,7 +340,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     ]);
 
     //庫存異動歷程查詢
-    Route::group(['prefix' => 'stock-transaction-logs', 'as' => 'stock_transaction_logs'], function () {
+    Route::group(['prefix' => 'stock-transaction-logs', 'as' => 'backend_stock_transaction_logs'], function () {
         Route::get('/', [StockTransactionLogController::class, 'index']);
     });
 
