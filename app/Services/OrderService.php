@@ -1079,7 +1079,7 @@ class OrderService
                     'status_code' => 'CREATED',
                     'lgst_dispatched_deadline' => Carbon::parse($returnRequest->create_at)->addDay(2)->format('Y-m-d 23:59:59'),
                     'examination_deadline' => Carbon::parse($returnRequest->create_at)->addDay(7)->format('Y-m-d 23:59:59'),
-                    'returnable_amount' => $returnable['amount'][$supplier_id],
+                    'returnable_amount' => ($returnable['amount'][$supplier_id] * -1),
                     'returnable_points' => $returnable['points'][$supplier_id],
                     'returnable_point_discount' => $returnable['point_discount'][$supplier_id],
                     'created_by' => -1,
