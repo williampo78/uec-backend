@@ -173,11 +173,11 @@ class APIProductServices
         //根據階層顯示層級資料(賣場)
         if ($config_levels == '3') {
             $strSQL = "select cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*,0 as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
+                    pcc.`campaign_name`, pcc.`url_code`, pcc.`campaign_brief`, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
                     from `web_category_hierarchy` cate
                     inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
-                    inner join `promotional_campaigns` pcc on pcc.`id`=cate2.`promotion_campaign_id`
+                    inner join `promotional_campaigns` pcc on pcc.`id`=cate.`promotion_campaign_id`
                     where cate.`active`=1 and pcc.`active`=1
                     and current_timestamp() between pcc.`start_at` and pcc.`end_at` and cate.content_type='M' ";
             if ($keyword) {
