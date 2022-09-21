@@ -116,12 +116,14 @@ class CheckoutController extends Controller
                 }
                 if ($shipping_fee == $request->shipping_fee) {
                     if (isset($response['result']['paymentMethod'])) {
+                        // dd($response['result']['paymentMethod']);
                         if (in_array('TAPPAY_INSTAL', $response['result']['paymentMethod'])) {
                             //是否有符合信用卡分期門檻
                             $paid_amount = ($response['result']['totalPrice'] - ($response['result']['discount'] + abs($response['result']['thresholdAmount'])) - $point_discount + $shipping_fee);
                             $installment = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
                             $installment = $this->apiProductServices->handleInstallmentInterestRates($installment, $paid_amount);
                             $installment = isset($installment['details']) ? 1 : 0; //不符合回傳0
+                            $installment = 0;
                             $data['paymentMethod'] = $response['result']['paymentMethod'];
                             $del_key = "Del";
                             foreach ($data['paymentMethod'] as $key => $method) {
@@ -131,7 +133,7 @@ class CheckoutController extends Controller
                                 array_splice($data['paymentMethod'], $del_key, 1);
                             }
                         } else {
-                            $data['paymentMethod'] = $response['result']['paymentMethod'];
+                            $data['paymentMethod'] = array_values($response['result']['paymentMethod']);
                         }
                     } else {
                         $data['paymentMethod'] = ['TAPPAY_CREDITCARD', 'TAPPAY_LINEPAY', 'TAPPAY_JKOPAY'];
