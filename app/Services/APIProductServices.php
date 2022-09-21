@@ -212,7 +212,7 @@ class APIProductServices
         foreach ($categorys as $category) {
             $L1_data[$category->L1_LFT]["id"] = $category->L1ID;
             $L1_data[$category->L1_LFT]["name"] = $category->L1_NAME;
-            $L1_data[$category->L1_LFT]["shortName"] = $category->category_short_name;
+            $L1_data[$category->L1_LFT]["shortName"] = $category->L1_short_name;
             $L1_data[$category->L1_LFT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
             if ($config_levels == '3') {
                 $L2_data[$category->L1_LFT][$category->L2_LFT]["id"] = $category->L2ID;
