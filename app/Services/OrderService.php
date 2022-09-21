@@ -938,7 +938,7 @@ class OrderService
             ->Leftjoin('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
             ->join('return_request_details', 'return_request_details.return_request_id', 'return_requests.id')
             ->Leftjoin('order_details', 'order_details.order_id', 'return_requests.'.$new.'order_id')
-            ->where('return_requests.order_no', $orderNo)->where('return_request_details.record_identity', 'M')->get();
+            ->where('return_requests.order_no', $orderNo)->get();
         return $data;
     }
 
