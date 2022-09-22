@@ -1367,10 +1367,10 @@ class APICartServices
         $warehouseCode = $this->stockService->getWarehouseConfig();
         $shippingFee = ShippingFeeRulesService::getShippingFee('HOME');
         $feeInfo = array(
-            "shipping_fee" => $shippingFee['HOME']->shipping_fee,
-            "free_threshold" => $shippingFee['HOME']->free_threshold,
-            "notice" => $shippingFee['HOME']->notice_brief,
-            "noticeDetail" => $shippingFee['HOME']->notice_detailed,
+            "shipping_fee" => $stock_type == 'supplier' ? 0 : $shippingFee['HOME']->shipping_fee,
+            "free_threshold" => $stock_type == 'supplier' ? 0 : $shippingFee['HOME']->free_threshold,
+            "notice" => $stock_type == 'supplier' ? '' : $shippingFee['HOME']->notice_brief,
+            "noticeDetail" => $stock_type == 'supplier' ? '' : $shippingFee['HOME']->notice_detailed,
         );
         if (count($cartInfo) == 0) {
             return json_encode(array("status" => 404, "result" => $feeInfo));
@@ -1461,11 +1461,11 @@ class APICartServices
                         if (key_exists($data->id, $campaignThresholds)) {
                             $campaignThresholdWithDataId = $campaignThresholds[$data->id];
                             foreach ($campaignThresholdWithDataId as $threshold) {
-                            $campaignThreshold_brief[] = $threshold->threshold_brief;
-                            $campaignThreshold_item[] = $threshold;
-                            //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
-                            //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
-                            $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
+                                $campaignThreshold_brief[] = $threshold->threshold_brief;
+                                $campaignThreshold_item[] = $threshold;
+                                //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
+                                //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
+                                $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
 
                             }
                             //畫面顯示用
