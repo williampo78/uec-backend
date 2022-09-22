@@ -490,6 +490,7 @@ class OrderService
                         $cart['discount'][$obj->group_seq]['campaignID'] = $obj->promotionalCampaign->id;
                         $cart['discount'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                         $cart['discount'][$obj->group_seq]['campaignDiscount'] += $obj->discount;
+                        $cart['discount'][$obj->group_seq]['idList'][] = $obj->order_detail_id; //贈送的detail id;
                         $thresholdAmount += $obj->discount;
                     }
                     //滿額贈
@@ -502,7 +503,8 @@ class OrderService
                             'campaignBrief' => $obj->promotionalCampaign->campaign_brief,
                             'thresholdCampaignBrief' => $obj->promotionalCampaignThreshold->threshold_brief,
                         ]);
-                        $cart['gift'][$obj->group_seq]['itemList'][] = $obj->product_item_id; //贈送的商品;
+                        //$cart['gift'][$obj->group_seq]['itemList'][] = $obj->product_item_id; //贈送的商品;
+                        $cart['gift'][$obj->group_seq]['idList'][] = $obj->order_detail_id; //贈送的detail id;
                     }
                     break;
             }
