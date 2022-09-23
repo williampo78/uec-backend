@@ -443,7 +443,7 @@ class WebCategoryHierarchyService
     {
         $category = WebCategoryHierarchy::find($id);
 
-        return !$category->isLeaf();
+        return isset($category) ? !$category->isLeaf() : false;
     }
 
     /**
