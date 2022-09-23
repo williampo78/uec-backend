@@ -779,7 +779,7 @@ class OrderService
         // 有退貨申請單
         if (count($order->returnRequests) > 0) {
             //確認是否已有新版訂單
-            $new_order_id = $order->returnRequests[0]->new_order_id ? 'new_':'' ;
+            $new_order_id = $order->returnRequests[0]->new_order_id ? 'new_' : '';
             $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no, $new_order_id);
             foreach ($order->returnRequests as $returnRequest) {
                 $can_return = false;
@@ -939,7 +939,7 @@ class OrderService
 , `return_examinations`.*, `return_examinations`.`status_code` as `examinations_status`'))
             ->Leftjoin('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
             ->join('return_request_details', 'return_request_details.return_request_id', 'return_requests.id')
-            ->Leftjoin('order_details', 'order_details.order_id', 'return_requests.'.$new.'order_id')
+            ->Leftjoin('order_details', 'order_details.order_id', 'return_requests.' . $new . 'order_id')
             ->where('return_requests.order_no', $orderNo)->get();
         return $data;
     }
@@ -1050,6 +1050,7 @@ class OrderService
                             'points' => $orderDetail->points,
                             'record_identity' => $orderDetail->record_identity,
                             'purchase_price' => $orderDetail->purchase_price,
+                            'order_detail_seq' => $orderDetail->seq,
                             'created_by' => -1,
                             'updated_by' => -1,
                         ]);
