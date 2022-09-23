@@ -662,7 +662,6 @@ class OrderService
     {
         $status = [];
         $return_status = [];
-
         $T01 = null; //出貨單 產生時間
         $T02 = null; //出貨單 取消時間/作廢時間
         $T03 = null; //退款成功時間
@@ -678,32 +677,29 @@ class OrderService
                 ->first();
             $T03 = isset($payment->latest_api_date) ? Carbon::parse($payment->latest_api_date)->format('Y-m-d H:i') : $T03;
         }
-        if ($order->shipments->isNotEmpty()) {
-            //出貨單
-            foreach ($order->shipments as $detail) {
-                $T01 = Carbon::parse($detail->shipment_date)->format('Y-m-d H:i');
-                $T02 = !is_null($detail->voided_at) ? Carbon::parse($detail->voided_at)->format('Y-m-d H:i') : Carbon::parse($detail->cancelled_at)->format('Y-m-d H:i');
-                $T05 = (is_null($detail->shipped_at)) ? $T05 : Carbon::parse($detail->shipped_at)->format('Y-m-d H:i');
-                $T06 = (is_null($detail->delivered_at)) ? null : Carbon::parse($detail->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
-                $T07 = (is_null($detail->overdue_confirmed_at)) ? null : Carbon::parse($detail->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
-                $shipments = Shipment::with('shipmentDetails')->where('id', $detail->id)->get();
-                foreach ($shipments as $shipment) {
-                    foreach ($shipment->shipmentDetails as $shipment_detail) {
-                        $status[$shipment_detail->order_detail_id][$shipment_detail->product_item_id] = [
-                            "order_status" => $order->status_code,
-                            "payment_status" => $order->pay_status,
-                            "shipment_status" => $detail->status_code,
-                            "package_no" => $shipment->package_no,
-                            "T01" => $T01,
-                            "T02" => $T02,
-                            "T03" => $T03,
-                            "T04" => $T04,
-                            "T05" => $T05,
-                            "T06" => $T06,
-                            "T07" => $T07
-                        ];
-                    }
-                }
+
+        // 出貨貨態
+        $shipments = $this->getShipmentDetailByOrderNo($order->order_no);
+        if (isset($shipments)) {
+            foreach ($shipments as $shipment) {
+                $T01 = Carbon::parse($shipment->shipment_date)->format('Y-m-d H:i');
+                $T02 = !is_null($shipment->voided_at) ? Carbon::parse($shipment->voided_at)->format('Y-m-d H:i') : Carbon::parse($shipment->cancelled_at)->format('Y-m-d H:i');
+                $T05 = (is_null($shipment->shipped_at)) ? $T05 : Carbon::parse($shipment->shipped_at)->format('Y-m-d H:i');
+                $T06 = (is_null($shipment->delivered_at)) ? null : Carbon::parse($shipment->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
+                $T07 = (is_null($shipment->overdue_confirmed_at)) ? null : Carbon::parse($shipment->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
+                $status[$shipment->new_order_detail_id][$shipment->product_item_id] = [
+                    "order_status" => $order->status_code,
+                    "payment_status" => $order->pay_status,
+                    "shipment_status" => $shipment->status_code,
+                    "package_no" => $shipment->package_no,
+                    "T01" => $T01,
+                    "T02" => $T02,
+                    "T03" => $T03,
+                    "T04" => $T04,
+                    "T05" => $T05,
+                    "T06" => $T06,
+                    "T07" => $T07
+                ];
             }
             //重新組合
             foreach ($status as $order_detail_id => $shipment_detail) {
@@ -770,54 +766,36 @@ class OrderService
                     $shipment_status['can_return'][$order_detail_id][$item_id] = true;
                 }
             }
-        } else {
-            $shipment_status['shipped_info'] = null;
-            $shipment_status['shipped_status'] = null;
-            $shipment_status['can_return'] = false;
         }
 
-        // 有退貨申請單
-        if (count($order->returnRequests) > 0) {
-            //確認是否已有新版訂單
-            $new_order_id = $order->returnRequests[0]->new_order_id ? 'new_' : '';
-            $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no, $new_order_id);
-            foreach ($order->returnRequests as $returnRequest) {
-                $can_return = false;
-                if ($can_return_order['type'] == 3) {
-                    if ($returnRequest->status_code == 'COMPLETED' && $returnRequest->status_code == 'VOIDED') { //無「未結案」的退貨申請
-                        $can_return = false;
-                    } else {
-                        $can_return = true;
-                    }
+        // 退貨貨態
+        $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
+        if(isset($return_examination_info)) {
+            foreach ($return_examination_info as $return_detail) {
+                $T21 = (is_null($return_detail->created_at)) ? null : Carbon::parse($return_detail->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
+                if ($order->ship_from_whs == 'SELF') {
+                    $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
+                } else {
+                    $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//退貨檢驗單 派車時間
                 }
-                if (isset($return_examination_info)) {
-                    foreach ($return_examination_info as $return_detail) {
-                        $T21 = (is_null($return_detail->created_at)) ? null : Carbon::parse($return_detail->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
-                        if ($order->ship_from_whs == 'SELF') {
-                            $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
-                        } else {
-                            $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//退貨檢驗單 派車時間
-                        }
-                        $T23 = (is_null($return_detail->returnable_confirmed_at)) ? null : Carbon::parse($return_detail->returnable_confirmed_at)->format('Y-m-d H:i');//退貨檢驗單檢驗回報時間
-                        $T24 = (is_null($returnRequest->refund_at)) ? null : Carbon::parse($returnRequest->refund_at)->format('Y-m-d H:i');//退款成功時間 / 退款失敗時間
-                        $T25 = (is_null($return_detail->examination_reported_at)) ? null : Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
-                        $req_mobile = isset($returnRequest->req_mobile) ? substr($returnRequest->req_mobile, 0, 7) . '***' : "";
-                        $return_status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
-                            "can_return" => $can_return,
-                            "status_code" => $return_detail->examinations_status,
-                            "is_returnable" => $return_detail->is_returnable,
-                            "examination_no" => $return_detail->examination_no,
-                            "req_name" => $this->privacyCode($returnRequest->req_name),
-                            "req_mobile" => $req_mobile,
-                            "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
-                            "T21" => $T21,
-                            "T22" => $T22,
-                            "T23" => $T23,
-                            "T24" => $T24,
-                            "T25" => $T25
-                        ];
-                    }
-                }
+                $T23 = (is_null($return_detail->returnable_confirmed_at)) ? null : Carbon::parse($return_detail->returnable_confirmed_at)->format('Y-m-d H:i');//退貨檢驗單檢驗回報時間
+                $T24 = (is_null($return_detail->refund_at)) ? null : Carbon::parse($return_detail->refund_at)->format('Y-m-d H:i');//退款成功時間 / 退款失敗時間
+                $T25 = (is_null($return_detail->examination_reported_at)) ? null : Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
+                $req_mobile = isset($return_detail->req_mobile) ? substr($return_detail->req_mobile, 0, 7) . '***' : "";
+                $return_status[$return_detail->new_order_detail_id][$return_detail->product_item_id] = [
+                    "can_return" => false,
+                    "status_code" => $return_detail->examinations_status,
+                    "is_returnable" => $return_detail->is_returnable,
+                    "examination_no" => $return_detail->examination_no,
+                    "req_name" => $this->privacyCode($return_detail->req_name),
+                    "req_mobile" => $req_mobile,
+                    "req_address" => $return_detail->req_address,
+                    "T21" => $T21,
+                    "T22" => $T22,
+                    "T23" => $T23,
+                    "T24" => $T24,
+                    "T25" => $T25
+                ];
             }
             //重新組合for前端
             if (isset($return_status)) {
@@ -828,7 +806,7 @@ class OrderService
                     foreach ($examination_detail as $item_id => $detail) {
                         $info_array[] = [
                             'number_desc' => '退貨單號',
-                            'number' => $detail['examination_no'] ?? null,
+                            'number' => $detail['examination_no'],
                             'req_name' => $detail['req_name'],
                             'req_mobile' => $detail['req_mobile'],
                             'req_address' => $detail['req_address']
@@ -932,15 +910,23 @@ class OrderService
      * Author: Rowena
      * Return: string
      */
-    public function getReturnExaminationsByOrderNo(string $orderNo, $new)
+    public function getReturnExaminationsByOrderNo(string $orderNo)
     {
-        $data = ReturnRequest::select(DB::raw('distinct (`return_request_details`.`order_detail_id`), `return_request_details`.`product_item_id`
-,`return_requests`.`id`,`return_requests`.`request_no`, `return_requests`.`status_code` as `return_status`
-, `return_examinations`.*, `return_examinations`.`status_code` as `examinations_status`'))
-            ->Leftjoin('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
-            ->join('return_request_details', 'return_request_details.return_request_id', 'return_requests.id')
-            ->Leftjoin('order_details', 'order_details.order_id', 'return_requests.' . $new . 'order_id')
-            ->where('return_requests.order_no', $orderNo)->get();
+        $data = Order::select('return_examinations.status_code as examinations_status', 'return_examinations.is_returnable', 'return_examinations.examination_no'
+            , 'return_requests.req_name', 'return_requests.req_mobile', DB::raw('concat(return_requests.req_city, return_requests.req_district, return_requests.req_address) as req_address')
+            , 'return_examinations.created_at', 'return_examinations.lgst_dispatched_at', 'return_examinations.returnable_confirmed_at', 'return_examinations.examination_reported_at'
+            , 'return_requests.refund_at', 'return_request_details.product_item_id', 'order_details.id as new_order_detail_id', 'return_request_details.order_detail_id as ori_order_detail_id'
+            , 'return_request_details.product_item_id', 'order_details.id as new_order_detail_id', 'return_request_details.order_detail_id as ori_order_detail_id')
+            ->join('order_details', 'order_details.order_id', 'orders.id')
+            ->join('return_requests', 'return_requests.order_no', 'orders.order_no')
+            ->join("return_request_details", function ($join) {
+                $join->on('return_request_details.return_request_id', 'return_requests.id')
+                    ->on('return_request_details.order_detail_seq', 'order_details.seq');
+            })
+            ->join('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
+            ->where('orders.order_no', $orderNo)
+            ->where('orders.is_latest', 1)
+            ->get();
         return $data;
     }
 
@@ -1140,5 +1126,28 @@ class OrderService
             $result['results'] = [];
         }
         return $result;
+    }
+
+
+    /*
+     * 依訂單編號找出出貨貨態
+     * param string $orderNo
+     * Author: Rowena
+     * Return: string
+     */
+    public function getShipmentDetailByOrderNo(string $orderNo)
+    {
+        $data = Order::select('shipments.package_no', 'shipments.status_code', 'shipments.shipment_date', 'shipments.voided_at', 'shipments.cancelled_at', 'shipments.shipped_at', 'shipments.delivered_at', 'shipments.overdue_confirmed_at'
+            , 'shipment_details.product_item_id', 'order_details.id as new_order_detail_id', 'shipment_details.order_detail_id as ori_order_detail_id')
+            ->join('order_details', 'order_details.order_id', 'orders.id')
+            ->join('shipments', 'shipments.order_no', 'orders.order_no')
+            ->join("shipment_details", function ($join) {
+                $join->on('shipment_details.shipment_id', 'shipments.id')
+                    ->on('shipment_details.order_detail_seq', 'order_details.seq');
+            })
+            ->where('orders.order_no', $orderNo)
+            ->where('orders.is_latest', 1)
+            ->get();
+        return $data;
     }
 }
