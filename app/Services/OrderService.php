@@ -792,21 +792,21 @@ class OrderService
                 }
                 if (isset($return_examination_info)) {
                     foreach ($return_examination_info as $return_detail) {
-                        $T21 = (is_null($returnRequest->created_at)) ? null : Carbon::parse($returnRequest->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
+                        $T21 = (is_null($return_detail->created_at)) ? null : Carbon::parse($return_detail->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
                         if ($order->ship_from_whs == 'SELF') {
-                            $T22 = (is_null($returnRequest->lgst_dispatched_at)) ? null : Carbon::parse($returnRequest->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
+                            $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
                         } else {
-                            $T22 = (is_null($returnRequest->lgst_dispatched_at)) ? null : Carbon::parse($returnRequest->lgst_dispatched_at)->format('Y-m-d H:i');//退貨檢驗單 派車時間
+                            $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//退貨檢驗單 派車時間
                         }
-                        $T23 = (is_null($returnRequest->returnable_confirmed_at)) ? null : Carbon::parse($returnRequest->returnable_confirmed_at)->format('Y-m-d H:i');//退貨檢驗單檢驗回報時間
+                        $T23 = (is_null($return_detail->returnable_confirmed_at)) ? null : Carbon::parse($return_detail->returnable_confirmed_at)->format('Y-m-d H:i');//退貨檢驗單檢驗回報時間
                         $T24 = (is_null($returnRequest->refund_at)) ? null : Carbon::parse($returnRequest->refund_at)->format('Y-m-d H:i');//退款成功時間 / 退款失敗時間
-                        $T25 = (is_null($returnRequest->examination_reported_at)) ? null : Carbon::parse($returnRequest->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
+                        $T25 = (is_null($return_detail->examination_reported_at)) ? null : Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
                         $req_mobile = isset($returnRequest->req_mobile) ? substr($returnRequest->req_mobile, 0, 7) . '***' : "";
                         $return_status[$return_detail->order_detail_id][$return_detail->product_item_id] = [
                             "can_return" => $can_return,
                             "status_code" => $return_detail->examinations_status,
                             "is_returnable" => $return_detail->is_returnable,
-                            "examination_no" => $returnRequest->examination_no,
+                            "examination_no" => $return_detail->examination_no,
                             "req_name" => $this->privacyCode($returnRequest->req_name),
                             "req_mobile" => $req_mobile,
                             "req_address" => $returnRequest->req_city . $returnRequest->req_district . $returnRequest->req_address,
