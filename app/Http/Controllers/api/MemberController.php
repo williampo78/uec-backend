@@ -366,12 +366,12 @@ class MemberController extends Controller
             $payload['results']['cancelled_at'] = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i:s');
         }
         $giveaway_qty = [];
-
+        $countReturn = 0;
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
         // 貨態進度
         $shippedStatus = $this->orderService->getShippedStatus($order, $payload['results']['can_return_order']);
-        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus) {
+        $order->orderDetails->each(function ($orderDetail) use (&$payload, &$giveaway_qty, &$gtm, &$shippedStatus, &$countReturn) {
             if ($orderDetail->record_identity == 'M') {
                 $orderDetailPayload = [
                     'id' => $orderDetail->id,
@@ -400,6 +400,9 @@ class MemberController extends Controller
 
                 $payload['results']['order_details'][] = $orderDetailPayload;
                 $payload['results']['product_totals'] += 1;
+                if (isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id])) {
+                    $countReturn += 1;
+                }
             } else {
                 //order_details 非商品的數量
                 $giveaway_qty[$orderDetail->id] = ($orderDetail->qty - $orderDetail->returned_qty);
@@ -432,6 +435,12 @@ class MemberController extends Controller
             if (isset($returnRequest->request_date)) {
                 $payload['results']['return_date'] = Carbon::parse($returnRequest->request_date)->format('Y-m-d H:i:s');
             }
+        }
+
+        //可退貨的數量 = 單品數量時可以有退貨鈕
+        if ($payload['results']['can_return_order']['type'] == 3 && $countReturn == $payload['results']['product_totals']) {
+            $payload['results']['can_return_order']['status'] = false;
+            $payload['results']['can_return_order']['type'] = 4;
         }
 
         //金流相關數字
