@@ -543,7 +543,7 @@ class OrderService
                 $orderDetailIds = $findProductPRD_G->pluck('order_detail_id')->toArray();
                 $OrderDetails = collect();
                 if (empty($OrderDetails) === false) {
-                    $OrderDetails = OrderDetail::select(['id', 'order_id', 'product_id', 'qty'])
+                    $OrderDetails = OrderDetail::select(['id', 'order_id', 'product_id', 'qty', 'returned_qty'])
                         ->whereIn('id', $orderDetailIds)
                         ->get();
                 }
@@ -563,6 +563,7 @@ class OrderService
                     $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
 
                     if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
+                        $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty -optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
                         $order_details[$key]['discount_content'][$PRD->group_seq] = [
                             'display' => true,
                             'campaignName' => $PRD->promotionalCampaign->campaign_name,
@@ -574,19 +575,20 @@ class OrderService
                                     'productId' => $PRD->product->id,
                                     'productName' => $PRD->product->product_name,
                                     'productPhoto' => $photo_name,
-                                    'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty,
+                                    'qty' => $qty,
                                     'spec_1_value' => optional($PRD->productItem)->spec_1_value,
                                     'spec_2_value' => optional($PRD->productItem)->spec_2_value
                                 ],
                             ],
                         ];
                     } else {
+                        $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty -optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
                         $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
                             'id' => $PRD->order_detail_id,
                             'productId' => $PRD->product->id,
                             'productName' => $PRD->product->product_name,
                             'productPhoto' => $photo_name,
-                            'qty' => optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty,
+                            'qty' => $qty,
                             'spec_1_value' => optional($PRD->productItem)->spec_1_value,
                             'spec_2_value' => optional($PRD->productItem)->spec_2_value
                         ];
@@ -862,6 +864,11 @@ class OrderService
                     }
                 }
             }
+        }
+        if (!isset($shipment_status)) {
+            $shipment_status['shipped_info'] = null;
+            $shipment_status['shipped_status'] = null;
+            $shipment_status['can_return'] = false;
         }
         return $shipment_status;
     }
