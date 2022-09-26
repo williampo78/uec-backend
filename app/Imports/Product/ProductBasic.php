@@ -17,7 +17,7 @@ class ProductBasic implements ToCollection, WithMapping, WithStartRow, WithColum
     use Importable;
 
     //計算行數
-    protected $rowNum = 3;
+    protected $rowNum = 2;
 
     /**
      * @param Collection $collection
@@ -48,7 +48,6 @@ class ProductBasic implements ToCollection, WithMapping, WithStartRow, WithColum
             'supplier_item_no', //廠商貨號
             'ean', //國際條碼
             'pos_item_no',//POS品號
-            'prepared_qty', //實際庫存量
             'safty_qty', //安全庫存量
             'min_purchase_qty', //最小入庫量
             'photo_name', //Item圖示
@@ -78,6 +77,7 @@ class ProductBasic implements ToCollection, WithMapping, WithStartRow, WithColum
             'specification', //商品規格(html編輯器)
             'category_number',//  指定「POS小分類」代碼
             'web_category_hierarchy_ids',//  前台分類
+            'selling_channel'
         ]);
         $datekey = [];
         $index = 0;
