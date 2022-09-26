@@ -442,6 +442,9 @@ class MemberController extends Controller
         if ($payload['results']['can_return_order']['type'] == 3 && $payload['results']['return_product_totals'] == $payload['results']['product_totals']) {
             $payload['results']['can_return_order']['status'] = false;
             $payload['results']['can_return_order']['type'] = 4;
+        } else {
+            $payload['results']['can_return_order']['status'] = $shippedStatus['can_return_order']['status'];
+            $payload['results']['can_return_order']['type'] = $shippedStatus['can_return_order']['type'];
         }
 
         //金流相關數字

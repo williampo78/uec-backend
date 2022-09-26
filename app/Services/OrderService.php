@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\Types\Integer;
 use function PHPUnit\Framework\isEmpty;
+use function Symfony\Component\Translation\t;
 
 class OrderService
 {
@@ -565,7 +566,7 @@ class OrderService
                     $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
 
                     if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
-                        $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty -optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
+                        $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
                         $order_details[$key]['discount_content'][$PRD->group_seq] = [
                             'display' => true,
                             'campaignName' => $PRD->promotionalCampaign->campaign_name,
@@ -584,7 +585,7 @@ class OrderService
                             ],
                         ];
                     } else {
-                        $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty -optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
+                        $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
                         $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
                             'id' => $PRD->order_detail_id,
                             'productId' => $PRD->product->id,
@@ -771,11 +772,24 @@ class OrderService
                 }
             }
         }
+        $re_write_type = $can_return_order['type'];
+        $re_write_status = $can_return_order['status'];
 
         // 退貨貨態
         $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
-        if(isset($return_examination_info)) {
+        if ($can_return_order['type'] == 2 && $return_examination_info->count() == 0) { //至少一張出貨單配達、尚有出貨單未配達，沒有退貨
+            $re_write_type = 3;
+            $re_write_status = true;
+        }
+        $shipment_status['can_return_order']['type'] = $re_write_type;
+        $shipment_status['can_return_order']['status'] = $re_write_status;
+        if (isset($return_examination_info)) {
             foreach ($return_examination_info as $return_detail) {
+                $return_type = false;
+                if (($return_detail->return_requests_status != 'COMPLETED' || $return_detail->return_requests_status != 'VOIDED')) { //「未結案」的退貨申請
+                    $shipment_status['can_return_order']['type'] = 2;
+                    $shipment_status['can_return_order']['status'] = true;
+                }
                 $T21 = (is_null($return_detail->created_at)) ? null : Carbon::parse($return_detail->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
                 if ($order->ship_from_whs == 'SELF') {
                     $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
@@ -787,7 +801,7 @@ class OrderService
                 $T25 = (is_null($return_detail->examination_reported_at)) ? null : Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
                 $req_mobile = isset($return_detail->req_mobile) ? substr($return_detail->req_mobile, 0, 7) . '***' : "";
                 $return_status[$return_detail->new_order_detail_id][$return_detail->product_item_id] = [
-                    "can_return" => false,
+                    "can_return" => $return_type,
                     "status_code" => $return_detail->examinations_status,
                     "is_returnable" => $return_detail->is_returnable,
                     "examination_no" => $return_detail->examination_no,
@@ -806,7 +820,6 @@ class OrderService
                 foreach ($return_status as $order_detail_id => $examination_detail) {
                     $info_array = [];
                     $show_array = [];
-                    $can_return = false;
                     foreach ($examination_detail as $item_id => $detail) {
                         $info_array[] = [
                             'number_desc' => '退貨單號',
@@ -862,7 +875,7 @@ class OrderService
                         }
                         $shipment_status['shipped_info'][$order_detail_id][$item_id] = $info_array;
                         $shipment_status['shipped_status'][$order_detail_id][$item_id] = $show_array;
-                        $shipment_status['can_return'][$order_detail_id][$item_id] = $can_return;
+                        $shipment_status['can_return'][$order_detail_id][$item_id] = false;
                     }
                 }
             }
@@ -922,7 +935,7 @@ class OrderService
     public function getReturnExaminationsByOrderNo(string $orderNo)
     {
         $data = Order::select('return_examinations.status_code as examinations_status', 'return_examinations.is_returnable', 'return_examinations.examination_no'
-            , 'return_requests.req_name', 'return_requests.req_mobile', DB::raw('concat(return_requests.req_city, return_requests.req_district, return_requests.req_address) as req_address')
+            , 'return_requests.status_code as return_requests_status', 'return_requests.req_name', 'return_requests.req_mobile', DB::raw('concat(return_requests.req_city, return_requests.req_district, return_requests.req_address) as req_address')
             , 'return_examinations.created_at', 'return_examinations.lgst_dispatched_at', 'return_examinations.returnable_confirmed_at', 'return_examinations.examination_reported_at'
             , 'return_requests.refund_at', 'return_request_details.product_item_id', 'order_details.id as new_order_detail_id', 'return_request_details.order_detail_id as ori_order_detail_id'
             , 'return_request_details.product_item_id', 'order_details.id as new_order_detail_id', 'return_request_details.order_detail_id as ori_order_detail_id')
