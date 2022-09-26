@@ -1455,7 +1455,7 @@ class APIOrderService
                     $payment = OrderPayment::where('id', $newOrderPayment->id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => now()]);
                     if ($payment) {
                         if ($webData['payment_method'] == 'TAPPAY_INSTAL') {
-                            $tapPayData['order_no'] = $newOrder->id;
+                            $tapPayData['order_no'] = $webData['order_no'];
                             $tapPayData['card_key'] = Crypt::encrypt($tapPayResult['card_secret']['card_key']);
                             $tapPayData['card_token'] = Crypt::encrypt($tapPayResult['card_secret']['card_token']);
                             $tapPayData['created_by'] = $member_id;
