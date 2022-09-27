@@ -96,6 +96,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/products', ProductController::class, ['names' => ['index' => 'products']]);
 
     // 商品主檔 - 批次上傳
+
+    Route::get('/product-batch-upload/download/{id}', [ProductBatchController::class, 'download'])->name("product-batch-upload.download");
     Route::resource('/product-batch-upload',ProductBatchController::class , ['names' => ['index' => 'product-batch-upload']]);
     // 商品主檔 - 商城資訊管理
     Route::post('/products_mall/ajax', [ProductsMallController::class, 'ajax']);

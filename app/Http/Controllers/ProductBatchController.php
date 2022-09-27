@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Resources\Product\BatchResource;
 use App\Services\ProductBatchService;
 use App\Services\SupplierService;
-use App\Http\Resources\Product\BatchResource;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProductBatchController extends Controller
 {
@@ -128,5 +129,16 @@ class ProductBatchController extends Controller
     public function destroy($id)
     {
         //
+    }
+        /**
+     * 下載log
+     *
+     * @return void
+     */
+    public function download($id)
+    {
+        $get = $this->productBatchService->getById($id);
+
+        return Storage::disk('s3')->download($get->job_log_file);
     }
 }
