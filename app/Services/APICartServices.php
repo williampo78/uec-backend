@@ -1179,22 +1179,21 @@ class APICartServices
         $now = Carbon::now();
         $webDataAdd = [];
         $webDataUpd = [];
+        $i = 0;
+        $j = 0;
         foreach ($input['item_id'] as $key => $value) {
-
             //確認是否有該品項
             $product_item = ProductItem::where('id', $value)->get()->toArray();
+            if (!$product_item) continue;
             //確認是否有該品項
             $item = ShoppingCartDetail::where('member_id', '=', $member_id)->where('product_item_id', '=', $value)->first();
-
             if ($item) {
-
                 $latest_added_at = $item->latest_added_at;
                 //如果資料原本的狀態為1(已轉為訂單)或-1(已自購物車刪除)，則要更新時間
                 if ($item->status_code == 1 || $item->status_code == -1) {
                     $latest_added_at = $now;
                 }
-
-                $webDataUpd[$key] = [
+                $webDataUpd[$i] = [
                     "id" => $item->id,
                     "product_id" => $product_item[0]['product_id'],
                     "product_item_id" => $input['item_id'][$key],
@@ -1209,8 +1208,9 @@ class APICartServices
                     "updated_by" => $member_id,
                     "updated_at" => $now,
                 ];
+                $i++;
             } else {
-                $webDataAdd[$key] = [
+                $webDataAdd[$j] = [
                     $member_id,
                     $product_item[0]['product_id'],
                     $value,
@@ -1227,15 +1227,14 @@ class APICartServices
                     $now,
                     $now,
                 ];
+                $j++;
             }
-
         }
         $addColumn = [
             "member_id", "product_id", "product_item_id", "qty", "status_code",
             "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_time", "latest_added_at",
             "created_by", "updated_by", "created_at", "updated_at",
         ];
-
         DB::beginTransaction();
         try {
 
