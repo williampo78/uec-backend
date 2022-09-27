@@ -203,7 +203,7 @@ class ProductBatchService
                     'specification' => $productBasice['specification'] ?? '',
                     'rowNum' => $productBasice['rowNum'] ?? '',
                     'supplier_id' => $supplierData->id ?? '',
-                    'tax_type' => $supplierData->tax_type ?? '',
+                    'tax_type' => 'TAXABLE',
                     'supplier_product_no' => $supplier_product_no,
                     'brand_id' => $brandsData->id ?? '',
                     'lgst_temperature' => 'NORMAL', //常溫
@@ -232,9 +232,8 @@ class ProductBatchService
                         'safty_qty' => $item['safty_qty'] ?? '',
                         'photo_name' => $item['photo_name'] ?? '',
                         'rowNum' => $item['rowNum'] ?? '',
-                        'pos_item_no' => $productBasice['pos_item_no'] ?? '',
+                        'pos_item_no' => $item['pos_item_no'] ?? '',
                         'ean' => $item['ean'] ?? '',
-
                     ]));
                 }
 
@@ -854,6 +853,21 @@ class ProductBatchService
                 if (empty($productBasice['promotion_start_at']) || empty($productBasice['promotion_end_at'])) {
                     $productBasice = $productBasice->except(['promotion_start_at', 'promotion_end_at']);
                 }
+                switch ($productBasice['selling_channel']) {
+                    case 'E':
+                        $productBasice['selling_channel'] = 'EC';
+                        break;
+                    case 'S':
+                        $productBasice['selling_channel'] = 'STORE';
+                        break;
+                    case 'W':
+                        $productBasice['selling_channel'] ='WHOLE';
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+
                 //寫入新品提報table
                 $productId = Product::create($productBasice->toArray())->id;
 
@@ -884,7 +898,7 @@ class ProductBatchService
                         $img->resize('480', '480');
                         $resource = $img->stream()->detach();
                         $newPath = "products/{$productId}/{$newPhotoName}{$photoType}";
-                        // Storage::disk('s3')->put("{$newPath}", $resource, 'public');
+                        Storage::disk('s3')->put("{$newPath}", $resource, 'public');
                         $newItemPhotos->push([
                             'oldImagePath' => $imagePath,
                             'newImagePath' => $newPath,
@@ -1022,8 +1036,8 @@ class ProductBatchService
                 "sort" => $key,
                 "spec_1_value" => $item["spec_1_value"],
                 "spec_2_value" => $item["spec_2_value"],
-                "spec_1_only_key" => $findSpecOne["onlyKey"] ?? "",
-                "spec_2_only_key" => $findSpecTwo["onlyKey"] ?? "",
+                "spec_1_only_key" => $findSpecOne["only_key"] ?? "",
+                "spec_2_only_key" => $findSpecTwo["only_key"] ?? "",
                 "item_no" => "",
                 "pos_item_no" => $item["pos_item_no"],
                 "supplier_item_no" => $item["supplier_item_no"],
