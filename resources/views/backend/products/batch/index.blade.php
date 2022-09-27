@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 
-@section('title', '商品主檔 - 商品上架申請')
+@section('title', '商品主檔 - 批次上傳')
 
 @section('content')
 
@@ -10,7 +10,7 @@
             <!-- 表頭名稱 -->
             <div class="row">
                 <div class="col-sm-12">
-                    <h3 class="page-header"><i class="fa-solid fa-cube"></i>新品提報_批次上傳</h3>
+                    <h3 class="page-header"><i class="fa-solid fa-cube"></i>商品主檔 - 批次上傳</h3>
                 </div>
             </div>
             <div class="row">
@@ -121,7 +121,7 @@
                                         <td>@{{ item.status_name }}</td>
                                         <td>@{{ item.job_completed_at }}</td>
                                         <td>@{{ item.job_completed_log }}
-                                            <a v-show="item.job_log_file !== null" v-show :href="'/backend/sup_req_batch_products/download/'+item.id">下載失敗原因說明</a>
+                                            <a v-show="item.job_log_file !== null" v-show :href="'/backend/product-batch-upload/download/'+item.id">下載失敗原因說明</a>
                                         </td>
                                     </tr>
                                 </tbody>

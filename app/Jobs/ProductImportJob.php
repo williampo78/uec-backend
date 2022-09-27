@@ -79,6 +79,7 @@ class ProductImportJob implements ShouldQueue
             $zipAbsolutePath = Storage::path($productBatchData->saved_file_2_name);
             $endPath = $productBatchService->getFileFolderPath($productBatchData->saved_file_2_name);
             $extract = Storage::disk('s3')->extractTo($endPath, $zipAbsolutePath); //壓縮完後丟到S3
+            Storage::deleteDirectory($endPath);
             if (!$extract) {
                 $productBatchService->updateStatusById($productBatchData->id, 2, [
                     'job_completed_log' => '解壓縮失敗',
