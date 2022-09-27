@@ -196,7 +196,12 @@ return [
         App\Providers\ExcelServiceProvider::class,
         App\Providers\StrServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class , // 裁切圖片套件
-        Mews\Captcha\CaptchaServiceProvider::class
+        Mews\Captcha\CaptchaServiceProvider::class,
+        /**
+         * zip Plugin
+         */
+        App\Providers\Plugin\ExtendedLocalServiceProvider::class,
+        App\Providers\Plugin\ExtendedS3ServiceProvider::class,
     ],
 
     /*

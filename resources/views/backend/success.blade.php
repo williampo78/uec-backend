@@ -46,7 +46,9 @@
                                         @case('review_success')
                                             審核成功！
                                             @break
-
+                                        @case('upload_success')
+                                            已成功上傳檔案！
+                                        @break
                                         @default
                                             @isset($message)
                                                 {{ $message }}

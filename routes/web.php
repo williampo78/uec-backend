@@ -45,6 +45,8 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WebCategoryHierarchyController;
 use App\Http\Controllers\WebCategoryProductsController;
 use App\Http\Controllers\WebContentsController;
+use App\Http\Controllers\ProductBatchController;
+use App\Models\Product;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use Illuminate\Support\Facades\Route;
 
@@ -93,6 +95,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/products/ajax', [ProductController::class, 'ajax']);
     Route::resource('/products', ProductController::class, ['names' => ['index' => 'products']]);
 
+    // 商品主檔 - 批次上傳
+    Route::resource('/product-batch-upload',ProductBatchController::class , ['names' => ['index' => 'product-batch-upload']]);
     // 商品主檔 - 商城資訊管理
     Route::post('/products_mall/ajax', [ProductsMallController::class, 'ajax']);
     Route::resource('/products_mall', ProductsMallController::class, ['names' => ['index' => 'products_mall']]);

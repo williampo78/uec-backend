@@ -123,6 +123,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 365,
         ],
+        'batch_upload' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/batch_upload/batch.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 365,
+        ],
     ],
 
 ];
