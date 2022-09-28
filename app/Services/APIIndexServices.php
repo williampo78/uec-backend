@@ -54,7 +54,7 @@ class APIIndexServices
         } else {
             $ads = $ads->where("ad1.applicable_page", "=", "HOME");
         }
-        $ads = $ads->get();
+        $ads = $ads->orderBy('ad3.sort', 'asc')->get();
 
         $data = [];
         $img_H080A = [];
