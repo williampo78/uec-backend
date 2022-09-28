@@ -119,7 +119,7 @@ class ProductBatchService
      */
     public function addJob($batchUploadLogId)
     {
-        dispatch(new ProductImportJob($batchUploadLogId))->onQueue('common');
+        dispatch(new ProductImportJob($batchUploadLogId))->onQueue('dradvice-product-batch');
 
         return true;
     }
