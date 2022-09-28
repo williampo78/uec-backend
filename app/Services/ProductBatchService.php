@@ -119,7 +119,7 @@ class ProductBatchService
      */
     public function addJob($batchUploadLogId)
     {
-        dispatch(new ProductImportJob($batchUploadLogId))->onQueue('dradvice-product-batch');
+        dispatch(new ProductImportJob($batchUploadLogId))->onQueue('backend-product');
 
         return true;
     }
