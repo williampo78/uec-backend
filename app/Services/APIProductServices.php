@@ -326,7 +326,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null, $filter = null)
     {
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
@@ -428,17 +428,23 @@ class APIProductServices
         $products = $products->orderBy('p.id', 'asc');
 
         $products = $products->get();
-
         $data = [];
         $product_id = 0;
         $web_category_hierarchy_id = 0;
-        foreach ($products as $product) {
-            if (!$id) {//依產品編號找相關分類不進此判斷
-                if ($product->id == $product_id && $product->web_category_hierarchy_id == $web_category_hierarchy_id) continue;
+
+        if ($filter) {
+            foreach ($products as $product) {
+                $data[$product->web_category_hierarchy_id][$product->id][$product->attribute_id ?? 0] = $product;
             }
-            $data[$product->web_category_hierarchy_id][] = $product;
-            $product_id = $product->id;
-            $web_category_hierarchy_id = $product->web_category_hierarchy_id;
+        } else {
+            foreach ($products as $product) {
+                if (!$id) {//依產品編號找相關分類不進此判斷
+                    if ($product->id == $product_id && $product->web_category_hierarchy_id == $web_category_hierarchy_id) continue;
+                }
+                $data[$product->web_category_hierarchy_id][] = $product;
+                $product_id = $product->id;
+                $web_category_hierarchy_id = $product->web_category_hierarchy_id;
+            }
         }
         return $data;
     }
@@ -1699,17 +1705,19 @@ class APIProductServices
         foreach ($condition as $key) {
             $attribute_array[$key] = [];
         }
-        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand, 1);
         if ($products) {
             foreach ($products as $cateID => $prod) {
-                foreach ($prod as $product) {
-                    //品牌(商品)
-                    if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
-                    $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
-                    //屬性(商品)
-                    if (isset($attribute_array[$product->attribute_type])) {
-                        if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 0;
-                        $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 1;
+                foreach ($prod as $attribute) {
+                    foreach ($attribute as $product) {
+                        //品牌(商品)
+                        if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
+                        $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
+                        //屬性(商品)
+                        if (isset($attribute_array[$product->attribute_type])) {
+                            if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 0;
+                            $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 1;
+                        }
                     }
                 }
             }
