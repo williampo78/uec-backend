@@ -119,7 +119,7 @@ class ProductBatchService
      */
     public function addJob($batchUploadLogId)
     {
-        dispatch(new ProductImportJob($batchUploadLogId))->onQueue('common');
+        dispatch(new ProductImportJob($batchUploadLogId))->onQueue('backend-product');
 
         return true;
     }
@@ -631,7 +631,7 @@ class ProductBatchService
                     }
                     // POS商品編號已跟現有品項重複
                     if (!empty($item['pos_item_no'])) {
-                        if($productItem->where('pos_item_no',$item['pos_item_no'])->first()){
+                        if($productItem->where('pos_item_no',$item['pos_item_no'])->count() > 0){
                             $errorContent['errorMessage'] = 'POS商品編號已跟現有品項重複';
                             array_push($result, $errorContent);
                         };
@@ -938,6 +938,7 @@ class ProductBatchService
                         'sort' => $item['sort'] ?? 0,
                         'spec_1_value' => $item['spec_1_value'] ?? '',
                         'spec_2_value' => $item['spec_2_value'] ?? '',
+                        'pos_item_no'=>$item['pos_item_no'] ?? '' ,
                         'supplier_item_no' => $item['supplier_item_no'],
                         'item_no' => $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
                         'photo_name' => $photoName,

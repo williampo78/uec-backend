@@ -46,6 +46,7 @@ use App\Http\Controllers\WebCategoryHierarchyController;
 use App\Http\Controllers\WebCategoryProductsController;
 use App\Http\Controllers\WebContentsController;
 use App\Http\Controllers\ProductBatchController;
+use App\Http\Controllers\DownloadSampleController;
 use App\Models\Product;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use Illuminate\Support\Facades\Route;
@@ -349,5 +350,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::group(['prefix' => 'stock-transaction-logs', 'as' => 'backend_stock_transaction_logs'], function () {
         Route::get('/', [StockTransactionLogController::class, 'index']);
     });
+    Route::get('/download-sample/{fileName}', [DownloadSampleController::class, 'index']);
 
 });

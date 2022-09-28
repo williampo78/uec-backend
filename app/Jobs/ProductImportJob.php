@@ -57,7 +57,6 @@ class ProductImportJob implements ShouldQueue
      */
     public function handle(ProductBatchService $productBatchService)
     {
-
         try {
             Log::channel('batch_upload')->warning("log id : {$this->logId} 開始寫入");
             try {
@@ -65,8 +64,6 @@ class ProductImportJob implements ShouldQueue
                 $excelData = Excel::toArray(new BatchImport, $productBatchData->saved_file_1_name, '');
                 $products = collect($excelData[0]); // 取得商品
                 $productPhoto = collect($excelData[1]); //取得照片
-                Log::channel('batch_upload')->warning("log id : {$this->logId} -01");
-
             } catch (\Exception $e) {
                 Log::channel('batch_upload')->warning($e->getMessage());
                 $productBatchService->updateStatusById($productBatchData->id, 2, [
@@ -79,7 +76,6 @@ class ProductImportJob implements ShouldQueue
             $zipAbsolutePath = Storage::path($productBatchData->saved_file_2_name);
             $endPath = $productBatchService->getFileFolderPath($productBatchData->saved_file_2_name);
             $extract = Storage::disk('s3')->extractTo($endPath, $zipAbsolutePath); //壓縮完後丟到S3
-            Storage::deleteDirectory($endPath);
             if (!$extract) {
                 $productBatchService->updateStatusById($productBatchData->id, 2, [
                     'job_completed_log' => '解壓縮失敗',
@@ -91,11 +87,13 @@ class ProductImportJob implements ShouldQueue
             $verifyProduct = $productBatchService->verifyProduct($products); //檢查基本商品
             $verifySkuItem = $productBatchService->verifySkuItem($products); //進階檢查規格
             $verifyPhoto = $productBatchService->verifyPhoto($endPath, $productPhoto); //檢查照片
+            Storage::deleteDirectory($endPath);
+
             // //驗證未過
             if (!empty($verifyProduct) || !empty($verifySkuItem || !empty($verifyPhoto))) {
 
                 $random = Str::random(40);
-                $excelEndPath = "log/SupReqProduct/{$random}.xlsx";
+                $excelEndPath = "log/batchLog/{$random}.xlsx";
 
                 Excel::store(new ErrorImpoerLogExport($productBatchService->exportForm([
                     'verifyProduct' => $verifyProduct,
@@ -119,6 +117,7 @@ class ProductImportJob implements ShouldQueue
                 $productBatchService->updateStatusById($productBatchData->id, 1, [
                     'job_completed_log' => $job_completed_log,
                 ]);
+                Log::channel('batch_upload')->warning("log id : {$this->logId} 寫入完成");
 
                 return true;
             } else {
@@ -129,9 +128,9 @@ class ProductImportJob implements ShouldQueue
                 return false;
             }
 
-            Log::channel('batch_upload')->warning("log id : {$this->logId} 寫入完成");
         } catch (Exception $e) {
             $productBatchService->updateStatusById($this->logId, BatchUploadLogStatus::STATUS_FAILED);
+            Log::channel('batch_upload')->warning("catch log id : {$this->logId} 失敗" . $e->getMessage());
         }
     }
 

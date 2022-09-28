@@ -85,7 +85,7 @@
                                     <div>
                                         <ul style="list-style-type:none;">
                                             <li><b>注意事項</b></li>
-                                            <li>(1) 請先下載範例檔</li>
+                                            <li>(1) 請先下載範例檔(<a href="/backend/download-sample/商品主檔批次上傳-範例.xlsx">下載</a>)</li>
                                             <li>(2) 商品Excel</li>
                                             <li>　♦ 附檔名須為xlsx，筆數最多100筆</li>
                                             <li>　♦ 包含「items」、「photos」2個頁籤</li>
@@ -96,7 +96,7 @@
                                             <li>　♦ 各商品請獨立一個資料夾存放圖片</li>
                                             <li>　♦ 單張圖片的大小請勿超過1M、寬與高的比例須為1:1、至少須為480*480</li>
                                             <li>(4) 上傳檔案「商品Excel」、「圖片ZIP」加總大小上限為400MB</li>
-                                            <li>(5) 執行匯入後，約須10~20分鐘的等待時間，會再透過eMail通知匯入結果。</li>
+                                            <li>(5) 執行匯入後，約須10~20分鐘的等待時間，可從匯入記錄查看。</li>
                                         </ul>
                                     </div>
                                 </form>
@@ -104,7 +104,8 @@
                         </div>
                         {{-- tab show 2 --}}
                         <div class="tab-pane fade" id="import-log" role="tabpanel" aria-labelledby="import-log-tab">
-                            <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
+                            <table class="table table-striped table-bordered table-hover" style="width:100%"
+                                id="table_list">
                                 <thead>
                                     <tr>
                                         <th>匯入時間</th>
@@ -121,7 +122,8 @@
                                         <td>@{{ item.status_name }}</td>
                                         <td>@{{ item.job_completed_at }}</td>
                                         <td>@{{ item.job_completed_log }}
-                                            <a v-show="item.job_log_file !== null" v-show :href="'/backend/product-batch-upload/download/'+item.id">下載失敗原因說明</a>
+                                            <a v-show="item.job_log_file !== null" v-show
+                                                :href="'/backend/product-batch-upload/download/' + item.id">下載失敗原因說明</a>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -190,9 +192,9 @@
 
                     return true;
                 },
-                clearFile(){
-                    document.getElementById('excel').value= null;
-                    document.getElementById('image_zip').value= null;
+                clearFile() {
+                    document.getElementById('excel').value = null;
+                    document.getElementById('image_zip').value = null;
                 }
             },
             mounted() {
@@ -205,7 +207,12 @@
                 $("#form_import").validate({
                     // debug: true,
                     submitHandler: function(form) {
-                        return true;
+                        var yes = confirm('確定要匯入資料？');
+                        if (yes) {
+                            return true;
+                        } else{
+                            return false;
+                        }
                     },
                     errorClass: "help-block",
                     errorElement: "span",
