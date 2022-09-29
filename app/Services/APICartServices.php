@@ -2404,7 +2404,6 @@ class APICartServices
                 "shippingFee" => $fee,
                 "checkout" => $cartTotal - round($cartDiscount) + round($thresholdAmount),
             );
-
             //有符合的滿額折扣時
             if (count($cart['thresholdDiscount']) > 0) {
                 //取得滿額門檻內容
@@ -2536,6 +2535,7 @@ class APICartServices
                 //重構門檻活動
                 foreach ($cart['list'] as $productKey => $products) { //主產品
                     $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
+                    $products['campaignThresholdGiveaway'] = [];
                     $cart['list'][$productKey] = $products;
                 }
             }
