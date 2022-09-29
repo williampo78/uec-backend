@@ -1138,6 +1138,7 @@ class APIProductServices
             ->when(isset($min_consumption), function ($query) use ($min_consumption) {
                 $query->where('min_consumption', '<=', $min_consumption);
             })
+            ->orderBy('issuing_bank_no', 'asc')
             ->orderBy('interest_rate', 'asc')
             ->orderBy('number_of_installments', 'asc')
             ->get([
