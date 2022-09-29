@@ -85,7 +85,7 @@
                                     <div>
                                         <ul style="list-style-type:none;">
                                             <li><b>注意事項</b></li>
-                                            <li>(1) 請先下載範例檔(<a href="/backend/download-sample/商品主檔批次上傳-範例.xlsx">下載</a>)</li>
+                                            <li>(1) 請先下載範例檔(<a href="/backend/download-sample/product-batch-upload-sample.xlsx?rename=商品主檔批次上傳-範例&type=xlsx">下載</a>)</li>
                                             <li>(2) 商品Excel</li>
                                             <li>　♦ 附檔名須為xlsx，筆數最多100筆</li>
                                             <li>　♦ 包含「items」、「photos」2個頁籤</li>
