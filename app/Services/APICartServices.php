@@ -1428,10 +1428,8 @@ class APICartServices
                     }
                 }
             }
-            if ($stock_type == 'supplier' && !isset($product_payment_method['supplier'])) {
-                return json_encode(array("status" => 401, "result" => ['沒有符合廠商出貨的商品']));
-            } else {
-                return json_encode(array("status" => 401, "result" => ['沒有符合自出出貨的商品']));
+            if (!isset($product_payment_method[$stock_type])) {
+                return json_encode(array("status" => 401, "result" => ['沒有符合出貨的商品']));
             }
             //行銷活動
             foreach ($campaigns as $product_id => $item) {
