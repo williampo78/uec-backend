@@ -2528,7 +2528,7 @@ class APICartServices
                         }
                         if ($check > 0) {
                             $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
-                        } else{
+                        } else {
                             $products['campaignThresholdGiveaway'] = [];
                             $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                         }
@@ -2545,7 +2545,7 @@ class APICartServices
             }
 
             //取得主商品交集共同的付款方式
-            $payment_method = $product_payment_method[$stock_type][0];
+            $payment_method = isset($product_payment_method[$stock_type][0]) ? $product_payment_method[$stock_type][0] : ['TAPPAY_CREDITCARD'];
             foreach ($product_payment_method[$stock_type] as $collection) {
                 $payment_method = $collection->intersect($payment_method);
             }
