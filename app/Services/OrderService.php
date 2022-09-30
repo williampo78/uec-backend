@@ -771,23 +771,27 @@ class OrderService
                 }
             }
         }
-        $re_write_type = $can_return_order['type'];
-        $re_write_status = $can_return_order['status'];
 
         // 退貨貨態
         $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
-        if ($can_return_order['type'] == 2 && $return_examination_info->count() == 0) { //至少一張出貨單配達、尚有出貨單未配達，沒有退貨
-            $re_write_type = 3;
-            $re_write_status = true;
+
+        //可否申請退貨 B
+        if ($can_return_order['type'] == 2 && $return_examination_info->count() == 0) { //至少一張出貨單配達、尚有出貨單未配達，沒有退貨檢驗單
+            $shipment_status['can_return_order']['type'] = 3;
+            $shipment_status['can_return_order']['status'] = true;
         }
-        $shipment_status['can_return_order']['type'] = $re_write_type;
-        $shipment_status['can_return_order']['status'] = $re_write_status;
+
         if (isset($return_examination_info)) {
+            $voided_count = 0;
+            $exam_count = 0;
             foreach ($return_examination_info as $return_detail) {
                 $return_type = false;
-                if (($return_detail->return_requests_status != 'COMPLETED' || $return_detail->return_requests_status != 'VOIDED')) { //「未結案」的退貨申請
-                    $shipment_status['can_return_order']['type'] = 2;
-                    $shipment_status['can_return_order']['status'] = true;
+                if ($return_detail->return_requests_status != 'COMPLETED' && $return_detail->return_requests_status != 'VOIDED') { //未結案，退貨取消
+                    $exam_count++;
+                }
+                if ($return_detail->return_requests_status == 'VOIDED') { //退貨取消，狀態回復出貨狀態
+                    $voided_count++;
+                    continue;
                 }
                 $T21 = ($return_detail->created_at) ? Carbon::parse($return_detail->created_at)->format('Y-m-d H:i') : null;//退貨檢驗單 產生時間
                 if ($order->ship_from_whs == 'SELF') {
@@ -877,6 +881,14 @@ class OrderService
                         $shipment_status['can_return'][$order_detail_id][$item_id] = false;
                     }
                 }
+            }
+
+            if ($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
+                $shipment_status['can_return_order']['type'] = 3;
+                $shipment_status['can_return_order']['status'] = true;
+            } elseif ($exam_count > 0) { //有退貨申請未完成的
+                $shipment_status['can_return_order']['type'] = 2;
+                $shipment_status['can_return_order']['status'] = false;
             }
         }
         if (!isset($shipment_status)) {
