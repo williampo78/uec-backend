@@ -1120,6 +1120,8 @@ class OrderService
                                 $msg['examination'][$returnExamination->examination_no][] = [
                                     'id' => $orderDetail->id,
                                     'product_name' => $orderDetail->product->product_name,
+                                    'spec_1_value' => ($orderDetail->product->spec_dimension > 0 ? $orderDetail->productItem->spec_1_value : ''),
+                                    'spec_2_value' => ($orderDetail->product->spec_dimension > 1 ? $orderDetail->productItem->spec_2_value : ''),
                                     'return_qty' => $orderDetail->qty,
                                     'record_identity' => $orderDetail->record_identity
                                 ];

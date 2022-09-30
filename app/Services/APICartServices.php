@@ -1409,27 +1409,23 @@ class APICartServices
                 }
             }
             $prodQty = [];
-            $cartStockTypeCount['dradvice'] = [];
-            $cartStockTypeCount['supplier'] = [];
+            $cartStockTypeCount['dradvice'] = 0;
+            $cartStockTypeCount['supplier'] = 0;
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                     $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
 
+                    $product_payment_method[$stock_type][] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                     if (config('uec.cart_billing_split') == 1) {
                         //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
                         if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
                             $cartStockTypeCount['supplier']++;
-                            $product_payment_method['supplier'][] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                         } else {    //健康力出貨：買斷[A]、寄售[B] 商品
                             $cartStockTypeCount['dradvice']++;
-                            $product_payment_method['dradvice'][] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                         }
                     }
                 }
-            }
-            if (!isset($product_payment_method[$stock_type])) {
-                return json_encode(array("status" => 401, "result" => ['沒有符合出貨的商品']));
             }
             //行銷活動
             foreach ($campaigns as $product_id => $item) {
@@ -2547,7 +2543,7 @@ class APICartServices
             }
 
             //取得主商品交集共同的付款方式
-            $payment_method = isset($product_payment_method[$stock_type][0]) ? $product_payment_method[$stock_type][0] : ['TAPPAY_CREDITCARD'];
+            $payment_method = isset($product_payment_method[$stock_type]) ? $product_payment_method[$stock_type][0] : ['TAPPAY_CREDITCARD'];
             foreach ($product_payment_method[$stock_type] as $collection) {
                 $payment_method = $collection->intersect($payment_method);
             }
