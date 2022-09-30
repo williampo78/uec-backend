@@ -889,7 +889,7 @@ class APIOrderService
             $webData['utm_time'] = isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null;
             $webData['ship_from_whs'] = ($order['stock_type'] == 'supplier' ? 'SUP' : 'SELF');
             $webData['sup_transferred_at'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addMinutes($sup_trans_mins) : null);
-            $webData['ship_deadline'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addDay($ship_deadline)->format('Y-m-d 23:59:59') : null);
+            $webData['ship_deadline'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addWeekday($ship_deadline)->format('Y-m-d 23:59:59') : null);
             $webData['number_of_instal'] = isset($order['installment_info']['number_of_installments']) ? $order['installment_info']['number_of_installments'] : 0;
             $webData['interest_rate_of_instal'] = isset($cart['installments']['interest_rate']) ? $cart['installments']['interest_rate'] : 0;
             $webData['min_consumption_of_instal'] = isset($cart['installments']['min_consumption']) ? $cart['installments']['min_consumption'] : 0;
