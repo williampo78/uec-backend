@@ -774,7 +774,6 @@ class OrderService
 
         // 退貨貨態
         $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
-
         //可否申請退貨 B
         if ($can_return_order['type'] == 2 && $return_examination_info->count() == 0) { //至少一張出貨單配達、尚有出貨單未配達，沒有退貨檢驗單
             $shipment_status['can_return_order']['type'] = 3;
@@ -882,7 +881,6 @@ class OrderService
                     }
                 }
             }
-
             if ($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
                 $shipment_status['can_return_order']['type'] = 3;
                 $shipment_status['can_return_order']['status'] = true;
@@ -957,6 +955,10 @@ class OrderService
                     ->on('return_request_details.order_detail_seq', 'order_details.seq');
             })
             ->join('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
+            ->join("return_examination_details", function ($join) {
+                $join->on('return_examination_details.return_examination_id', 'return_examinations.id')
+                    ->on('return_examination_details.return_request_detail_id', 'return_request_details.id');
+            })
             ->where('orders.order_no', $orderNo)
             ->where('orders.is_latest', 1)
             ->get();
