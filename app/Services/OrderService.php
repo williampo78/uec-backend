@@ -675,14 +675,13 @@ class OrderService
         // 金流單
         if ($order->status_code == 'CANCELLED' || $order->status_code == 'VOIDED') {
             $payment = OrderPayment::select("latest_api_date")
-                ->where('source_table_name', 'return_requests')
+                ->where('source_table_name', 'orders')
                 ->where('payment_type', 'REFUND')
                 ->where('payment_status', 'COMPLETED')
                 ->where('order_no', $order->order_no)
                 ->first();
             $T03 = isset($payment->latest_api_date) ? Carbon::parse($payment->latest_api_date)->format('Y-m-d H:i') : $T03;
         }
-
         // 出貨貨態
         $shipments = $this->getShipmentDetailByOrderNo($order->order_no);
         if (isset($shipments)) {
@@ -720,13 +719,13 @@ class OrderService
                         "status_time" => $detail['T01'],
                         "status_display" => true
                     ];
-                    if ($detail['shipment_status'] == 'CANCELLED' || $detail['shipment_status'] == 'VOIDED') {
+                    if ($detail['order_status'] == 'CANCELLED' || $detail['order_status'] == 'VOIDED') {
                         $show_array[] = [
                             "status_desc" => "已取消",
                             "status_time" => $detail['T02'],
                             "status_display" => false
                         ];
-                        if ($detail['shipment_status'] == 'COMPLETED') {
+                        if ($detail['T03']) {
                             $show_array[] = [
                                 "status_desc" => "已退款",
                                 "status_time" => $detail['T03'],
