@@ -1069,7 +1069,7 @@ class APIOrderService
                                             "returned_point_discount" => 0,
                                             "returned_points" => 0,
                                             "main_product_id" => $products['productID'],
-                                            "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
+                                            "purchase_price" => $product_with['purchase_price'][$gift['productId']] ?? 0,
                                         ];
                                         $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                         //寫入折扣資訊
@@ -1341,7 +1341,7 @@ class APIOrderService
                                                 "returned_point_discount" => 0,
                                                 "returned_points" => 0,
                                                 "main_product_id" => $products['productID'],
-                                                "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
+                                                "purchase_price" => $product_with['purchase_price'][$gift['productId']] ?? 0,
                                             ];
                                             $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                             //寫入折扣資訊
