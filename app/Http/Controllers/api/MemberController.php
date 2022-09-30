@@ -437,7 +437,6 @@ class MemberController extends Controller
                 $payload['results']['return_date'] = Carbon::parse($returnRequest->request_date)->format('Y-m-d H:i:s');
             }
         }
-
         //可退貨的數量 = 單品數量時可以有退貨鈕
         if ($payload['results']['can_return_order']['type'] == 3 && $payload['results']['return_product_totals'] == $payload['results']['product_totals']) {
             $payload['results']['can_return_order']['status'] = false;

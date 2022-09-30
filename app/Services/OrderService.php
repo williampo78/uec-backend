@@ -772,6 +772,9 @@ class OrderService
             }
         }
 
+        $shipment_status['can_return_order']['type'] = $can_return_order['type'];
+        $shipment_status['can_return_order']['status'] = $can_return_order['status'];
+
         // 退貨貨態
         $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
         //可否申請退貨 B
