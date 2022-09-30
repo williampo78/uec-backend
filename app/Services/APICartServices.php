@@ -1386,8 +1386,6 @@ class APICartServices
             $cartGift = [];
             $assigned = [];
             $cartStockType = [];
-            $cartStockTypeCount['dradvice'] = 0;
-            $cartStockTypeCount['supplier'] = 0;
 
             foreach ($cartInfo as $items => $item) {
                 if ($items == 'item_photo') {
@@ -1411,7 +1409,8 @@ class APICartServices
                 }
             }
             $prodQty = [];
-            $product_payment_method = [];
+            $cartStockTypeCount['dradvice'] = [];
+            $cartStockTypeCount['supplier'] = [];
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
@@ -1428,6 +1427,11 @@ class APICartServices
                         }
                     }
                 }
+            }
+            if ($stock_type == 'supplier' && !isset($product_payment_method['supplier'])) {
+                return json_encode(array("status" => 401, "result" => ['沒有符合廠商出貨的商品']));
+            } else {
+                return json_encode(array("status" => 401, "result" => ['沒有符合自出出貨的商品']));
             }
             //行銷活動
             foreach ($campaigns as $product_id => $item) {
