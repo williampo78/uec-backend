@@ -688,10 +688,10 @@ class OrderService
         if (isset($shipments)) {
             foreach ($shipments as $shipment) {
                 $T01 = Carbon::parse($shipment->shipment_date)->format('Y-m-d H:i');
-                $T02 = !is_null($shipment->voided_at) ? Carbon::parse($shipment->voided_at)->format('Y-m-d H:i') : Carbon::parse($shipment->cancelled_at)->format('Y-m-d H:i');
-                $T05 = (is_null($shipment->shipped_at)) ? $T05 : Carbon::parse($shipment->shipped_at)->format('Y-m-d H:i');
-                $T06 = (is_null($shipment->delivered_at)) ? null : Carbon::parse($shipment->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
-                $T07 = (is_null($shipment->overdue_confirmed_at)) ? null : Carbon::parse($shipment->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
+                $T02 = ($shipment->voided_at) ? Carbon::parse($shipment->voided_at)->format('Y-m-d H:i') : Carbon::parse($shipment->cancelled_at)->format('Y-m-d H:i');
+                $T05 = ($shipment->shipped_at) ? Carbon::parse($shipment->shipped_at)->format('Y-m-d H:i') : null;
+                $T06 = ($shipment->delivered_at) ? Carbon::parse($shipment->delivered_at)->format('Y-m-d H:i') : null; //出貨單 配達時間
+                $T07 = ($shipment->overdue_confirmed_at) ? Carbon::parse($shipment->overdue_confirmed_at)->format('Y-m-d H:i') : null; //出貨單 配送異常時間
                 $status[$shipment->new_order_detail_id][$shipment->product_item_id] = [
                     "order_status" => $order->status_code,
                     "payment_status" => $order->pay_status,
@@ -790,15 +790,15 @@ class OrderService
                     $shipment_status['can_return_order']['type'] = 2;
                     $shipment_status['can_return_order']['status'] = true;
                 }
-                $T21 = (is_null($return_detail->created_at)) ? null : Carbon::parse($return_detail->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
+                $T21 = ($return_detail->created_at) ? Carbon::parse($return_detail->created_at)->format('Y-m-d H:i') : null;//退貨檢驗單 產生時間
                 if ($order->ship_from_whs == 'SELF') {
-                    $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
+                    $T22 = ($return_detail->lgst_dispatched_at) ? Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i') : null;//拋轉秋雨時間
                 } else {
-                    $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//退貨檢驗單 派車時間
+                    $T22 = ($return_detail->lgst_dispatched_at) ? Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i') : null;//退貨檢驗單 派車時間
                 }
-                $T23 = (is_null($return_detail->returnable_confirmed_at)) ? null : Carbon::parse($return_detail->returnable_confirmed_at)->format('Y-m-d H:i');//退貨檢驗單檢驗回報時間
-                $T24 = (is_null($return_detail->refund_at)) ? null : Carbon::parse($return_detail->refund_at)->format('Y-m-d H:i');//退款成功時間 / 退款失敗時間
-                $T25 = (is_null($return_detail->examination_reported_at)) ? null : Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
+                $T23 = ($return_detail->returnable_confirmed_at) ? Carbon::parse($return_detail->returnable_confirmed_at)->format('Y-m-d H:i') : null;//退貨檢驗單檢驗回報時間
+                $T24 = ($return_detail->refund_at) ? Carbon::parse($return_detail->refund_at)->format('Y-m-d H:i') : null;//退款成功時間 / 退款失敗時間
+                $T25 = ($return_detail->examination_reported_at) ? Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i') : null;//退貨檢驗單 檢驗異常時間
                 $req_mobile = isset($return_detail->req_mobile) ? substr($return_detail->req_mobile, 0, 7) . '***' : "";
                 $return_status[$return_detail->new_order_detail_id][$return_detail->product_item_id] = [
                     "can_return" => $return_type,
