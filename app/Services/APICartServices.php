@@ -2528,6 +2528,9 @@ class APICartServices
                         }
                         if ($check > 0) {
                             $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
+                        } else{
+                            $products['campaignThresholdGiveaway'] = [];
+                            $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                         }
                     }
                     $cart['list'][$productKey] = $products;
@@ -2535,8 +2538,8 @@ class APICartServices
             } else {
                 //重構門檻活動
                 foreach ($cart['list'] as $productKey => $products) { //主產品
-                    $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                     $products['campaignThresholdGiveaway'] = [];
+                    $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                     $cart['list'][$productKey] = $products;
                 }
             }
