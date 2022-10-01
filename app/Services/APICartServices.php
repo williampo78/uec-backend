@@ -2497,15 +2497,24 @@ class APICartServices
                 }
             }
 
-
             //有符合的滿額送贈時
             if (count($cart['thresholdGiftAway']) > 0) {
                 //取得滿額門檻內容
-                //dd($cart['thresholdGiftAway']);
                 foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
                     foreach ($threshold['products'] as $k => $product_id) {
                         $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //商品對應的門檻ID
                         $threshold_prod['thresholdBrief'][$product_id] = $threshold['thresholdBrief']; //門檻文案
+                    }
+                    $gift = 0;
+                    foreach ($threshold['campaignProdList'] as $giveaway) {
+                        if ($stock_gift_check[$giveaway['productId']]->stock_qty > 0 && ($stock_gift_check[$giveaway['productId']]->stock_qty - $giveaway['assignedQty']) >=0) { //贈品需有足夠庫存贈
+                            $gift++;
+                        }
+                    }
+                    if ($gift == count($threshold['campaignProdList'])) { //庫存可贈數=滿額贈數
+                        $show[$threshold['thresholdBrief']] = true;
+                    } else {
+                        $show[$threshold['thresholdBrief']] = false;
                     }
                 }
                 //重構商品滿額送贈
@@ -2514,18 +2523,26 @@ class APICartServices
                     if (count($products['campaignThresholdGiveaway']) > 0) {    //如果有門檻活動
                         //重構門檻活動
                         $check = 0;
+                        $double_check = 0;
                         if (isset($products['campaignThresholdGiveaway']['campaignThreshold'])) {
                             foreach ($products['campaignThresholdGiveaway']['campaignThreshold'] as $thresholdKey => $thresholdBrief) {
                                 if (isset($threshold_prod['thresholdBrief'][$products['productID']])) {
                                     if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
                                         $check++;
                                         $products['campaignThresholdGiveaway']['campaignThreshold'] = $thresholdBrief;
+                                        if ($show[$thresholdBrief]) {
+                                            $double_check++;
+                                        }
                                     }
                                 }
                             }
                         }
                         if ($check > 0) {
                             $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
+                        }
+                        if ($double_check == 0) {
+                            $products['campaignThresholdGiveaway'] = [];
+                            $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                         }
                     }
                     $cart['list'][$productKey] = $products;
