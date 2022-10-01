@@ -710,6 +710,7 @@ class OrderService
                 $info_array = [];
                 $show_array = [];
                 foreach ($shipment_detail as $item_id => $detail) {
+                    $ship_return = ($detail['T06'] ? true : false);
                     $info_array[] = [
                         'number_desc' => '配送單號',
                         'number' => $detail['package_no']
@@ -767,7 +768,7 @@ class OrderService
                     }
                     $shipment_status['shipped_info'][$order_detail_id][$item_id] = $info_array;
                     $shipment_status['shipped_status'][$order_detail_id][$item_id] = $show_array;
-                    $shipment_status['can_return'][$order_detail_id][$item_id] = true;
+                    $shipment_status['can_return'][$order_detail_id][$item_id] = $ship_return;
                 }
             }
         }
