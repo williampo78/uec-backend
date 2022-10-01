@@ -884,7 +884,7 @@ class OrderService
                     }
                 }
             }
-            if ($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
+            if ($return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
                 $shipment_status['can_return_order']['type'] = 3;
                 $shipment_status['can_return_order']['status'] = true;
             } elseif ($exam_count > 0) { //有退貨申請未完成的
