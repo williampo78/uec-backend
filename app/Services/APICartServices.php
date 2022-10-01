@@ -2551,9 +2551,11 @@ class APICartServices
             } else {
                 //重構門檻活動
                 foreach ($cart['list'] as $productKey => $products) { //主產品
-                    if (!isset($thresholdGiftAway[$products['campaignThresholdGiveaway']['campaignId']])) { //沒資料時，清空單品上的活動資料
-                        if ($tmp_data[$products['campaignThresholdGiveaway']['campaignId']] == 1) {
-                            $products['campaignThresholdGiveaway'] = [];
+                    if (isset($products['campaignThresholdGiveaway']['campaignId'])) {
+                        if (!isset($thresholdGiftAway[$products['campaignThresholdGiveaway']['campaignId']])) { //沒資料時，清空單品上的活動資料
+                            if ($tmp_data[$products['campaignThresholdGiveaway']['campaignId']] == 1) {
+                                $products['campaignThresholdGiveaway'] = [];
+                            }
                         }
                     }
                     $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
