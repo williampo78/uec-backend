@@ -1050,8 +1050,22 @@ class OrderService
                 $returnable['point_discount'] = [];
                 $returnable['item_id'] = [];
                 $returnable['detail_id'] = [];
+                $returnable['giveaway'] = [];
+                $returnable['return_id'] = $request->return_id;
+                $order->orderDetails->each(function ($orderDetail) use (&$returnable) {
+                    if ($orderDetail->record_identity == "G") { //找出贈品
+                        $returnable['giveaway'][$orderDetail->main_product_id][] = $orderDetail->id;
+                    }
+                });
                 $order->orderDetails->each(function ($orderDetail) use ($returnRequest, &$request, &$returnable, &$product_with) {
-                    if (in_array($orderDetail->id, $request->return_id)) {
+                    if (isset($returnable['giveaway'][$orderDetail->product_id])) {
+                        foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
+                            if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
+                                $returnable['return_id'][] = $give_value;
+                            }
+                        }
+                    }
+                    if (in_array($orderDetail->id, $returnable['return_id'])) {
                         $supplier = ($product_with['ship_from_whs'] == 'SUP') ? $product_with['supplier_id'][$orderDetail->product_item_id] : 0;
                         if (!key_exists($supplier, $returnable['amount'])) $returnable['amount'][$supplier] = 0;
                         if (!key_exists($supplier, $returnable['points'])) $returnable['points'][$supplier] = 0;
@@ -1121,7 +1135,7 @@ class OrderService
                 // 退貨檢驗單明細
                 if ($order->orderDetails->isNotEmpty()) {
                     $order->orderDetails->each(function ($orderDetail) use ($returnExamination, &$request, &$returnable, &$supplier_id, &$msg) {
-                        if (in_array($orderDetail->id, $request->return_id)) {
+                        if (in_array($orderDetail->id, $returnable['return_id'])) {
                             if ($returnable['item_id'][$orderDetail->product_item_id] == $supplier_id) {
                                 // 新增退貨檢驗單明細
                                 $returnExaminationDetail = ReturnExaminationDetail::create([
