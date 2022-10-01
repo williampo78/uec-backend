@@ -2207,6 +2207,7 @@ class APICartServices
                     }
                     $prods = [];
                     $compare_n_value = 0;
+                    $tmp_data[$campaign_id] = 0;
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
                         if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P03') { //﹝滿額﹞指定商品滿N元，送贈
                             if ($calc_amount[$campaign_id] < $item->n_value) continue;
@@ -2216,6 +2217,7 @@ class APICartServices
                             if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
                         }
                         $compare_n_value = $item->n_value;
+                        $tmp_data[$campaign_id] = 1;
                         if ($item->id == $campaign_threshold) {
                             $prd = 0;
                             foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
@@ -2291,7 +2293,6 @@ class APICartServices
                 }
             }
             //滿額送贈 CART_P03 & CART_P04
-
             //全車滿額贈
             $cartDiscount = 0;
             $compare_n_value = 0;
@@ -2507,7 +2508,7 @@ class APICartServices
                     }
                     $gift = 0;
                     foreach ($threshold['campaignProdList'] as $giveaway) {
-                        if ($stock_gift_check[$giveaway['productId']]->stock_qty > 0 && ($stock_gift_check[$giveaway['productId']]->stock_qty - $giveaway['assignedQty']) >=0) { //贈品需有足夠庫存贈
+                        if ($stock_gift_check[$giveaway['productId']]->stock_qty > 0 && ($stock_gift_check[$giveaway['productId']]->stock_qty - $giveaway['assignedQty']) >= 0) { //贈品需有足夠庫存贈
                             $gift++;
                         }
                     }
@@ -2550,7 +2551,11 @@ class APICartServices
             } else {
                 //重構門檻活動
                 foreach ($cart['list'] as $productKey => $products) { //主產品
-                    $products['campaignThresholdGiveaway'] = [];
+                    if (!isset($thresholdGiftAway[$products['campaignThresholdGiveaway']['campaignId']])) { //沒資料時，清空單品上的活動資料
+                        if ($tmp_data[$products['campaignThresholdGiveaway']['campaignId']] == 1) {
+                            $products['campaignThresholdGiveaway'] = [];
+                        }
+                    }
                     $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                     $cart['list'][$productKey] = $products;
                 }
