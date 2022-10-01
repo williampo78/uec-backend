@@ -980,7 +980,7 @@ class OrderService
     public function canReturnOrderV2(string $status_code, ?string $delivered_at, ?string $cooling_off_due_date, ?int $return_request_id): array
     {
         $now = Carbon::now();
-        $cooling_off_due_date = Carbon::parse($cooling_off_due_date);
+        $cooling_off_due_date = ($cooling_off_due_date) ? Carbon::parse($cooling_off_due_date) : null;
         $data = [];
         if ($status_code == 'PROCESSING' && !isset($cooling_off_due_date)) { //出貨準備中，無出貨單配達
             $data['status'] = true;
