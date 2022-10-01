@@ -773,15 +773,15 @@ class OrderService
             }
         }
 
-        $shipment_status['can_return_order']['type'] = $can_return_order['type'];
-        $shipment_status['can_return_order']['status'] = $can_return_order['status'];
-
         // 退貨貨態
         $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
         //可否申請退貨 B
         if ($can_return_order['type'] == 2 && $return_examination_info->count() == 0) { //至少一張出貨單配達、尚有出貨單未配達，沒有退貨檢驗單
             $shipment_status['can_return_order']['type'] = 3;
             $shipment_status['can_return_order']['status'] = true;
+        } else {
+            $shipment_status['can_return_order']['type'] = $can_return_order['type'];
+            $shipment_status['can_return_order']['status'] = $can_return_order['status'];
         }
 
         if (isset($return_examination_info)) {
@@ -885,7 +885,7 @@ class OrderService
                     }
                 }
             }
-            if ($return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
+            if ($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
                 $shipment_status['can_return_order']['type'] = 3;
                 $shipment_status['can_return_order']['status'] = true;
             } elseif ($exam_count > 0) { //有退貨申請未完成的
@@ -893,6 +893,7 @@ class OrderService
                 $shipment_status['can_return_order']['status'] = false;
             }
         }
+
         if (!isset($shipment_status)) {
             $shipment_status['shipped_info'] = null;
             $shipment_status['shipped_status'] = null;
