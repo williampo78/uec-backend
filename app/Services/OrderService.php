@@ -513,6 +513,7 @@ class OrderService
             }
 
         }
+        $tmp_group = "";
         foreach ($order_details as $key => $val) {
             $findProductPRD_M = OrderCampaignDiscount::where('order_detail_id', '=', $val['id'])
                 ->where('order_id', $orders['results']['order_id'])
@@ -520,7 +521,6 @@ class OrderService
                 ->where('record_identity', 'M')
                 ->where('discount', 0.0)
                 ->first();
-
             if ($findProductPRD_M !== null) {
                 $findProductPRD_G = OrderCampaignDiscount::with([
                     'promotionalCampaign',
@@ -564,26 +564,29 @@ class OrderService
                     }
 
                     $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
-
                     if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
                         $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
-                        $order_details[$key]['discount_content'][$PRD->group_seq] = [
-                            'display' => true,
-                            'campaignName' => $PRD->promotionalCampaign->campaign_name,
-                            'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
-                            'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
-                            'campaignProdList' => [
-                                [
-                                    'id' => $PRD->order_detail_id,
-                                    'productId' => $PRD->product->id,
-                                    'productName' => $PRD->product->product_name,
-                                    'productPhoto' => $photo_name,
-                                    'qty' => $qty,
-                                    'spec_1_value' => optional($PRD->productItem)->spec_1_value,
-                                    'spec_2_value' => optional($PRD->productItem)->spec_2_value
+
+                        if ($tmp_group != $PRD->order_detail_id) {
+                            $order_details[$key]['discount_content'][$PRD->group_seq] = [
+                                'display' => true,
+                                'campaignName' => $PRD->promotionalCampaign->campaign_name,
+                                'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
+                                'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
+                                'campaignProdList' => [
+                                    [
+                                        'id' => $PRD->order_detail_id,
+                                        'productId' => $PRD->product->id,
+                                        'productName' => $PRD->product->product_name,
+                                        'productPhoto' => $photo_name,
+                                        'qty' => $qty,
+                                        'spec_1_value' => optional($PRD->productItem)->spec_1_value,
+                                        'spec_2_value' => optional($PRD->productItem)->spec_2_value
+                                    ],
                                 ],
-                            ],
-                        ];
+                            ];
+                            $tmp_group = $PRD->order_detail_id;
+                        }
                     } else {
                         $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
                         $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
@@ -599,7 +602,6 @@ class OrderService
 
                 }
             }
-
             //滿額折
             $TargetThresholdDiscounts = $thresholdDiscounts
                 ->where('product_id', $val['product_id'])
@@ -1051,13 +1053,24 @@ class OrderService
                 $returnable['item_id'] = [];
                 $returnable['detail_id'] = [];
                 $returnable['giveaway'] = [];
+                $returnable['main_product'] = [];
                 $returnable['return_id'] = $request->return_id;
                 $order->orderDetails->each(function ($orderDetail) use (&$returnable) {
+                    if ($orderDetail->record_identity == "M") { //找出主商品
+                        $returnable['main_product'][$orderDetail->main_product_id][] = $orderDetail->id;
+                    }
                     if ($orderDetail->record_identity == "G") { //找出贈品
                         $returnable['giveaway'][$orderDetail->main_product_id][] = $orderDetail->id;
                     }
                 });
                 $order->orderDetails->each(function ($orderDetail) use ($returnRequest, &$request, &$returnable, &$product_with) {
+                    if (isset($returnable['main_product'][$orderDetail->product_id])) {
+                        foreach ($returnable['main_product'][$orderDetail->product_id] as $give_key => $give_value) {
+                            if (!in_array($returnable['main_product'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//找出主商品
+                                $returnable['return_id'][] = $give_value;
+                            }
+                        }
+                    }
                     if (isset($returnable['giveaway'][$orderDetail->product_id])) {
                         foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
                             if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
@@ -1161,6 +1174,8 @@ class OrderService
                         }
                     });
                 }
+                //依主從商品排序
+                array_multisort(array_column($msg['examination'][$returnExamination->examination_no], 'record_identity'), SORT_DESC,$msg['examination'][$returnExamination->examination_no]);
             }
             // 更新訂單
             Order::findOrFail($order->id)
