@@ -586,6 +586,14 @@ class OrderService
                                 ],
                             ];
                             $tmp_group = $PRD->order_detail_id;
+                        } else {
+                            $order_details[$key]['discount_content'][$PRD->group_seq] = [
+                                'display' => true,
+                                'campaignName' => $PRD->promotionalCampaign->campaign_name,
+                                'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
+                                'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
+                                'campaignProdList' => [],
+                            ];
                         }
                     } else {
                         $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
