@@ -1064,21 +1064,11 @@ class OrderService
                 $returnable['main_product'] = [];
                 $returnable['return_id'] = $request->return_id;
                 $order->orderDetails->each(function ($orderDetail) use (&$returnable) {
-                    if ($orderDetail->record_identity == "M") { //找出主商品
-                        $returnable['main_product'][$orderDetail->main_product_id][] = $orderDetail->id;
-                    }
                     if ($orderDetail->record_identity == "G") { //找出贈品
                         $returnable['giveaway'][$orderDetail->main_product_id][] = $orderDetail->id;
                     }
                 });
                 $order->orderDetails->each(function ($orderDetail) use ($returnRequest, &$request, &$returnable, &$product_with) {
-                    if (isset($returnable['main_product'][$orderDetail->product_id])) {
-                        foreach ($returnable['main_product'][$orderDetail->product_id] as $give_key => $give_value) {
-                            if (!in_array($returnable['main_product'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//找出主商品
-                                $returnable['return_id'][] = $give_value;
-                            }
-                        }
-                    }
                     if (isset($returnable['giveaway'][$orderDetail->product_id])) {
                         foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
                             if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
