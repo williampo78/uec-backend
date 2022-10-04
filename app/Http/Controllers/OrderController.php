@@ -313,9 +313,9 @@ class OrderController extends Controller
 
                 // 出貨單狀態
                 if (isset($orderDetail->shipmentDetail)) {
-                    $orderDetails['status_code'] = $orderDetail->shipmentDetail->shipment->status_code;
+                    $orderDetails['status_code'] = config('uec.shipment_status_code_options')[$orderDetail->shipmentDetail->shipment->status_code];
                 }
-                
+
                 $payload['order_details'][] = $orderDetails;
             });
         }
@@ -547,7 +547,7 @@ class OrderController extends Controller
                         $temp['product_name'] = $returnOrderDetail->productItem->product->product_name;
                         $temp['spec_dimension'] = $returnOrderDetail->productItem->product->spec_dimension;
                     }
-                    
+
                     if ($temp['spec_dimension'] == 0) {
                         $returnOrderDetails['dtl_desc'] = $temp['item_no'] . '_' . $temp['product_name'];
                     } elseif ($temp['spec_dimension'] == 1) {
@@ -560,11 +560,11 @@ class OrderController extends Controller
                         $returnOrderDetails['dtl_desc'] = $returnOrderDetail->promotionalCampaign->campaign_brief;
                     }
                 }
-                
+
                 $returnOrderDetails['selling_price'] = number_format($returnOrderDetail->selling_price);
                 $returnOrderDetails['subtotal'] = number_format($returnOrderDetail->subtotal);
                 $returnOrderDetails['refund_amount'] = number_format($returnOrderDetail->refund_amount);
-                
+
                 $payload['return_order_details'][] = $returnOrderDetails;
             });
         }
