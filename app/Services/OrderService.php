@@ -98,7 +98,7 @@ class OrderService
                 $orders = $orders->whereRelation('shipments', 'delivered_at', null);
             }
         }
-        
+
         return $orders->select()
             ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
             ->orderBy('ordered_date', 'desc')
@@ -1093,14 +1093,14 @@ class OrderService
                     }
                 });
                 $order->orderDetails->each(function ($orderDetail) use ($returnRequest, &$request, &$returnable, &$product_with) {
-                    if (isset($returnable['giveaway'][$orderDetail->product_id])) {
-                        foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
-                            if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
-                                $returnable['return_id'][] = $give_value;
+                    if (in_array($orderDetail->id, $returnable['return_id'])) {
+                        if (isset($returnable['giveaway'][$orderDetail->product_id])) {
+                            foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
+                                if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
+                                    $returnable['return_id'][] = $give_value;
+                                }
                             }
                         }
-                    }
-                    if (in_array($orderDetail->id, $returnable['return_id'])) {
                         $supplier = ($product_with['ship_from_whs'] == 'SUP') ? $product_with['supplier_id'][$orderDetail->product_item_id] : 0;
                         if (!key_exists($supplier, $returnable['amount'])) $returnable['amount'][$supplier] = 0;
                         if (!key_exists($supplier, $returnable['points'])) $returnable['points'][$supplier] = 0;
