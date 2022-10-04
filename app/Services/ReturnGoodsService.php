@@ -660,17 +660,20 @@ class ReturnGoodsService
         $validator = \Validator::make($this->params,
             [
                 'return_request_id' => 'required|int',
+                'type'              => 'required|string',
             ], [
                 'required' => ':attribute必填',
                 'integer'  => ':attribute格式錯誤',
+                'string'   => ':attribute格式錯誤',
             ], [
-                'return_request_id' => '退貨申請單id'
+                'return_request_id' => '退貨申請單id',
+                'type'              => '類型'
             ]);
 
         if ($validator->fails()) {
             $this->verifyResult = [
                 'status'           => false,
-                'code'             => 'E401',
+                'code'             => 'E400',
                 'http_status_code' => 400,
                 'message'          => $validator->errors()->first()
             ];
