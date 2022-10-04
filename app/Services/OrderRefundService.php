@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ReturnExamination;
 use App\Models\ReturnRequest;
+use App\Services\ReturnGoodsService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,14 @@ use Illuminate\Support\Facades\Log;
 
 class OrderRefundService
 {
+
+    private $returnGoodsService;
+
+    public function __construct(ReturnGoodsService $returnGoodsService)
+    {
+        $this->returnGoodsService = $returnGoodsService;
+    }
+
     /**
      * 處理和搜尋有關的sql
      * @param $builder
@@ -529,7 +538,7 @@ class OrderRefundService
         if (empty($returnExamination)) {
             return [
                 'status'  => false,
-                'message' => '發生錯誤'
+                'message' => '發生錯誤，檢驗單不存在'
             ];
         }
 
@@ -604,9 +613,17 @@ class OrderRefundService
             ->whereNull('is_returnable')
             ->first();
 
-        //呼叫退貨api
+        //所有檢驗單皆驗證完成，呼叫退貨api
         if (empty($unconfirmedReturnExamination)) {
-            #TODO 退貨api
+
+            $payload = [
+                'return_request_id' => $returnExamination->return_request_id,
+                'type'              => 'backend'
+            ];
+
+            return $this->returnGoodsService
+                ->setParameters($payload)
+                ->handle();
         }
 
         return [

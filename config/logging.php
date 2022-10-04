@@ -123,11 +123,17 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 365,
         ],
+        'refund_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/api/refund/error/refund.log'),
+        ],
+        'refund_params' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/api/refund/refund_params/refund.log'),
+        ],
         'batch_upload' => [
             'driver' => 'daily',
             'path' => storage_path('logs/batch_upload/batch.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 365,
         ],
     ],
 
