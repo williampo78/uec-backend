@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Services\ColumnNumberGenerator;
 
 class APIOrderService
 {
@@ -839,6 +840,8 @@ class APIOrderService
             $interest_fee = isset($cart['installments']['interest_fee']) ? $cart['installments']['interest_fee'] : 0;
             $webData = [];
             $webData['agent_id'] = 1;
+            //$webData['order_no'] = ColumnNumberGenerator::make(new Order(), 'order_no')->generate('OD', 6,1,1);//"OD" . date("ymd") . strtoupper($random);
+            //dd($webData['order_no']);
             $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
             $webData['revision_no'] = 0;
             $webData['is_latest'] = 1;
