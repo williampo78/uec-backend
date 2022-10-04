@@ -229,6 +229,53 @@
                             <br />
 
                             <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">訂單類型</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2-ship-from-whs" id="order_ship_from_whs"
+                                                name="order_ship_from_whs">
+                                                <option></option>
+                                                @if (config()->has('uec.order_ship_from_whs_options'))
+                                                    @foreach (config('uec.order_ship_from_whs_options') as $key => $value)
+                                                        <option value='{{ $key }}'
+                                                            {{ $key == request()->input('order_ship_from_whs') ? 'selected' : '' }}>
+                                                            {{ $value }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">資料範圍</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select class="form-control select2-data-range" id="data_range"
+                                                name="data_range">
+                                                <option></option>
+                                                @if (config()->has('uec.data_range_options'))
+                                                    @foreach (config('uec.data_range_options') as $key => $value)
+                                                        <option value='{{ $key }}'
+                                                            {{ $key == request()->input('data_range') ? 'selected' : '' }}>
+                                                            {{ $value }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4"></div>
+                            </div>
+                            <br />
+
+                            <div class="row">
                                 <div class="col-sm-8"></div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
@@ -267,8 +314,8 @@
                                         <th class="text-nowrap">訂單狀態</th>
                                         <th class="text-nowrap">付款方式</th>
                                         <th class="text-nowrap">物流方式</th>
-                                        <th class="text-nowrap">出貨單狀態</th>
                                         <th class="text-nowrap">結帳金額</th>
+                                        <th class="text-nowrap">訂單類型</th>
                                         <th class="text-nowrap">會員帳號</th>
                                         <th class="text-nowrap">訂購人</th>
                                     </tr>
@@ -292,12 +339,8 @@
                                                 <td>{{ $order['status_code'] ?? '' }}</td>
                                                 <td>{{ $order['payment_method'] ?? '' }}</td>
                                                 <td>{{ $order['lgst_method'] ?? '' }}</td>
-                                                <td>
-                                                    @isset($order['shipments'][0])
-                                                        {{ $order['shipments'][0]['status_code'] ?? '' }}
-                                                    @endisset
-                                                </td>
                                                 <td>{{ $order['paid_amount'] ?? '' }}</td>
+                                                <td>{{ $order['ship_from_whs'] ?? '' }}</td>
                                                 <td>{{ $order['member_account'] ?? '' }}</td>
                                                 <td>{{ $order['buyer_name'] ?? '' }}</td>
                                             </tr>
@@ -312,6 +355,7 @@
         </div>
         @include('backend.order.detail')
         @include('backend.order.invoice_detail')
+        @include('backend.order.invoice_allowance_detail')
         <!-- /.modal -->
 
     </div>
@@ -343,6 +387,8 @@
             $('.select2-order-status-code').select2();
             $('.select2-pay-status').select2();
             $('.select2-shipment-status-code').select2();
+            $('.select2-ship-from-whs').select2();
+            $('.select2-data-range').select2();
 
             // 驗證表單
             $("#search-form").validate({
@@ -414,11 +460,19 @@
                 axios.get(`/backend/order/${order_id}`)
                     .then(function(response) {
                         let order = response.data;
+                        console.log(order);
+
+                        // 退貨按鈕
+                        if (order.is_return == 1) {
+                            return_button = ' <a class="btn btn-danger" href="order_refund?order_no=' + order.order_no + '" role="button" target="_blank">退貨記錄</a>';
+                        } else {
+                            return_button = '';
+                        }
 
                         // 訂單資訊
                         $('#modal-order-no').empty().text(order.order_no);
                         $('#modal-ordered-date').empty().text(order.ordered_date);
-                        $('#modal-order-status-code').empty().text(order.status_code);
+                        $('#modal-order-status-code').empty().html(order.status_code + return_button);
                         $('#modal-payment-method').empty().text(order.payment_method);
                         $('#modal-pay-status').empty().text(order.pay_status);
                         $('#modal-shipping-free-threshold').empty().text(order.shipping_free_threshold);
@@ -435,10 +489,6 @@
 
                         // 物流
                         $('#modal-lgst-method').empty().text(order.lgst_method);
-                        $('#modal-shipment-status-code').empty();
-                        if (order.shipment) {
-                            $('#modal-shipment-status-code').text(order.shipment.status_code);
-                        }
 
                         // 金額區塊
                         $('#modal-total-amount').empty().text(order.total_amount);
@@ -473,7 +523,38 @@
                                     <td>${order_detail.cart_p_discount}</td>`;
                                 }
 
-                                $("#tab-order-detail tbody").append(`
+                                // 有退貨，退貨已完成
+                                if (order.is_return == 1 && order.return_status_code == 'COMPLETED') {
+                                    $("#tab-order-detail thead").empty();
+                                    $("#tab-order-detail thead").append(`
+                                    <tr>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">Item編號</th>
+                                        <th class="text-nowrap">商品名稱</th>
+                                        <th class="text-nowrap">規格一</th>
+                                        <th class="text-nowrap">規格二</th>
+                                        <th class="text-nowrap">售價</th>
+                                        <th class="text-nowrap">商品活動價</th>
+                                        <th class="text-nowrap">數量</th>
+                                        <th class="text-nowrap">單品<br>活動折抵</th>
+                                        <th class="text-nowrap">購物車<br>滿額折抵</th>
+                                        <th class="text-nowrap">小計</th>
+                                        <th class="text-nowrap">點數折抵</th>
+                                        <th class="text-nowrap">訂單身份</th>
+                                        <th class="text-nowrap">商品類型</th>
+                                        <th class="text-nowrap">託運單號</th>
+                                        <th class="text-nowrap">供應商</th>
+                                        <th class="text-nowrap">已退數量</th>
+                                        <th class="text-nowrap">已退單品活動折抵</th>
+                                        <th class="text-nowrap">已退購物車滿額折抵</th>
+                                        <th class="text-nowrap">已退小計</th>
+                                        <th class="text-nowrap">已退點數折抵</th>
+                                        <th class="text-nowrap">出貨單號</th>
+                                        <th class="text-nowrap">出貨單狀態</th>
+                                    </tr>
+                                    `);
+
+                                    $("#tab-order-detail tbody").append(`
                                     <tr>
                                         <td>${order_detail.seq}</td>
                                         <td>${order_detail.item_no}</td>
@@ -486,15 +567,48 @@
                                         <td>${order_detail.campaign_discount}</td>
                                         ${subtotal_and_cart_p_discount_html}
                                         <td>${order_detail.point_discount}</td>
-                                        <td>${record_identity}</td>
+                                        <td>${order_detail.record_identity}</td>
+                                        <td>${order_detail.product_type}</td>
                                         <td>${package_no}</td>
+                                        <td>${order_detail.supplier_name}</td>
                                         <td>${order_detail.returned_qty}</td>
                                         <td>${order_detail.returned_campaign_discount}</td>
                                         <td>${order_detail.returned_cart_p_discount}</td>
                                         <td>${order_detail.returned_subtotal}</td>
                                         <td>${order_detail.returned_point_discount}</td>
+                                        <td>${order_detail.shipment_no}</td>
+                                        <td>${order_detail.status_code}</td>
                                     </tr>
                                 `);
+                                } else {
+                                    $("#tab-order-detail tbody").append(`
+                                    <tr>
+                                        <td>${order_detail.seq}</td>
+                                        <td>${order_detail.item_no}</td>
+                                        <td>${order_detail.product_name}</td>
+                                        <td>${spec_1_value}</td>
+                                        <td>${spec_2_value}</td>
+                                        <td>${order_detail.selling_price}</td>
+                                        <td>${order_detail.unit_price}</td>
+                                        <td>${order_detail.qty}</td>
+                                        <td>${order_detail.campaign_discount}</td>
+                                        ${subtotal_and_cart_p_discount_html}
+                                        <td>${order_detail.point_discount}</td>
+                                        <td>${order_detail.record_identity}</td>
+                                        <td>${order_detail.supplier_item_no}</td>
+                                        <td>${order_detail.supplier_product_no}</td>
+                                        <td>${package_no}</td>
+                                        <td>${order_detail.supplier_name}</td>
+                                        <td>${order_detail.product_type}</td>
+                                        <td>${order_detail.returned_qty}</td>
+                                        <td>${order_detail.returned_campaign_discount}</td>
+                                        <td>${order_detail.returned_subtotal}</td>
+                                        <td>${order_detail.returned_point_discount}</td>
+                                        <td>${order_detail.shipment_no}</td>
+                                        <td>${order_detail.status_code}</td>
+                                    </tr>
+                                `);
+                                }
                             });
                         }
 
@@ -507,11 +621,13 @@
                         $('#modal-donated-institution-name').empty().text(order
                             .donated_institution_name);
                         $("#tab-invoice-info tbody").empty();
-
+                        console.log(order.invoices)
                         if (order.invoices) {
                             let count = 1;
 
                             order.invoices.forEach((invoice) => {
+                                let invoice_button_class = invoice.type_en == 'invoices' ? 'invoice' : 'invoice-allowance';
+                                    
                                 $("#tab-invoice-info tbody").append(`
                                     <tr data-count="${count}">
                                         <td>${count}</td>
@@ -520,7 +636,7 @@
                                         <td>${invoice.invoice_no}</td>
                                         <td>${invoice.tax_type}</td>
                                         <td>${invoice.amount}</td>
-                                        <td><button type="button" class="btn btn-primary btn-invoice-detail">詳細資訊</button></td>
+                                        <td><button type="button" class="btn btn-primary btn-${invoice_button_class}-detail">詳細資訊</button></td>
                                         <td>${invoice.remark}</td>
                                     </tr>
                                 `);
@@ -535,8 +651,8 @@
                         $("#tab-payment-info tbody").empty();
 
                         if (order.order_payments) {
+                            let count = 1;
                             order.order_payments.forEach((order_payment) => {
-                                let count = 1;
                                 let latest_api_date = order_payment.latest_api_date ?
                                     order_payment.latest_api_date : '';
                                 let remark = order_payment.remark ? order_payment.remark : '';
@@ -588,12 +704,48 @@
                             });
                         }
 
+                        let cancelled_reason = '';
+                        if (order.cancel_req_reason_code != null) {
+                            cancelled_reason += '取消原因:' + order.cancel_req_reason_code
+                        }
+                        if (order.cancel_req_remark != null) {
+                            cancelled_reason += '<br />取消備註:' + order.cancel_req_remark
+                        }
+
                         // 物流資訊
                         $('#modal-cancelled-voided-at').empty().text(order.cancelled_voided_at);
+                        $('#modal-cancelled-reason').empty().html(cancelled_reason);
                         $('#modal-shipped-at').empty().text(order.shipped_at);
                         $('#modal-arrived-store-at').empty().text(order.arrived_store_at);
                         $('#modal-home-dilivered-at').empty().text(order.home_dilivered_at);
                         $('#modal-cvs-completed-at').empty().text(order.cvs_completed_at);
+
+                        // 退貨成功
+                        $("#tab-return-success tbody").empty();
+
+                        // 有退貨，退貨已完成
+                        if (order.is_return == 1 && order.return_status_code == 'COMPLETED') {
+                            if (order.return_order_details) {
+                                let count = 1;
+                                order.return_order_details.forEach((return_order_detail) => {
+                                    $("#tab-return-success tbody").append(`
+                                        <tr>
+                                            <td>${count++}</td>
+                                            <td>${return_order_detail.request_no}</td>
+                                            <td>${return_order_detail.data_type}</td>
+                                            <td>${return_order_detail.dtl_desc}</td>
+                                            <td>${return_order_detail.selling_price}</td>
+                                            <td>${return_order_detail.qty}</td>
+                                            <td>${return_order_detail.subtotal}</td>
+                                            <td>${return_order_detail.point_discount}</td>
+                                            <td>${return_order_detail.refund_amount}</td>
+                                        </tr>
+                                    `);
+                                });
+                            }
+                        } else {
+                            $("#tab-return-success thead").empty();
+                        }
 
                         $('#order_detail').modal('show');
                     })
@@ -602,7 +754,7 @@
                     });
             });
 
-            // 點擊發票資訊中的詳細資訊
+            // 點擊發票資訊中的詳細資訊 發票資訊
             $(document).on('click', '.btn-invoice-detail', function() {
                 let count = $(this).closest('tr').attr('data-count');
 
@@ -635,6 +787,38 @@
                 }
             });
 
+            // 點擊發票資訊中的詳細資訊 折讓資訊
+            $(document).on('click', '.btn-invoice-allowance-detail', function() {
+                let count = $(this).closest('tr').attr('data-count');
+
+                if (invoices[count]) {
+                    $('#invoice-allowance-modal-invoice-no').empty().text(invoices[count].invoice_no);
+                    $('#invoice-allowance-modal-transaction-date').empty().text(invoices[count].transaction_date);
+                    $('#invoice-allowance-modal-allowance_no').empty().text(invoices[count].allowance_no);
+                    $('#invoice-allowance-modal-allowance_date').empty().text(invoices[count].allowance_date);
+                    $('#invoice-allowance-modal-allowance_amount').empty().text(invoices[count].allowance_amount);
+                    $('#invoice-allowance-modal-tax-type').empty().text(invoices[count].tax_type);
+
+                    $("#invoice-modal-invoice-info-table tbody").empty();
+
+                    if (invoices[count].invoice_details) {
+                        invoices[count].invoice_details.forEach((invoice_detail) => {
+                            $("#invoice-modal-invoice-info-table tbody").append(`
+                                <tr>
+                                    <td>${invoice_detail.seq}</td>
+                                    <td>${invoice_detail.item_name}</td>
+                                    <td>${invoice_detail.unit_price}</td>
+                                    <td>${invoice_detail.qty}</td>
+                                    <td>${invoice_detail.amount}</td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                    $('#invoice_allowance_detail').modal('show');
+                }
+            });
+
             // 匯出訂單
             $('#btn-export-excel').on('click', function() {
                 axios.get('/backend/order/excel', {
@@ -649,6 +833,8 @@
                             product_no: $('#product_no').val(),
                             product_name: $('#product_name').val(),
                             campaign_name: $('#campaign_name').val(),
+                            order_ship_from_whs: $('#order_ship_from_whs').val(),
+                            data_range: $('#data_range').val(),
                         },
                         responseType: 'blob',
                     })

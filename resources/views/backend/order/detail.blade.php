@@ -67,9 +67,7 @@
                         <table style="table-layout: fixed" class="table table-bordered">
                             <tr>
                                 <th class="active">物流方式</th>
-                                <td id="modal-lgst-method"></td>
-                                <th class="active">出貨單狀態</th>
-                                <td id="modal-shipment-status-code"></td>
+                                <td colspan="3" id="modal-lgst-method"></td>
                             </tr>
                         </table>
                     </div>
@@ -120,6 +118,9 @@
                     <li>
                         <a href="#tab-lgst-info" data-toggle="tab">物流資訊</a>
                     </li>
+                    <li>
+                        <a href="#tab-return-success" data-toggle="tab">退貨成功</a>
+                    </li>
                 </ul>
 
                 <!-- Tab panes -->
@@ -146,13 +147,20 @@
                                             <th class="text-nowrap">購物車<br>滿額折抵</th>
                                         @endif
                                         <th class="text-nowrap">點數折抵</th>
-                                        <th class="text-nowrap">備註</th>
+                                        <th class="text-nowrap">訂單身份</th>
+                                        <th class="text-nowrap">廠商貨號</th>
+                                        <th class="text-nowrap">廠商料號</th>
+                                        
                                         <th class="text-nowrap">託運單號</th>
+                                        <th class="text-nowrap">供應商</th>
+                                        <th class="text-nowrap">商品類型</th>
                                         <th class="text-nowrap">已退數量</th>
-                                        <th class="text-nowrap">已退單品活動折抵</th>
-                                        <th class="text-nowrap">已退購物車滿額折抵</th>
+                                        <th class="text-nowrap">已退活動折抵</th>
+                                        
                                         <th class="text-nowrap">已退小計</th>
                                         <th class="text-nowrap">已退點數折抵</th>
+                                        <th class="text-nowrap">出貨單號</th>
+                                        <th class="text-nowrap">出貨單狀態</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -293,27 +301,60 @@
                     <div class="tab-pane fade" id="tab-lgst-info">
                         <div class="table-responsive">
                             <table class='table table-striped table-bordered table-hover' style='width:40%'>
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">類型</th>
+                                        <th class="text-nowrap">時間</th>
+                                        <th class="text-nowrap">備註</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <tr>
                                         <th>取消 / 作廢時間</th>
                                         <td id="modal-cancelled-voided-at"></td>
+                                        <td id="modal-cancelled-reason"></td>
                                     </tr>
                                     <tr>
                                         <th>出貨時間</th>
                                         <td id="modal-shipped-at"></td>
+                                        <td></td>
                                     </tr>
                                     <tr>
                                         <th>到店時間</th>
                                         <td id="modal-arrived-store-at"></td>
+                                        <td></td>
                                     </tr>
                                     <tr>
                                         <th>(宅配)配達時間</th>
                                         <td id="modal-home-dilivered-at"></td>
+                                        <td></td>
                                     </tr>
                                     <tr>
                                         <th>(超取)取件時間</th>
                                         <td id="modal-cvs-completed-at"></td>
+                                        <td></td>
                                     </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="tab-return-success">
+                        <div class="table-responsive">
+                            <table class='table table-striped table-bordered table-hover' style='width:100%'>
+                                <thead>
+                                    <tr>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">退貨申請單號</th>
+                                        <th class="text-nowrap">明細類型</th>
+                                        <th class="text-nowrap">明細描述</th>
+                                        <th class="text-nowrap">售價</th>
+                                        <th class="text-nowrap">數量</th>
+                                        <th class="text-nowrap">小計</th>
+                                        <th class="text-nowrap">歸還點數</th>
+                                        <th class="text-nowrap">退款金額</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                 </tbody>
                             </table>
                         </div>

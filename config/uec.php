@@ -122,6 +122,18 @@ return [
         'VOIDED' => '已作廢',
     ],
 
+    // 訂單類型
+    'order_ship_from_whs_options' => [
+        'SELF' => '商城出貨',
+        'SUP' => '供應商出貨',
+    ],
+
+    // 資料範圍
+    'data_range_options' => [
+        'SHIPPED_AT_NULL' => '所有未出貨訂單',
+        'DELIVERED_AT_NULL' => '所有未配達訂單',
+    ],
+
     // 發票用途
     'invoice_usage_options' => [
         'P' => '個人電子發票',

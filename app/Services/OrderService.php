@@ -7,6 +7,7 @@ use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
 use App\Models\Shipment;
+use App\Models\ReturnOrderDetail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -75,6 +76,20 @@ class OrderService
             $orders = $orders->whereRelation('orderCampaignDiscounts.promotionalCampaign', 'campaign_name', 'LIKE', "%{$payload['campaign_name']}%");
         }
 
+        // 訂單類型
+        if (isset($payload['order_ship_from_whs'])) {
+            $orders = $orders->where('ship_from_whs', $payload['order_ship_from_whs']);
+        }
+
+        // 資料範圍
+        if (isset($payload['data_range'])) {
+            if ($payload['data_range'] == 'SHIPPED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'shipped_at', null);
+            } elseif ($payload['data_range'] == 'DELIVERED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'delivered_at', null);
+            }
+        }
+        
         return $orders->select()
             ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
             ->orderBy('ordered_date', 'desc')
@@ -98,6 +113,7 @@ class OrderService
             'orderDetails.product',
             'orderDetails.productItem',
             'orderDetails.shipmentDetail.shipment',
+            'orderDetails.product.supplier',
             'orderPayments' => function ($query) {
                 $query->orderBy('created_at', 'asc');
             },
@@ -126,7 +142,12 @@ class OrderService
             },
             'invoiceAllowances.invoice',
             'donatedInstitution',
-        ]);
+            'returnRequests',
+            'returnOrderDetails',
+            'returnOrderDetails.productItem',
+            'returnOrderDetails.productItem.product',
+            'returnOrderDetails.promotionalCampaign',
+            ]);
 
         $order = $order->find($id);
 
@@ -144,6 +165,9 @@ class OrderService
         $combineInvoices = $combineInvoices->sortBy('transaction_date');
 
         $order->combineInvoices = $combineInvoices;
+
+        // 退貨成功 排序
+        $order->returnOrderDetails = $order->returnOrderDetails->sortBy('Priority');
 
         return $order;
     }
