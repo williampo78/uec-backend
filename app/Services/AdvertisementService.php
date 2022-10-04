@@ -301,8 +301,12 @@ class AdvertisementService
             $content_data['remark'] = $input_data['remark'];
             $content_data['see_more_action'] = $input_data['see_more_action'] ?? null;
             $content_data['see_more_url'] = $input_data['see_more_url'] ?? null;
-            $content_data['see_more_target_blank'] = $input_data['see_more_target_blank'] ?? null;
             $content_data['see_more_cate_hierarchy_id'] = $input_data['see_more_cate_hierarchy_id'] ?? null;
+            if(isset($input_data['see_more_target_blank']) && $input_data['see_more_target_blank'] =='on'){
+                $content_data['see_more_target_blank'] = 1 ;
+            }else{
+                $content_data['see_more_target_blank'] = 0 ;
+            }
             if (!empty($input_data['start_at'])) {
                 $content_data['start_at'] = Carbon::parse($input_data['start_at'])->format('Y-m-d H:i:s');
             }
@@ -489,7 +493,7 @@ class AdvertisementService
             $update_content_data['see_more_cate_hierarchy_id'] = $input_data['see_more_cate_hierarchy_id'] ?? null;
             $update_content_data['updated_by'] = $user_id;
             $update_content_data['updated_at'] = $now;
-            if(isset($input_data['see_more_target_blank']) || isset($input_data['see_more_target_blank']) && $input_data['see_more_target_blank'] =='on'){
+            if(isset($input_data['see_more_target_blank']) && $input_data['see_more_target_blank'] =='on'){
                 $update_content_data['see_more_target_blank'] = 1 ;
             }else{
                 $update_content_data['see_more_target_blank'] = 0 ;

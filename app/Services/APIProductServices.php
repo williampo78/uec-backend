@@ -64,7 +64,6 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-
             $categorys = DB::table("web_category_products as cate_prod")
                 ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
                 ->join("web_category_hierarchy as cate", function ($join) {
@@ -73,7 +72,7 @@ class APIProductServices
                 })
                 ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
                 ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
-                ->select(DB::raw("cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+                ->select(DB::raw("cate2.`lft` L1_LFT,cate1.`lft` L2_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
                     '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name"))
                 ->where('prod.approval_status', 'APPROVED')
                 ->where('prod.start_launched_at', '<=', now())
@@ -136,21 +135,21 @@ class APIProductServices
             $L1_data[$category->L1_LFT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
 
             if ($config_levels == '3') {
-                $L2_data[$category->L1_LFT][$category->L2ID]["id"] = $category->L2ID;
-                $L2_data[$category->L1_LFT][$category->L2ID]["name"] = $category->L2_NAME;
+                $L2_data[$category->L1_LFT][$category->L2_LFT]["id"] = $category->L2ID;
+                $L2_data[$category->L1_LFT][$category->L2_LFT]["name"] = $category->L2_NAME;
 
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['id'] = $category->id;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['name'] = $category->category_name;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['type'] = $category->content_type;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_title'] = $category->meta_title;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_description'] = $category->meta_description;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['count'] = $category->pCount;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_name'] = $category->campaign_name;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['url_code'] = $category->url_code;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['lft'] = $category->lft;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['id'] = $category->id;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['name'] = $category->category_name;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['type'] = $category->content_type;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['meta_title'] = $category->meta_title;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['meta_description'] = $category->meta_description;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['lft'] = $category->lft;
 
             } else if ($config_levels == '2') {
 
@@ -172,12 +171,12 @@ class APIProductServices
 
         //根據階層顯示層級資料(賣場)
         if ($config_levels == '3') {
-            $strSQL = "select cate2.`lft` L1_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*,0 as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
+            $strSQL = "select cate2.`lft` L1_LFT,cate1.`lft` L2_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*,0 as pCount,
+                    pcc.`campaign_name`, pcc.`url_code`, pcc.`campaign_brief`, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name
                     from `web_category_hierarchy` cate
                     inner join `web_category_hierarchy` cate1 on cate1.`id`=cate.`parent_id`
                     inner join `web_category_hierarchy` cate2 on cate2.`id`=cate1.`parent_id`
-                    inner join `promotional_campaigns` pcc on pcc.`id`=cate2.`promotion_campaign_id`
+                    inner join `promotional_campaigns` pcc on pcc.`id`=cate.`promotion_campaign_id`
                     where cate.`active`=1 and pcc.`active`=1
                     and current_timestamp() between pcc.`start_at` and pcc.`end_at` and cate.content_type='M' ";
             if ($keyword) {
@@ -209,28 +208,28 @@ class APIProductServices
                     order by cate1.`lft`, cate.`lft`";
         }
         $categorys = DB::select($strSQL);
+
         foreach ($categorys as $category) {
             $L1_data[$category->L1_LFT]["id"] = $category->L1ID;
             $L1_data[$category->L1_LFT]["name"] = $category->L1_NAME;
-            $L1_data[$category->L1_LFT]["shortName"] = $category->category_short_name;
+            $L1_data[$category->L1_LFT]["shortName"] = $category->L1_short_name;
             $L1_data[$category->L1_LFT]["icon"] = ($category->L1_icon_name ? $s3 . $category->L1_icon_name : null);
-
             if ($config_levels == '3') {
-                $L2_data[$category->L1_LFT][$category->L2ID]["id"] = $category->L2ID;
-                $L2_data[$category->L1_LFT][$category->L2ID]["name"] = $category->L2_NAME;
+                $L2_data[$category->L1_LFT][$category->L2_LFT]["id"] = $category->L2ID;
+                $L2_data[$category->L1_LFT][$category->L2_LFT]["name"] = $category->L2_NAME;
 
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['id'] = $category->id;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['name'] = $category->category_name;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['type'] = $category->content_type;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_title'] = $category->meta_title;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_description'] = $category->meta_description;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['meta_keywords'] = $category->meta_keywords;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['count'] = $category->pCount;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_name'] = $category->campaign_name;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['url_code'] = $category->url_code;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['campaign_brief'] = $category->campaign_brief;
-                $L3_data[$category->L1_LFT][$category->L2ID][$category->id]['lft'] = $category->lft;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['id'] = $category->id;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['name'] = $category->category_name;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['type'] = $category->content_type;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['meta_title'] = $category->meta_title;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['meta_description'] = $category->meta_description;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['meta_keywords'] = $category->meta_keywords;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['count'] = $category->pCount;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['promotion_campaign_id'] = $category->promotion_campaign_id;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['campaign_name'] = $category->campaign_name;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['url_code'] = $category->url_code;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['campaign_brief'] = $category->campaign_brief;
+                $L3_data[$category->L1_LFT][$category->L2_LFT][$category->id]['lft'] = $category->lft;
 
             } else if ($config_levels == '2') {
                 $L2_data[$category->L1_LFT][$category->id]['id'] = $category->id;
@@ -248,12 +247,12 @@ class APIProductServices
             }
 
         }
+
         $data = [];
         if (!isset($L1_data)) {
             return 404;
         } else {
             foreach ($L1_data as $key1 => $value1) {
-
                 $data2 = [];
                 $data[$key1]["id"] = $value1["id"];
                 $data[$key1]["name"] = $value1["name"];
@@ -327,7 +326,7 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null, $filter = null)
     {
         //分類總覽階層
         $config_levels = config('uec.web_category_hierarchy_levels');
@@ -429,17 +428,23 @@ class APIProductServices
         $products = $products->orderBy('p.id', 'asc');
 
         $products = $products->get();
-
         $data = [];
         $product_id = 0;
         $web_category_hierarchy_id = 0;
-        foreach ($products as $product) {
-            if (!$id) {//依產品編號找相關分類不進此判斷
-                if ($product->id == $product_id && $product->web_category_hierarchy_id == $web_category_hierarchy_id) continue;
+
+        if ($filter) {
+            foreach ($products as $product) {
+                $data[$product->web_category_hierarchy_id][$product->id][$product->attribute_id ?? 0] = $product;
             }
-            $data[$product->web_category_hierarchy_id][] = $product;
-            $product_id = $product->id;
-            $web_category_hierarchy_id = $product->web_category_hierarchy_id;
+        } else {
+            foreach ($products as $product) {
+                if (!$id) {//依產品編號找相關分類不進此判斷
+                    if ($product->id == $product_id && $product->web_category_hierarchy_id == $web_category_hierarchy_id) continue;
+                }
+                $data[$product->web_category_hierarchy_id][] = $product;
+                $product_id = $product->id;
+                $web_category_hierarchy_id = $product->web_category_hierarchy_id;
+            }
         }
         return $data;
     }
@@ -1135,6 +1140,7 @@ class APIProductServices
             })
             ->orderBy('interest_rate', 'asc')
             ->orderBy('number_of_installments', 'asc')
+            ->orderBy('issuing_bank_no', 'asc')
             ->get([
                 'id',
                 'issuing_bank_no',
@@ -1204,7 +1210,8 @@ class APIProductServices
         $now = Carbon::now();
         $data = [];
         $s3 = config('filesystems.disks.s3.url');
-        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price")
+        $promotional = PromotionalCampaign::select("promotional_campaign_giveaways.promotional_campaign_id", "promotional_campaign_giveaways.product_id", "promotional_campaign_giveaways.assigned_qty as assignedQty", "promotional_campaigns.*", "products.start_launched_at", "products.end_launched_at", "products.product_name", "products.selling_price"
+            , DB::raw("(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS photo_name"))
             ->where("promotional_campaigns.start_at", "<=", $now)
             ->where("promotional_campaigns.end_at", ">=", $now)
             ->where("promotional_campaigns.active", "=", "1")
@@ -1212,9 +1219,9 @@ class APIProductServices
             ->join('products', 'products.id', '=', 'promotional_campaign_giveaways.product_id')
             ->where('products.approval_status', '=', 'APPROVED')->get();
         foreach ($promotional as $promotion) {
-            $productPhotos = ProductPhoto::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
+            //$productPhotos = ProductPhoto::where('product_id', $promotion->product_id)->orderBy('sort', 'asc')->first();
             $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id] = $promotion; //取單品的贈品
-            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($productPhotos->photo_name) ? $s3 . $productPhotos->photo_name : null);
+            $data['PROD'][$promotion->promotional_campaign_id][$promotion->product_id]['photo'] = (isset($promotion->photo_name) ? $s3 . $promotion->photo_name : null);
             if ($promotion->level_code == 'CART') {
                 $data['CART'][] = $promotion; //取全站贈品
             }
@@ -1699,17 +1706,19 @@ class APIProductServices
         foreach ($condition as $key) {
             $attribute_array[$key] = [];
         }
-        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand, 1);
         if ($products) {
             foreach ($products as $cateID => $prod) {
-                foreach ($prod as $product) {
-                    //品牌(商品)
-                    if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
-                    $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
-                    //屬性(商品)
-                    if (isset($attribute_array[$product->attribute_type])) {
-                        if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 0;
-                        $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 1;
+                foreach ($prod as $attribute) {
+                    foreach ($attribute as $product) {
+                        //品牌(商品)
+                        if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
+                        $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
+                        //屬性(商品)
+                        if (isset($attribute_array[$product->attribute_type])) {
+                            if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 0;
+                            $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 1;
+                        }
                     }
                 }
             }
@@ -1800,77 +1809,54 @@ class APIProductServices
         $s3 = config('filesystems.disks.s3.url');
         $explode_campaign = explode(',', $campaigns);
         $now = Carbon::now();
-
-        $promotional = PromotionalCampaign::where('active', '=', '1')
+        $promotional = PromotionalCampaign::with(['promotionalCampaignThresholds', 'promotionalCampaignGiveaways',
+            'promotionalCampaignGiveaways.product',
+            'promotionalCampaignGiveaways.product.productPhotos' => function ($query) {
+                $query->orderBy('product_id', 'asc')
+                    ->orderBy('sort', 'asc');
+            },])
+            ->where('active', '=', '1')
             ->where("category_code", "GIFT")
             ->where("start_at", "<=", $now)
-            ->where("end_at", ">=", $now)->get();
-        foreach ($promotional as $promotion) {
-            if (in_array($promotion->id, $explode_campaign)) {
-                $gifts[$promotion->id] = $promotion;
-            }
-        }
-
-        $products = Product::select("promotional_campaign_giveaways.promotional_campaign_id",
-            "products.product_name",
-            "products.id",
-            DB::raw("(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS displayPhoto"),
-            "promotional_campaign_giveaways.assigned_qty"
-        )
-            ->join("promotional_campaign_giveaways", "promotional_campaign_giveaways.product_id", "products.id")
-            ->get();
-        $data = [];
-        foreach ($products as $product) {
-            if (in_array($product->promotional_campaign_id, $explode_campaign)) {
-                $data[$product->promotional_campaign_id][$product->id] = $product;
-            }
-        }
-        if (isset($gifts)) {
-            foreach ($gifts as $campaign_id => $item) {
-                $campaignThresholds = PromotionalCampaignThreshold::where('promotional_campaign_id', $campaign_id)->orderBy('n_value')->get();
-                if (count($campaignThresholds) > 0) {
-                    foreach ($campaignThresholds as $threshold) {
-                        $thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
-                        foreach ($thresholdGift as $k => $v) {
-                            $giftArray[$campaign_id][$threshold->id][] = array(
-                                "productName" => $data[$campaign_id][$v->product_id]->product_name,
-                                "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
-                                "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
-                            );
-                        }
-
-                        $campaignGive[$campaign_id][] = array(
-                            "thresholdId" => $threshold->id,
-                            "thresholdBrief" => $threshold->threshold_brief,
-                            "qualified" => $threshold->is_qualified_to_sent == 1 ? true : false,
-                            "giveList" => $giftArray[$campaign_id][$threshold->id]
-                        );
-                    }
-                } else {
-                    $campaignGift = PromotionalCampaignGiveaway::where("promotional_campaign_id", $campaign_id)->where('threshold_id', 0)->get();
-                    foreach ($campaignGift as $k => $v) {
-                        $giftArray[$campaign_id][] = array(
-                            "productName" => $data[$campaign_id][$v->product_id]->product_name,
-                            "productPhoto" => $s3 . $data[$campaign_id][$v->product_id]->displayPhoto,
-                            "assignedQty" => $data[$campaign_id][$v->product_id]->assigned_qty
-                        );
-                    }
-                    $campaignGive[$campaign_id][] = array(
-                        "giveList" => $giftArray[$campaign_id]
+            ->where("end_at", ">=", $now)
+            ->whereIn('id', $explode_campaign)->get();
+        $campaignGive = [];
+        $giftArray = [];
+        foreach ($promotional as $campaign) {
+            $campaign->promotionalCampaignGiveaways->each(function ($giftDetail) use (&$giftArray, &$s3) {
+                $giftArray[$giftDetail->promotional_campaign_id][$giftDetail->threshold_id][] = array(
+                    "productName" => $giftDetail->product->product_name,
+                    "productPhoto" => $s3 . optional($giftDetail->product->productPhotos->first())->photo_name,
+                    "assignedQty" => $giftDetail->assigned_qty
+                );
+            });
+            if ($campaign->promotionalCampaignThresholds->isNotEmpty()) {
+                $campaign->promotionalCampaignThresholds->each(function ($thresholdDetail) use (&$campaignGive, $giftArray) {
+                    $campaignGive[$thresholdDetail->promotional_campaign_id][] = array(
+                        "thresholdId" => $thresholdDetail->id,
+                        "thresholdBrief" => $thresholdDetail->threshold_brief,
+                        "qualified" => $thresholdDetail->is_qualified_to_sent == 1 ? true : false,
+                        "giveList" => $giftArray[$thresholdDetail->promotional_campaign_id][$thresholdDetail->id]
                     );
-                }
-                $giveArray[] = array(
-                    "campaignID" => $campaign_id,
-                    "campaignUrlCode" => $item->url_code,
-                    "campaignBrief" => $item->campaign_brief,
-                    "campaignName" => $item->campaign_name,
-                    "expireDate" => $item->end_at,
-                    "gotoEvent" => ($item->level_code == 'CART_P' ? true : false),
-                    "qualified" => $item->is_qualified_to_sent == 1 ? true : false,
-                    "campaignGive" => (isset($campaignGive[$campaign_id]) ? $campaignGive[$campaign_id] : [])
+                });
+            } else {
+                $campaignGive[$campaign->id][] = array(
+                    "giveList" => $giftArray[$campaign->id][0]
                 );
             }
+
+            $giveArray[] = array(
+                "campaignID" => $campaign->id,
+                "campaignUrlCode" => $campaign->url_code,
+                "campaignBrief" => $campaign->campaign_brief,
+                "campaignName" => $campaign->campaign_name,
+                "expireDate" => $campaign->end_at,
+                "gotoEvent" => ($campaign->level_code == 'CART_P' ? true : false),
+                "qualified" => $campaign->is_qualified_to_sent == 1 ? true : false,
+                "campaignGive" => $campaignGive[$campaign->id]
+            );
         }
+
         if (isset($giveArray)) {
             $result['status'] = 200;
             $result['result'] = $giveArray;
@@ -1975,45 +1961,40 @@ class APIProductServices
         //產品主檔基本資訊
         $gtm = [];
         $data = [];
+        $product_categorys = self::getWebCategoryProducts('', '', '', '', '', '', '');
+        foreach ($product_categorys as $key => $category) {
+            foreach ($category as $kk => $vv) {
+                $rel_category[$vv->id] = array(
+                    "brand_name" => $vv->brand_name,
+                    "category_id" => $vv->web_category_hierarchy_id,
+                    "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
+                );
+
+            }
+        }
+        $product_spec = $this->getProductItems();
         if (sizeof($products) > 0) {
             foreach ($products as $product) {
-                if (strtotime($now) > strtotime($product->end_launched_at)) continue;
-                $product_categorys = self::getWebCategoryProducts('', '', '', '', $product->id, '', '');
-                $rel_category = [];
-                if (sizeof($product_categorys) > 0) {
-                    foreach ($product_categorys as $key => $category) {
-                        foreach ($category as $kk => $vv) {
-                            $rel_category[] = array(
-                                "category_id" => $vv->web_category_hierarchy_id,
-                                "category_name" => $vv->L1 . ", " . $vv->L2 . ($config_levels == 3 ? ", " . $vv->L3 : "")
-                            );
-
-                        }
-                    }
-                }
-                if (!$rel_category) continue;
-
-                //產品規格
                 $item_spec = [];
-                $ProductSpec = ProductItem::where('product_id', $product->id)->where('status', 1)->orderBy('sort', 'asc')->get();
-                if (count($ProductSpec) == 0) continue;
+                if (strtotime($now) > strtotime($product->end_launched_at)) continue;
+                if (!isset($rel_category[$product->id])) continue;
+                if (!isset($product_spec[$product->id])) continue;
+                //產品規格
                 $gtm['item_name'] = $product->product_name;
                 $gtm['currency'] = "TWD";
                 $item_spec['spec_dimension'] = $product->spec_dimension; //維度
                 //品牌
-                $item_brand = $this->brandsService->getBrand($product->brand_id);
-                $gtm['item_brand'] = $item_brand[0]->brand_name;
-
+                $gtm['item_brand'] = $rel_category[$product->id]['brand_name'];
                 //分類
-                $item_category = $this->getBreadcrumbCategory($rel_category[0]['category_id']);
-                $gtm['item_category'] = $item_category['level1']['name'];
-                $gtm['item_category2'] = $item_category['level2']['name'];
-                $gtm['item_category3'] = isset($item_category['level3']['name']) ? $item_category['level3']['name'] : "";
+                $item_category = explode(', ', $rel_category[$product->id]['category_name']);
+                $gtm['item_category'] = $item_category[0];
+                $gtm['item_category2'] = $item_category[1];
+                $gtm['item_category3'] = isset($item_category[2]) ? $item_category[2] : "";
                 $gtm['item_category4'] = "";
                 $gtm['item_category5'] = "";
 
                 if ($multi == 'item') {
-                    foreach ($ProductSpec as $item) {
+                    foreach ($product_spec[$product->id] as $item) {
                         $gtm['item_id'] = $item['item_no'];
                         if ($item_spec['spec_dimension'] > 0) {
                             $gtm['item_variant'] = $item['spec_1_value'] . ($item['spec_2_value'] ? "_" . $item['spec_2_value'] : "");
@@ -2023,9 +2004,9 @@ class APIProductServices
                         $data[$product->id][$item['id']] = $gtm;
                     }
                 } else {
-                    $gtm['item_id'] = $ProductSpec[0]['item_no'];
+                    $gtm['item_id'] = $product_spec[$product->id][0]['item_no'];
                     $spec_info = "";
-                    foreach ($ProductSpec as $item) {
+                    foreach ($product_spec[$product->id] as $item) {
                         if ($spec_info != "") {
                             $spec_info .= "、";
                         }
@@ -2073,5 +2054,17 @@ class APIProductServices
         ];
         return $result;
 
+    }
+
+    /*
+     * 取得商品item
+     */
+    public function getProductItems(): array
+    {
+        $productItem = ProductItem::where('status', 1)->orderBy('sort', 'asc')->get();
+        foreach ($productItem as $item) {
+            $productSpec[$item->product_id][] = $item;
+        }
+        return $productSpec;
     }
 }

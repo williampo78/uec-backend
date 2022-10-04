@@ -41,6 +41,30 @@
             text-align: right;
         }
 
+        .detail {
+            display: none;
+        }
+
+        .detail-show {
+            display: table-row;
+        }
+
+        .refund-item {
+            cursor: pointer;
+        }
+
+        .refund-item .fa-chevron-down {
+            display: none
+        }
+
+        .refund-item-active .fa-chevron-down {
+            display: inline
+        }
+
+        .refund-item-active span {
+            display: none
+        }
+
     </style>
 @endsection
 
@@ -69,7 +93,10 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <div class="input-group" id="order_refund_date_start_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group" name="order_refund_date_start" id="order_refund_date_start" value="{{ request()->input('order_refund_date_start') }}" autocomplete="off" data-input />
+                                                    <input type="text" class="form-control search-limit-group"
+                                                           name="order_refund_date_start" id="order_refund_date_start"
+                                                           value="{{ request()->input('order_refund_date_start') }}"
+                                                           autocomplete="off" data-input/>
                                                     <span class="input-group-btn" data-toggle>
                                                         <button class="btn btn-default" type="button">
                                                             <i class="fa-solid fa-calendar-days"></i>
@@ -84,7 +111,10 @@
                                         <div class="col-sm-4">
                                             <div class="form-group">
                                                 <div class="input-group" id="order_refund_date_end_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group" name="order_refund_date_end" id="order_refund_date_end" value="{{ request()->input('order_refund_date_end') }}" autocomplete="off" data-input />
+                                                    <input type="text" class="form-control search-limit-group"
+                                                           name="order_refund_date_end" id="order_refund_date_end"
+                                                           value="{{ request()->input('order_refund_date_end') }}"
+                                                           autocomplete="off" data-input/>
                                                     <span class="input-group-btn" data-toggle>
                                                         <button class="btn btn-default" type="button">
                                                             <i class="fa-solid fa-calendar-days"></i>
@@ -103,8 +133,9 @@
                                             </label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="request_no" id="request_no"
-                                                value="{{ request()->input('request_no') }}" />
+                                            <input class="form-control search-limit-group" name="request_no"
+                                                   id="request_no"
+                                                   value="{{ request()->input('request_no') }}"/>
                                         </div>
                                     </div>
                                 </div>
@@ -117,12 +148,13 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control search-limit-group" name="member_account"
-                                                id="member_account" value="{{ request()->input('member_account') }}" />
+                                                   id="member_account"
+                                                   value="{{ request()->input('member_account') }}"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <br />
+                            <br/>
 
                             <div class="row">
                                 <div class="col-sm-4">
@@ -132,7 +164,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control select2-shipment-status-code" id="status_code"
-                                                name="status_code">
+                                                    name="status_code">
                                                 <option></option>
                                                 @if (config()->has('uec.return_request_status_options'))
                                                     @foreach (config('uec.return_request_status_options') as $key => $value)
@@ -153,7 +185,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control search-limit-group" name="order_no" id="order_no"
-                                                value="{{ request()->input('order_no') }}" />
+                                                   value="{{ request()->input('order_no') }}"/>
                                         </div>
                                     </div>
                                 </div>
@@ -165,20 +197,48 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control search-limit-group" name="member_name"
-                                                id="member_name" value="{{ request()->input('member_name') }}" />
+                                                   id="member_name" value="{{ request()->input('member_name') }}"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <br />
+                            <br/>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">訂單類型</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select id="ship_from_whs" class="form-control select2-shipment-status-code"
+                                                    name="ship_from_whs">
+                                                <option></option>
+                                                @foreach ($shipFromWhs as $type)
+                                                    <option value='{{ $type['id'] }}'
+                                                        {{ $type['id'] == request('ship_from_whs') ? 'selected' : '' }}>
+                                                        {{ $type['text'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">待辦項目</label>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <select id="to_do_item" class="form-control select2-shipment-status-code"
+                                                    name="to_do_item">
+                                                <option></option>
+                                                @foreach ($toDoItems as $item)
+                                                    <option value='{{ $item['id'] }}'
+                                                        {{ $item['id'] == request('to_do_item') ? 'selected' : '' }}>
+                                                        {{ $item['text'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
@@ -186,7 +246,7 @@
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_export'])
                                                 <button data-url="{{ route('order_refund.export_excel') }}"
-                                                    class="btn btn-primary" id="btn-export-excel" type="button">
+                                                        class="btn btn-primary" id="btn-export-excel" type="button">
                                                     <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
                                                 </button>
                                             @endif
@@ -200,6 +260,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <br/>
                         </form>
                     </div>
 
@@ -207,48 +268,50 @@
                     <div class="panel-body">
                         <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
-                                id="table_list">
+                                   id="table_list">
                                 <thead>
-                                    <tr>
-                                        <th class="text-nowrap">功能</th>
-                                        <th class="text-nowrap">項次</th>
-                                        <th class="text-nowrap">退貨申請時間</th>
-                                        <th class="text-nowrap">退貨申請單號</th>
-                                        <th class="text-nowrap">訂單編號</th>
-                                        <th class="text-nowrap">狀態</th>
-                                        <th class="text-nowrap">物流方式</th>
-                                        <th class="text-nowrap">退款方式</th>
-                                        <th class="text-nowrap">退貨完成時間</th>
-                                        <th class="text-nowrap">取件聯絡人</th>
-                                        <th class="text-nowrap">取件聯絡手機</th>
-                                        <th class="text-nowrap">取件地址</th>
-                                    </tr>
+                                <tr>
+                                    <th class="text-nowrap">功能</th>
+                                    <th class="text-nowrap">項次</th>
+                                    <th class="text-nowrap">退貨申請時間</th>
+                                    <th class="text-nowrap">退貨申請單號</th>
+                                    <th class="text-nowrap">訂單編號</th>
+                                    <th class="text-nowrap">退貨申請單狀態</th>
+                                    <th class="text-nowrap">物流方式</th>
+                                    <th class="text-nowrap">訂單類型</th>
+                                    <th class="text-nowrap">退款方式</th>
+                                    <th class="text-nowrap">退貨完成時間</th>
+                                    <th class="text-nowrap">取件聯絡人</th>
+                                    <th class="text-nowrap">取件聯絡手機</th>
+                                    <th class="text-nowrap">取件地址</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($orderRefunds as $orderRefund)
-                                        <tr>
-                                            <td>
-                                                @if ($share_role_auth['auth_query'])
-                                                    <button data-id="{{ $orderRefund->id }}" type="button"
+                                @foreach ($orderRefunds as $orderRefund)
+                                    <tr>
+                                        <td>
+                                            @if ($share_role_auth['auth_query'])
+                                                <button data-id="{{ $orderRefund->id }}" type="button"
                                                         class="btn btn-info btn-sm order_refund_detail" title="檢視">
-                                                        <i class="fa-solid fa-magnifying-glass"></i>
-                                                    </button>
-                                                @endif
-                                            </td>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $orderRefund->request_date }}</td>
-                                            <td>{{ $orderRefund->request_no }}</td>
-                                            <td>{{ $orderRefund->order_no }}</td>
-                                            <td>{{ $orderRefund->status_code }}</td>
-                                            <td>{{ $orderRefund->lgst_method }}</td>
-                                            <td>{{ $orderRefund->refund_method }}</td>
-                                            <td>{{ $orderRefund->completed_at }}</td>
-                                            <td>{{ $orderRefund->req_name }}</td>
-                                            <td>{{ $orderRefund->req_mobile }}</td>
-                                            <td>{{ sprintf('%s%s%s', $orderRefund->req_city, $orderRefund->req_district, $orderRefund->req_address) }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                                </button>
+                                            @endif
+                                        </td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $orderRefund->request_date }}</td>
+                                        <td>{{ $orderRefund->request_no }}</td>
+                                        <td>{{ $orderRefund->order_no }}</td>
+                                        <td>{{ $orderRefund->status_code }}</td>
+                                        <td>{{ $orderRefund->lgst_method }}</td>
+                                        <td>{{ $orderRefund->ship_from_whs }}</td>
+                                        <td>{{ $orderRefund->refund_method }}</td>
+                                        <td>{{ $orderRefund->completed_at }}</td>
+                                        <td>{{ $orderRefund->req_name }}</td>
+                                        <td>{{ $orderRefund->req_mobile }}</td>
+                                        <td>{{ sprintf('%s%s%s', $orderRefund->req_city, $orderRefund->req_district, $orderRefund->req_address) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -256,37 +319,61 @@
                 </div>
             </div>
         </div>
-        @include('backend.order_refund.detail')
+    {{-- 詳細 modal--}}
+    @include('backend.order_refund.detail')
+    {{-- 協商回報 modal--}}
+    @include('backend.order_refund.negotiated_return')
+    {{-- 人工退款 modal --}}
+    @include('backend.order_refund.manual_refund')
+    <!-- /.modal -->
     </div>
 @endsection
 
 @section('js')
     <script src="{{ mix('js/order_refund.js') }}"></script>
     <script>
-        $(function() {
-            let get_detail_url = '{{ route('order_refund.detail') }}';
-            const required_message = '須指定﹝退貨申請時間﹞起訖、或﹝退貨申請單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！';
 
+        let get_detail_url;
+        let nego_refund_amount_object;
+        let manual_refund_form_object;
+        let negotiated_return_form_object;
+        let manual_refund_button_object;
+        const required_message = '須指定﹝退貨申請時間﹞起訖、或﹝退貨申請單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！';
+
+        $(function () {
+            get_detail_url = '{{ route('order_refund.detail') }}';
+            nego_refund_amount_object = $('#negotiated-return-form').find('input[name="nego_refund_amount"]');
+            manual_refund_form_object = $('#manual-refund-form');
+            negotiated_return_form_object = $('#negotiated-return-form');
+            manual_refund_button_object = $('#manual-refund-button');
+
+            //退貨申請時間-開始
             let order_refund_date_start_flatpickr = flatpickr("#order_refund_date_start_flatpickr", {
                 dateFormat: "Y-m-d",
                 maxDate: $("#order_refund_date_end").val(),
-                onChange: function(selectedDates, dateStr, instance) {
+                onChange: function (selectedDates, dateStr, instance) {
                     order_refund_date_end_flatpickr.set('minDate', dateStr);
                 },
             });
 
+            //退貨申請時間-結束
             let order_refund_date_end_flatpickr = flatpickr("#order_refund_date_end_flatpickr", {
                 dateFormat: "Y-m-d",
                 minDate: $("#order_refund_date_start").val(),
-                onChange: function(selectedDates, dateStr, instance) {
+                onChange: function (selectedDates, dateStr, instance) {
                     order_refund_date_start_flatpickr.set('maxDate', dateStr);
                 },
             });
 
-            // 驗證表單
+            //實際退款日期
+            flatpickr("#refund_at_flatpickr", {
+                dateFormat: "Y-m-d",
+            });
+
+            // 搜尋-驗證表單
             $("#search-form").validate({
                 // debug: true,
-                submitHandler: function(form) {
+                submitHandler: function (form) {
                     $('#btn-search').prop('disabled', true);
                     form.submit();
                 },
@@ -320,7 +407,7 @@
                 },
                 errorClass: "help-block",
                 errorElement: "span",
-                errorPlacement: function(error, element) {
+                errorPlacement: function (error, element) {
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -333,26 +420,146 @@
 
                     error.insertAfter(element);
                 },
-                highlight: function(element, errorClass, validClass) {
+                highlight: function (element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function(element, errorClass, validClass) {
+                unhighlight: function (element, errorClass, validClass) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
-                success: function(label, element) {
+                success: function (label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
 
+            //退貨協商回報-驗證表單
+            negotiated_return_form_object.validate({
+                submitHandler: function (form) {
+                    updateNegotiatedReturn();
+                },
+                rules: {
+                    //協商結果
+                    nego_result: {
+                        required: true
+                    },
+                    //退款金額
+                    nego_refund_amount: {
+                        required: true,
+                        min: 0,
+                        max: 999999,
+                        digits: true
+                    },
+                    //協商內容備註
+                    nego_remark: {
+                        required: true,
+                        maxlength: 250
+                    },
+                },
+                messages: {
+                    //退款金額
+                    nego_refund_amount: {
+                        min: '請輸入大於{0}的數字',
+                        max: '請輸入小於{0}的數字',
+                        digits: '金額格式錯誤'
+                    },
+                    //協商內容備註
+                    nego_remark: {
+                        maxlength: '字數請勿超過{0}',
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function (error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    if (element.prop("type") === 'radio') {
+                        element.closest('.form-group').append(error);
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function (label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
+
+            //人工退款-驗證表單
+            manual_refund_form_object.validate({
+                submitHandler: function (form) {
+                    updateManualRefund();
+                },
+                rules: {
+                    //實際退款日期
+                    refund_at: {
+                        required: true,
+                        date: true
+                    },
+                    //退款備註
+                    manually_refund_remark: {
+                        required: true,
+                        maxlength: 250
+                    },
+                },
+                messages: {
+                    //實際退款日期
+                    refund_at: {
+                        date: '日期格式錯誤',
+                    },
+                    //退款備註
+                    manually_refund_remark: {
+                        maxlength: '字數請勿超過{0}',
+                    },
+                },
+                errorClass: "help-block",
+                errorElement: "span",
+                errorPlacement: function (error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                        return;
+                    }
+
+                    error.insertAfter(element);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).closest(".form-group").addClass("has-error");
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+                success: function (label, element) {
+                    $(element).closest(".form-group").removeClass("has-error");
+                },
+            });
+
+            //切換協商結果radio
+            $(document).on('change', 'input[name="nego_result"]', function () {
+                console.log(212121);
+                nego_refund_amount_object.prop('disabled', false);
+                //不允許退貨
+                if ($(this).val() == 0) {
+                    nego_refund_amount_object.prop('disabled', true);
+                    nego_refund_amount_object.val(0);
+                }
+            });
+
             //點擊放大鏡
-            $(document).on('click', '.order_refund_detail', function() {
+            $(document).on('click', '.order_refund_detail', function () {
                 axios.get(get_detail_url, {
-                        params: {
-                            id: $(this).data('id')
-                        },
-                        responseType: 'json',
-                    })
-                    .then(function(response) {
+                    params: {
+                        id: $(this).data('id')
+                    },
+                    responseType: 'json',
+                })
+                    .then(function (response) {
 
                         if (response.data.status == false) {
                             alert('發生錯誤');
@@ -362,66 +569,159 @@
                         let return_request = response.data.data.return_request;
                         let return_details = response.data.data.return_details;
                         let return_information = response.data.data.return_information;
+                        //文字是取件單號或是物流單號
+                        $('#number_or_logistics_name_column_name').html(response.data.data.number_or_logistics_name_column_name);
 
                         //檢視資料內的內容
                         handleReturnRequest(return_request);
                         //退款明細
-                        handleReturnDetails(return_details);
+                        handleReturnDetails(return_details, return_request.request_no);
                         //處理退貨明細資料
                         handleReturnInformation(return_information);
 
                         $('#order_refund_detail').modal('show');
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                         console.log(error);
                     });
             });
 
             // 匯出excel
-            $('#btn-export-excel').on('click', function() {
+            $('#btn-export-excel').on('click', function () {
 
                 let url = $(this).data('url');
 
                 axios.get(url, {
-                        params: {
-                            order_refund_date_start: $('#order_refund_date_start').val(),
-                            order_refund_date_end: $('#order_refund_date_end').val(),
-                            request_no: $('#request_no').val(),
-                            member_account: $('#member_account').val(),
-                            status_code: $('#status_code').val(),
-                            order_no: $('#order_no').val(),
-                            member_name: $('#member_name').val(),
-                        },
-                        responseType: 'blob',
-                    })
-                    .then(function(response) {
+                    params: {
+                        order_refund_date_start: $('#order_refund_date_start').val(),
+                        order_refund_date_end: $('#order_refund_date_end').val(),
+                        request_no: $('#request_no').val(),
+                        member_account: $('#member_account').val(),
+                        status_code: $('#status_code').val(),
+                        order_no: $('#order_no').val(),
+                        member_name: $('#member_name').val(),
+                        ship_from_whs: $('#ship_from_whs').val(),
+                        to_do_item: $('#to_do_item').val(),
+                    },
+                    responseType: 'blob',
+                })
+                    .then(function (response) {
                         saveAs(response.data, "order_refunds.xlsx");
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                         console.log(error);
                     });
             });
+
+            //協商回報按鈕
+            $(document).on('click', '.negotiated-return', function () {
+
+                removeError();
+
+                //檢驗單id
+                negotiated_return_form_object.find('input[name="return_examination_id"]').val($(this).data('return_examination_id'));
+                //退貨申請單號
+                negotiated_return_form_object.find('[data-target="request-no"]').html($(this).data('return_request_no'));
+                //退貨檢驗單號
+                negotiated_return_form_object.find('[data-target="examination-no"]').html($(this).data('return_examination_no'));
+                //協商結果
+                negotiated_return_form_object.find('input[name="nego_result"]').prop('checked', false);
+                //退款金額
+                negotiated_return_form_object.find('input[name="nego_refund_amount"]').val('');
+                //協商內容備註
+                negotiated_return_form_object.find('textarea[name="nego_remark"]').val('');
+            });
+
+            //人工退款按鈕
+            $(document).on('click', '#manual-refund-button', function () {
+
+                removeError();
+                //退貨單id
+                manual_refund_form_object.find('input[name="return_request_id"]').val($(this).data('return_request_id'));
+                //退貨申請單號
+                manual_refund_form_object.find('[data-target="request_no"]').html($(this).data('request_no'));
+                //實際退款日期
+                manual_refund_form_object.find('input[name="refund_at"]').val('');
+                //退款備註
+                manual_refund_form_object.find('textarea[name="manually_refund_remark"]').val('');
+            });
+
+            //退貨檢驗單號收合
+            $(document).on('click', '.refund-item', function () {
+                const index = [...$('.refund-item')].indexOf(this);
+                $(`.detail-${index}`).toggleClass('detail-show');
+                $(this).toggleClass('refund-item-active');
+            });
         });
+
+        function removeError(){
+            $('.has-error').removeClass('has-error');
+            $('.help-block').html('');
+        }
+
+        //送出人工退款
+        function updateManualRefund() {
+
+            axios.post('{{ route('order_refund.update_manual_refund') }}', {
+                _method: 'PUT',
+                return_request_id: manual_refund_form_object.find('input[name="return_request_id"]').val(),
+                refund_at: manual_refund_form_object.find('input[name="refund_at"]').val(),
+                manually_refund_remark: manual_refund_form_object.find('textarea[name="manually_refund_remark"]').val(),
+            }).then(function (response) {
+                alert(response.data.message);
+                $('#manual-refund-modal').modal('hide');
+            }).catch(function (error) {
+                alert(error.response.data.message);
+            });
+        }
+
+        //更新協商狀態
+        function updateNegotiatedReturn() {
+
+            axios.post('{{ route('order_refund.update_negotiated_return') }}', {
+                _method: 'PUT',
+                return_examination_id: negotiated_return_form_object.find('input[name="return_examination_id"]').val(),
+                nego_result: negotiated_return_form_object.find('input[name="nego_result"]:checked').val(),
+                nego_refund_amount: negotiated_return_form_object.find('input[name="nego_refund_amount"]').val(),
+                nego_remark: negotiated_return_form_object.find('textarea[name="nego_remark"]').val(),
+            }).then(function (response) {
+                alert(response.data.message);
+                $('#negotiated_return').modal('hide');
+            }).catch(function (error) {
+                alert(error.response.data.message);
+            });
+        }
 
         //檢視資料內的內容
         function handleReturnRequest(return_request) {
-            //檢視資料內的內容 start
+
             //退貨申請單號
             $('#modal-request-no').empty().text(return_request.request_no);
             //退貨申請時間
             $('#modal-request-date').empty().text(return_request.request_date);
             //訂單編號
             $('#modal-order-no').empty().text(return_request.order_no);
+
+            //人工退款按鈕
+            manual_refund_button_object.hide();
+
+            $('#modal-prompt-text').text(return_request.prompt_text);
+
+            //允許人工退款
+            if (return_request.can_manual_refund) {
+                manual_refund_button_object.show();
+                //人工退款按鈕 申請單流水號
+                manual_refund_button_object.data('return_request_id', return_request.id);
+                //人工退款按鈕 申請單編號
+                manual_refund_button_object.data('request_no', return_request.request_no);
+            }
+
             //退貨單狀態
             $('#modal-status-code').empty().text(return_request.status_code);
             //退貨完成時間
             $('#modal-completed-at').empty().text(return_request.completed_at);
-            //退貨說明
-            $('#modal-req-remark').empty().text(return_request.req_remark);
             //物流方式
             $('#modal-lgst-method').empty().text(return_request.lgst_method);
-            //物流廠商
-            $('#modal-return-request').empty().text(return_request.lgst_company)
             //會員編號
             $('#modal-member-account').empty().text(return_request.member_account);
             //訂購人
@@ -439,29 +739,79 @@
             $('#modal-req-reason-description').empty().text(return_request.req_reason_description);
             //退貨備註
             $('.modal-req-remark').empty().text(return_request.req_remark);
-
-            //檢視資料內的內容 end
         }
 
         //退款明細
-        function handleReturnDetails(return_details) {
+        function handleReturnDetails(return_details, request_no) {
             let list = '';
             $('#return_details_content').empty();
 
             //退款明細 start
-            $.each(return_details, function(index, value) {
+            $.each(return_details, function (index, value) {
+
+                let details = '';
+                //詳細內容
+                $.each(value.details, function (index, detail) {
+                    details += `<tr>
+                        <td>${detail.item_no}</td>
+                        <td>${detail.product_name}</td>
+                        <td>${detail.spec_1_value}</td>
+                        <td>${detail.spec_2_value}</td>
+                        <td>${detail.request_qty}</td>
+                        <td>${detail.supplier_product_no}</td>
+                    </tr>`;
+                });
+
+                let button = '';
+                if (value.button.can_operate) {
+                    button = `<button type="button" class="btn btn-warning negotiated-return" data-return_examination_id="${value.return_examination_id}" data-return_request_no="${request_no}" data-return_examination_no="${value.examination_no}" data-toggle="modal" data-target="#negotiated_return" data-dismiss="modal">${value.button.title}</button>`;
+                }
+
                 list += `<tr>
-                            <td class="text-nowrap">${index + 1 }</td>
-                            <td class="text-nowrap">${value.item_no}</td>
-                            <td class="text-nowrap">${value.product_name}</td>
-                            <td class="text-nowrap">${value.spec_1}</td>
-                            <td class="text-nowrap">${value.spec_2}</td>
-                            <td class="text-nowrap">${value.request_qty}</td>
-                            <td class="text-nowrap">${value.passed_qty}</td>
-                            <td class="text-nowrap">${value.failed_qty}</td>
+                            <td class="text-nowrap">${index + 1}</td>
+                            <td class="text-nowrap">
+                                ${button}
+                            </td>
+                            <td class="text-nowrap refund-item">
+                                <span>></span>
+                                <i class="fa-sharp fa-solid fa-chevron-down"></i>
+                                ${value.examination_no}
+                            </td>
+                            <td class="text-nowrap">${value.status_code}</td>
+                            <td class="text-nowrap">${value.supplier_name}</td>
+                            <td class="text-nowrap">${value.lgst_dispatched_at}</td>
+                            <td class="text-nowrap">${value.number_or_logistics_name}</td>
+                            <td class="text-nowrap">${value.lgst_doc_no}</td>
+                            <td class="text-nowrap">${value.examination_reported_at}</td>
+                            <td class="text-nowrap">${value.is_examination_passed}</td>
+                            <td class="text-nowrap">${value.examination_remark}</td>
+                            <td class="text-nowrap">${value.nego_result}</td>
+                            <td class="text-nowrap">${value.nego_refund_amount}</td>
+                            <td class="text-nowrap">${value.nego_remark}</td>
+                        </tr>
+                        <tr class="detail detail-${index}" style="background:#eee">
+                            <td style="border:none" colspan="2"></td>
+                            <td style="border:none" colspan="5">
+                                <table class="table table-bordered">
+                                   <thead>
+                                        <tr class="active">
+                                          <th>Item編號</th>
+                                          <th>商品名稱</th>
+                                          <th>規格一</th>
+                                          <th>規格二</th>
+                                          <th>申請數量</th>
+                                          <th>廠商料號</th>
+                                        </tr>
+                                    </thead>
+                                   <tbody>
+                                        ${details}
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td style="border:none" colspan="5"></td>
                         </tr>`;
                 index++;
-            })
+            });
 
             $('#return_details_content').append(list);
             //退款明細 end
@@ -473,9 +823,9 @@
             $('#return_information_content').empty();
 
             //處理退貨明細資料 start
-            $.each(return_information, function(index, value) {
+            $.each(return_information, function (index, value) {
                 list += `<tr>
-                            <td class="text-nowrap">${index + 1 }</td>
+                            <td class="text-nowrap">${index + 1}</td>
                             <td class="text-nowrap">${value.created_at}</td>
                             <td class="text-nowrap">${value.payment_type_desc}</td>
                             <td class="text-nowrap">Tappay</td>

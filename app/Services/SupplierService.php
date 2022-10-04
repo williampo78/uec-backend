@@ -24,15 +24,16 @@ class SupplierService
     public function getSuppliers(array $queryData = []): Collection
     {
         $user = auth()->user();
-        $suppliers = Supplier::where('agent_id', $user->agent_id);
-
+        $suppliers = new Supplier ;
+        if($user !== null){
+            $suppliers = $suppliers->where('agent_id', $user->agent_id);
+        }
         // 檢查使用者是否為供應商
         if (!empty($queryData['check_user_is_supplier'])) {
             if (isset($user->supplier_id)) {
                 $suppliers = $suppliers->where('id', $user->supplier_id);
             }
         }
-
         // 狀態
         if (isset($queryData['active'])) {
             $suppliers = $suppliers->where('active', $queryData['active']);

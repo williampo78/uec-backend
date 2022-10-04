@@ -206,4 +206,41 @@ class UniversalService
         if (strncmp($params, "'", 1) === 0 && substr($params, $len - 1) == "'") return $params; // already quoted
         return addslashes($params);
     }
+
+    /*
+     * 訂單狀態
+     * params: 'CREATED', 'PENDING'
+     * Author: Rowena
+     * Return: string
+     */
+    public function getOrderStatus(string $orderStatus, string $payStatus, $refundStatus)
+    {
+        $result = null;
+        if ($orderStatus == 'CREATED') {
+            switch ($payStatus) {
+                case 'PENDING':
+                    $result = '待付款';
+                    break;
+                case 'FAILED':
+                    $result = '付款失敗';
+                    break;
+                case 'COMPLETED':
+                    $result = '已付款';
+                    break;
+            }
+        } else if ($orderStatus == 'VOIDED') {
+            $result = '訂單作廢';
+        } else if ($orderStatus == 'CANCELLED') {
+            switch ($refundStatus) {
+                case 'COMPLETED':
+                    $result = '已退款';
+                    break;
+                default:
+                    $result = '已取消';
+                    break;
+            }
+        }
+        return $result;
+    }
+
 }
