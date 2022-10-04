@@ -45,6 +45,9 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\WebCategoryHierarchyController;
 use App\Http\Controllers\WebCategoryProductsController;
 use App\Http\Controllers\WebContentsController;
+use App\Http\Controllers\ProductBatchController;
+use App\Http\Controllers\DownloadSampleController;
+use App\Models\Product;
 use CKSource\CKFinderBridge\Controller\CKFinderController;
 use Illuminate\Support\Facades\Route;
 
@@ -93,6 +96,10 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::post('/products/ajax', [ProductController::class, 'ajax']);
     Route::resource('/products', ProductController::class, ['names' => ['index' => 'products']]);
 
+    // 商品主檔 - 批次上傳
+
+    Route::get('/product-batch-upload/download/{id}', [ProductBatchController::class, 'download'])->name("product-batch-upload.download");
+    Route::resource('/product-batch-upload',ProductBatchController::class , ['names' => ['index' => 'product-batch-upload']]);
     // 商品主檔 - 商城資訊管理
     Route::post('/products_mall/ajax', [ProductsMallController::class, 'ajax']);
     Route::resource('/products_mall', ProductsMallController::class, ['names' => ['index' => 'products_mall']]);
@@ -343,5 +350,6 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::group(['prefix' => 'stock-transaction-logs', 'as' => 'backend_stock_transaction_logs'], function () {
         Route::get('/', [StockTransactionLogController::class, 'index']);
     });
+    Route::get('/download-sample/{fileName}', [DownloadSampleController::class, 'index']);
 
 });

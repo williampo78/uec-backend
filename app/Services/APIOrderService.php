@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Encryption\DecryptException;
+use App\Services\ColumnNumberGenerator;
 
 class APIOrderService
 {
@@ -839,6 +840,8 @@ class APIOrderService
             $interest_fee = isset($cart['installments']['interest_fee']) ? $cart['installments']['interest_fee'] : 0;
             $webData = [];
             $webData['agent_id'] = 1;
+            //$webData['order_no'] = ColumnNumberGenerator::make(new Order(), 'order_no')->generate('OD', 6,1,1);//"OD" . date("ymd") . strtoupper($random);
+            //dd($webData['order_no']);
             $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
             $webData['revision_no'] = 0;
             $webData['is_latest'] = 1;
@@ -889,7 +892,7 @@ class APIOrderService
             $webData['utm_time'] = isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null;
             $webData['ship_from_whs'] = ($order['stock_type'] == 'supplier' ? 'SUP' : 'SELF');
             $webData['sup_transferred_at'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addMinutes($sup_trans_mins) : null);
-            $webData['ship_deadline'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addDay($ship_deadline)->format('Y-m-d 23:59:59') : null);
+            $webData['ship_deadline'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addWeekday($ship_deadline)->format('Y-m-d 23:59:59') : null);
             $webData['number_of_instal'] = isset($order['installment_info']['number_of_installments']) ? $order['installment_info']['number_of_installments'] : 0;
             $webData['interest_rate_of_instal'] = isset($cart['installments']['interest_rate']) ? $cart['installments']['interest_rate'] : 0;
             $webData['min_consumption_of_instal'] = isset($cart['installments']['min_consumption']) ? $cart['installments']['min_consumption'] : 0;
@@ -1069,7 +1072,7 @@ class APIOrderService
                                             "returned_point_discount" => 0,
                                             "returned_points" => 0,
                                             "main_product_id" => $products['productID'],
-                                            "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
+                                            "purchase_price" => $product_with['purchase_price'][$gift['productId']] ?? 0,
                                         ];
                                         $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                         //寫入折扣資訊
@@ -1341,7 +1344,7 @@ class APIOrderService
                                                 "returned_point_discount" => 0,
                                                 "returned_points" => 0,
                                                 "main_product_id" => $products['productID'],
-                                                "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
+                                                "purchase_price" => $product_with['purchase_price'][$gift['productId']] ?? 0,
                                             ];
                                             $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                             //寫入折扣資訊
@@ -1455,7 +1458,7 @@ class APIOrderService
                     $payment = OrderPayment::where('id', $newOrderPayment->id)->update(['rec_trade_id' => $tapPayResult['rec_trade_id'], 'latest_api_date' => now()]);
                     if ($payment) {
                         if ($webData['payment_method'] == 'TAPPAY_INSTAL') {
-                            $tapPayData['order_no'] = $newOrder->id;
+                            $tapPayData['order_no'] = $webData['order_no'];
                             $tapPayData['card_key'] = Crypt::encrypt($tapPayResult['card_secret']['card_key']);
                             $tapPayData['card_token'] = Crypt::encrypt($tapPayResult['card_secret']['card_token']);
                             $tapPayData['created_by'] = $member_id;

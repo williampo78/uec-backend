@@ -1179,22 +1179,21 @@ class APICartServices
         $now = Carbon::now();
         $webDataAdd = [];
         $webDataUpd = [];
+        $i = 0;
+        $j = 0;
         foreach ($input['item_id'] as $key => $value) {
-
             //確認是否有該品項
             $product_item = ProductItem::where('id', $value)->get()->toArray();
+            if (!$product_item) continue;
             //確認是否有該品項
             $item = ShoppingCartDetail::where('member_id', '=', $member_id)->where('product_item_id', '=', $value)->first();
-
             if ($item) {
-
                 $latest_added_at = $item->latest_added_at;
                 //如果資料原本的狀態為1(已轉為訂單)或-1(已自購物車刪除)，則要更新時間
                 if ($item->status_code == 1 || $item->status_code == -1) {
                     $latest_added_at = $now;
                 }
-
-                $webDataUpd[$key] = [
+                $webDataUpd[$i] = [
                     "id" => $item->id,
                     "product_id" => $product_item[0]['product_id'],
                     "product_item_id" => $input['item_id'][$key],
@@ -1209,8 +1208,9 @@ class APICartServices
                     "updated_by" => $member_id,
                     "updated_at" => $now,
                 ];
+                $i++;
             } else {
-                $webDataAdd[$key] = [
+                $webDataAdd[$j] = [
                     $member_id,
                     $product_item[0]['product_id'],
                     $value,
@@ -1227,15 +1227,14 @@ class APICartServices
                     $now,
                     $now,
                 ];
+                $j++;
             }
-
         }
         $addColumn = [
             "member_id", "product_id", "product_item_id", "qty", "status_code",
             "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_time", "latest_added_at",
             "created_by", "updated_by", "created_at", "updated_at",
         ];
-
         DB::beginTransaction();
         try {
 
@@ -1367,10 +1366,10 @@ class APICartServices
         $warehouseCode = $this->stockService->getWarehouseConfig();
         $shippingFee = ShippingFeeRulesService::getShippingFee('HOME');
         $feeInfo = array(
-            "shipping_fee" => $shippingFee['HOME']->shipping_fee,
-            "free_threshold" => $shippingFee['HOME']->free_threshold,
-            "notice" => $shippingFee['HOME']->notice_brief,
-            "noticeDetail" => $shippingFee['HOME']->notice_detailed,
+            "shipping_fee" => $stock_type == 'supplier' ? 0 : $shippingFee['HOME']->shipping_fee,
+            "free_threshold" => $stock_type == 'supplier' ? 0 : $shippingFee['HOME']->free_threshold,
+            "notice" => $stock_type == 'supplier' ? '' : $shippingFee['HOME']->notice_brief,
+            "noticeDetail" => $stock_type == 'supplier' ? '' : $shippingFee['HOME']->notice_detailed,
         );
         if (count($cartInfo) == 0) {
             return json_encode(array("status" => 404, "result" => $feeInfo));
@@ -1387,8 +1386,6 @@ class APICartServices
             $cartGift = [];
             $assigned = [];
             $cartStockType = [];
-            $cartStockTypeCount['dradvice'] = 0;
-            $cartStockTypeCount['supplier'] = 0;
 
             foreach ($cartInfo as $items => $item) {
                 if ($items == 'item_photo') {
@@ -1412,13 +1409,14 @@ class APICartServices
                 }
             }
             $prodQty = [];
-            $product_payment_method = [];
+            $cartStockTypeCount['dradvice'] = 0;
+            $cartStockTypeCount['supplier'] = 0;
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                     $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
 
-                    $product_payment_method[] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
+                    $product_payment_method[$stock_type][] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                     if (config('uec.cart_billing_split') == 1) {
                         //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
                         if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
@@ -1461,11 +1459,11 @@ class APICartServices
                         if (key_exists($data->id, $campaignThresholds)) {
                             $campaignThresholdWithDataId = $campaignThresholds[$data->id];
                             foreach ($campaignThresholdWithDataId as $threshold) {
-                            $campaignThreshold_brief[] = $threshold->threshold_brief;
-                            $campaignThreshold_item[] = $threshold;
-                            //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
-                            //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
-                            $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
+                                $campaignThreshold_brief[] = $threshold->threshold_brief;
+                                $campaignThreshold_item[] = $threshold;
+                                //$thresholdGift = PromotionalCampaignThreshold::find($threshold->id)->promotionalCampaignGiveaways;
+                                //$campaignThresholdGift[$data->id][$threshold->id][] = $thresholdGift;
+                                $campaignThresholdGift[$data->id][$threshold->id][] = $threshold->promotionalCampaignGiveaways;
 
                             }
                             //畫面顯示用
@@ -2209,6 +2207,7 @@ class APICartServices
                     }
                     $prods = [];
                     $compare_n_value = 0;
+                    $tmp_data[$campaign_id] = 0;
                     foreach ($campaignThresholdItem[$campaign_id] as $threshold => $item) {
                         if ($campaignThresholdMain[$campaign_id]->campaign_type == 'CART_P03') { //﹝滿額﹞指定商品滿N元，送贈
                             if ($calc_amount[$campaign_id] < $item->n_value) continue;
@@ -2218,6 +2217,7 @@ class APICartServices
                             if ($compare_n_value >= $calc_qty[$campaign_id]) continue;
                         }
                         $compare_n_value = $item->n_value;
+                        $tmp_data[$campaign_id] = 1;
                         if ($item->id == $campaign_threshold) {
                             $prd = 0;
                             foreach ($campaignThresholdGift[$campaign_id][$item->id] as $key => $giftawayInfo) {
@@ -2293,7 +2293,6 @@ class APICartServices
                 }
             }
             //滿額送贈 CART_P03 & CART_P04
-
             //全車滿額贈
             $cartDiscount = 0;
             $compare_n_value = 0;
@@ -2405,7 +2404,6 @@ class APICartServices
                 "shippingFee" => $fee,
                 "checkout" => $cartTotal - round($cartDiscount) + round($thresholdAmount),
             );
-
             //有符合的滿額折扣時
             if (count($cart['thresholdDiscount']) > 0) {
                 //取得滿額門檻內容
@@ -2500,15 +2498,24 @@ class APICartServices
                 }
             }
 
-
             //有符合的滿額送贈時
             if (count($cart['thresholdGiftAway']) > 0) {
                 //取得滿額門檻內容
-                //dd($cart['thresholdGiftAway']);
                 foreach ($cart['thresholdGiftAway'] as $key => $threshold) {
                     foreach ($threshold['products'] as $k => $product_id) {
                         $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //商品對應的門檻ID
                         $threshold_prod['thresholdBrief'][$product_id] = $threshold['thresholdBrief']; //門檻文案
+                    }
+                    $gift = 0;
+                    foreach ($threshold['campaignProdList'] as $giveaway) {
+                        if ($stock_gift_check[$giveaway['productId']]->stock_qty > 0 && ($stock_gift_check[$giveaway['productId']]->stock_qty - $giveaway['assignedQty']) >= 0) { //贈品需有足夠庫存贈
+                            $gift++;
+                        }
+                    }
+                    if ($gift == count($threshold['campaignProdList'])) { //庫存可贈數=滿額贈數
+                        $show[$threshold['thresholdBrief']] = true;
+                    } else {
+                        $show[$threshold['thresholdBrief']] = false;
                     }
                 }
                 //重構商品滿額送贈
@@ -2517,12 +2524,16 @@ class APICartServices
                     if (count($products['campaignThresholdGiveaway']) > 0) {    //如果有門檻活動
                         //重構門檻活動
                         $check = 0;
+                        $double_check = 0;
                         if (isset($products['campaignThresholdGiveaway']['campaignThreshold'])) {
                             foreach ($products['campaignThresholdGiveaway']['campaignThreshold'] as $thresholdKey => $thresholdBrief) {
                                 if (isset($threshold_prod['thresholdBrief'][$products['productID']])) {
                                     if ($threshold_prod['thresholdBrief'][$products['productID']] == $thresholdBrief) {
                                         $check++;
                                         $products['campaignThresholdGiveaway']['campaignThreshold'] = $thresholdBrief;
+                                        if ($show[$thresholdBrief]) {
+                                            $double_check++;
+                                        }
                                     }
                                 }
                             }
@@ -2530,20 +2541,31 @@ class APICartServices
                         if ($check > 0) {
                             $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = true;   //滿足活動時狀態為true
                         }
+                        if ($double_check == 0) {
+                            $products['campaignThresholdGiveaway'] = [];
+                            $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
+                        }
                     }
                     $cart['list'][$productKey] = $products;
                 }
             } else {
                 //重構門檻活動
                 foreach ($cart['list'] as $productKey => $products) { //主產品
+                    if (isset($products['campaignThresholdGiveaway']['campaignId'])) {
+                        if (!isset($thresholdGiftAway[$products['campaignThresholdGiveaway']['campaignId']])) { //沒資料時，清空單品上的活動資料
+                            if ($tmp_data[$products['campaignThresholdGiveaway']['campaignId']] == 1) {
+                                $products['campaignThresholdGiveaway'] = [];
+                            }
+                        }
+                    }
                     $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                     $cart['list'][$productKey] = $products;
                 }
             }
 
             //取得主商品交集共同的付款方式
-            $payment_method = $product_payment_method[0];
-            foreach ($product_payment_method as $collection) {
+            $payment_method = isset($product_payment_method[$stock_type]) ? $product_payment_method[$stock_type][0] : ['TAPPAY_CREDITCARD'];
+            foreach ($product_payment_method[$stock_type] as $collection) {
                 $payment_method = $collection->intersect($payment_method);
             }
             $cart['paymentMethod'] = $payment_method->all();

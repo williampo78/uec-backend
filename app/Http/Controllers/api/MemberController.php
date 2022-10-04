@@ -311,6 +311,7 @@ class MemberController extends Controller
                 'return_date' => null,
                 'order_details' => null,
                 'product_totals' => 0,
+                'return_product_totals' => 0,
                 'delivery_method' => null,
                 'package_no' => null,
                 'total_amount' => $order->total_amount,
@@ -366,7 +367,6 @@ class MemberController extends Controller
             $payload['results']['cancelled_at'] = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i:s');
         }
         $giveaway_qty = [];
-
         $products = $this->apiProductServices->getProducts();
         $gtm = $this->apiProductServices->getProductItemForGTM($products, 'item');
         // 貨態進度
@@ -379,15 +379,15 @@ class MemberController extends Controller
                     'product_name' => $orderDetail->product->product_name,
                     'spec_1_value' => $orderDetail->productItem->spec_1_value,
                     'spec_2_value' => $orderDetail->productItem->spec_2_value,
-                    'qty' => $orderDetail->qty,
+                    'qty' => ($orderDetail->qty - $orderDetail->returned_qty),
                     'unit_price' => number_format($orderDetail->unit_price),
-                    'subtotal' => number_format($orderDetail->subtotal),
+                    'subtotal' => number_format(($orderDetail->subtotal - $orderDetail->returned_subtotal)),
                     'product_id' => $orderDetail->product_id,
                     'product_item_id' => $orderDetail->product_item_id,
                     'product_no' => $orderDetail->product->product_no,
                     'can_buy' => $orderDetail->record_identity == 'M' ? true : false,
                     'selling_price' => number_format($orderDetail->selling_price),
-                    'total_discount' => number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount),
+                    'total_discount' => number_format(($orderDetail->campaign_discount - $orderDetail->returned_campaign_discount) + ($orderDetail->cart_p_discount - $orderDetail->returned_cart_p_discount)),
                     'discount_content' => [],
                     'gtm' => isset($gtm[$orderDetail->product_id][$orderDetail->product_item_id]) ? $gtm[$orderDetail->product_id][$orderDetail->product_item_id] : "",
                     'can_return' => isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id] : "",
@@ -400,9 +400,13 @@ class MemberController extends Controller
 
                 $payload['results']['order_details'][] = $orderDetailPayload;
                 $payload['results']['product_totals'] += 1;
+                $can_return = isset($shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id]) ? $shippedStatus['can_return'][$orderDetail->id][$orderDetail->product_item_id] : true;
+                if ($can_return === false) { //計算已退貨數量
+                    $payload['results']['return_product_totals'] += 1;
+                }
             } else {
                 //order_details 非商品的數量
-                $giveaway_qty[$orderDetail->id] = $orderDetail->qty;
+                $giveaway_qty[$orderDetail->id] = ($orderDetail->qty - $orderDetail->returned_qty);
             }
         });
         $payload = $this->orderService->addDiscountsToOrder($payload, $giveaway_qty, $shippedStatus);
@@ -432,6 +436,14 @@ class MemberController extends Controller
             if (isset($returnRequest->request_date)) {
                 $payload['results']['return_date'] = Carbon::parse($returnRequest->request_date)->format('Y-m-d H:i:s');
             }
+        }
+        //可退貨的數量 = 單品數量時可以有退貨鈕
+        if ($payload['results']['can_return_order']['type'] == 3 && $payload['results']['return_product_totals'] == $payload['results']['product_totals']) {
+            $payload['results']['can_return_order']['status'] = false;
+            $payload['results']['can_return_order']['type'] = 4;
+        } else {
+            $payload['results']['can_return_order']['status'] = $shippedStatus['can_return_order']['status'];
+            $payload['results']['can_return_order']['type'] = $shippedStatus['can_return_order']['type'];
         }
 
         //金流相關數字
@@ -663,12 +675,12 @@ class MemberController extends Controller
         }
 
         //前台退貨申請
-        if(config('uec.cart_p_discount_split') == 1) {//折車多單
+        if (config('uec.cart_p_discount_split') == 1) {//折車多單
             $requestNo = $this->returnRequestService->generateRequestNo(); //退貨申請單號
             $return_status = $this->orderService->setReturnByOrderNo($order, $request, $requestNo);
             return response()->json([
                 'message' => $return_status['message'],
-                'results'=> $return_status['results']
+                'results' => $return_status['results']
             ], $return_status['status']);
         } else {
             DB::beginTransaction();

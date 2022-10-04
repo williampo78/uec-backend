@@ -16,8 +16,12 @@ class BrandsService
 
     public function getBrands()
     {
-        $agent_id = Auth::user()->agent_id;
-        return Brand::where('agent_id', $agent_id)->where('active', 1)->get();
+        $user = auth()->user();
+        $brand = new Brand ;
+        if($user){
+            $brand = $brand->where('agent_id',$user->agent_id) ;
+        }
+        return $brand->where('active', 1)->get();
     }
 
     public function getBrand($id)
