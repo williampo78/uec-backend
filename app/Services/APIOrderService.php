@@ -787,7 +787,7 @@ class APIOrderService
         $campaign_group = [];
         $campaign_group_code = [];
         $group_i = 0;
-        $tmp_product_id = "";
+        $tmp_campaign_id = "";
         foreach ($cart['list'] as $products) {
             foreach ($campaigns as $product_id => $item) {
                 if ($products['productID'] == $product_id) {
@@ -795,18 +795,16 @@ class APIOrderService
                         foreach ($products['itemList'] as $item_info) {
                             $campaign[$v->level_code][$v->category_code][$product_id] = $v;
                             if ($v->level_code != 'CART_P') { //單品活動才做
-                                if ($item_info['campaignDiscountStatus'] && $tmp_product_id != $products['productID']) {
+                                if ($item_info['campaignDiscountStatus'] && $tmp_campaign_id != $v->id) {
                                     $group_i++;
-                                    $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
-                                }
-                                if (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
-                                    if ($item_info['campaignGiftAway']['campaignGiftStatus'] && $tmp_product_id != $products['productID']) {
+                                } elseif (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
+                                    if ($item_info['campaignGiftAway']['campaignGiftStatus']&& $tmp_campaign_id != $v->id) {
                                         $group_i++;
-                                        $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
                                     }
                                 }
+                                $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
                                 $campaign_group_code[$product_id][$v->id] = $v->level_code;
-                                $tmp_product_id = $products['productID'];
+                                $tmp_campaign_id = $v->id;
                             }
                         }
                     }
