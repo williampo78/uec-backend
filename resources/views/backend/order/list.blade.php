@@ -460,7 +460,6 @@
                 axios.get(`/backend/order/${order_id}`)
                     .then(function(response) {
                         let order = response.data;
-                        console.log(order);
 
                         // 退貨按鈕
                         if (order.is_return == 1) {
@@ -621,13 +620,13 @@
                         $('#modal-donated-institution-name').empty().text(order
                             .donated_institution_name);
                         $("#tab-invoice-info tbody").empty();
-                        console.log(order.invoices)
+
                         if (order.invoices) {
                             let count = 1;
 
                             order.invoices.forEach((invoice) => {
                                 let invoice_button_class = invoice.type_en == 'invoices' ? 'invoice' : 'invoice-allowance';
-                                    
+
                                 $("#tab-invoice-info tbody").append(`
                                     <tr data-count="${count}">
                                         <td>${count}</td>

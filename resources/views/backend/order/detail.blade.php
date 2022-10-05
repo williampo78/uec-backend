@@ -46,7 +46,7 @@
                                 <td id="modal-member-account"></td>
                             </tr>
                             <tr>
-                                <th class="active">訂購人email</th>
+                                <th class="active">訂購人Email</th>
                                 <td colspan="3" id="modal-buyer-email"></td>
                             </tr>
                         </table>
@@ -150,13 +150,13 @@
                                         <th class="text-nowrap">訂單身份</th>
                                         <th class="text-nowrap">廠商貨號</th>
                                         <th class="text-nowrap">廠商料號</th>
-                                        
+
                                         <th class="text-nowrap">託運單號</th>
                                         <th class="text-nowrap">供應商</th>
                                         <th class="text-nowrap">商品類型</th>
                                         <th class="text-nowrap">已退數量</th>
                                         <th class="text-nowrap">已退活動折抵</th>
-                                        
+
                                         <th class="text-nowrap">已退小計</th>
                                         <th class="text-nowrap">已退點數折抵</th>
                                         <th class="text-nowrap">出貨單號</th>
