@@ -20,7 +20,7 @@
                         <form id="search-form" class="form-horizontal" method="GET" action="{{ route('products_mall') }}">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">庫存類型</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -39,7 +39,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品序號</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -49,7 +49,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">供應商</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -68,7 +68,7 @@
                             <br>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品通路</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -90,7 +90,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品名稱</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -100,7 +100,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">前台分類</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -119,7 +119,7 @@
                             <br>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">配送方式</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -139,7 +139,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品類型</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -159,7 +159,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">上架狀態</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -192,7 +192,7 @@
                             <br>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left: 0" class="col-sm-3">
                                         <label class="control-label">上架時間</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -207,7 +207,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-1 text-center">
+                                    <div style="padding: 0" class="col-sm-1 text-center">
                                         <label class="control-label">～</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -225,7 +225,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">查詢筆數上限</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -234,7 +234,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">建檔時間</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -249,7 +249,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-1 text-center">
+                                    <div style="padding: 0" class="col-sm-1 text-center">
                                         <label class="control-label">～</label>
                                     </div>
                                     <div class="col-sm-4">
