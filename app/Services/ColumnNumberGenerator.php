@@ -116,7 +116,7 @@ class ColumnNumberGenerator
     public function getRandomNumber(int $count): ?string
     {
         $range_end = 9;
-        for ($i = 1; $i <= $count; $i++) {
+        for ($i = 1; $i < $count; $i++) {
             $range_end .= 9;
         }
         return random_int(1, $range_end);
