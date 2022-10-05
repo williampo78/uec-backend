@@ -13,19 +13,12 @@ use App\Models\ShipmentDetail;
 use App\Models\ShoppingCartDetail;
 use App\Models\StockTransactionLog;
 use App\Models\WarehouseStock;
-use App\Services\APIService;
-use App\Services\APITapPayService;
-use App\Services\StockService;
-use App\Services\SysConfigService;
 use Carbon\Carbon;
-use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Contracts\Encryption\DecryptException;
-use App\Services\ColumnNumberGenerator;
 
 class APIOrderService
 {
@@ -753,7 +746,6 @@ class APIOrderService
     public function setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount)
     {
         $member_id = Auth::guard('api')->user()->member_id;
-        $random = Str::random(6);
         //商城倉庫代碼
         $warehouseCode = $this->stockService->getWarehouseConfig();
 
@@ -840,9 +832,7 @@ class APIOrderService
             $interest_fee = isset($cart['installments']['interest_fee']) ? $cart['installments']['interest_fee'] : 0;
             $webData = [];
             $webData['agent_id'] = 1;
-            //$webData['order_no'] = ColumnNumberGenerator::make(new Order(), 'order_no')->generate('OD', 6,1,1);//"OD" . date("ymd") . strtoupper($random);
-            //dd($webData['order_no']);
-            $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
+            $webData['order_no'] = ColumnNumberGenerator::make(new Order(), 'order_no')->generate('OD', 6, true, date("ymd"), 'number');
             $webData['revision_no'] = 0;
             $webData['is_latest'] = 1;
             $webData['ordered_date'] = now();
@@ -1530,14 +1520,13 @@ class APIOrderService
         $status = Order::getOrder($data['order_id']);
         if ($status['status_code'] != 'CREATED') exit;
         $now = Carbon::now();
-        $random = Str::random(6);
         DB::beginTransaction();
         try {
             if ($status['ship_from_whs'] == 'SELF') { //出貨倉，SELF-自有倉儲(秋雨倉)
                 //建立出貨單頭
                 $shipData = [];
                 $shipData['agent_id'] = 1;
-                $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
+                $shipData['shipment_no'] = ColumnNumberGenerator::make(new Shipment(), 'shipment_no')->generate('SH', 6, true, date("ymd"), 'number');
                 $shipData['shipment_date'] = $now;
                 $shipData['status_code'] = 'CREATED';
                 $shipData['payment_method'] = $data['payment_method'];
@@ -1604,11 +1593,11 @@ class APIOrderService
                 }
                 //一品一單
                 foreach ($shipment['detail'] as $main_product_id => $order_detail) {
-                    $random = Str::random(6);
+
                     //建立出貨單頭
                     $shipData = [];
                     $shipData['agent_id'] = 1;
-                    $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
+                    $shipData['shipment_no'] = ColumnNumberGenerator::make(new Shipment(), 'shipment_no')->generate('SH', 6, true, date("ymd"), 'number');
                     $shipData['shipment_date'] = $now;
                     $shipData['status_code'] = 'CREATED';
                     $shipData['payment_method'] = $data['payment_method'];
