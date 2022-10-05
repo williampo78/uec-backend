@@ -787,15 +787,27 @@ class APIOrderService
         $campaign_group = [];
         $campaign_group_code = [];
         $group_i = 0;
+        $tmp_product_id = "";
         foreach ($cart['list'] as $products) {
             foreach ($campaigns as $product_id => $item) {
                 if ($products['productID'] == $product_id) {
                     foreach ($item as $k => $v) {
-                        $campaign[$v->level_code][$v->category_code][$product_id] = $v;
-                        if ($v->level_code != 'CART_P') { //單品活動才做
-                            $group_i++;
-                            $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
-                            $campaign_group_code[$product_id][$v->id] = $v->level_code;
+                        foreach ($products['itemList'] as $item_info) {
+                            $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+                            if ($v->level_code != 'CART_P') { //單品活動才做
+                                if ($item_info['campaignDiscountStatus'] && $tmp_product_id != $products['productID']) {
+                                    $group_i++;
+                                    $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
+                                }
+                                if (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
+                                    if ($item_info['campaignGiftAway']['campaignGiftStatus'] && $tmp_product_id != $products['productID']) {
+                                        $group_i++;
+                                        $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
+                                    }
+                                }
+                                $campaign_group_code[$product_id][$v->id] = $v->level_code;
+                                $tmp_product_id = $products['productID'];
+                            }
                         }
                     }
                 }
@@ -824,6 +836,7 @@ class APIOrderService
                 $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //門檻ID
             }
         }
+
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -849,7 +862,7 @@ class APIOrderService
             $webData['cart_campaign_discount'] = $cart_campaign_discount; //原C002滿額折抵
             $webData['cart_p_discount'] = 0;//新C003滿額折抵
             $webData['point_discount'] = $order['point_discount'];
-            $webData['paid_amount'] = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee'] + $cart_p_discount + $interest_fee);
+            $webData['paid_amount'] = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee'] + $cart_p_discount);
             $webData['points'] = $order['points'];
             $webData['is_paid'] = 0;
             $webData['pay_status'] = 'PENDING';
