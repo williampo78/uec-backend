@@ -37,4 +37,9 @@ class ReturnRequest extends Model
     {
         return $this->hasMany(ReturnExamination::class, 'request_no','request_no');
     }
+
+    public function returnOrderDetails()
+    {
+        return $this->hasMany(ReturnOrderDetail::class, 'return_request_id');
+    }
 }

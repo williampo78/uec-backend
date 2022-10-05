@@ -5,6 +5,7 @@ namespace App\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use phpDocumentor\Reflection\Types\Integer;
 
 /**
  * Table欄位編號產生器
@@ -56,16 +57,21 @@ class ColumnNumberGenerator
      * @param integer $count
      * @param boolean $isRandom
      * @param string $dateFormat
+     * @param string $type
      * @return string
      */
-    public function generate(string $prefix, int $count, bool $isRandom = false, string $dateFormat = 'ymd'): string
+    public function generate(string $prefix, int $count, bool $isRandom = false, string $dateFormat = 'ymd', string $type): string
     {
         $newNumber = '';
         $numberHead = $prefix . now()->format($dateFormat);
 
         do {
             if ($isRandom) {
-                $numberTail = $this->getRandomNumber($count);
+                if ($type == 'number') {
+                    $numberTail = $this->getRandomNumber($count);
+                } elseif ($type == 'string') {
+                    $numberTail = $this->getRandomString($count);
+                }
             } else {
                 $numberTail = $this->getSerialNumber($numberHead, $count);
             }
@@ -91,11 +97,10 @@ class ColumnNumberGenerator
         // 有取得編號，則最後一筆編號+1
         if (isset($lastNumber)) {
             $numberHeadLength = Str::length($numberHead);
-            $lastNumberTail = (string) Str::of($lastNumber)->substr($numberHeadLength);
-            $newNumberTail = (int) $lastNumberTail + 1;
+            $lastNumberTail = (string)Str::of($lastNumber)->substr($numberHeadLength);
+            $newNumberTail = (int)$lastNumberTail + 1;
             $newNumberTail = Str::of($newNumberTail)->padLeft($count, '0');
-        }
-        // 未取得編號，則建立第一筆編號
+        } // 未取得編號，則建立第一筆編號
         else {
             $newNumberTail = Str::of('1')->padLeft($count, '0');
         }
@@ -105,13 +110,16 @@ class ColumnNumberGenerator
 
     /**
      * 取得亂數
-     *
      * @param integer $count
-     * @return string
+     * @return integer
      */
-    public function getRandomNumber(int $count): string
+    public function getRandomNumber(int $count): ?string
     {
-        return Str::upper(Str::random($count));
+        $range_end = 9;
+        for ($i = 1; $i < $count; $i++) {
+            $range_end .= 9;
+        }
+        return random_int(1, $range_end);
     }
 
     /**
@@ -139,5 +147,16 @@ class ColumnNumberGenerator
             ->first();
 
         return isset($request) ? $request->request_no : null;
+    }
+
+    /**
+     * 取得亂數
+     *
+     * @param integer $count
+     * @return string
+     */
+    public function getRandomString(int $count): string
+    {
+        return Str::upper(Str::random($count));
     }
 }

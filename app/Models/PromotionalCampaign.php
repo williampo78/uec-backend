@@ -78,4 +78,12 @@ class PromotionalCampaign extends Model
     {
         return $this->hasMany(PromotionalCampaignThreshold::class, 'promotional_campaign_id');
     }
+
+    /**
+     * 建立與銷退明細的關聯
+     */
+    public function returnOrderDetails()
+    {
+        return $this->hasMany(ReturnOrderDetail::class, 'promotional_campaign_id');
+    }
 }
