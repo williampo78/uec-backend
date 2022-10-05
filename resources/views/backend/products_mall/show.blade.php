@@ -140,54 +140,54 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12" id="category_products">
+                                <div class="col-sm-10" id="category_products">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">前台分類<span class="text-red">*</span></label>
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">前台分類<span class="text-red">*</span></label>
                                         </div>
                                         {{-- <div class="col-sm-11">
                                             <button class="btn btn-large btn-warning btn-sm" type="button"
                                                 data-toggle="modal" data-target="#model_category">新增分類</button>
                                         </div> --}}
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <table class="table table-striped table-bordered table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th class="col-sm-11">名稱</th>
-                                                    <th class="col-sm-1">功能</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr class="CategoryHierarchyProducts" v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
-                                                    @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
-                                                    @drop="drop" draggable="true" :data-index="CategoryKey"
-                                                    :data-type="'Category'">
-                                                    <td style="vertical-align:middle">
-                                                        <i class="fa-solid fa-list"></i>
-                                                        @{{ Category . category_name }}
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-danger"
-                                                            @click="Del(Category,CategoryKey,'Category')" disabled>刪除</button>
-                                                    </td>
-                                                </tr>
+                                        <div class="col-sm-10">
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-sm-11">名稱</th>
+                                                        <th class="col-sm-1">功能</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="CategoryHierarchyProducts" v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
+                                                        @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
+                                                        @drop="drop" draggable="true" :data-index="CategoryKey"
+                                                        :data-type="'Category'">
+                                                        <td style="vertical-align:middle">
+                                                            <i class="fa-solid fa-list"></i>
+                                                            @{{ Category . category_name }}
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-danger"
+                                                                @click="Del(Category,CategoryKey,'Category')" disabled>刪除</button>
+                                                        </td>
+                                                    </tr>
 
-                                            </tbody>
-                                        </table>
-                                        <span id="CategoryHierarchyProducts_error_msg" style="display: none" class="text-red">必須填寫</span>
+                                                </tbody>
+                                            </table>
+                                            <span id="CategoryHierarchyProducts_error_msg" style="display: none" class="text-red">必須填寫</span>
+                                        </div>
+                                        <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
+                                            rows="10">@{{ CategoryHierarchyProducts }}</textarea>
                                     </div>
-                                    <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
-                                        rows="10">@{{ CategoryHierarchyProducts }}</textarea>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">關聯關鍵字</label>
+                                        <div class="col-sm-2">
+                                            <label style="width: 125px" class="control-label">關聯關鍵字</label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-10">
                                             <input class="form-control" name="keywords"
                                                 value="{{ $products->keywords }}">
                                         </div>
@@ -195,52 +195,52 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">關聯性商品</label>
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">關聯性商品</label>
                                         </div>
-                                        <div class="col-sm-10">
+                                        {{-- <div class="col-sm-10"> --}}
                                             {{-- related_products table --}}
                                             {{-- <button class="btn btn-large btn-warning btn-sm" type="button"
                                                 data-toggle="modal" data-target="#model_related_products">新增商品</button> --}}
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <table class="table table-striped table-bordered table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th class="col-sm-11">名稱</th>
-                                                    <th class="col-sm-1">功能</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
-                                                    @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                    draggable="true" :data-index="key" :data-type="'Products'">
-                                                    <td style="vertical-align:middle">
-                                                        <i class="fa-solid fa-list"></i>
-                                                        @{{ Product . product_name }}
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-danger"
-                                                            @click="Del(Product ,key ,'Products')" disabled>刪除</button>
-                                                    </td>
-                                                </tr>
+                                        {{-- </div> --}}
+                                        <div class="col-sm-10">
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-sm-11">名稱</th>
+                                                        <th class="col-sm-1">功能</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
+                                                        @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                        draggable="true" :data-index="key" :data-type="'Products'">
+                                                        <td style="vertical-align:middle">
+                                                            <i class="fa-solid fa-list"></i>
+                                                            @{{ Product . product_name }}
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-danger"
+                                                                @click="Del(Product ,key ,'Products')" disabled>刪除</button>
+                                                        </td>
+                                                    </tr>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
+                                            rows="10">@{{ RelatedProducts }}</textarea>
                                     </div>
-                                    <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
-                                        rows="10">@{{ RelatedProducts }}</textarea>
 
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">每單限購數量<span
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">每單限購數量<span
                                                     class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-2">
@@ -254,10 +254,10 @@
                         <hr>
                         <section id="page-2">
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">促銷小標</label>
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">促銷小標</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <input class="form-control" name="promotion_desc"
@@ -267,10 +267,10 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">促銷小標生效時間
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">促銷小標生效時間
                                             </label>
                                         </div>
                                         <div class="col-sm-2">
@@ -293,13 +293,13 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">商品內容<span
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">商品內容<span
                                                     class="text-red">*</span></label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-10">
                                             <textarea id="description" name="description" placeholder="請在這裡填寫內容" >{{$products->description}}</textarea>
                                             <span id="description_error_msg" style="display: none" class="text-red">必須填寫</span>
                                         </div>
@@ -307,13 +307,13 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">商品規格<span
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">商品規格<span
                                                     class="text-red">*</span></label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-10">
                                             <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
                                                 accept=".jpg,.jpeg,.png">{{$products->specification}}</textarea>
                                                 <span id="specification_error_msg" style="display: none" class="text-red">必須填寫</span>
@@ -325,10 +325,10 @@
                         <hr>
                         <section id="page-3">
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">Google Shop圖檔
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">Google Shop圖檔
                                             </label>
                                         </div>
                                         <div class="col-sm-3">
@@ -341,14 +341,14 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-8">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">Item圖示<span
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">Item圖示<span
                                                     class="text-red">*</span></label>
                                             {{-- product_items --}}
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-8">
                                             <table class="table table-striped table-bordered table-hover">
                                                 <thead>
                                                     <tr>
@@ -393,12 +393,12 @@
                         <hr>
                         <section id="page-4">
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">網頁標題</label>
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">網頁標題</label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-10">
                                             <input class="form-control" name="meta_title"
                                                 value="{{ $products->meta_title }}" readonly>
                                         </div>
@@ -406,12 +406,12 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">網頁描述</label>
+                                        <div class="col-sm-2">
+                                            <label style="width:125px" class="control-label">網頁描述</label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-10">
                                             <input class="form-control" name="mata_description"
                                                 value="{{ $products->mata_description }}" readonly>
                                         </div>
@@ -419,10 +419,11 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
                                         <div class="col-sm-2">
-                                            <label class="control-label">網頁標籤(以半形逗號分隔)</label>
+                                            <label style="width:125px" class="control-label">網頁標籤 <br>
+                                                (以半形逗號分隔)</label>
                                         </div>
                                         <div class="col-sm-10">
                                             <input class="form-control" name="mata_keywords"
