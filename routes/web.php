@@ -183,6 +183,8 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
         Route::put('/ajax/update-negotiated-return', [OrderRefundController::class, 'updateNegotiatedReturn'])->name('order_refund.update_negotiated_return');
         //人工退款
         Route::put('/ajax/update-manual-refund', [OrderRefundController::class, 'updateManualRefund'])->name('order_refund.update_manual_refund');
+        //作廢
+        Route::put('/ajax/void-return-examination', [OrderRefundController::class, 'voidReturnExamination'])->name('order_refund.void_return_examination');
     });
 
     // 金流對帳單

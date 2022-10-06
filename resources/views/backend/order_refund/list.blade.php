@@ -339,6 +339,7 @@
         let negotiated_return_form_object;
         let manual_refund_button_object;
         const required_message = '須指定﹝退貨申請時間﹞起訖、或﹝退貨申請單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！';
+        const void_return_examination_url = '{{ route('order_refund.void_return_examination') }}'
 
         $(function () {
             get_detail_url = '{{ route('order_refund.detail') }}';
@@ -551,7 +552,7 @@
                 }
             });
 
-            //點擊放大鏡
+            //點擊放大鏡-查看詳細資料
             $(document).on('click', '.order_refund_detail', function () {
                 axios.get(get_detail_url, {
                     params: {
@@ -651,6 +652,34 @@
                 const index = [...$('.refund-item')].indexOf(this);
                 $(`.detail-${index}`).toggleClass('detail-show');
                 $(this).toggleClass('refund-item-active');
+            });
+
+            //作廢按鈕
+            $(document).on('click', '.void-button', function () {
+                let self = $(this);
+                let return_examination_id = $(this).data('return_examination_id');
+                let return_examination_no = $(this).data('return_examination_no');
+
+                if (!confirm(`確定將退貨檢驗單《${return_examination_no}》作廢？`)) {
+                    return false;
+                }
+
+                self.prop('disabled', true);
+
+                axios.post(void_return_examination_url, {
+                    _method: 'PUT',
+                    return_examination_id: return_examination_id,
+                }).then(function (response) {
+
+                    alert(response.data.message);
+                    location = location
+
+                }).catch(function (error) {
+                    console.log(error);
+                    alert(error);
+                    self.prop('disabled', false);
+                    //alert(error.response.data.message);
+                });
             });
         });
 
@@ -753,18 +782,24 @@
                 //詳細內容
                 $.each(value.details, function (index, detail) {
                     details += `<tr>
-                        <td>${detail.item_no}</td>
+                        <td class="text-nowrap">${detail.item_no}</td>
                         <td>${detail.product_name}</td>
-                        <td>${detail.spec_1_value}</td>
-                        <td>${detail.spec_2_value}</td>
-                        <td>${detail.request_qty}</td>
-                        <td>${detail.supplier_product_no}</td>
+                        <td class="text-nowrap">${detail.spec_1_value}</td>
+                        <td class="text-nowrap">${detail.spec_2_value}</td>
+                        <td class="text-nowrap">${detail.request_qty}</td>
+                        <td class="text-nowrap">${detail.supplier_product_no}</td>
                     </tr>`;
                 });
 
                 let button = '';
-                if (value.button.can_operate) {
-                    button = `<button type="button" class="btn btn-warning negotiated-return" data-return_examination_id="${value.return_examination_id}" data-return_request_no="${request_no}" data-return_examination_no="${value.examination_no}" data-toggle="modal" data-target="#negotiated_return" data-dismiss="modal">${value.button.title}</button>`;
+                //協商回報
+                if (value.buttons.includes('negotiate')) {
+                    button += `<button type="button" class="btn btn-warning negotiated-return" data-return_examination_id="${value.return_examination_id}" data-return_request_no="${request_no}" data-return_examination_no="${value.examination_no}" data-toggle="modal" data-target="#negotiated_return" data-dismiss="modal">協商回報</button>`;
+                }
+
+                //作廢
+                if(value.buttons.includes('void')){
+                    button += `<button type="button" class="btn btn-danger void-button" data-return_examination_id="${value.return_examination_id}" data-return_examination_no="${value.examination_no}">作廢</button>`;
                 }
 
                 list += `<tr>
@@ -791,16 +826,16 @@
                         </tr>
                         <tr class="detail detail-${index}" style="background:#eee">
                             <td style="border:none" colspan="2"></td>
-                            <td style="border:none" colspan="5">
+                            <td style="border:none" colspan="10">
                                 <table class="table table-bordered">
                                    <thead>
                                         <tr class="active">
-                                          <th>Item編號</th>
-                                          <th>商品名稱</th>
-                                          <th>規格一</th>
-                                          <th>規格二</th>
-                                          <th>申請數量</th>
-                                          <th>廠商料號</th>
+                                          <th class="text-nowrap">Item編號</th>
+                                          <th class="text-nowrap">商品名稱</th>
+                                          <th class="text-nowrap" >規格一</th>
+                                          <th class="text-nowrap">規格二</th>
+                                          <th class="text-nowrap">申請數量</th>
+                                          <th class="text-nowrap">廠商料號</th>
                                         </tr>
                                     </thead>
                                    <tbody>
@@ -808,7 +843,7 @@
                                     </tbody>
                                 </table>
                             </td>
-                            <td style="border:none" colspan="5"></td>
+                            <td style="border:none" colspan="2"></td>
                         </tr>`;
                 index++;
             });
