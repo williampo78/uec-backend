@@ -672,7 +672,6 @@ export default {
         },
         async search() {
             let stockTypes = this.form.stockType.split("_");
-
             let data = {
                 supplier_id: this.form.supplierId,
                 product_no: this.form.productNo,

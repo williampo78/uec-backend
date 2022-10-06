@@ -330,7 +330,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/order_refund.js') }}"></script>
     <script>
 
         let get_detail_url;

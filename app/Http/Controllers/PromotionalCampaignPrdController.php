@@ -73,6 +73,8 @@ class PromotionalCampaignPrdController extends Controller
             'type_code' => 'CAMPAIGN_TYPE',
             'udf_01' => self::LEVEL_CODE,
         ]);
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
 
         return view('backend.promotional_campaign.prd.create', $result);
     }
@@ -128,7 +130,8 @@ class PromotionalCampaignPrdController extends Controller
             'type_code' => 'CAMPAIGN_TYPE',
             'udf_01' => self::LEVEL_CODE,
         ]);
-
+        // 供應商
+        $result['suppliers'] = $this->supplierService->getSuppliers();
         // 單品活動
         $result['campaign'] = $this->promotionalCampaignService->getPrdCampaignForEditPage($id);
         $result['campaign'] = $this->promotionalCampaignService->formatPrdCampaignForEditPage($result['campaign']);
@@ -228,6 +231,7 @@ class PromotionalCampaignPrdController extends Controller
             'start_launched_at_end',
             'product_type',
             'limit',
+            'stock_types',
             'exclude_product_ids',
         ]);
 

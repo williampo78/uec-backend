@@ -4,11 +4,10 @@
             data-input
             class="form-control"
             autocomplete="off"
-            :name="name"
-            v-model="valueLocal"
             :config="configLocal"
-            @on-change="onChange"
             :disabled="disabled"
+            v-bind="attrs"
+            v-on="$listeners"
         >
         </flat-pickr>
         <div class="input-group-btn">
@@ -27,22 +26,15 @@
 <script>
 import flatPickr from "vue-flatpickr-component";
 import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
-import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
+import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw";
 
 export default {
     components: {
         "flat-pickr": flatPickr,
     },
     name: "vue-flat-pickr",
+    inheritAttrs: false,
     props: {
-        name: {
-            type: String,
-            default: "",
-        },
-        value: {
-            type: String,
-            default: "",
-        },
         config: {
             type: Object,
             default: () => ({}),
@@ -64,16 +56,6 @@ export default {
             },
         };
     },
-    computed: {
-        valueLocal: {
-            get() {
-                return this.value;
-            },
-            set(value) {
-                this.$emit("update:value", value);
-            },
-        },
-    },
     watch: {
         config: {
             handler(config) {
@@ -83,9 +65,14 @@ export default {
             immediate: true,
         },
     },
-    methods: {
-        onChange(selectedDates, dateStr, instance) {
-            this.$emit("on-change", selectedDates, dateStr, instance);
+    computed: {
+        attrs() {
+            const attrs = { ...this.$attrs };
+
+            attrs.class = this.$vnode.data.staticClass;
+            attrs.style = this.$vnode.data.staticStyle;
+
+            return attrs;
         },
     },
 };

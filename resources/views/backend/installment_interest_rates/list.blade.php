@@ -199,7 +199,7 @@
                                             <div class="row">
                                                 <div class="col-sm-5">
                                                     <vue-flat-pickr name="started_at"
-                                                                    :value.sync="modal.startedAt.date"
+                                                                    v-model="modal.startedAt.date"
                                                                     :config="modal.startedAt.config"
                                                                     @on-change="onStartedAtChange"
                                                                     :disabled="modal.startedAt.disabled">
@@ -210,7 +210,7 @@
                                                 </div>
                                                 <div class="col-sm-5">
                                                     <vue-flat-pickr name="ended_at"
-                                                                    :value.sync="modal.endedAt.date"
+                                                                    v-model="modal.endedAt.date"
                                                                     :config="modal.endedAt.config"
                                                                     @on-change="onEndedAtChange"
                                                                     :disabled="modal.endedAt.disabled">

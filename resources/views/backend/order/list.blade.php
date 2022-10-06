@@ -362,7 +362,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/order.js') }}"></script>
     <script>
         //攤提單品計算
         let cart_p_discount_split = '{{ config('uec.cart_p_discount_split') }}';

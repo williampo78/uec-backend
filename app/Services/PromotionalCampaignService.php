@@ -765,7 +765,7 @@ class PromotionalCampaignService
         // 上下架狀態
         if (isset($queryData['launch_status'])) {
             switch ($queryData['launch_status']) {
-                // 待上架
+                    // 待上架
                 case 'prepare_to_launch':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
@@ -773,7 +773,7 @@ class PromotionalCampaignService
                     });
                     break;
 
-                // 已上架
+                    // 已上架
                 case 'launched':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
@@ -782,7 +782,7 @@ class PromotionalCampaignService
                     });
                     break;
 
-                // 下架
+                    // 下架
                 case 'no_launch':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
@@ -790,7 +790,7 @@ class PromotionalCampaignService
                     });
                     break;
 
-                // 關閉
+                    // 關閉
                 case 'disabled':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 0);
@@ -1143,11 +1143,11 @@ class PromotionalCampaignService
             },
         ])
             ->where('agent_id', $user->agent_id)
-        // 不可選到<門市限定>的商品
+            // 不可選到<門市限定>的商品
             ->where('selling_channel', '!=', 'STORE');
 
         // 供應商
-        if (isset($data['supplier_id'])) {
+        if (isset($data['supplier_id']) && $data['supplier_id'] != 'all') {
             $products = $products->where('supplier_id', $data['supplier_id']);
         }
 
@@ -1208,6 +1208,11 @@ class PromotionalCampaignService
         // 限制筆數
         if (isset($data['limit'])) {
             $products = $products->limit($data['limit']);
+        }
+
+        // 庫存類型
+        if (!empty($data['stock_types'])) {
+            $products = $products->whereIn('stock_type', $data['stock_types']);
         }
 
         // 排除已存在的商品
@@ -1588,7 +1593,7 @@ class PromotionalCampaignService
         // 上下架狀態
         if (isset($queryData['launch_status'])) {
             switch ($queryData['launch_status']) {
-                // 待上架
+                    // 待上架
                 case 'prepare_to_launch':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
@@ -1596,7 +1601,7 @@ class PromotionalCampaignService
                     });
                     break;
 
-                // 已上架
+                    // 已上架
                 case 'launched':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
@@ -1605,7 +1610,7 @@ class PromotionalCampaignService
                     });
                     break;
 
-                // 下架
+                    // 下架
                 case 'no_launch':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 1)
@@ -1613,7 +1618,7 @@ class PromotionalCampaignService
                     });
                     break;
 
-                // 關閉
+                    // 關閉
                 case 'disabled':
                     $campaigns = $campaigns->where(function ($query) {
                         $query->where('active', 0);
@@ -1877,7 +1882,10 @@ class PromotionalCampaignService
             'productItems.warehouses' => function ($query) use ($warehouseNumber) {
                 return $query->where('number', $warehouseNumber);
             },
-        ])->where('agent_id', $user->agent_id);
+        ])
+            ->where('agent_id', $user->agent_id)
+            // 不可選到<門市限定>的商品
+            ->where('selling_channel', '!=', 'STORE');
 
         // 供應商
         if (isset($data['supplier_id']) && $data['supplier_id'] != 'all') {
@@ -2275,7 +2283,8 @@ class PromotionalCampaignService
                 // Banner圖檔路徑-Desktop版
                 if (isset($data['banner_photo_desktop'])) {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_desktop)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
@@ -2285,7 +2294,8 @@ class PromotionalCampaignService
                     $promotionalCampaignData['banner_photo_desktop'] = $data['banner_photo_desktop']->storePublicly(self::CART_V2_UPLOAD_PATH_PREFIX . $id, 's3');
                 } elseif (isset($data['is_delete_banner_photo_desktop']) && $data['is_delete_banner_photo_desktop'] == 'true') {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_desktop)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
@@ -2297,7 +2307,8 @@ class PromotionalCampaignService
                 // Banner圖檔路徑-Mobile版
                 if (isset($data['banner_photo_mobile'])) {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_mobile)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
@@ -2307,7 +2318,8 @@ class PromotionalCampaignService
                     $promotionalCampaignData['banner_photo_mobile'] = $data['banner_photo_mobile']->storePublicly(self::CART_V2_UPLOAD_PATH_PREFIX . $id, 's3');
                 } elseif (isset($data['is_delete_banner_photo_mobile']) && $data['is_delete_banner_photo_mobile'] == 'true') {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_mobile)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
@@ -2345,7 +2357,8 @@ class PromotionalCampaignService
                 // Banner圖檔路徑-Desktop版
                 if (isset($data['banner_photo_desktop'])) {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_desktop)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
@@ -2355,7 +2368,8 @@ class PromotionalCampaignService
                     $promotionalCampaignData['banner_photo_desktop'] = $data['banner_photo_desktop']->storePublicly(self::CART_V2_UPLOAD_PATH_PREFIX . $id, 's3');
                 } elseif (isset($data['is_delete_banner_photo_desktop']) && $data['is_delete_banner_photo_desktop'] == 'true') {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_desktop)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_desktop)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_desktop)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_desktop);
@@ -2367,7 +2381,8 @@ class PromotionalCampaignService
                 // Banner圖檔路徑-Mobile版
                 if (isset($data['banner_photo_mobile'])) {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_mobile)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
@@ -2377,7 +2392,8 @@ class PromotionalCampaignService
                     $promotionalCampaignData['banner_photo_mobile'] = $data['banner_photo_mobile']->storePublicly(self::CART_V2_UPLOAD_PATH_PREFIX . $id, 's3');
                 } elseif (isset($data['is_delete_banner_photo_mobile']) && $data['is_delete_banner_photo_mobile'] == 'true') {
                     // 移除舊圖片
-                    if (!empty($originPromotionalCampaign->banner_photo_mobile)
+                    if (
+                        !empty($originPromotionalCampaign->banner_photo_mobile)
                         && Storage::disk('s3')->exists($originPromotionalCampaign->banner_photo_mobile)
                     ) {
                         Storage::disk('s3')->delete($originPromotionalCampaign->banner_photo_mobile);
