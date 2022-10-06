@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Exports\OrderRefundExport;
 use App\Models\LookupValuesV;
+use App\Models\ReturnExamination;
+use App\Models\ReturnRequest;
 use App\Services\OrderRefundService;
+use App\Services\ReturnGoodsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,12 +17,15 @@ use Maatwebsite\Excel\Facades\Excel;
 class OrderRefundController extends Controller
 {
     private $orderRefundService;
+    private $returnGoodsService;
 
     public function __construct(
-        OrderRefundService $OrderRefundService
+        OrderRefundService $OrderRefundService,
+        ReturnGoodsService $returnGoodsService
     )
     {
         $this->orderRefundService = $OrderRefundService;
+        $this->returnGoodsService = $returnGoodsService;
     }
 
     /**
@@ -93,6 +99,14 @@ class OrderRefundController extends Controller
      */
     public function getDetail(Request $request)
     {
+        // 無權限
+        if (!$request->share_role_auth['auth_query']) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Forbidden',
+            ], 403);
+        }
+
         if (empty($request->id)) {
             return response()->json([
                 'status'  => false,
@@ -107,10 +121,11 @@ class OrderRefundController extends Controller
             ->where('agent_id', Auth::user()->agent_id)
             ->get(['description', 'code']);
 
-        //整理檢驗單資料
-        $returnExaminations = $this->orderRefundService->handleReturnExaminations($returnExaminations, $lookupValuesVs, $request->share_role_auth);
         //退貨申請單資料
         $ReturnRequest = $this->orderRefundService->getReturnRequest($id, $request->share_role_auth);
+
+        //整理檢驗單資料
+        $returnExaminations = $this->orderRefundService->handleReturnExaminations($returnExaminations, $lookupValuesVs, $request->share_role_auth, $ReturnRequest);
 
         return response()->json([
             'status'  => true,
@@ -270,5 +285,79 @@ class OrderRefundController extends Controller
         }
 
         return response()->json($updateResult);
+    }
+
+    /**
+     * 廢除退貨檢驗單
+     * @param Request $request
+     * @return JsonResponse
+     * @Author: Eric
+     * @DateTime: 2022/10/5 下午 03:54
+     */
+    public function voidReturnExamination(request $request)
+    {
+        $result = [
+            'status'  => false,
+            'message' => 'Forbidden'
+        ];
+
+        // 無權限
+        if (!$request->share_role_auth['auth_void']) {
+            return response()->json($result, 403);
+        }
+
+        $now = now();
+        //取得檢驗單
+        $ReturnExamination = ReturnExamination::whereIn('status_code', ['CREATED', 'DISPATCHED'])
+            ->findOrFail($request->return_examination_id);
+        //作廢
+        $ReturnExamination
+            ->update([
+                'status_code'             => 'VOIDED',
+                'is_returnable'           => 0,
+                'returnable_confirmed_at' => $now,
+                'voided_by'               => auth()->user()->id,
+                'voided_at'               => $now,
+            ]);
+
+        //取得所有檢驗單
+        $returnExaminations = ReturnExamination::where('return_request_id', $ReturnExamination->return_request_id)
+            ->get();
+
+        //未作廢的檢驗單
+        $notVoidedReturnExamination = $returnExaminations
+            ->where('status_code', '!=', 'VOIDED');
+
+        //有檢驗單未作廢
+        if ($notVoidedReturnExamination->isNotEmpty()) {
+
+            //所有檢驗單皆檢驗，則呼叫退貨程式
+            if ($returnExaminations->whereNull('is_returnable')->isEmpty()) {
+
+                $payload = [
+                    'return_request_id' => $ReturnExamination->return_request_id,
+                    'type'              => 'backend'
+                ];
+
+                $returnGoodsResult = $this->returnGoodsService
+                    ->setParameters($payload)
+                    ->handle();
+
+                if($returnGoodsResult['status'] === false){
+                    return response()->json($result);
+                }
+            }
+            //所有檢驗單皆作廢，則退貨申請單更新為作廢
+        }else{
+            ReturnRequest::findOrFail($ReturnExamination->return_request_id)
+                ->update([
+                    'status_code' => 'VOIDED',
+                ]);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => '作廢成功'
+        ]);
     }
 }
