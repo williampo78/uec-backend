@@ -12,6 +12,7 @@ use App\Models\ReturnExaminationDetail;
 use App\Models\ReturnRequest;
 use App\Models\ReturnRequestDetail;
 use App\Models\Shipment;
+use App\Models\ReturnOrderDetail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -84,6 +85,20 @@ class OrderService
             $orders = $orders->whereRelation('orderCampaignDiscounts.promotionalCampaign', 'campaign_name', 'LIKE', "%{$payload['campaign_name']}%");
         }
 
+        // 訂單類型
+        if (isset($payload['order_ship_from_whs'])) {
+            $orders = $orders->where('ship_from_whs', $payload['order_ship_from_whs']);
+        }
+
+        // 資料範圍
+        if (isset($payload['data_range'])) {
+            if ($payload['data_range'] == 'SHIPPED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'shipped_at', null);
+            } elseif ($payload['data_range'] == 'DELIVERED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'delivered_at', null);
+            }
+        }
+
         return $orders->select()
             ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
             ->orderBy('ordered_date', 'desc')
@@ -107,6 +122,7 @@ class OrderService
             'orderDetails.product',
             'orderDetails.productItem',
             'orderDetails.shipmentDetail.shipment',
+            'orderDetails.product.supplier',
             'orderPayments' => function ($query) {
                 $query->orderBy('created_at', 'asc');
             },
@@ -135,7 +151,12 @@ class OrderService
             },
             'invoiceAllowances.invoice',
             'donatedInstitution',
-        ]);
+            'returnRequests',
+            'returnOrderDetails',
+            'returnOrderDetails.productItem',
+            'returnOrderDetails.productItem.product',
+            'returnOrderDetails.promotionalCampaign',
+            ]);
 
         $order = $order->find($id);
 
@@ -153,6 +174,9 @@ class OrderService
         $combineInvoices = $combineInvoices->sortBy('transaction_date');
 
         $order->combineInvoices = $combineInvoices;
+
+        // 退貨成功 排序
+        $order->returnOrderDetails = $order->returnOrderDetails->sortBy('Priority');
 
         return $order;
     }
@@ -1069,14 +1093,14 @@ class OrderService
                     }
                 });
                 $order->orderDetails->each(function ($orderDetail) use ($returnRequest, &$request, &$returnable, &$product_with) {
-                    if (isset($returnable['giveaway'][$orderDetail->product_id])) {
-                        foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
-                            if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
-                                $returnable['return_id'][] = $give_value;
+                    if (in_array($orderDetail->id, $returnable['return_id'])) {
+                        if (isset($returnable['giveaway'][$orderDetail->product_id])) {
+                            foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
+                                if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
+                                    $returnable['return_id'][] = $give_value;
+                                }
                             }
                         }
-                    }
-                    if (in_array($orderDetail->id, $returnable['return_id'])) {
                         $supplier = ($product_with['ship_from_whs'] == 'SUP') ? $product_with['supplier_id'][$orderDetail->product_item_id] : 0;
                         if (!key_exists($supplier, $returnable['amount'])) $returnable['amount'][$supplier] = 0;
                         if (!key_exists($supplier, $returnable['points'])) $returnable['points'][$supplier] = 0;

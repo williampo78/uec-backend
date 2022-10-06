@@ -77,6 +77,14 @@ class Order extends Model
     }
 
     /**
+     * 建立與銷退明細的關聯
+     */
+    public function returnOrderDetails()
+    {
+        return $this->hasMany(ReturnOrderDetail::class, 'order_no', 'order_no');
+    }
+
+    /**
      * 取得 訂單
      *
      */

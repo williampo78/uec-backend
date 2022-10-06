@@ -13,19 +13,12 @@ use App\Models\ShipmentDetail;
 use App\Models\ShoppingCartDetail;
 use App\Models\StockTransactionLog;
 use App\Models\WarehouseStock;
-use App\Services\APIService;
-use App\Services\APITapPayService;
-use App\Services\StockService;
-use App\Services\SysConfigService;
 use Carbon\Carbon;
-use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Contracts\Encryption\DecryptException;
-use App\Services\ColumnNumberGenerator;
 
 class APIOrderService
 {
@@ -753,7 +746,6 @@ class APIOrderService
     public function setOrdersV2($cart, $order, $campaigns, $campaign_gift, $campaign_discount)
     {
         $member_id = Auth::guard('api')->user()->member_id;
-        $random = Str::random(6);
         //商城倉庫代碼
         $warehouseCode = $this->stockService->getWarehouseConfig();
 
@@ -795,15 +787,25 @@ class APIOrderService
         $campaign_group = [];
         $campaign_group_code = [];
         $group_i = 0;
+        $tmp_campaign_id = "";
         foreach ($cart['list'] as $products) {
             foreach ($campaigns as $product_id => $item) {
                 if ($products['productID'] == $product_id) {
                     foreach ($item as $k => $v) {
-                        $campaign[$v->level_code][$v->category_code][$product_id] = $v;
-                        if ($v->level_code != 'CART_P') { //單品活動才做
-                            $group_i++;
-                            $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
-                            $campaign_group_code[$product_id][$v->id] = $v->level_code;
+                        foreach ($products['itemList'] as $item_info) {
+                            $campaign[$v->level_code][$v->category_code][$product_id] = $v;
+                            if ($v->level_code != 'CART_P') { //單品活動才做
+                                if ($item_info['campaignDiscountStatus'] && $tmp_campaign_id != $v->id) {
+                                    $group_i++;
+                                } elseif (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
+                                    if ($item_info['campaignGiftAway']['campaignGiftStatus']&& $tmp_campaign_id != $v->id) {
+                                        $group_i++;
+                                    }
+                                }
+                                $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
+                                $campaign_group_code[$product_id][$v->id] = $v->level_code;
+                                $tmp_campaign_id = $v->id;
+                            }
                         }
                     }
                 }
@@ -832,6 +834,7 @@ class APIOrderService
                 $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //門檻ID
             }
         }
+
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -840,9 +843,7 @@ class APIOrderService
             $interest_fee = isset($cart['installments']['interest_fee']) ? $cart['installments']['interest_fee'] : 0;
             $webData = [];
             $webData['agent_id'] = 1;
-            //$webData['order_no'] = ColumnNumberGenerator::make(new Order(), 'order_no')->generate('OD', 6,1,1);//"OD" . date("ymd") . strtoupper($random);
-            //dd($webData['order_no']);
-            $webData['order_no'] = "OD" . date("ymd") . strtoupper($random);
+            $webData['order_no'] = ColumnNumberGenerator::make(new Order(), 'order_no')->generate('OD', 6, true, date("ymd"), 'number');
             $webData['revision_no'] = 0;
             $webData['is_latest'] = 1;
             $webData['ordered_date'] = now();
@@ -909,7 +910,7 @@ class APIOrderService
             $paymantData['payment_type'] = 'PAY';
             $paymantData['payment_method'] = $order['payment_method'];
             $paymantData['payment_status'] = 'PENDING';
-            $paymantData['amount'] = ($webData['paid_amount'] + $webData['fee_of_instal']);
+            $paymantData['amount'] = ($webData['paid_amount']);
             $paymantData['point_discount'] = $webData['point_discount'];
             $paymantData['points'] = $webData['points'];
             $paymantData['record_created_reason'] = 'ORDER_CREATED';
@@ -1530,14 +1531,13 @@ class APIOrderService
         $status = Order::getOrder($data['order_id']);
         if ($status['status_code'] != 'CREATED') exit;
         $now = Carbon::now();
-        $random = Str::random(6);
         DB::beginTransaction();
         try {
             if ($status['ship_from_whs'] == 'SELF') { //出貨倉，SELF-自有倉儲(秋雨倉)
                 //建立出貨單頭
                 $shipData = [];
                 $shipData['agent_id'] = 1;
-                $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
+                $shipData['shipment_no'] = ColumnNumberGenerator::make(new Shipment(), 'shipment_no')->generate('SH', 6, true, date("ymd"), 'number');
                 $shipData['shipment_date'] = $now;
                 $shipData['status_code'] = 'CREATED';
                 $shipData['payment_method'] = $data['payment_method'];
@@ -1604,11 +1604,11 @@ class APIOrderService
                 }
                 //一品一單
                 foreach ($shipment['detail'] as $main_product_id => $order_detail) {
-                    $random = Str::random(6);
+
                     //建立出貨單頭
                     $shipData = [];
                     $shipData['agent_id'] = 1;
-                    $shipData['shipment_no'] = "SH" . date("ymd") . strtoupper($random);
+                    $shipData['shipment_no'] = ColumnNumberGenerator::make(new Shipment(), 'shipment_no')->generate('SH', 6, true, date("ymd"), 'number');
                     $shipData['shipment_date'] = $now;
                     $shipData['status_code'] = 'CREATED';
                     $shipData['payment_method'] = $data['payment_method'];

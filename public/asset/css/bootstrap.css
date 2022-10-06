@@ -1388,7 +1388,8 @@ a.bg-danger:hover {
   background-color: #e4b9b9;
 }
 .page-header {
-  padding-bottom: 9px;
+  font-size: 28px;
+  padding-bottom: 5px;
   /* margin: 40px 0 20px; */
   border-bottom: 1px solid #eee;
 }
@@ -6569,4 +6570,13 @@ button.close {
 @media print {
   .panel-heading { padding: 10px; }
   .panel-body { padding: 10px; }
+}
+
+@media screen and (max-width: 768px) {
+  .block{
+    display: block!important;
+  }
+  .mb-1{
+    margin-bottom: 15px;
+  }
 }
