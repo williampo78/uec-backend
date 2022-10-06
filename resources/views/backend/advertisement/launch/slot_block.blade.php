@@ -22,8 +22,8 @@
                     </label>
                 </div>
                 <div class="col-sm-9">
-                    <div class="row">
-                        <div class="col-sm-5">
+                    <div style="display: flex;justify-content:space-between; padding-right:15px" class="row">
+                        <div>
                             <div class="input-group" id="start_at_flatpickr">
                                 <input type="text" class="form-control" name="start_at" id="start_at" value=""
                                     autocomplete="off" data-input />
@@ -34,10 +34,10 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="col-sm-2 text-center">
+                        <div class="text-center">
                             <label class="control-label">～</label>
                         </div>
-                        <div class="col-sm-5">
+                        <div >
                             <div class="input-group" id="end_at_flatpickr">
                                 <input type="text" class="form-control" name="end_at" id="end_at" value=""
                                     autocomplete="off" data-input />
@@ -76,7 +76,7 @@
                 <div class="col-sm-3">
                     <label class="control-label">備註</label>
                 </div>
-                <div class="col-sm-9">
+                <div style="padding-left: 0" class="col-sm-9">
                     <input type="text" class="form-control" id="remark" name="remark" />
                 </div>
             </div>
@@ -104,7 +104,7 @@
                         <span>(例：#DAF7CD)</span>
                     </label>
                 </div>
-                <div class="col-sm-9">
+                <div style="padding-left: 0" class="col-sm-9">
                     <input class="form-control colorpicker" type="text" id="slot_color_code" name="slot_color_code" disabled autocomplete="off" />
                 </div>
             </div>
@@ -126,7 +126,7 @@
                 <div class="col-sm-3">
                     <label class="control-label">版位icon</label>
                 </div>
-                <div class="col-sm-9">
+                <div style="padding-left:0" class="col-sm-9">
                     <div class="row">
                         <div class="col-sm-5">
                             <input type="file" id="slot_icon_name" name="slot_icon_name" disabled />

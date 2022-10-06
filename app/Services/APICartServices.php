@@ -2558,6 +2558,7 @@ class APICartServices
                             }
                         }
                     }
+                    $products['campaignThresholdGiveaway'] = [];
                     $products['campaignThresholdGiveaway']['campaignThresholdStatus'] = false;  //不滿足活動時狀態為false
                     $cart['list'][$productKey] = $products;
                 }

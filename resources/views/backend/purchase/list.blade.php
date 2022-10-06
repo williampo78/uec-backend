@@ -16,107 +16,80 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
 
-                    <div class="panel-heading">
-                        <form role="form" class="form-horizontal" id="select-form" method="GET" action=""
-                            enctype="multipart/form-data">
-                            <br>
-                            <div class="row">
-                                {{-- row 1 start --}}
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3"><label class="control-label"> 供應商 </label></div>
-                                        <div class="col-sm-9">
-                                            <div class='input-group' id='supplier_deliver_date_dp'>
-                                                <select class="form-control js-select2-department" name="supplier"
-                                                    id="supplier" value="{{ request()->input('supplier') }}">
-                                                    <option value=""></option>
-                                                    @foreach ($supplier as $v)
-                                                        <option value='{{ $v['id'] }}'
-                                                            {{ request()->input('supplier') && $v['id'] == request()->input('supplier') ? 'selected' : '' }}>
-                                                            {{ $v['name'] }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                    <div class="panel-heading" style="padding: 15px;">
+                        <form role="form" class="form-horizontal" id="select-form" method="GET" action="" enctype="multipart/form-data">
+                            {{-- row 1 start --}}
+                            <div style="display: grid; grid-template-columns: 3fr 2fr 2fr; gap: 15px;  border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;" class="block">
+                                <div>
+                                    <div class="col-sm-3"><label class="control-label"> 供應商 </label></div>
+                                    <div class="col-sm-9">
+                                        <div class='input-group mb-1' id='supplier_deliver_date_dp'>
+                                            <select class="form-control js-select2-department mb-1" name="supplier"
+                                                id="supplier" value="{{ request()->input('supplier') }}">
+                                                <option value=""></option>
+                                                @foreach ($supplier as $v)
+                                                    <option value='{{ $v['id'] }}'
+                                                        {{ request()->input('supplier') && $v['id'] == request()->input('supplier') ? 'selected' : '' }}>
+                                                        {{ $v['name'] }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
+                                    </div>
 
+                                </div>
+                                <div>
+                                    <div class="col-sm-4"><label class="control-label">供應商統編</label></div>
+                                    <div class="col-sm-8">
+                                        <input class="form-control mb-1" name="company_number" id="company_number"
+                                            value="{{ request()->input('company_number') }}">
                                     </div>
                                 </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-4"><label class="control-label">供應商統編</label></div>
-                                        <div class="col-sm-8">
-                                            <div class='input-group'>
-                                                <input class="form-control" name="company_number" id="company_number"
-                                                    value="{{ request()->input('company_number') }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-4"><label class="control-label">採購單號</label></div>
-                                        <div class="col-sm-8">
-                                            <div class='input-group'>
-                                                <input class="form-control" name="order_supplier_number"
-                                                    id="order_supplier_number"
-                                                    value="{{ request()->input('order_supplier_number') }}">
-                                            </div>
-                                        </div>
+                                <div>
+                                    <div class="col-sm-4"><label class="control-label">採購單號</label></div>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" name="order_supplier_number"
+                                            id="order_supplier_number"
+                                            value="{{ request()->input('order_supplier_number') }}">
                                     </div>
                                 </div>
                             </div>
-                            <hr>
                             {{-- row 1 end --}}
                             {{-- row 2 start --}}
-                            <div class="row">
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3"><label class="control-label">進貨日期</label></div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class="input-group" id="trade_date_start_flatpickr">
-                                                    <input type="text" class="form-control" name="trade_date_start" id="trade_date_start" value="{{ request()->input('trade_date_start') }}" autocomplete="off" data-input />
-                                                    <span class="input-group-btn" data-toggle>
-                                                        <button class="btn btn-default" type="button">
-                                                            <i class="fa-solid fa-calendar-days"></i>
-                                                        </button>
-                                                    </span>
-                                                </div>
+                            <div style="display: grid; grid-template-columns: 3fr 2fr 2fr; gap: 15px"  class="block">
+                                <div>
+                                    <div class="col-sm-3"><label class="control-label">進貨日期</label></div>
+                                    <div class="col-sm-9" style="display: flex; justify-content: space-between;">
+                                        <div class="form-group" style="margin-right: 0; margin-left: 0; margin-bottom: 0;">
+                                            <div class="input-group" id="trade_date_start_flatpickr">
+                                                <input type="text" class="form-control" name="trade_date_start" id="trade_date_start" value="{{ request()->input('trade_date_start') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
+                                                </span>
                                             </div>
                                         </div>
-                                        <div class="col-sm-1">
-                                            <div class="form-group">
-                                                <label class="control-label">　～</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class="input-group" id="trade_date_end_flatpickr">
-                                                    <input type="text" class="form-control" name="trade_date_end" id="trade_date_end" value="{{ request()->input('trade_date_end') }}" autocomplete="off" data-input />
-                                                    <span class="input-group-btn" data-toggle>
-                                                        <button class="btn btn-default" type="button">
-                                                            <i class="fa-solid fa-calendar-days"></i>
-                                                        </button>
-                                                    </span>
-                                                </div>
+                                        <label style="margin-top: 8px;">～</label>
+                                        <div class="form-group" style="margin-right: 0; margin-left: 0; margin-bottom: 0;">
+                                            <div class="input-group" id="trade_date_end_flatpickr">
+                                                <input type="text" class="form-control" name="trade_date_end" id="trade_date_end" value="{{ request()->input('trade_date_end') }}" autocomplete="off" data-input />
+                                                <span class="input-group-btn" data-toggle>
+                                                    <button class="btn btn-default" type="button">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                    </button>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-4"><label class="control-label">進貨單號</label></div>
-                                        <div class="col-sm-8">
-                                            <div class='input-group'>
-                                                <input class="form-control" name="number" id="number"
-                                                    value="{{ request()->input('number') }}">
-                                            </div>
-                                        </div>
+                                <div>
+                                    <div class="col-sm-4"><label class="control-label">進貨單號</label></div>
+                                    <div class="col-sm-8">
+                                        <input class="form-control mb-1" name="number" id="number"
+                                            value="{{ request()->input('number') }}">
                                     </div>
                                 </div>
-                                <div class="col-sm-4 text-right">
+                                <div class="text-right">
                                     <div class="col-sm-12">
                                         <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
                                     </div>
@@ -132,7 +105,7 @@
                 <!-- Table list -->
                 <div class="panel-body">
 
-                    <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
+                    <table class="table table-striped table-bordered table-hover" style="width:100%;" id="table_list">
                         <thead>
                             <tr>
                                 <th>功能</th>
