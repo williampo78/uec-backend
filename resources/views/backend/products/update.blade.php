@@ -1004,12 +1004,12 @@
                                 <tr v-for="(Sku, SkuKey) in SkuList">
                                     <td v-if="products.spec_dimension >= 1">@{{ Sku.spec_1_value }}</td>
                                     <td v-if="products.spec_dimension == 2">@{{ Sku.spec_2_value }}</td>
-                                    <td><input style="min-width: 120px" class="form-control" v-model="Sku.item_no" readonly></td>
-                                    <td><input style="min-width: 120px" class="form-control" v-model="Sku.supplier_item_no"
+                                    <td><input style="min-width:120px" class="form-control" v-model="Sku.item_no" readonly></td>
+                                    <td><input style="min-width:120px" class="form-control" v-model="Sku.supplier_item_no"
                                         :disabled="Sku.id !== '' && edit_readonly == 1"></td>
                                     <td>
                                         <div class="form-group" style="margin-right:0px;margin-left:0px;">
-                                            <input style="min-width: 120px" class="form-control ean_va" v-model="Sku.ean"
+                                            <input style="min-width:120px" class="form-control ean_va" v-model="Sku.ean"
                                                 :name="'ean_va[' + SkuKey + ']'"
                                                 :disabled="Sku.id !== '' && edit_readonly == 1"
                                                 >
