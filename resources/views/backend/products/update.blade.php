@@ -2,9 +2,9 @@
 @section('title', '商品主檔 - 新增基本資訊')
 @section('content')
     <style>
-        /* .no-pa {
+        .no-pa {
                             padding: 0px;
-                    } */
+                    }
         .ondragover {
             background: #b7e0fb !important;
             transition: background-color 0.5s;
@@ -81,6 +81,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .form-group{
+            margin:0 0 15px 0 !important;
+        }
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -120,7 +123,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">庫存類型</label><span class="text-red">*</span>
                                     </div>
                                     <div class="col-sm-3">
@@ -150,7 +153,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label ">商品序號</label><span class="text-red">*</span>
                                     </div>
                                     <div class="col-sm-9">
@@ -164,7 +167,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">供應商<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -182,7 +185,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品名稱<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -195,7 +198,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">課稅別<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -211,7 +214,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">POS分類<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -231,7 +234,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">品牌<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -248,7 +251,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品型號</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -261,7 +264,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品通路<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
@@ -296,7 +299,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">溫層<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
@@ -313,7 +316,7 @@
                         <div class="row ">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">配送方式<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -328,7 +331,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品交期<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
@@ -345,7 +348,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">單位<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -355,7 +358,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">最小採購量</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -367,7 +370,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">效期控管<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
@@ -392,7 +395,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">允收期(天)</label>
                                     </div>
                                     <div class="col-sm-3">
@@ -411,7 +414,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品類型<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3 ">
@@ -439,7 +442,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">停售<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-2">
@@ -469,7 +472,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">材積(公分) <span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
@@ -483,7 +486,7 @@
                                     <div class="col-sm-1">
                                         <label class="control-label">寬</label>
                                     </div>
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <input class="form-control" name="width" type="number" min="0"
                                             value="{{ $products->width }}"
                                             {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
@@ -500,7 +503,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">重量(公克)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
@@ -514,7 +517,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">市價(含稅)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -526,7 +529,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">售價(含稅)<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -540,7 +543,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">付款方式</label>
                                     </div>
                                     @foreach ($payment_method_options as $key => $val)
@@ -561,7 +564,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">成本(含稅)</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -571,7 +574,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">毛利(%)</label>
                                     </div>
                                     <div class="col-sm-6">
@@ -588,7 +591,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">採購人員</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -599,7 +602,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">轉單審核人員</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -611,7 +614,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">建檔人員</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -622,7 +625,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">建檔時間</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -635,7 +638,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">修改人員</label>
                                     </div>
                                     <div class="col-sm-7">
@@ -652,7 +655,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">修改時間</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -667,7 +670,7 @@
                         <div class="row">
                             <div class="col-sm-12 ">
                                 <div class="form-group">
-                                    <div class="col-sm-1 ">
+                                    <div class="col-sm-1 no-pa">
                                         <label class="control-label">商品簡述</label>
                                     </div>
                                     <div class="col-sm-10">
@@ -705,7 +708,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <div class="col-sm-1 ">
+                                    <div class="col-sm-1 no-pa">
                                         <label class="control-label">專利字號</label>
                                     </div>
                                     <div class="col-sm-10">
@@ -719,7 +722,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <div class="col-sm-1 ">
+                                    <div class="col-sm-1 no-pa">
                                         <label class="control-label">保固期限<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
@@ -747,7 +750,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <div class="col-sm-1 ">
+                                    <div class="col-sm-1 no-pa">
                                         <label class="control-label">保固範圍</label>
                                     </div>
                                     <div class="col-sm-11">
@@ -760,7 +763,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <div class="col-sm-1 ">
+                                        <div class="col-sm-1 no-pa">
                                             <label class="control-label">商品圖檔</label>
                                         </div>
                                         <div class="col-sm-10">
@@ -969,7 +972,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col-sm-6">
-                                <div class="col-sm-2 ">
+                                <div class="col-sm-2 no-pa">
                                     <label class="control-label">安全庫存量</label>
                                 </div>
                                 <div class="col-sm-8">
