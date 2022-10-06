@@ -795,10 +795,10 @@ class APIOrderService
                         foreach ($products['itemList'] as $item_info) {
                             $campaign[$v->level_code][$v->category_code][$product_id] = $v;
                             if ($v->level_code != 'CART_P') { //單品活動才做
-                                if ($item_info['campaignDiscountStatus'] && $tmp_campaign_id != $v->id) {
+                                if ($item_info['campaignDiscountStatus']) {
                                     $group_i++;
                                 } elseif (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
-                                    if ($item_info['campaignGiftAway']['campaignGiftStatus']&& $tmp_campaign_id != $v->id) {
+                                    if ($item_info['campaignGiftAway']['campaignGiftStatus']) {
                                         $group_i++;
                                     }
                                 }
