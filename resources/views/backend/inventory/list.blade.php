@@ -77,33 +77,24 @@
                                     </div>
                                 </div>
                             </div>
-                            <br />
 
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="row">
+                                    <div class="row" >
                                         <div class="col-sm-3">
                                             <label class="control-label">Item編號</label>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class='input-group'>
-                                                    <input type='text' class="form-control" name="item_no_start"
-                                                        id="item_no_start" value="{{ request()->input('item_no_start') }}"
-                                                        autocomplete="off" />
-                                                </div>
+                                        <div class="col-sm-9" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <div class='input-group'>
+                                                <input type='text' class="form-control" name="item_no_start"
+                                                    id="item_no_start" value="{{ request()->input('item_no_start') }}"
+                                                    autocomplete="off" />
                                             </div>
-                                        </div>
-                                        <div class="col-sm-1 text-center">
-                                            <label class="control-label">～</label>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class='input-group'>
-                                                    <input type='text' class="form-control" name="item_no_end"
-                                                        id="item_no_end" value="{{ request()->input('item_no_end') }}"
-                                                        autocomplete="off" />
-                                                </div>
+                                            <label class="control-label text-center">～</label>
+                                            <div class='input-group'>
+                                                <input type='text' class="form-control" name="item_no_end"
+                                                    id="item_no_end" value="{{ request()->input('item_no_end') }}"
+                                                    autocomplete="off" />
                                             </div>
                                         </div>
                                     </div>
@@ -140,40 +131,29 @@
                                     </div>
                                 </div>
                             </div>
-                            <br />
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label
-                                            class="control-label">庫存總量：{{ number_format($inventories->sum('original_stock_qty')) }}</label>
-                                    </div>
-                                    <div class="col-sm-9"></div>
+                            <div class="row" style="display: flex; justify-content: space-between;">
+                                <div style="flex-grow: 1; margin-left: 15px;">
+                                    <label
+                                        class="control-label">庫存總量：{{ number_format($inventories->sum('original_stock_qty')) }}</label>
                                 </div>
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3"></div>
-                                        <div class="col-sm-9 text-right">
-                                            @if ($share_role_auth['auth_export'])
-                                                <button data-url="{{ route('inventory.export_excel') }}"
-                                                    class="btn btn-primary" id="btn-export-excel" type="button">
-                                                    <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
-                                                </button>
-                                            @endif
+                                <div style="margin-right: 15px; margin-bottom: 5px;">
+                                    <div class="text-right">
+                                        @if ($share_role_auth['auth_export'])
+                                            <button data-url="{{ route('inventory.export_excel') }}"
+                                                class="btn btn-primary" id="btn-export-excel" type="button">
+                                                <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                                            </button>
+                                        @endif
 
-                                            @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning" id="btn-search">
-                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
-                                                </button>
+                                        @if ($share_role_auth['auth_query'])
+                                            <button class="btn btn-warning" id="btn-search">
+                                                <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                            </button>
 
-                                                <button type="button" class="btn btn-danger" id="btn-reset">
-                                                    <i class="fa-solid fa-eraser"></i> 清除
-                                                </button>
-                                            @endif
-                                        </div>
+                                            <button type="button" class="btn btn-danger" id="btn-reset">
+                                                <i class="fa-solid fa-eraser"></i> 清除
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
