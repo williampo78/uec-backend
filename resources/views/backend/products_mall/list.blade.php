@@ -298,7 +298,7 @@
                                     <th class="text-nowrap">項次</th>
                                     <th class="text-nowrap">供應商</th>
                                     <th class="text-nowrap">商品序號</th>
-                                    <th class="text-nowrap">商品名稱</th>
+                                    <th style="width: 300px; box-sizing:border-box" class="text-nowrap">商品名稱</th>
                                     <th class="text-nowrap">售價(含稅)</th>
                                     <th class="text-nowrap">成本(含稅)</th>
                                     <th class="text-nowrap">毛利(%)</th>
