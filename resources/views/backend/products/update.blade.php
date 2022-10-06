@@ -475,7 +475,7 @@
                                     <div class="col-sm-2 no-pa">
                                         <label class="control-label">材積(公分) <span class="text-red">*</span></label>
                                     </div>
-                                    <div class="col-sm-1">
+                                    <div class="col-sm-1 no-pa">
                                         <label class="control-label">長</label>
                                     </div>
                                     <div class="col-sm-2">
@@ -483,7 +483,7 @@
                                             value="{{ $products->length }}"
                                             {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
-                                    <div class="col-sm-1">
+                                    <div class="col-sm-1 no-pa">
                                         <label class="control-label">寬</label>
                                     </div>
                                     <div class="col-sm-2 no-pa">
@@ -491,7 +491,7 @@
                                             value="{{ $products->width }}"
                                             {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
-                                    <div class="col-sm-1">
+                                    <div class="col-sm-1 no-pa">
                                         <label class="control-label">高</label>
                                     </div>
                                     <div class="col-sm-2">
@@ -804,7 +804,7 @@
                 </div>
                 <hr>
                 <div id="page-2">
-                    <div id="SkuComponent">
+                    <div style="overflow:auto" id="SkuComponent">
                         <textarea style="display: none;" name="SpecListJson" id="" cols="30" rows="10">@{{ SpecList }}</textarea>
                         <div class="row form-group">
                             <div class="col-sm-12">
@@ -989,27 +989,27 @@
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th v-if="products.spec_dimension >= 1" style="width: 10%">規格一</th>
-                                    <th v-if="products.spec_dimension == 2" style="width: 10%">規格二</th>
-                                    <th style="width: 15%">Item編號</th>
-                                    <th style="width: 10%">廠商貨號</th>
-                                    <th style="width: 10%">國際條碼</th>
-                                    <th style="width: 10%">POS品號<span class="stock_type_list text-red">*</span></th>
-                                    <th style="width: 10%">安全庫存量<span class="text-red">*</span></th>
-                                    <th style="width: 10%">是否追加<span class="text-red">*</span></th>
-                                    <th style="width: 10%">狀態<span class="text-red">*</span></th>
+                                    <th v-if="products.spec_dimension >= 1" class="text-nowrap">規格一</th>
+                                    <th v-if="products.spec_dimension == 2" class="text-nowrap">規格二</th>
+                                    <th class="text-nowrap">Item編號</th>
+                                    <th class="text-nowrap">廠商貨號</th>
+                                    <th class="text-nowrap">國際條碼</th>
+                                    <th class="text-nowrap">POS品號<span class="stock_type_list text-red">*</span></th>
+                                    <th class="text-nowrap">安全庫存量<span class="text-red">*</span></th>
+                                    <th class="text-nowrap">是否追加<span class="text-red">*</span></th>
+                                    <th class="text-nowrap">狀態<span class="text-red">*</span></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(Sku, SkuKey) in SkuList">
                                     <td v-if="products.spec_dimension >= 1">@{{ Sku.spec_1_value }}</td>
                                     <td v-if="products.spec_dimension == 2">@{{ Sku.spec_2_value }}</td>
-                                    <td><input class="form-control" v-model="Sku.item_no" readonly></td>
-                                    <td><input class="form-control" v-model="Sku.supplier_item_no"
+                                    <td><input style="min-width: 120px" class="form-control" v-model="Sku.item_no" readonly></td>
+                                    <td><input style="min-width: 120px" class="form-control" v-model="Sku.supplier_item_no"
                                         :disabled="Sku.id !== '' && edit_readonly == 1"></td>
                                     <td>
                                         <div class="form-group" style="margin-right:0px;margin-left:0px;">
-                                            <input class="form-control ean_va" v-model="Sku.ean"
+                                            <input style="min-width: 120px" class="form-control ean_va" v-model="Sku.ean"
                                                 :name="'ean_va[' + SkuKey + ']'"
                                                 :disabled="Sku.id !== '' && edit_readonly == 1"
                                                 >
@@ -1017,7 +1017,7 @@
                                     </td>
                                     <td>
                                         <div class="form-group" style="margin-right:0px;margin-left:0px;">
-                                            <input class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
+                                            <input style="min-width: 120px" class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
                                                 :name="'pos_item_no[' + SkuKey + ']'" :data-item_no="Sku.item_no"
                                                 data-va="pos_item_no" :disabled="Sku.id !== '' && edit_readonly == 1">
                                         </div>
