@@ -758,22 +758,23 @@
                                 </div>
                                 <textarea style="display: none" name="SkuListdata" cols="30"
                                     rows="10">@{{ SkuList }}</textarea>
+                                    <div style="overflow: auto">
                                 <table class="table table-striped table-bordered table-hover">
                                     <thead>
                                         <tr>
                                             @if ($products->spec_dimension >= '1')
-                                                <th style="width: 10%">規格一</th>
+                                                <th class="text-nowrap">規格一</th>
                                             @endif
                                             @if ($products->spec_dimension == '2')
-                                                <th v-if="products.spec_dimension == 2" style="width: 10%">規格二</th>
+                                                <th v-if="products.spec_dimension == 2" class="text-nowrap">規格二</th>
                                             @endif
-                                            <th style="width: 15%">Item編號</th>
-                                            <th style="width: 10%">廠商貨號</th>
-                                            <th style="width: 10%">國際條碼</th>
-                                            <th style="width: 10%">POS品號</th>
-                                            <th style="width: 10%">安全庫存量*</th>
-                                            <th style="width: 10%">是否追加*</th>
-                                            <th style="width: 10%">狀態*</th>
+                                            <th class="text-nowrap">Item編號</th>
+                                            <th class="text-nowrap">廠商貨號</th>
+                                            <th class="text-nowrap">國際條碼</th>
+                                            <th class="text-nowrap">POS品號</th>
+                                            <th class="text-nowrap">安全庫存量*</th>
+                                            <th class="text-nowrap">是否追加*</th>
+                                            <th class="text-nowrap">狀態*</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -790,15 +791,15 @@
                                                     </td>
                                                 @endif
 
-                                                <td><input class="form-control" value="{{ $val->item_no }}" disabled>
+                                                <td><input style="min-width:120px" class="form-control" value="{{ $val->item_no }}" disabled>
                                                 </td>
-                                                <td><input class="form-control" value="{{ $val->supplier_item_no }}"
+                                                <td><input style="min-width:120px" class="form-control" value="{{ $val->supplier_item_no }}"
                                                         disabled></td>
-                                                <td><input class="form-control" value="{{ $val->ean }}" disabled>
+                                                <td><input style="min-width:120px" class="form-control" value="{{ $val->ean }}" disabled>
                                                 </td>
-                                                <td><input class="form-control" value="{{ $val->pos_item_no }}"
+                                                <td><input style="min-width:120px" class="form-control" value="{{ $val->pos_item_no }}"
                                                         disabled></td>
-                                                <td><input class="form-control" value="{{ $val->safty_qty }}"
+                                                <td><input style="min-width:120px" class="form-control" value="{{ $val->safty_qty }}"
                                                         disabled>
                                                 </td>
                                                 <td>
@@ -822,6 +823,7 @@
 
                                     </tbody>
                                 </table>
+                            </div>
 
                             </div>
 

@@ -35,6 +35,6 @@ class ReturnRequestController extends Controller
             ->setParameters($payload)
             ->handle();
 
-        return response()->json($result, $result['http_status_code']);
+        return response()->json($result, $result['http_status_code'], [], JSON_UNESCAPED_UNICODE);
     }
 }
