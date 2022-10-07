@@ -17,17 +17,20 @@
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
                         <form role="form" class="form-horizontal" id="select-form" method="GET" action=""
-                              enctype="multipart/form-data">
+                            enctype="multipart/form-data">
                             <br>
                             <div class="row">
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3"><label class="control-label">進貨日期</label></div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
+                                        <div class="col-sm-9" style="display: flex; justify-content:space-between">
+                                            <div class="form-group" style="width:46%;margin:0">
                                                 <div class="input-group" id="trade_date_start_flatpickr">
-                                                    <input type="text" class="form-control" name="trade_date_start" id="trade_date_start" value="{{ request()->input('trade_date_start') }}" autocomplete="off" data-input />
+                                                    <input type="text" class="form-control" name="trade_date_start"
+                                                        id="trade_date_start"
+                                                        value="{{ request()->input('trade_date_start') }}"
+                                                        autocomplete="off" data-input />
                                                     <span class="input-group-btn" data-toggle>
                                                         <button class="btn btn-default" type="button">
                                                             <i class="fa-solid fa-calendar-days"></i>
@@ -35,16 +38,12 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-sm-1">
-                                            <div class="form-group">
-                                                <label class="control-label">　～</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
+                                            <label class="control-label">~</label>
+                                            <div class="form-group" style="width:46%;margin:0">
                                                 <div class="input-group" id="trade_date_end_flatpickr">
-                                                    <input type="text" class="form-control" name="trade_date_end" id="trade_date_end" value="{{ request()->input('trade_date_end') }}" autocomplete="off" data-input />
+                                                    <input type="text" class="form-control" name="trade_date_end"
+                                                        id="trade_date_end" value="{{ request()->input('trade_date_end') }}"
+                                                        autocomplete="off" data-input />
                                                     <span class="input-group-btn" data-toggle>
                                                         <button class="btn btn-default" type="button">
                                                             <i class="fa-solid fa-calendar-days"></i>
@@ -58,11 +57,11 @@
                                 {{-- row 1 start --}}
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3"><label class="control-label"> 供應商 </label></div>
+                                        <div class="col-sm-3"><label class="control-label">供應商</label></div>
                                         <div class="col-sm-9">
                                             <div class='input-group' id='supplier_deliver_date_dp'>
                                                 <select class="form-control js-select2-department" name="supplier"
-                                                        id="supplier" value="{{ request()->input('company_number') }}">
+                                                    id="supplier" value="{{ request()->input('company_number') }}">
                                                     <option value=""></option>
                                                     @foreach ($supplier as $v)
                                                         <option value='{{ $v['id'] }}'
@@ -82,8 +81,8 @@
                                         <div class="col-sm-8">
                                             <div class='input-group'>
                                                 <input class="form-control" name="order_supplier_number"
-                                                       id="order_supplier_number"
-                                                       value="{{ request()->input('company_number') }}">
+                                                    id="order_supplier_number"
+                                                    value="{{ request()->input('company_number') }}">
                                             </div>
                                         </div>
                                     </div>
@@ -96,47 +95,42 @@
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3"><label class="control-label">POS品號</label></div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-
-                                                <input class="form-control" name="POS_start_number"
-                                                       id="POS_start_number"
-                                                       value="{{ request()->input('POS_start_number') }}">
+                                        <div class="col-sm-9" style="display: flex;justify-content:space-between">
+                                            <div class="form-group" style="width:46%;margin: 0">
+                                                <input class="form-control" name="POS_start_number" id="POS_start_number"
+                                                    value="{{ request()->input('POS_start_number') }}">
                                             </div>
-                                        </div>
-                                        <div class="col-sm-1">
                                             <div class="form-group">
-                                                <label class="control-label">　～</label>
+                                                <label class="control-label">~</label>
                                             </div>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
+                                            <div class="form-group" style="width:46%;margin:0">
                                                 <input class="form-control" name="POS_end_number" id="POS_end_number"
-                                                       value="{{ request()->input('POS_end_number') }}">
+                                                    value="{{ request()->input('POS_end_number') }}">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-4"><label class="control-label">商品名稱</label></div>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-3"><label class="control-label">商品名稱</label></div>
+                                        <div class="col-sm-9">
                                             <div class='input-group'>
                                                 <input class="form-control" name="product_name" id="product_name"
-                                                       value="{{ request()->input('product_name') }}">
+                                                    value="{{ request()->input('product_name') }}">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-4 text-right">
                                     <div class="col-sm-9">
-                                        <a class="btn btn-info" target="_blank" href='{{ $excel_url  ?? ''}} '
+                                        <a class="btn btn-info" target="_blank" href='{{ $excel_url ?? '' }} '
                                             {{ $excel_url ?? 'disabled' }}>
                                             <i class="fa-solid fa-file-excel"></i>
                                             匯出EXCEL</a>
                                     </div>
                                     <div class="col-sm-3">
-                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i>
+                                            查詢</button>
                                     </div>
                                 </div>
                                 {{-- row 2 end --}}
@@ -150,56 +144,55 @@
                 <div style="overflow-x: scroll;">
                     <div class="" style="width: 120%">
 
-                        <table class="table table-striped table-bordered table-hover" style="width:100%"
-                               id="table_list">
+                        <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
-                            <tr>
-                                <th>項次</th>
-                                <th>供應商</th>
-                                <th>進貨日期</th>
-                                <th>進貨單號</th>
-                                <th>採購單稅別</th>
-                                <th>Item編號</th>
-                                <th>POS品號</th>
-                                <th>商品名稱</th>
-                                <th>規格一</th>
-                                <th>規格二</th>
-                                <th>單價</th>
-                                <th>數量</th>
-                                <th>未稅金額</th>
-                                <th>稅額</th>
-                                <th>含稅金額</th>
-                            </tr>
+                                <tr>
+                                    <th>項次</th>
+                                    <th>供應商</th>
+                                    <th>進貨日期</th>
+                                    <th>進貨單號</th>
+                                    <th>採購單稅別</th>
+                                    <th>Item編號</th>
+                                    <th>POS品號</th>
+                                    <th>商品名稱</th>
+                                    <th>規格一</th>
+                                    <th>規格二</th>
+                                    <th>單價</th>
+                                    <th>數量</th>
+                                    <th>未稅金額</th>
+                                    <th>稅額</th>
+                                    <th>含稅金額</th>
+                                </tr>
                             </thead>
                             <tbody>
-                            @if (isset($buy_out_products))
-                                @foreach ($buy_out_products as $key => $obj)
-                                    <tr>
-                                        <td>{{ $key += 1 }}</td>
-                                        <td>{{ $obj->supplier_name }}</td>
-                                        <td>{{ $obj->trade_date }}</td>
-                                        <td>{{ $obj->number }}</td>
-                                        <td>
-                                            @if (isset(config('uec.tax_option')[$obj->order_supplier_tax]))
-                                                {{ config('uec.tax_option')[$obj->order_supplier_tax] }}
-                                            @else
-                                                error
-                                            @endif
-                                        </td>
-                                        <td>{{ $obj->item_no }}</td>
-                                        <td>{{ $obj->pos_item_no }}</td>
-                                        <td>{{ $obj->product_name }}</td>
-                                        <td>{{ $obj->spec_1_value }}</td>
-                                        <td>{{ $obj->spec_2_value }}</td>
-                                        <td>{{ $obj->item_price }}</td>
-                                        <td>{{ $obj->item_qty }}</td>
-                                        <td>{{ $obj->detail_subtotal_nontax_price }}</td>
-                                        <td>{{ $obj->detail_subtotal_tax_price }}</td>
-                                        <td>{{ $obj->detail_original_subtotal_price }}</td>
-                                    </tr>
-                                @endforeach
+                                @if (isset($buy_out_products))
+                                    @foreach ($buy_out_products as $key => $obj)
+                                        <tr>
+                                            <td>{{ $key += 1 }}</td>
+                                            <td>{{ $obj->supplier_name }}</td>
+                                            <td>{{ $obj->trade_date }}</td>
+                                            <td>{{ $obj->number }}</td>
+                                            <td>
+                                                @if (isset(config('uec.tax_option')[$obj->order_supplier_tax]))
+                                                    {{ config('uec.tax_option')[$obj->order_supplier_tax] }}
+                                                @else
+                                                    error
+                                                @endif
+                                            </td>
+                                            <td>{{ $obj->item_no }}</td>
+                                            <td>{{ $obj->pos_item_no }}</td>
+                                            <td>{{ $obj->product_name }}</td>
+                                            <td>{{ $obj->spec_1_value }}</td>
+                                            <td>{{ $obj->spec_2_value }}</td>
+                                            <td>{{ $obj->item_price }}</td>
+                                            <td>{{ $obj->item_qty }}</td>
+                                            <td>{{ $obj->detail_subtotal_nontax_price }}</td>
+                                            <td>{{ $obj->detail_subtotal_tax_price }}</td>
+                                            <td>{{ $obj->detail_original_subtotal_price }}</td>
+                                        </tr>
+                                    @endforeach
 
-                            @endif
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -212,7 +205,7 @@
 @endsection
 @section('js')
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#supplier').select2();
 
             let trade_date_start_flatpickr = flatpickr("#trade_date_start_flatpickr", {
@@ -233,14 +226,14 @@
 
             $("#select-form").validate({
                 // debug: true,
-                submitHandler: function (form) {
+                submitHandler: function(form) {
                     form.submit();
                 },
                 rules: {
                     trade_date_start: {
                         required: true,
                         monthIntervalVerify: {
-                            param: function () {
+                            param: function() {
                                 let obj = {
                                     start_time: $('#trade_date_start').val(),
                                     end_time: $('#trade_date_end').val(),
@@ -248,14 +241,14 @@
                                 }
                                 return obj;
                             },
-                            depends: function (element) {
+                            depends: function(element) {
                                 return $('#trade_date_start').val() && $('#trade_date_end').val();
                             },
                         },
                     },
                     trade_date_end: {
                         required: true,
-                        greaterSameThan: function () {
+                        greaterSameThan: function() {
                             return $('#trade_date_start').val();
                         },
                     },
@@ -268,7 +261,7 @@
                 },
                 errorClass: "help-block",
                 errorElement: "span",
-                errorPlacement: function (error, element) {
+                errorPlacement: function(error, element) {
                     if (element.parent('.input-group').length || element.is(':radio')) {
                         error.insertAfter(element.parent());
                         return;
@@ -280,13 +273,13 @@
 
                     error.insertAfter(element);
                 },
-                highlight: function (element, errorClass, validClass) {
+                highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                unhighlight: function (element, errorClass, validClass) {
+                unhighlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
-                success: function (label, element) {
+                success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
