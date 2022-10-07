@@ -787,24 +787,26 @@ class APIOrderService
         $campaign_group = [];
         $campaign_group_code = [];
         $group_i = 0;
-        $tmp_campaign_id = "";
-        foreach ($cart['list'] as $products) {
-            foreach ($campaigns as $product_id => $item) {
-                if ($products['productID'] == $product_id) {
-                    foreach ($item as $k => $v) {
-                        foreach ($products['itemList'] as $item_info) {
+        foreach ($cart['list'] as $products) { //購物車產品列表 product
+            foreach ($products['itemList'] as $item_info) { //產品規格 product_item
+                foreach ($campaigns as $product_id => $item) { //活動
+                    if ($products['productID'] == $product_id) {
+                        foreach ($item as $k => $v) {
                             $campaign[$v->level_code][$v->category_code][$product_id] = $v;
                             if ($v->level_code != 'CART_P') { //單品活動才做
-                                if ($item_info['campaignDiscountStatus']) {
-                                    $group_i++;
-                                } elseif (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
-                                    if ($item_info['campaignGiftAway']['campaignGiftStatus']) {
+                                if (!isset($campaign_group[$product_id][$v->id])) {
+                                    if ($item_info['campaignDiscountStatus']) {
                                         $group_i++;
+                                    } elseif (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
+                                        if ($item_info['campaignGiftAway']['campaignGiftStatus']) {
+                                            $group_i++;
+                                        }
                                     }
+                                    $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
+                                } else {
+                                    $campaign_group[$product_id][$v->id] = $campaign_group[$product_id][$v->id];
                                 }
-                                $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
                                 $campaign_group_code[$product_id][$v->id] = $v->level_code;
-                                $tmp_campaign_id = $v->id;
                             }
                         }
                     }
@@ -834,7 +836,6 @@ class APIOrderService
                 $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //門檻ID
             }
         }
-
         DB::beginTransaction();
         try {
             //訂單單頭

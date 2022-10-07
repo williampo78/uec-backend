@@ -178,7 +178,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/order_payments_report.js') }}"></script>
     <script>
         $(function() {
             let date_start_flatpickr = flatpickr("#date_start_flatpickr", {

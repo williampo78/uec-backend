@@ -30,7 +30,7 @@
                                 <div class="col-sm-10">
                                     <vue-flat-pickr
                                         name="expectedDate"
-                                        :value.sync="modal.expectedDate.expectedDate"
+                                        v-model="modal.expectedDate.expectedDate"
                                         :config="flatPickrConfig.expectedDate">
                                     </vue-flat-pickr>
                                 </div>

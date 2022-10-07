@@ -16,6 +16,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        placeholder: {
+            type: String,
+            default: "請選擇",
+        },
     },
     mounted: function () {
         var vm = this;
@@ -24,6 +28,7 @@ export default {
             .select2({
                 data: this.options,
                 allowClear: this.allowClear,
+                placeholder: this.placeholder,
             })
             .val(this.value)
             .trigger("change")
@@ -46,6 +51,7 @@ export default {
                     .select2({
                         data: options,
                         allowClear: this.allowClear,
+                        placeholder: this.placeholder,
                     })
                     .val(this.value)
                     .trigger("change");

@@ -72,8 +72,14 @@
                                                                     style="color: red;">*</span></label>
                                                         </div>
                                                         <div class="col-sm-10">
-                                                            <select2 class="form-control" :options="campaignTypes"
-                                                                v-model="form.campaignType" name="campaign_type">
+                                                            <select2
+                                                                class="form-control"
+                                                                :options="campaignTypes"
+                                                                v-model="form.campaignType"
+                                                                name="campaign_type"
+                                                                @select2-selecting="onCampaignTypeSelecting"
+                                                                :allow-clear="false"
+                                                            >
                                                                 <option disabled value=""></option>
                                                             </select2>
                                                         </div>
@@ -169,7 +175,48 @@
                                                     </div>
                                                 </div>
                                             </div>
-
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">
+                                                                庫存類型 <span style="color: red;">*</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="stock_type" value="A_B"
+                                                                    v-model="form.stockType" @click="clickStockType">買斷 / 寄售
+                                                            </label>
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="stock_type" value="T"
+                                                                    v-model="form.stockType" @click="clickStockType">轉單
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-2">
+                                                            <label class="control-label">
+                                                                供應商 <span style="color: red;">*</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-sm-10">
+                                                            <select2
+                                                                class="form-control"
+                                                                :options="suppliers"
+                                                                v-model="form.supplierId"
+                                                                name="supplier_id"
+                                                                :allow-clear="false"
+                                                                @select2-selecting="onSupplierSelecting"
+                                                            >
+                                                                <option disabled value=""></option>
+                                                            </select2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <hr style="border-top: 1px solid gray;" />
                                         </div>
 
@@ -354,27 +401,43 @@
                     targetGroups: "all",
                     giveaways: [],
                     products: [],
+                    stockType: "",
+                    supplierId: "all",
                 },
                 saveButton: {
                     isDisabled: false,
                 },
                 campaignTypes: [],
+                suppliers: [{
+                    text: "全部",
+                    id: "all",
+                }],
                 productModal: {
                     id: "product-modal",
                     title: "新增單品",
+                    supplier: {
+                        id: "",
+                        isDisabled: true,
+                    },
                     productType: {
                         id: "N",
                         includeOptions: ["N"],
                     },
+                    stockType: "",
                     excludeProductIds: [],
                 },
                 giveawayModal: {
                     id: "giveaway-modal",
                     title: "新增贈品",
+                    supplier: {
+                        id: "",
+                        isDisabled: true,
+                    },
                     productType: {
                         id: "G",
                         includeOptions: ["N", "G"],
                     },
+                    stockType: "",
                     excludeProductIds: [],
                 },
                 showXValue: true,
@@ -383,12 +446,23 @@
             },
             created() {
                 let campaignTypes = @json($campaignTypes);
+                let suppliers = @json($suppliers);
 
                 if (campaignTypes) {
                     campaignTypes.forEach(campaignType => {
                         this.campaignTypes.push({
                             text: campaignType.description,
                             id: campaignType.code,
+                            udf03: campaignType.udf_03,
+                        });
+                    });
+                }
+
+                if (suppliers) {
+                    suppliers.forEach(supplier => {
+                        this.suppliers.push({
+                            text: supplier.name,
+                            id: supplier.id,
                         });
                     });
                 }
@@ -580,6 +654,12 @@
                             required: true,
                             maxlength: 20,
                         },
+                        stock_type: {
+                            required: true,
+                        },
+                        supplier_id: {
+                            required: true,
+                        },
                     },
                     messages: {
                         end_at: {
@@ -641,6 +721,31 @@
                 });
             },
             watch: {
+                "form.stockType"(value) {
+                    // 若「庫存類型」為「轉單」且「活動類型」為「GIFT」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
+                    if (value == "T") {
+                        let campaignType = this.campaignTypes.find(campaignType => campaignType.id == this.form.campaignType);
+                        if (campaignType && campaignType.udf03 == "GIFT") {
+                            this.$set(this.suppliers[0], "disabled", true);
+                            if (this.form.supplierId == "all") {
+                                this.form.supplierId = "";
+                            }
+                        }
+                    }
+                    // 若「庫存類型」為「買斷/寄售」：可選擇「全部」、亦可指定到單一供應商。
+                    else {
+                        if (this.suppliers[0].hasOwnProperty('disabled')) {
+                            this.suppliers[0].disabled = false;
+                        }
+                    }
+
+                    this.productModal.stockType = value;
+                    this.giveawayModal.stockType = value;
+                },
+                "form.supplierId"(value) {
+                    this.productModal.supplier.id = value;
+                    this.giveawayModal.supplier.id = value;
+                },
                 "form.campaignType"(value) {
                     if (['PRD01', 'PRD02', 'PRD03', 'PRD04'].includes(value)) {
                         this.showXValue = true;
@@ -655,11 +760,33 @@
                     } else {
                         this.showXValueHint = false;
                     }
+
+                    let campaignType = this.campaignTypes.find(campaignType => campaignType.id == value);
+                    // 若「活動類型」為「GIFT」且「庫存類型」為「轉單」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
+                    if (campaignType && campaignType.udf03 == "GIFT") {
+                        if (this.form.stockType == "T") {
+                            this.$set(this.suppliers[0], "disabled", true);
+                            if (this.form.supplierId == "all") {
+                                this.form.supplierId = "";
+                            }
+                        }
+                    }
+                    // 若「活動類型」非「GIFT」：可選擇「全部」、亦可指定到單一供應商。
+                    else {
+                        if (this.suppliers[0].hasOwnProperty('disabled')) {
+                            this.suppliers[0].disabled = false;
+                        }
+                    }
                 },
             },
             methods: {
                 // 新增贈品
                 addGiveaway() {
+                    if (!this.form.stockType || !this.form.supplierId) {
+                        alert("尚未指定「庫存類型」、「供應商」，不允許新增贈品！");
+                        return;
+                    }
+
                     this.giveawayModal.excludeProductIds = [];
                     this.form.giveaways.forEach(giveaway => {
                         this.giveawayModal.excludeProductIds.push(giveaway.productId);
@@ -675,6 +802,11 @@
                 },
                 // 新增商品
                 addProduct() {
+                    if (!this.form.stockType || !this.form.supplierId) {
+                        alert("尚未指定「庫存類型」、「供應商」，不允許新增商品！");
+                        return;
+                    }
+
                     this.productModal.excludeProductIds = [];
                     this.form.products.forEach(product => {
                         this.productModal.excludeProductIds.push(product.productId);
@@ -727,6 +859,73 @@
                             launchStatus: product.launchStatus,
                         });
                     });
+                },
+                // 點擊庫存類型
+                clickStockType(event) {
+                    if (this.form.stockType == event.target.value) {
+                        return;
+                    }
+
+                    let errorMessage = "";
+                    // 未選擇活動類型
+                    if (!this.form.campaignType) {
+                        errorMessage += "請先選擇「活動類型」，才能切換「庫存類型」！\n"
+                    }
+
+                    // 已有指定贈品
+                    if (this.form.giveaways.length) {
+                        errorMessage += "請先刪除贈品設定，才能切換「庫存類型」！\n"
+                    }
+
+                    // 已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除商品設定，才能切換「庫存類型」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
+                // 當選擇供應商時
+                onSupplierSelecting(event) {
+                    if (event.params.args.data.id == "all") {
+                        return;
+                    }
+
+                    let errorMessage = "";
+                    // 已有指定贈品
+                    if (this.form.giveaways.length) {
+                        errorMessage += "請先刪除贈品設定，才能切換「供應商」！\n"
+                    }
+
+                    // 已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除商品設定，才能切換「供應商」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
+                // 當選擇活動類型時
+                onCampaignTypeSelecting(event) {
+                    let errorMessage = "";
+                    // 已有指定贈品
+                    if (this.form.giveaways.length) {
+                        errorMessage += "請先刪除贈品設定，才能切換「活動類型」！\n"
+                    }
+
+                    // 已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除商品設定，才能切換「活動類型」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
                 },
             },
         });

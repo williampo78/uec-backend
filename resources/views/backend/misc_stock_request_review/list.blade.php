@@ -37,7 +37,7 @@
                                                     <div class="col-sm-5">
                                                         <vue-flat-pickr
                                                             name="submitted_at_start"
-                                                            :value.sync="form.submittedAtStart"
+                                                            v-model="form.submittedAtStart"
                                                             :config="flatPickrConfig.submittedAtStart"
                                                             @on-change="onSubmittedAtStartChange">
                                                         </vue-flat-pickr>
@@ -48,7 +48,7 @@
                                                     <div class="col-sm-5">
                                                         <vue-flat-pickr
                                                             name="submitted_at_end"
-                                                            :value.sync="form.submittedAtEnd"
+                                                            v-model="form.submittedAtEnd"
                                                             :config="flatPickrConfig.submittedAtEnd"
                                                             @on-change="onSubmittedAtEndChange">
                                                         </vue-flat-pickr>
