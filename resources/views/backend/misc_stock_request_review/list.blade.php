@@ -3,6 +3,17 @@
 @section('title', '進貨退出單審核')
 
 @section('content')
+    
+<style>
+    .list-content{ display: grid; grid-template-columns: repeat(3,110px 1fr); color: #333333; border: 1px solid #DDDDDD; border-radius: 2px; margin-bottom: 0; width: 100%;}
+    .list-content dt,.label-title{ padding: 10px; background-color: #F5F5F5; border-bottom:  1px solid #DDDDDD; width: 100%; margin-bottom: 0;}
+    .list-content dd,.label-content{ padding: 10px; border-bottom:  1px solid #DDDDDD;}
+    .border-none{ border: none!important;}
+    .column-full{ grid-column: 2/7;}
+    .check-content{
+        display: grid; grid-template-columns: 110px 1fr; color: #333333; border: 1px solid #DDDDDD; border-radius: 2px; margin-bottom: 0; width: 100%;
+    }
+</style>
     <div id="app" v-cloak>
         <div id="page-wrapper">
             <div class="row">
@@ -13,62 +24,37 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <form id="search-form" class="form-horizontal" method="get" action="">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">退出單號</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="request_no" v-model="form.requestNo">
-                                            </div>
+                        <div class="panel-heading" style="padding: 15px;">
+                            <form id="search-form" method="get" action="">
+                                <div  style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 15px"  class="block">
+                                    <div  class="form-group mb-1" style="display: grid; grid-template-columns: 110px 1fr; align-items: center;margin-bottom: 0;" >
+                                        <label class="control-label">退出單號</label>
+                                        <input type="text" class="form-control" name="request_no" v-model="form.requestNo">
+                                    </div>
+                                    <div class="form-group mb-1" style="margin-right: 0; margin-left: 0; margin-bottom: 0; display: grid; grid-template-columns: 110px 1fr; align-items: center;">
+                                        <label class="control-label">送審時間</label>
+                                        <div style="display: flex; align-items: center;">
+                                            <vue-flat-pickr
+                                                name="submitted_at_start"
+                                                :value.sync="form.submittedAtStart"
+                                                :config="flatPickrConfig.submittedAtStart"
+                                                @on-change="onSubmittedAtStartChange">
+                                            </vue-flat-pickr>
+                                            <label>～</label>
+                                            <vue-flat-pickr
+                                                name="submitted_at_end"
+                                                :value.sync="form.submittedAtEnd"
+                                                :config="flatPickrConfig.submittedAtEnd"
+                                                @on-change="onSubmittedAtEndChange">
+                                            </vue-flat-pickr>
                                         </div>
                                     </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">送審時間</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="row">
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            name="submitted_at_start"
-                                                            :value.sync="form.submittedAtStart"
-                                                            :config="flatPickrConfig.submittedAtStart"
-                                                            @on-change="onSubmittedAtStartChange">
-                                                        </vue-flat-pickr>
-                                                    </div>
-                                                    <div class="col-sm-2 text-center">
-                                                        <label class="control-label">～</label>
-                                                    </div>
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            name="submitted_at_end"
-                                                            :value.sync="form.submittedAtEnd"
-                                                            :config="flatPickrConfig.submittedAtEnd"
-                                                            @on-change="onSubmittedAtEndChange">
-                                                        </vue-flat-pickr>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3"></div>
-                                            <div class="col-sm-9 text-right">
-                                                <span v-if="auth.auth_query">
-                                                    <button type="button" class="btn btn-warning" @click="search">
-                                                        <i class="fa-solid fa-magnifying-glass"></i> 查詢
-                                                    </button>
-                                                </span>
-                                            </div>
-                                        </div>
+                                    <div class="text-right">
+                                        <span v-if="auth.auth_query">
+                                            <button type="button" class="btn btn-warning" @click="search">
+                                                <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </form>
