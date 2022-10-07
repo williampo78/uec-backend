@@ -1,6 +1,11 @@
 @extends('backend.layouts.master')
 @section('title', '採購單')
 @section('content')
+<style>
+    .no-pa {
+        padding:0
+    }
+</style>
     <!--列表-->
     <div id="page-wrapper">
 
@@ -11,18 +16,18 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-sm-12">
+        <div class="row" >
+            <div class="col-sm-12" >
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
                     <div class="panel-heading">
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
+                            <div class="row" style="margin-bottom: 30px">
+                                <div class="col-sm-5">
+                                    <div class="col-sm-2 no-pa">
                                         <h5>供應商</h5>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-10 no-pa">
                                         <select class="form-control js-select2-department" name="supplier" id="supplier">
                                             <option value=""></option>
                                             @foreach ($data['supplier'] as $v)
@@ -34,8 +39,8 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-3">
-                                    <div class="col-sm-3">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3 no-pa">
                                         <h5>供應商統編</h5>
                                     </div>
                                     <div class="col-sm-9">
@@ -45,7 +50,7 @@
                                 </div>
 
                                 <div class="col-sm-3">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-3 no-pa">
                                         <h5>狀態</h5>
                                     </div>
                                     <div class="col-sm-9">
@@ -68,11 +73,11 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="col-sm-2">
-                                        <h5>採購日期：</h5>
+                                <div class="col-sm-5">
+                                    <div class="col-sm-2 no-pa">
+                                        <h5>採購日期</h5>
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-10 no-pa" style="display: flex; justify-content:space-between">
                                         <div class="form-group" id="div_select_start_date">
                                             <div class="input-group" id="select_start_date_flatpickr">
                                                 <input type="text" class="form-control" name="select_start_date" id="select_start_date" value="{{ $data['getData']['select_start_date'] ?? '' }}" autocomplete="off" data-input />
@@ -83,11 +88,7 @@
                                                 </span>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <h5>～</h5>
-                                    </div>
-                                    <div class="col-sm-4">
+                                        <h5>~</h5>
                                         <div class="form-group" id="div_select_end_date">
                                             <div class="input-group" id="select_end_date_flatpickr">
                                                 <input type="text" class="form-control" name="select_end_date" id="select_end_date" value="{{ $data['getData']['select_end_date'] ?? '' }}" autocomplete="off" data-input />
@@ -101,8 +102,8 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-3">
-                                    <div class="col-sm-3">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-3 no-pa">
                                         <h5>採購單號</h5>
                                     </div>
                                     <div class="col-sm-9">
@@ -112,7 +113,7 @@
                                 </div>
 
                                 <div class="col-sm-3">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-3 no-pa">
                                         <h5>請購單號</h5>
                                     </div>
                                     <div class="col-sm-9">
@@ -173,7 +174,7 @@
                                             @method('DELETE')
                                             @csrf
                                         </form>
-                                        <td>
+                                        <td class="text-nowrap">
                                             @if ($share_role_auth['auth_query'])
                                                 <button class="btn btn-info btn-sm"
                                                     @click="showBtn({{ $v['id'] }})">
