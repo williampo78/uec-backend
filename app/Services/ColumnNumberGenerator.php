@@ -111,15 +111,15 @@ class ColumnNumberGenerator
     /**
      * 取得亂數
      * @param integer $count
-     * @return integer
+     * @return string
      */
     public function getRandomNumber(int $count): ?string
     {
-        $range_end = 9;
-        for ($i = 1; $i < $count; $i++) {
-            $range_end .= 9;
-        }
-        return random_int(1, $range_end);
+        $range_start = str_pad(1, $count, "0", STR_PAD_LEFT);
+        $range_end = str_pad(9, $count, "9", STR_PAD_LEFT);
+        $number = rand($range_start, $range_end);
+        $number = Str::of($number)->padLeft($count, "0");
+        return $number;
     }
 
     /**
