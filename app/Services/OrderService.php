@@ -1135,7 +1135,7 @@ class OrderService
                         $returnable['points'][$supplier] += $orderDetail->points;
                         $returnable['point_discount'][$supplier] += $orderDetail->point_discount;
                         $returnable['item_id'][$orderDetail->product_item_id] = $supplier;
-                        $returnable['detail_id'][$orderDetail->product_item_id] = $return_request_detail->id;
+                        $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id] = $return_request_detail->id;
                     }
                 });
             }
@@ -1177,7 +1177,7 @@ class OrderService
                                 // 新增退貨檢驗單明細
                                 $returnExaminationDetail = ReturnExaminationDetail::create([
                                     'return_examination_id' => $returnExamination->id,
-                                    'return_request_detail_id' => $returnable['detail_id'][$orderDetail->product_item_id],
+                                    'return_request_detail_id' => $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id],
                                     'product_item_id' => $orderDetail->product_item_id,
                                     'item_no' => $orderDetail->item_no,
                                     'request_qty' => $orderDetail->qty,
