@@ -477,6 +477,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     modal: {
@@ -491,7 +492,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       form: {
-        supplierId: "",
+        supplierId: "all",
         productNo: "",
         productName: "",
         sellingPriceMin: "",
@@ -502,9 +503,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         startLaunchedAtEnd: "",
         productType: "",
         limit: 100,
+        stockType: "",
         excludeProductIds: []
       },
-      suppliers: [],
+      supplier: {
+        isDisabled: false
+      },
+      suppliers: [{
+        text: "全部",
+        id: "all"
+      }],
       productTypeOptions: [],
       products: [],
       limitOptions: [100, 300, 500]
@@ -521,16 +529,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               self = _this;
 
+              if (_this.modal.supplier) {
+                if (typeof _this.modal.supplier.isDisabled !== "undefined") {
+                  _this.supplier.isDisabled = _this.modal.supplier.isDisabled;
+                }
+              }
+
               if (_this.modal.productType) {
                 if (_this.modal.productType.id) {
                   _this.form.productType = _this.modal.productType.id;
                 }
               }
 
-              _context.next = 4;
+              _context.next = 5;
               return _this.getOptions();
 
-            case 4:
+            case 5:
               data = _context.sent;
 
               if (data.suppliers) {
@@ -563,7 +577,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
               }
 
-            case 8:
+            case 9:
             case "end":
               return _context.stop();
           }
@@ -572,11 +586,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }))();
   },
   computed: {
+    modalSupplierId: function modalSupplierId() {
+      return this.modal.supplier.id;
+    },
+    modalStockType: function modalStockType() {
+      return this.modal.stockType;
+    },
     modalExcludeProductIds: function modalExcludeProductIds() {
       return this.modal.excludeProductIds;
     }
   },
   watch: {
+    modalSupplierId: function modalSupplierId(newValue, oldValue) {
+      this.form.supplierId = newValue;
+    },
+    modalStockType: function modalStockType(newValue, oldValue) {
+      this.form.stockType = newValue;
+    },
     modalExcludeProductIds: function modalExcludeProductIds(newValue, oldValue) {
       this.form.excludeProductIds = newValue;
     }
@@ -630,11 +656,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this2 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var data, products;
+        var stockTypes, data, products;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                stockTypes = _this2.form.stockType.split("_");
                 data = {
                   supplier_id: _this2.form.supplierId,
                   product_no: _this2.form.productNo,
@@ -647,12 +674,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   start_launched_at_end: _this2.form.startLaunchedAtEnd,
                   product_type: _this2.form.productType,
                   limit: _this2.form.limit,
+                  stock_types: stockTypes,
                   exclude_product_ids: _this2.form.excludeProductIds
                 };
-                _context2.next = 3;
+                _context2.next = 4;
                 return _this2.getProducts(data);
 
-              case 3:
+              case 4:
                 products = _context2.sent;
                 _this2.products = [];
                 products.forEach(function (product) {
@@ -671,7 +699,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   });
                 });
 
-              case 6:
+              case 7:
               case "end":
                 return _context2.stop();
             }
@@ -1623,6 +1651,7 @@ var render = function () {
                               attrs: {
                                 options: _vm.suppliers,
                                 "allow-clear": false,
+                                disabled: _vm.supplier.isDisabled,
                               },
                               model: {
                                 value: _vm.form.supplierId,
@@ -2722,3 +2751,4 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
 
 /******/ })()
 ;
+//# sourceMappingURL=main.js.map
