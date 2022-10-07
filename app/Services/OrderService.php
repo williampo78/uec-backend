@@ -861,6 +861,7 @@ class OrderService
                     $info_array = [];
                     $show_array = [];
                     foreach ($examination_detail as $item_id => $detail) {
+                        if ($detail['status_code'] == 'VOIDED') continue; //退貨檢驗作廢，狀態回復出貨狀態
                         $info_array[] = [
                             'number_desc' => '退貨單號',
                             'number' => $detail['examination_no'],
@@ -878,7 +879,8 @@ class OrderService
                             "status_time" => $detail['T22'],
                             "status_display" => false
                         ];
-                        if ($detail['status_code'] == 'VOIDED' || ($detail['status_code'] == 'M_CLOSED' && $detail['is_returnable'] === 0)) {
+
+                        if (($detail['status_code'] == 'M_CLOSED' && $detail['is_returnable'] === 0)) {
                             $show_array[] = [
                                 "status_desc" => "退貨失敗",
                                 "status_time" => $detail['T23'],
