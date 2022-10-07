@@ -1129,7 +1129,7 @@ class OrderService
                             'created_by' => -1,
                             'updated_by' => -1,
                         ]);
-                        $returnable['amount'][$supplier] += $orderDetail->subtotal;
+                        $returnable['amount'][$supplier] += ($orderDetail->subtotal + $orderDetail->point_discount);
                         $returnable['points'][$supplier] += $orderDetail->points;
                         $returnable['point_discount'][$supplier] += $orderDetail->point_discount;
                         $returnable['item_id'][$orderDetail->product_item_id] = $supplier;
@@ -1156,8 +1156,8 @@ class OrderService
                     'request_no' => $requestNo,
                     'supplier_id' => $supplier_id,
                     'status_code' => 'CREATED',
-                    'lgst_dispatched_deadline' => Carbon::parse($returnRequest->create_at)->addDay(2)->format('Y-m-d 23:59:59'),
-                    'examination_deadline' => Carbon::parse($returnRequest->create_at)->addDay(7)->format('Y-m-d 23:59:59'),
+                    'lgst_dispatched_deadline' => Carbon::parse($returnRequest->create_at)->addWeekday(2)->format('Y-m-d 23:59:59'),
+                    'examination_deadline' => Carbon::parse($returnRequest->create_at)->addWeekday(7)->format('Y-m-d 23:59:59'),
                     'returnable_amount' => ($returnable['amount'][$supplier_id] * -1),
                     'returnable_points' => $returnable['points'][$supplier_id],
                     'returnable_point_discount' => $returnable['point_discount'][$supplier_id],
