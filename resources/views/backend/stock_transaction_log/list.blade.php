@@ -3,6 +3,11 @@
 @section('title', '庫存異動歷程查詢')
 
 @section('content')
+    <style>
+        .stock-outer{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; padding: 0 5px; }
+        .stock-title{ display: grid; grid-template-columns: 100px 1fr;  align-items: center; }
+        .flex-center{ display: flex; align-items: center; }
+    </style>
     <div id="app" v-cloak>
         <div id="page-wrapper">
             <!-- 表頭名稱 -->
@@ -17,184 +22,103 @@
                         <!-- 功能按鈕 -->
                         <div class="panel-heading">
                             <form id="search-form" class="form-horizontal" method="GET" action="">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">異動日期</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="row">
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            :setting="searchParameters.dateStart"></vue-flat-pickr>
-                                                    </div>
-                                                    <div class="col-sm-2 text-center">
-                                                        <label class="control-label">～</label>
-                                                    </div>
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            :setting="searchParameters.dateEnd"></vue-flat-pickr>
-                                                    </div>
-                                                </div>
+                                <div class="block stock-outer" >
+                                    <div class="mb-1 stock-title" >
+                                        <label>異動日期</label>
+                                        <div>
+                                            <div class="flex-center">
+                                                <vue-flat-pickr
+                                                    :setting="searchParameters.dateStart" style="flex-grow:1"></vue-flat-pickr>
+                                                <label>～</label>
+                                                <vue-flat-pickr
+                                                    :setting="searchParameters.dateEnd"style="flex-grow:1"></vue-flat-pickr>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">倉庫</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <select2 class="form-control" :options="options.warehouses"
-                                                         v-model="searchParameters.warehouse" name="warehouse">
-                                                    <option disabled value=""></option>
-                                                </select2>
-                                            </div>
+                                    <div  class="mb-1 stock-title">
+                                        <label>倉庫</label>
+                                        <div>
+                                            <select2 class="form-control" :options="options.warehouses"
+                                                        v-model="searchParameters.warehouse" name="warehouse">
+                                                <option disabled value=""></option>
+                                            </select2>
                                         </div>
                                     </div>
+                                    <div  class="mb-1 stock-title">
+                                        <label>供應商</label>
+                                        <div>
+                                            <select2 class="form-control" :options="options.suppliers"
+                                                        :disabled="data.disabledSupplierId"
+                                                        v-model="searchParameters.supplierId" name="supplierId">
+                                                <option disabled value=""></option>
+                                            </select2>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">供應商</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <select2 class="form-control" :options="options.suppliers"
-                                                         :disabled="data.disabledSupplierId"
-                                                         v-model="searchParameters.supplierId" name="supplierId">
-                                                    <option disabled value=""></option>
-                                                </select2>
-                                            </div>
+                                <div class="block stock-outer">
+                                    <div  class="mb-1 stock-title">
+                                        <label>Item編號</label>
+                                        <div class="flex-center">
+                                            <input class="form-control" name="itemNoStart"
+                                                v-model="searchParameters.itemNoStart" autocomplete="off">
+                                            <label>～</label>
+                                            <input class="form-control" name="itemNoEnd"
+                                                v-model="searchParameters.itemNoEnd" autocomplete="off">
                                         </div>
+                                    </div>
+                                    <div class="mb-1 stock-title">
+                                        <label>來源單據名稱</label>
+                                        <select2 class="form-control"
+                                                    :options="options.sourceTableNames"
+                                                    v-model="searchParameters.sourceTableName"
+                                                    name="sourceTableName">
+                                            <option disabled value=""></option>
+                                        </select2>
+                                    </div>
+                                    <div class="mb-1 stock-title">
+                                        <label>來源單號</label>
+                                        <input type="text" class="form-control" name="sourceDocNo"
+                                                v-model="searchParameters.sourceDocNo" autocomplete="off"
+                                                placeholder="模糊查詢">
                                     </div>
                                 </div>
-                                <br/>
-
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3"><label class="control-label">Item編號</label></div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group">
-                                                    <input class="form-control" name="itemNoStart"
-                                                           v-model="searchParameters.itemNoStart" autocomplete="off">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <div class="form-group">
-                                                    <label class="control-label">　～</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group">
-                                                    <input class="form-control" name="itemNoEnd"
-                                                           v-model="searchParameters.itemNoEnd" autocomplete="off">
-                                                </div>
-                                            </div>
+                                <div class="block stock-outer">
+                                    <div class="mb-1 stock-title">
+                                        <label>商品序號</label>
+                                        <div class="flex-center">
+                                            <input type="text" class="form-control" name="productNoStart"
+                                                    v-model="searchParameters.productNoStart"
+                                                    autocomplete="off">
+                                            <label>～</label>
+                                            <input type="text" class="form-control" name="productNoEnd"
+                                            v-model="searchParameters.productNoEnd"
+                                            autocomplete="off">
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">來源單據名稱</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <select2 class="form-control"
-                                                         :options="options.sourceTableNames"
-                                                         v-model="searchParameters.sourceTableName"
-                                                         name="sourceTableName">
-                                                    <option disabled value=""></option>
-                                                </select2>
-                                            </div>
-                                        </div>
+                                    <div class="mb-1 stock-title">
+                                        <label>庫存類型
+                                        </label>
+                                        <select2 class="form-control" :options="options.stockTypes"
+                                                    v-model="searchParameters.stockType" name="stockType">
+                                            <option disabled value=""></option>
+                                        </select2>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">來源單號
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="sourceDocNo"
-                                                       v-model="searchParameters.sourceDocNo" autocomplete="off"
-                                                       placeholder="模糊查詢">
-                                            </div>
-                                        </div>
+                                    <div  class="mb-1 stock-title">
+                                        <label>筆數限制
+                                        </label>
+                                        <input class="form-control search-limit-group" name="limit"
+                                                v-model="searchParameters.limit" value="500" readonly>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3"><label class="control-label">商品序號</label></div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group">
-                                                    <input type="text" class="form-control" name="productNoStart"
-                                                           v-model="searchParameters.productNoStart"
-                                                           autocomplete="off">
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-1">
-                                                <div class="form-group">
-                                                    <label class="control-label">　～</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="form-group">
-                                                    <input type="text" class="form-control" name="productNoEnd"
-                                                           v-model="searchParameters.productNoEnd"
-                                                           autocomplete="off">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">庫存類型
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <select2 class="form-control" :options="options.stockTypes"
-                                                         v-model="searchParameters.stockType" name="stockType">
-                                                    <option disabled value=""></option>
-                                                </select2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">筆數限制
-                                                </label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input class="form-control search-limit-group" name="limit"
-                                                       v-model="searchParameters.limit" value="500" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <br/>
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                    </div>
-                                    <div class="col-sm-4">
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3"></div>
-                                            <div class="col-sm-9 text-right">
-                                                <div v-if="data.auth.auth_query">
-                                                    <button type="submit" class="btn btn-warning">
-                                                        <i class="fa-solid fa-magnifying-glass"></i> 查詢
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger" @click="resetForm">
-                                                        <i class="fa-solid fa-eraser"></i> 清除
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="text-right" style="padding-right: 5px; padding-bottom: 5px;">
+                                    <div v-if="data.auth.auth_query">
+                                        <button type="submit" class="btn btn-warning">
+                                            <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                        </button>
+                                        <button type="button" class="btn btn-danger" @click="resetForm">
+                                            <i class="fa-solid fa-eraser"></i> 清除
+                                        </button>
                                     </div>
                                 </div>
                             </form>
