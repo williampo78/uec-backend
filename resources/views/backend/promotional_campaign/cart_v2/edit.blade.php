@@ -65,9 +65,16 @@
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <select2 class="form-control" :options="campaignTypes"
-                                                        v-model="form.campaignType" name="campaign_type"
-                                                        @select2-change="changeCampaignType" disabled>
+                                                    <select2
+                                                        class="form-control"
+                                                        :options="campaignTypes"
+                                                        v-model="form.campaignType"
+                                                        name="campaign_type"
+                                                        @select2-change="onCampaignTypeChange"
+                                                        @select2-selecting="onCampaignTypeSelecting"
+                                                        :allow-clear="false"
+                                                        disabled
+                                                    >
                                                         <option disabled value=""></option>
                                                     </select2>
                                                 </div>
@@ -192,10 +199,15 @@
                                                             style="color: red;">*</span></label>
                                                 </div>
                                                 <div class="col-sm-11">
-                                                    <select2 class="form-control" :options="suppliers"
-                                                        v-model="form.supplierId" name="supplier_id" :allow-clear="false"
-                                                        @select2-selecting="selectingSupplier"
-                                                        :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                    <select2
+                                                        class="form-control"
+                                                        :options="suppliers"
+                                                        v-model="form.supplierId"
+                                                        name="supplier_id"
+                                                        :allow-clear="false"
+                                                        @select2-selecting="onSupplierSelecting"
+                                                        :disabled="isNowGreaterThanOrEqualToStartAt"
+                                                    >
                                                         <option disabled value=""></option>
                                                     </select2>
                                                 </div>
@@ -706,6 +718,7 @@
                         this.campaignTypes.push({
                             text: campaignType.description,
                             id: campaignType.code,
+                            udf03: campaignType.udf_03,
                         });
                     });
                 }
@@ -1067,27 +1080,48 @@
                 });
             },
             watch: {
-                "form.stockType"(newValue, oldValue) {
-                    // 若「庫存類型」為「轉單」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
-                    if (newValue == "T") {
-                        this.$set(this.suppliers[0], "disabled", true);
-                        if (this.form.supplierId == "all") {
-                            this.form.supplierId = "";
+                "form.stockType"(value) {
+                    // 若「庫存類型」為「轉單」且「活動類型」為「GIFT」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
+                    if (value == "T") {
+                        let campaignType = this.campaignTypes.find(campaignType => campaignType.id == this.form.campaignType);
+                        if (campaignType && campaignType.udf03 == "GIFT") {
+                            this.$set(this.suppliers[0], "disabled", true);
+                            if (this.form.supplierId == "all") {
+                                this.form.supplierId = "";
+                            }
                         }
                     }
-                    // 若「庫存類型」為「買斷 /寄售」：可選擇「全部」、亦可指定到單一供應商。
+                    // 若「庫存類型」為「買斷/寄售」：可選擇「全部」、亦可指定到單一供應商。
                     else {
                         if (this.suppliers[0].hasOwnProperty('disabled')) {
                             this.suppliers[0].disabled = false;
                         }
                     }
 
-                    this.productModal.stockType = newValue;
-                    this.giveawayModal.stockType = newValue;
+                    this.productModal.stockType = value;
+                    this.giveawayModal.stockType = value;
                 },
-                "form.supplierId"(newValue, oldValue) {
-                    this.productModal.supplier.id = newValue;
-                    this.giveawayModal.supplier.id = newValue;
+                "form.supplierId"(value) {
+                    this.productModal.supplier.id = value;
+                    this.giveawayModal.supplier.id = value;
+                },
+                "form.campaignType"(value) {
+                    let campaignType = this.campaignTypes.find(campaignType => campaignType.id == value);
+                    // 若「活動類型」為「GIFT」且「庫存類型」為「轉單」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
+                    if (campaignType && campaignType.udf03 == "GIFT") {
+                        if (this.form.stockType == "T") {
+                            this.$set(this.suppliers[0], "disabled", true);
+                            if (this.form.supplierId == "all") {
+                                this.form.supplierId = "";
+                            }
+                        }
+                    }
+                    // 若「活動類型」非「GIFT」：可選擇「全部」、亦可指定到單一供應商。
+                    else {
+                        if (this.suppliers[0].hasOwnProperty('disabled')) {
+                            this.suppliers[0].disabled = false;
+                        }
+                    }
                 },
             },
             methods: {
@@ -1283,6 +1317,11 @@
                     }
 
                     let errorMessage = "";
+                    // 未選擇活動類型
+                    if (!this.form.campaignType) {
+                        errorMessage += "請先選擇「活動類型」，才能切換「庫存類型」！\n"
+                    }
+
                     // 頁籤「門檻」已有指定贈品
                     if (this.form.thresholds.some(threshold => threshold.giveaways.length)) {
                         errorMessage += "請先刪除「門檻」頁籤的贈品設定，才能切換「庫存類型」！\n"
@@ -1299,7 +1338,7 @@
                     }
                 },
                 // 當選擇供應商時
-                selectingSupplier(event) {
+                onSupplierSelecting(event) {
                     if (event.params.args.data.id == "all") {
                         return;
                     }
@@ -1320,8 +1359,26 @@
                         alert(errorMessage);
                     }
                 },
+                // 當選擇活動類型時
+                onCampaignTypeSelecting(event) {
+                    let errorMessage = "";
+                    // 頁籤「門檻」已有指定贈品
+                    if (this.form.thresholds.some(threshold => threshold.giveaways.length)) {
+                        errorMessage += "請先刪除「門檻」頁籤的贈品設定，才能切換「活動類型」！\n"
+                    }
+
+                    // 頁籤「指定商品」已有指定商品
+                    if (this.form.products.length) {
+                        errorMessage += "請先刪除「指定商品」頁籤的商品設定，才能切換「活動類型」！\n"
+                    }
+
+                    if (errorMessage) {
+                        event.preventDefault();
+                        alert(errorMessage);
+                    }
+                },
                 // 選擇活動類型
-                changeCampaignType() {
+                onCampaignTypeChange() {
                     this.form.thresholds = [];
                 },
                 // 儲存商品modal的商品

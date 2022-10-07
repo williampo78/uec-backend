@@ -26,7 +26,7 @@
                                                     <div class="col-sm-5">
                                                         <vue-flat-pickr
                                                             name="request_date_start"
-                                                            :value.sync="form.requestDateStart"
+                                                            v-model="form.requestDateStart"
                                                             :config="flatPickrConfig.requestDateStart"
                                                             @on-change="onRequestDateStartChange">
                                                         </vue-flat-pickr>
@@ -37,7 +37,7 @@
                                                     <div class="col-sm-5">
                                                         <vue-flat-pickr
                                                             name="request_date_end"
-                                                            :value.sync="form.requestDateEnd"
+                                                            v-model="form.requestDateEnd"
                                                             :config="flatPickrConfig.requestDateEnd"
                                                             @on-change="onRequestDateEndChange">
                                                         </vue-flat-pickr>
@@ -84,7 +84,7 @@
                                                     <div class="col-sm-5">
                                                         <vue-flat-pickr
                                                             name="actual_date_start"
-                                                            :value.sync="form.actualDateStart"
+                                                            v-model="form.actualDateStart"
                                                             :config="flatPickrConfig.actualDateStart"
                                                             @on-change="onActualDateStartChange">
                                                         </vue-flat-pickr>
@@ -95,7 +95,7 @@
                                                     <div class="col-sm-5">
                                                         <vue-flat-pickr
                                                             name="actual_date_end"
-                                                            :value.sync="form.actualDateEnd"
+                                                            v-model="form.actualDateEnd"
                                                             :config="flatPickrConfig.actualDateEnd"
                                                             @on-change="onActualDateEndChange">
                                                         </vue-flat-pickr>

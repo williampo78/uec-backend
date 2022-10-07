@@ -1,0 +1,23 @@
+.v-collapse-toggler:hover {
+    cursor: pointer;
+}
+
+.v-collapse-toggler > i.fa-chevron-right {
+    transition: transform 0.2s ease;
+}
+
+.v-collapse-toggler.active > i.fa-chevron-right {
+    transform: rotate(90deg);
+}
+
+.v-collapse-content {
+    max-height: 0;
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+    padding: 0;
+}
+
+.v-collapse-content-end {
+    transition: max-height 0.3s ease-in;
+    max-height: 500px;
+}

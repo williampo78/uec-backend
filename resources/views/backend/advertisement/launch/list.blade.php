@@ -38,7 +38,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
+                                        <div style="padding-right:0" class="col-sm-3">
                                             <label class="control-label">版位</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -59,7 +59,7 @@
 
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <div class="col-sm-4">
+                                        <div style="padding-right: 0" class="col-sm-4">
                                             <label class="control-label">上下架狀態</label>
                                         </div>
                                         <div class="col-sm-8">
@@ -88,7 +88,7 @@
                                 </div>
 
                                 <div class="col-sm-5">
-                                    <div class="col-sm-3">
+                                    <div style="padding-right: 0" class="col-sm-3">
                                         <label class="control-label">上架起日</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -124,7 +124,7 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
+                                        <div style="padding-right: 0" class="col-sm-3">
                                             <label class="control-label">版位標題</label>
                                         </div>
                                         <div class="col-sm-9">
@@ -180,7 +180,7 @@
                                     @isset($ad_slot_contents)
                                         @foreach ($ad_slot_contents as $ad_slot_content)
                                             <tr>
-                                                <td>
+                                                <td class="text-nowrap">
                                                     @if ($share_role_auth['auth_query'])
                                                         <button type="button" class="btn btn-info btn-sm slot_content_detail"
                                                             data-slot-content-id="{{ $ad_slot_content->slot_content_id }}"
@@ -357,7 +357,7 @@
                             let sort = value.sort !== null ? value.sort :
                                 '<i class="fa-solid fa-xmark fa-lg"></i>';
                             let image_name_url = value.image_name_url ?
-                                `<img src="${value.image_name_url}" class="img-responsive" width="300" height="300" />` :
+                                `<img src="${value.image_name_url}" class="img-responsive" width="180" height="180" />` :
                                 '<i class="fa-solid fa-xmark fa-lg"></i>';
                             let image_alt = value.image_alt ? value.image_alt :
                                 '<i class="fa-solid fa-xmark fa-lg"></i>';
@@ -396,7 +396,7 @@
                                             <td>
                                                 ${sort}
                                             </td>
-                                            <td>
+                                            <td style="width:220px">
                                                 ${image_name_url}
                                             </td>
                                             <td>

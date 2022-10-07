@@ -38,7 +38,7 @@ class APITapPayService
         $data['prime'] = $input['prime'];
         $data['partner_key'] = config('tappay.partner_key');
         $data['merchant_id'] = config('tappay.merchant_id')[$input['payment_method']];
-        $data['amount'] = $input['paid_amount'] + $input['fee_of_instal'];
+        $data['amount'] = $input['paid_amount'];
         $data['currency'] = 'TWD';
         $data['details'] = config('tappay.details');
         $buyer['phone_number'] = $input['buyer_mobile'];

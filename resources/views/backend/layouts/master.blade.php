@@ -10,12 +10,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('asset/img/favicon.ico') }}" />
-    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.css') }}" />
-    <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-treefy.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/sb-admin-2.css') }}" />
     <link rel="stylesheet"
         href="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/timeline.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
@@ -44,21 +41,13 @@
     </div>
 
     <script src="{{ mix('js/app.js') }}"></script>
-    <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap.js') }}"></script>
-    <script src="{{ asset('asset/js/template/bower_components/bootstrap/dist/js/bootstrap-filestyle.min.js') }}">
-    </script>
-    <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/collapse.js') }}"></script>
-    <script src="{{ asset('asset/js/template/bower_components/bootstrap/js/transition.js') }}"></script>
     <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
     <script src="{{ asset('asset/js/build/ckeditor.js') }}"></script>
-    <script src="{{ asset('asset/js/bootstrap-treefy.js') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
 
     <script>
-        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
-
         @isset($share_role_auth)
             var RoleAuthJson = @json($share_role_auth);
         @endisset
@@ -77,8 +66,9 @@
                 checkingBackendUse();
             }
 
+            // datatable 共用
             $('#table_list').DataTable({
-                "aaSorting": [],
+                "order": [],
             });
         });
     </script>

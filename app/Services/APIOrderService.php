@@ -787,24 +787,26 @@ class APIOrderService
         $campaign_group = [];
         $campaign_group_code = [];
         $group_i = 0;
-        $tmp_campaign_id = "";
-        foreach ($cart['list'] as $products) {
-            foreach ($campaigns as $product_id => $item) {
-                if ($products['productID'] == $product_id) {
-                    foreach ($item as $k => $v) {
-                        foreach ($products['itemList'] as $item_info) {
+        foreach ($cart['list'] as $products) { //購物車產品列表 product
+            foreach ($products['itemList'] as $item_info) { //產品規格 product_item
+                foreach ($campaigns as $product_id => $item) { //活動
+                    if ($products['productID'] == $product_id) {
+                        foreach ($item as $k => $v) {
                             $campaign[$v->level_code][$v->category_code][$product_id] = $v;
                             if ($v->level_code != 'CART_P') { //單品活動才做
-                                if ($item_info['campaignDiscountStatus'] && $tmp_campaign_id != $v->id) {
-                                    $group_i++;
-                                } elseif (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
-                                    if ($item_info['campaignGiftAway']['campaignGiftStatus']&& $tmp_campaign_id != $v->id) {
+                                if (!isset($campaign_group[$product_id][$v->id])) {
+                                    if ($item_info['campaignDiscountStatus']) {
                                         $group_i++;
+                                    } elseif (isset($item_info['campaignGiftAway']['campaignGiftStatus'])) {
+                                        if ($item_info['campaignGiftAway']['campaignGiftStatus']) {
+                                            $group_i++;
+                                        }
                                     }
+                                    $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
+                                } else {
+                                    $campaign_group[$product_id][$v->id] = $campaign_group[$product_id][$v->id];
                                 }
-                                $campaign_group[$product_id][$v->id] = $group_i;    //群組ID (C002)
                                 $campaign_group_code[$product_id][$v->id] = $v->level_code;
-                                $tmp_campaign_id = $v->id;
                             }
                         }
                     }
@@ -834,7 +836,6 @@ class APIOrderService
                 $threshold_prod['thresholdGiftaway'][$product_id] = $threshold['thresholdID']; //門檻ID
             }
         }
-
         DB::beginTransaction();
         try {
             //訂單單頭
@@ -860,7 +861,7 @@ class APIOrderService
             $webData['cart_campaign_discount'] = $cart_campaign_discount; //原C002滿額折抵
             $webData['cart_p_discount'] = 0;//新C003滿額折抵
             $webData['point_discount'] = $order['point_discount'];
-            $webData['paid_amount'] = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee'] + $cart_p_discount);
+            $webData['paid_amount'] = ($order['total_price'] + $order['cart_campaign_discount'] + $order['point_discount'] + $order['shipping_fee'] + $cart_p_discount + $interest_fee);
             $webData['points'] = $order['points'];
             $webData['is_paid'] = 0;
             $webData['pay_status'] = 'PENDING';
@@ -910,7 +911,7 @@ class APIOrderService
             $paymantData['payment_type'] = 'PAY';
             $paymantData['payment_method'] = $order['payment_method'];
             $paymantData['payment_status'] = 'PENDING';
-            $paymantData['amount'] = ($webData['paid_amount'] + $webData['fee_of_instal']);
+            $paymantData['amount'] = ($webData['paid_amount']);
             $paymantData['point_discount'] = $webData['point_discount'];
             $paymantData['points'] = $webData['points'];
             $paymantData['record_created_reason'] = 'ORDER_CREATED';

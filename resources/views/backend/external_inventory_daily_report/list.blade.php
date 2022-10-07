@@ -261,7 +261,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/external_inventory_daily_report.js') }}"></script>
     <script>
         $(function() {
             flatpickr("#counting_date_flatpickr", {
