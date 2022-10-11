@@ -8,7 +8,7 @@
             </div>
 
             <div class="modal-body">
-                <dl class="list-content block">
+                <dl class="list-content d-block d-md-grid">
                     <dt>退出單號</dt>
                     <dd>@{{ modal.review.requestNo }}</dd>
                     <dt>庫別</dt>
@@ -30,7 +30,7 @@
                     <dt class="border-none">備註</dt>
                     <dd class="column-full border-none">@{{ modal.review.remark }}</dd>
                 </dl>
-                
+
                 <hr style="border-top: 1px solid gray;">
 
                 <form id="review-form" class="form-horizontal">
@@ -39,12 +39,12 @@
                         <div class="label-content">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-primary" @click="checkAll">
-                                        <i class="fa-solid fa-check"></i> 全勾選
-                                    </button>
-                                    <button type="button" class="btn btn-primary" @click="cancelAll">
-                                        <i class="fa-solid fa-xmark"></i> 全取消
-                                    </button>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="reviewResult" value="CHECK" @change="checkAll">全勾選
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="reviewResult" value="CANCEL" @change="cancelAll">全取消
+                                    </label>
                                 </div>
                             </div>
                             <br>

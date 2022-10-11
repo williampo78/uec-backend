@@ -19,12 +19,12 @@
                     <div class="panel-heading" style="padding: 15px;">
                         <form role="form" class="form-horizontal" id="select-form" method="GET" action="" enctype="multipart/form-data">
                             {{-- row 1 start --}}
-                            <div style="display: grid; grid-template-columns: 3fr 2fr 2fr; gap: 15px;  border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;" class="block">
+                            <div style="grid-template-columns: 3fr 2fr 2fr; gap: 15px;  border-bottom: 1px solid #eee; margin-bottom: 15px;" class="d-block d-md-grid">
                                 <div>
                                     <div class="col-sm-3"><label class="control-label"> 供應商 </label></div>
                                     <div class="col-sm-9">
-                                        <div class='input-group mb-1' id='supplier_deliver_date_dp'>
-                                            <select class="form-control js-select2-department mb-1" name="supplier"
+                                        <div class='input-group mb-4' id='supplier_deliver_date_dp'>
+                                            <select class="form-control js-select2-department mb-4" name="supplier"
                                                 id="supplier" value="{{ request()->input('supplier') }}">
                                                 <option value=""></option>
                                                 @foreach ($supplier as $v)
@@ -40,7 +40,7 @@
                                 <div>
                                     <div class="col-sm-4"><label class="control-label">供應商統編</label></div>
                                     <div class="col-sm-8">
-                                        <input class="form-control mb-1" name="company_number" id="company_number"
+                                        <input class="form-control mb-4" name="company_number" id="company_number"
                                             value="{{ request()->input('company_number') }}">
                                     </div>
                                 </div>
@@ -55,7 +55,7 @@
                             </div>
                             {{-- row 1 end --}}
                             {{-- row 2 start --}}
-                            <div style="display: grid; grid-template-columns: 3fr 2fr 2fr; gap: 15px"  class="block">
+                            <div style="grid-template-columns: 3fr 2fr 2fr; gap: 15px"  class="d-block d-md-grid">
                                 <div>
                                     <div class="col-sm-3"><label class="control-label">進貨日期</label></div>
                                     <div class="col-sm-9" style="display: flex; justify-content: space-between;">
@@ -71,7 +71,7 @@
                                         </div>
                                         <label style="margin-top: 8px;">～</label>
                                         <div class="form-group" style="margin-right: 0; margin-left: 0; margin-bottom: 0;">
-                                            <div class="input-group" id="trade_date_end_flatpickr">
+                                            <div class="input-group mb-md-0 mb-4" id="trade_date_end_flatpickr">
                                                 <input type="text" class="form-control" name="trade_date_end" id="trade_date_end" value="{{ request()->input('trade_date_end') }}" autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
@@ -85,7 +85,7 @@
                                 <div>
                                     <div class="col-sm-4"><label class="control-label">進貨單號</label></div>
                                     <div class="col-sm-8">
-                                        <input class="form-control mb-1" name="number" id="number"
+                                        <input class="form-control mb-md-0 mb-4" name="number" id="number"
                                             value="{{ request()->input('number') }}">
                                     </div>
                                 </div>

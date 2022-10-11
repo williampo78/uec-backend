@@ -2,6 +2,19 @@
 
 @section('title', '進貨退出單')
 
+@section('css')
+    <style>
+        .stock-outer{ grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 0 5px; }
+        .stock-title{ display: grid; grid-template-columns: 100px 1fr;  align-items: center; }
+        .label-content{ padding: 10px; }
+        .stock-viewer{ grid-template-columns: 1fr 1fr 1fr; border: 1px solid #DDDDDD; border-radius: 2px; }
+        .label-title{ padding: 10px; background-color: #F5F5F5;  width: 100%; margin-bottom: 0;}
+        .viewer-title{ display: grid; grid-template-columns: 100px 1fr;  align-items: center; border-bottom:  1px solid #DDDDDD; }
+        .viewer-outer{ display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); color: #333333;gap: 2rem; }
+        .viewer-inner{ grid-template-columns: repeat(2,minmax(0,1fr)); color: #333333; border: 1px solid #DDDDDD; border-radius: 2px; }
+        .column-full{ grid-column: 1/4; }
+    </style>
+@endsection
 @section('content')
     <div id="app" v-cloak>
         <div id="page-wrapper">
@@ -13,154 +26,94 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <form id="search-form" class="form-horizontal" method="get" action="">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">申請日期</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="row">
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            name="request_date_start"
-                                                            v-model="form.requestDateStart"
-                                                            :config="flatPickrConfig.requestDateStart"
-                                                            @on-change="onRequestDateStartChange">
-                                                        </vue-flat-pickr>
-                                                    </div>
-                                                    <div class="col-sm-2 text-center">
-                                                        <label class="control-label">～</label>
-                                                    </div>
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            name="request_date_end"
-                                                            v-model="form.requestDateEnd"
-                                                            :config="flatPickrConfig.requestDateEnd"
-                                                            @on-change="onRequestDateEndChange">
-                                                        </vue-flat-pickr>
-                                                    </div>
-                                                </div>
-                                            </div>
+                        <div class="panel-heading" style="padding: 15px;">
+                            <form id="search-form" method="get" action="">
+                                <div class="stock-outer d-md-grid d-block">
+                                    <div class="form-group stock-title">
+                                        <label class="control-label">申請日期</label>
+                                        <div class="d-flex align-items-center">
+                                            <vue-flat-pickr
+                                                name="request_date_start"
+                                                v-model="form.requestDateStart"
+                                                :config="flatPickrConfig.requestDateStart"
+                                                @on-change="onRequestDateStartChange"
+                                                class="flex-grow-1"
+                                            >
+                                            </vue-flat-pickr>
+                                            <label>～</label>
+                                            <vue-flat-pickr
+                                                class="flex-grow-1"
+                                                name="request_date_end"
+                                                v-model="form.requestDateEnd"
+                                                :config="flatPickrConfig.requestDateEnd"
+                                                @on-change="onRequestDateEndChange">
+                                            </vue-flat-pickr>
                                         </div>
                                     </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">退出單號</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="request_no" v-model="form.requestNo">
-                                            </div>
-                                        </div>
+                                    <div class="form-group stock-title">
+                                        <label>退出單號</label>
+                                        <input type="text" class="form-control" name="request_no" v-model="form.requestNo">
                                     </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">狀態</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <select2 class="form-control" :options="requestStatuses"
-                                                    v-model="form.requestStatus" name="request_status">
-                                                    <option disabled value=""></option>
-                                                </select2>
-                                            </div>
-                                        </div>
+                                    <div class="form-group stock-title">
+                                        <label>狀態</label>
+                                        <select2 class="form-control" :options="requestStatuses"
+                                            v-model="form.requestStatus" name="request_status">
+                                            <option disabled value=""></option>
+                                        </select2>
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">實際出庫日</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <div class="row">
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            name="actual_date_start"
-                                                            v-model="form.actualDateStart"
-                                                            :config="flatPickrConfig.actualDateStart"
-                                                            @on-change="onActualDateStartChange">
-                                                        </vue-flat-pickr>
-                                                    </div>
-                                                    <div class="col-sm-2 text-center">
-                                                        <label class="control-label">～</label>
-                                                    </div>
-                                                    <div class="col-sm-5">
-                                                        <vue-flat-pickr
-                                                            name="actual_date_end"
-                                                            v-model="form.actualDateEnd"
-                                                            :config="flatPickrConfig.actualDateEnd"
-                                                            @on-change="onActualDateEndChange">
-                                                        </vue-flat-pickr>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                <div class="stock-outer d-md-grid d-block">
+                                    <div class="form-group stock-title">
+                                        <label class="control-label">實際出庫日</label>
+                                        <div class="d-flex align-items-center">
+                                            <vue-flat-pickr
+                                                class="flex-grow-1"
+                                                name="actual_date_start"
+                                                v-model="form.actualDateStart"
+                                                :config="flatPickrConfig.actualDateStart"
+                                                @on-change="onActualDateStartChange">
+                                            </vue-flat-pickr>
+                                            <label class="control-label">～</label>
+                                            <vue-flat-pickr
+                                                class="flex-grow-1"
+                                                name="actual_date_end"
+                                                v-model="form.actualDateEnd"
+                                                :config="flatPickrConfig.actualDateEnd"
+                                                @on-change="onActualDateEndChange">
+                                            </vue-flat-pickr>
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">商品序號</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="product_no" v-model="form.productNo">
-                                            </div>
-                                        </div>
+                                    <div class="form-group stock-title">
+                                        <label class="control-label">商品序號</label>
+                                        <input type="text" class="form-control" name="product_no" v-model="form.productNo">
                                     </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">供應商</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <select2 class="form-control" :options="suppliers"
-                                                    v-model="form.supplierId" name="supplier_id">
-                                                    <option disabled value=""></option>
-                                                </select2>
-                                            </div>
-                                        </div>
+                                    <div class="form-group stock-title">
+                                        <label class="control-label">供應商</label>
+                                        <select2 class="form-control" :options="suppliers"
+                                            v-model="form.supplierId" name="supplier_id">
+                                            <option disabled value=""></option>
+                                        </select2>
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3">
-                                                <label class="control-label">查詢筆數上限</label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="limit" v-model="form.limit" readonly>
-                                            </div>
-                                        </div>
+                                <div class="stock-outer d-md-grid d-block">
+                                    <div class="form-group stock-title mb-md-0 mb-4">
+                                        <label class="control-label">查詢筆數上限</label>
+                                        <input type="text" class="form-control" name="limit" v-model="form.limit" readonly>
                                     </div>
+                                    <div class=""></div>
+                                    <div class="text-right">
+                                        <span v-if="auth.auth_query">
+                                            <button type="button" class="btn btn-warning" @click="search">
+                                                <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                            </button>
 
-                                    <div class="col-sm-4">
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <div class="col-sm-3"></div>
-                                            <div class="col-sm-9 text-right">
-                                                <span v-if="auth.auth_query">
-                                                    <button type="button" class="btn btn-warning" @click="search">
-                                                        <i class="fa-solid fa-magnifying-glass"></i> 查詢
-                                                    </button>
-
-                                                    <button type="button" class="btn btn-danger" @click="resetForm">
-                                                        <i class="fa-solid fa-eraser"></i> 清除
-                                                    </button>
-                                                </span>
-                                            </div>
-                                        </div>
+                                            <button type="button" class="btn btn-danger" @click="resetForm">
+                                                <i class="fa-solid fa-eraser"></i> 清除
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </form>

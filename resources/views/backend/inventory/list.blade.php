@@ -132,7 +132,7 @@
                                 </div>
                             </div>
                             <div class="row" style="display: flex; justify-content: space-between;">
-                                <div style="flex-grow: 1; margin-left: 15px;">
+                                <div style="flex-grow: 1;">
                                     <label
                                         class="control-label">庫存總量：{{ number_format($inventories->sum('original_stock_qty')) }}</label>
                                 </div>
