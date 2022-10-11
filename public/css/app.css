@@ -25991,6 +25991,9 @@ span.error {
     border-bottom: 1px solid #ddd;
     padding: 30px;
 }
+.page-header{
+    font-size: 36px;
+}
 
 
 .vue-treeselect__menu {
