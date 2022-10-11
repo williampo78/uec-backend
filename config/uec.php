@@ -29,18 +29,6 @@ return [
         'X' => '非人工上稿',
     ],
 
-    //  狀態
-    'active_options' => [
-        0 => '關閉',
-        1 => '啟用',
-    ],
-
-    //  狀態2
-    'active2_options' => [
-        0 => '失效',
-        1 => '生效',
-    ],
-
     // 上下架狀態
     'launch_status_options' => [
         'prepare_to_launch' => '待上架',
@@ -241,6 +229,20 @@ return [
 
     // 各種選項
     'options' => [
+        // 狀態
+        'actives' => [
+            // 類型1
+            'type1' => [
+                0 => '關閉',
+                1 => '啟用',
+            ],
+            // 類型2
+            'type2' => [
+                0 => '失效',
+                1 => '生效',
+            ],
+        ],
+
         // 庫存申請單
         'misc_stock_requests' => [
             // 申請單狀態

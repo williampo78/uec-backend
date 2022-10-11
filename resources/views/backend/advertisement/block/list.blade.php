@@ -167,8 +167,8 @@
                                                 @endisset
                                             </td>
                                             <td class="text-nowrap">
-                                                @isset(config('uec.active_options')[$obj->active])
-                                                    {{ config('uec.active_options')[$obj->active] }}
+                                                @isset(config('uec.options.actives.type1')[$obj->active])
+                                                    {{ config('uec.options.actives.type1')[$obj->active] }}
                                                 @endisset
                                             </td>
                                             <td class="text-nowrap">
