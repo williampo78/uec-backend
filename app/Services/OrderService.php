@@ -861,6 +861,7 @@ class OrderService
                     $info_array = [];
                     $show_array = [];
                     foreach ($examination_detail as $item_id => $detail) {
+                        if ($detail['status_code'] == 'VOIDED') continue; //退貨檢驗作廢，狀態回復出貨狀態
                         $info_array[] = [
                             'number_desc' => '退貨單號',
                             'number' => $detail['examination_no'],
@@ -878,7 +879,8 @@ class OrderService
                             "status_time" => $detail['T22'],
                             "status_display" => false
                         ];
-                        if ($detail['status_code'] == 'VOIDED' || ($detail['status_code'] == 'M_CLOSED' && $detail['is_returnable'] === 0)) {
+
+                        if (($detail['status_code'] == 'M_CLOSED' && $detail['is_returnable'] === 0)) {
                             $show_array[] = [
                                 "status_desc" => "退貨失敗",
                                 "status_time" => $detail['T23'],
@@ -1133,7 +1135,7 @@ class OrderService
                         $returnable['points'][$supplier] += $orderDetail->points;
                         $returnable['point_discount'][$supplier] += $orderDetail->point_discount;
                         $returnable['item_id'][$orderDetail->product_item_id] = $supplier;
-                        $returnable['detail_id'][$orderDetail->product_item_id] = $return_request_detail->id;
+                        $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id] = $return_request_detail->id;
                     }
                 });
             }
@@ -1175,7 +1177,7 @@ class OrderService
                                 // 新增退貨檢驗單明細
                                 $returnExaminationDetail = ReturnExaminationDetail::create([
                                     'return_examination_id' => $returnExamination->id,
-                                    'return_request_detail_id' => $returnable['detail_id'][$orderDetail->product_item_id],
+                                    'return_request_detail_id' => $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id],
                                     'product_item_id' => $orderDetail->product_item_id,
                                     'item_no' => $orderDetail->item_no,
                                     'request_qty' => $orderDetail->qty,
