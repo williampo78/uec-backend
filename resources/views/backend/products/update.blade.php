@@ -3,8 +3,9 @@
 @section('content')
     <style>
         .no-pa {
-                            padding: 0px;
-                    }
+            padding: 0px;
+        }
+
         .ondragover {
             background: #b7e0fb !important;
             transition: background-color 0.5s;
@@ -81,8 +82,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .form-group{
-            margin:0 0 15px 0 !important;
+
+        .form-group {
+            margin: 0 0 15px 0 !important;
         }
     </style>
     <div class="sysinfo">
@@ -157,8 +159,8 @@
                                         <label class="control-label ">商品序號</label><span class="text-red">*</span>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="product_no"
-                                            value="{{ $products->product_no }}" readonly>
+                                        <input class="form-control" name="product_no" value="{{ $products->product_no }}"
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -352,7 +354,8 @@
                                         <label class="control-label">單位<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="uom" value="{{ $products->uom }}" {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
+                                        <input class="form-control" name="uom" value="{{ $products->uom }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -362,7 +365,9 @@
                                         <label class="control-label">最小採購量</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="min_purchase_qty" type="number" min="0" value="{{ $products->min_purchase_qty }}" {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
+                                        <input class="form-control" name="min_purchase_qty" type="number"
+                                            min="0" value="{{ $products->min_purchase_qty }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -401,11 +406,13 @@
                                     <div class="col-sm-3">
                                         <input type="number" class="form-control" id="expiry_receiving_days"
                                             name="expiry_receiving_days" min="0"
-                                            value="{{ $products->expiry_receiving_days }}"  {{ $products->edit_readonly == '1' ? '' : 'readonly' }}>
+                                            value="{{ $products->expiry_receiving_days }}"
+                                            {{ $products->edit_readonly == '1' ? '' : 'readonly' }}>
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="control-label">
-                                            <a href="#" data-toggle="modal" data-target="#model_requisitions_log">請購紀錄</a>
+                                            <a href="#" data-toggle="modal"
+                                                data-target="#model_requisitions_log">請購紀錄</a>
                                         </label>
                                     </div>
                                 </div>
@@ -447,24 +454,24 @@
                                     </div>
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
-                                            <input type="radio" name="is_discontinued" id="inlineRadio1" value="1"
-                                                {{ $products->is_discontinued == '1' ? 'checked' : '' }}
+                                            <input type="radio" name="is_discontinued" id="inlineRadio1"
+                                                value="1" {{ $products->is_discontinued == '1' ? 'checked' : '' }}
                                                 {{ $products->edit_readonly == '1' && $products->is_discontinued != '1' ? 'disabled' : '' }}>
                                             是
                                         </label>
                                     </div>
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
-                                            <input type="radio" name="is_discontinued" id="inlineRadio3" value="0"
-                                                {{ $products->is_discontinued == '0' ? 'checked' : '' }}
+                                            <input type="radio" name="is_discontinued" id="inlineRadio3"
+                                                value="0" {{ $products->is_discontinued == '0' ? 'checked' : '' }}
                                                 {{ $products->edit_readonly == '1' && $products->is_discontinued != '0' ? 'disabled' : '' }}>
                                             否
                                         </label>
                                     </div>
-                                    @if($products->edit_readonly == 1)
-                                    <div class="col-sm-6">
-                                        <label class="control-label" style="color:red;">商品若要停售，須先下架，不可直接修改</label>
-                                    </div>
+                                    @if ($products->edit_readonly == 1)
+                                        <div class="col-sm-6">
+                                            <label class="control-label" style="color:red;">商品若要停售，須先下架，不可直接修改</label>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -549,11 +556,13 @@
                                     @foreach ($payment_method_options as $key => $val)
                                         <label class="radio-inline">
                                             @if ($payment_method_options_lock[$key])
-                                                <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked onclick="return false">
+                                                <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                    value="{{ $key }}" checked onclick="return false">
                                                 {{ $val }}
                                             @else
                                                 <input class="payment_method" type="checkbox" name="payment_method[]"
-                                                    value="{{ $key }}" {{in_array($key,$payment_method) ? 'checked' : '' }}>
+                                                    value="{{ $key }}"
+                                                    {{ in_array($key, $payment_method) ? 'checked' : '' }}>
                                                 {{ $val }}
                                             @endif
                                         </label>
@@ -582,7 +591,8 @@
                                     </div>
                                     <div class="col-sm-3">
                                         <label class="control-label">
-                                            <a href="#" data-toggle="modal" data-target="#model_promotional">促銷活動</a>
+                                            <a href="#" data-toggle="modal"
+                                                data-target="#model_promotional">促銷活動</a>
                                         </label>
                                     </div>
                                 </div>
@@ -606,7 +616,8 @@
                                         <label class="control-label">轉單審核人員</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input class="form-control" name="keyword" id="keyword" value="" readonly>
+                                        <input class="form-control" name="keyword" id="keyword" value=""
+                                            readonly>
                                     </div>
                                 </div>
                             </div>
@@ -712,8 +723,7 @@
                                         <label class="control-label">專利字號</label>
                                     </div>
                                     <div class="col-sm-10">
-                                        <input class="form-control" name="patent_no"
-                                            value="{{ $products->patent_no }}">
+                                        <input class="form-control" name="patent_no" value="{{ $products->patent_no }}">
                                     </div>
                                 </div>
                             </div>
@@ -769,36 +779,41 @@
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                             <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
-                                            <input type="file" @change="fileSelected" multiple>
+                                            <input type="file" style="margin-bottom: 15px;" @change="fileSelected"
+                                                multiple>
                                             <input style="display: none" type="file" :ref="'images_files'"
                                                 name="filedata[]" multiple>
+                                            <div style="display: flex; flex-wrap:wrap; gap:15px">
+                                                <div style="max-width:180px;"v-for="(image, key) in images"
+                                                    :key="key">
+                                                    <div class="thumbnail" @dragstart="drag" @dragover='dragover'
+                                                        @dragleave='dragleave' @drop="drop" :data-index="key"
+                                                        :data-type="'image'" draggable="true"
+                                                        style="pointer-events: auto;">
+                                                        <div class="img-box" style="pointer-events: none;">
+                                                            <img :ref="'image'">
+                                                        </div>
+                                                        <div class="caption" style="pointer-events: none;">
+                                                            <p class="text-overflow-p">檔案名稱: @{{ image.name }}</p>
+                                                            <p>檔案大小:@{{ image.sizeConvert }}</p>
+                                                            <p>
+                                                                排序: @{{ key + 1 }}
+                                                                <button class="btn btn-danger pull-right btn-events-none"
+                                                                    type="button" @click="delImages(key)"
+                                                                    style="pointer-events: auto;">
+                                                                    <i class="fa-solid fa-trash-can"></i>
+                                                                </button>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <textarea style="display:none;" name="imgJson" id="" cols="30" rows="10">@{{ images }}</textarea>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row form-group">
-                                <div class="col-sm-2 col-md-2" v-for="(image, key) in images" :key="key">
-                                    <div class="thumbnail" @dragstart="drag" @dragover='dragover'
-                                        @dragleave='dragleave' @drop="drop" :data-index="key" :data-type="'image'"
-                                        draggable="true" style="pointer-events: auto;">
-                                        <div class="img-box" style="pointer-events: none;">
-                                            <img :ref="'image'">
-                                        </div>
-                                        <div class="caption" style="pointer-events: none;">
-                                            <p class="text-overflow-p">檔案名稱: @{{ image.name }}</p>
-                                            <p>檔案大小:@{{ image.sizeConvert }}</p>
-                                            <p>
-                                                排序: @{{ key + 1 }}
-                                                <button class="btn btn-danger pull-right btn-events-none" type="button"
-                                                    @click="delImages(key)" style="pointer-events: auto;">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -808,254 +823,281 @@
                         <textarea style="display: none;" name="SpecListJson" id="" cols="30" rows="10">@{{ SpecList }}</textarea>
                         <div class="row form-group">
                             <div class="col-sm-12">
-                                <div class="col-sm-2 ">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="0"
-                                            v-model="products.spec_dimension"
-                                            :disabled="products.spec_dimension !== 0">
-                                        單規格
-                                    </label>
+                                <div class="col-sm-1">
+                                    <label class="control-label">商品規格<span class="text-red">*</span></label>
                                 </div>
-                                <div class="col-sm-2">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="1"
-                                            v-model="products.spec_dimension"
-                                            :disabled="products.spec_dimension == 2">
-                                        一維多規格
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label class="radio-inline">
-                                        <input type="radio" name="spec_dimension" value="2"
-                                            v-model="products.spec_dimension" >
-                                        二維多規格
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6" v-if="products.spec_dimension >= 1">
-                                <div class="col-sm-2 ">
-                                    <label class="control-label">規格一<span class="text-red">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <div class="form-group">
-                                        <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                            value="{{ $products->spec_1 }}">
+                                <div class="col-sm-11">
+                                    <div class="col-sm-12" style="margin-bottom:20px">
+                                        <div class="col-sm-2 ">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="spec_dimension" value="0"
+                                                    v-model="products.spec_dimension"
+                                                    :disabled="products.spec_dimension !== 0">
+                                                單規格
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="spec_dimension" value="1"
+                                                    v-model="products.spec_dimension"
+                                                    :disabled="products.spec_dimension == 2">
+                                                一維多規格
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="spec_dimension" value="2"
+                                                    v-model="products.spec_dimension">
+                                                二維多規格
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
 
-                            <div class="col-sm-6" v-if="products.spec_dimension == 2">
-                                <div class="col-sm-2 ">
-                                    <label class="control-label">規格二<span class="text-red">*</span></label>
-                                </div>
-                                <div class="col-sm-9">
-                                    <div class="form-group">
-                                        <input class="form-control" type="text" name="spec_2" id="spec_2"
-                                            value="{{ $products->spec_2 }}">
+                                    <div class="row form-group col-sm-12">
+                                        <div class="col-sm-6" v-if="products.spec_dimension >= 1">
+                                            <div class="col-sm-2 ">
+                                                <label class="control-label">規格一<span class="text-red">*</span></label>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <div class="form-group">
+                                                    <input class="form-control" type="text" name="spec_1"
+                                                        id="spec_1" value="{{ $products->spec_1 }}">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6" v-if="products.spec_dimension == 2">
+                                            <div class="col-sm-2 ">
+                                                <label class="control-label">規格二<span class="text-red">*</span></label>
+                                            </div>
+                                            <div class="col-sm-9">
+                                                <div class="form-group">
+                                                    <input class="form-control" type="text" name="spec_2"
+                                                        id="spec_2" value="{{ $products->spec_2 }}">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        {{-- 二維多規格 --}}
-                        <div class="row form-group">
-                            <div class="col-sm-6" v-if="products.spec_dimension >= 1">
-                                <table class="table table-striped table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>
+                                    {{-- 二維多規格 --}}
+                                    <div class="row form-group col-sm-12">
+                                        <div class="col-sm-6" v-if="products.spec_dimension >= 1">
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <button class="btn btn-primary btn-sm" type="button"
+                                                                @click="AddSpecToSkuList('1')">新增項目
+                                                            </button>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
+                                                        @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                        draggable="true" :data-index="spec_1_key" :data-type="'spec_1'">
+                                                        <td>
+                                                            <div class="col-sm-1">
+                                                                <label class="control-label">
+                                                                    <i class="fa-solid fa-list fa-lg"></i>
+                                                                </label>
+                                                            </div>
+                                                            <div class="col-sm-9">
+                                                                <div v-if="spec_1.old_spec">
+                                                                    <div class="form-group">
+                                                                        <input class="form-control spec_1_va"
+                                                                            :name="'spec_1_va[' + spec_1_key + ']'"
+                                                                            v-model="spec_1.name" data-va="spec_1_va">
+                                                                    </div>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <div class="form-group">
+                                                                        <input class="form-control spec_1_va"
+                                                                            :name="'spec_1_va[' + spec_1_key + ']'"
+                                                                            v-model="spec_1.name" data-va="spec_1_va">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-2">
+                                                                <div v-if="spec_1.old_spec">
+                                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                                        @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)"
+                                                                        disabled>刪除</button>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                                        @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button>
+                                                                </div>
+
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-sm-6" v-if="products.spec_dimension == '2'">
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <button class="btn btn-primary btn-sm" type="button"
+                                                                @click="AddSpecToSkuList('2')">新增項目
+                                                            </button>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
+                                                        @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                        draggable="true" :data-index="spec_2_key" :data-type="'spec_2'">
+                                                        <td>
+                                                            <div class="col-sm-1">
+                                                                <label class="control-label">
+                                                                    <i class="fa-solid fa-list fa-lg"></i>
+                                                                </label>
+                                                            </div>
+                                                            <div class="col-sm-9">
+                                                                <div v-if="spec_2.old_spec">
+                                                                    <div class="form-group">
+                                                                        <input class="form-control spec_2_va"
+                                                                            :name="'spec_2_va[' + spec_2_key + ']'"
+                                                                            v-model="spec_2.name" data-va="spec_2_va">
+                                                                    </div>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <div class="form-group">
+                                                                        <input class="form-control spec_2_va"
+                                                                            :name="'spec_2_va[' + spec_2_key + ']'"
+                                                                            v-model="spec_2.name" data-va="spec_2_va">
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-2">
+                                                                <div v-if="spec_2.old_spec">
+                                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                                        @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)"
+                                                                        disabled>刪除</button>
+                                                                </div>
+                                                                <div v-else>
+                                                                    <button class="btn btn-danger btn-sm" type="button"
+                                                                        @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="row form-group col-sm-12">
+                                        <div class="col-sm-6" style="margin-bottom:20px">
+                                            <div class="col-sm-2 no-pa">
+                                                <label class="control-label">安全庫存量</label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <input class="form-control" name="safty_qty_all" id="keyword"
+                                                    v-model="safty_qty_all">
+                                            </div>
+                                            <div class="cola-sm-2">
                                                 <button class="btn btn-primary btn-sm" type="button"
-                                                    @click="AddSpecToSkuList('1')">新增項目
-                                                </button>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                            :data-index="spec_1_key" :data-type="'spec_1'">
-                                            <td>
-                                                <div class="col-sm-1">
-                                                    <label class="control-label">
-                                                        <i class="fa-solid fa-list fa-lg"></i>
-                                                    </label>
-                                                </div>
-                                                <div class="col-sm-9">
-                                                    <div v-if="spec_1.old_spec">
-                                                        <div class="form-group">
-                                                            <input class="form-control spec_1_va"
-                                                                :name="'spec_1_va[' + spec_1_key + ']'"
-                                                                v-model="spec_1.name" data-va="spec_1_va">
-                                                        </div>
-                                                    </div>
-                                                    <div v-else>
-                                                        <div class="form-group">
-                                                            <input class="form-control spec_1_va"
-                                                                :name="'spec_1_va[' + spec_1_key + ']'"
-                                                                v-model="spec_1.name" data-va="spec_1_va">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <div v-if="spec_1.old_spec">
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)"
-                                                            disabled>刪除</button>
-                                                    </div>
-                                                    <div v-else>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button>
-                                                    </div>
+                                                    @click="change_safty_qty_all">套用</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <textarea style="display: none;" id="SkuListdata" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
 
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-sm-6" v-if="products.spec_dimension == '2'">
-                                <table class="table table-striped table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <button class="btn btn-primary btn-sm" type="button"
-                                                    @click="AddSpecToSkuList('2')">新增項目
-                                                </button>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2" @dragstart="drag"
-                                            @dragover='dragover' @dragleave='dragleave' @drop="drop" draggable="true"
-                                            :data-index="spec_2_key" :data-type="'spec_2'">
-                                            <td>
-                                                <div class="col-sm-1">
-                                                    <label class="control-label">
-                                                        <i class="fa-solid fa-list fa-lg"></i>
-                                                    </label>
-                                                </div>
-                                                <div class="col-sm-9">
-                                                    <div v-if="spec_2.old_spec">
-                                                        <div class="form-group">
-                                                            <input class="form-control spec_2_va"
-                                                                :name="'spec_2_va[' + spec_2_key + ']'"
-                                                                v-model="spec_2.name" data-va="spec_2_va">
-                                                        </div>
+                                    <table class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th v-if="products.spec_dimension >= 1" class="text-nowrap">規格一</th>
+                                                <th v-if="products.spec_dimension == 2" class="text-nowrap">規格二</th>
+                                                <th class="text-nowrap">Item編號</th>
+                                                <th class="text-nowrap">廠商貨號</th>
+                                                <th class="text-nowrap">國際條碼</th>
+                                                <th class="text-nowrap">POS品號<span
+                                                        class="stock_type_list text-red">*</span>
+                                                </th>
+                                                <th class="text-nowrap">安全庫存量<span class="text-red">*</span></th>
+                                                <th class="text-nowrap">是否追加<span class="text-red">*</span></th>
+                                                <th class="text-nowrap">狀態<span class="text-red">*</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(Sku, SkuKey) in SkuList">
+                                                <td v-if="products.spec_dimension >= 1">@{{ Sku.spec_1_value }}</td>
+                                                <td v-if="products.spec_dimension == 2">@{{ Sku.spec_2_value }}</td>
+                                                <td><input style="width:140px" class="form-control" v-model="Sku.item_no"
+                                                        readonly></td>
+                                                <td><input style="width:140px" class="form-control"
+                                                        v-model="Sku.supplier_item_no"
+                                                        :disabled="Sku.id !== '' && edit_readonly == 1"></td>
+                                                <td>
+                                                    <div class="form-group" style="margin-right:0px;margin-left:0px;">
+                                                        <input style="width:140px" class="form-control ean_va"
+                                                            v-model="Sku.ean" :name="'ean_va[' + SkuKey + ']'"
+                                                            :disabled="Sku.id !== '' && edit_readonly == 1">
                                                     </div>
-                                                    <div v-else>
-                                                        <div class="form-group">
-                                                            <input class="form-control spec_2_va"
-                                                                :name="'spec_2_va[' + spec_2_key + ']'"
-                                                                v-model="spec_2.name" data-va="spec_2_va"
-                                                                >
-                                                        </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group" style="margin-right:0px;margin-left:0px;">
+                                                        <input style="width: 140px" class="form-control pos_item_no_va"
+                                                            v-model="Sku.pos_item_no"
+                                                            :name="'pos_item_no[' + SkuKey + ']'"
+                                                            :data-item_no="Sku.item_no" data-va="pos_item_no"
+                                                            :disabled="Sku.id !== '' && edit_readonly == 1">
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group"
+                                                        style="margin-right:0px;margin-left:0px;width:75px">
+                                                        <input class="form-control safty_qty_va" type="number"
+                                                            min="0" v-model="Sku.safty_qty"
+                                                            :name="'safty_qty_va[' + SkuKey + ']'"
+                                                            :disabled="Sku.id !== '' && edit_readonly == 1">
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control js-select2"
+                                                        v-model="Sku.is_additional_purchase"
+                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
+                                                        <option value="1">是</option>
+                                                        <option value="0">否</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control js-select2" v-model="Sku.status"
+                                                        @change="checkItemQty($event,Sku,SkuKey)"
+                                                        {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
+                                                        <option value="1">啟用</option>
+                                                        <option value="0">停用</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
 
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <div v-if="spec_2.old_spec">
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)"
-                                                            disabled>刪除</button>
-                                                    </div>
-                                                    <div v-else>
-                                                        <button class="btn btn-danger btn-sm" type="button"
-                                                            @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+
                         </div>
-                        <div class="row form-group">
-                            <div class="col-sm-6">
-                                <div class="col-sm-2 no-pa">
-                                    <label class="control-label">安全庫存量</label>
-                                </div>
-                                <div class="col-sm-8">
-                                    <input class="form-control" name="safty_qty_all" id="keyword"
-                                        v-model="safty_qty_all">
-                                </div>
-                                <div class="cola-sm-2">
-                                    <button class="btn btn-primary btn-sm" type="button" @click="change_safty_qty_all">套用</button>
-                                </div>
-                            </div>
-                        </div>
-                        <textarea style="display: none;" id="SkuListdata" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
 
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th v-if="products.spec_dimension >= 1" class="text-nowrap">規格一</th>
-                                    <th v-if="products.spec_dimension == 2" class="text-nowrap">規格二</th>
-                                    <th class="text-nowrap">Item編號</th>
-                                    <th class="text-nowrap">廠商貨號</th>
-                                    <th class="text-nowrap">國際條碼</th>
-                                    <th class="text-nowrap">POS品號<span class="stock_type_list text-red">*</span></th>
-                                    <th class="text-nowrap">安全庫存量<span class="text-red">*</span></th>
-                                    <th class="text-nowrap">是否追加<span class="text-red">*</span></th>
-                                    <th class="text-nowrap">狀態<span class="text-red">*</span></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(Sku, SkuKey) in SkuList">
-                                    <td v-if="products.spec_dimension >= 1">@{{ Sku.spec_1_value }}</td>
-                                    <td v-if="products.spec_dimension == 2">@{{ Sku.spec_2_value }}</td>
-                                    <td><input style="min-width:120px" class="form-control" v-model="Sku.item_no" readonly></td>
-                                    <td><input style="min-width:120px" class="form-control" v-model="Sku.supplier_item_no"
-                                        :disabled="Sku.id !== '' && edit_readonly == 1"></td>
-                                    <td>
-                                        <div class="form-group" style="margin-right:0px;margin-left:0px;">
-                                            <input style="min-width:120px" class="form-control ean_va" v-model="Sku.ean"
-                                                :name="'ean_va[' + SkuKey + ']'"
-                                                :disabled="Sku.id !== '' && edit_readonly == 1"
-                                                >
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group" style="margin-right:0px;margin-left:0px;">
-                                            <input style="min-width: 120px" class="form-control pos_item_no_va" v-model="Sku.pos_item_no"
-                                                :name="'pos_item_no[' + SkuKey + ']'" :data-item_no="Sku.item_no"
-                                                data-va="pos_item_no" :disabled="Sku.id !== '' && edit_readonly == 1">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group" style="margin-right:0px;margin-left:0px;">
-                                            <input class="form-control safty_qty_va" type="number" min="0"
-                                                v-model="Sku.safty_qty" :name="'safty_qty_va[' + SkuKey + ']'"
-                                                :disabled="Sku.id !== '' && edit_readonly == 1">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <select class="form-control js-select2" v-model="Sku.is_additional_purchase"
-                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
-                                            <option value="1">是</option>
-                                            <option value="0">否</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="form-control js-select2" v-model="Sku.status"
-                                            @change="checkItemQty($event,Sku,SkuKey)"
-                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
-                                            <option value="1">啟用</option>
-                                            <option value="0">停用</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
                 {{-- 二維多規格結束 --}}
-                <button class="btn btn-large btn-success" type="button" id="save_data">
-                    <i class="fa-solid fa-floppy-disk"></i> 儲存
-                </button>
-                <a class="btn btn-danger" href="{{ URL::previous() }}">
-                    <i class="fa-solid fa-ban"></i> 取消
-                </a>
+                <div class="row" style="margin-bottom:15px">
+                    <div class="col-sm-12">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-11">
+
+                            <button class="btn btn-large btn-success" type="button" id="save_data">
+                                <i class="fa-solid fa-floppy-disk"></i> 儲存
+                            </button>
+                            <a class="btn btn-danger" href="{{ URL::previous() }}">
+                                <i class="fa-solid fa-ban"></i> 取消
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </form>
             {{-- 修改紀錄 --}}
             @include('backend.products.models.model_update_log')
@@ -1109,11 +1151,11 @@
                     let edit_readonly = this.edit_readonly;
 
                     this.SkuList.map(function(value, key) {
-                        if(edit_readonly == 1 ){
-                            if(value.id == ''){
+                        if (edit_readonly == 1) {
+                            if (value.id == '') {
                                 value.safty_qty = change_num;
                             }
-                        }else{
+                        } else {
                             value.safty_qty = change_num;
                         }
                     });
