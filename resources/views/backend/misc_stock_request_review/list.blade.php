@@ -1,19 +1,16 @@
 @extends('backend.layouts.master')
 
 @section('title', '進貨退出單審核')
-
+@section('css')
+    <style>
+        .list-content{ grid-template-columns: repeat(3,110px 1fr); color: #333333; border: 1px solid #DDDDDD; border-radius: 2px; margin-bottom: 0; width: 100%;}
+        .list-content dt,.label-title{ padding: 10px; background-color: #F5F5F5; border-bottom:  1px solid #DDDDDD; width: 100%; margin-bottom: 0;}
+        .list-content dd,.label-content{ padding: 10px; border-bottom:  1px solid #DDDDDD;}
+        .column-full{ grid-column: 2/7;}
+        .check-content{ display: grid; grid-template-columns: 110px 1fr; color: #333333; border: 1px solid #DDDDDD; border-radius: 2px; margin-bottom: 0; width: 100%; }
+    </style>
+@endsection
 @section('content')
-    
-<style>
-    .list-content{ display: grid; grid-template-columns: repeat(3,110px 1fr); color: #333333; border: 1px solid #DDDDDD; border-radius: 2px; margin-bottom: 0; width: 100%;}
-    .list-content dt,.label-title{ padding: 10px; background-color: #F5F5F5; border-bottom:  1px solid #DDDDDD; width: 100%; margin-bottom: 0;}
-    .list-content dd,.label-content{ padding: 10px; border-bottom:  1px solid #DDDDDD;}
-    .border-none{ border: none!important;}
-    .column-full{ grid-column: 2/7;}
-    .check-content{
-        display: grid; grid-template-columns: 110px 1fr; color: #333333; border: 1px solid #DDDDDD; border-radius: 2px; margin-bottom: 0; width: 100%;
-    }
-</style>
     <div id="app" v-cloak>
         <div id="page-wrapper">
             <div class="row">
@@ -26,12 +23,12 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" style="padding: 15px;">
                             <form id="search-form" method="get" action="">
-                                <div  style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 15px"  class="block">
-                                    <div  class="form-group mb-1" style="display: grid; grid-template-columns: 110px 1fr; align-items: center;margin-bottom: 0;" >
+                                <div  style="grid-template-columns: 1fr 2fr auto; gap: 15px"  class="d-block d-md-grid">
+                                    <div  class="form-group mb-4" style="display: grid; grid-template-columns: 110px 1fr; align-items: center;margin-bottom: 0;" >
                                         <label class="control-label">退出單號</label>
                                         <input type="text" class="form-control" name="request_no" v-model="form.requestNo">
                                     </div>
-                                    <div class="form-group mb-1" style="margin-right: 0; margin-left: 0; margin-bottom: 0; display: grid; grid-template-columns: 110px 1fr; align-items: center;">
+                                    <div class="form-group mb-4" style="margin-right: 0; margin-left: 0; margin-bottom: 0; display: grid; grid-template-columns: 110px 1fr; align-items: center;">
                                         <label class="control-label">送審時間</label>
                                         <div style="display: flex; align-items: center;">
                                             <vue-flat-pickr

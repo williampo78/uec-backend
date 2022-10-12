@@ -148,25 +148,19 @@
                             <hr style="border-top: 1px solid gray" />
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        @click="checkAll"
-                                    >
-                                        <i class="fa-solid fa-check"></i> 全勾選
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        @click="cancelAll"
-                                    >
-                                        <i class="fa-solid fa-xmark"></i> 全取消
-                                    </button>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="reviewResult" value="CHECK"
+                                           @change="checkAll">全勾選
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="reviewResult" value="CANCEL"
+                                            @change="cancelAll">全取消
+                                    </label>
                                 </div>
                             </div>
                             <br />
 
-                            <div class="table-responsive">
+                            <div class="table-responsive overflow-scroll" style="max-height: 50vh;">
                                 <table
                                     class="table table-striped table-bordered table-hover"
                                     style="width: 100%"
