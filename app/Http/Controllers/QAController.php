@@ -82,7 +82,7 @@ class QAController extends Controller
         $payloads = [
             'description' => $web_content->description,
             'sort' => $web_content->sort,
-            'active' => config('uec.active_options')[$web_content->active] ?? null,
+            'active' => config('uec.options.actives.type1')[$web_content->active] ?? null,
             'content_name' => $web_content->content_name,
             'content_text' => $web_content->content_text,
         ];

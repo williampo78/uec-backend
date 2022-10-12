@@ -101,7 +101,7 @@ class PromotionalCampaignService
                 'id' => $campaign->id,
                 'campaign_name' => $campaign->campaign_name,
                 'campaign_type' => null,
-                'active' => config('uec.active2_options')[$campaign->active] ?? null,
+                'active' => config('uec.options.actives.type2')[$campaign->active] ?? null,
                 'start_at' => Carbon::parse($campaign->start_at)->format('Y-m-d H:i:s'),
                 'end_at' => Carbon::parse($campaign->end_at)->format('Y-m-d H:i:s'),
             ];
@@ -151,7 +151,7 @@ class PromotionalCampaignService
         $result = [
             'id' => $campaign->id,
             'campaign_name' => $campaign->campaign_name,
-            'active' => config('uec.active2_options')[$campaign->active] ?? null,
+            'active' => config('uec.options.actives.type2')[$campaign->active] ?? null,
             'campaign_type' => $campaign->campaign_type,
             'display_campaign_type' => null,
             'n_value' => $campaign->n_value,
@@ -899,7 +899,7 @@ class PromotionalCampaignService
         $result = [
             'id' => $campaign->id,
             'campaign_name' => $campaign->campaign_name,
-            'active' => config('uec.active2_options')[$campaign->active] ?? null,
+            'active' => config('uec.options.actives.type2')[$campaign->active] ?? null,
             'campaign_type' => $campaign->campaign_type,
             'display_campaign_type' => null,
             'n_value' => $campaign->n_value,

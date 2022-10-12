@@ -50,7 +50,7 @@ class PromotionalCampaignCartController extends Controller
         ]);
 
         // 狀態
-        $result['activeOptions'] = config('uec.active2_options');
+        $result['activeOptions'] = config('uec.options.actives.type2');
 
         // 網址列參數不足
         if (count($queryData) > 0) {

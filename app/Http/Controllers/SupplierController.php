@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Supplier\Index;
 use App\Services\LookupValuesVService;
 use App\Services\SupplierService;
 use App\Services\SupplierTypeService;
@@ -30,16 +31,23 @@ class SupplierController extends Controller
      */
     public function index(Request $request)
     {
-        $queryData = $request->query();
+        $requestPayload = $request->only([
+            'supplier_type_id',
+            'display_number_or_name',
+            'company_number',
+            'active',
+        ]);
 
-        $result = [];
-        // 供應商類別
-        $result['supplierTypes'] = $this->supplierTypeService->getSupplierTypes();
-        // 狀態
-        $result['activeOptions'] = config('uec.active_options');
-        $result['suppliers'] = $this->supplierService->getTableList($queryData);
+        $suppliers = $this->supplierService->getList($requestPayload);
+        $responsePayload = [
+            'supplier_types' => $this->supplierTypeService->getSupplierTypes(),
+            'auth' => $request->share_role_auth,
+            'suppliers' => Index\SupplierResource::collection($suppliers),
+        ];
 
-        return view('backend.supplier.list', $result);
+        return view('backend.supplier.list', [
+            'payload' => $responsePayload,
+        ]);
     }
 
     /**
@@ -55,12 +63,6 @@ class SupplierController extends Controller
         $result['paymentTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'PAYMENT_TERMS',
         ]);
-        // 稅別
-        $result['taxTypeOptions'] = config('uec.tax_type_options');
-        // 狀態
-        $result['activeOptions'] = config('uec.active_options');
-        // 合約狀態
-        $result['supplierContractStatusCodeOptions'] = config('uec.supplier_contract_status_code_options');
         // 供應商合約條款
         $result['supplierContractTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'SUPPLIER_CONTRACT_TERMS',
@@ -105,12 +107,6 @@ class SupplierController extends Controller
         $result['paymentTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'PAYMENT_TERMS',
         ]);
-        // 稅別
-        $result['taxTypeOptions'] = config('uec.tax_type_options');
-        // 狀態
-        $result['activeOptions'] = config('uec.active_options');
-        // 合約狀態
-        $result['supplierContractStatusCodeOptions'] = config('uec.supplier_contract_status_code_options');
         // 供應商合約條款
         $result['supplierContractTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'SUPPLIER_CONTRACT_TERMS',
@@ -135,12 +131,6 @@ class SupplierController extends Controller
         $result['paymentTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'PAYMENT_TERMS',
         ]);
-        // 稅別
-        $result['taxTypeOptions'] = config('uec.tax_type_options');
-        // 狀態
-        $result['activeOptions'] = config('uec.active_options');
-        // 合約狀態
-        $result['supplierContractStatusCodeOptions'] = config('uec.supplier_contract_status_code_options');
         // 供應商合約條款
         $result['supplierContractTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'SUPPLIER_CONTRACT_TERMS',
