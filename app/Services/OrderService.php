@@ -820,6 +820,7 @@ class OrderService
         if (isset($return_examination_info)) {
             $voided_count = 0;
             $exam_count = 0;
+            $closed_count = 0;
             foreach ($return_examination_info as $return_detail) {
                 $return_type = false;
                 if ($return_detail->return_requests_status != 'COMPLETED' && $return_detail->return_requests_status != 'VOIDED') { //未結案，退貨取消
@@ -828,6 +829,9 @@ class OrderService
                 if ($return_detail->return_requests_status == 'VOIDED') { //退貨取消，狀態回復出貨狀態
                     $voided_count++;
                     continue;
+                }
+                if ($return_detail->return_requests_status == 'CLOSED') { //退貨取消，狀態回復出貨狀態
+                    $closed_count++;
                 }
                 $T21 = ($return_detail->created_at) ? Carbon::parse($return_detail->created_at)->format('Y-m-d H:i') : null;//退貨檢驗單 產生時間
                 if ($order->ship_from_whs == 'SELF') {
@@ -920,7 +924,7 @@ class OrderService
                     }
                 }
             }
-            if ($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
+            if (($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) || $closed_count >0) { //已取消退貨 (進入挑品頁)
                 $shipment_status['can_return_order']['type'] = 3;
                 $shipment_status['can_return_order']['status'] = true;
             } elseif ($exam_count > 0) { //有退貨申請未完成的
