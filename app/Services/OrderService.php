@@ -817,7 +817,6 @@ class OrderService
             $shipment_status['can_return_order']['type'] = $can_return_order['type'];
             $shipment_status['can_return_order']['status'] = $can_return_order['status'];
         }
-
         if (isset($return_examination_info)) {
             $voided_count = 0;
             $exam_count = 0;
@@ -926,7 +925,7 @@ class OrderService
                 $shipment_status['can_return_order']['status'] = true;
             } elseif ($exam_count > 0) { //有退貨申請未完成的
                 $shipment_status['can_return_order']['type'] = 2;
-                $shipment_status['can_return_order']['status'] = false;
+                $shipment_status['can_return_order']['status'] = true;
             }
         }
 
