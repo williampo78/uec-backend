@@ -3,10 +3,8 @@
 @section('title', '供應商主檔管理')
 
 @section('content')
-    <div id="app">
-        <!--新增-->
+    <div id="app" v-cloak>
         <div id="page-wrapper">
-            <!-- 表頭名稱 -->
             <div class="row">
                 <div class="col-sm-12">
                     <h1 class="page-header"><i class="fa-solid fa-truck"></i> 供應商主檔管理</h1>
@@ -15,7 +13,6 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default">
-                        <!-- 功能按鈕(新增) -->
                         <div class="panel-heading">
                             <form id="search-form" class="form-horizontal" method="get" action="">
                                 <div class="row">
@@ -25,7 +22,12 @@
                                                 <label class="control-label">供應商類別</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select2 class="form-control" :options="supplierTypes" v-model="form.supplierTypeId" name="supplier_type_id">
+                                                <select2
+                                                    class="form-control"
+                                                    :options="supplierTypes"
+                                                    v-model="form.supplierTypeId"
+                                                    name="supplier_type_id"
+                                                >
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -38,8 +40,13 @@
                                                 <label class="control-label">供應商</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="display_number_or_name"
-                                                    v-model="form.displayNumberOrName" placeholder="模糊查詢" />
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    name="display_number_or_name"
+                                                    v-model="form.displayNumberOrName"
+                                                    placeholder="模糊查詢"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -50,8 +57,12 @@
                                                 <label class="control-label">統一編號</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="company_number"
-                                                    v-model="form.companyNumber" />
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    name="company_number"
+                                                    v-model="form.companyNumber"
+                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -64,7 +75,12 @@
                                                 <label class="control-label">狀態</label>
                                             </div>
                                             <div class="col-sm-9">
-                                                <select2 class="form-control" :options="activeOptions" v-model="form.active" name="active">
+                                                <select2
+                                                    class="form-control"
+                                                    :options="activeOptions"
+                                                    v-model="form.active"
+                                                    name="active"
+                                                >
                                                     <option disabled value=""></option>
                                                 </select2>
                                             </div>
@@ -75,15 +91,15 @@
                                         <div class="form-group">
                                             <div class="col-sm-3"></div>
                                             <div class="col-sm-9 text-right">
-                                                @if ($share_role_auth['auth_query'])
-                                                    <button type="button" class="btn btn-danger" @click="resetForm">
-                                                        <i class="fa-solid fa-eraser"></i> 清除
-                                                    </button>
-
+                                                <span v-if="auth.authQuery">
                                                     <button class="btn btn-warning">
                                                         <i class="fa-solid fa-magnifying-glass"></i> 查詢
                                                     </button>
-                                                @endif
+
+                                                    <button type="button" class="btn btn-danger" @click="resetForm">
+                                                        <i class="fa-solid fa-eraser"></i> 清除
+                                                    </button>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -91,17 +107,14 @@
                             </form>
                         </div>
 
-                        <!-- Table list -->
                         <div class="panel-body">
                             <div class="row">
-                                @if ($share_role_auth['auth_create'])
-                                    <div class="col-sm-2">
-                                        <a href="{{ route('supplier.create') }}" class="btn btn-block btn-warning btn-sm"
-                                            id="btn-create">
-                                            <i class="fa-solid fa-plus"></i> 新增
-                                        </a>
-                                    </div>
-                                @endif
+                                <div class="col-sm-2" v-if="auth.authCreate">
+                                    <a :href="`${BASE_URI}/create`"
+                                        class="btn btn-block btn-warning btn-sm">
+                                        <i class="fa-solid fa-plus"></i> 新增
+                                    </a>
+                                </div>
                             </div>
                             <hr />
                             <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
@@ -121,44 +134,32 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($suppliers as $supplier)
-                                            <tr>
-                                                <td>
-                                                    @if ($share_role_auth['auth_query'])
-                                                        <a class="btn btn-info btn-sm"
-                                                            href="{{ route('supplier.show', $supplier->id) }}" title="檢視">
-                                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                                        </a>
-                                                    @endif
+                                        <tr v-for="(supplier, index) in suppliers" :key="index">
+                                            <td>
+                                                <span v-if="auth.authQuery">
+                                                    <a class="btn btn-info btn-sm"
+                                                        :href="`${BASE_URI}/${supplier.id}`" title="檢視">
+                                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                                    </a>
+                                                </span>
 
-                                                    @if ($share_role_auth['auth_update'])
-                                                        <a class="btn btn-info btn-sm"
-                                                            href="{{ route('supplier.edit', $supplier->id) }}">
-                                                            <i class="fa-solid fa-pencil"></i>
-                                                            編輯
-                                                        </a>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $supplier->display_number }}</td>
-                                                <td>{{ $supplier->company_number }}</td>
-                                                <td>{{ $supplier->short_name }}</td>
-                                                <td>{{ $supplier->name }}</td>
-                                                <td>
-                                                    @if ($supplier->active)
-                                                        啟用
-                                                    @else
-                                                        關閉
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @isset($supplier->paymentTerm)
-                                                        {{ $supplier->paymentTerm->description }}
-                                                    @endisset
-                                                </td>
-                                                <td>{{ $supplier->telephone }}</td>
-                                                <td>{{ $supplier->address }}</td>
-                                            </tr>
-                                        @endforeach
+                                                <span v-if="auth.authUpdate">
+                                                    <a class="btn btn-info btn-sm"
+                                                        :href="`${BASE_URI}/${supplier.id}/edit`">
+                                                        <i class="fa-solid fa-pencil"></i>
+                                                        編輯
+                                                    </a>
+                                                </span>
+                                            </td>
+                                            <td>@{{ supplier.displayNumber }}</td>
+                                            <td>@{{ supplier.companyNumber }}</td>
+                                            <td>@{{ supplier.shortName }}</td>
+                                            <td>@{{ supplier.name }}</td>
+                                            <td>@{{ supplier.activeName }}</td>
+                                            <td>@{{ supplier.paymentTermName }}</td>
+                                            <td>@{{ supplier.telephone }}</td>
+                                            <td>@{{ supplier.address }}</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -172,24 +173,41 @@
 
 @section('js')
     <script>
+        const BASE_URI = '/backend/supplier';
+
         let vm = new Vue({
             el: "#app",
-            data: {
-                form: {
-                    supplierTypeId: null,
-                    displayNumberOrName: "",
-                    companyNumber: "",
-                    active: null,
-                },
-                supplierTypes: [],
-                activeOptions: [],
+            data() {
+                return {
+                    form: {
+                        supplierTypeId: null,
+                        displayNumberOrName: "",
+                        companyNumber: "",
+                        active: null,
+                    },
+                    supplierTypes: [],
+                    activeOptions: [
+                        {
+                            id: 1,
+                            text: "啟用",
+                        },
+                        {
+                            id: 0,
+                            text: "關閉",
+                        },
+                    ],
+                    suppliers: [],
+                    auth: {},
+                };
             },
             created() {
-                let supplierTypes = @json($supplierTypes);
-                let activeOptions = @json($activeOptions);
+                this.BASE_URI = BASE_URI;
+                let payload = @json($payload);
+                payload = camelcaseKeys(payload, { deep: true });
 
-                if (supplierTypes) {
-                    supplierTypes.forEach(supplierType => {
+                // 供應商類別
+                if (!_.isEmpty(payload.supplierTypes)) {
+                    payload.supplierTypes.forEach(supplierType => {
                         this.supplierTypes.push({
                             text: supplierType.name,
                             id: supplierType.id,
@@ -197,28 +215,34 @@
                     });
                 }
 
-                if (activeOptions) {
-                    Object.entries(activeOptions).forEach(([key, activeOption]) => {
-                        this.activeOptions.push({
-                            text: activeOption,
-                            id: parseInt(key),
-                        });
-                    });
+                // 權限
+                if (payload.auth) {
+                    this.auth = payload.auth;
                 }
 
-                this.form.supplierTypeId = "{{ request()->input('supplier_type_id') }}";
-                this.form.supplierTypeId = this.form.supplierTypeId ? parseInt(this.form.supplierTypeId) : null;
-                this.form.displayNumberOrName = "{{ request()->input('display_number_or_name') }}";
-                this.form.companyNumber = "{{ request()->input('company_number') }}";
-                this.form.active = "{{ request()->input('active') }}";
-                this.form.active = this.form.active ? parseInt(this.form.active) : null;
+                // 供應商
+                if (!_.isEmpty(payload.suppliers)) {
+                    this.suppliers = payload.suppliers;
+                }
+
+                this.setQueryParameters();
             },
             methods: {
                 resetForm() {
-                    let self = this;
+                    this.form = this.$options.data().form;
+                },
+                setQueryParameters() {
+                    const urlSearchParams = new URLSearchParams(window.location.search);
+                    const params = Object.fromEntries(urlSearchParams.entries());
 
-                    Object.keys(self.form).forEach(function(value, index) {
-                        self.form[value] = "";
+                    urlSearchParams.forEach((value, key) => {
+                        let formKey = _.camelCase(key);
+
+                        if (!this.form.hasOwnProperty(formKey)) {
+                            return;
+                        }
+
+                        this.form[formKey] = value;
                     });
                 },
             },

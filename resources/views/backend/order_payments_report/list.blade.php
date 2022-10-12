@@ -94,8 +94,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <br />
-                            <br />
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="col-sm-3"></div>

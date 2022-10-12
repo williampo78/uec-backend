@@ -8,125 +8,91 @@
             </div>
 
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">退出單號</label>
-                            <p class="form-control-static">@{{ modal.show.requestNo }}</p>
-                        </div>
+                <div class="stock-viewer d-block d-md-grid">
+                    <div class="form-group viewer-title mb-0">
+                        <label class="control-label label-title">退出單號</label>
+                        <p class="form-control-static label-content">@{{ modal.show.requestNo }}</p>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">庫別</label>
-                            <p class="form-control-static">@{{ modal.show.warehouseName }}</p>
-                        </div>
+                    <div class="form-group viewer-title mb-0">
+                        <label class="control-label label-title">庫別</label>
+                        <p class="form-control-static label-content">@{{ modal.show.warehouseName }}</p>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">申請總量</label>
-                            <p class="form-control-static">@{{ modal.show.expectedQty }}</p>
-                        </div>
+                    <div class="form-group viewer-title mb-0">
+                        <label class="control-label label-title">申請總量</label>
+                        <p class="form-control-static label-content">@{{ modal.show.expectedQty }}</p>
                     </div>
+                        <div class="form-group viewer-title mb-0">
+                            <label class="control-label label-title">申請時間</label>
+                            <p class="form-control-static label-content">@{{ modal.show.requestDate }}</p>
+                        </div>
+                        <div class="form-group viewer-title mb-0">
+                            <label class="control-label label-title">送審時間</label>
+                            <p class="form-control-static label-content">@{{ modal.show.submittedAt }}</p>
+                        </div>
+                        <div class="form-group viewer-title mb-0">
+                            <label class="control-label label-title">預計出庫日</label>
+                            <p class="form-control-static label-content">@{{ modal.show.expectedDate }}</p>
+                        </div>
+                        <div class="form-group viewer-title mb-0">
+                            <label class="control-label label-title">稅別</label>
+                            <p class="form-control-static label-content">@{{ modal.show.tax }}</p>
+                        </div>
+                        <div class="form-group viewer-title mb-0">
+                            <label class="control-label label-title">申請稅額</label>
+                            <p class="form-control-static label-content">@{{ modal.show.expectedTaxAmount }}</p>
+                        </div>
+                        <div class="form-group viewer-title mb-0">
+                            <label class="control-label label-title">申請總金額</label>
+                            <p class="form-control-static label-content">@{{ modal.show.expectedAmount }}</p>
+                        </div>
+                        <div class="form-group viewer-title mb-0 column-full border-0">
+                            <label class="control-label label-title">備註</label>
+                            <p class="form-control-static label-content">@{{ modal.show.remark }}</p>
+                        </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">申請時間</label>
-                            <p class="form-control-static">@{{ modal.show.requestDate }}</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">送審時間</label>
-                            <p class="form-control-static">@{{ modal.show.submittedAt }}</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">預計出庫日</label>
-                            <p class="form-control-static">@{{ modal.show.expectedDate }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">稅別</label>
-                            <p class="form-control-static">@{{ modal.show.tax }}</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">申請稅額</label>
-                            <p class="form-control-static">@{{ modal.show.expectedTaxAmount }}</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">申請總金額</label>
-                            <p class="form-control-static">@{{ modal.show.expectedAmount }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <label class="control-label">備註</label>
-                            <p class="form-control-static" style="white-space: pre-wrap">@{{ modal.show.remark }}</p>
-                        </div>
-                    </div>
-                </div>
+
                 <hr style="border-top: 1px solid gray;">
 
-                <h4>物流資訊</h4>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">收件人</label>
-                            <p class="form-control-static">@{{ modal.show.shipToName }}</p>
+                <div class="viewer-outer d-block d-md-grid">
+                    <div>
+                        <h5 class="fs-4 fw-bold">物流資訊</h5>
+                        <div class="viewer-inner d-block d-md-grid">
+                            <div class="form-group viewer-title mb-0">
+                                <label class="control-label label-title">收件人</label>
+                                <p class="form-control-static label-content">@{{ modal.show.shipToName }}</p>
+                            </div>
+                            <div class="form-group viewer-title mb-0">
+                                <label class="control-label label-title">聯絡電話</label>
+                                <p class="form-control-static label-content">@{{ modal.show.shipToMobile }}</p>
+                            </div>
+                            <div class="form-group viewer-title mb-0 border-0" style="grid-column: 1/3;">
+                                <label class="control-label label-title">地址</label>
+                                <p class="form-control-static label-content">@{{ modal.show.shipToAddress }}</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">聯絡電話</label>
-                            <p class="form-control-static">@{{ modal.show.shipToMobile }}</p>
+                    <div>
+                        <h5 class="fs-4 fw-bold">倉庫回報資訊</h5>
+                        <div class="viewer-inner d-block d-md-grid">
+                            <div class="form-group viewer-title mb-0">
+                                <label class="control-label  label-title">實際出庫日</label>
+                                <p class="form-control-static label-content">@{{ modal.show.actualDate }}</p>
+                            </div>
+                            <div class="form-group viewer-title mb-0">
+                                <label class="control-label  label-title">實退稅額</label>
+                                <p class="form-control-static label-content">@{{ modal.show.actualTaxAmount }}</p>
+                            </div>
+                            <div class="form-group viewer-title mb-0 border-0" style="grid-column: 1/3;">
+                                <label class="control-label label-title">實退總金額</label>
+                                <p class="form-control-static label-content">@{{ modal.show.actualAmount }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            <label class="control-label">地址</label>
-                            <p class="form-control-static">@{{ modal.show.shipToAddress }}</p>
-                        </div>
-                    </div>
-                </div>
+
                 <hr style="border-top: 1px solid gray;">
 
-                <h4>倉庫回報資訊</h4>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">實際出庫日</label>
-                            <p class="form-control-static">@{{ modal.show.actualDate }}</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">實退稅額</label>
-                            <p class="form-control-static">@{{ modal.show.actualTaxAmount }}</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="form-group">
-                            <label class="control-label">實退總金額</label>
-                            <p class="form-control-static">@{{ modal.show.actualAmount }}</p>
-                        </div>
-                    </div>
-                </div>
-                <hr style="border-top: 1px solid gray;">
-
-                <h4>商品明細</h4>
+                <h5 class="fs-4 fw-bold">商品明細</h5>
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered" style="width:100%">
                         <thead>
