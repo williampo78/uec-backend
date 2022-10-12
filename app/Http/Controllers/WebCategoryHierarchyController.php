@@ -55,6 +55,7 @@ class WebCategoryHierarchyController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $request->merge(json_decode($request->data, true));
         $requestPayload = $request->only([
             'category_name',
             'category_level',
@@ -109,6 +110,7 @@ class WebCategoryHierarchyController extends Controller
      */
     public function update(Request $request, $id): JsonResponse
     {
+        $request->merge(json_decode($request->data, true));
         $requestPayload = $request->only([
             'category_name',
             'gross_margin_threshold',
