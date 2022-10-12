@@ -156,7 +156,7 @@ class OrderService
             'returnOrderDetails.productItem',
             'returnOrderDetails.productItem.product',
             'returnOrderDetails.promotionalCampaign',
-            ]);
+        ]);
 
         $order = $order->find($id);
 
@@ -1132,8 +1132,8 @@ class OrderService
                             'updated_by' => -1,
                         ]);
                         $returnable['amount'][$supplier] += ($orderDetail->subtotal + $orderDetail->point_discount);
-                        $returnable['points'][$supplier] += $orderDetail->points;
-                        $returnable['point_discount'][$supplier] += $orderDetail->point_discount;
+                        $returnable['points'][$supplier] += abs($orderDetail->points); //正數呈現
+                        $returnable['point_discount'][$supplier] += abs($orderDetail->point_discount); ////正數呈現
                         $returnable['item_id'][$orderDetail->product_item_id] = $supplier;
                         $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id] = $return_request_detail->id;
                     }
@@ -1150,8 +1150,7 @@ class OrderService
             $exam_payload = [];
             foreach ($returnable['amount'] as $supplier_id => $returnableVal) {
                 // 新增退貨檢驗單
-                $random_string = Str::upper(Str::random(6));
-                $examination_no = 'RX' . $now->format('ymd') . $random_string;
+                $examination_no = ColumnNumberGenerator::make(new ReturnExamination(), 'examination_no')->generate('RX', 6, true, date("ymd"), 'number');
                 $returnExamination = ReturnExamination::create([
                     'return_request_id' => $returnRequest->id,
                     'examination_no' => $examination_no,
@@ -1163,6 +1162,9 @@ class OrderService
                     'returnable_amount' => ($returnable['amount'][$supplier_id] * -1),
                     'returnable_points' => $returnable['points'][$supplier_id],
                     'returnable_point_discount' => $returnable['point_discount'][$supplier_id],
+                    'expected_ret_amount' => ($returnable['amount'][$supplier_id] * -1),
+                    'expected_ret_points' => $returnable['points'][$supplier_id],
+                    'expected_ret_point_discount' => $returnable['point_discount'][$supplier_id],
                     'created_by' => -1,
                     'updated_by' => -1,
                 ]);
@@ -1199,7 +1201,7 @@ class OrderService
                     });
                 }
                 //依主從商品排序
-                array_multisort(array_column($msg['examination'][$returnExamination->examination_no], 'record_identity'), SORT_DESC,$msg['examination'][$returnExamination->examination_no]);
+                array_multisort(array_column($msg['examination'][$returnExamination->examination_no], 'record_identity'), SORT_DESC, $msg['examination'][$returnExamination->examination_no]);
             }
             // 更新訂單
             Order::findOrFail($order->id)
